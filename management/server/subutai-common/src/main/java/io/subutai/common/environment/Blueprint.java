@@ -1,4 +1,4 @@
-package io.subutai.core.strategy.api;
+package io.subutai.common.environment;
 
 
 import java.util.Collections;
@@ -35,15 +35,15 @@ public class Blueprint
     @JsonProperty( "nodes" )
     private List<NodeSchema> nodes;
 
-    @JsonProperty( "sshGroupId" )
-    private int sshGroupId;
+//    @JsonProperty( "sshGroupId" )
+//    private int sshGroupId;
+//
+//    @JsonProperty( "hostGroupId" )
+//    private int hostGroupId;
 
-    @JsonProperty( "hostGroupId" )
-    private int hostGroupId;
 
-
-    public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshGroupId" ) final int sshGroupId,
-                      @JsonProperty( "hostGroupId" ) final int hostGroupId,
+    public Blueprint( @JsonProperty( "name" ) final String name,/*, @JsonProperty( "sshGroupId" ) final int sshGroupId,
+                      @JsonProperty( "hostGroupId" ) final int hostGroupId,*/
                       @JsonProperty( "nodes" ) List<NodeSchema> nodes )
     {
 
@@ -52,8 +52,8 @@ public class Blueprint
 
         this.id = UUID.randomUUID();
         this.name = name;
-        this.sshGroupId = sshGroupId;
-        this.hostGroupId = hostGroupId;
+//        this.sshGroupId = sshGroupId;
+//        this.hostGroupId = hostGroupId;
         this.nodes = nodes;
     }
 
@@ -82,14 +82,14 @@ public class Blueprint
     }
 
 
-    public int getSshGroupId()
-    {
-        return sshGroupId;
-    }
-
-
-    public int getHostGroupId()
-    {
-        return hostGroupId;
-    }
+//    public int getSshGroupId()
+//    {
+//        return sshGroupId;
+//    }
+//
+//
+//    public int getHostGroupId()
+//    {
+//        return hostGroupId;
+//    }
 }

@@ -39,8 +39,8 @@ public class Node
     private String peerId;
 
     @GsonRequired
-    @JsonProperty( "hostId" )
-    private String hostId;
+    @JsonProperty( "resourceHostId" )
+    private String resourceHostId;
 
     @GsonRequired
     @JsonProperty( "hostname" )
@@ -56,7 +56,7 @@ public class Node
                  @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
                  @JsonProperty( "sshGroupId" ) final int sshGroupId,
                  @JsonProperty( "hostsGroupId" ) final int hostsGroupId, @JsonProperty( "peerId" ) final String peerId,
-                 @JsonProperty( "hostId" ) final String hostId )
+                 @JsonProperty( "resourceHostId" ) final String resourceHostId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
@@ -70,7 +70,7 @@ public class Node
         this.sshGroupId = sshGroupId;
         this.hostsGroupId = hostsGroupId;
         this.peerId = peerId;
-        this.hostId = hostId;
+        this.resourceHostId = resourceHostId;
     }
 
 
@@ -110,9 +110,9 @@ public class Node
     }
 
 
-    public String getHostId()
+    public String getResourceHostId()
     {
-        return hostId;
+        return resourceHostId;
     }
 
 
@@ -126,7 +126,7 @@ public class Node
         sb.append( ", sshGroupId=" ).append( sshGroupId );
         sb.append( ", hostsGroupId=" ).append( hostsGroupId );
         sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", hostId='" ).append( hostId ).append( '\'' );
+        sb.append( ", resourceHostId='" ).append( resourceHostId ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
     }

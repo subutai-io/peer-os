@@ -59,7 +59,7 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.NodeSchema;
+import io.subutai.common.environment.NodeSchema;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.strategy.api.UnlimitedStrategy;
 
@@ -143,6 +143,8 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            checkName( name );
+
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
@@ -151,14 +153,15 @@ public class RestServiceImpl implements RestService
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-            Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+            Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
 
             eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, (e.getMessage() == null ?
-                    "Internal error" : e.getMessage()) ) ).build();
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, ( e.getMessage() == null ? "Internal error" : e.getMessage() ) ) )
+                           .build();
         }
 
         return Response.ok( JsonUtil.toJson( eventId ) ).build();
@@ -172,9 +175,11 @@ public class RestServiceImpl implements RestService
 
         try
         {
+            checkName( name );
+
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
 
-            Topology topology = new Topology( name, 0, 0 );
+            Topology topology = new Topology( name );
 
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
@@ -215,7 +220,7 @@ public class RestServiceImpl implements RestService
                 final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
                 final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-                topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+                topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
 
             eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
@@ -247,7 +252,7 @@ public class RestServiceImpl implements RestService
                     JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
 
 
-            Topology topology = new Topology( name, 0, 0 );
+            Topology topology = new Topology( name );
 
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
@@ -385,7 +390,7 @@ public class RestServiceImpl implements RestService
         try
         {
             DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-            if ( attr == null )
+            if ( attr == null && attr.getDataHandler().getContent() == null )
             {
                 throw new Exception( "Error, cannot read an attachment", null );
             }
@@ -427,7 +432,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            return Response.ok( JsonUtil
+                    .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
                            .build();
         }
         catch ( Exception e )
@@ -830,5 +836,14 @@ public class RestServiceImpl implements RestService
                     containerHost.getPeerId(), rhId ) );
         }
         return containerDtos;
+    }
+
+
+    private void checkName( final String name ) throws Exception
+    {
+        if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
+        {
+            throw new Exception( "Duplicated environment name" );
+        }
     }
 }

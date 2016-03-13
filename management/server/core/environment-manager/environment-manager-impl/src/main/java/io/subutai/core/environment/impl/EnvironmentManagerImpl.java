@@ -607,7 +607,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                 entry.getKey().getName(), new ContainerHostInfoModel( newHost ),
                                 entry.getKey().getTemplateName(), HostArchitecture.AMD64,
                                 entry.getKey().getSshGroupId(), entry.getKey().getHostsGroupId(),
-                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getHostId(),
+                                Common.DEFAULT_DOMAIN_NAME, containerType, entry.getKey().getResourceHostId(),
                                 entry.getKey().getName() ) ) );
             }
         }
