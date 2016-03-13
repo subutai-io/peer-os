@@ -565,14 +565,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
-        boolean result = super.updateHostInfo( hostInfo );
-        if ( this.netInterfaces == null || this.netInterfaces.size() == 0 )
-        {
-            setNetInterfaces( hostInfo.getHostInterfaces() );
-            result = true;
-        }
+        super.updateHostInfo( hostInfo );
+
+        setNetInterfaces( hostInfo.getHostInterfaces() );
 
         ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
+
         for ( ContainerHostInfo info : resourceHostInfo.getContainers() )
         {
             ContainerHostEntity containerHost;
@@ -589,7 +587,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                             info.getHostInterfaces(), info.getHostname(), "management", info.getArch().name(),
                             "management", null, null, ContainerSize.SMALL, info.getState() );
                     addContainerHost( containerHost );
-                    result = true;
                 }
                 else
                 {
@@ -617,8 +614,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
         }
 
-
-        return result;
+        return true;
     }
 
 

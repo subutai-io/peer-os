@@ -35,12 +35,13 @@ func LxcClone(parent, child, envId, addr, token string) {
 	}
 
 	container.SetContainerUid(child)
+	container.SetApt(child)
 	setDns(child)
 	LxcStart(child)
 
 	container.AptUpdate(child)
 	// container.Start(child)
-	log.Info(child + " with ID " + gpg.GetFingerprint(child) + " successfully cloned ")
+	log.Info(child + " with ID " + gpg.GetFingerprint(child) + " successfully cloned")
 
 }
 
@@ -64,13 +65,11 @@ func setDns(name string) {
 		dns = "10.10.0.254"
 	}
 
-	resolv := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns)
-	log.Check(log.DebugLevel, "Writing resolv.conf",
+	resolv := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns + "\n")
+	log.Check(log.DebugLevel, "Writing resolv.conf.orig",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/original", resolv, 0644))
-
-	resolv2 := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns)
 	log.Check(log.DebugLevel, "Writing resolv.conf",
-		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolv.conf", resolv2, 0644))
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolv.conf", resolv, 0644))
 }
 
 func setStaticNetwork(name string) {

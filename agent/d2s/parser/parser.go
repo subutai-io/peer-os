@@ -1,29 +1,31 @@
 package parser
 
 import (
-	"fmt"
 	docker "github.com/docker/docker/builder/dockerfile/parser"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
-func parceEnv(line []string) string {
-	line = line[1:]
-	str := ""
-	if strings.Contains(line[0], "=") {
-		str = strings.Join(line, " ")
-	} else {
-		str = line[0] + "=" + strings.Join(line[1:], " ")
+func parceEnv(line string) string {
+	var tokenWhitespace = regexp.MustCompile(`[\t\v\f\r ]+`)
+	var str string
 
+	line = strings.Replace(line, "ENV ", "", -1)
+	if strings.Contains(line, "=") {
+		str = line
+	} else {
+		slice := tokenWhitespace.Split(line, 2)
+		str = slice[0] + "=" + `"` + strings.Join(slice[1:], " ") + `"`
 	}
-	str = strings.Replace(str, `\t`, " ", -1)
-	fmt.Println(str)
+	str = strings.Replace(str, "\t", " ", -1)
 	return "export " + str + "\n"
 }
 
 func parceCopy(line []string) string {
 	if len(line) > 1 {
+		line[1] = `"/opt/docker2subutai/` + strings.Replace(line[1], `"`, "", -1) + `"`
 		return "cp -rf " + strings.Join(line[1:], " ") + "\n"
 	}
 	return ""
@@ -52,16 +54,19 @@ func parceFrom(line []string) string {
 	return ""
 }
 
-func parceCmd(line []string) string {
+func parceCmd(line []string, isEntrypoint bool) string {
 	if len(line) > 1 {
 		str := strings.Join(line[1:], " ")
 		str = strings.Replace(str, "\t", " ", -1)
+		if isEntrypoint {
+			str, _ = strconv.Unquote(str)
+		}
 		return str
 	}
 	return ""
 }
 
-func Parce(name string) (out, env, cmd, image string) {
+func Parce(name string) (out, env, cmd, image, user string) {
 	file, _ := os.Open(name)
 	node, _ := docker.Parse(file)
 	file.Close()
@@ -70,7 +75,8 @@ func Parce(name string) (out, env, cmd, image string) {
 		if str := strings.Fields(n.Dump()); len(str) > 0 {
 			switch str[0] {
 			case "env":
-				env = env + parceEnv(str)
+				// env = env + parceEnv(str)
+				env = env + parceEnv(n.Original)
 			case "run":
 				out = out + parceRun(str)
 			case "add", "copy":
@@ -78,22 +84,16 @@ func Parce(name string) (out, env, cmd, image string) {
 			case "from":
 				image = parceFrom(str)
 			case "cmd":
-				cmd = cmd + parceCmd(str)
+				cmd = cmd + parceCmd(str, false)
 			case "entrypoint":
-				cmd = cmd + parceCmd(str) + " "
+				cmd = cmd + parceCmd(str, true) + " "
+			case "user":
+				user, _ = strconv.Unquote(strings.Join(str[1:], ""))
 			}
 		}
 	}
-	if len(cmd) > 1 {
-		slice := strings.Split(cmd, " ")
-		for i, _ := range slice {
-			slice[i] = strings.Replace(slice[i], `"`, "", -1)
-		}
-
-		cmd = slice[0] + ` "` + strings.Join(slice[1:], " ") + `"`
-	}
 	if len(out) > 0 {
-		return out, env, cmd, image
+		return out, env, cmd, image, user
 	}
 	return
 }
