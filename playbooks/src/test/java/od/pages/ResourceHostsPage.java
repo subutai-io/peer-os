@@ -4,16 +4,13 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 
-public class UserManagementPage extends PageObject {
+public class ResourceHostsPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
     //endregion
 
     //region WEB ELEMENTS: Buttons
-
-    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
-    public WebElementFacade buttonAddUser;
 
     //endregion
 
@@ -47,10 +44,8 @@ public class UserManagementPage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    @FindBy(xpath = "*//h1[contains(text(),\"User management\")]")
-    public WebElementFacade headerUserManagement;
-
-    public String sikuliButtonSetPublicKey = "src/test/resources/imgs/buttons/buttonSetPublicKey.png";
+    @FindBy(xpath = "*//h1[contains(text(),\"Resource Hosts\")]")
+    public WebElementFacade headerResourceHosts;
 
     //endregion
 }
