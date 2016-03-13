@@ -21,6 +21,21 @@ public class ContainerQuota
     private Map<ContainerResourceType, ContainerResource> resources = new HashMap<>();
 
 
+    public ContainerQuota( ContainerResource resource )
+    {
+        addResource( resource );
+    }
+
+
+    public ContainerQuota( ContainerResource... resources )
+    {
+        for ( int i = 0; i < resources.length; i++ )
+        {
+            addResource( resources[i] );
+        }
+    }
+
+
     public void addResource( ContainerResource containerResource )
     {
         Preconditions.checkNotNull( containerResource );

@@ -27,6 +27,13 @@ public class ContainerRamResource extends ContainerResource<ByteValueResource>
     }
 
 
+    public ContainerRamResource( double value, ByteUnit unit )
+    {
+
+        this( new ByteValueResource( ByteValueResource.toBytes( BigDecimal.valueOf( value ), unit ) ) );
+    }
+
+
     /**
      * Usually used to write value to CLI
      */
@@ -45,5 +52,12 @@ public class ContainerRamResource extends ContainerResource<ByteValueResource>
     public String getPrintValue()
     {
         return String.format( "%s%s", resource.convert( ByteUnit.MB ), ByteUnit.MB.getAcronym() );
+    }
+
+
+    @JsonIgnore
+    public double doubleValue( ByteUnit unit )
+    {
+        return getResource().getValue( unit ).doubleValue();
     }
 }
