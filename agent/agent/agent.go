@@ -83,7 +83,7 @@ func connectionMonitor() {
 	hostname, _ := os.Hostname()
 	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
 	for {
-		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/security/keyman/getpublickeyring?hostid=" + fingerprint)
+		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
 		if err == nil && resp.StatusCode == http.StatusOK {
 			resp.Body.Close()
 		} else {
