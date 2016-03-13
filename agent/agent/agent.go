@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"os"
 	"runtime"
-	// "strconv"
 	"strings"
 	"sync"
 	"time"
@@ -67,14 +66,32 @@ func Start(c *cli.Context) {
 	go lib.Collect()
 	initAgent()
 
+	go connectionMonitor()
+
 	for {
-		// log.Debug("NumGoroutine " + strconv.Itoa(runtime.NumGoroutine()))
 		Instance()
 		if heartbeat() {
 			time.Sleep(30 * time.Second)
 		} else {
 			time.Sleep(5 * time.Second)
 		}
+	}
+}
+
+func connectionMonitor() {
+	client := tlsConfig()
+	hostname, _ := os.Hostname()
+	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
+	for {
+		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/security/keyman/getpublickeyring?hostid=" + fingerprint)
+		if err == nil && resp.StatusCode == http.StatusOK {
+			resp.Body.Close()
+		} else {
+			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
+			lastHeartbeat = []byte{}
+			go heartbeat()
+		}
+		time.Sleep(time.Second * 10)
 	}
 }
 
@@ -116,11 +133,10 @@ func heartbeat() bool {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
 		resp.Body.Close()
-	} else {
-		connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
-		return false
+		return true
 	}
-	return true
+	lastHeartbeat = []byte{}
+	return false
 }
 
 func execute(rsp executer.EncRequest) {
@@ -186,7 +202,7 @@ func execute(rsp executer.EncRequest) {
 					"response": payload,
 				})
 				log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
-				response(message)
+				go response(message)
 			} else {
 				sOut = nil
 			}
@@ -215,6 +231,9 @@ func response(msg []byte) {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
 	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) {
 		resp.Body.Close()
+	} else {
+		time.Sleep(time.Second * 5)
+		go response(msg)
 	}
 }
 
