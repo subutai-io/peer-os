@@ -9,8 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.common.util.JsonUtil;
-import io.subutai.core.strategy.api.Blueprint;
+import io.subutai.common.environment.Blueprint;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
@@ -65,7 +64,7 @@ public class RestServiceImpl implements RestService
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
             final Topology topology =
-                    strategy.distribute( blueprint.getName(), blueprint.getSshGroupId(), blueprint.getHostGroupId(),
+                    strategy.distribute( blueprint.getName(), /*blueprint.getSshGroupId(), blueprint.getHostGroupId(),*/
                             blueprint.getNodes(), peerGroupResources, quotas );
             return Response.ok( topology ).build();
         }

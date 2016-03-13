@@ -2,9 +2,7 @@ package io.subutai.core.strategy.impl;
 
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -13,9 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.Node;
-import io.subutai.core.strategy.api.Blueprint;
-import io.subutai.core.strategy.api.NodeSchema;
+import io.subutai.common.environment.Blueprint;
+import io.subutai.common.environment.NodeSchema;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -36,7 +33,7 @@ public class BlueprintTest
         mySet = new ArrayList<>();
         mySet.add( node );
 
-        blueprint = new Blueprint( "test", 0, 0, mySet );
+        blueprint = new Blueprint( "test", mySet );
         blueprint.setId( UUID.randomUUID() );
     }
 

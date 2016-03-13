@@ -74,14 +74,14 @@ public class DistributeCommand extends SubutaiShellCommandSupport
 
 
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
-            Topology topology = strategy.distribute( "Test", 0, 0, groupResources, quotas );
+            Topology topology = strategy.distribute( "Test", groupResources, quotas );
             System.out.println( topology.getEnvironmentName() );
             for ( String peer : topology.getNodeGroupPlacement().keySet() )
             {
                 for ( Node ng : topology.getNodeGroupPlacement().get( peer ) )
                 {
                     System.out.println(
-                            String.format( "%s\t%s\t\t%s\t\t%s\t%s", ng.getPeerId(), ng.getHostId(), ng.getName(),
+                            String.format( "%s\t%s\t\t%s\t\t%s\t%s", ng.getPeerId(), ng.getResourceHostId(), ng.getName(),
                                     ng.getTemplateName(), ng.getType() ) );
                 }
             }
