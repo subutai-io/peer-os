@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
@@ -43,7 +44,43 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     private RelationMeta getUserLinkRelation( RelationLink relationLink )
     {
         User activeUser = identityManager.getActiveUser();
-        UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+        UserDelegate delegatedUser = null;
+        if ( activeUser != null ) {
+            delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+        }
+        else
+        {
+            // if activeUser == null then select first RelationLink with Ownership level User
+            // and verify that it is User type
+
+            // to get RelationLink type of User with Ownership level User
+            // walk through relation tree and get desired Object
+
+            // relationLink = trustedObject
+            // get list of all relations where trustedObject = relationLink and RelationInfo.ownership = 'User'
+            // select first object where relation.source.context = PermissionObject.IdentityManagement.getName()
+
+            // Ownership User already defines that trusted object is owned by source or target
+            List<Relation> relationList =
+                    relationDataService.getTrustedRelationsByOwnership( relationLink, Ownership.USER );
+            for ( final Relation relation : relationList )
+            {
+                if ( PermissionObject.IdentityManagement.getName().equals( relation.getSource().getContext() ) )
+                {
+                    delegatedUser = identityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() );
+                    if ( delegatedUser != null ) {
+                        break;
+                    }
+                }
+                if ( PermissionObject.IdentityManagement.getName().equals( relation.getTarget().getContext() ) )
+                {
+                    delegatedUser = identityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() );
+                    if ( delegatedUser != null ) {
+                        break;
+                    }
+                }
+            }
+        }
         return new RelationMeta( delegatedUser, relationLink, relationLink.getLinkId() );
     }
 
