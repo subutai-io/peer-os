@@ -23,7 +23,7 @@
 					<select class="b-search-input" ng-model="advEnvCtrl.templatesType">
 						<option value="all">All</option>
 						<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
-							{{ templatesType }}
+							{{ templatesType }} ({{ templateList.length }})
 						</option>
 					</select>
 				</div>

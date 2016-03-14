@@ -3533,8 +3533,8 @@ td.b-main-table__status-col {
 }
 
 .b-tools-menu__inpit {
-	padding: 10px;
-	border-bottom: 1px solid #CCCEEE;	
+	padding: 10px 10px 0 10px;
+	/*border-bottom: 1px solid #CCCEEE;	*/
 }
 
 .b-search-input {
