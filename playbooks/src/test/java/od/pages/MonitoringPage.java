@@ -32,6 +32,9 @@ public class MonitoringPage extends PageObject {
 
     //region WEB ELEMENTS: Selectors
 
+    @FindBy(xpath = "*//select[@ng-model=\"monitoringCtrl.selectedEnvironment\"]")
+    public WebElementFacade selectorSelectEnvironment;
+
     @FindBy(xpath = "*//div[@ng-show=\"monitoringCtrl.currentType == 'peer'\"]")
     public WebElementFacade selectorHosts;
 
@@ -48,6 +51,9 @@ public class MonitoringPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Icons
+
+    public String sikuliMenuIconRH = "src/test/resources/imgs/icons/iconRHMenuIcon.png";
+    public String sikuliTitleEnvironment = "src/test/resources/imgs/titles/titleEnvironment.png";
 
     //endregion
 
