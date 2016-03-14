@@ -3532,3 +3532,26 @@ td.b-main-table__status-col {
 	color: #fa0000;
 }
 
+.b-tools-menu__inpit {
+	padding: 10px;
+	border-bottom: 1px solid #CCCEEE;	
+}
+
+.b-search-input {
+	box-sizing: border-box;
+	height: 29px;
+	border: 1px solid #CCCEEE;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 13px;
+	color: #04346E;
+	padding: 0 30px 0 5px;
+	width: 100%;
+	background-image: url(../assets/elements/search-icon.png);
+	background-repeat: no-repeat;
+	background-position: 98% 50%;
+}
+
+.b-search-input:focus{
+    outline: none;
+}
+
