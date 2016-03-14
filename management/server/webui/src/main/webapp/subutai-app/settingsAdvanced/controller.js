@@ -43,10 +43,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 
 		$scope.$apply();
 
-		$('.terminal-viewport').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
+		$('.terminal-viewport').perfectScrollbar();
 	}, 100);
 
 	$scope.session = {
@@ -130,30 +127,51 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 		saveAs(blob, "karaflogs" + moment().format('YYYY-MM-DD HH:mm:ss') + ".txt");
 	}
 
+	vm.logLevel = 'INFO';
 	function renderHtml(html_code) {
 		//initHighlighting();
 		if(html_code && html_code.length > 0) {
 			var html_code_array = html_code.match(/[^\r\n]+/g);
-			var errorString = false;
+			var temp = false;
+			var stingColor = false;
 			for(var i = 0; i < html_code_array.length; i++) {
-				//console.log(parseDate(html_code_array[i]));
-				if(html_code_array[i].includes('ERROR')) {
-					html_code_array[i] = '<span style="color: #c1272d;">' + html_code_array[i] + '</span>';
-					errorString = '#c1272d';
-				} else if(html_code_array[i].includes('WARN')) {
-					html_code_array[i] = '<span style="color: #ef3f61;">' + html_code_array[i] + '</span>';
-					errorString = '#ef3f61';
-				} else if(!parseDate(html_code_array[i]) && errorString) {
-					html_code_array[i] = '<span style="color: ' + errorString + ';">' + html_code_array[i] + '</span>';
+				if(vm.logLevel == 'all' || html_code_array[i].includes(vm.logLevel)) {
+					if(html_code_array[i].includes('ERROR') || html_code_array[i].includes('WARN')) {
+						if(html_code_array[i].includes('WARN')) {
+							stingColor = '#f1c40f';
+						} else if(html_code_array[i].includes('ERROR')) {
+							stingColor = '#c1272d';
+						}
+						html_code_array[i] = '<span style="color: ' + stingColor + ';">' + html_code_array[i] + '</span>';
+					} else {
+						stingColor = false;
+					}
+					temp = checkNextString(i, html_code_array, stingColor);
+					html_code_array = temp.array;
+					i = temp.index;
 				} else {
-					errorString = false;
+					//html_code_array.splice(i, 1);
+					delete html_code_array[i];
 				}
 			}
+			console.log(html_code_array);
 			var codeBlock = document.getElementById('js-highlight-block');
 			codeBlock.scrollTop = codeBlock.scrollHeight;
 			return $sce.trustAsHtml(html_code_array.join('\n'));
 		} else {
 			return $sce.trustAsHtml(html_code);
+		}
+	}
+
+	function checkNextString(index, stringArray, color) {
+		if(color == undefined || color == null) color = false;
+		if(!parseDate(stringArray[index+1])) {
+			if(color) {
+				stringArray[index] = '<span style="color: ' + color + ';">' + stringArray[index+1] + '</span>';
+			}
+			return checkNextString(index+1, stringArray, color);
+		} else {
+			return {"index": index, "array": stringArray};
 		}
 	}
 
