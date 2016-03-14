@@ -74,37 +74,45 @@
 				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar-cloud">
 					<ul ng-show="advEnvCtrl.currentResourceHosts.length > 0">
 						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
-						ng-click="advEnvCtrl.addResource2Build(resourceHost, advEnvCtrl.currentPeer, $index)">
+						ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
 							<span class="b-cloud-item-resource-name g-margin-bottom">
 								Recource Host {{$index + 1}}
 							</span>
 							<div class="b-progress__cloud b-progress__cloud_rh">
-								<div class="b-progress-text g-margin-bottom">
-									<i class="b-icon b-icon_cloud b-icon_cpu g-margin-right-quarter"></i> 
-									CPU:Intel Core 2 Duo
+								<div class="g-margin-bottom">
+									<div class="b-progress-text">
+										<i class="b-icon b-icon_cloud b-icon_cpu g-margin-right-quarter"></i>
+										CPU: {{ resourceHost.cpu }}
+									</div>
+									<div class="b-progress-cloud g-margin-bottom-half">
+										<div class="b-progress-cloud-fill" ng-style="{ 'width': 100 - resourceHost.cpuAvailable + '%'}"></div>
+									</div>
+									<div class="b-progress-text">
+										<span class="g-text-blue">{{ 100 - resourceHost.cpuAvailable | number:1 }} %</span> available
+									</div>
 								</div>
 								<div class="g-margin-bottom">
 									<div class="b-progress-text g-margin-bottom-half">
 										<i class="b-icon b-icon_cloud b-icon_hdd g-margin-right-quarter"></i> 
-										HDD:2048MB
+										HDD: {{ resourceHost.hdd / 1073741824 | number:1 }} Gb
 									</div>
 									<div class="b-progress-cloud g-margin-bottom-half">
-										<div class="b-progress-cloud-fill" style="width: 0%"></div>
+										<div class="b-progress-cloud-fill" ng-style="{ 'width': resourceHost.hddAvailable / resourceHost.hdd * 100 + '%'}"></div>
 									</div>
 									<div class="b-progress-text">
-										<span class="g-text-blue">0MB</span> used
+										<span class="g-text-blue">{{ resourceHost.hddAvailable / 1073741824 | number:1 }} Gb</span> available
 									</div>
 								</div>
 								<div>
 									<div class="b-progress-text g-margin-bottom-half">
 										<i class="b-icon b-icon_cloud b-icon_ram g-margin-right-quarter"></i> 
-										RAM:  256MB
+										RAM: {{ resourceHost.memory / 1073741824 | number:1 }} Gb
 									</div>
 									<div class="b-progress-cloud g-margin-bottom-half">
-										<div class="b-progress-cloud-fill" style="width: 0%"></div>
+										<div class="b-progress-cloud-fill" ng-style="{ 'width': resourceHost.memoryAvailable / resourceHost.memory * 100 + '%'}"></div>
 									</div>
 									<div class="b-progress-text">
-										<span class="g-text-blue">0MB</span> used
+										<span class="g-text-blue">{{ resourceHost.memoryAvailable / 1073741824 | number:1 }} Gb</span> available
 									</div>
 								</div>
 							</div>
