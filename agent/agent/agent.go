@@ -41,8 +41,14 @@ type Heartbeat struct {
 }
 
 var (
-	lastHeartbeat []byte
-	mutex         sync.Mutex
+	lastHeartbeat     []byte
+	mutex             sync.Mutex
+	fingerprint       string
+	hostname          string
+	client            *http.Client
+	instanceType      string
+	instanceArch      string
+	lastHeartbeatTime time.Time
 )
 
 func initAgent() {
@@ -54,6 +60,9 @@ func initAgent() {
 	}
 	container.PoolInstance()
 	Instance()
+	instanceType = utils.InstanceType()
+	instanceArch = strings.ToUpper(runtime.GOARCH)
+	client = tlsConfig()
 }
 
 func Start(c *cli.Context) {
@@ -79,10 +88,13 @@ func Start(c *cli.Context) {
 }
 
 func connectionMonitor() {
-	client := tlsConfig()
-	hostname, _ := os.Hostname()
-	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
 	for {
+		hostname, _ = os.Hostname()
+		if fingerprint == "" {
+			fingerprint = gpg.GetFingerprint(hostname + "@subutai.io")
+			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
+			continue
+		}
 		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
 		if err == nil && resp.StatusCode == http.StatusOK {
 			resp.Body.Close()
@@ -91,27 +103,25 @@ func connectionMonitor() {
 			lastHeartbeat = []byte{}
 			go heartbeat()
 		}
+
 		time.Sleep(time.Second * 10)
 	}
 }
 
 func heartbeat() bool {
+	if time.Since(lastHeartbeatTime) < time.Second*3 {
+		return true
+	}
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	client := tlsConfig()
-	hostname, _ := os.Hostname()
-	instancetype := utils.InstanceType()
-	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
-
 	list := container.GetActiveContainers(false)
-
 	beat := Heartbeat{
 		Type:       "HEARTBEAT",
 		Hostname:   hostname,
 		Id:         fingerprint,
-		Arch:       strings.ToUpper(runtime.GOARCH),
-		Instance:   instancetype,
+		Arch:       instanceArch,
+		Instance:   instanceType,
 		Containers: list,
 		Interfaces: utils.GetInterfaces(),
 		Alert:      alert.Alert(list),
@@ -130,6 +140,7 @@ func heartbeat() bool {
 	})
 	log.Check(log.WarnLevel, "Marshal response json", err)
 
+	lastHeartbeatTime = time.Now()
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
 		resp.Body.Close()
@@ -144,9 +155,6 @@ func execute(rsp executer.EncRequest) {
 	var md, contName, pub, keyring, payload string
 	var flag bool
 	var err error
-
-	hostname, _ := os.Hostname()
-	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
 
 	if rsp.HostId == fingerprint {
 		flag = true
@@ -208,7 +216,7 @@ func execute(rsp executer.EncRequest) {
 			}
 		}
 	}
-	heartbeat()
+	go heartbeat()
 }
 
 func tlsConfig() *http.Client {
@@ -227,7 +235,6 @@ func tlsConfig() *http.Client {
 }
 
 func response(msg []byte) {
-	client := tlsConfig()
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
 	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) {
 		resp.Body.Close()
@@ -239,9 +246,6 @@ func response(msg []byte) {
 
 func command() {
 	var rsp []executer.EncRequest
-	client := tlsConfig()
-	hostname, _ := os.Hostname()
-	fingerprint := gpg.GetFingerprint(hostname + "@subutai.io")
 
 	resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/requests/" + fingerprint)
 	if log.Check(log.WarnLevel, "Getting requests", err) {
@@ -272,7 +276,7 @@ func ping(rw http.ResponseWriter, request *http.Request) {
 func trigger(rw http.ResponseWriter, request *http.Request) {
 	if request.Method == http.MethodPost && strings.Split(request.RemoteAddr, ":")[0] == config.Management.Host {
 		rw.WriteHeader(http.StatusAccepted)
-		command()
+		go command()
 	} else {
 		rw.WriteHeader(http.StatusForbidden)
 	}
