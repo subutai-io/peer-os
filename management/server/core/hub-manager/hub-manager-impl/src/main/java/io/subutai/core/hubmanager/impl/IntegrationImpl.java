@@ -40,8 +40,8 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.proccessors.EnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
@@ -92,10 +92,10 @@ public class IntegrationImpl implements Integration
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
-            StateLinkProccessor environmentProccessor =
-                    new EnvironmentProccessor( environmentManager, configManager, peerManager );
+            StateLinkProccessor hubEnvironmentProccessor =
+                    new HubEnvironmentProccessor( environmentManager, configManager, peerManager );
 
-            heartbeatProcessor.addProccessor( environmentProccessor );
+            heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
 
