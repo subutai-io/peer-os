@@ -52,10 +52,10 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 									vm.installedHubPlugins[i].restore = true;
 								}
 							}
-							var temp = [];
 							for (var i = 0; i < vm.plugins.length; ++i) {
 								vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 								vm.plugins[i].installed = false;
+								vm.plugins[i].restore = false;
 								for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
 									if (vm.plugins[i].name === vm.installedHubPlugins[j].name) {
 										if (vm.installedHubPlugins[j].restore === false) {
@@ -63,8 +63,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 											vm.plugins[i].launch = true;
 											vm.plugins[i].hubId = vm.installedHubPlugins[j].id;
 											vm.plugins[i].url = vm.installedHubPlugins[j].url;
-											vm.plugins[i].restore = false;
-											temp.push (vm.installedHubPlugins[j]);
 										}
 										else {
 											vm.plugins[i].restore = true;
@@ -75,7 +73,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 									}
 								}
 							}
-							vm.installedHubPlugins = temp;
 							$scope.$applyAsync (function() {
 								var toScroll = document.getElementById (localStorage.getItem ("bazaarScroll"));
 								if (toScroll !== null) {
@@ -426,7 +423,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 			var arr = plugin.dependencies.slice();
 			for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 				for (var j = 0; j < plugin.dependencies.length; ++j) {
-					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j]) {
+					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
 						var index = arr.indexOf (plugin.dependencies[j]);
 						arr.splice (index, 1);
 					}
@@ -462,7 +459,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 							var arr = dependencies.slice();
 							for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 								for (var j = 0; j < dependencies.length; ++j) {
-									if (vm.installedHubPlugins[i].uid === dependencies[j]) {
+									if (vm.installedHubPlugins[i].uid === dependencies[j] && vm.installedHubPlugins[i].restore === false) {
 										var index = arr.indexOf (dependencies[j]);
 										arr.splice (index, 1);
 									}
@@ -475,9 +472,17 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 										installPluginDependencies (vm.plugins[j].dependencies, function() {
 											return;
 										});
-										BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
-											callback();
-										});
+										console.log (vm.plugins[j].restore);
+										if (vm.plugins[j].restore === false) {
+											BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
+												callback();
+											});
+										}
+										else {
+											BazaarSrv.restoreHubPlugin (vm.plugins[j]).success (function (data) {;
+												callback();
+											});
+										}
 									}
 								}
 							}
@@ -574,7 +579,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 			var arr = plugin.dependencies.slice();
 			for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 				for (var j = 0; j < plugin.dependencies.length; ++j) {
-					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j]) {
+					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
 						var index = arr.indexOf (plugin.dependencies[j]);
 						arr.splice (index, 1);
 					}
@@ -595,7 +600,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					var arr = dependencies.slice();
 					for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 						for (var j = 0; j < dependencies.length; ++j) {
-							if (vm.installedHubPlugins[i].uid === dependencies[j]) {
+							if (vm.installedHubPlugins[i].uid === dependencies[j] && vm.installedHubPlugins[i].restore === false) {
 								var index = arr.indexOf (dependencies[j]);
 								arr.splice (index, 1);
 							}
@@ -608,16 +613,23 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 								installPluginDependencies (vm.plugins[j].dependencies, function() {
 									return;
 								});
-								BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
-									callback();
-								});
+								if (vm.plugins[j].restore === false) {
+									BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
+										callback();
+									});
+								}
+								else {
+									BazaarSrv.restoreHubPlugin (vm.plugins[j]).success (function (data) {;
+										callback();
+									});
+								}
 							}
 						}
 					}
 				}
 				installPluginDependencies (arr, function() {
 					setTimeout (function() {
-						BazaarSrv.installHubPlugin (plugin).success (function (data) {
+						BazaarSrv.restoreHubPlugin (plugin).success (function (data) {
 							setTimeout (function() {
 								progress = 1;
 								instance.stop (1);
@@ -645,7 +657,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 							clearInterval( interval );
 						}*/
 					}, 150);
-				BazaarSrv.installHubPlugin (plugin).success (function (data) {
+				BazaarSrv.restoreHubPlugin (plugin).success (function (data) {
 					setTimeout (function() {
 						progress = 1;
 						instance.stop (1);
@@ -660,30 +672,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					clearInterval (interval);
 				});
 			}
-			var progress = 0,
-				interval = setInterval (function() {
-					progress = Math.min (progress + Math.random() * 0.1, 0.99);
-					instance.setProgress (progress);
-/*					if( progress === 0.99 ) {
-						progress = 1;
-						instance.stop(  1 );
-						clearInterval( interval );
-					}*/
-				}, 150);
-			BazaarSrv.restoreHubPlugin (plugin).success (function (data) {
-				setTimeout (function() {
-					progress = 1;
-					instance.stop (1);
-					clearInterval (interval);
-					setTimeout (function() {
-						localStorage.setItem ("bazaarScroll", plugin.id);
-						$rootScope.$emit('reloadPluginsStates');
-					}, 2000);
-				}, 2000);
-			}).error (function (error) {
-				instance.stop (-1);
-				clearInterval (interval);
-			});
 		};
 	}
 
