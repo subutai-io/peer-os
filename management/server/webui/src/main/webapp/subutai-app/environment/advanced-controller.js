@@ -29,6 +29,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.domainStrategies = [];
 	vm.strategies = [];
 	vm.activeCloudTab = 'peers';
+	vm.templatesType = 'all';
 
 	vm.peerIds = [];
 	vm.resourceHosts = [];

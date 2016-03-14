@@ -3546,9 +3546,14 @@ td.b-main-table__status-col {
 	color: #04346E;
 	padding: 0 30px 0 5px;
 	width: 100%;
+	background: transparent;
 	background-image: url(../assets/elements/search-icon.png);
 	background-repeat: no-repeat;
 	background-position: 98% 50%;
+}
+
+select.b-search-input {
+	background-image: none;
 }
 
 .b-search-input:focus{

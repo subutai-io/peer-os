@@ -29,6 +29,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.templates = [];
 
 	vm.activeCloudTab = 'templates';
+	vm.templatesType = 'all';
 
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
@@ -49,7 +50,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	environmentService.getTemplates()
 		.then(function (data) {
 			vm.templates = data;
-			console.log(data);
 		});
 		//.error(function (data) {
 		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
