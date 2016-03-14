@@ -18,11 +18,14 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 
 	var vm = this;
 	vm.config = {};
+	vm.karafLogs = '';
+	vm.logLevel = 'all';
 	vm.activeTab = "karafconsole";
 	vm.getConfig = getConfig;
 	vm.updateConfig = updateConfig;
 	vm.saveLogs = saveLogs;
 	vm.renderHtml = renderHtml;
+	vm.setLevel = setLevel;
 
 	//Console UI
 	$scope.theme = 'modern';
@@ -102,10 +105,11 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	//END Console UI
 
 	function getConfig() {
-		$('.js-karaflogs-load-screen').addClass('lololo').show();
+		$('.js-karaflogs-load-screen').show();
 		SettingsAdvancedSrv.getConfig().success(function (data) {
 			$('.js-karaflogs-load-screen').hide();
 			vm.config = data;
+			vm.karafLogs = getFilteredLogs(data.karafLogs);
 		}).error(function(error){
 			SweetAlert.swal("ERROR!", error, "error");
 			$('.js-karaflogs-load-screen').hide();
@@ -127,9 +131,18 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 		saveAs(blob, "karaflogs" + moment().format('YYYY-MM-DD HH:mm:ss') + ".txt");
 	}
 
-	vm.logLevel = 'INFO';
 	function renderHtml(html_code) {
 		//initHighlighting();
+		var codeBlock = document.getElementById('js-highlight-block');
+		codeBlock.scrollTop = codeBlock.scrollHeight;
+		return $sce.trustAsHtml(html_code);
+	}
+
+	function setLevel() {
+		vm.karafLogs = getFilteredLogs(vm.config.karafLogs);
+	}
+
+	function getFilteredLogs(html_code) {
 		if(html_code && html_code.length > 0) {
 			var html_code_array = html_code.match(/[^\r\n]+/g);
 			var temp = false;
@@ -152,25 +165,22 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 				} else {
 					html_code_array.splice(i, 1);
 					i--;
-					//delete html_code_array[i];
 				}
 			}
-
-			var codeBlock = document.getElementById('js-highlight-block');
-			codeBlock.scrollTop = codeBlock.scrollHeight;
-			return $sce.trustAsHtml(html_code_array.join('\n'));
+			return html_code_array.join('\n');
 		} else {
-			return $sce.trustAsHtml(html_code);
+			return '';
 		}
 	}
 
 	function checkNextString(index, stringArray, color) {
 		if(color == undefined || color == null) color = false;
-		if(!parseDate(stringArray[index+1])) {
+		if(stringArray[index+1] != undefined && !parseDate(stringArray[index+1])) {
+			index++;
 			if(color) {
-				stringArray[index] = '<span style="color: ' + color + ';">' + stringArray[index+1] + '</span>';
+				stringArray[index] = '<span style="color: ' + color + ';">' + stringArray[index] + '</span>';
 			}
-			return checkNextString(index+1, stringArray, color);
+			return checkNextString(index, stringArray, color);
 		} else {
 			return {"index": index, "array": stringArray};
 		}

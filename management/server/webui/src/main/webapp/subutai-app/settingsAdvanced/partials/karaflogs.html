@@ -1,15 +1,25 @@
 <script src="scripts/libs/nprogress.js"></script>
-<div class="b-main-table-border" ng-init="settingsAdvancedCtrl.getConfig()">
+<div class="b-main-table-border">
 	<table class="b-main-table b-main-table_auto-width" align="center" ng-init="settingsAdvancedCtrl.getConfig()">
 		<tr>
 			<td>
 				<!--<textarea id="ta" class="b-text-logs" ng-model="settingsAdvancedCtrl.config.karafLogs" spellcheck="false"></textarea>-->
 				<pre class="b-karaf-logs">
-					<code id="js-highlight-block" class="nginx b-highlight-block" ng-bind-html="settingsAdvancedCtrl.renderHtml(settingsAdvancedCtrl.config.karafLogs)"></code>
+					<code id="js-highlight-block" class="nginx b-highlight-block" ng-bind-html="settingsAdvancedCtrl.renderHtml(settingsAdvancedCtrl.karafLogs)"></code>
 				</pre>
 			</td>
 
 			<td>
+
+				<select class="b-popup-body-input g-margin-bottom" 
+				ng-model="settingsAdvancedCtrl.logLevel" 
+				ng-change="settingsAdvancedCtrl.setLevel()">
+					<option value="all">All</option>
+					<option value="INFO">INFO</option>
+					<option value="WARN">WARN</option>
+					<option value="DEBUG">DEBUG</option>
+					<option value="ERROR">ERROR</option>
+				</select>
 
 				<button
 				class="b-btn b-btn_blue g-margin-bottom"
