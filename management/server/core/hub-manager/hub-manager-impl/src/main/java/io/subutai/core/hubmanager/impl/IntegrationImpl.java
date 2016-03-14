@@ -234,22 +234,25 @@ public class IntegrationImpl implements Integration
             @Override
             public boolean accept( File pathname )
             {
-                return pathname.getName().matches( ".*" + name + ".*" );
+            	return pathname.getName().matches( ".*" + name + ".*" );
             }
         } );
-        for ( File f : dirs )
-        {
-            LOG.info( f.getAbsolutePath() );
-            try
-            {
-                FileUtils.deleteDirectory( f );
-                LOG.debug( f.getName() + " is removed." );
-            }
-            catch ( IOException e )
-            {
-                e.printStackTrace();
-            }
-        }
+        if (dirs != null)
+		{
+			for (File f : dirs)
+			{
+				LOG.info (f.getAbsolutePath ());
+				try
+				{
+					FileUtils.deleteDirectory (f);
+					LOG.debug (f.getName () + " is removed.");
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace ();
+				}
+			}
+		}
         if ( file.delete() )
         {
             LOG.debug( file.getName() + " is removed." );

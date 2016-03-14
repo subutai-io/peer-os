@@ -1,6 +1,7 @@
 package io.subutai.core.bazaar.rest;
 
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.util.JsonUtil;
@@ -42,6 +43,21 @@ public class RestServiceImpl implements RestService
 	public Response uninstallPlugin (Long id, String kar, String name)
 	{
 		bazaar.uninstallPlugin (id, kar, name);
+		return Response.status (Response.Status.OK).build();
+	}
+
+	@Override
+	public Response restorePlugin (Long id, String name, String version, String kar, String url, String uid)
+	{
+		try
+		{
+			bazaar.restorePlugin (id, name, version, kar, url, uid);
+		}
+		catch (HubPluginException e)
+		{
+			e.printStackTrace();
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+		}
 		return Response.status (Response.Status.OK).build();
 	}
 
