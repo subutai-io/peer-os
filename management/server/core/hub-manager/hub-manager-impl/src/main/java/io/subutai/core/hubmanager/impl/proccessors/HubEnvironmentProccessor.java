@@ -9,47 +9,31 @@ import java.io.InputStreamReader;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthenticationException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 
-import io.subutai.common.environment.Node;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.RegistrationData;
-import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.protocol.PlacementStrategy;
-import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.environment.EnvironmentBuildDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.hub.share.dto.environment.EnvironmentDto;
-import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -96,19 +80,19 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
-            LOG.debug( "Getting EnvironmentData from Hub..." );
+            LOG.debug( "Getting Environment peer data from Hub..." );
 
             Response r = client.get();
             byte[] encryptedContent = readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
-            LOG.debug( "EnvironmentDto: " + result.toString() );
+            LOG.debug( "EnvironmentPeerDto: " + result.toString() );
             return result;
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            throw new HubPluginException( "Could not retrieve environment data", e );
+            throw new HubPluginException( "Could not retrieve environment peer data", e );
         }
     }
 
@@ -133,9 +117,43 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         }
     }
 
+
     private void exchangePEK( final EnvironmentPeerDto peerDto )
     {
+        Set<String> usedIps = Sets.newHashSet();
+        String exchangeURL = String.format( "/rest/v1/environments/%s/exchange-pek", peerDto.getEnvironmentId() );
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( exchangeURL, configManager.getHubIp() );
 
+            LOG.debug( "Sending PEK to Hub ..." );
+            EnvironmentBuildDto buildDto = new EnvironmentBuildDto();
+            buildDto.setUsedIPs( usedIps );
+
+            //TODO get PEK and set
+//            buildDto.setPublicKey(  );
+
+            byte[] cborData = JsonUtil.toCbor( buildDto );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+            Response r = client.post(encryptedData);
+
+            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "PEK sent successfully to Hub" );
+
+                byte[] encryptedContent = readContent( r );
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+                EnvironmentBuildDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentBuildDto.class );
+                //TODO save signed Public key
+            }
+
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            LOG.error( "Could not send resource hosts configurations.", e );
+        }
     }
 
 
