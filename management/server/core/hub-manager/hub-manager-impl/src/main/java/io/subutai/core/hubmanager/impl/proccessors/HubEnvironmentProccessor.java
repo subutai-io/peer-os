@@ -33,6 +33,8 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.EnvironmentBuildDto;
+import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
+import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -152,14 +154,36 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            LOG.error( "Could not send resource hosts configurations.", e );
+            LOG.error( "Could not send PEK to Hub.", e.getMessage() );
         }
     }
 
 
     private void createContainer( final EnvironmentPeerDto peerDto )
     {
+        String containerDataURL = String.format( "/rest/v1/environments/%s/container-creation-workflow", peerDto.getEnvironmentId() );
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
 
+            Response r = client.get();
+            byte[] encryptedContent = readContent( r );
+
+            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            EnvironmentNodesDto result = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
+            LOG.debug( "EnvironmentNodesDto: " + result.toString() );
+
+            for ( EnvironmentNodeDto nodeDto: result.getNodes() )
+            {
+                //TODO by using API create container
+            }
+
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
+        }
     }
 
 
