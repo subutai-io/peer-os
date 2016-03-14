@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,13 +21,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 
-import io.subutai.common.gson.required.RequiredDeserializer;
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.task.CloneRequest;
+import io.subutai.common.task.CloneResponse;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
@@ -48,7 +58,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     private ConfigManager configManager;
     private PeerManager peerManager;
     private EnvironmentManager environmentManager;
-    private Gson gson = RequiredDeserializer.createValidatingGson();
 
 
     public HubEnvironmentProccessor( final EnvironmentManager environmentManager, final ConfigManager hConfigManager,
@@ -88,6 +97,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] encryptedContent = readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
+
             LOG.debug( "EnvironmentPeerDto: " + result.toString() );
             return result;
         }
@@ -123,7 +133,10 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     private void exchangePEK( final EnvironmentPeerDto peerDto )
     {
         Set<String> usedIps = Sets.newHashSet();
-        String exchangeURL = String.format( "/rest/v1/environments/%s/exchange-pek", peerDto.getEnvironmentId() );
+        String exchangeURL =
+                String.format( "/rest/v1/environments/%s/exchange-pek", peerDto.getEnvironmentInfo().getId() );
+        EnvironmentId environmentId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
+
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( exchangeURL, configManager.getHubIp() );
@@ -132,13 +145,22 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             EnvironmentBuildDto buildDto = new EnvironmentBuildDto();
             buildDto.setUsedIPs( usedIps );
 
-            //TODO get PEK and set
-//            buildDto.setPublicKey(  );
+
+            PublicKeyContainer publicKeyContainer =
+                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
+
+            io.subutai.hub.share.dto.PublicKeyContainer keyContainer =
+                    new io.subutai.hub.share.dto.PublicKeyContainer();
+            keyContainer.setKey( publicKeyContainer.getKey() );
+            keyContainer.setHostId( publicKeyContainer.getHostId() );
+            keyContainer.setFingerprint( publicKeyContainer.getFingerprint() );
+
+            buildDto.setPublicKey( keyContainer );
 
             byte[] cborData = JsonUtil.toCbor( buildDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
-            Response r = client.post(encryptedData);
+            Response r = client.post( encryptedData );
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
@@ -147,21 +169,27 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 byte[] encryptedContent = readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 EnvironmentBuildDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentBuildDto.class );
-                //TODO save signed Public key
-            }
 
+                peerManager.getLocalPeer().updatePeerEnvironmentPubKey( environmentId,
+                        PGPKeyUtil.readPublicKeyRing( buildDtoResponse.getPublicKey().getKey() ) );
+            }
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
             LOG.error( "Could not send PEK to Hub.", e.getMessage() );
         }
+        catch ( PeerException e )
+        {
+            LOG.error( "Could not save signed key.", e.getMessage() );
+        }
     }
 
 
     private void createContainer( final EnvironmentPeerDto peerDto )
     {
-        String containerDataURL = String.format( "/rest/v1/environments/%s/container-creation-workflow", peerDto.getEnvironmentId() );
+        String containerDataURL = String.format( "/rest/v1/environments/%s/container-creation-workflow",
+                peerDto.getEnvironmentInfo().getId() );
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
@@ -173,14 +201,32 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             EnvironmentNodesDto result = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
             LOG.debug( "EnvironmentNodesDto: " + result.toString() );
 
-            for ( EnvironmentNodeDto nodeDto: result.getNodes() )
-            {
-                //TODO by using API create container
-            }
+            SubnetUtils.SubnetInfo subnetInfo =
+                    new SubnetUtils( peerDto.getEnvironmentInfo().getSubnetCidr() ).getInfo();
+            String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
 
+            CreateEnvironmentContainerGroupRequest containerGroupRequest = new CreateEnvironmentContainerGroupRequest();
+            for ( EnvironmentNodeDto nodeDto : result.getNodes() )
+            {
+                final String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
+                CloneRequest cloneRequest =
+                        new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
+                                ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
+                                peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64,
+                                ContainerSize.valueOf( nodeDto.getContainerSize() ) );
+
+                containerGroupRequest.addRequest( cloneRequest );
+            }
+            final CreateEnvironmentContainerResponseCollector containerCollector =
+                    peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
+            List<CloneResponse> cloneResponseList = containerCollector.getResponses();
+            for (CloneResponse cloneResponse: cloneResponseList)
+            {
+                //TODO
+            }
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+                | PeerException e )
         {
             LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
         }
