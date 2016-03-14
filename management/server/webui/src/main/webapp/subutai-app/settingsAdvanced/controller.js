@@ -150,11 +150,12 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 					html_code_array = temp.array;
 					i = temp.index;
 				} else {
-					//html_code_array.splice(i, 1);
-					delete html_code_array[i];
+					html_code_array.splice(i, 1);
+					i--;
+					//delete html_code_array[i];
 				}
 			}
-			console.log(html_code_array);
+
 			var codeBlock = document.getElementById('js-highlight-block');
 			codeBlock.scrollTop = codeBlock.scrollHeight;
 			return $sce.trustAsHtml(html_code_array.join('\n'));
