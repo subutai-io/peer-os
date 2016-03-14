@@ -414,18 +414,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         final TaskCallbackHandler<CloneRequest, CloneResponse> successResultHandler =
                 getCloneSuccessHandler( this, response );
 
+        final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( requestGroup.getEnvironmentId() );
+
+        if ( environmentVni == null )
+        {
+            throw new PeerException(
+                    String.format( "No reserved vni found for environment %s", requestGroup.getEnvironmentId() ) );
+        }
+
         for ( final CloneRequest request : requestGroup.getRequests() )
         {
             try
             {
-                final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
-
-                if ( environmentVni == null )
-                {
-                    throw new PeerException(
-                            String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-                }
-
 
                 CloneTask task = new CloneTask( request, environmentVni.getVlan() );
 
