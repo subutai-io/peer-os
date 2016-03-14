@@ -90,7 +90,11 @@ func Parce(name string) (out, env, cmd, image, user, wdir string) {
 			case "user":
 				user, _ = strconv.Unquote(strings.Join(str[1:], ""))
 			case "workdir":
-				wdir, _ = strconv.Unquote(strings.Join(str[1:], ""))
+				{
+					wdir, _ = strconv.Unquote(strings.Join(str[1:], ""))
+					out = out + "cd " + wdir + "\n"
+
+				}
 			}
 		}
 	}
