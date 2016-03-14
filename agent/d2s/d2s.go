@@ -29,7 +29,7 @@ cd /opt/docker2subutai/
 `
 
 	//parse
-	out, env, cmd, _, user := parser.Parce(dockerfile)
+	out, env, cmd, _, user, wdir := parser.Parce(dockerfile)
 
 	// if img != "" {
 	// 	cmd := exec.Command("subutai", "import", img)
@@ -46,6 +46,7 @@ cat > /opt/docker2subutai/cmd <<- EndOfCMD
 #!/bin/bash
 cd /opt/docker2subutai/
 . .env
+cd ` + wdir + `
 ` + cmd + `
 EndOfCMD
 
