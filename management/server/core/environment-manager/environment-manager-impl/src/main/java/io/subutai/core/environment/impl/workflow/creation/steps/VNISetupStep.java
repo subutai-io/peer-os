@@ -83,8 +83,7 @@ public class VNISetupStep
         //TODO: add gateway to reserve vni
         Vni newVni = new Vni( freeVni, environment.getId() );
 
-        //reserve new vni and create gateway
-        LOGGER.debug( "Creating gateways..." );
+        //reserve new vni
         for ( final Peer peer : peers )
         {
             peer.reserveVni( newVni );
