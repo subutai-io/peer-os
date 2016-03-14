@@ -144,30 +144,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     }
 
-    private String getToken( String user, String password ) throws AuthenticationException
-    {
-        String loginUrl = String.format(
-                "https://127.0.0.1:8443/rest/v1/identity/gettoken?username=" + user + "&password=" + password );
-        WebClient webClient = RestUtil.createTrustedWebClient( loginUrl );
-        Response response = webClient.get();
-        if ( response.getStatus() == HttpStatus.SC_OK )
-        {
-            InputStream responseEntity = response.readEntity( InputStream.class );
-            if ( responseEntity != null )
-            {
-                return getStringFromInputStream( responseEntity );
-            }
-            else
-            {
-                throw new AuthenticationException( "Could not get token." );
-            }
-        }
-        else
-        {
-            throw new AuthenticationException( "Could not get token." );
-        }
-    }
-
 
     private byte[] readContent( Response response ) throws IOException
     {
