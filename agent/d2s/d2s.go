@@ -46,8 +46,11 @@ cat > /opt/docker2subutai/cmd <<- EndOfCMD
 #!/bin/bash
 cd /opt/docker2subutai/
 . .env
-cd ` + wdir + `
-` + cmd + `
+`
+	if wdir != "" {
+		out = out + `cd ` + wdir + "\n"
+	}
+	out = out + cmd + `
 EndOfCMD
 
 chmod a+x /opt/docker2subutai/cmd
