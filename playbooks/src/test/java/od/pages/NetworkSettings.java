@@ -4,7 +4,7 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 
-public class UserManagementPage extends PageObject {
+public class NetworkSettings extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
@@ -12,8 +12,8 @@ public class UserManagementPage extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
-    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
-    public WebElementFacade buttonAddUser;
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green g-left g-margin-bottom\"]")
+    public WebElementFacade buttonSave;
 
     //endregion
 
@@ -47,10 +47,8 @@ public class UserManagementPage extends PageObject {
 
     //region WEB ELEMENTS: Headers
 
-    @FindBy(xpath = "*//h1[contains(text(),\"User management\")]")
-    public WebElementFacade headerUserManagement;
-
-    public String sikuliButtonSetPublicKey = "src/test/resources/imgs/buttons/buttonSetPublicKey.png";
+    @FindBy(xpath = "*//span[contains(text(),\"Network Settings\")]")
+    public WebElementFacade headerNetworkSettings;
 
     //endregion
 }
