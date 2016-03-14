@@ -12,8 +12,11 @@
 				</ul>
 			</div>
 			<div class="b-tools-menu js-scrollbar">
+				<div class="b-tools-menu__inpit">
+					<input type="text" class="b-search-input" ng-model="searchTemplate" id="js-search">
+				</div>
 				<ul>
-					<li ng-repeat="template in environmentSimpleViewCtrl.templates">
+					<li ng-repeat="template in environmentSimpleViewCtrl.templates  | filter:searchTemplate">
 						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
 							<span class="b-cloud-item">
 								<img
