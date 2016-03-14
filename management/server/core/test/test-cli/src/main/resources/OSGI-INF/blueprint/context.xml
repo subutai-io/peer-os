@@ -1,15 +1,20 @@
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0">
+
+  <authz:enable />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/do">
+    <command name="test/error">
       <action class="io.subutai.core.test.cli.TestCommand" />
     </command>
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/hearbeat">
-      <action class="io.subutai.core.test.cli.SendHeartbeatCommand" />
+    <command name="test/verify">
+      <action class="io.subutai.core.test.cli.TestRoleValidation" />
     </command>
   </command-bundle>
 
+  <bean id="errLstnr" scope="singleton" class="io.subutai.core.test.cli.SubutaiEventListenerImpl" />
+  <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
 </blueprint>

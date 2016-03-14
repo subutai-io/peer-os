@@ -4,8 +4,6 @@ package io.subutai.core.registration.rest.transitional;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
@@ -16,16 +14,13 @@ import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
-/**
- * Created by talas on 9/15/15.
- */
 public class ContainerInfoJson implements ContainerInfo
 {
     private String id;
     private String hostname;
     private Integer vlan;
     private String templateName;
-    private Set<HostHostInterfaceJson> interfaces = new HashSet<>();
+    private Set<HostInterfaceJson> interfaces = new HashSet<>();
     private HostArchitecture arch;
     private String publicKey;
     private String gateway;
@@ -56,7 +51,7 @@ public class ContainerInfoJson implements ContainerInfo
         }
         for ( HostInterface anHostInterface : hostInfo.getHostInterfaces().getAll() )
         {
-            this.interfaces.add( new HostHostInterfaceJson( anHostInterface ) );
+            this.interfaces.add( new HostInterfaceJson( anHostInterface ) );
         }
     }
 
@@ -96,16 +91,13 @@ public class ContainerInfoJson implements ContainerInfo
 
 
     @Override
-    public String getContainerName()
-    {
-        return null;
-    }
-
-
-    @Override
     public HostInterfaces getHostInterfaces()
     {
         HostInterfaces result = new HostInterfaces();
+        if ( this.interfaces == null )
+        {
+            return result;
+        }
         for ( HostInterface hostInterface : this.interfaces )
         {
             HostInterfaceModel model = new HostInterfaceModel( hostInterface );

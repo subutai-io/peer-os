@@ -1,41 +1,48 @@
-NProgress.start();
-setTimeout(function() {
-	NProgress.done();
-	$('.fade').removeClass('out');
-}, 1000);
-
-$(document).ready(function() {
-	$('.b-nav-menu-link').on('click', function(){
-		if($(this).next('.b-nav-menu__sub').length > 0) {
-			if($(this).parent().hasClass('b-nav-menu_active')) {
-				$(this).parent().removeClass('b-nav-menu_active');
-				$(this).next('.b-nav-menu__sub').slideUp(300);
-			} else {
-				$(this).parent().addClass('b-nav-menu_active');
-				$(this).next('.b-nav-menu__sub').slideDown(300);
-			}
-			return false;
-		}
-	});
-
-	function colEqualHeight() {
-		if( $('.b-nav').height() > $('.b-workspace').height() ) {
-			$('.b-workspace').height( $('.b-nav').height() );
-		}else if( $('.b-nav').height() < $('.b-workspace').height() ) {
-			$('.b-nav').height( $('.b-workspace').height() );
-		}
-	}
-	colEqualHeight();
-});
-
 $(".b-form-input_dropdown").click(function () {
 	$(this).toggleClass("is-active");
+});
+
+$('body').on('click', '.js-notification', function() {
+	$('.b-hub-status__dropdown').slideUp(100);
+	var currentDropDown = $(this).next('.b-hub-status__dropdown');
+	if(currentDropDown.hasClass('b-hub-status__dropdown_open')) {
+		$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+	} else {
+		$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+		currentDropDown.slideDown(200);
+		currentDropDown.addClass('b-hub-status__dropdown_open');
+	}
+	return false;
+});
+
+$(document).on('click', function(event) {
+	if(!$(event.target).closest('.js-header-dropdown').hasClass('js-header-dropdown')){
+		$('.b-hub-status__dropdown').slideUp(100);
+		$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+	}
+
+	if(
+		!$(event.target).closest('.js-dropen-menu').hasClass('js-dropen-menu') && 
+		$(event.target).closest('g').attr('class') != 'element-call-menu' && 
+		$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
+	){
+		$('.b-template-settings__dropdown').slideUp(100);
+	}
 });
 
 $(".b-form-input-dropdown-list").click(function(e) {
 	e.stopPropagation();
 });
 
-//document.getElementById("uploadBtn").onchange = function () {
-//	document.getElementById("uploadFile").value = this.value;
-//};
+$('.js-scrollbar').perfectScrollbar({
+	"wheelPropagation": true,
+	"swipePropagation": false
+});
+
+$('body').on('click', '.js-hide-resources', function(){
+	$('.b-cloud-add-tools').animate({'left': 0}, 300);
+	return false;
+});
+
+var UPDATE_NIGHTLY_BUILD_STATUS;
+

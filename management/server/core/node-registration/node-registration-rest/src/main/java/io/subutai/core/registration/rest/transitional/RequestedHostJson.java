@@ -16,7 +16,7 @@ public class RequestedHostJson implements RequestedHost
 {
     private String id;
     private String hostname;
-    private Set<HostHostInterfaceJson> interfaces = Sets.newHashSet();
+    private Set<HostInterfaceJson> interfaces = Sets.newHashSet();
     private HostArchitecture arch;
     private String secret;
 
@@ -74,11 +74,10 @@ public class RequestedHostJson implements RequestedHost
         Set<HostInterface> temp = Sets.newHashSet();
         temp.addAll( interfaces );
         return temp;
-        //        return Sets.newHashSet();
     }
 
 
-    public void setInterfaces( final Set<HostHostInterfaceJson> interfaces )
+    public void setInterfaces( final Set<HostInterfaceJson> interfaces )
     {
         this.interfaces = interfaces;
     }

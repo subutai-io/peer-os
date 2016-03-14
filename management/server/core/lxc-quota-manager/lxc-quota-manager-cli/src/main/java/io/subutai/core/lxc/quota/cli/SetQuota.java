@@ -1,19 +1,17 @@
 package io.subutai.core.lxc.quota.cli;
 
 
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
-import io.subutai.common.resource.ResourceValueParser;
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.lxc.quota.api.QuotaManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.resource.ResourceValueParser;
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 
 
 @Command( scope = "quota", name = "set", description = "Sets specified quota to container" )
@@ -27,8 +25,8 @@ public class SetQuota extends SubutaiShellCommandSupport
             + "container name" )
     private String containerName;
 
-    @Argument( index = 1, name = "resource type", required = true, multiValued = false, description = "specify resource "
-            + "type" )
+    @Argument( index = 1, name = "resource type", required = true, multiValued = false, description =
+            "specify resource " + "type" )
     private String resourceType;
 
     @Argument( index = 2, name = "quota value", required = true, multiValued = false, description = "set quota value" )
@@ -63,12 +61,9 @@ public class SetQuota extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        ResourceType type = ResourceType.valueOf( resourceType );
-        ContainerHost containerHost = localPeer.getContainerHostByName( containerName );
+        ContainerResourceType type = ContainerResourceType.valueOf( resourceType );
 
         ResourceValueParser parser = quotaManager.getResourceValueParser( type );
-        ResourceValue resourceValue = parser.parse( quotaValue );
-        quotaManager.setQuota( containerHost.getContainerId(), type, resourceValue );
         return null;
     }
 }

@@ -1,6 +1,7 @@
 package io.subutai.core.network.impl;
 
 
+import java.time.Instant;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -19,17 +20,19 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PPeerInfo;
+import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.ContainerInfo;
-import io.subutai.core.network.api.N2NConnection;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -55,21 +58,119 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupN2NConnection( final String superNodeIp, final int superNodePort, final String interfaceName,
-                                    final String communityName, final String localIp, final String keyType,
-                                    final String pathToKeyFile ) throws NetworkManagerException
+    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException
     {
         execute( getManagementHost(),
-                commands.getSetupN2NConnectionCommand( superNodeIp, superNodePort, interfaceName, communityName,
-                        localIp, keyType, pathToKeyFile ) );
+                commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
+                        getUnixTimestampOffset( secretKeyTtlSec ) ) );
+    }
+
+
+    private long getUnixTimestampOffset( long offsetSec )
+    {
+        long unixTimestamp = Instant.now().getEpochSecond();
+        return unixTimestamp + offsetSec;
     }
 
 
     @Override
-    public void removeN2NConnection( final String interfaceName, final String communityName )
+    public void removeP2PConnection( final String communityName ) throws NetworkManagerException
+    {
+        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( communityName ) );
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws NetworkManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
+
+        execute( getManagementHost(),
+                commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
+    }
+
+
+    @Override
+    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException
+    {
+        Set<P2PConnection> connections = Sets.newHashSet();
+
+        CommandResult result = execute( getManagementHost(), commands.getListP2PConnectionsCommand() );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "(\\w+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.*)" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+            }
+        }
+
+        return connections;
+    }
+
+
+    @Override
+    public PingDistance getPingDistance( final Host host, final String sourceHostIp, final String targetHostIp )
             throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveN2NConnectionCommand( interfaceName, communityName ) );
+
+        CommandResult result = execute( host, commands.getPingDistanceCommand( targetHostIp ) );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        PingDistance distance = new PingDistance( sourceHostIp, targetHostIp, null, null, null, null );
+        Pattern p = Pattern.compile( "^rtt.*(\\d+\\.\\d+)/(\\d+\\.\\d+)/(\\d+\\.\\d+)/(\\d+\\.\\d+).*" );
+
+        while ( st.hasMoreTokens() )
+        {
+            String nextToken = st.nextToken();
+            Matcher m = p.matcher( nextToken );
+
+            if ( m.find() && m.groupCount() == 4 )
+            {
+                distance = new PingDistance( sourceHostIp, targetHostIp, new Double( m.group( 1 ) ),
+                        new Double( m.group( 2 ) ), new Double( m.group( 3 ) ), new Double( m.group( 4 ) ) );
+                break;
+            }
+        }
+        return distance;
+    }
+
+
+    @Override
+    public Set<P2PPeerInfo> listPeersInEnvironment( final String communityName ) throws NetworkManagerException
+    {
+        Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
+
+        CommandResult result =
+                execute( getManagementHost(), commands.getListPeersInEnvironmentCommand( communityName ) );
+
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "(.+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.+)" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                p2PPeerInfos.add( new P2PPeerInfo( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+            }
+        }
+
+
+        return p2PPeerInfos;
     }
 
 
@@ -95,24 +196,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupGateway( final String gatewayIp, final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        execute( getManagementHost(), commands.getSetupGatewayCommand( gatewayIp, vLanId ) );
-    }
-
-
-    @Override
-    public void setupGatewayOnContainer( final String containerName, final String gatewayIp,
-                                         final String interfaceName ) throws NetworkManagerException
-    {
-        execute( getContainerHost( containerName ),
-                commands.getSetupGatewayOnContainerCommand( gatewayIp, interfaceName ) );
-    }
-
-
-    @Override
     public void removeGateway( final int vLanId ) throws NetworkManagerException
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
@@ -126,9 +209,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        Set<Vni> reservedVnis = getReservedVnis();
-
-        for ( Vni vni : reservedVnis )
+        for ( Vni vni : getReservedVnis().list() )
         {
             if ( vni.getEnvironmentId().equals( environmentId.getId() ) )
             {
@@ -174,34 +255,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<N2NConnection> listN2NConnections() throws NetworkManagerException
-    {
-        Set<N2NConnection> connections = Sets.newHashSet();
-
-        CommandResult result = execute( getManagementHost(), commands.getListN2NConnectionsCommand() );
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile(
-                "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)"
-                        + "\\s+(\\w+)\\s+(\\w+)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 5 )
-            {
-                connections.add( new N2NConnectionImpl( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
-                        m.group( 4 ), m.group( 5 ) ) );
-            }
-        }
-
-        return connections;
-    }
-
-
-    @Override
     public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final String environmentId )
             throws NetworkManagerException
     {
@@ -237,7 +290,7 @@ public class NetworkManagerImpl implements NetworkManager
         CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
 
         Pattern p = Pattern.compile( String.format(
-                        "\\s*(%s\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
+                        "\\s*(%s\\d+)\\s*(\\d+)\\s*(\\d+)\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
                                 + "}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*", NetworkManager.TUNNEL_PREFIX ),
                 Pattern.CASE_INSENSITIVE );
 
@@ -387,9 +440,9 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<Vni> getReservedVnis() throws NetworkManagerException
+    public Vnis getReservedVnis() throws NetworkManagerException
     {
-        Set<Vni> reservedVnis = Sets.newHashSet();
+        Vnis reservedVnis = new Vnis();
 
         CommandResult result = execute( getManagementHost(), commands.getListReservedVnisCommand() );
 
@@ -455,7 +508,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected ManagementHost getManagementHost() throws NetworkManagerException
+    protected Host getManagementHost() throws NetworkManagerException
     {
         try
         {
@@ -516,9 +569,18 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void exchangeSshKeys( final Set<ContainerHost> containers ) throws NetworkManagerException
+    public void exchangeSshKeys( final Set<ContainerHost> containers, final Set<String> additionalSshKeys )
+            throws NetworkManagerException
     {
-        getSshManager( containers ).execute();
+        getSshManager( containers ).execute( additionalSshKeys, false );
+    }
+
+
+    @Override
+    public void appendSshKeys( final Set<ContainerHost> containers, final Set<String> sshKeys )
+            throws NetworkManagerException
+    {
+        getSshManager( containers ).execute( sshKeys, true );
     }
 
 

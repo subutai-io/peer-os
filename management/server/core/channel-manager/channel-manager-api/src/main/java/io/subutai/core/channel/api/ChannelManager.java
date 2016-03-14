@@ -8,5 +8,4 @@ package io.subutai.core.channel.api;
  */
 public interface ChannelManager
 {
-    boolean isEncryptionEnabled();
 }

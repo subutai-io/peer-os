@@ -3,6 +3,8 @@ package io.subutai.core.environment.impl.entity;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -11,16 +13,22 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.persistence.UniqueConstraint;
 
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +38,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.Blueprint;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -39,12 +46,20 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.N2NUtil;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**
@@ -54,69 +69,97 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
  * @see ContainerHost
  */
 @Entity
-@Table( name = "env" )
+@Table( name = "env",
+        uniqueConstraints=@UniqueConstraint(columnNames={"name", "user_id"}))
 @Access( AccessType.FIELD )
+@JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE )
 public class EnvironmentImpl implements Environment, Serializable
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentImpl.class );
 
     @Transient
+    @JsonIgnore
     private EnvironmentManagerImpl environmentManager;
 
     @Id
     @Column( name = "environment_id" )
+    @JsonProperty("environmentId")
     private String environmentId;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @Column( name = "peer_id", nullable = false )
+    @JsonProperty("peerId")
     private String peerId;
 
     @Column( name = "name", nullable = false )
+    @JsonProperty("name")
     private String name;
 
     @Column( name = "create_time", nullable = false )
+    @JsonProperty("created")
     private long creationTimestamp = System.currentTimeMillis();
 
     @Column( name = "subnet_cidr" )
+    @JsonProperty("subnet")
     private String subnetCidr;
 
     @Column( name = "last_used_ip_idx" )
+    @JsonIgnore
     private int lastUsedIpIndex;
 
     @Column( name = "vni" )
+    @JsonIgnore
     private Long vni;
-
-    @Column( name = "super_node" )
-    private String superNode;
-
-    @Column( name = "super_node_port" )
-    private int superNodePort;
 
 
     @Column( name = "tunnel_network" )
+    @JsonIgnore
     private String tunnelNetwork;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
+    @JsonIgnore
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = false )
+    @JsonIgnore
     private Set<PeerConf> peerConfs = Sets.newHashSet();
 
     @Enumerated( EnumType.STRING )
     @Column( name = "status", nullable = false )
+    @JsonProperty("status")
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
-    @Column( name = "public_key", length = 3000 )
-    private String publicKey;
+    @Column( name = "relation_declaration", length = 3000 )
+    @JsonIgnore
+    private String relationDeclaration;
+
+    @Column( name = "initial_blueprint" )
+    @JsonIgnore
+    @Lob
+    private String rawBlueprint;
 
     @Column( name = "user_id" )
+    @JsonIgnore
     private Long userId;
 
+    @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentAlertHandlerImpl.class,
+            cascade = CascadeType.ALL, orphanRemoval = true )
+    @JsonIgnore
+    private Set<EnvironmentAlertHandler> alertHandlers = Sets.newHashSet();
+
+
+    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    @JsonIgnore
+    private Set<String> sshKeys = new HashSet<>();
+
     @Transient
+    @JsonIgnore
     private EnvironmentId envId;
 
 
@@ -133,7 +176,10 @@ public class EnvironmentImpl implements Environment, Serializable
 
         this.name = name;
         this.subnetCidr = cidr.getInfo().getCidrSignature();
-        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
+        if ( !Strings.isNullOrEmpty( sshKey ) )
+        {
+            sshKeys.add( sshKey.trim() );
+        }
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
@@ -151,32 +197,59 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String getSshKey()
-    {
-        return publicKey;
-    }
-
-
-    @Override
-    public void setSshKey( final String sshKey, boolean async ) throws EnvironmentModificationException
+    public void addSshKey( final String sshKey, final boolean async ) throws EnvironmentModificationException
     {
         try
         {
-            environmentManager.setSshKey( getId(), sshKey, async );
+            environmentManager.addSshKey( getId(), sshKey, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
             //this should not happen
-            LOG.error( String.format( "Error setting ssh key to environment %s", getName() ), e );
+            LOG.error( String.format( "Error adding ssh key to environment %s", getName() ), e );
             throw new EnvironmentModificationException( e );
         }
     }
 
 
-    public void saveSshKey( final String sshKey )
+    @Override
+    public void removeSshKey( final String sshKey, final boolean async ) throws EnvironmentModificationException
     {
-        this.publicKey = Strings.isNullOrEmpty( sshKey ) ? null : sshKey.trim();
-        //        dataService.update( this );
+        try
+        {
+            environmentManager.removeSshKey( getId(), sshKey, async );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            //this should not happen
+            LOG.error( String.format( "Error removing ssh key from environment %s", getName() ), e );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    @Override
+    public Set<String> getSshKeys()
+    {
+        return sshKeys;
+    }
+
+
+    public void addSshKey( final String sshKey )
+    {
+        if ( !Strings.isNullOrEmpty( sshKey ) )
+        {
+            sshKeys.add( sshKey );
+        }
+    }
+
+
+    public void removeSshKey( final String sshKey )
+    {
+        if ( !Strings.isNullOrEmpty( sshKey ) )
+        {
+            sshKeys.remove( sshKey );
+        }
     }
 
 
@@ -205,6 +278,31 @@ public class EnvironmentImpl implements Environment, Serializable
     public EnvironmentStatus getStatus()
     {
         return status;
+    }
+
+
+    @Override
+    public String getRelationDeclaration()
+    {
+        return relationDeclaration;
+    }
+
+
+    public void setRelationDeclaration( final String relationDeclaration )
+    {
+        this.relationDeclaration = relationDeclaration;
+    }
+
+
+    public String getRawTopology()
+    {
+        return rawBlueprint;
+    }
+
+
+    public void setRawTopology( final String rawBlueprint )
+    {
+        this.rawBlueprint = rawBlueprint;
     }
 
 
@@ -295,7 +393,44 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public Set<EnvironmentContainerHost> getContainerHosts()
     {
-        return containers;
+        Set<EnvironmentContainerHost> containerHosts;
+
+        if ( containers == null )
+        {
+            containerHosts = Sets.newHashSet();
+        }
+        else
+        {
+            containerHosts = Sets.newConcurrentHashSet( containers );
+        }
+
+        if ( !CollectionUtil.isCollectionEmpty( containerHosts ) && environmentManager != null )
+        {
+            RelationManager relationManager = environmentManager.getRelationManager();
+            IdentityManager identityManager = environmentManager.getIdentityManager();
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate userDelegate = identityManager.getUserDelegate( activeUser );
+
+
+            if ( userDelegate != null )
+            {
+                for ( Iterator<EnvironmentContainerHost> iterator = containerHosts.iterator(); iterator.hasNext(); )
+                {
+                    final EnvironmentContainerHost containerHost = iterator.next();
+                    RelationMeta relationMeta =
+                            new RelationMeta( userDelegate, this, containerHost, containerHost.getId() );
+                    boolean trustedRelation =
+                            relationManager.getRelationInfoManager().allHasReadPermissions( relationMeta );
+
+                    if ( !trustedRelation )
+                    {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        return containerHosts;
     }
 
 
@@ -309,12 +444,12 @@ public class EnvironmentImpl implements Environment, Serializable
 
     //TODO: remove environmentId param
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Blueprint blueprint,
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           boolean async ) throws EnvironmentModificationException
     {
         try
         {
-            return environmentManager.growEnvironment( environmentId, blueprint, async );
+            return environmentManager.growEnvironment( environmentId, topology, async );
         }
         catch ( EnvironmentNotFoundException e )
         {
@@ -326,7 +461,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public Set<Peer> getPeers()
+    public Set<Peer> getPeers() throws PeerException
     {
         Set<Peer> peers = Sets.newHashSet();
 
@@ -342,6 +477,7 @@ public class EnvironmentImpl implements Environment, Serializable
     public void removeContainer( ContainerHost container )
     {
         Preconditions.checkNotNull( container );
+
         containers.remove( container );
     }
 
@@ -439,32 +575,6 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String getSuperNode()
-    {
-        return superNode;
-    }
-
-
-    public void setSuperNode( final String superNode )
-    {
-        this.superNode = superNode;
-    }
-
-
-    @Override
-    public int getSuperNodePort()
-    {
-        return superNodePort;
-    }
-
-
-    public void setSuperNodePort( final int superNodePort )
-    {
-        this.superNodePort = superNodePort;
-    }
-
-
-    @Override
     public String getTunnelNetwork()
     {
         return tunnelNetwork;
@@ -512,29 +622,14 @@ public class EnvironmentImpl implements Environment, Serializable
         {
             throw new IllegalStateException( "Tunnel network not defined yet." );
         }
-        return N2NUtil.generateInterfaceName( tunnelNetwork );
+        return P2PUtil.generateInterfaceName( tunnelNetwork );
     }
 
 
     @Override
     public String getTunnelCommunityName()
     {
-        if ( tunnelNetwork == null )
-        {
-            throw new IllegalStateException( "Tunnel network does not defined yet." );
-        }
-        return N2NUtil.generateCommunityName( this.environmentId );
-    }
-
-
-    @Override
-    public String toString()
-    {
-        return "EnvironmentImpl{" + "userId=" + userId + ", publicKey='" + publicKey + '\'' + ", status=" + status
-                + ", peerConfs=" + peerConfs + ", containers=" + containers + ", superNodePort=" + superNodePort
-                + ", superNode='" + superNode + '\'' + ", vni=" + vni + ", lastUsedIpIndex=" + lastUsedIpIndex
-                + ", subnetCidr='" + subnetCidr + '\'' + ", creationTimestamp=" + creationTimestamp + ", name='" + name
-                + '\'' + ", peerId='" + peerId + '\'' + ", environmentId='" + environmentId + '\'' + '}';
+        return P2PUtil.generateCommunityName( environmentId );
     }
 
 
@@ -552,5 +647,74 @@ public class EnvironmentImpl implements Environment, Serializable
     public void setUserId( final Long userId )
     {
         this.userId = userId;
+    }
+
+
+    @Override
+    public Set<EnvironmentAlertHandler> getAlertHandlers()
+    {
+        return alertHandlers;
+    }
+
+
+    @Override
+    public void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
+    {
+        if ( environmentAlertHandler == null )
+        {
+            throw new IllegalArgumentException( "Invalid alert handler id." );
+        }
+        EnvironmentAlertHandlerImpl handlerId =
+                new EnvironmentAlertHandlerImpl( environmentAlertHandler.getAlertHandlerId(),
+                        environmentAlertHandler.getAlertHandlerPriority() );
+        handlerId.setEnvironment( this );
+        alertHandlers.add( handlerId );
+    }
+
+
+    @Override
+    public void removeAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
+    {
+        alertHandlers.remove( environmentAlertHandler );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", version=" + version + ", peerId='"
+                + peerId + '\'' + ", name='" + name + '\'' + ", creationTimestamp=" + creationTimestamp
+                + ", subnetCidr='" + subnetCidr + '\'' + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni
+                + ", tunnelNetwork='" + tunnelNetwork + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
+                + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
+                + alertHandlers + ", envId=" + envId + '}';
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.EnvironmentManagement.getName();
     }
 }

@@ -1,187 +1,518 @@
 'use strict';
 
 angular.module('subutai.monitoring.controller', [])
-    .controller('MonitoringCtrl', MonitoringCtrl);
+	.controller('MonitoringCtrl', MonitoringCtrl);
 
-MonitoringCtrl.$inject = ['$scope', 'monitoringSrv'];
+MonitoringCtrl.$inject = ['$scope', '$timeout', 'monitoringSrv', 'cfpLoadingBar'];
 
-function MonitoringCtrl($scope, monitoringSrv) {
+function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 
-    var vm = this;
-    vm.currentType = 'peer';
-    vm.charts = [{}, {}, {}, {}];
-    vm.environments = [];
-    vm.containers = [];
-    vm.hosts = [];
-    vm.selectedEnvironment = '';
-    vm.currentHost = '';
-    vm.period = 1;
+	var vm = this;
 
-    //functions
-    vm.showContainers = showContainers;
-    vm.setCurrentType = setCurrentType;
-    vm.getServerData = getServerData;
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
 
-    monitoringSrv.getEnvironments().success(function (data) {
-        vm.environments = data;
-    });
+	vm.currentType = 'peer';
+	vm.charts = [{}, {}, {}, {}];
+	vm.environments = [];
+	vm.containers = [];
+	vm.hosts = [];
+	vm.selectedEnvironment = '';
+	vm.currentHost = '';
+	vm.period = 1;
+	vm.parseOptions = {
+		1: {labelStep: 10, valueStep: 1},
+		6: {labelStep: 60, valueStep: 5},
+		12: {labelStep: 120, valueStep: 10},
+		24: {labelStep: 240, valueStep: 20},
+		48: {labelStep: 480, valueStep: 40}
+	};
+
+	//functions
+	vm.showContainers = showContainers;
+	vm.setCurrentType = setCurrentType;
+	vm.getServerData = getServerData;
+
+	monitoringSrv.getEnvironments().success(function (data) {
+		vm.environments = data;
+	});
 
 	monitoringSrv.getResourceHosts().success(function (data) {
 		vm.hosts = data;
-		for(var i = 0; i < vm.hosts.length; i++) {
-			if(vm.hosts[i].hostname == 'management') {
+		vm.currentHost = vm.hosts.length > 0 ? vm.hosts[0].id : '';
+		getServerData();
+	});
 
-				vm.hosts[i].id = '';
+	function setCurrentType(type) {
+		vm.containers = [];
+		vm.selectedEnvironment = '';
+		vm.currentHost = '';
+		vm.currentType = type;
+	}
 
-				var temp = angular.copy(vm.hosts[0]);
-				vm.hosts[0] = angular.copy(vm.hosts[i]);
-				vm.currentHost = vm.hosts[i].id;
-				vm.hosts[i] = temp;
-
-				getServerData();
+	function showContainers(environmentId) {
+		vm.containers = [];
+		for (var i in vm.environments) {
+			if (environmentId == vm.environments[i].id) {
+				vm.containers = vm.environments[i].containers;
 				break;
 			}
 		}
-	});
-
-    function setCurrentType(type) {
-        vm.containers = [];
-        vm.selectedEnvironment = '';
-        vm.currentType = type;
-    }
-
-    function showContainers(environmentId) {
-        vm.containers = [];
-        for (var i in vm.environments) {
-            if (environmentId == vm.environments[i].id) {
-                vm.containers = vm.environments[i].containers;
-                break;
-            }
-        }
-    }
+	}
 
 	function getServerData() {
-		if(vm.period > 0) {
+		if (vm.period > 0 && vm.currentHost) {
 			LOADING_SCREEN();
 			monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
 				vm.charts = [];
-				for(var i = 0; i < data.metrics.length; i++) {
-					vm.charts.push(getChartData(data.metrics[i]));
+				if(data['metrics']) {
+					for (var i = 0; i < data['metrics'].length; i++) {
+						angular.equals(data['metrics'][i], {}) ?
+							vm.charts.push({data: [], name: "NO DATA"}) :
+								vm.charts.push(getChartData(data['metrics'][i]));
+					}
+				} else {
+					for (var i = 0; i < 4; i++) {
+						vm.charts.push({data: [], name: "NO DATA"});
+					}
 				}
-				//getServerData();
 				LOADING_SCREEN('none');
-			}).error(function(error){
+			}).error(function (error) {
 				console.log(error);
 				LOADING_SCREEN('none');
 			});
 		}
 	}
 
-    vm.onClick = function (points, evt) {
-        console.log(points, evt);
-    };
+	vm.onClick = function (points, evt) {
+		console.log(points, evt);
+	};
 
-    function getChartData(obj) {
-        //console.log(obj);
-        var result = {};
-        result.values = [];
-        result.labels = [];
-        result.series = [];
-        result.options = {};
-        result.name = '';
-        result.unit = "MB";
+	function getChartData(obj) {
+		var series = obj.series;
+		var seriesName = obj.series[0].name;
 
-        var setLabels = true;
-        if (obj.series !== undefined) {
-            var timeInterval = null;
-            switch (parseInt( vm.period )) {
-                case 6:
-                    timeInterval = "1h";
-                    break;
-                case 12:
-                    timeInterval = "2h";
-                    break;
-                default:
-                case 1:
-                    timeInterval = "10m";
-                    break;
-            }
+		/** Chart options **/
+		var chartOptions = {
+			chart: {
+				type: 'lineChart',
+				height: 350,
+				margin: {
+					top: 20,
+					right: 20,
+					bottom: 70,
+					left: 60
+				},
+				x: function (d) {
+					return d.x;
+				},
+				y: function (d) {
+					return d.y;
+				},
+				legend: {
+					key: function (d) {
+						return;
+					},
+					dispatch: {
+						legendMouseover: function (t, u) {
+							chartSeries.legend = t.key;
+							$scope.$apply();
+							return;
+						},
+						legendMouseout: function (t, u) {
+							chartSeries.legend = "";
+							$scope.$apply();
+							return;
+						}
+					},
+					padding: 20
+				},
+				useInteractiveGuideline: true,
+				yAxis: {
+					showMaxMin: false,
+					tickFormat: function (d) {
+						if (seriesName.indexOf('cpu') > -1 && d > 100) {
+							return "";
+						}
+						return d;
+					}
+				},
+				forceY: null,
+				xAxis: {
+					showMaxMin: false,
+					tickValues: [],
+					tickFormat: function (d) {
+						return d3.time.format("%H:%M")(new Date(d));
+					}
+				},
+				interpolate: 'monotone',
+				callback: function (chart) {
+				}
+			}
+		};
 
-            result.name = obj.series[0].name;
-            if (obj.series[0].name.indexOf('cpu') > -1) {
-                result.options = {
-                    pointDot: false,
-                    scaleShowVerticalLines: false,
-                    scaleOverride: true,
-                    scaleStartValue: 0,
-                    scaleStepWidth: 20,
-                    scaleSteps: 5,
-                    showXLabelseByEveryMinutes: timeInterval,
-                    animation: false
-                };
-            } else {
-                result.options = {
-                    pointDot: false,
-                    scaleShowVerticalLines: false,
-                    showXLabelseByEveryMinutes: timeInterval,
-                    animation: false
-                };
-            }
+		if(seriesName == 'host_disk') {
+			chartOptions.chart.interactiveLayer = getCustomTooltip('used', 'total');
+		}
 
-            for (var i = 0; i < obj.series.length; i++) {
-                var currentValues = [];
-                for (var j = 0; j < obj.series[i].values.length; j++) {
-                    if (setLabels) {
-                        //var label = obj.series[i].values[j][0];
-                        var label = moment(obj.series[i].values[j][0]).format('H:mm');
-                        result.labels.push(label);
-                    }
+		if(seriesName == 'host_net') {
+			chartOptions.chart.interactiveLayer = getCustomTooltip('in', 'out');
+		}
 
-                    switch (obj.series[0].name) {
-                        case 'lxc_net':
-                        case 'host_net':
-                            currentValues.push(Math.round((obj.series[i].values[j][1] / 70)  * 100) / 100);
-                            break;
-                        case 'lxc_memory':
-                        case 'host_memory':
-                            currentValues.push(Math.round(obj.series[i].values[j][1] / Math.pow(10, 6)  * 100) / 100);
-                            break;
-                        case 'lxc_disk':
-                        case 'host_disk':
-                            currentValues.push(Math.round(obj.series[i].values[j][1] / Math.pow(10, 6) * 100) / 100);
-                            break;
-                        case 'lxc_cpu':
-                        case 'host_cpu':
-                            currentValues.push(Math.round(obj.series[i].values[j][1] * 100) / 100);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                setLabels = false;
-                result.values.push(currentValues);
+		
+		function getCustomTooltip(firstValue, secondValue) {
+			return {"tooltip": {"contentGenerator": function(d) {
+				//console.log(d);
 
-                var seriesLabel = obj.series[i].tags.type;
+				var values = {};
+				for (var i = 0; i < d.series.length; i++) {
+					var currentSerieKey = d.series[i].key.split(' ');
+					if(values[currentSerieKey[0]] == undefined) {
+						values[currentSerieKey[0]] = {};
+					}
+					values[currentSerieKey[0]][currentSerieKey[1]] = {"value": d.series[i].value, "color": d.series[i].color};
+				}
 
-                if( obj.series[0].name.indexOf( "disk" ) > 0 )
-                {
-                    seriesLabel = obj.series[i].tags.mount;
-                }
+				var tooltipTable = [
+					'<table>',
+						'<thead>',
+							'<tr>',
+								'<td>',
+									'<strong class="x-value">' + d.value + '</strong>',
+								'</td>',
+								'<td class="value_left">',
+									firstValue,
+								'</td>',
+								'<td class="value_left">',
+									'/',
+								'</td>',
+								'<td class="value_left">',
+									secondValue,
+								'</td>',
+							'</tr>',
+						'</thead>',
+						'<tbody>',
+				];
 
-                if( obj.series[0].name.indexOf( "host_net" ) >= 0 )
-                {
-                    seriesLabel = obj.series[i].tags.iface + " " + seriesLabel;
-                }
+				for(var key in values) {
 
-                result.series.push(seriesLabel);
-            }
-            if(obj.series[0].name == 'host_cpu' || obj.series[0].name == 'lxc_cpu') {
-                result.unit = "%";
-            } else {
-                result.unit = "MB";
-            }
-        }
-        return result;
-    }
+					var firstValueHtml = '';
+					var secondValueHtml = '';
+					if(values[key][firstValue] !== undefined) {
+						firstValueHtml = '<div style="background-color: ' + values[key][firstValue].color + '"></div> ' + values[key][firstValue].value;
+					}
+					if(values[key][secondValue] !== undefined) {
+						secondValueHtml = '<div style="background-color: ' + values[key][secondValue].color + '"></div> ' + values[key][secondValue].value;
+					}
+
+					var row = [
+					'<tr>',
+						'<td class="key">' + key + '</td>',
+						'<td class="value_left legend-color-guide">',
+							firstValueHtml,
+						'</td>',
+						'<td class="value_left">/</td>',
+						'<td class="value_left legend-color-guide">',
+							secondValueHtml,
+						'</td>',
+					'</tr>'
+					].join('');
+					tooltipTable.push(row);
+				}
+
+				tooltipTable.push('</tbody>');
+				tooltipTable.push('</table>');
+				return tooltipTable.join('');
+			}}};
+		}
+
+		var chartSeries = {
+			name: seriesName,
+			unit: null,
+			data: [],
+			options: chartOptions,
+			legend: ""
+		};
+		var maxValue = 0, unitCoefficient = 1;
+		var minutes, start, end, diff, leftLimit, duration;
+		var stubValues = [];
+
+		/** Exclude "available" field from HOST_DISK series **/
+		if(series[0].name == 'host_disk') {
+			var temp = [];
+			for(var serie in series) {
+				if(series[serie].tags.type != 'available') {
+					temp.push(series[serie]);
+				}
+			}
+			series = temp;
+		}
+
+		/** Calculate amount of incomplete data received form rest **/
+		start = moment(series[0].values[0][0]);
+		end = moment(getEndDate(obj));
+		duration = moment.duration(end.diff(start)).asMinutes();
+		diff = vm.period * 60 - duration;
+		leftLimit = moment(series[0].values[0][0]).subtract(diff, 'minutes');
+
+		/** Generate stub values if data is incomplete at the begining **/
+		if (diff > 0) {
+			var startPoint = moment(series[0].values[0][0]);
+			while (startPoint.subtract(1, "minutes") >= leftLimit) {
+				stubValues.unshift({
+					x: startPoint.valueOf(),
+					y: 0
+				});
+			}
+		}
+
+		/** Generate stub values if data is incomplete at the end **/
+		for(var item in series) {
+			if(moment(series[item].values[series[item].values.length - 1][0]).valueOf() < moment(getEndDate(obj)).valueOf()) {
+				var from = moment(series[item].values[series[item].values.length - 1][0]);
+				var to = moment(getEndDate(obj)).valueOf();
+
+				from.add(1, "minutes");
+				while(from.valueOf() <= to) {
+					series[item].values.push([from.valueOf(), 0]);
+					from.add(1, "minutes");
+				}
+			}
+		}
+
+		/** Restructure rest data into required format **/
+		/** Append stub values at the beginning of VALUES array **/
+		/** Generate scaled values for X axis **/
+		for (var item in series) {
+			var values = series[item].values;
+			var realValues = [];
+			for (var value in values) {
+				realValues.push({
+					x: moment(values[value][0]).valueOf(),
+					y: values[value][1]
+				});
+			}
+			series[item].values = getXAxisScaledValues(stubValues.concat(realValues));
+		}
+
+		/** Define maximum value for right unit detection **/
+		for(var serie in series) {
+			for(var item in series[serie].values) {
+				if(Math.round(series[serie].values[item].y * 100) / 100 > maxValue ) {
+					maxValue = Math.round(series[serie].values[item].y * 100) / 100;
+				} else {
+					continue;
+				}
+			}
+		}
+
+		/** Set chart's X axis labels **/
+		chartOptions.chart.xAxis.tickValues = getXAxisLabels(series[0].values);
+
+		/** Define data unit **/
+		switch (seriesName) {
+			case 'host_cpu':
+			case 'lxc_cpu':
+				chartOptions.chart.yAxis.axisLabel = "%";
+				chartOptions.chart.forceY = 100;
+				chartSeries.unit = "%";
+				break;
+			case 'host_net':
+			case 'lxc_net':
+				switch (true) {
+					case maxValue / Math.pow(10, 9) > 1:
+						chartOptions.chart.yAxis.axisLabel = "Gbps";
+						chartSeries.unit = "Gbps";
+						chartOptions.chart.forceY = maxValue / Math.pow(10, 9);
+						unitCoefficient = Math.pow(10, 9);
+						break;
+					case maxValue / Math.pow(10, 6) > 1:
+						chartOptions.chart.yAxis.axisLabel = "Mbps";
+						chartSeries.unit = "Mbps";
+						chartOptions.chart.forceY = maxValue / Math.pow(10, 6);
+						unitCoefficient = Math.pow(10, 6);
+						break;
+					case maxValue / Math.pow(10, 3) > 1:
+						chartOptions.chart.yAxis.axisLabel = "Kbps";
+						chartSeries.unit = "Kbps";
+						chartOptions.chart.forceY = maxValue / Math.pow(10, 3);
+						unitCoefficient = Math.pow(10, 3);
+						break;
+					default:
+						chartOptions.chart.yAxis.axisLabel = "bps";
+						chartSeries.unit = "bps";
+						chartOptions.chart.forceY = maxValue;
+						unitCoefficient = 1;
+						break;
+				}
+				break;
+			case 'host_memory':
+			case 'lxc_memory':
+			case 'host_disk':
+			case 'lxc_disk':
+				switch (true) {
+					case maxValue / Math.pow(10, 9) > 1:
+						chartOptions.chart.yAxis.axisLabel = "GB";
+						chartOptions.chart.forceY = maxValue / Math.pow(10, 9);
+						chartSeries.unit = "GB";
+						unitCoefficient = Math.pow(10, 9);
+						break;
+					case maxValue / Math.pow(10, 6) > 1:
+						chartOptions.chart.yAxis.axisLabel = "MB";
+						chartOptions.chart.forceY = maxValue / Math.pow(10, 6);
+						chartSeries.unit = "MB";
+						unitCoefficient = Math.pow(10, 6);
+						break;
+					case maxValue / Math.pow(10, 3):
+						chartOptions.chart.yAxis.axisLabel = "KB";
+						chartOptions.chart.forceY = (maxValue / Math.pow(10, 3));
+						chartSeries.unit = "KB";
+						unitCoefficient = Math.pow(10, 3);
+						break;
+					default:
+						chartOptions.chart.yAxis.axisLabel = "Byte";
+						chartOptions.chart.forceY = maxValuez;
+						chartSeries.unit = "Byte";
+						unitCoefficient = 1;
+						break;
+				}
+			default:
+				break;
+		}
+
+		/** Iterate over series of rest data **/
+		for (var item in series) {
+			var chartSerie = {
+				values: [],
+				key: series[item].tags.type ? series[item].tags.type : "",
+				area: true
+			};
+			var values = series[item].values;
+
+			for (var value in values) {
+
+				switch (seriesName) {
+					case 'host_net':
+						chartSerie.key = series[item].tags.iface + ' ' + series[item].tags.type;
+						break;
+					case 'host_disk':
+						chartSerie.key = series[item].tags.mount + ' ' + series[item].tags.type;
+						break;
+					case 'lxc_disk':
+						chartSerie.key = series[item].tags.mount;
+						break;
+					case 'lxc_net':
+					case 'host_cpu':
+					case 'lxc_cpu':
+					case 'host_memory':
+					case 'lxc_memory':
+						break;
+					default:
+						console.error('Unregistered target type!');
+						break;
+				}
+				chartSerie.values.push({
+					x: moment(values[value].x).valueOf(),
+					y: values[value].y == undefined ? 0 : parseFloat((values[value].y / unitCoefficient).toFixed(2))
+				});
+			}
+			chartSeries.data.push(chartSerie);
+		}
+
+		/** Select chart color range **/
+		if (seriesName.indexOf('lxc') > -1) {
+			chartOptions.chart.color = d3.scale.category10().range();
+		} else {
+			chartOptions.chart.color = d3.scale.category20().range();
+		}
+		return chartSeries;
+	}
+
+	/** Generate X axis labels related to defined labelStep coefficient **/
+	function getXAxisLabels(data) {
+		var labels = [];
+		var labelStepCoefficient = vm.parseOptions[parseInt(vm.period)].labelStep;
+		var valueStepCoefficient = vm.parseOptions[vm.period].labelStep;
+		for (var index = 0; index < data.length; index++) {
+			if (moment(data[index].x).get('minute') == 0 ||
+					moment(data[index].x).get('minute') % labelStepCoefficient == 0 ||
+					parseInt(vm.period) == 1 && moment(data[index].x).get('minute') % valueStepCoefficient == 0
+			   ) {
+				labels.push(moment(data[index].x).valueOf());
+				var tempStore = moment(data[index].x).valueOf();
+				while (true) {
+					tempStore += labelStepCoefficient * 60000;
+					if (tempStore > moment(data[data.length - 1].x).valueOf()) {
+						return labels;
+					}
+					labels.push(tempStore);
+				}
+				return labels;
+			}
+		}
+	}
+
+	/** Generate X axis values related to defined valueStep coefficient **/
+	function getXAxisScaledValues(data) {
+		var chartDataMap = getChartDataMap(data);
+		var scaledData = [];
+		var valueStepCoefficient = vm.parseOptions[parseInt(vm.period)].valueStep;
+		var maxValue = moment(data[data.length - 1].x).valueOf();
+
+		for (var index = 0; index < data.length; index++) {
+			if (moment(data[index].x).get('minute') % valueStepCoefficient == 0) {
+				scaledData.push({
+					x: moment(data[index].x).valueOf(),
+					y: data[index].y
+				});
+				var tempStore = moment(data[index].x);
+				while (tempStore.add(valueStepCoefficient, 'minutes').valueOf() <= maxValue) {
+					scaledData.push({
+						x: tempStore.valueOf(),
+						y: chartDataMap[tempStore.valueOf()]
+					});
+				}
+				if (tempStore.subtract(valueStepCoefficient, 'minutes').valueOf() == maxValue) {
+					return scaledData;
+				} else {
+					scaledData.push({
+						x: maxValue,
+						y: chartDataMap[maxValue]
+					});
+					return scaledData;
+				}
+			}
+			if (index == 0) {
+				scaledData.push({
+					x: moment(data[index].x).valueOf(),
+					y: data[index].y
+				});
+			}
+		}
+	}
+
+	/** Generate map from objects array **/
+	function getChartDataMap(data) {
+		var dataMap = {};
+		for (var index in data) {
+			dataMap[data[index].x] = data[index].y;
+		}
+		return dataMap;
+	}
+
+	/** Get max timestamp of series **/
+	function getEndDate(data) {
+		var maxValue = 0;
+		for (var serie in data.series) {
+			if(moment(data.series[serie].values[data.series[serie].values.length - 1][0]).valueOf() > maxValue) {
+				maxValue = moment(data.series[serie].values[data.series[serie].values.length - 1][0]).valueOf();
+			} else {
+				continue;
+			}
+		}
+		return maxValue;
+	}
 };
 

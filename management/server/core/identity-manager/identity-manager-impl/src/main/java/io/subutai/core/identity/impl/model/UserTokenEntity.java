@@ -5,17 +5,13 @@ import java.util.Date;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.token.TokenUtil;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 
 
@@ -28,7 +24,7 @@ import io.subutai.core.identity.api.model.UserToken;
 public class UserTokenEntity implements UserToken
 {
     @Id
-    @Column( name = "token", unique = true )
+    @Column( name = "token" )
     private String token;
 
     @Column( name = "secret" )
@@ -45,10 +41,6 @@ public class UserTokenEntity implements UserToken
 
     @Column( name = "valid_date" )
     private Date validDate;
-
-	/*@OneToOne (cascade = CascadeType.ALL, targetEntity = UserEntity.class)
-    @JoinColumn (name = "user_id", nullable = true, insertable = true, updatable = true)
-	private User user;*/
 
 
     @Column( name = "user_id" )
@@ -158,20 +150,6 @@ public class UserTokenEntity implements UserToken
     {
         this.validDate = validDate;
     }
-
-
-	/*@Override
-	public User getUser ()
-	{
-		return user;
-	}
-
-
-	@Override
-	public void setUser (final User user)
-	{
-		this.user = user;
-	}*/
 
 
     @Override

@@ -1,0 +1,80 @@
+<div ng-controller="AccountCtrl as accountCtrl">
+
+	<div class="b-workspace__header b-workspace__header_tabs">
+
+		<div class="b-tabs-menu b-tabs-menu_header">
+
+			<ul>
+				<li class="b-tabs-menu__item b-tabs-menu__item_active">
+					Public key
+				</li>
+				<li class="b-tabs-menu__item" ui-sref="change-pass">
+					Change password
+				</li>
+			</ul>
+		</div>
+</div>
+
+	<div class="b-workspace__content">
+		<div class="b-form">
+
+			<div class="b-pgp-page-row">
+				<div class="b-pgp-page-row_list">
+					<div class="b-pgp-page-block b-pgp-page-block_auto-width">
+						<div class="b-main-table-border">
+							<table class="b-main-table b-main-table_with-header b-main-table_horizontal" align="center">
+								<tr>
+									<th>Status</th>
+									<td>Active</td>
+								</tr>
+								<tr>
+									<th>KeyId(UserId)</th>
+									<td>{{ accountCtrl.publicKeyInfo.userId }}</td>
+								</tr>
+								<tr>
+									<th>Fingerprint</th>
+									<td>{{ accountCtrl.publicKeyInfo.fingerprint }}</td>
+								</tr>
+								<tr>
+									<th>Public Key:</th>
+									<td>
+										<textarea class="b-form-input b-form-input_textarea bp-set-pub-key"
+											ng-model="accountCtrl.publicKeyInfo.key"
+											style="width: 420px; height: 160px; font-family: monospace;">
+										</textarea>
+										<div class="b-pgp-page-block__buttons">
+											<button class="b-btn b-btn_blue" ng-click="accountCtrl.setPublicKey(accountCtrl.publicKeyInfo.key)">
+												Set public key
+											</button>
+											<div class="clear"></div>
+										</div>
+									</td>
+								</tr>
+								<tr ng-show="!accountCtrl.hasPGPplugin">
+									<th>Message:</th>
+									<td>
+										<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input"
+											ng-model="accountCtrl.message"
+											ng-change="accountCtrl.autoSign()"
+											style="width: 420px; height: 160px; font-family: monospace;">
+										</textarea>
+										<div class="b-pgp-page-block__buttons">
+											<button class="b-btn b-btn_blue" ng-click="accountCtrl.approveDocument()">
+												Approve delegate document
+											</button>
+											<div class="clear"></div>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+</div>
+

@@ -34,7 +34,7 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 			url += hostId + '/';
 		}
 		return $http.get(
-			url + period, 
+			url + period,
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);
 	}

@@ -2,26 +2,10 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
     >
-
-  <!-- Allow the use of system properties -->
-  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-
-  <cm:property-placeholder persistent-id="peer" update-strategy="none">
-    <cm:default-properties>
-      <cm:property name="ownerPublicKeyringFile" value="" />
-      <cm:property name="peerPublicKeyringFile" value="" />
-      <cm:property name="peerSecretKeyringFile" value="" />
-      <cm:property name="peerSecretKeyringPwd" value="" />
-      <!-- broker security -->
-      <cm:property name="encryptionEnabled" value="false" />
-    </cm:default-properties>
-  </cm:property-placeholder>
 
   <!-- ************************************************************************************************* -->
 
@@ -40,10 +24,6 @@
   <bean id="securityManager" scope="singleton" init-method="init" destroy-method="destroy"
         class="io.subutai.core.security.impl.SecurityManagerImpl">
 
-    <argument value="$[subutaiKeystorePath]/${ownerPublicKeyringFile}" />
-    <argument value="$[subutaiKeystorePath]/${peerSecretKeyringFile}" />
-    <argument value="$[subutaiKeystorePath]/${peerPublicKeyringFile}" />
-    <argument value="${peerSecretKeyringPwd}" />
     <argument ref="jsonProvider" />
     <property name="daoManager" ref="daoSecurityManager" />
     <property name="keyServer" ref="keyServer" />
@@ -54,20 +34,4 @@
 
   <service ref="securityManager" interface="io.subutai.core.security.api.SecurityManager" />
 
-  <!-- ************************************************************************************************** -->
-
-  <!-- broker security start -->
-  <bean id="encryptor" scope="singleton" class="io.subutai.core.security.broker.MessageEncryptor">
-    <argument value="${encryptionEnabled}" />
-  </bean>
-
-  <bean id="decryptor" scope="singleton" class="io.subutai.core.security.broker.MessageDecryptor">
-    <argument value="${encryptionEnabled}" />
-  </bean>
-
-  <service ref="encryptor" interface="io.subutai.core.broker.api.TextMessagePostProcessor" />
-
-  <service ref="decryptor" interface="io.subutai.core.broker.api.ByteMessagePreProcessor" />
-
-  <!-- broker security end -->
 </blueprint>

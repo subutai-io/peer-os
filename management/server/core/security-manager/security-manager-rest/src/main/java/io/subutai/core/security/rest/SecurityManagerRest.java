@@ -28,7 +28,8 @@ public interface SecurityManagerRest
     @POST
     @Path( "keyman/addpublickeyring" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response addPublicKeyRing( @FormParam( "hostid" ) String identityId, @FormParam( "keytext" ) String keyText );
+    public Response addPublicKeyRing( @FormParam( "hostid" ) String identityId,
+                                      @FormParam( "keytext" ) String keyText );
 
 
     /* *******************************
@@ -45,8 +46,17 @@ public interface SecurityManagerRest
      */
     @GET
     @Path( "keyman/getpublickeyring" )
-    @Produces( { MediaType.APPLICATION_JSON } )
+    @Produces( { MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON } )
     public Response getPublicKeyRing( @QueryParam( "hostid" ) String identityId );
+
+
+    /* *******************************
+     *
+     */
+    @GET
+    @Path( "keyman/getpublickey" )
+    @Produces( { MediaType.TEXT_PLAIN} )
+    public Response getPublicKey( @QueryParam( "hostid" ) String identityId );
 
 
     /* *******************************
@@ -85,7 +95,6 @@ public interface SecurityManagerRest
     public Response getKeyTrustTree( @QueryParam( "identityid" ) String identityId );
 
 
-
     /* *******************************
      *
      */
@@ -93,7 +102,6 @@ public interface SecurityManagerRest
     @Path( "keyman/trust/revoke" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response revokeKey( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
-
 
 
     /* *******************************
@@ -106,15 +114,13 @@ public interface SecurityManagerRest
                               @QueryParam( "level" ) int trustLevel );
 
 
-
     /* *******************************
      *
      */
     @GET
     @Path( "keyman/trust/verify" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response verifyTrust( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target);
-
+    public Response verifyTrust( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
 
 
     /* *******************************
@@ -123,7 +129,7 @@ public interface SecurityManagerRest
     @GET
     @Path( "keyman/signature/verify" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    public Response verifySignature( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target);
+    public Response verifySignature( @QueryParam( "source" ) String source, @QueryParam( "target" ) String target );
 
 
     /* *******************************

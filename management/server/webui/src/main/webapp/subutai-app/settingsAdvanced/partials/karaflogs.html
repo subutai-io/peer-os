@@ -1,0 +1,35 @@
+<script src="scripts/libs/nprogress.js"></script>
+<div class="b-main-table-border" ng-init="settingsAdvancedCtrl.getConfig()">
+	<table class="b-main-table b-main-table_auto-width" align="center" ng-init="settingsAdvancedCtrl.getConfig()">
+		<tr>
+			<td>
+				<!--<textarea id="ta" class="b-text-logs" ng-model="settingsAdvancedCtrl.config.karafLogs" spellcheck="false"></textarea>
+				<script>
+					setTimeout( function() { document.getElementById("ta").scrollTop = document.getElementById("ta").scrollHeight }, 500 );
+				</script>-->
+				<pre class="b-karaf-logs">
+					<code id="js-highlight-block" class="nginx b-highlight-block" ng-bind-html="settingsAdvancedCtrl.renderHtml(settingsAdvancedCtrl.config.karafLogs)"></code>
+				</pre>
+			</td>
+
+			<td>
+
+				<button
+				class="b-btn b-btn_blue g-margin-bottom"
+				ng-click="settingsAdvancedCtrl.getConfig()">
+					<i class="fa fa-refresh"></i>&#160;&#160;Refresh
+				</button><br>
+
+				<button
+				class="b-btn b-btn_green"
+				ng-click="settingsAdvancedCtrl.saveLogs()">
+					<i class="fa fa-floppy-o"></i>&#160;&#160;Export
+				</button>
+				
+			</td>
+		</tr>
+	</table>
+	<div class="b-loading-screen js-karaflogs-load-screen">
+		<div class="b-load-icon"></div>
+	</div>
+</div>

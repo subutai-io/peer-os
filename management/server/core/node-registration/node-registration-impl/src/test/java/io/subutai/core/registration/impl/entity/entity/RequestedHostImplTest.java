@@ -20,9 +20,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
 
-/**
- * Created by talas on 8/26/15.
- */
 public class RequestedHostImplTest
 {
 

@@ -10,9 +10,8 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.destruction.steps.CleanUpNetworkStep;
-import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupN2NStep;
-import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainersStep;
+import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
+import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupP2PStep;
 import io.subutai.core.environment.impl.workflow.destruction.steps.RemoveKeysStep;
 
 
@@ -32,9 +31,8 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public enum EnvironmentDestructionPhase
     {
         INIT,
-        DESTROY_CONTAINERS,
-        CLEANUP_NETWORKING,
-        CLEANUP_N2N,
+        CLEANUP_ENVIRONMENT,
+        CLEANUP_P2P,
         REMOVE_KEYS,
         FINALIZE
     }
@@ -62,23 +60,23 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
-        return EnvironmentDestructionPhase.CLEANUP_N2N;
+        return EnvironmentDestructionPhase.CLEANUP_ENVIRONMENT;
     }
 
 
-    public EnvironmentDestructionPhase CLEANUP_N2N()
+    public EnvironmentDestructionPhase CLEANUP_ENVIRONMENT()
     {
-        operationTracker.addLog( "Cleaning up N2N" );
+        operationTracker.addLog( "Cleaning up environment" );
 
         try
         {
-            new CleanupN2NStep( environment ).execute();
+            new CleanupEnvironmentStep( environment ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
-            return EnvironmentDestructionPhase.DESTROY_CONTAINERS;
+            return EnvironmentDestructionPhase.CLEANUP_P2P;
         }
         catch ( Exception e )
         {
@@ -89,36 +87,15 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     }
 
 
-    public EnvironmentDestructionPhase DESTROY_CONTAINERS()
+    public EnvironmentDestructionPhase CLEANUP_P2P()
     {
-        operationTracker.addLog( "Destroying containers" );
+        operationTracker.addLog( "Cleaning up P2P" );
 
         try
         {
-            new DestroyContainersStep( environment, environmentManager, forceMetadataRemoval ).execute();
+            new CleanupP2PStep( environment ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
-
-            return EnvironmentDestructionPhase.CLEANUP_NETWORKING;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentDestructionPhase CLEANUP_NETWORKING()
-    {
-        operationTracker.addLog( "Cleaning up networking" );
-
-        try
-        {
-            new CleanUpNetworkStep( environment ).execute();
-
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentDestructionPhase.REMOVE_KEYS;
         }
@@ -139,7 +116,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new RemoveKeysStep( environment ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return EnvironmentDestructionPhase.FINALIZE;
         }
@@ -174,7 +151,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
         this.error = error;
         LOG.error( "Error destroying environment", error );
         operationTracker.addLogFailed( error.getMessage() );

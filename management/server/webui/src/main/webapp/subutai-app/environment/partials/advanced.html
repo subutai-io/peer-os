@@ -1,0 +1,243 @@
+<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="dragOver(event)">
+	<div class="b-cloud__tools">
+		<div class="b-cloud-tools">
+			<div class="b-tabs-menu b-tabs-menu_cloud-env">
+				<ul>
+					<li class="b-tabs-menu__item"
+						ng-click="advEnvCtrl.activeCloudTab = 'peers'"
+						ng-class="advEnvCtrl.activeCloudTab == 'peers' ? 'b-tabs-menu__item_active' : ''">
+						Peers
+					</li>
+					<li class="b-tabs-menu__item js-hide-resources"
+						ng-click="advEnvCtrl.activeCloudTab = 'templates'"
+						ng-class="advEnvCtrl.activeCloudTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
+						Templates
+					</li>
+				</ul>
+			</div>
+			<div class="b-tools-menu js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
+				<ul class="">
+					<li ng-repeat="template in advEnvCtrl.templates" 
+						data-template="{{ template }}">
+						<span class="b-tools-menu__item">
+							<span class="b-cloud-item">
+								<img
+									src="assets/templates/{{ template }}.jpg"
+									alt="{{ template }}"
+									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+							</span>
+							<span class="b-cloud-item-text">{{ template }}</span>
+						</span>
+						<div class="b-dragAndDrop-item"
+							ondragstart="startDrag(event)" ondrop="drop(event)" ondragend="endtDrag(event)" draggable="true" 
+							data-template="{{ template }}">
+						</div>
+					</li>
+				</ul>
+				<div style="height: 46px;"></div>
+			</div>
+			<div class="b-tools-menu b-tools-menu_custom-scroll-huc b-tools-menu_advanced js-scrollbar" 
+			ng-show="advEnvCtrl.activeCloudTab == 'peers'">
+				<ul>
+					<li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
+					tooltips 
+					tooltip-template="{{ peerId }}" 
+					tooltip-side="left" 
+					ng-click="advEnvCtrl.showResources(peerId, peersResources, $index)">
+						<span class="b-tools-menu__item" class="b-cloud-item-text g-margin-bottom-half">
+							Peer {{$index + 1}}
+						</span>
+
+						<div class="b-progress__cloud">
+							<div class="b-progress-cloud g-margin-bottom-half">
+								<div class="b-progress-cloud-fill" style="width: 0%"></div>
+							</div>
+							<div class="b-progress-text">
+								<span class="g-text-blue">0%</span> resources used
+							</div>
+						</div>
+					</li>
+				</ul>
+				<div class="b-loading-screen js-peer-load-screen">
+					<div class="b-load-icon"></div>
+				</div>
+			</div>
+			<div class="b-cloud-add-tools">
+				<div class="b-tabs-menu b-tabs-menu_cloud-env">
+					<div>
+						Resource hosts 
+						<a href="#" class="js-hide-resources">
+							<i class="fa fa-arrow-right g-right g-text-grey"></i>
+						</a>
+					</div>
+				</div>
+				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar-cloud">
+					<ul ng-show="advEnvCtrl.currentResourceHosts.length > 0">
+						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
+						ng-click="advEnvCtrl.addResource2Build(resourceHost, advEnvCtrl.currentPeer, $index)">
+							<span class="b-cloud-item-resource-name g-margin-bottom">
+								Recource Host {{$index + 1}}
+							</span>
+							<div class="b-progress__cloud b-progress__cloud_rh">
+								<div class="b-progress-text g-margin-bottom">
+									<i class="b-icon b-icon_cloud b-icon_cpu g-margin-right-quarter"></i> 
+									CPU:Intel Core 2 Duo
+								</div>
+								<div class="g-margin-bottom">
+									<div class="b-progress-text g-margin-bottom-half">
+										<i class="b-icon b-icon_cloud b-icon_hdd g-margin-right-quarter"></i> 
+										HDD:2048MB
+									</div>
+									<div class="b-progress-cloud g-margin-bottom-half">
+										<div class="b-progress-cloud-fill" style="width: 0%"></div>
+									</div>
+									<div class="b-progress-text">
+										<span class="g-text-blue">0MB</span> used
+									</div>
+								</div>
+								<div>
+									<div class="b-progress-text g-margin-bottom-half">
+										<i class="b-icon b-icon_cloud b-icon_ram g-margin-right-quarter"></i> 
+										RAM:  256MB
+									</div>
+									<div class="b-progress-cloud g-margin-bottom-half">
+										<div class="b-progress-cloud-fill" style="width: 0%"></div>
+									</div>
+									<div class="b-progress-text">
+										<span class="g-text-blue">0MB</span> used
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="b-cloud__space">
+		<div class="b-cloud-space b-cloud-space_border-right">
+			<div class="b-cloud-space__work">
+				<div
+				class="b-cloud-space-work"
+				id="js-environment-creation"
+				ng-init="advEnvCtrl.initJointJs()" 
+				ondrop="drop(event)">
+
+					<div class="b-template-settings__dropdown js-dropen-menu">
+						<form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
+							<div class="header"></div>
+							<div class="body">
+								<div class="b-form-group">
+									<div class="b-form-group__label">Container name</div>
+									<input type="text" 
+										id="js-container-name" 
+										class="b-form-input b-form-input_full" 
+										ng-model="templateSettings.containerName" required>									
+								</div>
+								<div class="b-form-group">
+									<div class="b-form-group__label">Select quota size</div>
+									<select class="b-form-input b-form-input_full" 
+										id="js-container-size" 
+										ng-model="templateSettings.quotaSize"
+									>
+										<option 
+										ng-repeat="type in environmentViewCtrl.containersType" 
+										value="{{ type }}" >
+											{{ type }}
+										</option>
+									</select>
+								</div>
+							</div>
+							<div class="footer">
+								<button type="submit" class="b-btn b-btn_green">Save</button>
+							</div>
+						</form>
+					</div>
+
+				</div>
+				<div class="b-cloud-create-buttons">
+
+					<button class="b-btn b-btn_white"
+					ng-click="advEnvCtrl.clearWorkspace()">
+						Cancel
+					</button>
+
+					<button
+					class="b-btn b-btn_green"
+					ng-if="!advEnvCtrl.isEditing" 
+					ng-click="advEnvCtrl.buildEnvironmentByJoint()">
+						Apply
+					</button>
+
+					<button
+					class="b-btn b-btn_green"
+					ng-if="advEnvCtrl.isEditing"
+					ng-click="advEnvCtrl.notifyChanges()">
+						Apply
+					</button>
+				</div>
+			</div>
+			<div class="b-cloud-space__table">
+				<table datatable="ng"
+				dt-options="environmentViewCtrl.dtOptionsInstallTable"
+				dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
+				class="row-border hover subt_table-containers-table">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>SSH Key</th>
+							<th>Domains</th>
+							<th>Containers</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat = "environment in environmentViewCtrl.environments">
+							<td>
+								<div class="b-status-icon b-status-icon_{{ environment.status }}"
+									tooltips
+									tooltip-template="{{ environment.status }}"
+									tooltip-side="right">
+								</div>
+							</td>
+							<td>
+								<span tooltips
+									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
+									tooltip-side="right"
+								>
+									{{ environment.name }}
+								</span>
+							</td>
+							<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/
+								<a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a></td>
+							<td><button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure</button></td>
+							<td ng-init="environmentViewCtrl.containersTags(environment)">
+								<span class="g-circle-label g-circle-label_blue g-margin-left-quarter" 
+								ng-repeat="(key, value) in environment.containersByQuota" 
+								ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(key)}" 
+								tooltips 
+								tooltip-template="{{value.tooltip}}">
+									{{value.quantity}}
+								</span>
+							</td>
+							<td>
+								<a href
+									class="b-icon b-icon_share"
+									tooltips
+									tooltip-template='Share'
+									ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
+									ng-show = "environment.status === 'HEALTHY'"
+									style = "margin-left: 10px; margin-top: 5px">
+								</a>
+								<a href class="b-icon b-icon_edit" ng-click="advEnvCtrl.editEnvironment(environment)" style = "margin-left: 10px; margin-top: 5px; visibility: visible"></a>
+								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)" style = "margin-left: 10px; margin-top: 5px"></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+

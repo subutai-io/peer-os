@@ -11,13 +11,15 @@
 .settings
 .metadata
 target
+git.properties
 
 # Package Files #
 *.jar
 *.war
 *.ear
 /server/server-karaf/nb-configuration.xml
-server/core/broker/broker-impl/activemq-data
 *.uml
 out
 .DS_Store
+
+server/webui/src/main/webapp/subutai-app/subutai-app.js

@@ -2,6 +2,7 @@ package io.subutai.core.kurjun.rest.vapt;
 
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -10,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
@@ -26,15 +28,6 @@ public interface RestAptManager
     public static final String PACKAGE_FILE_PART_NAME = "package";
 
 
-//    @GET
-//    @Path( "dists/{release}/{component}/{arch: binary-\\w+}/Release" )
-//    @Produces( MediaType.TEXT_PLAIN )
-//    Response getRelease(
-//            @PathParam( "release" ) String release,
-//            @PathParam( "component" ) String component,
-//            @PathParam( "arch" ) String arch
-//    );
-    
     @GET
     @Path( "dists/{release}/Release" )
     @Produces( MediaType.TEXT_PLAIN )
@@ -44,12 +37,8 @@ public interface RestAptManager
     @GET
     @Path( "dists/{release}/{component}/{arch: binary-\\w+}/{packages: Packages(\\.\\w+)?}" )
     @Produces( MediaType.TEXT_PLAIN )
-    Response getPackagesIndex(
-            @PathParam( "release" ) String release,
-            @PathParam( "component" ) String component,
-            @PathParam( "arch" ) String arch,
-            @PathParam( "packages" ) String packagesIndex
-    );
+    Response getPackagesIndex( @PathParam( "release" ) String release, @PathParam( "component" ) String component,
+                               @PathParam( "arch" ) String arch, @PathParam( "packages" ) String packagesIndex );
 
 
     @GET
@@ -61,9 +50,8 @@ public interface RestAptManager
     @GET
     @Path( "info" )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getPackageInfo( @QueryParam( MD5_PARAM ) String md5,
-            @QueryParam( NAME_PARAM ) String name,
-            @QueryParam( VERSION_PARAM ) String version );
+    Response getPackageInfo( @QueryParam( MD5_PARAM ) String md5, @QueryParam( NAME_PARAM ) String name,
+                             @QueryParam( VERSION_PARAM ) String version );
 
 
     @GET
@@ -71,8 +59,20 @@ public interface RestAptManager
     Response getPackage( @QueryParam( MD5_PARAM ) String md5 );
 
 
+    @GET
+    @Path( "list" )
+    Response listPackages();
+
+
     @POST
     @Path( "upload" )
+    @Produces( MediaType.TEXT_PLAIN )
     @Consumes( MediaType.MULTIPART_FORM_DATA )
     Response upload( @Multipart( PACKAGE_FILE_PART_NAME ) Attachment attachment );
+
+
+    @DELETE
+    @Path( "delete" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response deletePackage( @QueryParam( MD5_PARAM ) String md5 );
 }

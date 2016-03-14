@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>peer-manager-parent</artifactId>
-    <version>4.0.0-RC5</version>
+    <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
 
   <artifactId>peer-manager-impl</artifactId>
@@ -42,10 +42,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>repository-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-net</groupId>
@@ -102,11 +98,6 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20131018</version>
     </dependency>
     <dependency>
       <groupId>org.apache.openjpa</groupId>

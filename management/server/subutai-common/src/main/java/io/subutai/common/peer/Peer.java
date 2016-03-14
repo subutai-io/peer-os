@@ -12,27 +12,34 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesRequest;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
+import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
-import io.subutai.common.protocol.N2NConfig;
+import io.subutai.common.network.Vnis;
+import io.subutai.common.protocol.ControlNetworkConfig;
+import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 
 
 /**
  * Peer interface
  */
-public interface Peer extends PeerSpecific, EnvironmentSpecific
+public interface Peer
 {
 
     /**
@@ -53,16 +60,14 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo();
+    public PeerInfo getPeerInfo() throws PeerException;
 
     /**
      * Creates environment container group on the peer
      *
      * @param request - container creation request
-     *
-     * @return - set of metadaobjects of created containers
      */
-    public Set<ContainerHostInfoModel> createEnvironmentContainerGroup(
+    public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
 
 
@@ -147,7 +152,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns true of the peer is reachable online, false otherwise
      */
-    public boolean isOnline() throws PeerException;
+    public boolean isOnline();
 
     /**
      * Sends message to the peer
@@ -178,7 +183,12 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /**
      * Returns state of container
      */
-    public ContainerHostState getContainerState( ContainerId containerId );
+    public ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
+
+    /**
+     * Returns set of container information of the environment
+     */
+    public Set<ContainerHostInfo> getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
 
@@ -229,7 +239,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* ************************************************
      * Returns all existing gateways of the peer
      */
-    public Set<Gateway> getGateways() throws PeerException;
+    public Gateways getGateways() throws PeerException;
 
 
     /* ************************************************
@@ -241,7 +251,7 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* ************************************************
      * Returns all reserved vnis on the peer
      */
-    public Set<Vni> getReservedVnis() throws PeerException;
+    public Vnis getReservedVnis() throws PeerException;
 
     /**
      * Gets containerHost by Id specified
@@ -254,7 +264,8 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
+            throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -266,32 +277,46 @@ public interface Peer extends PeerSpecific, EnvironmentSpecific
 
     HostInterfaces getInterfaces() throws PeerException;
 
-    void setupN2NConnection( N2NConfig config ) throws PeerException;
+    /**
+     * Resets a secret key for a given P2P network
+     *
+     * @param p2PCredentials - P2P network credentials
+     */
+    void resetP2PSecretKey( P2PCredentials p2PCredentials ) throws PeerException;
 
-    void removeN2NConnection( EnvironmentId environmentId ) throws PeerException;
 
-    void createGateway( Gateway gateway ) throws PeerException;
+    void setupP2PConnection( P2PConfig config ) throws PeerException;
+
+    void removeP2PConnection( EnvironmentId environmentId ) throws PeerException;
+
+    void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
 
     void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
-    ResourceValue getAvailableQuota( ContainerHost containerHost, ResourceType resourceType ) throws PeerException;
+    PeerResources getResourceLimits( String peerId ) throws PeerException;
 
-    ResourceValue getQuota( ContainerHost containerHost, ResourceType resourceType ) throws PeerException;
+    ContainerQuota getAvailableQuota( ContainerId containerId ) throws PeerException;
 
-    void setQuota( ContainerHost containerHost, ResourceType resourceType, ResourceValue resourceValue )
-            throws PeerException;
+    ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
+
+    void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
 
 
-    ResourceValue getAvailableQuota( ContainerId containerId, ResourceType resourceType ) throws PeerException;
-
-    ResourceValue getQuota( ContainerId containerId, ResourceType resourceType ) throws PeerException;
-
-    void setQuota( ContainerId containerId, ResourceType resourceType, ResourceValue resourceValue )
-            throws PeerException;
-
-    void alert( AlertPack alert ) throws PeerException;
+    void alert( AlertEvent alert ) throws PeerException;
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
+
+    ControlNetworkConfig getControlNetworkConfig( String localPeerId ) throws PeerException;
+
+    boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
+
+    PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
+
+    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
+
+    HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
+
+    PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 }

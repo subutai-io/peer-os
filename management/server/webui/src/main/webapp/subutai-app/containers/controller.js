@@ -3,11 +3,17 @@
 angular.module('subutai.containers.controller', ['ngTagsInput'])
 	.controller('ContainerViewCtrl', ContainerViewCtrl);
 
-ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout'];
+ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 
-function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout) {
+function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $stateParams, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
+
+	cfpLoadingBar.start();
+	angular.element(document).ready(function () {
+		cfpLoadingBar.complete();
+	});
+
 	vm.environments = [];
 	vm.containers = [];
 	vm.containersType = [];
@@ -217,6 +223,11 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			/*environmentService.getContainerStatus(vm.containers[key].id).success(function (data) {
 				vm.containers[key].state = data.STATE;
 			});*/
+			if(vm.containers[key].state == 'STOPPING') {
+				vm.containers[key].state = 'STOPPED';
+			} else {
+				vm.containers[key].state = 'RUNNING';
+			}
 		});		
 	}
 

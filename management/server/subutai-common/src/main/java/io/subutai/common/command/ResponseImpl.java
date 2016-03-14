@@ -4,9 +4,7 @@ package io.subutai.common.command;
 import java.util.Set;
 import java.util.UUID;
 
-import io.subutai.common.command.Response;
-import io.subutai.common.command.ResponseType;
-
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 
@@ -102,5 +100,15 @@ public class ResponseImpl implements Response
     public Set<String> getConfigPoints()
     {
         return configPoints;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return MoreObjects.toStringHelper( this ).add( "type", type ).add( "id", id ).add( "commandId", commandId )
+                          .add( "pid", pid ).add( "responseNumber", responseNumber ).add( "stdOut", stdOut )
+                          .add( "stdErr", stdErr ).add( "exitCode", exitCode ).add( "configPoints", configPoints )
+                          .toString();
     }
 }

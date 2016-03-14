@@ -58,7 +58,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment =  environmentManager.saveOrUpdate( environment );
+        environment =  environmentManager.update( environment );
 
         return ContainerDestructionPhase.VALIDATE;
     }
@@ -92,7 +92,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
             new DestroyContainerStep( environmentManager, environment, containerHost, forceMetadataRemoval,
                     operationTracker ).execute();
 
-            environment = environmentManager.saveOrUpdate( environment );
+            environment = environmentManager.update( environment );
 
             return ContainerDestructionPhase.FINALIZE;
         }
@@ -111,7 +111,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         operationTracker.addLogDone( skippedDestruction ? "Container is not destroyed" : "Container is destroyed" );
 
@@ -129,7 +129,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     public void setError( final Throwable error )
     {
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.saveOrUpdate( environment );
+        environment = environmentManager.update( environment );
 
         this.error = error;
         LOG.error( "Error destroying container", error );

@@ -1,13 +1,9 @@
 package io.subutai.core.identity.api;
 
 
-import java.security.PrivilegedAction;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
-
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -17,6 +13,7 @@ import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
 
 
@@ -57,6 +54,7 @@ public interface IdentityManager
      */
     String getUserToken( String userName, String password );
 
+
     /* *************************************************
      */
     User authenticateByToken( String token );
@@ -65,6 +63,47 @@ public interface IdentityManager
     /* *************************************************
      */
     User authenticateUser( String userName, String password );
+
+
+
+    /* *************************************************
+     */
+    void setPeerOwner( User user );
+
+
+    /* *************************************************
+     */
+    String getPeerOwnerId();
+
+
+    /* *************************************************
+     */
+    User getUserByKeyId( String keyId );
+
+
+    /* *************************************************
+     */
+    User getUserByFingerprint( String fingerprint );
+
+
+    /* *************************************************
+     */
+    UserDelegate getUserDelegate( long userId );
+
+
+    /* *************************************************
+     */
+    UserDelegate getUserDelegate( User user );
+
+
+    /* *************************************************
+     */
+    UserDelegate getUserDelegate( String id );
+
+
+    /* *************************************************
+     */
+    void setUserPublicKey( long userId, String publicKeyASCII );
 
 
     /* *************************************************
@@ -79,6 +118,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    void assignUserRole( User user, Role role );
+
+
+    /* *************************************************
+      */
     User getUser( long userId );
 
 
@@ -98,14 +142,35 @@ public interface IdentityManager
 
 
     /* *************************************************
-         */
+     */
     User createTempUser( String userName, String password, String fullName, String email, int type );
 
 
+    //**************************************************************
+    void setTrustLevel( User user, int trustLevel );
+
+
+
     /* *************************************************
-     *
      */
-    User createUser( String userName, String password, String fullName, String email, int type );
+    UserDelegate createUserDelegate( User user, String delegateUserId, boolean genKeyPair );
+
+
+    /* *************************************************
+    */
+    User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
+                     boolean generateKeyPair, boolean createUserDelegate ) throws Exception;
+
+    User modifyUser( User user, String password ) throws Exception;
+
+
+    void approveDelegatedUser( String trustMessage );
+
+
+    void createIdentityDelegationDocument();
+
+        
+    User getUserByUsername( String userName );
 
 
     /* *************************************************
@@ -115,12 +180,22 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    boolean changeUserPassword( long userId, String oldPassword, String newPassword );
+    void removeUserRole( User user, Role role );
+
+
+    /* *************************************************
+     */
+    boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception;
 
 
     /* *************************************************
      */
     void updateUser( User user );
+
+    /*
+     * ************************************************
+     */
+    void updateUser( User user, String publicKey );
 
 
     /* *************************************************
@@ -177,6 +252,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    void assignRolePermission( Role role, Permission permission );
+
+
+    /* *************************************************
+     */
     void removeAllRolePermissions( long roleId );
 
 
@@ -187,11 +267,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     Session authenticateSession( String login, String password );
 
+
     /* *************************************************
-         */
+    */
     UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType, Date validDate );
 
 
@@ -219,4 +299,7 @@ public interface IdentityManager
     /* *************************************************
      */
     void removeUserToken( String tokenId );
+
+
+
 }

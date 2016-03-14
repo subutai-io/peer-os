@@ -6,8 +6,13 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Host;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PPeerInfo;
+import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 
 
@@ -15,20 +20,41 @@ public interface NetworkManager
 {
     String TUNNEL_PREFIX = "tunnel";
     String TUNNEL_TYPE = "vxlan";
-    String N2N_STRING_KEY = "string";
+    String P2P_STRING_KEY = "string";
 
 
     /**
-     * Sets up an N2N connection to super node on management host
+     * Sets up an P2P connection to super node on management host
      */
-    public void setupN2NConnection( String superNodeIp, int superNodePort, String interfaceName, String communityName,
-                                    String localIp, String keyType, String pathToKeyFile )
+    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException;
+
+    /**
+     * Removes P2P connection
+     */
+    public void removeP2PConnection( String communityName ) throws NetworkManagerException;
+
+
+    /**
+     * Resets a secret key for a given P2P network
+     *
+     * @param p2pHash - P2P network hash
+     * @param newSecretKey - new secret key to set
+     * @param ttlSeconds - time-to-live for the new secret key
+     */
+    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
+
     /**
-     * Removes N2N connection to super node on management host
+     * Lists existing P2P connections on management host
      */
-    public void removeN2NConnection( String interfaceName, String communityName ) throws NetworkManagerException;
+    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
+
+
+    PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
+
+    public Set<P2PPeerInfo> listPeersInEnvironment( String communityName ) throws NetworkManagerException;
 
     /**
      * Sets up tunnel to another peer on management host
@@ -56,16 +82,6 @@ public interface NetworkManager
      */
     public ContainerInfo getContainerIp( String containerName ) throws NetworkManagerException;
 
-    /**
-     * Sets up gateway IP for specified VLAN on management host
-     */
-    public void setupGateway( String gatewayIp, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Sets up gateway IP on a container
-     */
-    public void setupGatewayOnContainer( String containerName, String gatewayIp, String interfaceName )
-            throws NetworkManagerException;
 
     /**
      * Removes gateway IP for specified VLAN on management host
@@ -89,10 +105,6 @@ public interface NetworkManager
      */
     public Set<Tunnel> listTunnels() throws NetworkManagerException;
 
-    /**
-     * Lists existing N2N connections on management host
-     */
-    public Set<N2NConnection> listN2NConnections() throws NetworkManagerException;
 
     /**
      * Sets up VNI-VLAN mapping on management host
@@ -120,14 +132,24 @@ public interface NetworkManager
     /**
      * Returns all reserved VNIs on management host
      */
-    public Set<Vni> getReservedVnis() throws NetworkManagerException;
+    public Vnis getReservedVnis() throws NetworkManagerException;
 
     /**
      * Enables passwordless ssh access between containers
      *
      * @param containers - set of {@code ContainerHost}
+     * @param additionalSshKeys - set of additional ssh keys to add to each container
      */
-    public void exchangeSshKeys( Set<ContainerHost> containers ) throws NetworkManagerException;
+    public void exchangeSshKeys( Set<ContainerHost> containers, Set<String> additionalSshKeys )
+            throws NetworkManagerException;
+
+    /**
+     * Appends ssh keys to each container
+     *
+     * @param containers - containers
+     * @param sshKeys - ssh keys
+     */
+    public void appendSshKeys( Set<ContainerHost> containers, Set<String> sshKeys ) throws NetworkManagerException;
 
     /**
      * Adds supplied ssh key to authorized_keys file of given containers

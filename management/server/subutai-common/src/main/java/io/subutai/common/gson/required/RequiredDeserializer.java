@@ -16,8 +16,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
-import io.subutai.common.environment.Blueprint;
-import io.subutai.common.environment.NodeGroup;
+import io.subutai.common.environment.Node;
 
 
 public class RequiredDeserializer<T> implements JsonDeserializer<T>
@@ -93,8 +92,7 @@ public class RequiredDeserializer<T> implements JsonDeserializer<T>
     public static Gson createValidatingGson()
     {
         return new GsonBuilder()
-                .registerTypeAdapter( NodeGroup.class, new RequiredDeserializer<NodeGroup>() )
-                .registerTypeAdapter( Blueprint.class, new RequiredDeserializer<Blueprint>() )
+                .registerTypeAdapter( Node.class, new RequiredDeserializer<Node>() )
                 .setPrettyPrinting().create();
     }
 }

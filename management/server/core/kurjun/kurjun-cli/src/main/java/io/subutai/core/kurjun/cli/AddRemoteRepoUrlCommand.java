@@ -15,8 +15,12 @@ public class AddRemoteRepoUrlCommand extends SubutaiShellCommandSupport
 {
 
     private final TemplateManager templateManager;
+    
     @Argument( index = 0, name = "repository", multiValued = false, description = "Remote repo url" )
     private String url;
+    
+    @Argument( index = 1, name = "token", multiValued = false, description = "Remote repo access token" )
+    private String token;
 
 
     public AddRemoteRepoUrlCommand( final TemplateManager templateManager )
@@ -28,8 +32,8 @@ public class AddRemoteRepoUrlCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        templateManager.addRemoteRepository( new URL( url ) );
-        System.out.println( "Url added ok" );
+        templateManager.addRemoteRepository( new URL( url ), token );
+        System.out.println( "Url added." );
         return null;
     }
 }

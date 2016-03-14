@@ -1,0 +1,29 @@
+<div ng-controller="SettingsAdvancedCtrl as settingsAdvancedCtrl">
+
+	<div class="b-workspace__header b-workspace__header_tabs">
+		<div class="b-tabs-menu b-tabs-menu_header">
+			<ul>
+				<li class="b-tabs-menu__item"
+				ng-click="settingsAdvancedCtrl.activeTab = 'karafconsole'"
+				ng-class="settingsAdvancedCtrl.activeTab == 'karafconsole' ? 'b-tabs-menu__item_active' : ''">
+					Console
+				</li>
+				<li class="b-tabs-menu__item"
+				ng-click="settingsAdvancedCtrl.activeTab = 'karaflogs'"
+				ng-class="settingsAdvancedCtrl.activeTab == 'karaflogs' ? 'b-tabs-menu__item_active' : ''">
+					Logs
+				</li>
+			</ul>
+		</div>
+	</div>
+
+
+	<div ng-if="settingsAdvancedCtrl.activeTab == 'karaflogs'" 
+		ng-include="'subutai-app/settingsAdvanced/partials/karaflogs.html'">
+	</div>
+	<div ng-show="settingsAdvancedCtrl.activeTab == 'karafconsole'" class="b-workspace__content">
+		<div class="b-terminal">
+			<terminal terminal-class="modern-terminal" terminal-config="modern"></terminal>
+		</div>		
+	</div>
+</div>

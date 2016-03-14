@@ -41,9 +41,17 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getRelease( String release )
     {
-        String releaseIndex = aptManager.getRelease( release, null, null );
-        return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build() :
-               notFoundResponse( "Release not found." );
+        try
+        {
+            String releaseIndex = aptManager.getRelease( release, null, null );
+            return ( releaseIndex != null ) ? Response.ok( releaseIndex ).build() :
+                   notFoundResponse( "Release not found." );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Failed to get release package", e );
+        }
+        return Response.serverError().entity( "Failed to get release package." ).build();
     }
 
 
@@ -102,10 +110,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response upload( Attachment attachment )
     {
-        //        if ( checkAuthentication( Permission.ADD_PACKAGE ) )
-        //        {
-        //            return forbiddenResponse();
-        //        }
 
         File temp = null;
         try
@@ -124,6 +128,7 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
         catch ( IOException | IllegalArgumentException ex )
         {
             LOGGER.error( "Failed to upload", ex );
+            return badRequest( ex.getMessage() );
         }
         finally
         {
@@ -136,10 +141,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getPackageInfo( String md5, String name, String version )
     {
-        //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-        //        {
-        //            return forbiddenResponse();
-        //        }
 
         String str = aptManager.getPackageInfo( decodeMd5( md5 ), name, version );
 
@@ -154,10 +155,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response getPackage( String md5 )
     {
-        //        if ( checkAuthentication( Permission.GET_PACKAGE ) )
-        //        {
-        //            return forbiddenResponse();
-        //        }
 
         String serialized = aptManager.getSerializedPackageInfo( decodeMd5( md5 ) );
 
@@ -177,6 +174,42 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     }
 
 
+    @Override
+    public Response listPackages()
+    {
+        return Response.ok( MetadataUtils.JSON.toJson( aptManager.list() ) ).build();
+    }
+
+
+    @Override
+    public Response deletePackage( String md5 )
+    {
+        byte[] md5bytes = decodeMd5( md5 );
+        if ( md5bytes != null )
+        {
+            try
+            {
+                boolean deleted = aptManager.delete( md5bytes );
+                if ( deleted )
+                {
+                    return Response.ok( "Apt package deleted" ).build();
+                }
+                else
+                {
+                    return packageNotFoundResponse();
+                }
+            }
+            catch ( IOException ex )
+            {
+                String err = "Failed to delete apt package";
+                LOGGER.error( err, ex );
+                return Response.serverError().entity( err ).build();
+            }
+        }
+        return badRequest( "Invalid md5 checksum" );
+    }
+
+
     private String makePackageFilename( PackageMetadata metadata )
     {
         StringBuilder sb = new StringBuilder();
@@ -188,11 +221,6 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     }
 
 
-    //    @Override
-    //    protected AuthManager getAuthManager()
-    //    {
-    //        return authManager;
-    //    }
     @Override
     protected Logger getLogger()
     {

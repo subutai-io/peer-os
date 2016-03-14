@@ -5,18 +5,27 @@
     background-color:transparent;
     border: none;
     border-radius: 0;
-	color: green;
+	color: #fff;
+    font-size: 14px;
+    font-family: "Ubuntu Mono", monospace;
+	position: relative;
+	overflow-x: hidden;
 }
 .terminal {
-    background-color:#000;
+    /*background-color: #210819;*/
+    background-color: #2D3436;
     height: 500px;
-    color: green;
-    font-family: monospace;
+    color: #fff;
+    font-family: "Ubuntu Mono", monospace;
     overflow-x: hidden;
     overflow-y:hidden;
-    font-size: 12px;
+    font-size: 14px;
     position:relative;
     padding:10px;
+}
+
+.terminal-prompt {
+	color: #8AE234;
 }
 
 .terminal-target{
@@ -38,6 +47,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     padding:0;
+	position: relative;
 }
 
 .terminal-cursor{

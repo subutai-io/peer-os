@@ -1,0 +1,154 @@
+<div class="b-cloud" ng-controller="EnvironmentSimpleViewCtrl as environmentSimpleViewCtrl">
+	<div class="b-cloud__tools g-right">
+		<div class="b-cloud-tools">
+			<div class="b-tabs-menu b-tabs-menu_cloud-env">
+				<ul>
+					<li class="b-tabs-menu__item b-tabs-menu__item_active"
+						style="width: 100%" 
+						ng-click="environmentSimpleViewCtrl.activeCloudTab = 'templates'"
+						ng-class="environmentSimpleViewCtrl.activeCloudTab == 'templates' ? 'b-tabs-menu__item_active' : ''">
+						Templates
+					</li>
+				</ul>
+			</div>
+			<div class="b-tools-menu js-scrollbar">
+				<ul>
+					<li ng-repeat="template in environmentSimpleViewCtrl.templates">
+						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
+							<span class="b-cloud-item">
+								<img
+									ng-src="assets/templates/{{ template }}.jpg"
+									alt="{{ template }}"
+									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+							</span>
+							<span class="b-cloud-item-text">{{ template }}</span>
+						</span>
+					</li>
+				</ul>
+				<div style="height: 46px;"></div>
+			</div>
+		</div>
+	</div>
+	<div class="b-cloud__space">
+		<div class="b-cloud-space b-cloud-space_border-right">
+			<div class="b-cloud-space__work">
+				<div
+					class="b-cloud-space-work"
+					id="js-environment-creation"
+					ng-init="environmentSimpleViewCtrl.initJointJs()">
+
+					<div class="b-template-settings__dropdown js-dropen-menu">
+						<form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
+							<div class="header"></div>
+							<div class="body">
+								<div class="b-form-group">
+									<div class="b-form-group__label">Container name</div>
+									<input type="text" 
+										id="js-container-name" 
+										class="b-form-input b-form-input_full" 
+										ng-model="templateSettings.containerName" required>									
+								</div>
+								<div class="b-form-group">
+									<div class="b-form-group__label">Select quota size</div>
+									<select class="b-form-input b-form-input_full" 
+										id="js-container-size" 
+										ng-init="templateSettings.quotaSize = 'SMALL'" 
+										ng-model="templateSettings.quotaSize"
+									>
+										<option 
+										ng-repeat="type in environmentViewCtrl.containersType" 
+										value="{{ type }}" >
+											{{ type }}
+										</option>
+									</select>
+								</div>
+							</div>
+							<div class="footer">
+								<button type="submit" class="b-btn b-btn_green">Save</button>
+							</div>
+						</form>
+					</div>
+
+				</div>
+				<div class="b-cloud-create-buttons">
+					<button class="b-btn b-btn_white"
+							ng-click="environmentSimpleViewCtrl.clearWorkspace()">
+						Cancel
+					</button>
+					<button
+					class="b-btn b-btn_green"
+					ng-if="!environmentSimpleViewCtrl.isEditing"
+					ng-click="environmentSimpleViewCtrl.buildEnvironmentByJoint()">
+						Apply
+					</button>
+					<button
+					class="b-btn b-btn_green"
+					ng-if="environmentSimpleViewCtrl.isEditing"
+					ng-click="environmentSimpleViewCtrl.notifyChanges()">
+						Apply
+					</button>
+				</div>
+			</div>
+			<div class="b-cloud-space__table">
+				<table datatable="ng"
+				dt-options="environmentViewCtrl.dtOptionsInstallTable"
+				dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
+				class="row-border hover subt_table-containers-table">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>SSH Key</th>
+							<th>Domains</th>
+							<th>Containers</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat = "environment in environmentViewCtrl.environments">
+							<td>
+								<div class="b-status-icon b-status-icon_{{ environment.status }}"
+									tooltips
+									tooltip-template="{{ environment.status }}"
+									tooltip-side="right">
+								</div>
+							</td>
+							<td>
+								<span tooltips
+									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
+									tooltip-side="right"
+								>
+									{{ environment.name }}
+								</span>
+							</td>
+							<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/
+								<a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a></td>
+							<td><button class="b-btn b-btn_grey" ng-click="environmentViewCtrl.showDomainForm(environment.id)">Configure</button></td>
+							<td>
+								<span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
+									  ng-repeat="(key, value) in environment.containersByQuota"
+									  ng-style="{'background-color' : environmentViewCtrl.getQuotaColor(key)}"
+									  tooltips
+									  tooltip-template="{{value.tooltip}}">
+									{{value.quantity}}
+                            	</span>
+							</td>
+							<td class="b-main-table__controls">
+								<a href
+									class="b-icon b-icon_share"
+									tooltips
+									tooltip-template='Share'
+									ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
+									ng-show = "environment.status === 'HEALTHY'">
+								</a>
+								<a href class="b-icon b-icon_edit" ng-click="environmentSimpleViewCtrl.editEnvironment(environment)" style = "visibility: visible"></a>
+								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)"></a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+

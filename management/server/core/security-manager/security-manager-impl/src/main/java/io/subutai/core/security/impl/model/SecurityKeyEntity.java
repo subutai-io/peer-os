@@ -8,12 +8,7 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -60,7 +55,7 @@ public class SecurityKeyEntity implements SecurityKey
     private short status;
 
     @Column( name = TYPE )
-    private int type;
+    private int type = 0;
 
 
     //*********************************************

@@ -1,27 +1,29 @@
 <div ng-controller="ConsoleViewCtrl as consoleViewCtrl">
 
-	<div class="b-workspace__header">
-		<h1 class="b-title">Console</h1>
+	<div class="b-workspace__header b-workspace__header_tabs">
+
+		<div class="b-tabs-menu b-tabs-menu_header">
+
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-tabs-menu__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('peer')">
+					Peer
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-class="consoleViewCtrl.currentType == 'environments' ? 'b-tabs-menu__item_active' : ''" 
+					ng-click="consoleViewCtrl.setCurrentType('environments')">
+					Environment
+				</li>
+			</ul>
+		</div>
 	</div>
 
 	<div class="b-workspace__content">
 
-		<div class="b-main-form b-main-form_overflow-hidden">
+		<div class="b-main-form">
 
 			<div class="b-console-selects">
-
-				<div class="b-console-selects__item b-main-form__wrapper" 
-				ng-show="consoleViewCtrl.containers.length > 0">
-					<select class="b-popup-body-input" 
-						ng-model="selectedContainer" 
-						ng-change="consoleViewCtrl.setConsole(selectedContainer, 'container')">
-						<option value="">Select container</option>
-						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
-							{{ container.hostname }}
-						</option>
-					</select>
-					<div class="clear"></div>
-				</div>
 
 				<div class="b-console-selects__item b-main-form__wrapper" 
 				ng-show="consoleViewCtrl.currentType == 'environments'">
@@ -37,11 +39,24 @@
 				</div>
 
 				<div class="b-console-selects__item b-main-form__wrapper" 
+				ng-show="consoleViewCtrl.containers.length > 0">
+					<select class="b-popup-body-input" 
+						ng-model="selectedContainer" 
+						ng-change="consoleViewCtrl.setConsole(selectedContainer, 'container')">
+						<option value="">Select container</option>
+						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
+							{{ container.hostname }}
+						</option>
+					</select>
+					<div class="clear"></div>
+				</div>
+
+				<div class="b-console-selects__item b-main-form__wrapper" 
 				ng-show="consoleViewCtrl.currentType == 'peer'">
 					<select class="b-popup-body-input" 
 						ng-model="selectedPeer" 
 						ng-change="consoleViewCtrl.setConsole(selectedPeer)">
-						<option value="">Select peer</option>
+						<option value="">Select Host</option>
 						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
 							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
 						</option>
@@ -52,7 +67,7 @@
 			</div>
 
 			<div class="b-toggle-buttons">
-				<ul>
+				<!--<ul>
 					<li class="b-toggle-buttons__item" 
 					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-toggle-buttons__item_active' : ''" 
 					ng-click="consoleViewCtrl.setCurrentType('peer')">
@@ -63,23 +78,27 @@
 					ng-click="consoleViewCtrl.setCurrentType('environments')">
 						Environment
 					</li>
-				</ul>
+				</ul>-->
 
 				<div class="b-main-form__wrapper b-main-form__wrapper_min">
-					<label class="b-popup-body-label b-popup-body-label_inline">Timeout</label>
+					<label class="b-popup-body-label b-popup-body-label_inline">
+						<i class="fa fa-question-circle" style="font-size:16px"
+						   tooltips tooltip-side="bottom" tooltip-template='Command execution before killed in seconds'></i>&nbsp;Timeout</label>
 					<input type="text" 
 						ng-model="consoleViewCtrl.timeOut" 
 						class="b-popup-body-input">
 				</div>
 
 				<div class="b-main-form__wrapper b-main-form__wrapper_min">
-					<label class="b-popup-body-label b-popup-body-label_inline" for="terminal-as-daemon">Daemon</label>
+					<label class="b-popup-body-label b-popup-body-label_inline" for="terminal-as-daemon">
+						<i class="fa fa-question-circle" style="font-size:16px"
+						   tooltips tooltip-side="bottom" tooltip-template='Execute command as a daemon'></i>&nbsp;Daemon</label>
 					<input type="checkbox" 
 						ng-model="consoleViewCtrl.daemon" 
 						id="terminal-as-daemon" 
 						class="b-popup-body-checkbox">
-					<div class="clear"></div>
 				</div>
+				<div class="clear"></div>
 
 				<div class="b-main-form__wrapper" 
 					ng-show="consoleViewCtrl.selectedEnvironment.length > 0 && consoleViewCtrl.activeConsole !== undefinded && consoleViewCtrl.activeConsole.length > 0 && consoleViewCtrl.selectedNodeType == 'container'">

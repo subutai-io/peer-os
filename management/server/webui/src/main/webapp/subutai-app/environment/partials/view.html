@@ -1,27 +1,32 @@
-<div ng-controller="EnvironmentViewCtrl as environmentViewCtrl">
+<div ng-controller="EnvironmentViewCtrl as environmentViewCtrl" class="b-workspace__environments">
 
-	<div class="b-workspace__header">
-		<h1 class="b-title">Environments</h1>
-	</div>
+	<div class="b-workspace__header b-workspace__header_cloud-env">
 
-	<div class="b-workspace__content">
-		<div class="b-data-table">
-			<table datatable="" ng-init="environmentViewCtrl.initDBReload()"
-				dt-options="environmentViewCtrl.dtOptions" 
-				dt-columns="environmentViewCtrl.dtColumns" 
-				dt-instance="environmentViewCtrl.dtInstance" 
-				class="row-border hover">
-			</table>
+		<div class="b-switcher">
+			<div class="b-toggle b-toggle_cloud">
+				<input type="checkbox" 
+					class="b-check" 
+					ng-model="environmentMode" 
+					ng-change="environmentViewCtrl.changeMode(environmentMode)">
+
+				<div class="b-toggle-bg"></div>
+				<b class="b-b b-switch"></b>
+			</div>
 		</div>
 
-		<!--<div class="b-empty-list" ng-show="environmentViewCtrl.environments.length == 0">
-			<div class="b-empty-list__text">
-				You don’t have any environments, chose blueprint and build it
-			</div>
-			<a class="b-btn b-btn_blue" ui-sref="blueprints">
-				<i class="fa fa-plus"></i> Blueprints
-			</a>	
-		</div>-->
 	</div>
-	
+
+	<div class="b-workspace__content b-workspace__content_cloud-env">
+		<div
+				ng-if="environmentViewCtrl.activeMode == 'simple'"
+				ng-include="'subutai-app/environment/partials/simple.html'">
+		</div>
+
+		<div
+				ng-if="environmentViewCtrl.activeMode == 'advanced'"
+				ng-include="'subutai-app/environment/partials/advanced.html'">
+		</div>
+
+	</div>
+
 </div>

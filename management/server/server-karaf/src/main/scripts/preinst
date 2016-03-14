@@ -1,0 +1,4 @@
+#!/bin/bash
+
+service management stop
+rm -rf /opt/subutai-mng/data/*

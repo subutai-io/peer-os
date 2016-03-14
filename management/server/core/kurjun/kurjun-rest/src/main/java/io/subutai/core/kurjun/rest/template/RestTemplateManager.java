@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -24,19 +25,37 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 public interface RestTemplateManager
 {
     // TODO: copied from TemplateServlet. Put to some common place 
-    static final String MD5_PARAM = "md5";
+    static final String ID_PARAM = "id";
     static final String NAME_PARAM = "name";
     static final String VERSION_PARAM = "version";
     static final String PACKAGE_FILE_PART_NAME = "package";
     static final String TYPE_PARAM = "type";
     static final String IS_KURJUN_CLIENT_PARAM = "kc";
-    static final String RESPONSE_TYPE_MD5 = "md5";
+    static final String RESPONSE_TYPE_ID = "id";
+
+    @GET
+    @Path( "repositories" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getRepositories();
+
+
+    @GET
+    @Path( "shared-info" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getSharedTemplateInfos( @QueryParam( ID_PARAM ) String id );
+
+
+    @GET
+    @Path( "{repository}/can-upload" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response checkUploadAllowed( @PathParam( "repository" ) String repository );
+
 
     @GET
     @Path( "{repository}/get" )
     @Produces( MediaType.TEXT_PLAIN )
     Response getTemplate( @PathParam( "repository" ) String repository,
-                          @QueryParam( MD5_PARAM ) String md5,
+                          @QueryParam( ID_PARAM ) String id,
                           @QueryParam( NAME_PARAM ) String name,
                           @QueryParam( VERSION_PARAM ) String version,
                           @QueryParam( TYPE_PARAM ) String type,
@@ -48,7 +67,7 @@ public interface RestTemplateManager
     @Path( "{repository}/info" )
     @Produces( MediaType.APPLICATION_JSON )
     Response getTemplateInfo( @PathParam( "repository" ) String repository,
-                          @QueryParam( MD5_PARAM ) String md5,
+                          @QueryParam( ID_PARAM ) String id,
                           @QueryParam( NAME_PARAM ) String name,
                           @QueryParam( VERSION_PARAM ) String version,
                           @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient
@@ -59,6 +78,12 @@ public interface RestTemplateManager
     @Produces( MediaType.APPLICATION_JSON )
     Response getTemplateList( @PathParam( "repository") String repository,
                               @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient );
+    
+    
+    @GET
+    @Path( "{repository}/template-list" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getTemplateListSimple( @PathParam( "repository") String repository );
 
 
     @POST
@@ -73,7 +98,24 @@ public interface RestTemplateManager
     @DELETE
     @Path( "{repository}" )
     @Produces( MediaType.TEXT_PLAIN )
-    Response deleteTemplates( @PathParam( "repository" ) String repository,
-                              @QueryParam( MD5_PARAM ) String md5
+    Response deleteTemplate( @PathParam( "repository" ) String repository,
+                              @QueryParam( ID_PARAM ) String id
     );
+
+    
+    @PUT
+    @Path( "share/{targetUserName}" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response shareTemplate( @PathParam( "targetUserName" ) String targetUserName,
+            @QueryParam( ID_PARAM ) String id
+    );
+
+
+    @DELETE
+    @Path( "share/{targetUserName}" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response unshareTemplate( @PathParam( "targetUserName" ) String targetUserName,
+            @QueryParam( ID_PARAM ) String id
+    );
+
 }

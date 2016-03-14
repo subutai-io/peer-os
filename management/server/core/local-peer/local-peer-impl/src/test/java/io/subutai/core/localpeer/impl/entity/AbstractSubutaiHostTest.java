@@ -4,7 +4,6 @@ package io.subutai.core.localpeer.impl.entity;
 import java.util.UUID;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -22,8 +21,6 @@ import io.subutai.common.peer.Peer;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -95,7 +92,6 @@ public class AbstractSubutaiHostTest
         when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
         when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anHostInterface.getIp() ).thenReturn( IP );
-        when( anHostInterface.getMac() ).thenReturn( MAC );
         host = new HostImpl( PEER_ID, hostInfo );
         host.setPeer( peer );
         host.init();
@@ -202,54 +198,6 @@ public class AbstractSubutaiHostTest
     {
         assertFalse( host.getHostInterfaces().getAll().isEmpty() );
     }
-
-
-    @Test
-    @Ignore
-    public void testGetIpByInterfaceName() throws Exception
-    {
-        assertNotNull( host.getIpByInterfaceName( INTERFACE_NAME ) );
-
-        assertNull( host.getIpByInterfaceName( DUMMY_INTERFACE_NAME ) );
-    }
-
-
-    @Test
-    @Ignore
-    public void testGetMacByInterfaceName() throws Exception
-    {
-        assertNotNull( host.getMacByInterfaceName( INTERFACE_NAME ) );
-
-        assertNull( host.getMacByInterfaceName( DUMMY_INTERFACE_NAME ) );
-    }
-
-    //
-    //    @Test
-    //    public void testAddInterface() throws Exception
-    //    {
-    //        HostInterfaceImpl hostInterface = mock( HostInterfaceImpl.class );
-    //
-    //        host.addInterface( hostInterface );
-    //
-    //        verify( hostInterface ).setHost( host );
-    //
-    //        assertTrue( host.getInterfaces().contains( hostInterface ) );
-    //    }
-
-
-    //    @Test
-    //    public void testSetNetInterfaces() throws Exception
-    //    {
-    //        Interface anInterface = mock( Interface.class );
-    //        when( anInterface.getName() ).thenReturn( INTERFACE_NAME );
-    //        when( anInterface.getIp() ).thenReturn( IP );
-    //        when( anInterface.getMac() ).thenReturn( MAC );
-    //
-    //        host.setNetInterfaces( Sets.newHashSet( anInterface ) );
-    //
-    //        assertTrue( host.getInterfaces().size() == 1 );
-    //    }
-    //
 
 
     @Test

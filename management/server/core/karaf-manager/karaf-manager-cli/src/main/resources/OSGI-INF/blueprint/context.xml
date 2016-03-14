@@ -1,0 +1,14 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <reference id="karafManager" interface="io.subutai.core.karaf.manager.api.KarafManager" />
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="karaf/command">
+      <action class="io.subutai.core.karaf.manager.cli.KarafShellCommand">
+        <argument ref="karafManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+
+</blueprint>

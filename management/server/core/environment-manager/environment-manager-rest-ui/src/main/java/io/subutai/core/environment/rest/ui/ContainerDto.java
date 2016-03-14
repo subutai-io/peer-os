@@ -3,8 +3,8 @@ package io.subutai.core.environment.rest.ui;
 
 import java.util.Set;
 
-import io.subutai.common.peer.ContainerType;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.peer.ContainerSize;
 
 
 /**
@@ -17,28 +17,31 @@ public class ContainerDto
     private String hostname;
     private ContainerHostState state;
     private String ip;
-    private String mac;
     private String templateName;
-    private ContainerType type;
+    private ContainerSize type;
     private String arch;
     private Set<String> tags;
 
+    private String peerId;
+    private String hostId;
 
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
-                         final ContainerHostState state, final String ip, final String mac, final String templateName,
-                         final ContainerType type, final String arch, final Set<String> tags )
+                         final ContainerHostState state, final String ip, final String templateName,
+                         final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
+                         final String hostId )
     {
         this.id = id;
         this.environmentId = environmentId;
         this.hostname = hostname;
         this.state = state;
         this.ip = ip;
-        this.mac = mac;
         this.templateName = templateName;
         this.type = type;
         this.arch = arch;
         this.tags = tags;
+        this.peerId = peerId;
+        this.hostId = hostId;
     }
 
 
@@ -114,13 +117,13 @@ public class ContainerDto
     }
 
 
-    public ContainerType getType()
+    public ContainerSize getType()
     {
         return type;
     }
 
 
-    public void setType( final ContainerType type )
+    public void setType( final ContainerSize type )
     {
         this.type = type;
     }
@@ -138,18 +141,6 @@ public class ContainerDto
     }
 
 
-    public String getMac()
-    {
-        return mac;
-    }
-
-
-    public void setMac( final String mac )
-    {
-        this.mac = mac;
-    }
-
-
     public String getArch()
     {
         return arch;
@@ -159,5 +150,29 @@ public class ContainerDto
     public void setArch( final String arch )
     {
         this.arch = arch;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
+    }
+
+
+    public void setPeerId( String peerId )
+    {
+        this.peerId = peerId;
+    }
+
+
+    public String getHostId()
+    {
+        return hostId;
+    }
+
+
+    public void setHostId( String hostId )
+    {
+        this.hostId = hostId;
     }
 }

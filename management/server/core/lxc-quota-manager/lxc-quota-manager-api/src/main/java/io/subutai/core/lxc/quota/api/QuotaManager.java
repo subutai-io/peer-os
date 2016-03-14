@@ -1,14 +1,15 @@
 package io.subutai.core.lxc.quota.api;
 
 
+import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainerType;
-import io.subutai.common.quota.ContainerQuotaHolder;
+import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ResourceType;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.resource.PeerResources;
 import io.subutai.common.resource.ResourceValueParser;
 
 
@@ -19,63 +20,50 @@ import io.subutai.common.resource.ResourceValueParser;
 public interface QuotaManager
 {
     /**
-     * Returns available quota value of container by resource type.
+     * Returns available quota values of container.
      *
      * @param containerId container id
-     * @param resourceType resource type
      *
      * @return quota value
      */
 
-    ResourceValue getAvailableQuota( ContainerId containerId, ResourceType resourceType ) throws QuotaException;
+    ContainerQuota getAvailableQuota( ContainerId containerId ) throws QuotaException;
+
+    PeerResources getResourceLimits( String peerId );
 
     /**
-     * Returns current quota value of container by resource type.
+     * Returns current quota values of container.
      *
      * @param containerId container id
-     * @param resourceType resource type
      *
      * @return quota value
      */
-    ResourceValue getQuota( final ContainerId containerId, final ResourceType resourceType ) throws QuotaException;
+    ContainerQuota getQuota( final ContainerId containerId ) throws QuotaException;
+
+    //    MeasureUnit getDefaultMeasureUnit( ContainerResourceType type );
 
     /**
-     * Sets quota value of container by resource type.
+     * Sets quota values of container.
      *
      * @param containerId container id
-     * @param resourceType resource type
-     * @param quotaValue new quota value
+     * @param containerQuota new quota value
      */
 
-    void setQuota( final ContainerId containerId, ResourceType resourceType, ResourceValue quotaValue )
-            throws QuotaException;
+    void setQuota( ContainerId containerId, ContainerQuota containerQuota ) throws QuotaException;
 
-    /**
-     * Sets quota values.
-     *
-     * @param containerId container id
-     * @param containerQuota set of quota values
-     */
-    void setQuota( ContainerId containerId, ContainerQuotaHolder containerQuota ) throws QuotaException;
+    ResourceValueParser getResourceValueParser( ContainerResourceType containerResourceType ) throws QuotaException;
 
-
-    /**
-     * Returns resource value parser by resource type.
-     *
-     * @param resourceType resource type
-     *
-     * @return resource value parser
-     */
-    ResourceValueParser getResourceValueParser( ResourceType resourceType ) throws QuotaException;
 
     /**
      * Returns predefined quotas of container type
      *
-     * @param containerType @see ContainerType container type
+     * @param containerSize @see ContainerType container type
      *
      * @return @see ContainerQuota
      */
-    ContainerQuotaHolder getDefaultContainerQuota( ContainerType containerType );
+    ContainerQuota getDefaultContainerQuota( ContainerSize containerSize );
+
+    //    <T extends ContainerResource> T getQuota( ContainerId containerId, Class<T> type ) throws QuotaException;
 
     /**
      * Returns allowed cpus/cores ids on container
@@ -93,4 +81,11 @@ public interface QuotaManager
      * @param cpuSet - allowed cpu set
      */
     public void setCpuSet( ContainerId containerId, Set<Integer> cpuSet ) throws QuotaException;
+
+    /**
+     * Removes quota setting when container destroyed
+     */
+    void removeQuota( ContainerId containerId );
+
+    Map<ContainerSize, ContainerQuota> getDefaultQuotas();
 }

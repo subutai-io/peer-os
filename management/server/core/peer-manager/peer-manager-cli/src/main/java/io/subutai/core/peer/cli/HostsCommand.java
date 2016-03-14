@@ -6,15 +6,15 @@ import java.text.SimpleDateFormat;
 
 import org.apache.karaf.shell.commands.Command;
 
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.ManagementHost;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.common.peer.ResourceHost;
 
 
 @Command( scope = "peer", name = "hosts" )
@@ -41,21 +41,9 @@ public class HostsCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        //User user = identityManager.getUser();
-
         LocalPeer localPeer = peerManager.getLocalPeer();
 
-        ManagementHost managementHost = localPeer.getManagementHost();
-        if ( managementHost == null )
-        {
-            System.out.println( "Management host not available." );
-            return null;
-        }
-
-        //System.out.println( String.format( "Current user %s. Time: %s", user.getUsername(),
-                //fmt.format( System.currentTimeMillis() ) ) );
         System.out.println( "List of hosts in local peer:" );
-        print( managementHost, "" );
         for ( ResourceHost resourceHost : localPeer.getResourceHosts() )
         {
             print( resourceHost, "\t" );
@@ -79,5 +67,20 @@ public class HostsCommand extends SubutaiShellCommandSupport
 
         System.out
                 .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
+
+
+        for ( HostInterface hostInterface : host.getHostInterfaces().getAll() )
+        {
+            System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
+        }
+
+        if ( host instanceof ResourceHost && host.getHostInterfaces().getAll().isEmpty() )
+        {
+
+            for ( HostInterface hostInterface : ( ( ResourceHost ) host ).getNetInterfaces() )
+            {
+                System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
+            }
+        }
     }
 }

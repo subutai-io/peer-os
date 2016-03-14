@@ -15,10 +15,5 @@ public interface ContainerHostInfo extends HostInfo
     /**
      * Returns status/state of container
      */
-    public ContainerHostState getState();
-
-    /**
-     * Returns lxc container name
-     */
-    public String getContainerName();
+    ContainerHostState getState();
 }

@@ -4,6 +4,7 @@ package io.subutai.common.environment;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -11,50 +12,49 @@ import java.util.UUID;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import io.subutai.common.gson.required.GsonRequired;
-import io.subutai.common.util.CollectionUtil;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
+
+import io.subutai.common.environment.Node;
+import io.subutai.common.util.CollectionUtil;
 
 
 /**
  * Blueprint for environment creation stores nodeGroups.
  *
- * @see NodeGroup
+ * @see Node
  */
 public class Blueprint
 {
     @JsonIgnore
     private UUID id;
     @JsonProperty( "name" )
-    @GsonRequired
     private String name;
-    @JsonProperty( "sshKey" )
-    private String sshKey;
-    @JsonProperty( "nodegroups" )
-    @GsonRequired
-    private Set<NodeGroup> nodeGroups;
+
+    @JsonProperty( "nodes" )
+    private List<NodeSchema> nodes;
+
+//    @JsonProperty( "sshGroupId" )
+//    private int sshGroupId;
+//
+//    @JsonProperty( "hostGroupId" )
+//    private int hostGroupId;
 
 
-    public Blueprint( @JsonProperty( "name" ) final String name, @JsonProperty( "sshKey" ) final String sshKey,
-                      @JsonProperty( "nodegroups" ) final Set<NodeGroup> nodeGroups )
+    public Blueprint( @JsonProperty( "name" ) final String name,/*, @JsonProperty( "sshGroupId" ) final int sshGroupId,
+                      @JsonProperty( "hostGroupId" ) final int hostGroupId,*/
+                      @JsonProperty( "nodes" ) List<NodeSchema> nodes )
     {
-        this.name = name;
-        this.nodeGroups = nodeGroups;
-        this.sshKey = sshKey;
-    }
 
-
-    public Blueprint( final String name, final Set<NodeGroup> nodeGroups )
-    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid name" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodeGroups ), "Invalid node group set" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( nodes ), "Invalid node group set" );
 
         this.id = UUID.randomUUID();
         this.name = name;
-        this.nodeGroups = nodeGroups;
+//        this.sshGroupId = sshGroupId;
+//        this.hostGroupId = hostGroupId;
+        this.nodes = nodes;
     }
 
 
@@ -76,34 +76,20 @@ public class Blueprint
     }
 
 
-    public Set<NodeGroup> getNodeGroups()
+    public List<NodeSchema> getNodes()
     {
-        return nodeGroups == null ? Sets.<NodeGroup>newHashSet() : Collections.unmodifiableSet( nodeGroups );
+        return nodes == null ? Lists.<NodeSchema>newArrayList() : Collections.unmodifiableList( nodes );
     }
 
 
-    @JsonIgnore
-    public Map<String, Set<NodeGroup>> getNodeGroupsMap()
-    {
-        Map<String, Set<NodeGroup>> result = new HashMap<>();
-
-        for ( NodeGroup nodeGroup : nodeGroups )
-        {
-            String key = nodeGroup.getPeerId();
-            Set<NodeGroup> nodes = result.get( key );
-            if ( nodes == null )
-            {
-                nodes = new HashSet<>();
-                result.put( key, nodes );
-            }
-            nodes.add( nodeGroup );
-        }
-        return result;
-    }
-
-
-    public String getSshKey()
-    {
-        return sshKey;
-    }
+//    public int getSshGroupId()
+//    {
+//        return sshGroupId;
+//    }
+//
+//
+//    public int getHostGroupId()
+//    {
+//        return hostGroupId;
+//    }
 }
