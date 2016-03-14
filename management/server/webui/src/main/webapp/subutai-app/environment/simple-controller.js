@@ -45,13 +45,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.addContainer = addContainer;
 	vm.closePopup = closePopup;
 
+	// @todo workaround
 	environmentService.getTemplates()
-		.success(function (data) {
+		.then(function (data) {
 			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
+			console.log(data);
 		});
+		//.error(function (data) {
+		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
+		//});
 
 	environmentService.getStrategies().success(function (data) {
 		vm.strategies = data;

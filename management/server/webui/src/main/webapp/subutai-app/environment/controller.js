@@ -79,14 +79,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		vm.currentUser = data;
 	});
 
-	environmentService.getTemplates()
-		.success(function (data) {
-			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});
-
 	environmentService.getContainersType()
 		.success(function (data) {
 			vm.containersType = data;
