@@ -336,7 +336,7 @@ public class HostRegistryImpl implements HostRegistry
     {
         return RestUtil.createWebClient(
                 String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ), SystemSettings.getAgentPort(),
-                        action ), 2000, 2000, 3 );
+                        action ), 3000, 5000, 1 );
     }
 
 
