@@ -134,7 +134,6 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 			var html_code_array = html_code.match(/[^\r\n]+/g);
 			var temp = false;
 			var stingColor = false;
-			var spliceIdx = 0;
 			for(var i = 0; i < html_code_array.length; i++) {
 				if(vm.logLevel == 'all' || html_code_array[i].includes(vm.logLevel)) {
 					if(html_code_array[i].includes('ERROR') || html_code_array[i].includes('WARN')) {
@@ -151,8 +150,8 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 					html_code_array = temp.array;
 					i = temp.index;
 				} else {
-					html_code_array.splice(i - spliceIdx++, 1);
-					//delete html_code_array[i];
+					html_code_array.splice(i, 1);
+					i--;
 				}
 			}
 			console.log(html_code_array);
