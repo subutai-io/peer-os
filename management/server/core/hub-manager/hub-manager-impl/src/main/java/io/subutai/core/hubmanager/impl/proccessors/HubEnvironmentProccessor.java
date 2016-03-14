@@ -30,6 +30,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
@@ -143,8 +144,13 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             LOG.debug( "Sending PEK to Hub ..." );
             EnvironmentBuildDto buildDto = new EnvironmentBuildDto();
-            buildDto.setUsedIPs( usedIps );
 
+            for ( HostInterface hostInterface : peerManager.getLocalPeer().getInterfaces().getAll() )
+            {
+                usedIps.add( hostInterface.getIp() );
+            }
+
+            buildDto.setUsedIPs( usedIps );
 
             PublicKeyContainer publicKeyContainer =
                     peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
@@ -219,10 +225,30 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             }
             final CreateEnvironmentContainerResponseCollector containerCollector =
                     peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
+
             List<CloneResponse> cloneResponseList = containerCollector.getResponses();
-            for (CloneResponse cloneResponse: cloneResponseList)
+            for ( CloneResponse cloneResponse : cloneResponseList )
             {
-                //TODO
+                for ( EnvironmentNodeDto nodeDto : result.getNodes() )
+                {
+                    if ( cloneResponse.getContainerName().equals( nodeDto.getContainerName() ) )
+                    {
+                        nodeDto.setIp( cloneResponse.getIp() );
+                        nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
+                        nodeDto.setAgentId( cloneResponse.getAgentId() );
+                        nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
+                    }
+                }
+            }
+
+
+            byte[] cborData = JsonUtil.toCbor( result );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+            Response response = client.post( encryptedData );
+            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Containers state sent successfully to Hub" );
             }
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
