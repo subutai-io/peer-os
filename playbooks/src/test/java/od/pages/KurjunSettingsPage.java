@@ -4,7 +4,7 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 
-public class UserManagementPage extends PageObject {
+public class KurjunSettingsPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
@@ -12,9 +12,19 @@ public class UserManagementPage extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
-    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
-    public WebElementFacade buttonAddUser;
+    @FindBy(xpath = "*//button[@ng-click=\"settingsKurjunCtrl.updateConfigUrls()\"]")
+    public WebElementFacade buttonSave;
 
+    @FindBy(xpath = "*//button[@ng-click=\"settingsKurjunCtrl.addUrl()\"]")
+    public WebElementFacade buttonAdd;
+
+    @FindBy(xpath = "*//button[@ng-click=\"settingsKurjunCtrl.updateConfigQuotas()\"]")
+    public WebElementFacade buttonSaveQuotas;
+    //endregion
+
+    //region WEB ELEMENTS: sikuli Title
+
+    public String sikuliTitleQuotas = "src/test/resources/imgs/titles/titleQuotas.png";
     //endregion
 
     //region WEB ELEMENTS: Checkboxes
@@ -46,11 +56,6 @@ public class UserManagementPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Headers
-
-    @FindBy(xpath = "*//h1[contains(text(),\"User management\")]")
-    public WebElementFacade headerUserManagement;
-
-    public String sikuliButtonSetPublicKey = "src/test/resources/imgs/buttons/buttonSetPublicKey.png";
 
     //endregion
 }

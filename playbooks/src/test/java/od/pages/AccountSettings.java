@@ -4,16 +4,22 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 
-public class UserManagementPage extends PageObject {
+public class AccountSettings extends PageObject {
 
     //region WEB ELEMENTS: Fields
+
+    @FindBy(xpath = "*//textarea[@class=\"b-form-input b-form-input_textarea bp-set-pub-key ng-pristine ng-untouched ng-valid\"]")
+    public WebElementFacade fieldPGP;
 
     //endregion
 
     //region WEB ELEMENTS: Buttons
 
-    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
-    public WebElementFacade buttonAddUser;
+    @FindBy(xpath = "*//button[contains(text(),\"Set public key\")]")
+    public WebElementFacade buttonSetPublicKey;
+
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green\"]")
+    public WebElementFacade buttonSave;
 
     //endregion
 
@@ -26,6 +32,8 @@ public class UserManagementPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Tables
+
+    public String sikuliTitleChangePassword = "src/test/resources/imgs/titles/titleChangePassword.png";
 
     //endregion
 
@@ -46,11 +54,6 @@ public class UserManagementPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Headers
-
-    @FindBy(xpath = "*//h1[contains(text(),\"User management\")]")
-    public WebElementFacade headerUserManagement;
-
-    public String sikuliButtonSetPublicKey = "src/test/resources/imgs/buttons/buttonSetPublicKey.png";
 
     //endregion
 }
