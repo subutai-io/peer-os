@@ -17,6 +17,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.object.relation.api.RelationInfoManager;
+import io.subutai.core.object.relation.api.RelationVerificationException;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
@@ -41,7 +42,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-    private RelationMeta getUserLinkRelation( RelationLink relationLink )
+    private RelationMeta getUserLinkRelation( RelationLink relationLink ) throws RelationVerificationException
     {
         User activeUser = identityManager.getActiveUser();
         UserDelegate delegatedUser = null;
@@ -81,6 +82,12 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
             }
         }
+
+        if ( delegatedUser == null )
+        {
+            throw new RelationVerificationException( "Failed to get trusted object owner" );
+        }
+
         return new RelationMeta( delegatedUser, relationLink, relationLink.getLinkId() );
     }
 
@@ -330,7 +337,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( true, false, false, false, Ownership.USER.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -340,7 +354,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, true, false, false, Ownership.USER.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -350,7 +371,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, false, false, true, Ownership.USER.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -360,7 +388,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, false, true, false, Ownership.USER.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -370,7 +405,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( true, false, false, false, Ownership.GROUP.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -380,7 +422,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -390,7 +439,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, false, false, true, Ownership.GROUP.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -400,7 +456,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, false, true, false, Ownership.GROUP.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -409,7 +472,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -418,7 +488,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, true, false, false, Ownership.ALL.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -427,7 +504,14 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, false, true, Ownership.ALL.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -436,6 +520,13 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.ALL.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        try
+        {
+            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 }
