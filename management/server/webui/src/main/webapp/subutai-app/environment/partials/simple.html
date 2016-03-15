@@ -19,7 +19,7 @@
 					<select class="b-search-input" ng-model="environmentSimpleViewCtrl.templatesType">
 						<option value="all">All</option>
 						<option ng-repeat="(templatesType, templateList) in environmentSimpleViewCtrl.templates" value="{{ templatesType }}">
-							{{ templatesType }}
+						{{ templatesType }} ({{ templateList.length }})
 						</option>
 					</select>
 				</div>
