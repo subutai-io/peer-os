@@ -24,15 +24,20 @@ public class SubutaiSteps extends ScenarioSteps {
     BlueprintsPage blueprintsPage;
     EnvironmentsPage environmentsPage;
     ContainersPage containersPage;
+    KurjunPage kurjunPage;
     ConsolePage consolePage;
     UserManagementPage userManagementPage;
     RoleManagementPage roleManagementPage;
+    AccountSettings accountSettingsPage;
     TokensPage tokensPage;
     PeerRegistrationPage peerRegistrationPage;
-    ResourceNodesPage resourceNodesPage;
+    ResourceHostsPage resourceHostsPage;
     TrackerPage trackerPage;
-    PluginsPage pluginsPage;
-    PluginIntegratorPage pluginIntegratorPage;
+    BazaarPage bazaarPage;
+    PeerSettingsPage peerSettingsPage;
+    KurjunSettingsPage kurjunSettingsPage;
+    NetworkSettings networkSettingsPage;
+    AdvancedPage advancedPage;
     AboutPage aboutPage;
     PgpPlugin pgpPlugin;
     Screen screen = new Screen();
@@ -82,13 +87,17 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnMenuItemMonitoring() {
-        commonPage.linkMonitoring.click();
+    public void clickOnMenuItemMonitoring() throws FindFailed {
+//        commonPage.linkMonitoring.click();
+        screen.click(commonPage.sikuliMenuItemMonitoring);
+        commonPage.waitFor(2000);
     }
 
     @Step
-    public void clickOnSelectorHostsMonitoringPage() {
-        monitoringPage.selectorHosts.click();
+    public void clickOnSelectorHostsMonitoringPage() throws FindFailed {
+//        monitoringPage.selectorHosts.click();
+        screen.click(monitoringPage.sikuliMenuIconRH);
+        commonPage.waitFor(2000);
     }
 
     @Step
@@ -110,18 +119,21 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnMenuItemContainers() {
-        commonPage.linkContainers.click();
+    public void clickOnMenuItemContainers() throws FindFailed {
+//        commonPage.linkContainers.click();
+        screen.click(commonPage.sikuliMenuItemContainers);
     }
 
     @Step
-    public void clickOnMenuItemConsole() {
-        commonPage.linkConsole.click();
+    public void clickOnMenuItemConsole() throws FindFailed {
+//        commonPage.linkConsole.click();
+        screen.click(commonPage.sikuliMenuItemConsole);
     }
 
     @Step
-    public void clickOnSelectorHostsConsolePage() {
-        consolePage.itemSelectorHost.click();
+    public void clickOnSelectorHostsConsolePage() throws FindFailed {
+//        consolePage.itemSelectorHost.click();
+        screen.click(consolePage.sikuliIconSelectorHost);
     }
 
     @Step
@@ -144,49 +156,59 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnMenuItemRoleManagement() {
-        commonPage.linkRoleManagement.click();
+    public void clickOnMenuItemRoleManagement() throws FindFailed {
+//        commonPage.linkRoleManagement.click();
+        screen.click(commonPage.sikuliMenuItemRoleManagement);
     }
 
     @Step
-    public void clickOnMenuItemTokens() {
-        commonPage.linkTokens.click();
+    public void clickOnMenuItemTokens() throws FindFailed {
+//        commonPage.linkTokens.click();
+        screen.click(commonPage.sikuliMenuItemTokens);
     }
 
     @Step
-    public void clickOnMenuItemPeerRegistration() {
-        commonPage.linkPeerRegistration.click();
+    public void clickOnMenuItemPeerRegistration() throws FindFailed {
+//        commonPage.linkPeerRegistration.click();
+        screen.click(commonPage.sikuliMenuItemPeerRegistration);
     }
 
     @Step
-    public void clickOnMenuItemResourceNodes() {
-        commonPage.linkResourceNode.click();
+    public void clickOnMenuItemResourceHosts() throws FindFailed {
+//        commonPage.linkResourceNode.click();
+        screen.click(commonPage.sikuliMenuItemResourceHosts);
     }
 
     @Step
-    public void clickOnMenuItemTracker() {
-        commonPage.linkTracker.click();
+    public void clickOnMenuItemTracker() throws FindFailed {
+//        commonPage.linkTracker.click();
+        screen.click(commonPage.sikuliMenuItemTracker);
     }
 
     @Step
-    public void clickOnMenuItemPlugins() {
-        commonPage.linkPlugins.click();
+    public void clickOnMenuItemBazaar() throws FindFailed {
+//        commonPage.linkPlugins.click();
+        screen.click(commonPage.sikuliMenuItemBazaar);
     }
 
     @Step
-    public void clickOnMenuItemPluginIntegrator() {
-        commonPage.linkPluginIntegrator.click();
+    public void clickOnMenuItemSystemSettings() throws FindFailed {
+//        commonPage.linkPluginIntegrator.click();
+        screen.click(commonPage.sikuliMenuItemSystemSettings);
     }
 
     @Step
-    public void clickOnMenuItemAbout() {
-        commonPage.linkAbout.click();
+    public void clickOnMenuItemAbout() throws FindFailed {
+//        commonPage.linkAbout.click();
+        screen.click(commonPage.sikuliMenuItemAbout);
     }
 
     @Step
     public void clickOnIconTemplateMongo() throws FindFailed {
+        environmentsPage.waitTemplateMongo();
         screen.click(environmentsPage.sikuliTemplateMongo);
     }
+
 
     @Step
     public void clickOnButtonApply() throws FindFailed {
@@ -270,20 +292,100 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(userManagementPage.sikuliButtonSetPublicKey);
     }
 
+    @Step
+    public void clickOnUpperMenuItemRegisterPeer() throws FindFailed {
+        screen.click(commonPage.sikuliUpperMenuItemRegisterPeer);
+    }
+
+    @Step
+    public void clickOnIconNotifications() throws FindFailed {
+        screen.click(commonPage.sikuliIconNotifications);
+    }
+
+    @Step
+    public void clickOnAdvancedMode() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonAdvanced);
+    }
+
+    @Step
+    public void clickOnTitleTemplates() throws FindFailed {
+        screen.click(environmentsPage.sikuliTitleTemplates);
+    }
+
+    @Step
+    public void clickOnMenuItemKurjun() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemKurjun);
+    }
+
+    @Step
+    public void clickOnTitleAPT() throws FindFailed {
+        screen.click(kurjunPage.sikuliTitleAPT);
+    }
+
+    @Step
+    public void clickOnMenuItemUserIdentity() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemUserIdentity);
+    }
+
+    @Step
+    public void clickOnTitleChangePassword() throws FindFailed {
+        screen.click(accountSettingsPage.sikuliTitleChangePassword);
+    }
+
+    @Step
+    public void clickOnTitleInstalled() throws FindFailed {
+        screen.click(bazaarPage.sikuliMenuTitleInstalled);
+    }
+
+    @Step
+    public void clickOnTitleAdvanced() throws FindFailed {
+        screen.click(bazaarPage.sikuliMenuTitleAdvanced);
+    }
+
+    @Step
+    public void clickOnMenuItemPeerSettings() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemPeerSettings);
+    }
+
+    @Step
+    public void clickOnTitlePolicy() throws FindFailed {
+        screen.click(peerSettingsPage.sikuliTitlePolicy);
+    }
+
+    @Step
+    public void clickOnMenuItemKurjunSettings() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemKurjunSettings);
+    }
+
+    @Step
+    public void clickOnTitleQuotas() throws FindFailed {
+        screen.click(kurjunSettingsPage.sikuliTitleQuotas);
+    }
+
+    @Step
+    public void clickOnMenuItemNetworkSettings() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemNetworkSettings);
+    }
+
+    @Step
+    public void clickOnMenuItemAdvanced() throws FindFailed {
+        screen.click(commonPage.sikuliMenuItemAdvanced);
+    }
+
+    @Step
+    public void clickOnTitleEnvironment() throws FindFailed {
+        screen.click(monitoringPage.sikuliTitleEnvironment);
+    }
+
+    @Step
+    public void clickOnTitleLogs() throws FindFailed {
+        screen.click(advancedPage.sikuliTitleLogs);
+    }
 
     //endregion
 
     //region ACTION: Wait
 
-    @Step
-    public void waitForIconTemplateMongo(){
-        environmentsPage.waitFor(environmentsPage.iconTemplateMongo);
-    }
-
-    @Step
-    public void waitForIconDeleteEnvironment(){
-        environmentsPage.waitFor(environmentsPage.iconDeleteEnvironment);
-    }
     //endregion
 
     //region VERIFICATION: AssertThat
@@ -384,8 +486,8 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void userShouldObserveHeaderResourceNodes() {
-        assertThat(resourceNodesPage.headerNodes.isVisible(), is(true));
+    public void userShouldObserveHeaderResourceHosts() {
+        assertThat(resourceHostsPage.headerResourceHosts.isVisible(), is(true));
     }
 
     @Step
@@ -394,23 +496,13 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void userShouldObserveHeaderPlugins() {
-        assertThat(pluginsPage.headerPlugins.isVisible(), is(true));
-    }
-
-    @Step
-    public void userShouldObservePluginItems() {
-        assertThat(pluginsPage.pluginItems.isVisible(), is(true));
-    }
-
-    @Step
-    public void userShouldObserveHeaderPluginIntegrator() {
-        assertThat(pluginIntegratorPage.headerPluginIntegrator.isVisible(), is(true));
+    public void userShouldObserveHeaderPeerSettings() {
+        assertThat(peerSettingsPage.headerPeerSettings.isVisible(), is(true));
     }
 
     @Step
     public void userShouldObserveButtonUploadNewPlugin() {
-        assertThat(pluginIntegratorPage.buttonUploadNewPlugin.isVisible(), is(true));
+        assertThat(bazaarPage.buttonUploadNewPlugin.isVisible(), is(true));
     }
 
     @Step
@@ -421,6 +513,137 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void userShouldObserveButtonCreateEnvironment() {
         assertThat(environmentsPage.buttonCreateEnvironment.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveTitleRegisterPeer() {
+        assertThat(commonPage.titleUpperMenuRegisterPeer.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveUpperMenuBody() {
+        assertThat(commonPage.upperMenuLoginBody.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveLinkSignUp() {
+        assertThat(commonPage.linkSignUp.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonRegister() {
+        assertThat(commonPage.buttonRegister.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveNotificationsBody() {
+        assertThat(commonPage.upperMenuNotificationsBody.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveLinkClear() {
+        assertThat(commonPage.linkClear.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveUserNameAdmin() {
+        assertThat(commonPage.linkAdmin.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonModes() {
+        assertThat(environmentsPage.buttonModes.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObservePluginMongo() {
+        environmentsPage.waitTemplateMongo();
+        assertThat(environmentsPage.templateMongo.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonApply() {
+        assertThat(environmentsPage.buttonApply.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveTitlePeers() {
+        assertThat(environmentsPage.titlePeers.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveGreenButton() {
+        assertThat(commonPage.buttonGreen.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveFieldPGP() {
+        assertThat(accountSettingsPage.fieldPGP.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonSetPublicKey() {
+        assertThat(accountSettingsPage.buttonSetPublicKey.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonSave() {
+        assertThat(accountSettingsPage.buttonSave.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonSetPeerOwner() {
+        assertThat(peerSettingsPage.buttonSetPeerOwner.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonSaveOnPolicyPage() {
+        assertThat(peerSettingsPage.buttonSave.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonSaveOnKurjunSettingsPage() {
+        assertThat(kurjunSettingsPage.buttonSave.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonAddOnKurjunSettingsPage() {
+        assertThat(kurjunSettingsPage.buttonAdd.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveHeaderNetworkSettings() {
+        assertThat(networkSettingsPage.headerNetworkSettings.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonSaveOnNetworkSettingsPage() {
+        assertThat(networkSettingsPage.buttonSave.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveHeaderAdvanced() {
+        assertThat(advancedPage.headerAdvancedSettings.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonExport() {
+        assertThat(advancedPage.buttonExport.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveSelectorEnvironment() {
+        assertThat(monitoringPage.selectorSelectEnvironment.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveSelectorEnvironmentConsole() {
+        assertThat(consolePage.selectorEnvironment.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonSaveOnKurjunSettingsQuotasPage() {
+        assertThat(kurjunSettingsPage.buttonSaveQuotas.isVisible(), is(true));
     }
     //endregion
 
@@ -435,6 +658,8 @@ public class SubutaiSteps extends ScenarioSteps {
     public void seeOutputOfPwdCommand() {
         assertThat(consolePage.outputOfPwdCommand.isVisible(), Matchers.is(true));
     }
+
+
 
     //endregion
 }

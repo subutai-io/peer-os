@@ -74,7 +74,7 @@ public class DistributeCommand extends SubutaiShellCommandSupport
 
 
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
-            Topology topology = strategy.distribute( "Test", 0, 0, groupResources, quotas );
+            Topology topology = strategy.distribute( "Test", groupResources, quotas );
             System.out.println( topology.getEnvironmentName() );
             for ( String peer : topology.getNodeGroupPlacement().keySet() )
             {

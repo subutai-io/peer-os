@@ -34,7 +34,6 @@ import org.apache.http.auth.AuthenticationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 
-import io.subutai.core.strategy.api.Blueprint;
 import io.subutai.common.environment.Node;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.peer.ContainerSize;

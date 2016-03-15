@@ -18,7 +18,7 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
-import io.subutai.core.strategy.api.NodeSchema;
+import io.subutai.common.environment.NodeSchema;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.UnlimitedStrategy;
 
@@ -46,9 +46,9 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
     public UnlimitedPlacementStrategy()
     {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop" ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra" ) );
+        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master", 0, 0 ) );
+        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop", 0, 0 ) );
+        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra", 0, 0 ) );
     }
 
 
@@ -67,11 +67,11 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
 
     @Override
-    public Topology distribute( final String environmentName, final int sshGroupId, final int hostGroupId,
+    public Topology distribute( final String environmentName/*, final int sshGroupId, final int hostGroupId*/,
                                 PeerGroupResources peerGroupResources, Map<ContainerSize, ContainerQuota> quotas )
             throws StrategyException
     {
-        Topology result = new Topology( environmentName, sshGroupId, hostGroupId );
+        Topology result = new Topology( environmentName/*, sshGroupId, hostGroupId*/ );
 
         Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
         for ( Node node : nodes )
@@ -84,11 +84,11 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
 
     @Override
-    public Topology distribute( final String environmentName, final int sshGroupId, final int hostGroupId,
+    public Topology distribute( final String environmentName, /*final int sshGroupId, final int hostGroupId,*/
                                 final List<NodeSchema> nodeSchema, final PeerGroupResources peerGroupResources,
                                 final Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
-        Topology result = new Topology( environmentName, sshGroupId, hostGroupId );
+        Topology result = new Topology( environmentName/*, sshGroupId, hostGroupId*/ );
 
         Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
         for ( Node node : ng )

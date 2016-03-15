@@ -120,8 +120,8 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 				peerRegistrationService.unregisterPeerRequest(peerId).success(function (data) {
 					SweetAlert.swal("Unregistered!", "Your peer request has been unregistered.", "success");
 					vm.dtInstance.reloadData(null, false);
-				}).error(function (data) {
-					SweetAlert.swal("ERROR!", data.ERROR, "error");
+				}).error(function (error) {
+					SweetAlert.swal("ERROR!", error, "error");
 				});
 			}
 		});
@@ -145,8 +145,8 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 				peerRegistrationService.cancelPeerRequest(peerId).success(function (data) {
 					SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");
 					vm.dtInstance.reloadData(null, false);
-				}).error(function (data) {
-					SweetAlert.swal("ERROR!", data.ERROR, "error");
+				}).error(function (error) {
+					SweetAlert.swal("ERROR!", error, "error");
 				});
 			}
 		});
