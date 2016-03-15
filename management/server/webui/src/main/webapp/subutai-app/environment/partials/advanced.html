@@ -143,35 +143,48 @@
 				ng-init="advEnvCtrl.initJointJs()" 
 				ondrop="drop(event)">
 
-					<div class="b-template-settings__dropdown js-dropen-menu">
-						<form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
-							<div class="header"></div>
-							<div class="body">
-								<div class="b-form-group">
-									<div class="b-form-group__label">Container name</div>
-									<input type="text" 
-										id="js-container-name" 
-										class="b-form-input b-form-input_full" 
-										ng-model="templateSettings.containerName" required>									
+					<div class="b-template-settings js-dropen-menu">
+						<div class="header"></div>
+
+						<div class="b-template-settings__coll">
+							<form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
+								<div class="body">
+									<div class="b-form-group">
+										<div class="b-form-group__label">Container name</div>
+										<input type="text" 
+											id="js-container-name" 
+											class="b-form-input b-form-input_full" 
+											ng-model="templateSettings.containerName" required>									
+									</div>
+									<div class="b-form-group">
+										<div class="b-form-group__label">Select quota size</div>
+										<select class="b-form-input b-form-input_full" 
+											id="js-container-size" 
+											ng-init="templateSettings.quotaSize = 'SMALL'" 
+											ng-model="templateSettings.quotaSize"
+										>
+											<option 
+											ng-repeat="type in environmentViewCtrl.containersType" 
+											value="{{ type }}" >
+												{{ type }}
+											</option>
+										</select>
+									</div>
 								</div>
-								<div class="b-form-group">
-									<div class="b-form-group__label">Select quota size</div>
-									<select class="b-form-input b-form-input_full" 
-										id="js-container-size" 
-										ng-model="templateSettings.quotaSize"
-									>
-										<option 
-										ng-repeat="type in environmentViewCtrl.containersType" 
-										value="{{ type }}" >
-											{{ type }}
-										</option>
-									</select>
+								<div class="footer">
+									<button type="submit" class="b-btn b-btn_green">Save</button>
 								</div>
-							</div>
-							<div class="footer">
-								<button type="submit" class="b-btn b-btn_green">Save</button>
-							</div>
-						</form>
+							</form>
+						</div>
+
+						<div class="b-template-settings__coll">
+							<p class="b-template-settings__text">
+							{{ templateSettings.quotaSize }}: <br>
+								<span ng-repeat="(key, value) in environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize]">
+									{{ key }}: {{ value }}<br>
+								</span>
+							</p>
+						</div>
 					</div>
 
 				</div>
