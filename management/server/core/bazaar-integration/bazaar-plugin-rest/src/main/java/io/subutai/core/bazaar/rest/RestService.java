@@ -9,6 +9,12 @@ import javax.ws.rs.core.Response;
 public interface RestService
 {
 	@GET
+	@Path( "products/checksum" )
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getListMD5 ();
+
+
+	@GET
 	@Path( "products" )
 	@Produces( { MediaType.APPLICATION_JSON } )
 	public Response listProducts ();
@@ -23,7 +29,7 @@ public interface RestService
 	@Produces( { MediaType.TEXT_PLAIN } )
 	public Response installPlugin (@FormParam ("name") String name, @FormParam ("version") String version, @FormParam ("kar") String kar, @FormParam ("url") String url, @FormParam ("uid") String uid);
 
-	@POST
+	@DELETE
 	@Path( "uninstall" )
 	@Produces( { MediaType.TEXT_PLAIN } )
 	public Response uninstallPlugin (@FormParam ("id") Long id, @FormParam ("kar") String kar, @FormParam ("name") String name);

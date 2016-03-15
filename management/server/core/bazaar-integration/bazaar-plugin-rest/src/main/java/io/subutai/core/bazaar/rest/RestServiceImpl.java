@@ -61,6 +61,12 @@ public class RestServiceImpl implements RestService
 		return Response.status (Response.Status.OK).build();
 	}
 
+	@Override
+	public Response getListMD5 ()
+	{
+		return Response.status( Response.Status.OK ).entity( bazaar.getChecksum () ).build();
+	}
+
 	public void setBazaar (final Bazaar bazaar)
 	{
 		this.bazaar = bazaar;
