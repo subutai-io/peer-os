@@ -48,7 +48,17 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/management-key-exchange">
+      <action class="io.subutai.core.localpeer.cli.ManagementKeyExchangeCommand">
+        <argument ref="localPeer" />
+        <argument ref="identityManager" />
+      </action>
+    </command>
+  </command-bundle>
+
   <reference id="localPeer" availability="mandatory" interface="io.subutai.common.peer.LocalPeer" />
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="identityManager" availability="mandatory" interface="io.subutai.core.identity.api.IdentityManager" />
 
 </blueprint>
