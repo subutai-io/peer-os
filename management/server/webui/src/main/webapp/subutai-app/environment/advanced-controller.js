@@ -824,17 +824,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	}
 }
 
-function imageExists(image_url){
-
-    var http = new XMLHttpRequest();
-
-    http.open('HEAD', image_url, false);
-    http.send();
-
-    return http.status != 404;
-
-}
-
 function placeRhSimple( model ) {
 	var array = model.attributes.grid;
 	var sizeObj = model.attributes.gridSize;

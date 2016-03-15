@@ -641,6 +641,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.isEditing = true;
 		for(var container in environment.containers) {
 			var pos = vm.findEmptyCubePostion();
+			var img = 'assets/templates/' + environment.containers[container].templateName + '.jpg';
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 				templateName: environment.containers[container].templateName,
@@ -648,7 +652,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
 				attrs: {
-					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
+					image: { 'xlink:href': img },
 					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
 					title: {text: environment.containers[container].templateName}
 				}
