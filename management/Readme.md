@@ -58,7 +58,7 @@ To build the project, you need to have the following tools:
     ```bash
     mvn clean install
     ```
-  If you want to create a Debian package add additional flag
+  If you want to create a Debian package, add additional flag
   
     ```bash
   mvn clean install -P deb
