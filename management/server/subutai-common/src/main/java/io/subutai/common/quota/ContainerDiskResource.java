@@ -42,4 +42,10 @@ public abstract class ContainerDiskResource extends ContainerResource<ByteValueR
     {
         return String.format( "%s%s", resource.convert( ByteUnit.GB ), ByteUnit.GB.getAcronym() );
     }
+
+    @JsonIgnore
+    public double doubleValue( ByteUnit unit )
+    {
+        return getResource().getValue( unit ).doubleValue();
+    }
 }

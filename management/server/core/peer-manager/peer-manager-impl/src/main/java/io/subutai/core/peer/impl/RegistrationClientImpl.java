@@ -49,9 +49,8 @@ public class RegistrationClientImpl implements RegistrationClient
             String s = response.readEntity( String.class );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException(
-                        String.format( "Remote peer '%s' return %d error code. Please try again later.",
-                                destinationHost, response.getStatus() ) );
+                throw new PeerException( String.format( "Remote peer '%s' return %d error code.", destinationHost,
+                        response.getStatus() ) );
             }
             else
             {
@@ -60,9 +59,7 @@ public class RegistrationClientImpl implements RegistrationClient
         }
         catch ( Exception e )
         {
-            throw new PeerException(
-                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
-                            e.getMessage() ) );
+            throw new PeerException( String.format( "Can not connect to '%s'.", destinationHost ) );
         }
     }
 
@@ -81,9 +78,8 @@ public class RegistrationClientImpl implements RegistrationClient
             Response response = client.post( registrationData );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException(
-                        String.format( "Remote peer '%s' return %d error code. Please try again later.",
-                                destinationHost, response.getStatus() ) );
+                throw new PeerException( String.format( "Remote peer '%s' return %d error code.", destinationHost,
+                        response.getStatus() ) );
             }
             else
             {
@@ -93,8 +89,7 @@ public class RegistrationClientImpl implements RegistrationClient
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
-                            e.getMessage() ) );
+                    String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
     }
 
@@ -110,7 +105,6 @@ public class RegistrationClientImpl implements RegistrationClient
 
         try
         {
-
             Response response = client.post( registrationData );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
@@ -121,8 +115,7 @@ public class RegistrationClientImpl implements RegistrationClient
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
-                            e.getMessage() ) );
+                    String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
     }
 
@@ -147,8 +140,7 @@ public class RegistrationClientImpl implements RegistrationClient
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
-                            e.getMessage() ) );
+                    String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
     }
 
@@ -173,8 +165,7 @@ public class RegistrationClientImpl implements RegistrationClient
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
-                            e.getMessage() ) );
+                    String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
     }
 
@@ -199,8 +190,7 @@ public class RegistrationClientImpl implements RegistrationClient
         catch ( Exception e )
         {
             throw new PeerException(
-                    String.format( "Error requesting remote peer '%s': %s .Please try again later.", destinationHost,
-                            e.getMessage() ) );
+                    String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
     }
 

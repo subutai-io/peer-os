@@ -161,6 +161,20 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response check( final String hostId )
+    {
+        if ( securityManager.getKeyManager().getPublicKey( hostId ) != null )
+        {
+            return Response.ok().build();
+        }
+        else
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+    }
+
+
     protected String decrypt( String message ) throws PGPException
     {
         return securityManager.decryptNVerifyResponseFromHost( message );

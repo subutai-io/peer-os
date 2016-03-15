@@ -61,6 +61,7 @@ public class Node
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Resource host id is null" );
         Preconditions.checkNotNull( type );
 
         this.hostname = hostname;
