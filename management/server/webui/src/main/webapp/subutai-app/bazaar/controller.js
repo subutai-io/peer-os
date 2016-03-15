@@ -108,6 +108,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 			}
 			else {
 				vm.notRegistered = true;
+				LOADING_SCREEN ("none");
 			}
 		});
 	}
