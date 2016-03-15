@@ -1,8 +1,10 @@
 package io.subutai.core.hubmanager.impl;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -10,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
@@ -19,6 +23,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.security.crypto.certificate.CertificateData;
@@ -231,5 +236,20 @@ public class ConfigManager
     public String getHubIp()
     {
         return configDataService.getHubConfig( peerId ).getHubIp();
+    }
+
+    public byte[] readContent( Response response ) throws IOException
+    {
+        if ( response.getEntity() == null )
+        {
+            return null;
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        InputStream is = ( ( InputStream ) response.getEntity() );
+
+        IOUtils.copy( is, bos );
+        return bos.toByteArray();
     }
 }

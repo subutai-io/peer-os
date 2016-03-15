@@ -1,11 +1,7 @@
 package io.subutai.core.hubmanager.impl.proccessors;
 
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -20,7 +16,6 @@ import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
@@ -95,7 +90,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             LOG.debug( "Getting Environment peer data from Hub..." );
 
             Response r = client.get();
-            byte[] encryptedContent = readContent( r );
+            byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
@@ -144,6 +139,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             LOG.debug( "Sending PEK to Hub ..." );
             EnvironmentBuildDto buildDto = new EnvironmentBuildDto();
+            buildDto.setEnvironmentId( peerDto.getEnvironmentInfo().getId() );
+            buildDto.setPeerId( peerManager.getLocalPeer().getId() );
 
             for ( HostInterface hostInterface : peerManager.getLocalPeer().getInterfaces().getAll() )
             {
@@ -168,11 +165,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             Response r = client.post( encryptedData );
 
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+            if ( r.getStatus() == HttpStatus.SC_OK )
             {
                 LOG.debug( "PEK sent successfully to Hub" );
 
-                byte[] encryptedContent = readContent( r );
+                byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 EnvironmentBuildDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentBuildDto.class );
 
@@ -201,7 +198,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
 
             Response r = client.get();
-            byte[] encryptedContent = readContent( r );
+            byte[] encryptedContent = configManager.readContent( r );
 
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentNodesDto result = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
@@ -257,60 +254,5 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
         }
-    }
-
-
-    private byte[] readContent( Response response ) throws IOException
-    {
-        if ( response.getEntity() == null )
-        {
-            return null;
-        }
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        InputStream is = ( ( InputStream ) response.getEntity() );
-
-        IOUtils.copy( is, bos );
-        return bos.toByteArray();
-    }
-
-
-    private String getStringFromInputStream( InputStream is )
-    {
-
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        try
-        {
-
-            br = new BufferedReader( new InputStreamReader( is ) );
-            while ( ( line = br.readLine() ) != null )
-            {
-                sb.append( line );
-            }
-        }
-        catch ( IOException e )
-        {
-            LOG.error( e.getMessage() );
-        }
-        finally
-        {
-            if ( br != null )
-            {
-                try
-                {
-                    br.close();
-                }
-                catch ( IOException e )
-                {
-                    LOG.error( e.getMessage() );
-                }
-            }
-        }
-
-        return sb.toString();
     }
 }
