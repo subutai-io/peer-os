@@ -51,7 +51,7 @@ To build the project, you need to have the following tools:
 
 - Clone the project by using:
 
-    `git clone https://github.com/subutai-io/Subutai.git`
+    `git clone https://github.com/subutai-io/base.git`
 
 - Start maven build ( cd to management directory and issue ):
 
