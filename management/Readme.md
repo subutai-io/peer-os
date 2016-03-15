@@ -49,6 +49,12 @@ To build the project, you need to have the following tools:
 
 ###Build steps
 
+- Create folder for project under any folder you want
+    ```bash
+    mkdir SubutaiSocial
+    cd SubutaiSocial
+    ```
+
 - Clone the project by using:
 
     `git clone https://github.com/subutai-io/base.git`
