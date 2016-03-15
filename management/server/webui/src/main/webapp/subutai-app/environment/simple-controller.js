@@ -22,8 +22,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.applyChanges = applyChanges;
 
 	vm.environments = [];
-	vm.domainStrategies = [];
-	vm.strategies = [];
 
 	vm.colors = quotaColors;
 	vm.templates = [];
@@ -54,14 +52,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		//.error(function (data) {
 		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		//});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
-	});
 
 	function closePopup() {
 		vm.buildCompleted = false;

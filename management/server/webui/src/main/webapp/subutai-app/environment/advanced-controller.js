@@ -26,8 +26,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 
-	vm.domainStrategies = [];
-	vm.strategies = [];
 	vm.activeCloudTab = 'peers';
 	vm.templatesType = 'all';
 
@@ -68,14 +66,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		//.error(function (data) {
 		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		//});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
-	});
 
 	function getPeers() {
 		$('.js-peer-load-screen').show();

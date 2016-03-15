@@ -65,6 +65,7 @@ function environmentService($http, $q) {
 
 
 		getContainersType : getContainersType,
+		getContainersTypesInfo : getContainersTypesInfo,
 		setTags : setTags,
 		removeTag : removeTag,
 
@@ -262,6 +263,11 @@ function environmentService($http, $q) {
 	function getContainersType() {
 		return $http.get(CONTAINER_TYPES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
+
+	function getContainersTypesInfo() {
+		return $http.get(CONTAINER_TYPES_URL + "info", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
 
 	function getEnvQuota(containerId) {
 		return $http.get(

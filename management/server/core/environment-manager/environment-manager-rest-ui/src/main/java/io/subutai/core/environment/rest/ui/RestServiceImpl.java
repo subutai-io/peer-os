@@ -624,6 +624,20 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response listContainerTypesInfo()
+    {
+        try
+        {
+            return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity(gson.toJson( e.getMessage() )).build();
+        }
+    }
+
+
     /** Peers strategy **************************************************** */
     @Override
     public Response listPlacementStrategies()

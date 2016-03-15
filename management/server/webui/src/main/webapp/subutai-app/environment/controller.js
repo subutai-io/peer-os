@@ -36,8 +36,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.nodeStatus = 'Add to';
 	vm.nodeList = [];
 	vm.colors = quotaColors;
-	vm.templates = [];
 	vm.containersType = [];
+	vm.containersTypeInfo = [];
 	vm.listOfUsers = [];
 	vm.users2Add = [];
 	vm.installedContainers = [];
@@ -86,6 +86,27 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, data );
 		});
+
+	environmentService.getContainersTypesInfo()
+		.success(function (data) {
+			vm.containersTypeInfo = [];
+
+			for( var i = 0; i < data.length; i++ )
+			{
+				var type = data[i].key.split(/\.(.+)?/)[0];
+				var property = data[i].key.split(/\.(.+)?/)[1];
+
+				if( vm.containersTypeInfo[type] === undefined )
+				{
+					vm.containersTypeInfo[type] = {};
+				}
+
+				vm.containersTypeInfo[type][property] = data[i].value;
+			}
+
+			console.log(vm.containersTypeInfo);
+		});
+
 
 	vm.containersTotal = [];
 	function loadEnvironments() {
