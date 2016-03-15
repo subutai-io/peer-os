@@ -112,6 +112,7 @@ func heartbeat() bool {
 	if time.Since(lastHeartbeatTime) < time.Second*3 {
 		return true
 	}
+	lastHeartbeatTime = time.Now()
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -140,7 +141,6 @@ func heartbeat() bool {
 	})
 	log.Check(log.WarnLevel, "Marshal response json", err)
 
-	lastHeartbeatTime = time.Now()
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
 		resp.Body.Close()

@@ -6,7 +6,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net/http"
@@ -274,7 +273,6 @@ func sendData(c string) {
 	log.Check(log.FatalLevel, "Sending registration request to management", err)
 
 	if resp.Status != "200 OK" {
-		container.Destroy(c)
 		log.Error("Failed to exchange GPG Public Keys. StatusCode: " + resp.Status)
 	}
 

@@ -11,7 +11,8 @@ function check {
 	name=$1
 	child="test`date +%s`"	
 	subutai clone $name $child
-	
+
+	if [ "$(subutai list -i $child | grep -c RUNNING)" == "0" ]; then return; fi	
 	IP=""
 	while [ "$IP" == "" ]; do
 		IP=$(lxc-attach -n $child -- ifconfig eth0 | grep "inet addr:" | cut -d: -f2 | awk '{print $1}')
@@ -24,12 +25,12 @@ function check {
 	done
 	sleep 30
 	while true; do
-        	if [ "$DEBIAN" == "1" ]; then
+        if [ "$DEBIAN" == "1" ]; then
 			STATUS=$(lxc-attach -n $child -- systemctl is-active docker2subutai.service)
-        	elif [ "$UBUNTU" == "1" ]; then
+        elif [ "$UBUNTU" == "1" ]; then
 			lxc-attach -n $child -- service docker2subutai status
-			STATUS=$(lxc-attach -n $child -- service docker2subutai status  | grep -c running)
-        	fi
+			STATUS=$(lxc-attach -n $child -- service docker2subutai status | grep -c running)
+		fi
 
 		echo $STATUS
 		if [ "$STATUS" == "active" ] || [ "$STATUS" == "1" ]; then
@@ -68,7 +69,11 @@ for name in $(ls /home/ubuntu/docker); do
 	elif [ "$UBUNTU" == "1" ]; then
 		subutai clone master $name
 		DISTR="master"
+	else
+		continue
 	fi
+
+    if [ "$(subutai list -i $name | grep -c RUNNING)" == "0" ]; then continue; fi
 
 	IP=""
 	while [ "$IP" == "" ]; do
@@ -81,8 +86,8 @@ for name in $(ls /home/ubuntu/docker); do
 	
 	/apps/subutai/current/bin/d2s /home/ubuntu/docker/$name
 
-	lxc-attach -n $name -- apt update
-	lxc-attach -n $name -- apt install -y openssh-server wget curl
+	# lxc-attach -n $name -- apt update
+	# lxc-attach -n $name -- apt install -y openssh-server wget curl
 	lxc-attach -n $name -- mkdir /opt/docker2subutai
 	
 	cp /home/ubuntu/tmpfs/archive.tar.gz /mnt/lib/lxc/$name/opt/docker2subutai/
@@ -90,5 +95,5 @@ for name in $(ls /home/ubuntu/docker); do
 	rm /mnt/lib/lxc/$name/opt/docker2subutai/archive.tar.gz
 	
 	finish $name
-	check $name $DISTR &
+	check $name $DISTR 
 done
