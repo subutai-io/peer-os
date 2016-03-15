@@ -53,9 +53,10 @@ To build the project, you need to have the following tools:
 
     `git clone https://github.com/subutai-io/base.git`
 
-- Start maven build ( cd to management directory and issue ):
+- Start maven build:
 
     ```bash
+    cd base/management
     mvn clean install
     ```
   If you want to create a Debian package, add additional flag
