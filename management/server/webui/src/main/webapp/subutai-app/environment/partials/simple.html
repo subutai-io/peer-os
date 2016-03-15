@@ -12,8 +12,20 @@
 				</ul>
 			</div>
 			<div class="b-tools-menu js-scrollbar">
-				<ul>
-					<li ng-repeat="template in environmentSimpleViewCtrl.templates">
+				<div class="b-tools-menu__inpit">
+					<input type="text" class="b-search-input" ng-model="searchTemplate" id="js-search">
+				</div>
+				<div class="b-tools-menu__inpit">
+					<select class="b-search-input" ng-model="environmentSimpleViewCtrl.templatesType">
+						<option value="all">All</option>
+						<option ng-repeat="(templatesType, templateList) in environmentSimpleViewCtrl.templates" value="{{ templatesType }}">
+						{{ templatesType }} ({{ templateList.length }})
+						</option>
+					</select>
+				</div>
+				<ul ng-repeat="(templatesType, templateList) in environmentSimpleViewCtrl.templates" 
+					ng-if="environmentSimpleViewCtrl.templatesType == 'all' || environmentSimpleViewCtrl.templatesType == templatesType">
+					<li ng-repeat="template in templateList | filter:searchTemplate">
 						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
 							<span class="b-cloud-item">
 								<img
@@ -37,36 +49,46 @@
 					id="js-environment-creation"
 					ng-init="environmentSimpleViewCtrl.initJointJs()">
 
-					<div class="b-template-settings__dropdown js-dropen-menu">
-						<form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
-							<div class="header"></div>
-							<div class="body">
-								<div class="b-form-group">
-									<div class="b-form-group__label">Container name</div>
-									<input type="text" 
-										id="js-container-name" 
-										class="b-form-input b-form-input_full" 
-										ng-model="templateSettings.containerName" required>									
+					<div class="b-template-settings js-dropen-menu">
+						<div class="header"></div>
+						<div class="b-template-settings__coll">
+							<form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
+								<div class="body">
+									<div class="b-form-group">
+										<div class="b-form-group__label">Container name</div>
+										<input type="text" 
+											id="js-container-name" 
+											class="b-form-input b-form-input_full" 
+											ng-model="templateSettings.containerName" required>									
+									</div>
+									<div class="b-form-group">
+										<div class="b-form-group__label">Select quota size</div>
+										<select class="b-form-input b-form-input_full" 
+											id="js-container-size" 
+											ng-init="templateSettings.quotaSize = 'SMALL'" 
+											ng-model="templateSettings.quotaSize"
+										>
+											<option 
+											ng-repeat="type in environmentViewCtrl.containersType" 
+											value="{{ type }}" title="{{ environmentViewCtrl.containersTypeInfo[type] }}" >
+												{{ type }}
+											</option>
+										</select>
+									</div>
 								</div>
-								<div class="b-form-group">
-									<div class="b-form-group__label">Select quota size</div>
-									<select class="b-form-input b-form-input_full" 
-										id="js-container-size" 
-										ng-init="templateSettings.quotaSize = 'SMALL'" 
-										ng-model="templateSettings.quotaSize"
-									>
-										<option 
-										ng-repeat="type in environmentViewCtrl.containersType" 
-										value="{{ type }}" >
-											{{ type }}
-										</option>
-									</select>
+								<div class="footer">
+									<button type="submit" class="b-btn b-btn_green">Save</button>
 								</div>
-							</div>
-							<div class="footer">
-								<button type="submit" class="b-btn b-btn_green">Save</button>
-							</div>
-						</form>
+							</form>
+						</div>
+						<div class="b-template-settings__coll">
+							<p class="b-template-settings__text">
+							{{ templateSettings.quotaSize }}: <br>
+								<span ng-repeat="(key, value) in environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize]">
+									{{ key }}: {{ value }}<br>
+								</span>
+							</p>
+						</div>
 					</div>
 
 				</div>

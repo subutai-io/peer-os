@@ -22,13 +22,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.applyChanges = applyChanges;
 
 	vm.environments = [];
-	vm.domainStrategies = [];
-	vm.strategies = [];
 
 	vm.colors = quotaColors;
 	vm.templates = [];
 
 	vm.activeCloudTab = 'templates';
+	vm.templatesType = 'all';
 
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
@@ -45,21 +44,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.addContainer = addContainer;
 	vm.closePopup = closePopup;
 
+	// @todo workaround
 	environmentService.getTemplates()
-		.success(function (data) {
+		.then(function (data) {
 			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
-	});
+		//.error(function (data) {
+		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
+		//});
 
 	function closePopup() {
 		vm.buildCompleted = false;
@@ -649,6 +641,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.isEditing = true;
 		for(var container in environment.containers) {
 			var pos = vm.findEmptyCubePostion();
+			var img = 'assets/templates/' + environment.containers[container].templateName + '.jpg';
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 				templateName: environment.containers[container].templateName,
@@ -656,7 +652,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
 				attrs: {
-					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
+					image: { 'xlink:href': img },
 					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
 					title: {text: environment.containers[container].templateName}
 				}

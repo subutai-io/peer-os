@@ -626,6 +626,20 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response listContainerTypesInfo()
+    {
+        try
+        {
+            return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity(gson.toJson( e.getMessage() )).build();
+        }
+    }
+
+
     /** Peers strategy **************************************************** */
     @Override
     public Response listPlacementStrategies()
@@ -650,7 +664,7 @@ public class RestServiceImpl implements RestService
 
         CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
 
-        Map<String, List<String>> peerHostMap = Maps.newHashMap();
+        Map<String, List<PeerDto>> peerHostMap = Maps.newHashMap();
 
         try
         {
@@ -664,7 +678,15 @@ public class RestServiceImpl implements RestService
                         for ( ResourceHostMetric metric : collection
                                 .toArray( new ResourceHostMetric[collection.size()] ) )
                         {
-                            peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                            peerHostMap.get( peer.getId() ).add(
+                                    new PeerDto(
+                                        metric.getHostInfo().getId(),
+                                        metric.getCpuModel(),
+                                        metric.getUsedCpu().toString(),
+                                        metric.getTotalRam().toString(),
+                                        metric.getAvailableRam().toString(),
+                                        metric.getTotalSpace().toString(),
+                                        metric.getAvailableSpace().toString()) );
                         }
                     }
                     return true;
