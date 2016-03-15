@@ -649,6 +649,9 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						{
+							files: ['scripts/libs/FileSaver.min.js']
+						},
+						{
 							name: 'vtortola.ng-terminal'
 						},
                         {

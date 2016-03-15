@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="plugins/usergrid/partials/style.css">
+<div ng-controller="UsergridCtrl as usergridCtrl">
+
+	<div class="b-workspace__header">
+		<h1 class="b-title">Plugins/<span class="b-title_breadcrumbs">UserGrid</span></h1>
+	</div>
+
+	<div class="b-workspace__content">
+		<div class="b-tabs-menu">
+			<ul>
+				<li class="b-tabs-menu__item"
+					ng-click="usergridCtrl.activeTab = 'install'"
+					ng-class="usergridCtrl.activeTab == 'install' ? 'b-tabs-menu__item_active' : ''">
+					Install
+				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="usergridCtrl.activeTab = 'manage'"
+					ng-class="usergridCtrl.activeTab == 'manage' ? 'b-tabs-menu__item_active' : ''">
+					Manage
+				</li>
+			</ul>
+		</div>
+		<div
+				ng-if="usergridCtrl.activeTab == 'install'"
+				ng-include="'plugins/usergrid/partials/install.html'">
+		</div>
+
+		<div
+				ng-if="usergridCtrl.activeTab == 'manage'"
+				ng-include="'plugins/usergrid/partials/manage.html'">
+		</div>
+	</div>
+</div>
