@@ -199,7 +199,27 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
         vm.notificationsCount = 0;
         localStorage.removeItem('notifications');
     }
+
+
+	if (localStorage.getItem ("bazaarMD5") === null) {
+		localStorage.setItem (getBazaarChecksum());
+		bazaarUpdate = true;
+	}
+	else {
+		if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
+			bazaarUpdate = true;
+		}
+	}
+   	function getBazaarChecksum() {
+		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
+			return data;
+		});
+		return "";
+	}
+
 }
+
+var bazaarUpdate = false;
 
 function SubutaiController($rootScope) {
     var vm = this;

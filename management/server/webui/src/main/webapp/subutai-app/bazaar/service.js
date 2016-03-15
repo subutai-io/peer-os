@@ -24,8 +24,8 @@ function BazaarSrv($http) {
 		restoreHubPlugin: restoreHubPlugin,
 		registerPeer: registerPeer,
 		checkRegistration: checkRegistration,
-		getRefOldPlugins: getRefOldPlugins,
-		uninstallHubPluginWOButton: uninstallHubPluginWOButton
+		getRefOldPlugins: getRefOldPlugins
+		//uninstallHubPluginWOButton: uninstallHubPluginWOButton
 	};
 
 	return BazaarSrv;

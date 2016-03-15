@@ -11,9 +11,6 @@ BazaarCtrl.$inject = ['$scope', '$rootScope', 'BazaarSrv', 'ngDialog', 'SweetAle
 function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $location, cfpLoadingBar) {
 
 	var vm = this;
-
-/*	vm.plugins = [{name: "test", version: "BETA", description: "Some desc...", installed: true, img: "http://twimgs.com/informationweek/galleries/automated/723/01_Hadoop_full.jpg"}, {name: "test2", version: "ALPHA", description: "Some desc...", installed: false, img: "https://flume.apache.org/_static/flume-logo.png"}];*/
-	vm.plugins = [];
 	vm.activeTab = "hub";
 	vm.changeTab = changeTab;
 	function changeTab (tab) {
@@ -108,10 +105,14 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 			}
 			else {
 				vm.notRegistered = true;
+				LOADING_SCREEN ("none");
 			}
 		});
 	}
-	getHubPlugins();
+	vm.plugins = localStorage.getItem ("bazaarProducts");
+	if (bazaarUpdate === true || vm.plugins === null) {
+		getHubPlugins();
+	}
 
 /*	vm.buttonCheck = buttonCheck;
 	function buttonCheck (s) {
