@@ -16,8 +16,20 @@
 				</ul>
 			</div>
 			<div class="b-tools-menu js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
-				<ul class="">
-					<li ng-repeat="template in advEnvCtrl.templates" 
+				<div class="b-tools-menu__inpit">
+					<input type="text" class="b-search-input" ng-model="searchTemplate" id="js-search">
+				</div>
+				<div class="b-tools-menu__inpit">
+					<select class="b-search-input" ng-model="advEnvCtrl.templatesType">
+						<option value="all">All</option>
+						<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
+							{{ templatesType }} ({{ templateList.length }})
+						</option>
+					</select>
+				</div>
+				<ul ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" 
+					ng-if="advEnvCtrl.templatesType == 'all' || advEnvCtrl.templatesType == templatesType">
+					<li ng-repeat="template in templateList  | filter:searchTemplate" 
 						data-template="{{ template }}">
 						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
@@ -74,37 +86,45 @@
 				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar-cloud">
 					<ul ng-show="advEnvCtrl.currentResourceHosts.length > 0">
 						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
-						ng-click="advEnvCtrl.addResource2Build(resourceHost, advEnvCtrl.currentPeer, $index)">
+						ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
 							<span class="b-cloud-item-resource-name g-margin-bottom">
 								Recource Host {{$index + 1}}
 							</span>
 							<div class="b-progress__cloud b-progress__cloud_rh">
-								<div class="b-progress-text g-margin-bottom">
-									<i class="b-icon b-icon_cloud b-icon_cpu g-margin-right-quarter"></i> 
-									CPU:Intel Core 2 Duo
+								<div class="g-margin-bottom">
+									<div class="b-progress-text">
+										<i class="b-icon b-icon_cloud b-icon_cpu g-margin-right-quarter"></i>
+										CPU: {{ resourceHost.cpu }}
+									</div>
+									<div class="b-progress-cloud g-margin-bottom-half">
+										<div class="b-progress-cloud-fill" ng-style="{ 'width': 100 - resourceHost.cpuAvailable + '%'}"></div>
+									</div>
+									<div class="b-progress-text">
+										<span class="g-text-blue">{{ 100 - resourceHost.cpuAvailable | number:1 }} %</span> available
+									</div>
 								</div>
 								<div class="g-margin-bottom">
 									<div class="b-progress-text g-margin-bottom-half">
 										<i class="b-icon b-icon_cloud b-icon_hdd g-margin-right-quarter"></i> 
-										HDD:2048MB
+										HDD: {{ resourceHost.hdd / 1073741824 | number:1 }} Gb
 									</div>
 									<div class="b-progress-cloud g-margin-bottom-half">
-										<div class="b-progress-cloud-fill" style="width: 0%"></div>
+										<div class="b-progress-cloud-fill" ng-style="{ 'width': resourceHost.hddAvailable / resourceHost.hdd * 100 + '%'}"></div>
 									</div>
 									<div class="b-progress-text">
-										<span class="g-text-blue">0MB</span> used
+										<span class="g-text-blue">{{ resourceHost.hddAvailable / 1073741824 | number:1 }} Gb</span> available
 									</div>
 								</div>
 								<div>
 									<div class="b-progress-text g-margin-bottom-half">
 										<i class="b-icon b-icon_cloud b-icon_ram g-margin-right-quarter"></i> 
-										RAM:  256MB
+										RAM: {{ resourceHost.memory / 1073741824 | number:1 }} Gb
 									</div>
 									<div class="b-progress-cloud g-margin-bottom-half">
-										<div class="b-progress-cloud-fill" style="width: 0%"></div>
+										<div class="b-progress-cloud-fill" ng-style="{ 'width': resourceHost.memoryAvailable / resourceHost.memory * 100 + '%'}"></div>
 									</div>
 									<div class="b-progress-text">
-										<span class="g-text-blue">0MB</span> used
+										<span class="g-text-blue">{{ resourceHost.memoryAvailable / 1073741824 | number:1 }} Gb</span> available
 									</div>
 								</div>
 							</div>
@@ -123,35 +143,48 @@
 				ng-init="advEnvCtrl.initJointJs()" 
 				ondrop="drop(event)">
 
-					<div class="b-template-settings__dropdown js-dropen-menu">
-						<form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
-							<div class="header"></div>
-							<div class="body">
-								<div class="b-form-group">
-									<div class="b-form-group__label">Container name</div>
-									<input type="text" 
-										id="js-container-name" 
-										class="b-form-input b-form-input_full" 
-										ng-model="templateSettings.containerName" required>									
+					<div class="b-template-settings js-dropen-menu">
+						<div class="header"></div>
+
+						<div class="b-template-settings__coll">
+							<form ng-submit="advEnvCtrl.addSettingsToTemplate(templateSettings)">
+								<div class="body">
+									<div class="b-form-group">
+										<div class="b-form-group__label">Container name</div>
+										<input type="text" 
+											id="js-container-name" 
+											class="b-form-input b-form-input_full" 
+											ng-model="templateSettings.containerName" required>									
+									</div>
+									<div class="b-form-group">
+										<div class="b-form-group__label">Select quota size</div>
+										<select class="b-form-input b-form-input_full" 
+											id="js-container-size" 
+											ng-init="templateSettings.quotaSize = 'SMALL'" 
+											ng-model="templateSettings.quotaSize"
+										>
+											<option 
+											ng-repeat="type in environmentViewCtrl.containersType" 
+											value="{{ type }}" >
+												{{ type }}
+											</option>
+										</select>
+									</div>
 								</div>
-								<div class="b-form-group">
-									<div class="b-form-group__label">Select quota size</div>
-									<select class="b-form-input b-form-input_full" 
-										id="js-container-size" 
-										ng-model="templateSettings.quotaSize"
-									>
-										<option 
-										ng-repeat="type in environmentViewCtrl.containersType" 
-										value="{{ type }}" >
-											{{ type }}
-										</option>
-									</select>
+								<div class="footer">
+									<button type="submit" class="b-btn b-btn_green">Save</button>
 								</div>
-							</div>
-							<div class="footer">
-								<button type="submit" class="b-btn b-btn_green">Save</button>
-							</div>
-						</form>
+							</form>
+						</div>
+
+						<div class="b-template-settings__coll">
+							<p class="b-template-settings__text">
+							{{ templateSettings.quotaSize }}: <br>
+								<span ng-repeat="(key, value) in environmentViewCtrl.containersTypeInfo[templateSettings.quotaSize]">
+									{{ key }}: {{ value }}<br>
+								</span>
+							</p>
+						</div>
 					</div>
 
 				</div>

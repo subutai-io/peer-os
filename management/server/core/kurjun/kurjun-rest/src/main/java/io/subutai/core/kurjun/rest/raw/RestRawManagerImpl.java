@@ -239,7 +239,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
     private RawMetadata convertToRawMetadata( Resource raw )
     {
-        RawMetadata defaultTemplate = new RawMetadata( decodeMd5( raw.getMd5Sum() ), raw.getName() );
+        RawMetadata defaultTemplate = new RawMetadata( decodeMd5( raw.getMd5Sum() ), raw.getName(), raw.getSize() );
         return defaultTemplate;
     }
 
