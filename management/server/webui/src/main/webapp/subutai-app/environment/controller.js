@@ -103,8 +103,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 				vm.containersTypeInfo[type][property] = data[i].value;
 			}
-
-			console.log(vm.containersTypeInfo);
 		});
 
 
@@ -160,7 +158,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	reloadTableData();
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		console.log('cancel');
 		$timeout.cancel(refreshTable);
 	});
 
@@ -195,7 +192,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				vm.listOfUsers[i].delete = true;
 			}
 			environmentService.getShared(environment.id).success(function (data2) {
-				console.log(data2);
 				vm.users2Add = data2;
 				for (var i = 0; i < vm.users2Add.length; ++i) {
 					if (vm.users2Add[i].id === vm.currentUser.id) {
@@ -399,7 +395,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	function deleteSSHKey(sshKey, index) {
 		LOADING_SCREEN();
 		environmentService.removeSshKey(vm.sshKeyForEnvironment, sshKey).success( function (data) {
-			console.log(data);
+
 			vm.sshKeysList.splice(index, 1);
 			LOADING_SCREEN('none');
 		}).error( function(error) {
