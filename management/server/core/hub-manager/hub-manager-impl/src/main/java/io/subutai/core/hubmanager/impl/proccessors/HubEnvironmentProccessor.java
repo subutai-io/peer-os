@@ -211,7 +211,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     new SubnetUtils( peerDto.getEnvironmentInfo().getSubnetCidr() ).getInfo();
             String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
 
-            CreateEnvironmentContainerGroupRequest containerGroupRequest = new CreateEnvironmentContainerGroupRequest();
+            CreateEnvironmentContainerGroupRequest containerGroupRequest =
+                    new CreateEnvironmentContainerGroupRequest( peerDto.getEnvironmentInfo().getId() );
             for ( EnvironmentNodeDto nodeDto : result.getNodes() )
             {
                 final String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
