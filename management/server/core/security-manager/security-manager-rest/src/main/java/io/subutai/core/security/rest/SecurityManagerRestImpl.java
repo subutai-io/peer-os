@@ -73,16 +73,28 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKeyRing( final String identityId )
     {
-        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+        String key = "";
 
-        if ( Strings.isNullOrEmpty( key ) )
+        try
         {
+            key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+
+            if ( Strings.isNullOrEmpty( key ) )
+            {
+                logger.info( " ************* Public Key not found with id:" +  identityId);
+                return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+            }
+            else
+            {
+                return Response.ok( key ).build();
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.error( "************ Error in getPublicKeyRest identityId:" + identityId);
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-        else
-        {
-            return Response.ok( key ).build();
-        }
+
     }
 
 
@@ -92,17 +104,29 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKey( final String identityId )
     {
-        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+        String key = "";
 
-        if ( Strings.isNullOrEmpty( key ) )
+        try
         {
+            key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+
+            if ( Strings.isNullOrEmpty( key ) )
+            {
+                logger.info( " ************* Public Key not found with id:" +  identityId);
+                return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+            }
+            else
+            {
+                return Response.ok( key ).build();
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.error( "************ Error in getPublicKeyRest identityId:" + identityId);
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-        else
-        {
-            return Response.ok( key ).build();
-        }
-    }
+
+ }
 
 
     /* ******************************
