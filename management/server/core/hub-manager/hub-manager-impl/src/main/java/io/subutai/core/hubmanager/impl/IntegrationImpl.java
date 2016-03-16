@@ -45,6 +45,7 @@ import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -70,6 +71,7 @@ public class IntegrationImpl implements Integration
     private DaoManager daoManager;
     private ConfigDataService configDataService;
     private Monitor monitor;
+    private IdentityManager identityManager;
 
 
     public IntegrationImpl( DaoManager daoManager )
@@ -83,7 +85,6 @@ public class IntegrationImpl implements Integration
         try
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
-
             this.configManager =
                     new ConfigManager( securityManager, peerManager, configDataService );
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
@@ -93,7 +94,7 @@ public class IntegrationImpl implements Integration
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( environmentManager, configManager, peerManager );
+                    new HubEnvironmentProccessor( environmentManager, configManager, peerManager, identityManager );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
