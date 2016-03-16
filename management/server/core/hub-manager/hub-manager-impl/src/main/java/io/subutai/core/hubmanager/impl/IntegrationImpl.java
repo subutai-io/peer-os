@@ -357,4 +357,10 @@ public class IntegrationImpl implements Integration
         mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
         return mapper;
     }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
+    }
 }
