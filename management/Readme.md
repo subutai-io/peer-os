@@ -115,7 +115,38 @@ To build the project, you need to have the following tools:
 
   [Download Page](https://maven.apache.org/download.cgi)
   
-  [Installation](http://basicgroundwork.blogspot.com/2015/05/installing-maven-333-on-ubuntu-1504.html)
+  #### Installation (Ubuntu 15.04)
+  
+  - Unzip the binary with tar
+  
+  ```bash
+  tar -zxf apache-maven-3.3.3-bin.tar.gz
+  ```
+  
+  - Move the application directory to `/usr/local`
+  
+  ```bash
+  sudo cp -R apache-maven-3.3.3 /usr/local
+  ```
+
+  - Make a soft link in `/usr/bin` for universal access of `mvn`
+  
+  ```bash
+  sudo ln -s /usr/local/apache-maven-3.3.3/bin/mvn /usr/bin/mvn
+  ```
+  
+  - Verifify mvn installation
+  
+  ```bash
+  mvn --version
+  
+  Apache Maven 3.3.3 (12a6b3acb947671f09b81f49094c53f426d8cea1; 2014-12-14T17:29:23+00:00)
+  Maven home: /usr/local/apache-maven-3.2.5
+  Java version: 1.7.0_80, vendor: Oracle Corporation
+  Java home: /usr/lib/jvm/java-7-oracle/jre
+  Default locale: en_US, platform encoding: UTF-8
+  OS name: "linux", version: "3.13.0-48-generic", arch: "amd64", family: "unix"
+  ```
 
 ###Build steps
 
