@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +25,18 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
-import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
-import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.EnvironmentBuildDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
@@ -54,14 +54,16 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     private ConfigManager configManager;
     private PeerManager peerManager;
     private EnvironmentManager environmentManager;
+    private IdentityManager identityManager;
 
 
     public HubEnvironmentProccessor( final EnvironmentManager environmentManager, final ConfigManager hConfigManager,
-                                     final PeerManager peerManager )
+                                     final PeerManager peerManager, final IdentityManager identityManager )
     {
         this.environmentManager = environmentManager;
         this.configManager = hConfigManager;
         this.peerManager = peerManager;
+        this.identityManager = identityManager;
     }
 
 
@@ -149,6 +151,10 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             buildDto.setUsedIPs( usedIps );
 
+            LOG.info( "Active user ID: "+identityManager.getActiveUser().getId());
+            LOG.info( "Active user Email: "+identityManager.getActiveUser().getEmail());
+            LOG.info( "Active user Name: "+identityManager.getActiveUser().getFullName());
+
             PublicKeyContainer publicKeyContainer =
                     peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
 
@@ -173,8 +179,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 EnvironmentBuildDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentBuildDto.class );
 
-                peerManager.getLocalPeer().updatePeerEnvironmentPubKey( environmentId,
-                        PGPKeyUtil.readPublicKeyRing( buildDtoResponse.getPublicKey().getKey() ) );
+                PGPPublicKeyRing signedKey = PGPKeyUtil.readPublicKeyRing( buildDtoResponse.getPublicKey().getKey() );
+                peerManager.getLocalPeer().updatePeerEnvironmentPubKey( environmentId, signedKey );
             }
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
@@ -212,15 +218,21 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     new CreateEnvironmentContainerGroupRequest( peerDto.getEnvironmentInfo().getId() );
             for ( EnvironmentNodeDto nodeDto : result.getNodes() )
             {
-                final String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
-                CloneRequest cloneRequest =
-                        new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                                ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
-                                peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64,
-                                ContainerSize.valueOf( nodeDto.getContainerSize() ) );
+                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+                String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
 
-                containerGroupRequest.addRequest( cloneRequest );
+//                CloneRequest cloneRequest =
+//                        new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
+//                                ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
+//                                peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
+//
+//                containerGroupRequest.addRequest( cloneRequest );
             }
+
+            LOG.info( "Active user ID: "+identityManager.getActiveUser().getId());
+            LOG.info( "Active user Email: "+identityManager.getActiveUser().getEmail());
+            LOG.info( "Active user Name: "+identityManager.getActiveUser().getFullName());
+
             final CreateEnvironmentContainerResponseCollector containerCollector =
                     peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
 
