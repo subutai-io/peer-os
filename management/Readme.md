@@ -108,7 +108,7 @@ To build the project, you need to have the following tools:
   update-java-alternatives -l
   sudo nano /etc/profile
   
-  Add
+  Add following lines at the end:
   export JAVA_HOME="path that you found in update-java-alternatives for your JDK without quotes"
   export PATH=$JAVA_HOME/bin:$PATH
   ```
