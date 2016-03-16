@@ -13,12 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Node;
+import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
-import io.subutai.common.environment.NodeSchema;
 import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.UnlimitedStrategy;
 
@@ -67,11 +67,10 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
 
     @Override
-    public Topology distribute( final String environmentName/*, final int sshGroupId, final int hostGroupId*/,
-                                PeerGroupResources peerGroupResources, Map<ContainerSize, ContainerQuota> quotas )
-            throws StrategyException
+    public Topology distribute( final String environmentName, PeerGroupResources peerGroupResources,
+                                Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
-        Topology result = new Topology( environmentName/*, sshGroupId, hostGroupId*/ );
+        Topology result = new Topology( environmentName );
 
         Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
         for ( Node node : nodes )
@@ -84,11 +83,11 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
 
     @Override
-    public Topology distribute( final String environmentName, /*final int sshGroupId, final int hostGroupId,*/
-                                final List<NodeSchema> nodeSchema, final PeerGroupResources peerGroupResources,
+    public Topology distribute( final String environmentName, final List<NodeSchema> nodeSchema,
+                                final PeerGroupResources peerGroupResources,
                                 final Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
-        Topology result = new Topology( environmentName/*, sshGroupId, hostGroupId*/ );
+        Topology result = new Topology( environmentName );
 
         Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
         for ( Node node : ng )

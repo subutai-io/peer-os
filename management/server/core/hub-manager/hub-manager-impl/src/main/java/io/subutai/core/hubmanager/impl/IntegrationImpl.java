@@ -247,7 +247,7 @@ public class IntegrationImpl implements Integration
         int indexOfStr = url.indexOf( "/package/" );
         String fileName = url.substring( indexOfStr + 9, url.length() );
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
-        File repo = new File( "/opt/subutai-mng/data/repository/io/subutai/" );
+        File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
             @Override

@@ -26,9 +26,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 
-	vm.domainStrategies = [];
-	vm.strategies = [];
 	vm.activeCloudTab = 'peers';
+	vm.templatesType = 'all';
 
 	vm.peerIds = [];
 	vm.resourceHosts = [];
@@ -59,21 +58,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.addResource2Build = addResource2Build;
 	vm.closePopup = closePopup;
 
+	// @todo workaround
 	environmentService.getTemplates()
-		.success(function (data) {
+		.then(function (data) {
 			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
-	});
+		//.error(function (data) {
+		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
+		//});
 
 	function getPeers() {
 		$('.js-peer-load-screen').show();
@@ -830,17 +822,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		//ngDialog.closeAll();
 		containerSettingMenu.hide();
 	}
-}
-
-function imageExists(image_url){
-
-    var http = new XMLHttpRequest();
-
-    http.open('HEAD', image_url, false);
-    http.send();
-
-    return http.status != 404;
-
 }
 
 function placeRhSimple( model ) {
