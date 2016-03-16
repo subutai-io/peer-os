@@ -401,7 +401,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
+//    @RolesAllowed( "Environment-Management|Write" ) TODO this is only for testing period of Environment
     @Override
     public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest requestGroup ) throws PeerException
@@ -1648,7 +1648,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     /* ***********************************************
      *  Create PEK
      */
-    @RolesAllowed( "Environment-Management|Write" )
+//    @RolesAllowed( "Environment-Management|Write" ) TODO this is only for testing period of Environment
     @Override
     public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
     {
