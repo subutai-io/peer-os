@@ -102,6 +102,7 @@ To build the project, you need to have the following tools:
   export JAVA_HOME="path that you found"
   export PATH=$JAVA_HOME/bin:$PATH
   ```
+  
 - Unlimited strength files (specific for Java version)
 
   [Download Page (JDK 8)](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
@@ -110,7 +111,6 @@ To build the project, you need to have the following tools:
   unzip jce_policy-8.zip
   cd UnlimitedJCEPolicyJDK8
   sudo cp local_policy.jar US_export_policy.jar $JAVA_HOME/jre/lib/security
-  Enter password for root
   ```
   
 - Maven version 3.2.2 or later
