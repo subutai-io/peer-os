@@ -25,12 +25,16 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.network.Vni;
+import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
@@ -38,10 +42,10 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.dto.environment.EnvironmentBuildDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.hub.share.dto.network.VniDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -140,20 +144,24 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             WebClient client = configManager.getTrustedWebClientWithAuth( exchangeURL, configManager.getHubIp() );
 
             LOG.debug( "Sending PEK to Hub ..." );
-            EnvironmentBuildDto buildDto = new EnvironmentBuildDto();
-            buildDto.setEnvironmentId( peerDto.getEnvironmentInfo().getId() );
-            buildDto.setPeerId( peerManager.getLocalPeer().getId() );
 
             for ( HostInterface hostInterface : peerManager.getLocalPeer().getInterfaces().getAll() )
             {
                 usedIps.add( hostInterface.getIp() );
             }
 
-            buildDto.setUsedIPs( usedIps );
+            Vnis vnis = peerManager.getLocalPeer().getReservedVnis();
+            for ( Vni vni: vnis.list())
+            {
+                VniDto vniDto = new VniDto();
+                vniDto.setPeerId( peerManager.getLocalPeer().getId() );
+                vniDto.setEnvironmentId( peerDto.getEnvironmentInfo().getId() );
+                vniDto.setVni( vni.getVni() );
+                vniDto.setVlan( vni.getVlan() );
+                peerDto.getVnis().add( vniDto );
+            }
 
-            LOG.info( "Active user ID: "+identityManager.getActiveUser().getId());
-            LOG.info( "Active user Email: "+identityManager.getActiveUser().getEmail());
-            LOG.info( "Active user Name: "+identityManager.getActiveUser().getFullName());
+            peerDto.setUsedIPs( usedIps );
 
             PublicKeyContainer publicKeyContainer =
                     peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
@@ -164,9 +172,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             keyContainer.setHostId( publicKeyContainer.getHostId() );
             keyContainer.setFingerprint( publicKeyContainer.getFingerprint() );
 
-            buildDto.setPublicKey( keyContainer );
+            peerDto.setPublicKey( keyContainer );
 
-            byte[] cborData = JsonUtil.toCbor( buildDto );
+            byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
             Response r = client.post( encryptedData );
@@ -177,7 +185,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
                 byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-                EnvironmentBuildDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentBuildDto.class );
+                EnvironmentPeerDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
                 PGPPublicKeyRing signedKey = PGPKeyUtil.readPublicKeyRing( buildDtoResponse.getPublicKey().getKey() );
                 peerManager.getLocalPeer().updatePeerEnvironmentPubKey( environmentId, signedKey );
@@ -210,6 +218,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             EnvironmentNodesDto result = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
             LOG.debug( "EnvironmentNodesDto: " + result.toString() );
 
+            Vni vni = new Vni( peerDto.getEnvironmentInfo().getVni(), peerDto.getEnvironmentInfo().getId() );
+            peerManager.getLocalPeer().reserveVni( vni );
+
             SubnetUtils.SubnetInfo subnetInfo =
                     new SubnetUtils( peerDto.getEnvironmentInfo().getSubnetCidr() ).getInfo();
             String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
@@ -220,18 +231,20 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             {
                 ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
                 String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
+                try
+                {
+                    CloneRequest cloneRequest =
+                            new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
+                                    ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
+                                    peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
 
-//                CloneRequest cloneRequest =
-//                        new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-//                                ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
-//                                peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
-//
-//                containerGroupRequest.addRequest( cloneRequest );
+                    containerGroupRequest.addRequest( cloneRequest );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( e.getMessage() );
+                }
             }
-
-            LOG.info( "Active user ID: "+identityManager.getActiveUser().getId());
-            LOG.info( "Active user Email: "+identityManager.getActiveUser().getEmail());
-            LOG.info( "Active user Name: "+identityManager.getActiveUser().getFullName());
 
             final CreateEnvironmentContainerResponseCollector containerCollector =
                     peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
