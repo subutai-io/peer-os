@@ -59,7 +59,6 @@ func initAgent() {
 		cont.Start("management")
 	}
 	container.PoolInstance()
-	Instance()
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()
@@ -71,10 +70,9 @@ func Start(c *cli.Context) {
 	http.HandleFunc("/heartbeat", heartbeatCall)
 	go http.ListenAndServe(":7070", nil)
 
+	initAgent()
 	go container.ContainersRestoreState()
 	go lib.Collect()
-	initAgent()
-
 	go connectionMonitor()
 
 	for {
@@ -230,7 +228,7 @@ func tlsConfig() *http.Client {
 	}
 
 	transport := &http.Transport{TLSClientConfig: tlsconfig}
-	client := &http.Client{Transport: transport}
+	client := &http.Client{Transport: transport, Timeout: time.Second * 30}
 	return client
 }
 
