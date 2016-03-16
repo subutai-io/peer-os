@@ -117,7 +117,13 @@ To build the project, you need to have the following tools:
 
   [Download Page](https://maven.apache.org/download.cgi)
   
-  ###### Installation (Ubuntu 15.04)
+  Before installing, remove older versions:
+  
+  ```bash
+  sudo apt-get purge maven maven2 maven3
+  ```
+  
+  ###### Installation (manual way - works only on Ubuntu 15.04)
   
   - Unzip the binary with tar
   
@@ -137,7 +143,15 @@ To build the project, you need to have the following tools:
   sudo ln -s /usr/local/apache-maven-3.3.3/bin/mvn /usr/bin/mvn
   ```
   
-  - Verifify mvn installation
+  ###### Installation (apt repo - older versions)
+  
+  ```bash
+  sudo apt-add-repository ppa:andrei-pozolotin/maven3
+  sudo apt-get update
+  sudo apt-get install maven3
+  ```
+  
+  ###### Verifify mvn installation
   
   ```bash
   mvn --version
