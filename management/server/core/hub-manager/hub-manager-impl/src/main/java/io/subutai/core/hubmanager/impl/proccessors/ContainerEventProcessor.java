@@ -19,7 +19,7 @@ import io.subutai.hub.share.dto.ContainerEventDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-public class ContainerEventProcessor
+public class ContainerEventProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -34,6 +34,20 @@ public class ContainerEventProcessor
         this.manager = integration;
         this.configManager = configManager;
         this.peerManager = peerManager;
+    }
+
+
+    @Override
+    public void run()
+    {
+        try
+        {
+            process();
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to process container event: {}", e );
+        }
     }
 
 
