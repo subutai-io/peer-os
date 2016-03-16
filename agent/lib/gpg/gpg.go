@@ -255,6 +255,8 @@ func parseKeyId(s string) string {
 }
 
 func writeData(c, t, n, m string) {
+	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt.asc")
+	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt")
 	token := []byte(t + "\n" + GetFingerprint(c) + "\n" + n + m)
 	err := ioutil.WriteFile(config.Agent.LxcPrefix+c+"/stdin.txt", token, 0644)
 	log.Check(log.FatalLevel, "Writing Management public key", err)
@@ -270,14 +272,14 @@ func sendData(c string) {
 	}
 	client := &http.Client{Transport: tr}
 	resp, err := client.Post("https://"+config.Management.Host+":"+config.Management.Port+config.Management.RestVerify+"?sptoken="+GetToken(), "text/plain", asc)
+	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt.asc")
+	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt")
 	log.Check(log.FatalLevel, "Sending registration request to management", err)
 
 	if resp.Status != "200 OK" {
 		log.Error("Failed to exchange GPG Public Keys. StatusCode: " + resp.Status)
 	}
 
-	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt.asc")
-	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt")
 }
 
 func ExchageAndEncrypt(c, t string) {

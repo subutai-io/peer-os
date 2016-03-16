@@ -251,8 +251,6 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 	var exitCode int
 	var cmd bytes.Buffer
 
-	cmd.WriteString("timeout ")
-	cmd.WriteString(strconv.Itoa(r.Timeout) + " ")
 	cmd.WriteString(r.Command)
 	for _, a := range r.Args {
 		cmd.WriteString(a + " ")
@@ -264,7 +262,7 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 			log.Debug("Container " + name + " is running")
 		}
 
-		exitCode, err = lxc_c.RunCommandStatus([]string{"/bin/bash", "-c", cmd.String()}, opts)
+		exitCode, err = lxc_c.RunCommandStatus([]string{"timeout", strconv.Itoa(r.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
 		log.Check(log.WarnLevel, "Execution command", err)
 
 		o_write.Close()
