@@ -13,7 +13,7 @@ To build the project, you need to have the following tools:
 
   [Download Page (JDK 8)](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
   
-  #### Installation (manual way)
+  ###### Installation (manual way)
    - Download the 32-bit or 64-bit Linux "compressed binary file" - it has a ".tar.gz" file extension.
 
    - Uncompress it
@@ -115,7 +115,7 @@ To build the project, you need to have the following tools:
 
   [Download Page](https://maven.apache.org/download.cgi)
   
-  #### Installation (Ubuntu 15.04)
+  ###### Installation (Ubuntu 15.04)
   
   - Unzip the binary with tar
   
