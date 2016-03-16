@@ -62,4 +62,7 @@ public interface Monitor
      * @return
      */
     Set<AlertListener> getAlertListeners();
+
+
+    String getPlainHistoricalMetrics( final Host host, final Date startTime, final Date endTime );
 }
