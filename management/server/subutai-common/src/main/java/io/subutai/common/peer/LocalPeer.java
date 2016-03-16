@@ -182,4 +182,6 @@ public interface LocalPeer extends Peer
     Host findHostByName( String hostname ) throws HostNotFoundException;
 
     List<Task> getTaskList();
+
+    public void exchangeMhKeysWithRH() throws Exception;
 }
