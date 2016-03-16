@@ -99,7 +99,6 @@ public class IntegrationImpl implements Integration
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
-
             this.hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
             this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, 900,
                     TimeUnit.SECONDS ); // Executes every 15 minutes
