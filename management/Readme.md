@@ -64,12 +64,12 @@ To build the project, you need to have the following tools:
    $ sudo update-alternatives --config java
    There are 3 choices for the alternative java (providing /usr/bin/java).
 
-     Selection    Path                                            Priority   Status
-     ------------------------------------------------------------
-     0            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      auto mode
-     1            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      manual mode
-* 2            /usr/lib/jvm/jdk1.7.0/bin/java                   1         manual mode
-     3            /usr/lib/jvm/jdk1.8.0/bin/java                   1         manual mode
+       Selection    Path                                            Priority   Status
+       ------------------------------------------------------------
+       0            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      auto mode
+       1            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      manual mode
+   * 2            /usr/lib/jvm/jdk1.7.0/bin/java                   1         manual mode
+      3            /usr/lib/jvm/jdk1.8.0/bin/java                   1         manual mode
 
    Press enter to keep the current choice[*], or type selection number: 3
    update-alternatives: using /usr/lib/jvm/jdk1.8.0/bin/java to provide /usr/bin/java (java) in manual mode
