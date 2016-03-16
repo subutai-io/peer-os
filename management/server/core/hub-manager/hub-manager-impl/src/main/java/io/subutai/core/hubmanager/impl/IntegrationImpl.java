@@ -10,7 +10,6 @@ import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +39,7 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
@@ -55,15 +55,23 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class IntegrationImpl implements Integration
 {
+    private static final long TIME_15_MINUTES = 900;
+
     private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
 
     private SecurityManager securityManager;
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
     private ConfigManager configManager;
+
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
+
     private ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
+
     private ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
+
     private HeartbeatProcessor heartbeatProcessor;
     private ResourceHostConfProcessor resourceHostConfProcessor;
     private SystemConfProcessor systemConfProcessor;
@@ -72,6 +80,8 @@ public class IntegrationImpl implements Integration
     private ConfigDataService configDataService;
     private Monitor monitor;
     private IdentityManager identityManager;
+
+    private ContainerEventProcessor containerEventProcessor;
 
 
     public IntegrationImpl( DaoManager daoManager )
@@ -85,27 +95,33 @@ public class IntegrationImpl implements Integration
         try
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
-            this.configManager =
-                    new ConfigManager( securityManager, peerManager, configDataService );
+
+            configManager = new ConfigManager( securityManager, peerManager, configDataService );
+
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
+
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
-            resourceHostMonitorProcessor =
-                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
+
+            resourceHostMonitorProcessor = new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
-            StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( environmentManager, configManager, peerManager, identityManager );
+
+            StateLinkProccessor hubEnvironmentProccessor = new HubEnvironmentProccessor( environmentManager, configManager, peerManager, identityManager );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
-            this.hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
-            this.resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, 900,
-                    TimeUnit.SECONDS ); // Executes every 15 minutes
-            this.resourceHostMonitorExecutorService
-                    .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
+            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
+
+            resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+
+            resourceHostMonitorExecutorService.scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
+
+            containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
+
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
         }
-        catch ( IOException | PGPException | CertificateException | KeyStoreException | NoSuchAlgorithmException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
         }
@@ -124,7 +140,10 @@ public class IntegrationImpl implements Integration
     public void sendHeartbeat() throws HubPluginException
     {
         heartbeatProcessor.sendHeartbeat();
+
         resourceHostConfProcessor.sendResourceHostConf();
+
+        containerEventProcessor.process();
     }
 
 
@@ -234,25 +253,25 @@ public class IntegrationImpl implements Integration
             @Override
             public boolean accept( File pathname )
             {
-            	return pathname.getName().matches( ".*" + name + ".*" );
+                return pathname.getName().matches( ".*" + name + ".*" );
             }
         } );
         if (dirs != null)
-		{
-			for (File f : dirs)
-			{
-				LOG.info (f.getAbsolutePath ());
-				try
-				{
-					FileUtils.deleteDirectory (f);
-					LOG.debug (f.getName () + " is removed.");
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace ();
-				}
-			}
-		}
+        {
+            for (File f : dirs)
+            {
+                LOG.info (f.getAbsolutePath ());
+                try
+                {
+                    FileUtils.deleteDirectory (f);
+                    LOG.debug (f.getName () + " is removed.");
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace ();
+                }
+            }
+        }
         if ( file.delete() )
         {
             LOG.debug( file.getName() + " is removed." );
