@@ -111,7 +111,13 @@ To build the project, you need to have the following tools:
   Add following lines at the end:
   export JAVA_HOME="path that you found in update-java-alternatives for your JDK without quotes"
   export PATH=$JAVA_HOME/bin:$PATH
+  
+  Save file
+  
+  reset
   ```
+  
+  Check again.
   
 - Unlimited strength files (specific for Java version)
 
