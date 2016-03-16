@@ -14,7 +14,7 @@ is_running()
     grep -Eq "$CMD_PATT" "/proc/$pid/cmdline" 2>/dev/null && return 0
     return 1
   fi
-  return 0
+  return 3
 }
 
 
