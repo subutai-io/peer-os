@@ -10,7 +10,6 @@ import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +45,7 @@ import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -55,7 +55,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 public class IntegrationImpl implements Integration
 {
-    private static final long SECONDS_15_MIN = 900;
+    private static final long TIME_15_MINUTES = 900;
 
     private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
 
@@ -79,8 +79,10 @@ public class IntegrationImpl implements Integration
     private DaoManager daoManager;
     private ConfigDataService configDataService;
     private Monitor monitor;
+    private IdentityManager identityManager;
 
     private ContainerEventProcessor containerEventProcessor;
+
 
     public IntegrationImpl( DaoManager daoManager )
     {
@@ -94,7 +96,7 @@ public class IntegrationImpl implements Integration
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
 
-            this.configManager = new ConfigManager( securityManager, peerManager, configDataService );
+            configManager = new ConfigManager( securityManager, peerManager, configDataService );
 
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
 
@@ -104,23 +106,22 @@ public class IntegrationImpl implements Integration
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
-            StateLinkProccessor hubEnvironmentProccessor = new HubEnvironmentProccessor( environmentManager, configManager, peerManager );
+            StateLinkProccessor hubEnvironmentProccessor = new HubEnvironmentProccessor( environmentManager, configManager, peerManager, identityManager );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
-
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
             hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
 
-            resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, SECONDS_15_MIN, TimeUnit.SECONDS );
+            resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
             resourceHostMonitorExecutorService.scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
-            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, SECONDS_15_MIN, TimeUnit.SECONDS );
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
         }
-        catch ( IOException | PGPException | CertificateException | KeyStoreException | NoSuchAlgorithmException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
         }
@@ -130,9 +131,7 @@ public class IntegrationImpl implements Integration
     public void destroy()
     {
         hearbeatExecutorService.shutdown();
-
         resourceHostConfExecutorService.shutdown();
-
         resourceHostMonitorExecutorService.shutdown();
     }
 
@@ -254,25 +253,25 @@ public class IntegrationImpl implements Integration
             @Override
             public boolean accept( File pathname )
             {
-            	return pathname.getName().matches( ".*" + name + ".*" );
+                return pathname.getName().matches( ".*" + name + ".*" );
             }
         } );
         if (dirs != null)
-		{
-			for (File f : dirs)
-			{
-				LOG.info (f.getAbsolutePath ());
-				try
-				{
-					FileUtils.deleteDirectory (f);
-					LOG.debug (f.getName () + " is removed.");
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace ();
-				}
-			}
-		}
+        {
+            for (File f : dirs)
+            {
+                LOG.info (f.getAbsolutePath ());
+                try
+                {
+                    FileUtils.deleteDirectory (f);
+                    LOG.debug (f.getName () + " is removed.");
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace ();
+                }
+            }
+        }
         if ( file.delete() )
         {
             LOG.debug( file.getName() + " is removed." );
@@ -376,5 +375,11 @@ public class IntegrationImpl implements Integration
         ObjectMapper mapper = new ObjectMapper( factory );
         mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
         return mapper;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 }
