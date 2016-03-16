@@ -85,6 +85,8 @@ To build the project, you need to have the following tools:
 
    You need to [set the new JDK as default](http://stackoverflow.com/questions/2809366/changing-java-platform-on-which-netbeans-runs/2809447#2809447) editing the configuration file.
 
+
+
   ###### Ubuntu: Installing Java 8
   ```bash
   sudo add-apt-repository ppa:webupd8team/java
