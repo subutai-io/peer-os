@@ -95,9 +95,19 @@ To build the project, you need to have the following tools:
   ```
 
   ###### Setting JAVA_HOME
+  
+  To check if JAVA_HOME is set or not, execute
+  
+  ```bash
+  echo $JAVA_HOME
+  ```
+  
+  If the result is empty or points to the version of Java that is not suitable, you need to set it. 
+  
   ```bash
   update-java-alternatives -l
   sudo nano /etc/profile
+  
   Add
   export JAVA_HOME="path that you found in update-java-alternatives for your JDK without quotes"
   export PATH=$JAVA_HOME/bin:$PATH
