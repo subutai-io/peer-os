@@ -264,9 +264,10 @@ func main() {
 
 		Name: "backup", Usage: "backup Subutai container",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "full", Usage: "make full backup"}},
+			cli.BoolFlag{Name: "full", Usage: "make full backup"},
+			cli.BoolFlag{Name: "stop", Usage: "stop container at the time of backup"}},
 		Action: func(c *cli.Context) {
-			lib.BackupContainer(c.Args().Get(0), c.Bool("full"))
+			lib.BackupContainer(c.Args().Get(0), c.Bool("full"), c.Bool("stop"))
 		}}, {
 
 		Name: "restore", Usage: "restore Subutai container",
