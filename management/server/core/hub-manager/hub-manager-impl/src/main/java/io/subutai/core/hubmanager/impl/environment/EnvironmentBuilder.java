@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -15,10 +14,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
@@ -26,16 +26,25 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.settings.Common;
+import io.subutai.common.task.CloneRequest;
+import io.subutai.common.task.CloneResponse;
 import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.util.P2PUtil;
@@ -62,92 +71,51 @@ public class EnvironmentBuilder
     }
 
 
-    private long vniId = 1234560;
+    // gw-109 is created after cloning container
+    private long vniId = 2500000;
 
-//    private String envId = UUID.randomUUID().toString();
-    private String envId = "f8f3e4de-2bf9-45e6-98f4-f09d65a86723"; // Should be UUID. Otherwise reserving VNI doesn't work.
+    private String envId = "25e3e4de-2bf9-45e6-98f4-f09d65a86700"; // Should be UUID. Otherwise reserving VNI doesn't work.
 
-    private String p2pSubnet = "10.11.12.";
+    private String p2pSubnet = "10.11.25.";
 
-    private String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
+    private String containerHostname = "25c51c6d-8122-4f4d-8de1-c3dd8914df11";
+
+    private String containerName = "Container Name 25";
+
+    private String containerIp = "192.168.25.2/24";
+
+    private String templateName = "master";
+
+    private ContainerSize containerSize = ContainerSize.SMALL;
+
 
     public void build() throws Exception
     {
-//        buildVni();
-
-//        p2p();
-
+        generatePEK();
+        buildVni();
+        p2p();
         prepareTemplates();
-    }
-
-
-    private void buildVni() throws Exception
-    {
-        Vni vni = new Vni( vniId, envId );
-
-        Vni resultVni = peerManager.getLocalPeer().reserveVni( vni );
-
-        log.info( "resultVni: {}", resultVni );
-
-        log.info( "reserved vnis: {}", peerManager.getLocalPeer().getReservedVnis().list() );
+        cloneContainers();
     }
 
 
     // -----------------------------------------------------------------------------------------------------------------------------------------------
-    // prepare templates
+    // PEK
     // -----------------------------------------------------------------------------------------------------------------------------------------------
 
-
-    private void prepareTemplates() throws InterruptedException, ExecutionException
+    private void generatePEK() throws PeerException, PGPException
     {
-        String hostname = UUID.randomUUID().toString();
-        String templateName = "master";
+        log.debug( "Generating PEK - START");
 
-        Node node = new Node( hostname, "Container Name", templateName, ContainerSize.SMALL, 0, 0, peerManager.getLocalPeer().getId(), getFirstResourceHostId() );
+        EnvironmentId environmentId = new EnvironmentId( envId );
 
-        Set<Node> nodes = Sets.newHashSet( node );
+        PublicKeyContainer publicKeyContainer = peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
 
-        ExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+        PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
 
-        CompletionService<PrepareTemplatesResponseCollector> taskCompletionService = getCompletionService( exec );
+        peerManager.getLocalPeer().updatePeerEnvironmentPubKey( environmentId, pubRing );
 
-        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
-
-        exec.shutdown();
-
-        Future<PrepareTemplatesResponseCollector> future = taskCompletionService.take();
-
-        PrepareTemplatesResponseCollector response = future.get();
-
-        log.debug( "Response count: {}", response.getResponses().size() );
-
-        for ( ImportTemplateResponse importTemplateResponse : response.getResponses() )
-        {
-            // ImportTemplateResponse{resourceHostId='A57DBD6CF41B4A33F97686BD5E4B238A96210297', templateName='master', elapsedTime=408}
-            log.debug( "{}", importTemplateResponse );
-        }
-
-        for ( OperationMessage msg : response.getOperationMessages() )
-        {
-            log.debug( "{}", msg );
-        }
-    }
-
-
-    private String getFirstResourceHostId()
-    {
-        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
-        {
-            return rh.getId();
-        }
-
-        return null;
-    }
-
-
-    private CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
-    {
-        return new ExecutorCompletionService<>( executor );
+        log.debug( "Generating PEK - END");
     }
 
 
@@ -158,32 +126,38 @@ public class EnvironmentBuilder
 
     private void p2p() throws Exception
     {
-//        P2PConfig config = new P2PConfig(
-//                peerManager.getLocalPeer().getId(),
-//                envId,
-//                "p2p_" + p2pSubnet + "0",
-//                "com_" + envId,
-//                  p2pSubnet + "1",
-//                sharedKey,
-//                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
-//
-//        ExecutorService p2pExecutor = Executors.newSingleThreadScheduledExecutor();
-//
-//        ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
-//
-//        p2pCompletionService.submit( new SetupP2PConnectionTask( peerManager.getLocalPeer(), config ) );
-//
-//        Future<P2PConfig> f = p2pCompletionService.take();
-//
-//        f.get();
-//
-//        p2pExecutor.shutdown();
+        P2PConfig config = new P2PConfig(
+                peerManager.getLocalPeer().getId(),
+                envId,
+                "p2p_" + p2pSubnet + "0",
+                "com_" + envId,
+                p2pSubnet + "1",
+                "sharedKey",
+                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC
+        );
+
+        log.debug( "p2p - START");
+
+        ExecutorService p2pExecutor = Executors.newSingleThreadScheduledExecutor();
+
+        ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
+
+        p2pCompletionService.submit( new SetupP2PConnectionTask( peerManager.getLocalPeer(), config ) );
+
+        Future<P2PConfig> f = p2pCompletionService.take();
+
+        f.get();
+
+        p2pExecutor.shutdown();
+
+        log.debug( "p2p - END");
 
         //
         // Setup tunnels
         //
 
-//        Map<String, String> tunnels = ImmutableMap.of( "89D869D0AB3C1064E7275CF0F716EDFB0B6E56AA", p2pSubnet + "1" );
+        log.debug( "tunnel - START");
+
         Map<String, String> tunnels = ImmutableMap.of( peerManager.getLocalPeer().getId(), p2pSubnet + "1" );
 
         ExecutorService tunnelExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -194,9 +168,13 @@ public class EnvironmentBuilder
 
         Future<Integer> f2 = tunnelCompletionService.take();
 
-        f2.get();
+        Integer vlanid = f2.get();
+
+        log.debug( "vlanid: {}", vlanid );
 
         tunnelExecutor.shutdown();
+
+        log.debug( "tunnel - END");
     }
 
 
@@ -268,4 +246,118 @@ public class EnvironmentBuilder
             return p2PConfig;
         }
     }
+
+
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
+    // clone containers
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    private void cloneContainers() throws PeerException
+    {
+        final CreateEnvironmentContainerGroupRequest request = new CreateEnvironmentContainerGroupRequest( envId );
+
+        CloneRequest cloneRequest = new CloneRequest(
+                getFirstResourceHostId(),
+                containerHostname,
+                containerName,
+                containerIp,
+                envId,
+                peerManager.getLocalPeer().getId(),
+                peerManager.getLocalPeer().getOwnerId(),
+                templateName,
+                HostArchitecture.AMD64,
+                containerSize
+        );
+
+        request.addRequest( cloneRequest );
+
+        CreateEnvironmentContainerResponseCollector response = peerManager.getLocalPeer().createEnvironmentContainerGroup( request );
+
+        for ( CloneResponse cloneResponse : response.getResponses() )
+        {
+            log.debug( "{}", cloneResponse );
+        }
+    }
+
+    protected CompletionService<CreateEnvironmentContainerResponseCollector> getEnvCompletionService( Executor executor )
+    {
+        return new ExecutorCompletionService<>( executor );
+    }
+
+
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
+    // vni
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    private void buildVni() throws Exception
+    {
+        Vni vni = new Vni( vniId, envId );
+
+        Vni resultVni = peerManager.getLocalPeer().reserveVni( vni );
+
+        log.info( "resultVni: {}", resultVni );
+
+        log.info( "reserved vnis: {}", peerManager.getLocalPeer().getReservedVnis().list() );
+    }
+
+
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
+    // prepare templates
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    private void prepareTemplates() throws InterruptedException, ExecutionException
+    {
+
+        Node node = new Node( containerHostname, containerName, templateName, containerSize, 0, 0, peerManager.getLocalPeer().getId(),
+                getFirstResourceHostId() );
+
+        Set<Node> nodes = Sets.newHashSet( node );
+
+        ExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+
+        CompletionService<PrepareTemplatesResponseCollector> taskCompletionService = getCompletionService( exec );
+
+        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
+
+        exec.shutdown();
+
+        Future<PrepareTemplatesResponseCollector> future = taskCompletionService.take();
+
+        PrepareTemplatesResponseCollector response = future.get();
+
+        log.debug( "Response count: {}", response.getResponses().size() );
+
+        for ( ImportTemplateResponse importTemplateResponse : response.getResponses() )
+        {
+            // ImportTemplateResponse{resourceHostId='A57DBD6CF41B4A33F97686BD5E4B238A96210297', templateName='master', elapsedTime=408}
+            log.debug( "{}", importTemplateResponse );
+        }
+
+        for ( OperationMessage msg : response.getOperationMessages() )
+        {
+            log.debug( "{}", msg );
+        }
+    }
+
+
+    private String getFirstResourceHostId()
+    {
+        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+        {
+            return rh.getId();
+        }
+
+        return null;
+    }
+
+
+    private CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
+    {
+        return new ExecutorCompletionService<>( executor );
+    }
+
+
 }
