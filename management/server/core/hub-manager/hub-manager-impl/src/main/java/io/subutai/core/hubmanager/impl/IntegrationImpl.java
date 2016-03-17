@@ -12,7 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
@@ -39,6 +38,7 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
@@ -83,6 +83,8 @@ public class IntegrationImpl implements Integration
 
     private ContainerEventProcessor containerEventProcessor;
 
+    private EnvironmentBuilder envBuilder;
+
 
     public IntegrationImpl( DaoManager daoManager )
     {
@@ -111,15 +113,18 @@ public class IntegrationImpl implements Integration
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
-            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
+            containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
+
+            // todo revert
+            /*hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
 
             resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
             resourceHostMonitorExecutorService.scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
 
-            containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );*/
 
-            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+            envBuilder = new EnvironmentBuilder( this, configManager, peerManager );
         }
         catch ( Exception e )
         {
@@ -139,11 +144,21 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendHeartbeat() throws HubPluginException
     {
-        heartbeatProcessor.sendHeartbeat();
+        // todo revert
+/*        heartbeatProcessor.sendHeartbeat();
 
         resourceHostConfProcessor.sendResourceHostConf();
 
-        containerEventProcessor.process();
+        containerEventProcessor.process();*/
+
+        try
+        {
+            envBuilder.build();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to build env: ", e );
+        }
     }
 
 
@@ -157,11 +172,16 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
+
+        // todo revert
+/*
         configManager.addHubConfig( hupIp );
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
-        //        sendHeartbeat();
+*/
+
+        LOG.info( ">> test" );
     }
 
 
