@@ -162,7 +162,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
-    private void buildContainer( final EnvironmentPeerDto peerDto )
+    private void buildContainer( EnvironmentPeerDto peerDto )
     {
         String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow",
                 peerDto.getEnvironmentInfo().getId() );
@@ -172,7 +172,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             hubEnvironmentManager.setupVNI( peerDto );
 
             LOG.debug( "env_via_hub: Setup P2P..." );
-            hubEnvironmentManager.setupP2P( peerDto );
+            peerDto = hubEnvironmentManager.setupP2P( peerDto );
 
             WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
             Response r = client.get();

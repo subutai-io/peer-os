@@ -2,9 +2,16 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +31,10 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
@@ -33,6 +43,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;
+import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
@@ -178,9 +189,55 @@ public class HubEnvironmentManager
     }
 
 
-    public void setupP2P( EnvironmentPeerDto peerDto )
+    public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto )
     {
-        //TODO
+        LocalPeer peer = peerManager.getLocalPeer();
+        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        String tunInName = P2PUtil.generateInterfaceName( env.getTunnelNetwork() );
+        String tunComName = P2PUtil.generateCommunityName( env.getTunnelNetwork() );
+
+        SubnetUtils.SubnetInfo subnetInfo =
+                new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
+        final String addresses = subnetInfo.getAddress();
+
+        ExecutorService p2pExecutor = Executors.newFixedThreadPool( 1 );
+        ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
+
+        P2PConfig config = new P2PConfig( peer.getId(), env.getId(), tunInName, tunComName, addresses, env.getP2pHash(),
+                env.getP2pTTL() );
+        p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
+
+        try
+        {
+            final Future<P2PConfig> f = p2pCompletionService.take();
+            P2PConfig createdConfig = f.get();
+            p2pExecutor.shutdown();
+
+            peerDto.setTunnelAddress( createdConfig.getAddress() );
+            peerDto.setCommunityName( createdConfig.getCommunityName() );
+            peerDto.setInterfaceName( createdConfig.getInterfaceName() );
+            peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
+
+            ExecutorService tunnelExecutor = Executors.newFixedThreadPool( 1 );
+
+            ExecutorCompletionService<Integer> tunnelCompletionService =
+                    new ExecutorCompletionService<Integer>( tunnelExecutor );
+
+            Map<String, String> tunnel = new HashMap<>();
+            tunnel.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
+            tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnel ) );
+
+            final Future<Integer> fTunnel = tunnelCompletionService.take();
+            fTunnel.get();
+
+            tunnelExecutor.shutdown();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not create P2P tunnel.", e.getMessage() );
+        }
+
+        return peerDto;
     }
 
 
@@ -244,5 +301,50 @@ public class HubEnvironmentManager
             LOG.error( "Could not clone containers" );
         }
         return null;
+    }
+
+
+    private class SetupP2PConnectionTask implements Callable<P2PConfig>
+    {
+        private Peer peer;
+        private P2PConfig p2PConfig;
+
+
+        public SetupP2PConnectionTask( final Peer peer, final P2PConfig config )
+        {
+            this.peer = peer;
+            this.p2PConfig = config;
+        }
+
+
+        @Override
+        public P2PConfig call() throws Exception
+        {
+            peer.setupP2PConnection( p2PConfig );
+            return p2PConfig;
+        }
+    }
+
+
+    private class SetupTunnelTask implements Callable<Integer>
+    {
+        private final Peer peer;
+        private final String environmentId;
+        private final Map<String, String> tunnels;
+
+
+        public SetupTunnelTask( final Peer peer, final String environmentId, final Map<String, String> tunnels )
+        {
+            this.peer = peer;
+            this.environmentId = environmentId;
+            this.tunnels = tunnels;
+        }
+
+
+        @Override
+        public Integer call() throws Exception
+        {
+            return peer.setupTunnels( tunnels, environmentId );
+        }
     }
 }
