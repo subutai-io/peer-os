@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,13 +24,20 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.network.Vni;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.task.ImportTemplateResponse;
+import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.IntegrationImpl;
@@ -66,6 +76,8 @@ public class EnvironmentBuilder
 //        buildVni();
 
 //        p2p();
+
+        prepareTemplates();
     }
 
 
@@ -82,11 +94,68 @@ public class EnvironmentBuilder
 
 
     // -----------------------------------------------------------------------------------------------------------------------------------------------
+    // prepare templates
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    private void prepareTemplates() throws InterruptedException, ExecutionException
+    {
+        String hostname = UUID.randomUUID().toString();
+
+        Node node = new Node( hostname, "Container Name", "master", ContainerSize.SMALL, 0, 0, peerManager.getLocalPeer().getId(), getFirstResourceHostId() );
+
+        Set<Node> nodes = Sets.newHashSet( node );
+
+        ExecutorService exec = Executors.newSingleThreadScheduledExecutor();
+
+        CompletionService<PrepareTemplatesResponseCollector> taskCompletionService = getCompletionService( exec );
+
+        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
+
+        exec.shutdown();
+
+        Future<PrepareTemplatesResponseCollector> future = taskCompletionService.take();
+
+        PrepareTemplatesResponseCollector response = future.get();
+
+        for ( ImportTemplateResponse importTemplateResponse : response.getResponses() )
+        {
+            // ImportTemplateResponse{resourceHostId='A57DBD6CF41B4A33F97686BD5E4B238A96210297', templateName='master', elapsedTime=408}
+            log.debug( "{}", importTemplateResponse );
+        }
+
+        log.debug( "Operation messages:" );
+
+        for ( OperationMessage message : response.getOperationMessages() )
+        {
+            log.debug( message.getDescription() );
+        }
+    }
+
+
+    private String getFirstResourceHostId()
+    {
+        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+        {
+            return rh.getId();
+        }
+
+        return null;
+    }
+
+
+    private CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
+    {
+        return new ExecutorCompletionService<>( executor );
+    }
+
+
+    // -----------------------------------------------------------------------------------------------------------------------------------------------
     // p2p
     // -----------------------------------------------------------------------------------------------------------------------------------------------
 
 
-    public void p2p() throws Exception
+    private void p2p() throws Exception
     {
 //        P2PConfig config = new P2PConfig(
 //                peerManager.getLocalPeer().getId(),
@@ -113,7 +182,8 @@ public class EnvironmentBuilder
         // Setup tunnels
         //
 
-        Map<String, String> tunnels = ImmutableMap.of( "89D869D0AB3C1064E7275CF0F716EDFB0B6E56AA", p2pSubnet + "1" );
+//        Map<String, String> tunnels = ImmutableMap.of( "89D869D0AB3C1064E7275CF0F716EDFB0B6E56AA", p2pSubnet + "1" );
+        Map<String, String> tunnels = ImmutableMap.of( peerManager.getLocalPeer().getId(), p2pSubnet + "1" );
 
         ExecutorService tunnelExecutor = Executors.newSingleThreadScheduledExecutor();
 
