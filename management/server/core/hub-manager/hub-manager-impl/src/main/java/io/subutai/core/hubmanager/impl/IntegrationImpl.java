@@ -1,16 +1,17 @@
 package io.subutai.core.hubmanager.impl;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -36,9 +38,9 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
@@ -77,9 +79,10 @@ public class IntegrationImpl implements Integration
     private ConfigDataService configDataService;
     private Monitor monitor;
     private IdentityManager identityManager;
-    private HubEnvironmentManager hubEnvironmentManager;
 
     private ContainerEventProcessor containerEventProcessor;
+
+    private EnvironmentBuilder envBuilder;
 
 
     public IntegrationImpl( DaoManager daoManager )
@@ -100,29 +103,27 @@ public class IntegrationImpl implements Integration
 
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
 
-            resourceHostMonitorProcessor =
-                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
+            resourceHostMonitorProcessor = new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
-            StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager );
+//            StateLinkProccessor hubEnvironmentProccessor = new HubEnvironmentProccessor( environmentManager, configManager, peerManager, identityManager );
 
-            heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
+//            heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
-
-            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
-
-            resourceHostConfExecutorService
-                    .scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
-
-            resourceHostMonitorExecutorService
-                    .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
-            containerEventExecutor
-                    .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+            // todo revert
+            /*hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
+
+            resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+
+            resourceHostMonitorExecutorService.scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
+
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );*/
+
+            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
         }
         catch ( Exception e )
         {
@@ -142,11 +143,14 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendHeartbeat() throws HubPluginException
     {
-        heartbeatProcessor.sendHeartbeat();
+        // todo revert
+/*        heartbeatProcessor.sendHeartbeat();
 
         resourceHostConfProcessor.sendResourceHostConf();
 
-        containerEventProcessor.process();
+        containerEventProcessor.process();*/
+
+        envBuilder.test();
     }
 
 
@@ -160,11 +164,14 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
+
+        // todo revert
+/*
         configManager.addHubConfig( hupIp );
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
-        //        sendHeartbeat();
+*/
     }
 
 
@@ -207,7 +214,7 @@ public class IntegrationImpl implements Integration
                 return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( r );
+            byte[] encryptedContent = readContent( r );
             ObjectMapper mapper = createMapper( new CBORFactory() );
 
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
@@ -259,19 +266,19 @@ public class IntegrationImpl implements Integration
                 return pathname.getName().matches( ".*" + name + ".*" );
             }
         } );
-        if ( dirs != null )
+        if (dirs != null)
         {
-            for ( File f : dirs )
+            for (File f : dirs)
             {
-                LOG.info( f.getAbsolutePath() );
+                LOG.info (f.getAbsolutePath ());
                 try
                 {
-                    FileUtils.deleteDirectory( f );
-                    LOG.debug( f.getName() + " is removed." );
+                    FileUtils.deleteDirectory (f);
+                    LOG.debug (f.getName () + " is removed.");
                 }
-                catch ( IOException e )
+                catch (IOException e)
                 {
-                    e.printStackTrace();
+                    e.printStackTrace ();
                 }
             }
         }
@@ -357,21 +364,32 @@ public class IntegrationImpl implements Integration
     }
 
 
-    public void setIdentityManager( final IdentityManager identityManager )
+    private byte[] readContent( Response response ) throws IOException
     {
-        this.identityManager = identityManager;
+        if ( response.getEntity() == null )
+        {
+            return null;
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        InputStream is = ( ( InputStream ) response.getEntity() );
+
+        IOUtils.copy( is, bos );
+        return bos.toByteArray();
     }
 
-
-    public void setHubEnvironmentManager( final HubEnvironmentManager hubEnvironmentManager )
-    {
-        this.hubEnvironmentManager = hubEnvironmentManager;
-    }
 
     private static ObjectMapper createMapper( JsonFactory factory )
     {
         ObjectMapper mapper = new ObjectMapper( factory );
         mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
         return mapper;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 }
