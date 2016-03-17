@@ -101,7 +101,7 @@ public class EnvironmentBuilder
     private void prepareTemplates() throws InterruptedException, ExecutionException
     {
         String hostname = UUID.randomUUID().toString();
-        String templateName = "master123";
+        String templateName = "master";
 
         Node node = new Node( hostname, "Container Name", templateName, ContainerSize.SMALL, 0, 0, peerManager.getLocalPeer().getId(), getFirstResourceHostId() );
 
