@@ -49,6 +49,7 @@ var (
 	instanceType      string
 	instanceArch      string
 	lastHeartbeatTime time.Time
+	pool              []container.Container
 )
 
 func initAgent() {
@@ -58,7 +59,6 @@ func initAgent() {
 	if cont.State("management") == "STOPPED" {
 		cont.Start("management")
 	}
-	container.PoolInstance()
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()
@@ -114,16 +114,16 @@ func heartbeat() bool {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	list := container.GetActiveContainers(false)
+	pool = container.GetActiveContainers(false)
 	beat := Heartbeat{
 		Type:       "HEARTBEAT",
 		Hostname:   hostname,
 		Id:         fingerprint,
 		Arch:       instanceArch,
 		Instance:   instanceType,
-		Containers: list,
+		Containers: pool,
 		Interfaces: utils.GetInterfaces(),
-		Alert:      alert.Alert(list),
+		Alert:      alert.Alert(pool),
 	}
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
@@ -151,21 +151,17 @@ func heartbeat() bool {
 func execute(rsp executer.EncRequest) {
 	var req executer.Request
 	var md, contName, pub, keyring, payload string
-	var flag bool
 	var err error
 
 	if rsp.HostId == fingerprint {
-		flag = true
 		md = gpg.DecryptWrapper(rsp.Request)
 	} else {
-		flag = false
-		contName, err = container.PoolInstance().GetTargetHostName(rsp.HostId)
-		counter := 0
-		for err != nil {
-			contName, err = container.PoolInstance().GetTargetHostName(rsp.HostId)
-			time.Sleep(time.Second * 3)
-			if counter = counter + 1; counter == 100 {
-				log.Warn("Container wait timeout: " + contName)
+		contName = nameById(rsp.HostId)
+		if contName == "" {
+			lastHeartbeat = []byte{}
+			heartbeat()
+			contName = nameById(rsp.HostId)
+			if contName == "" {
 				return
 			}
 		}
@@ -189,7 +185,11 @@ func execute(rsp executer.EncRequest) {
 
 	//create channels for stdout and stderr
 	sOut := make(chan executer.ResponseOptions)
-	req.Execute(flag, sOut)
+	if rsp.HostId == fingerprint {
+		go executer.ExecHost(req.Request, sOut)
+	} else {
+		go executer.AttachContainer(contName, req.Request, sOut)
+	}
 
 	for sOut != nil {
 		select {
@@ -288,4 +288,13 @@ func heartbeatCall(rw http.ResponseWriter, request *http.Request) {
 	} else {
 		rw.WriteHeader(http.StatusForbidden)
 	}
+}
+
+func nameById(id string) string {
+	for _, c := range pool {
+		if c.Id == id {
+			return c.Name
+		}
+	}
+	return ""
 }

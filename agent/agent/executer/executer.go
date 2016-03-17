@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"os/user"
 	"strconv"
-	// "strings"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -58,7 +58,7 @@ type ResponseOptions struct {
 	ExitCode       string `json:"exitCode,omitempty"`
 }
 
-func Run(req RequestOptions, out_c chan<- ResponseOptions) {
+func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	cmd := buildCmd(&req)
 	if cmd == nil {
 		close(out_c)
@@ -80,7 +80,8 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 		cmd.SysProcAttr.Credential = &syscall.Credential{Uid: 0, Gid: 0}
 	}
 	err := cmd.Start()
-	log.Check(log.WarnLevel, "Executing command: "+req.CommandId, err)
+	log.Check(log.WarnLevel, "Executing command: "+req.CommandId+" "+req.Command+" "+strings.Join(req.Args, " "), err)
+
 	wop.Close()
 	wep.Close()
 
@@ -214,16 +215,6 @@ func genericResponse(req *RequestOptions) ResponseOptions {
 
 func now() int64 {
 	return time.Now().Unix()
-}
-
-func (r *Request) Execute(isRh bool, sOut chan<- ResponseOptions) {
-	if isRh {
-		go Run(r.Request, sOut)
-	} else {
-		name, _ := container.PoolInstance().GetTargetHostName(r.Request.Id)
-		log.Debug("execute on contaner " + "Name " + name)
-		go AttachContainer(name, r.Request, sOut)
-	}
 }
 
 func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions) {

@@ -1,14 +1,12 @@
 package utils
 
 import (
-	"bufio"
-	"bytes"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net"
 	"strings"
-	"time"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 )
 
 type Iface struct {
@@ -41,21 +39,6 @@ func GetInterfaces() []Iface {
 		}
 	}
 	return l_ifaces
-}
-
-func SendIntermediateChunks(scanner *bufio.Scanner, timeout, c_size int, ch chan<- []byte) {
-	var buffer bytes.Buffer
-	end_time := time.Now().Add(time.Duration(timeout) * time.Second)
-	for scanner.Scan() {
-		buffer.WriteString(scanner.Text() + "\n")
-		if buffer.Len() >= c_size {
-			ch <- buffer.Bytes()
-		} else if end_time.Unix()-time.Now().Unix() <= 0 {
-			ch <- buffer.Bytes()
-			close(ch)
-		}
-	}
-	close(ch)
 }
 
 func PublicCert() string {
