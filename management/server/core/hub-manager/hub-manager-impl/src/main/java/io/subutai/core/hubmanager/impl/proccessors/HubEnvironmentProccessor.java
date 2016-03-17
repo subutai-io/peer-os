@@ -21,31 +21,24 @@ import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.hub.share.dto.network.VniDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -57,17 +50,15 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             Pattern.compile( "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
     private ConfigManager configManager;
     private PeerManager peerManager;
-    private EnvironmentManager environmentManager;
-    private IdentityManager identityManager;
+    private HubEnvironmentManager hubEnvironmentManager;
 
 
-    public HubEnvironmentProccessor( final EnvironmentManager environmentManager, final ConfigManager hConfigManager,
-                                     final PeerManager peerManager, final IdentityManager identityManager )
+    public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
+                                     final ConfigManager hConfigManager, final PeerManager peerManager )
     {
-        this.environmentManager = environmentManager;
         this.configManager = hConfigManager;
         this.peerManager = peerManager;
-        this.identityManager = identityManager;
+        this.hubEnvironmentManager = hubEnvironmentManager;
     }
 
 
@@ -117,11 +108,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             switch ( peerDto.getState() )
             {
-                case EXCHANGE_PEK:
-                    exchangePEK( peerDto );
+                case EXCHANGE_INFO:
+                    infoExchange( peerDto );
                     break;
-                case CREATE_CONTAINER:
-                    createContainer( peerDto );
+                case BUILD_CONTAINER:
+                    buildContainer( peerDto );
                     break;
             }
         }
@@ -132,57 +123,35 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
-    private void exchangePEK( final EnvironmentPeerDto peerDto )
+    private void infoExchange( final EnvironmentPeerDto peerDto )
     {
-        Set<String> usedIps = Sets.newHashSet();
         String exchangeURL =
-                String.format( "/rest/v1/environments/%s/exchange-pek", peerDto.getEnvironmentInfo().getId() );
-        EnvironmentId environmentId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
+                String.format( "/rest/v1/environments/%s/exchange-info", peerDto.getEnvironmentInfo().getId() );
 
+        EnvironmentId environmentId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( exchangeURL, configManager.getHubIp() );
 
-            LOG.debug( "Sending PEK to Hub ..." );
+            LOG.debug( "env_via_hub: Collecting reserved VNIs..." );
+            peerDto.setVnis( hubEnvironmentManager.getReservedVnis( peerDto ) );
 
-            for ( HostInterface hostInterface : peerManager.getLocalPeer().getInterfaces().getAll() )
-            {
-                usedIps.add( hostInterface.getIp() );
-            }
+            LOG.debug( "env_via_hub: Collecting used IPs..." );
+            peerDto.setUsedIPs( hubEnvironmentManager.getTunnelNetworks() );
 
-            Vnis vnis = peerManager.getLocalPeer().getReservedVnis();
-            for ( Vni vni: vnis.list())
-            {
-                VniDto vniDto = new VniDto();
-                vniDto.setPeerId( peerManager.getLocalPeer().getId() );
-                vniDto.setEnvironmentId( peerDto.getEnvironmentInfo().getId() );
-                vniDto.setVni( vni.getVni() );
-                vniDto.setVlan( vni.getVlan() );
-                peerDto.getVnis().add( vniDto );
-            }
+            LOG.debug( "env_via_hub: Collecting reserved gateways..." );
+            peerDto.setGateways( hubEnvironmentManager.getReservedGateways( peerDto ) );
 
-            peerDto.setUsedIPs( usedIps );
-
-            PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
-
-            io.subutai.hub.share.dto.PublicKeyContainer keyContainer =
-                    new io.subutai.hub.share.dto.PublicKeyContainer();
-            keyContainer.setKey( publicKeyContainer.getKey() );
-            keyContainer.setHostId( publicKeyContainer.getHostId() );
-            keyContainer.setFingerprint( publicKeyContainer.getFingerprint() );
-
-            peerDto.setPublicKey( keyContainer );
+            LOG.debug( "env_via_hub: Generating PEK..." );
+            peerDto.setPublicKey( hubEnvironmentManager.createPeerEnvironmentKeyPair( environmentId ) );
 
             byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
             Response r = client.post( encryptedData );
 
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
-                LOG.debug( "PEK sent successfully to Hub" );
-
+                LOG.debug( "Collected data successfully sent to Hub" );
                 byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 EnvironmentPeerDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
@@ -194,7 +163,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            LOG.error( "Could not send PEK to Hub.", e.getMessage() );
+            LOG.error( "Could not send collected data to Hub.", e.getMessage() );
         }
         catch ( PeerException e )
         {
@@ -203,9 +172,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
-    private void createContainer( final EnvironmentPeerDto peerDto )
+    private void buildContainer( final EnvironmentPeerDto peerDto )
     {
-        String containerDataURL = String.format( "/rest/v1/environments/%s/container-creation-workflow",
+        String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow",
                 peerDto.getEnvironmentInfo().getId() );
         try
         {
