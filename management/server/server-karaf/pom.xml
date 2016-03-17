@@ -247,6 +247,23 @@
                   </resources>
                 </configuration>
               </execution>
+	      <execution>
+                <id>copy-system-content</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <!-- Copying install scripts to deb source folder -->
+                  <outputDirectory>target/deb</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/system</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
               <execution>
                 <id>copy-deb-scripts</id>
                 <phase>prepare-package</phase>
@@ -310,6 +327,12 @@
                   <packageName>management</packageName>
                   <packageVersion>${project.version}</packageVersion>
                   <maintainerName>Subutai Social</maintainerName>
+		   <packageDependencies>
+                        <packageDependencies>openjdk-8-jre-headless</packageDependencies>
+                        <packageDependencies>subutai-dnsmasq</packageDependencies>
+                        <packageDependencies>subutai-influxdb</packageDependencies>
+                        <packageDependencies>curl</packageDependencies>
+                  </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
                 </configuration>
               </execution>

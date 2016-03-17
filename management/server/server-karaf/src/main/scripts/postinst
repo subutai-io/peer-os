@@ -1,3 +1,12 @@
 #!/bin/bash
 
-service management start
+if [ -f /tmp/.mng-firstrun ]; then
+	ln -fs /usr/share/zoneinfo/Universal /etc/localtime
+	echo "subutai:$6$fcP9G9YA$n5VVUh8wBN1Jn8h6D2Dx1U61zQ8OsSzre0EPe2BqAFfMehd11F3lmTavbIN9/H5SOAIonmZtBSlef8k0MAC.H0:16420:0:99999:7:::" >> /etc/shadow
+	sed -i /etc/ssh/sshd_config -e 's/PermitRootLogin without-password/PermitRootLogin yes/g'
+	echo -e "nameserver 10.10.10.254\ndomain intra.lan\nsearch intra.lan\n" > /etc/resolvconf/resolv.conf.d/original 
+	sed -i /etc/network/interfaces -e 's/iface eth0 inet dhcp/iface eth0 inet static\naddress 10.10.10.1\nnetmask 255.255.255.0\ngateway 10.10.10.254\n/g'
+	rm /tmp/.mng-firstrun
+else
+	service management start
+fi
