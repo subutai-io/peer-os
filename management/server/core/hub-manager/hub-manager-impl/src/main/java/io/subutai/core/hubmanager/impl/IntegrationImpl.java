@@ -124,7 +124,7 @@ public class IntegrationImpl implements Integration
 
             containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );*/
 
-            envBuilder = new EnvironmentBuilder( this, configManager, peerManager );
+            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
         }
         catch ( Exception e )
         {
@@ -151,14 +151,7 @@ public class IntegrationImpl implements Integration
 
         containerEventProcessor.process();*/
 
-        try
-        {
-            envBuilder.build();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error to build env: ", e );
-        }
+        envBuilder.test();
     }
 
 
@@ -172,7 +165,6 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
-
         // todo revert
 /*
         configManager.addHubConfig( hupIp );
@@ -180,8 +172,6 @@ public class IntegrationImpl implements Integration
 
         registrationManager.registerPeer( email, password );
 */
-
-        LOG.info( ">> test" );
     }
 
 
