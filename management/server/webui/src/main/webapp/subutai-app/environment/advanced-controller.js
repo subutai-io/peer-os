@@ -71,11 +71,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		$('.js-peer-load-screen').show();
 		environmentService.getPeers().success(function (data) {
 			vm.peerIds = data;
-
-			vm.peerIds['p1'] = [{id: 'rh1'}, {id: 'rh2'}, {id: 'rh3'}];
-			vm.peerIds['p2'] = [{id: 'rh1'}, {id: 'rh2'}, {id: 'rh3'}];
-			vm.peerIds['p3'] = [{id: 'rh1'}, {id: 'rh2'}, {id: 'rh3'}];
-			vm.peerIds['p4'] = [{id: 'rh1'}, {id: 'rh2'}, {id: 'rh3'}];
 			$('.js-peer-load-screen').hide();
 		}).error(function(error){
 			$('.js-peer-load-screen').hide();
