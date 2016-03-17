@@ -3,6 +3,7 @@ package io.subutai.core.hubmanager.impl;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -12,20 +13,28 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
+import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
+import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.task.CloneRequest;
+import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;
+import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
+import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.network.GatewayDto;
 import io.subutai.hub.share.dto.network.VniDto;
@@ -150,6 +159,89 @@ public class HubEnvironmentManager
         catch ( PeerException e )
         {
             LOG.error( "Could not create local peer PEK" );
+        }
+        return null;
+    }
+
+
+    public void setupVNI( EnvironmentPeerDto peerDto )
+    {
+        try
+        {
+            Vni vni = new Vni( peerDto.getEnvironmentInfo().getVni(), peerDto.getEnvironmentInfo().getId() );
+            peerManager.getLocalPeer().reserveVni( vni );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Could not setup VNI" );
+        }
+    }
+
+
+    public void setupP2P( EnvironmentPeerDto peerDto )
+    {
+        //TODO
+    }
+
+
+    public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto )
+    {
+        //TODO
+    }
+
+
+    public EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
+    {
+        try
+        {
+            SubnetUtils.SubnetInfo subnetInfo =
+                    new SubnetUtils( peerDto.getEnvironmentInfo().getSubnetCidr() ).getInfo();
+
+            String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
+
+            CreateEnvironmentContainerGroupRequest containerGroupRequest =
+                    new CreateEnvironmentContainerGroupRequest( peerDto.getEnvironmentInfo().getId() );
+
+            for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
+            {
+                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+                String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
+                try
+                {
+                    CloneRequest cloneRequest =
+                            new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
+                                    ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
+                                    peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
+
+                    containerGroupRequest.addRequest( cloneRequest );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( e.getMessage() );
+                }
+            }
+
+            final CreateEnvironmentContainerResponseCollector containerCollector =
+                    peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
+
+            List<CloneResponse> cloneResponseList = containerCollector.getResponses();
+            for ( CloneResponse cloneResponse : cloneResponseList )
+            {
+                for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
+                {
+                    if ( cloneResponse.getContainerName().equals( nodeDto.getContainerName() ) )
+                    {
+                        nodeDto.setIp( cloneResponse.getIp() );
+                        nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
+                        nodeDto.setAgentId( cloneResponse.getAgentId() );
+                        nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
+                    }
+                }
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Could not clone containers" );
         }
         return null;
     }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,26 +16,17 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.network.Vni;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
-import io.subutai.common.task.CloneRequest;
-import io.subutai.common.task.CloneResponse;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -178,73 +168,35 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 peerDto.getEnvironmentInfo().getId() );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
+            LOG.debug( "env_via_hub: Setup VNI..." );
+            hubEnvironmentManager.setupVNI( peerDto );
 
+            LOG.debug( "env_via_hub: Setup P2P..." );
+            hubEnvironmentManager.setupP2P( peerDto );
+
+            WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
-
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            EnvironmentNodesDto result = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
-            LOG.debug( "EnvironmentNodesDto: " + result.toString() );
+            EnvironmentNodesDto envNodes = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
 
-            Vni vni = new Vni( peerDto.getEnvironmentInfo().getVni(), peerDto.getEnvironmentInfo().getId() );
-            peerManager.getLocalPeer().reserveVni( vni );
+            LOG.debug( "env_via_hub: Prepare templates..." );
+            hubEnvironmentManager.prepareTemplates( peerDto, envNodes );
 
-            SubnetUtils.SubnetInfo subnetInfo =
-                    new SubnetUtils( peerDto.getEnvironmentInfo().getSubnetCidr() ).getInfo();
-            String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
+            LOG.debug( "env_via_hub: Clone containers..." );
+            EnvironmentNodesDto updatedNodes = hubEnvironmentManager.cloneContainers( peerDto, envNodes );
 
-            CreateEnvironmentContainerGroupRequest containerGroupRequest =
-                    new CreateEnvironmentContainerGroupRequest( peerDto.getEnvironmentInfo().getId() );
-            for ( EnvironmentNodeDto nodeDto : result.getNodes() )
-            {
-                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-                String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
-                try
-                {
-                    CloneRequest cloneRequest =
-                            new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                                    ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
-                                    peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
-
-                    containerGroupRequest.addRequest( cloneRequest );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( e.getMessage() );
-                }
-            }
-
-            final CreateEnvironmentContainerResponseCollector containerCollector =
-                    peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
-
-            List<CloneResponse> cloneResponseList = containerCollector.getResponses();
-            for ( CloneResponse cloneResponse : cloneResponseList )
-            {
-                for ( EnvironmentNodeDto nodeDto : result.getNodes() )
-                {
-                    if ( cloneResponse.getContainerName().equals( nodeDto.getContainerName() ) )
-                    {
-                        nodeDto.setIp( cloneResponse.getIp() );
-                        nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
-                        nodeDto.setAgentId( cloneResponse.getAgentId() );
-                        nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
-                    }
-                }
-            }
-
-
-            byte[] cborData = JsonUtil.toCbor( result );
+            byte[] cborData = JsonUtil.toCbor( updatedNodes );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
             Response response = client.post( encryptedData );
+
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Containers state sent successfully to Hub" );
+                LOG.debug( "env_via_hub: Environment successfully build!!!" );
             }
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                | PeerException e )
+                e )
         {
             LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
         }
