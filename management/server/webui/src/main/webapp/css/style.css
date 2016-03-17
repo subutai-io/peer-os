@@ -334,7 +334,7 @@ input[type=checkbox] {
 }
 
 .b-btn:disabled {
-    background-color: #f8fbfd;
+    background-color: #EAEAEA;
     color: #333333;
 }
 

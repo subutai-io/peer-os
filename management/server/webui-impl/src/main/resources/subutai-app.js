@@ -37,6 +37,11 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	vm.currentUserRoles = [];
 	$rootScope.notifications = {};
 	vm.hubRegisterError = false;
+    vm.isRegistrationFormVisible = false;
+
+    vm.getRegistrationFormVisibilityStatus = function () {
+        return vm.isRegistrationFormVisible;
+    };
 
 
     function checkIfRegistered() {
@@ -857,6 +862,22 @@ app.directive('checkbox-list-dropdown', function () {
             });
         }
     }
+});
+
+app.directive('focusInput', function ($timeout, $parse) {
+    return {
+        link: function (scope, element, attrs) {
+            var model = $parse(attrs.focusInput);
+            scope.$watch(model, function (value) {
+                if (value === true) {
+                    $timeout(function () {
+                        element[0].focus();
+                    });
+                }
+            });
+            //element.bind('blur', function () {});
+        }
+    };
 });
 
 //Global variables
