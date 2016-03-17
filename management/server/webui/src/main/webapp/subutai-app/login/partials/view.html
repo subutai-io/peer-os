@@ -1,7 +1,7 @@
 <div class="b-login">
 	<div class="b-login__form b-login__form_center">
 		<div class="b-login-form-header">
-			<a href="#"><img src="assets/elements/logo.svg" width="323px" alt=""></a>
+			<a><img src="assets/elements/logo.svg" width="323px" alt=""></a>
 		</div>
 		<div class="b-workspace b-workspace_login">
 
@@ -19,10 +19,11 @@
 							<label class="b-form-label">Username</label>
 							<input
 								class="b-form-input b-form-input_full" 
-								id="subt-input__login" 
-								ng-model="loginCtrl.name" 
-								name="login" 
-								tabindex=1 
+								id="subt-input__login"
+								ng-model="loginCtrl.name"
+								name="login"
+								focus-input="true"
+								tabindex=1
 								type="text">
 						</div>
 						<div class="b-form__wrapper g-margin-bottom">
