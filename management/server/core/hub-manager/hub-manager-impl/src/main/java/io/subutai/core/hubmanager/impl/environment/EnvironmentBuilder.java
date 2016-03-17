@@ -101,8 +101,9 @@ public class EnvironmentBuilder
     private void prepareTemplates() throws InterruptedException, ExecutionException
     {
         String hostname = UUID.randomUUID().toString();
+        String templateName = "master123";
 
-        Node node = new Node( hostname, "Container Name", "master", ContainerSize.SMALL, 0, 0, peerManager.getLocalPeer().getId(), getFirstResourceHostId() );
+        Node node = new Node( hostname, "Container Name", templateName, ContainerSize.SMALL, 0, 0, peerManager.getLocalPeer().getId(), getFirstResourceHostId() );
 
         Set<Node> nodes = Sets.newHashSet( node );
 
@@ -118,17 +119,17 @@ public class EnvironmentBuilder
 
         PrepareTemplatesResponseCollector response = future.get();
 
+        log.debug( "Response count: {}", response.getResponses().size() );
+
         for ( ImportTemplateResponse importTemplateResponse : response.getResponses() )
         {
             // ImportTemplateResponse{resourceHostId='A57DBD6CF41B4A33F97686BD5E4B238A96210297', templateName='master', elapsedTime=408}
             log.debug( "{}", importTemplateResponse );
         }
 
-        log.debug( "Operation messages:" );
-
-        for ( OperationMessage message : response.getOperationMessages() )
+        for ( OperationMessage msg : response.getOperationMessages() )
         {
-            log.debug( message.getDescription() );
+            log.debug( "{}", msg );
         }
     }
 
