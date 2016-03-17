@@ -15,11 +15,6 @@ import io.subutai.common.host.ResourceHostInfoModel;
  */
 public class ResourceHostMetric extends BaseMetric
 {
-    public static double DEFAULT_RESERVED_RAM = 1024 * 1024 * 1024;  // reserving 1 GB RAM for system stability
-    public static double DEFAULT_RESERVED_CPU = 5.0;     // reserving 5% CPU usage for system stability
-    public static double DEFAULT_RESERVED_DISK = 20 * 1024 * 1024 * 1024;
-    // reserving 20 GB diskLimit space for system stability
-
     @Expose
     @SerializedName( "host" )
     @JsonProperty( "host" )
