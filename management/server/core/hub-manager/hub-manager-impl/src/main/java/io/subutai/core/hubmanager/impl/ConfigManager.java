@@ -47,18 +47,6 @@ public class ConfigManager
     public static final String PEER_SECRET_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.secret.key";
 
 
-    public SecurityManager getSecurityManager()
-    {
-        return securityManager;
-    }
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
-
-
     private SecurityManager securityManager;
     private PeerManager peerManager;
     private ConfigDataService configDataService;
@@ -73,56 +61,47 @@ public class ConfigManager
     private String hubIp;
 
 
-    public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager, final
-    ConfigDataService configDataService )
+    public SecurityManager getSecurityManager()
+    {
+        return securityManager;
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager,
+                          final ConfigDataService configDataService )
             throws IOException, PGPException, KeyStoreException, CertificateException, NoSuchAlgorithmException
     {
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.configDataService = configDataService;
 
-        if ( sender == null )
-        {
-            PGPSecretKeyRing signingKeyRing = PGPKeyUtil.readSecretKeyRing( new FileInputStream( PEER_SECRET_KEY ) );
-            PGPSecretKey signingKey = signingKeyRing.getSecretKey();
-            this.sender = PGPEncryptionUtil.getPrivateKey( signingKey, SystemSettings.getPeerSecretKeyringPwd() );
-        }
+        PGPSecretKeyRing signingKeyRing = PGPKeyUtil.readSecretKeyRing( new FileInputStream( PEER_SECRET_KEY ) );
+        PGPSecretKey signingKey = signingKeyRing.getSecretKey();
 
-        if ( peerId == null )
-        {
-            this.peerId = peerManager.getLocalPeer().getId();
-            LOG.debug( "Getting peer id: " + peerId );
-        }
+        this.sender = PGPEncryptionUtil.getPrivateKey( signingKey, SystemSettings.getPeerSecretKeyringPwd() );
 
-        if ( hPublicKey == null )
-        {
-            this.hPublicKey = PGPKeyHelper.readPublicKey( H_PUB_KEY );
-            LOG.debug( "Getting hPublicKey from keystores folder: " + hPublicKey.toString() );
-        }
+        this.peerId = peerManager.getLocalPeer().getId();
 
-        if ( ownerPublicKey == null )
-        {
-            this.ownerPublicKey =
-                    securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
-                                   .getPublicKey();
-        }
+        this.hPublicKey = PGPKeyHelper.readPublicKey( H_PUB_KEY );
+        LOG.debug( "Getting hPublicKey from keystores folder: " + hPublicKey.toString() );
 
-        if ( peerPublicKey == null )
-        {
-            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
-        }
+        this.ownerPublicKey =
+                securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
+                               .getPublicKey();
 
-        if ( keyStore == null )
-        {
-            generateX509Certificate();
-            this.keyStore = KeyStore.getInstance( "JKS" );
-            this.keyStore.load( new FileInputStream( PEER_KEYSTORE ), "subutai".toCharArray() );
-        }
+        this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
-        if ( messenger == null )
-        {
-            this.messenger = new PGPMessenger( sender, hPublicKey );
-        }
+        generateX509Certificate();
+        this.keyStore = KeyStore.getInstance( "JKS" );
+        this.keyStore.load( new FileInputStream( PEER_KEYSTORE ), "subutai".toCharArray() );
+
+        this.messenger = new PGPMessenger( sender, hPublicKey );
     }
 
 
@@ -147,19 +126,21 @@ public class ConfigManager
             KeyStoreTool keyStoreTool = new KeyStoreTool();
             KeyStore sslkeyStore = keyStoreTool.load( keyStoreData );
 
+            if ( sslkeyStore.size() == 0 )
+            {
+                CertificateData certificateData = new CertificateData();
+                certificateData.setCommonName( fingerprint );
 
-            CertificateData certificateData = new CertificateData();
-            certificateData.setCommonName( fingerprint );
+                CertificateTool certificateTool = new CertificateTool();
 
-            CertificateTool certificateTool = new CertificateTool();
+                X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
 
-            X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
-
-            keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
+                keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
+            }
         }
         catch ( Exception ex )
         {
-            ex.printStackTrace();
+            LOG.error( "Error generating peer keystore for connecting to Hub" );
         }
     }
 
