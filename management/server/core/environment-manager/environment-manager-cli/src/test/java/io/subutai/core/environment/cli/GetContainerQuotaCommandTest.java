@@ -1,4 +1,4 @@
-package io.subutai.core.peer.cli;
+package io.subutai.core.environment.cli;
 
 
 import java.util.UUID;
@@ -13,10 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
@@ -28,8 +26,7 @@ import static org.mockito.Mockito.when;
 public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
 {
     private static final String CONTAINER_NAME = "container";
-    @Mock
-    PeerManager peerManager;
+
     @Mock
     EnvironmentManager environmentManager;
     @Mock
@@ -45,13 +42,11 @@ public class GetContainerQuotaCommandTest extends SystemOutRedirectTest
     @Before
     public void setUp() throws Exception
     {
-        command = new GetContainerQuotaCommand( peerManager, environmentManager );
-        when( peerManager.getPeer( anyString() ) ).thenReturn( peer );
+        command = new GetContainerQuotaCommand( environmentManager );
         when( environmentManager.loadEnvironment( any( String.class ) ) ).thenReturn( environment );
         when( environment.getContainerHostByHostname( anyString() ) ).thenReturn( containerHost );
         command.environmentId = UUID.randomUUID().toString();
-        command.quotaType = ContainerResourceType.CPU.getKey();
-        command.containerName = CONTAINER_NAME;
+        command.containerId = CONTAINER_NAME;
     }
 
 

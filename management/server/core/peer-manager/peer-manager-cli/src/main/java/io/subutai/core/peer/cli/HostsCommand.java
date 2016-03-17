@@ -6,13 +6,11 @@ import java.text.SimpleDateFormat;
 
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -22,18 +20,11 @@ public class HostsCommand extends SubutaiShellCommandSupport
 {
     DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
-    private IdentityManager identityManager;
 
 
     public void setPeerManager( final PeerManager peerManager )
     {
         this.peerManager = peerManager;
-    }
-
-
-    public void setIdentityManager( final IdentityManager identityManager )
-    {
-        this.identityManager = identityManager;
     }
 
 
@@ -67,20 +58,5 @@ public class HostsCommand extends SubutaiShellCommandSupport
 
         System.out
                 .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
-
-
-//        for ( HostInterface hostInterface : host.getHostInterfaces().getAll() )
-//        {
-//            System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
-//        }
-//
-//        if ( host instanceof ResourceHost && host.getHostInterfaces().getAll().isEmpty() )
-//        {
-//
-//            for ( HostInterface hostInterface : ( ( ResourceHost ) host ).getNetInterfaces() )
-//            {
-//                System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
-//            }
-//        }
     }
 }
