@@ -33,13 +33,11 @@ public class CloneRequest implements TaskRequest
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( templateName );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
-        //        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
         this.containerName = containerName;
         this.ip = ip;
-        //        this.vlan = vlan;
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
@@ -71,12 +69,6 @@ public class CloneRequest implements TaskRequest
     {
         return ip;
     }
-
-    //
-    //    public Integer getVlan()
-    //    {
-    //        return vlan;
-    //    }
 
 
     public String getEnvironmentId()

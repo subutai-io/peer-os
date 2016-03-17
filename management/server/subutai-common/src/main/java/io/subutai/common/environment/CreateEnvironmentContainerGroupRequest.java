@@ -10,6 +10,13 @@ import io.subutai.common.task.CloneRequest;
 public class CreateEnvironmentContainerGroupRequest
 {
     private final Set<CloneRequest> requests = new HashSet<>();
+    private final String environmentId;
+
+
+    public CreateEnvironmentContainerGroupRequest( final String environmentId )
+    {
+        this.environmentId = environmentId;
+    }
 
 
     public void addRequest( final CloneRequest request )
@@ -26,5 +33,11 @@ public class CreateEnvironmentContainerGroupRequest
     public Set<CloneRequest> getRequests()
     {
         return requests;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
     }
 }

@@ -10,12 +10,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
 
 public class SubutaiAppender extends AppenderSkeleton
 {
 
+    private static final Level MIN_REPORT_LOG_LEVEL = Level.ERROR;
     protected static Set<SubutaiErrorEventListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SubutaiErrorEventListener, Boolean>() );
 
@@ -33,7 +35,8 @@ public class SubutaiAppender extends AppenderSkeleton
     {
         try
         {
-            if ( event.getThrowableInformation() != null && event.getThrowableInformation().getThrowable() != null )
+            if ( event.getLevel().isGreaterOrEqual( MIN_REPORT_LOG_LEVEL ) && event.getThrowableInformation() != null
+                    && event.getThrowableInformation().getThrowable() != null )
             {
                 StringWriter errors = new StringWriter();
                 event.getThrowableInformation().getThrowable().printStackTrace( new PrintWriter( errors ) );

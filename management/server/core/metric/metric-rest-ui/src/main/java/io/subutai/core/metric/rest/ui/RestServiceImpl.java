@@ -63,9 +63,9 @@ public class RestServiceImpl implements RestService
                 host = localPeer.getManagementHost();
             }
 
-            return Response.ok( JsonUtil.toJson( monitor.getHistoricalMetrics( host,
+            return Response.ok( monitor.getPlainHistoricalMetrics( host,
                     start,
-                    current ))).build();
+                    current )).build();
         }
         catch ( Exception e )
         {

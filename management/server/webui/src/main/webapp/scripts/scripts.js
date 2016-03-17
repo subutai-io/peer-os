@@ -26,7 +26,7 @@ $(document).on('click', function(event) {
 		$(event.target).closest('g').attr('class') != 'element-call-menu' && 
 		$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
 	){
-		$('.b-template-settings__dropdown').slideUp(100);
+		$('.b-template-settings').slideUp(100);
 	}
 });
 

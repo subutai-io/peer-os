@@ -12,7 +12,7 @@ public class UserManagementPage extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
-    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green b-btn_header-button\"]")
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
     public WebElementFacade buttonAddUser;
 
     //endregion

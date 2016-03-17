@@ -228,28 +228,31 @@ public class IntegrationImpl implements Integration
         int indexOfStr = url.indexOf( "/package/" );
         String fileName = url.substring( indexOfStr + 9, url.length() );
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
-        File repo = new File( "/opt/subutai-mng/data/repository/io/subutai/" );
+        File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
             @Override
             public boolean accept( File pathname )
             {
-                return pathname.getName().matches( ".*" + name + ".*" );
+            	return pathname.getName().matches( ".*" + name + ".*" );
             }
         } );
-        for ( File f : dirs )
-        {
-            LOG.info( f.getAbsolutePath() );
-            try
-            {
-                FileUtils.deleteDirectory( f );
-                LOG.debug( f.getName() + " is removed." );
-            }
-            catch ( IOException e )
-            {
-                e.printStackTrace();
-            }
-        }
+        if (dirs != null)
+		{
+			for (File f : dirs)
+			{
+				LOG.info (f.getAbsolutePath ());
+				try
+				{
+					FileUtils.deleteDirectory (f);
+					LOG.debug (f.getName () + " is removed.");
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace ();
+				}
+			}
+		}
         if ( file.delete() )
         {
             LOG.debug( file.getName() + " is removed." );

@@ -30,4 +30,28 @@ public class SubutaiErrorEvent
         sb.append( '}' );
         return sb.toString();
     }
+
+
+    public long getTimeStamp()
+    {
+        return timeStamp;
+    }
+
+
+    public String getLoggerName()
+    {
+        return loggerName;
+    }
+
+
+    public String getRenderedMessage()
+    {
+        return renderedMessage;
+    }
+
+
+    public String getStackTrace()
+    {
+        return stackTrace;
+    }
 }

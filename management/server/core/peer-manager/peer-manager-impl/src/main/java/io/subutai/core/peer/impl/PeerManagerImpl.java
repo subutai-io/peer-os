@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -553,7 +554,27 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processRejectRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationData.getPeerInfo().getId() );
+        final String id = registrationData.getPeerInfo().getId();
+
+        final RegistrationData request = getRequest( id );
+
+        if ( request != null )
+        {
+            // try to decode with provided key phrase
+            final String keyPhrase = request.getKeyPhrase();
+            final Encrypted encryptedData = registrationData.getData();
+            try
+            {
+                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                encryptedData.decrypt( key, String.class );
+                removeRequest( id );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new PeerException( "Can not reject registration request." );
+            }
+        }
     }
 
 
@@ -561,7 +582,27 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processCancelRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationData.getPeerInfo().getId() );
+        final String id = registrationData.getPeerInfo().getId();
+
+        final RegistrationData request = getRequest( id );
+
+        if ( request != null )
+        {
+            // try to decode with provided key phrase
+            final String keyPhrase = registrationData.getKeyPhrase();
+            final Encrypted encryptedData = request.getData();
+            try
+            {
+                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                encryptedData.decrypt( key, String.class );
+                removeRequest( id );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new PeerException( "Can not cancel registration request." );
+            }
+        }
     }
 
 
@@ -576,8 +617,7 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( /*registrationData.getPeerInfo().getId(),*/
-                registrationData.getPeerInfo() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo() );
     }
 
 
@@ -647,6 +687,7 @@ public class PeerManagerImpl implements PeerManager
             final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
 
             registrationData.setToken( generateActiveUserToken() );
+            registrationData.setKeyPhrase( "" );
 
             RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
 
@@ -729,8 +770,12 @@ public class PeerManagerImpl implements PeerManager
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
         {
-            registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(),
-                    buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
+            final RegistrationData r = buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED );
+
+            // return received data
+            r.setData( request.getData() );
+
+            registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(), r );
         }
         catch ( Exception e )
         {
@@ -824,8 +869,15 @@ public class PeerManagerImpl implements PeerManager
         final List<PeerResources> resources = new ArrayList<>();
         for ( final Peer peer : getPeers() )
         {
-            PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( localPeerId );
-            resources.add( peerResources );
+            try
+            {
+                PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( localPeerId );
+                resources.add( peerResources );
+            }
+            catch ( Exception ignore )
+            {
+                 //ignore
+            }
         }
 
         return new PeerGroupResources( resources, getCommunityDistances() );

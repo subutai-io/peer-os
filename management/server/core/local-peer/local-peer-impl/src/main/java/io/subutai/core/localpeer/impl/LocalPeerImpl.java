@@ -150,6 +150,7 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -238,7 +239,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
             }
 
-            setResourceHostTransientFields( resourceHosts );
+            setResourceHostTransientFields( getResourceHosts() );
         }
         catch ( Exception e )
         {
@@ -276,8 +277,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ( ( Disposable ) resourceHost ).dispose();
         }
-        //todo: implement me
-        //        taskManager.cancelAll();
     }
 
 
@@ -414,18 +413,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         final TaskCallbackHandler<CloneRequest, CloneResponse> successResultHandler =
                 getCloneSuccessHandler( this, response );
 
+        final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( requestGroup.getEnvironmentId() );
+
+        if ( environmentVni == null )
+        {
+            throw new PeerException(
+                    String.format( "No reserved vni found for environment %s", requestGroup.getEnvironmentId() ) );
+        }
+
         for ( final CloneRequest request : requestGroup.getRequests() )
         {
             try
             {
-                final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( request.getEnvironmentId() );
-
-                if ( environmentVni == null )
-                {
-                    throw new PeerException(
-                            String.format( "No reserved vni found for environment %s", request.getEnvironmentId() ) );
-                }
-
 
                 CloneTask task = new CloneTask( request, environmentVni.getVlan() );
 
@@ -534,7 +533,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Set<ContainerHost> result = new HashSet<>();
 
-        for ( ResourceHost resourceHost : resourceHosts )
+        for ( ResourceHost resourceHost : getResourceHosts() )
         {
             result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
         }
@@ -549,7 +548,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( containerId.getId(), "Invalid container id" );
 
         ContainerHost result = null;
-        for ( ResourceHost resourceHost : resourceHosts )
+        for ( ResourceHost resourceHost : getResourceHosts() )
         {
             try
             {
@@ -573,7 +572,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Set<ContainerHost> result = new HashSet<>();
 
-        for ( ResourceHost resourceHost : resourceHosts )
+        for ( ResourceHost resourceHost : getResourceHosts() )
         {
             result.addAll( resourceHost.getContainerHostsByOwnerId( ownerId ) );
         }
@@ -1082,14 +1081,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     if ( managementLxc instanceof ContainerHostEntity )
                     {
                         managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
+
+                        //todo save flag that exchange happened to db
+                        exchangeMhKeysWithRH();
                     }
                 }
-                catch ( HostNotFoundException e )
+                catch ( Exception e )
                 {
-                    //ignore}
+                    //ignore
                 }
             }
         }
+    }
+
+
+    @Override
+    public void exchangeMhKeysWithRH() throws Exception
+    {
+
+        RegistrationManager registrationManager = ServiceLocator.getServiceNoCache( RegistrationManager.class );
+
+        String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
+
+        final RequestBuilder requestBuilder =
+                new RequestBuilder( String.format( "subutai import management -t %s", token ) );
+
+        commandUtil.execute( requestBuilder, getManagementHost() );
     }
 
 
@@ -1156,7 +1173,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<ContainerHost> containerHosts = Sets.newHashSet();
 
 
-        for ( ResourceHost resourceHost : resourceHosts )
+        for ( ResourceHost resourceHost : getResourceHosts() )
         {
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
@@ -2055,7 +2072,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return managementHost;
         }
 
-        for ( ResourceHost resourceHost : resourceHosts )
+        for ( ResourceHost resourceHost : getResourceHosts() )
         {
             if ( resourceHost.getHostname().equals( hostname ) )
             {

@@ -26,9 +26,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 
-	vm.domainStrategies = [];
-	vm.strategies = [];
 	vm.activeCloudTab = 'peers';
+	vm.templatesType = 'all';
 
 	vm.peerIds = [];
 	vm.resourceHosts = [];
@@ -59,27 +58,19 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.addResource2Build = addResource2Build;
 	vm.closePopup = closePopup;
 
+	// @todo workaround
 	environmentService.getTemplates()
-		.success(function (data) {
+		.then(function (data) {
 			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
-	});
+		//.error(function (data) {
+		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
+		//});
 
 	function getPeers() {
 		$('.js-peer-load-screen').show();
 		environmentService.getPeers().success(function (data) {
 			vm.peerIds = data;
-			//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 			$('.js-peer-load-screen').hide();
 		}).error(function(error){
 			$('.js-peer-load-screen').hide();
@@ -384,7 +375,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}
 		}
 
-		return pos[pos.length - 1];
+		return pos[pos.length - 1] + 1;
 	}
 
 	//custom shapes
@@ -481,7 +472,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				case 'element-tool-remove':
 					if (this.model.attributes.containerId) {
 						vm.excludedContainers.push(this.model);
-						console.log(vm.excludedContainers);
 					}
 
 					var rh = this.model.attributes.rh;
@@ -507,7 +497,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					return;
 					break;
 				case 'rotatable':
-					console.log(this.model);
 					/*vm.currentTemplate = this.model;
 					ngDialog.open({
 						template: 'subutai-app/environment/partials/popups/templateSettingsAdvanced.html',
@@ -727,12 +716,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 		if(vm.editingEnv) {
 			var removeContainers = getContainers2Build(vm.excludedContainers, false, true);
-			console.log(removeContainers);
 			vm.env2Remove = removeContainers.containersObj;
 			vm.containers2Remove = removeContainers.containersList;
 		}
 
-		console.log(vm.containers2Build);
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info-advanced.html',
 			scope: $scope,
@@ -810,7 +797,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function clearWorkspace() {
 		vm.cubeGrowth = 0;
-		PEER_MAP = [];
+		PEER_MAP = {};
 
 		vm.env2Build = {};
 		vm.containers2Build = [];
@@ -830,17 +817,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		//ngDialog.closeAll();
 		containerSettingMenu.hide();
 	}
-}
-
-function imageExists(image_url){
-
-    var http = new XMLHttpRequest();
-
-    http.open('HEAD', image_url, false);
-    http.send();
-
-    return http.status != 404;
-
 }
 
 function placeRhSimple( model ) {
@@ -889,6 +865,8 @@ function movePeer(peerId, posMod, counter) {
 			x = counter * posMod;
 			counter++;
 		}
+
+		PEER_MAP[peerKeys[i]].position--;
 
 		for(var key in PEER_MAP[peerKeys[i]].rh) {
 			var resourceHost = graph.getCell(PEER_MAP[peerKeys[i]].rh[key]);
