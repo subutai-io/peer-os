@@ -72,17 +72,17 @@ public class EnvironmentBuilder
 
 
     // gw-109 is created after cloning container
-    private long vniId = 2500000;
+    private long vniId = 2600000;
 
-    private String envId = "25e3e4de-2bf9-45e6-98f4-f09d65a86700"; // Should be UUID. Otherwise reserving VNI doesn't work.
+    private String envId = "26e3e4de-2bf9-45e6-98f4-f09d65a86700"; // Should be UUID. Otherwise reserving VNI doesn't work.
 
-    private String p2pSubnet = "10.11.25.";
+    private String p2pSubnet = "10.11.26.";
 
-    private String containerHostname = "25c51c6d-8122-4f4d-8de1-c3dd8914df11";
+    private String containerHostname = "26c51c6d-8122-4f4d-8de1-c3dd8914df11";
 
-    private String containerName = "Container Name 25";
+    private String containerName = "Container Name 26";
 
-    private String containerIp = "192.168.25.2/24";
+    private String containerIp = "192.168.26.2/24";
 
     private String templateName = "master";
 
