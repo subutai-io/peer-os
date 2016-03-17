@@ -69,18 +69,18 @@ public class HostsCommand extends SubutaiShellCommandSupport
                 .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
 
 
-        for ( HostInterface hostInterface : host.getHostInterfaces().getAll() )
-        {
-            System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
-        }
-
-        if ( host instanceof ResourceHost && host.getHostInterfaces().getAll().isEmpty() )
-        {
-
-            for ( HostInterface hostInterface : ( ( ResourceHost ) host ).getNetInterfaces() )
-            {
-                System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
-            }
-        }
+//        for ( HostInterface hostInterface : host.getHostInterfaces().getAll() )
+//        {
+//            System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
+//        }
+//
+//        if ( host instanceof ResourceHost && host.getHostInterfaces().getAll().isEmpty() )
+//        {
+//
+//            for ( HostInterface hostInterface : ( ( ResourceHost ) host ).getNetInterfaces() )
+//            {
+//                System.out.println( String.format( "\t%s %s", hostInterface.getName(), hostInterface.getIp() ) );
+//            }
+//        }
     }
 }

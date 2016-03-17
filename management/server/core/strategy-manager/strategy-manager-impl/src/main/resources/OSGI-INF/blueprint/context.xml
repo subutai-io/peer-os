@@ -25,6 +25,7 @@
   </reference-list>
 
   <service ref="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
+
   <service ref="masterPlacementStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
   <service ref="unlimitedStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
   <service ref="roundRobinStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
