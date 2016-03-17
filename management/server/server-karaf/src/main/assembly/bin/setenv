@@ -52,3 +52,9 @@ export SUBUTAI_APP_DATA_PATH="/opt/subutai-mng/"
 #export SUBUTAI_APP_DATA_PATH="/var/lib/subutai"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
 export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
+
+# JMX connection for Karaf
+# Warning: use this for dev stage only since JMX port is left unsecured!
+export JMX_ENABLED=true
+export JMX_PORT=10099
+export JMX_HOST=192.168.0.102
