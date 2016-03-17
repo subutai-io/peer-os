@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +25,8 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
@@ -39,6 +44,7 @@ import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -243,7 +249,41 @@ public class HubEnvironmentManager
 
     public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto )
     {
-        //TODO
+        Set<Node> nodes = new HashSet<>();
+        for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+        {
+            ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+            Node node =
+                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0,
+                            0, peerDto.getPeerId(), nodeDto.getHostId() );
+            nodes.add( node );
+        }
+
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( 1 );
+        CompletionService<PrepareTemplatesResponseCollector> taskCompletionService =
+                getCompletionService( taskExecutor );
+
+        LOG.debug( String.format( "Preparing templates on peer %s", peerManager.getLocalPeer().getId() ) );
+        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
+
+        taskExecutor.shutdown();
+
+        try
+        {
+            //collect results
+            Future<PrepareTemplatesResponseCollector> futures = taskCompletionService.take();
+            final PrepareTemplatesResponseCollector prepareTemplatesResponse = futures.get();
+
+            if ( !prepareTemplatesResponse.hasSucceeded() )
+            {
+                LOG.error( "There were errors during preparation of templates on peer " + prepareTemplatesResponse
+                        .getPeerId() );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "There were errors during preparation templates. Unexpected error.", e.getMessage() );
+        }
     }
 
 
@@ -346,5 +386,11 @@ public class HubEnvironmentManager
         {
             return peer.setupTunnels( tunnels, environmentId );
         }
+    }
+
+
+    protected CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
+    {
+        return new ExecutorCompletionService<>( executor );
     }
 }
