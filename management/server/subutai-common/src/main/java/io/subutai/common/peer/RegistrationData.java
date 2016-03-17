@@ -1,16 +1,12 @@
 package io.subutai.common.peer;
 
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
-
 /**
  * Registration DTO
  */
 public class RegistrationData
 {
     private PeerInfo peerInfo;
-    @JsonIgnore
     private String keyPhrase;
     private RegistrationStatus status;
     private Encrypted data;
