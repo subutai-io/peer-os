@@ -834,25 +834,6 @@ public class RestServiceImpl implements RestService
 
                 HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
-
-                //            String rhId = null;
-                //            for ( Peer peer : peerManager.getPeers() )
-                //            {
-                //                if ( peer.getId().equals( containerHost.getPeerId() ) )
-                //                {
-                //                    try
-                //                    {
-                //                        rhId = peer.getResourceHostIdByContainerId( containerHost.getContainerId()
-                // ).getId();
-
-                //                    }
-                //                    catch ( PeerException e )
-                //                    {
-                //                        LOG.error( "cannot get resourceHostByContainerId", e );
-                //                    }
-                //                }
-                //            }
-
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
