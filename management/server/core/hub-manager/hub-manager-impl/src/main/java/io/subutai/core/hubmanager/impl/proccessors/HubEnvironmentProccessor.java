@@ -201,4 +201,26 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
         }
     }
+
+
+    private void updateEnvironmentPeerData( EnvironmentPeerDto peerDto )
+    {
+        try
+        {
+            String envPeerDataUrl = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+            WebClient client = configManager.getTrustedWebClientWithAuth( envPeerDataUrl, configManager.getHubIp() );
+
+            byte[] cborData = JsonUtil.toCbor( peerDto );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+            Response r = client.post( encryptedData );
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                LOG.debug( "Environment peer data successfully sent to hub" );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not sent environment peer data to hub.", e.getMessage() );
+        }
+    }
 }
