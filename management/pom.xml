@@ -76,6 +76,8 @@
   </repositories>
 
   <properties>
+    <!-- turn off javadoc lint tool which breaks release -->
+    <additionalparam>-Xdoclint:none</additionalparam>
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Sonar -->
@@ -1213,7 +1215,9 @@
             <configuration>
               <localCheckout>true</localCheckout>
               <pushChanges>false</pushChanges>
+              <!--
               <tagNameFormat>v@${pom.version}</tagNameFormat>
+              -->
               <arguments>-Psubutai.release -Psonatype-oss-release</arguments>
               <autoVersionSubmodules>true</autoVersionSubmodules>
               <releaseProfiles>release</releaseProfiles>
@@ -1250,6 +1254,9 @@
                 <goals>
                   <goal>jar</goal>
                 </goals>
+                <configuration>
+                  <additionalparam>-Xdoclint:none</additionalparam>
+                </configuration>
               </execution>
             </executions>
           </plugin>
