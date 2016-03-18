@@ -197,7 +197,7 @@ public class ContainerCloneStep
         interfaces.addHostInterface(
                 new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
         final ContainerHostInfoModel infoModel =
-                new ContainerHostInfoModel( cloneResponse.getAgentId(), cloneResponse.getHostname(), interfaces,
+                new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(), interfaces,
                         cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
         return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
                 cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
