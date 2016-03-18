@@ -468,7 +468,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     final HostInterfaces interfaces = new HostInterfaces();
                     interfaces.addHostInterface(
                             new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp() ) );
-                    final String hostId = response.getAgentId();
+                    final String hostId = response.getContainerId();
                     final String localPeerId = localPeer.getId();
                     final HostArchitecture arch = request.getTemplateArch();
                     final String hostname = request.getHostname();
