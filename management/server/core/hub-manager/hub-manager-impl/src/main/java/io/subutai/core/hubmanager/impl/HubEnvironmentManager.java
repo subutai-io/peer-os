@@ -262,7 +262,7 @@ public class HubEnvironmentManager
                 getCompletionService( taskExecutor );
 
         LOG.debug( String.format( "Preparing templates on peer %s", peerManager.getLocalPeer().getId() ) );
-        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
+//        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
 
         taskExecutor.shutdown();
 
