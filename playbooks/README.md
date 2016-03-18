@@ -13,6 +13,7 @@ Open source too.
 [http://www.sikuli.org/](http://www.sikuli.org/) supporting JAVA.
 
 For clicks by elements and testing plugins we using **Sikuli**, all another places we are verifying with **Serenity**.
+
 Main blocks into Serenity: **Pages**, **Steps**, **DefSteps**, **Stories**
 
 **Pages:** This is Java classes extended from PageObject class. Here we are writing all web elements for next work.
