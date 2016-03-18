@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>9</version>
+  </parent>
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
@@ -15,6 +22,36 @@
   </modules>
 
   <description>Parent project for the Subutai Project Artifacts</description>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>akarasulu</id>
+      <name>Alex Karasulu</name>
+    </developer>
+    <developer>
+      <id>aasanaliev</id>
+      <name>Askhat Asanaliev</name>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/subutai-io/base</url>
+    <connection>
+      scm:git:git://github.com/subutai-io/base.git
+    </connection>
+    <developerConnection>
+      scm:git:git@github.com:subutai-io/base.git
+    </developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
   <repositories>
 
