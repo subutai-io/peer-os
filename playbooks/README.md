@@ -20,18 +20,18 @@ Main blocks into Serenity: **Pages**, **Steps**, **DefSteps**, **Stories**
 Base Pages          |                      |
 --------------------|-----------------------
 AboutPage           |  LoginPage
-AccountSettings      |  MonitoringPage
+AccountSettings     |  MonitoringPage
 AdvancedPage        |  NetworkSettings
-BazaarPage        |  PeerRegistrationPage
+BazaarPage          |  PeerRegistrationPage
 BlueprintsPage      |  PeerSettingsPage
-CommonPages    |  PgpPlugin
-ConsolePage        |  PluginIntegratorPage
-ContainersPage  |  PluginsPage
-EnvironmentsPage  |  ResourceHostsPage
-HomePage         |  ResourceNodesPage
-KurjunPage      |  RoleManagementPage
-KurjunSettingsPage | TokensPage
-TrackerPage      | UserManagementPage
+CommonPages         |  PgpPlugin
+ConsolePage         |  PluginIntegratorPage
+ContainersPage      |  PluginsPage
+EnvironmentsPage    |  ResourceHostsPage
+HomePage            |  ResourceNodesPage
+KurjunPage          |  RoleManagementPage
+KurjunSettingsPage  | TokensPage
+TrackerPage         | UserManagementPage
 
 **Steps:** Using Web Elements from Pages we creating base steps: clicks, enters, waits, types, etc.
 
@@ -55,7 +55,7 @@ Parameter       | Description
 
 Dependencies: **Maven3**, **Java7/8** also need additional packages **openVns**
 
-For **Ubuntu** need install next package:
+For Ubuntu need install next packages:
 ```scss
 sudo add-apt-repository ppa:gijzelaar/opencv2.4
 sudo apt-get update
