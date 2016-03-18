@@ -30,6 +30,7 @@ import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.peer.api.PeerManager;
@@ -45,6 +46,7 @@ public class ConfigManager
     public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/h.public.gpg";
     public static final String PEER_KEYSTORE = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.jks";
     public static final String PEER_SECRET_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.secret.key";
+    private static final String PEER_CERT_ALIAS = "peer_cert";
 
 
     private SecurityManager securityManager;
@@ -97,51 +99,45 @@ public class ConfigManager
 
         this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
-        generateX509Certificate();
-        this.keyStore = KeyStore.getInstance( "JKS" );
-        this.keyStore.load( new FileInputStream( PEER_KEYSTORE ), "subutai".toCharArray() );
-
         this.messenger = new PGPMessenger( sender, hPublicKey );
+
+        this.keyStore = loadKeyStore();
     }
 
 
-    private void generateX509Certificate()
+    private KeyStore loadKeyStore() throws KeyStoreException
     {
-        try
+        KeyStoreData keyStoreData = new KeyStoreData();
+        keyStoreData.setKeyStoreFile( PEER_KEYSTORE );
+        keyStoreData.setAlias( PEER_CERT_ALIAS );
+        keyStoreData.setPassword( SecuritySettings.KEYSTORE_PX1_PSW );
+        keyStoreData.setKeyStoreType( KeyStoreType.JKS );
+
+        KeyStoreTool keyStoreTool = new KeyStoreTool();
+        KeyStore sslkeyStore = keyStoreTool.load( keyStoreData );
+
+        //generate X509 cert for mutual SSL connection with Hub
+        if ( sslkeyStore.size() == 0 )
         {
             String fingerprint = PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() );
 
-            //**************Saving X509 certificate******************************************
             io.subutai.common.security.crypto.key.KeyManager sslkeyMan =
                     new io.subutai.common.security.crypto.key.KeyManager();
             KeyPairGenerator keyPairGenerator = sslkeyMan.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
             java.security.KeyPair sslKeyPair = sslkeyMan.generateKeyPair( keyPairGenerator );
 
-            KeyStoreData keyStoreData = new KeyStoreData();
-            keyStoreData.setKeyStoreFile( PEER_KEYSTORE );
-            keyStoreData.setAlias( "root_server_px1" );
-            keyStoreData.setPassword( "subutai" );
-            keyStoreData.setKeyStoreType( KeyStoreType.JKS );
+            CertificateData certificateData = new CertificateData();
 
-            KeyStoreTool keyStoreTool = new KeyStoreTool();
-            KeyStore sslkeyStore = keyStoreTool.load( keyStoreData );
+            certificateData.setCommonName( fingerprint );
 
-            if ( sslkeyStore.size() == 0 )
-            {
-                CertificateData certificateData = new CertificateData();
-                certificateData.setCommonName( fingerprint );
+            CertificateTool certificateTool = new CertificateTool();
 
-                CertificateTool certificateTool = new CertificateTool();
+            X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
 
-                X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
-
-                keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
-            }
+            keyStoreTool.addNSaveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
         }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error generating peer keystore for connecting to Hub" );
-        }
+
+        return sslkeyStore;
     }
 
 
@@ -191,8 +187,8 @@ public class ConfigManager
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
         String baseUrl = String.format( "https://%s", hubIp );
-        return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
-                hPublicKey.getFingerprint() );
+        return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore,
+                SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), hPublicKey.getFingerprint() );
     }
 
 
