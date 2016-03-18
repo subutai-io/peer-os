@@ -1256,21 +1256,21 @@
                 </goals>
                 <configuration>
                   <additionalparam>-Xdoclint:none</additionalparam>
+                  <additionalDependencies>
+                    <dependency>
+                      <groupId>org.osgi</groupId>
+                      <artifactId>org.osgi.compendium</artifactId>
+                      <version>${osgi.framework.version}</version>
+                    </dependency>
+                    <dependency>
+                      <groupId>org.osgi</groupId>
+                      <artifactId>org.osgi.core</artifactId>
+                      <version>${osgi.framework.version}</version>
+                    </dependency>
+                  </additionalDependencies>
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.compendium</artifactId>
-                <version>${osgi.framework.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>${osgi.framework.version}</version>
-              </dependency>
-            </dependencies>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
