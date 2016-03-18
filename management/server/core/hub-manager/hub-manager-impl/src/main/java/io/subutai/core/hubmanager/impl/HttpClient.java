@@ -6,6 +6,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
@@ -87,28 +88,36 @@ public class HttpClient
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
         WebClient client = WebClient.create( url );
+
+        // A client certificate is not provided in SSL context if async connection is used.
+        // See details: #311 - Registration failure due to inability to find fingerprint.
+        Map<String, Object> requestContext = WebClient.getConfig( client ).getRequestContext();
+        requestContext.put( "use.async.http.conduit", Boolean.FALSE );
+
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+
         httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
+
         httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
+
         httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
 
         httpConduit.setClient( httpClientPolicy );
 
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
+
         keyManagerFactory.init( keyStore, keyStorePassword );
 
-
-        //        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
-
-
-        TrustManager trustManager;
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
+
         tlsClientParameters.setDisableCNCheck( true );
+
         tlsClientParameters.setTrustManagers( new TrustManager[] { new FingerprintTrustManager( serverFingerprint ) } );
+
         tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
-        //        tlsClientParameters.setCertAlias( alias );
+
         httpConduit.setTlsClientParameters( tlsClientParameters );
 
         return client;
