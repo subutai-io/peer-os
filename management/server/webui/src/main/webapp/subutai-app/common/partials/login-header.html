@@ -76,9 +76,10 @@
 			<a href ng-click="currentUserCtrl.clearLogs()" class="show-more">Clear</a>
 		</div>
 	</div>
-
+{{isRegistrationForVisible}}
 	<div class="b-hub-status js-header-dropdown g-right"
-		ng-class="{'b-hub-status_active' : currentUserCtrl.hubStatus }"
+		 ng-click="currentUserCtrl.isRegistrationFormVisible = !currentUserCtrl.isRegistrationFormVisible"
+		 ng-class="{'b-hub-status_active' : currentUserCtrl.hubStatus }"
 	>
 		<div class="b-hub-menu js-notification">
 			<svg class="b-hub-menu-icon" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 7 7" enable-background="new 0 0 7 7" xml:space="preserve">
@@ -120,24 +121,35 @@
 				<div class="header">
 					Register Peer
 				</div>
-				<div class="body">
-					<div class="b-form__error-message" ng-if="currentUserCtrl.hubRegisterError">
-						{{ currentUserCtrl.hubRegisterError }}
+				<form ng-submit="currentUserCtrl.hubRegister()">
+					<div class="body">
+						<div class="b-form__error-message" ng-if="currentUserCtrl.hubRegisterError">
+							{{ currentUserCtrl.hubRegisterError }}
+						</div>
+						<div class="b-form-group g-margin-bottom">
+							<div class="g-text g-margin-bottom-half">Login</div>
+							<input type="text" class="b-form-input b-form-input_full" 
+								focus-input="currentUserCtrl.getRegistrationFormVisibilityStatus()" 
+								tabindex=1 
+								ng-model="currentUserCtrl.login">
+						</div>
+						<div class="b-form-group">
+							<div class="g-text g-margin-bottom-half">Password</div>
+							<input type="password" 
+								class="b-form-input b-form-input_full" 
+								value="******" 
+								tabindex=2 
+								ng-model="currentUserCtrl.pass">
+						</div>
 					</div>
-					<div class="b-form-group g-margin-bottom">
-						<div class="g-text g-margin-bottom-half">Login</div>
-						<input type="text" class="b-form-input b-form-input_full" ng-model="currentUserCtrl.login">
+					<div class="footer">
+						<a href="https://hub.subut.ai" target="_blank" class="b-form-label">Sign Up</a>
+						<button type="submit" class="b-btn b-btn_green g-right" tabindex=3
+								ng-disabled="!currentUserCtrl.login || !currentUserCtrl.pass">
+							Register
+						</button>
 					</div>
-					<div class="b-form-group">
-						<div class="g-text g-margin-bottom-half">Password</div>
-						<input type="password" class="b-form-input b-form-input_full" value="******"
-						ng-model="currentUserCtrl.pass">
-					</div>
-				</div>
-				<div class="footer">
-					<a href="https://hub.subut.ai" target="_blank" class="b-form-label">Sign Up</a>
-					<button class="b-btn b-btn_green g-right" ng-click="currentUserCtrl.hubRegister()">Register</button>
-				</div>
+				</form>
 			</div>
 			<div ng-if="currentUserCtrl.hubStatus">
 				<ul class="list">
