@@ -17,7 +17,7 @@ Main blocks into Serenity: **Pages**, **Steps**, **DefSteps**, **Stories**
 
 **Pages:** This is Java classes extended from PageObject class. Here we are writing all web elements for next work.
 
-Base Pages          |
+Base Pages          |                      |
 --------------------|-----------------------
 AboutPage           |  LoginPage
 AccountSettings      |  MonitoringPage
