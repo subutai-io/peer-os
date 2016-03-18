@@ -37,8 +37,6 @@ public class HostsCommandTest extends SystemOutRedirectTest
     @Mock
     PeerManager peerManager;
     @Mock
-    IdentityManager identityManager;
-    @Mock
     User user;
     @Mock
     LocalPeer localPeer;
@@ -57,7 +55,6 @@ public class HostsCommandTest extends SystemOutRedirectTest
     {
         command = new HostsCommand();
         command.setPeerManager( peerManager );
-        command.setIdentityManager( identityManager );
         //when( identityManager.getUser() ).thenReturn( user );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         //        when( localPeer.getManagementHost() ).thenReturn( managementHost );

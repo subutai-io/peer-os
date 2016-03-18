@@ -37,10 +37,12 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Node;
+import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -59,9 +61,8 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.common.environment.NodeSchema;
+import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.UnlimitedStrategy;
 
 
 public class RestServiceImpl implements RestService
@@ -145,7 +146,7 @@ public class RestServiceImpl implements RestService
         {
             checkName( name );
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
@@ -205,7 +206,7 @@ public class RestServiceImpl implements RestService
                                             .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
                                             .findFirst().get().getName();
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
@@ -633,9 +634,9 @@ public class RestServiceImpl implements RestService
         {
             return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
-            return Response.serverError().entity(gson.toJson( e.getMessage() )).build();
+            return Response.serverError().entity( gson.toJson( e.getMessage() ) ).build();
         }
     }
 
@@ -678,15 +679,12 @@ public class RestServiceImpl implements RestService
                         for ( ResourceHostMetric metric : collection
                                 .toArray( new ResourceHostMetric[collection.size()] ) )
                         {
-                            peerHostMap.get( peer.getId() ).add(
-                                    new PeerDto(
-                                        metric.getHostInfo().getId(),
-                                        metric.getCpuModel(),
-                                        metric.getUsedCpu().toString(),
-                                        metric.getTotalRam().toString(),
-                                        metric.getAvailableRam().toString(),
-                                        metric.getTotalSpace().toString(),
-                                        metric.getAvailableSpace().toString()) );
+                            peerHostMap.get( peer.getId() )
+                                       .add( new PeerDto( metric.getHostInfo().getId(), metric.getCpuModel(),
+                                                       metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
+                                                       metric.getAvailableRam().toString(),
+                                                       metric.getTotalSpace().toString(),
+                                                       metric.getAvailableSpace().toString() ) );
                         }
                     }
                     return true;
@@ -830,32 +828,25 @@ public class RestServiceImpl implements RestService
         Set<ContainerDto> containerDtos = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            ContainerHostState state = containerHost.getState();
-
-            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-
-            String rhId = null;
-            for ( Peer peer : peerManager.getPeers() )
+            try
             {
-                if ( peer.getId().equals( containerHost.getPeerId() ) )
-                {
-                    try
-                    {
-                        rhId = peer.getResourceHostIdByContainerId( containerHost.getContainerId() ).getId();
-                    }
-                    catch ( PeerException e )
-                    {
-                        LOG.error( "cannot get resourceHostByContainerId", e );
-                    }
-                }
+                ContainerHostState state = containerHost.getState();
+
+                HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                        containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
+                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
+                        containerHost.getPeerId(), /*rhId*/ containerHost.getResourceHostId().getId() ) );
             }
-
-
-            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
-                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                    containerHost.getPeerId(), rhId ) );
+            catch ( Exception e )
+            {
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                        containerHost.getHostname(), ContainerHostState.UNKNOWN, "UNKNOWN",
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        "UNKNOWN" ) );
+            }
         }
         return containerDtos;
     }

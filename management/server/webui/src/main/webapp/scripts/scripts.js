@@ -30,6 +30,32 @@ $(document).on('click', function(event) {
 	}
 });
 
+$('body').on('keydown', function(e) { 
+	var keyCode = e.keyCode || e.which; 
+	if (keyCode == 9) { 
+		e.preventDefault();
+		var fields = document.querySelectorAll('[tabindex]');
+		if(document.activeElement.hasAttribute('tabindex')){
+			for(var i = 0; i < fields.length; i++) {
+				if(fields[i] == document.activeElement) {
+					if(fields[i + 1] == undefined) {
+						fields[0].focus();
+					} else {
+						if($(fields[i + 1]).is(":visible") == true){
+							fields[i + 1].focus();
+						} else {
+							continue;
+						}
+					}
+					break;
+				}
+			}
+		} else {
+			fields[0].focus();
+		}
+	} 
+});
+
 $(".b-form-input-dropdown-list").click(function(e) {
 	e.stopPropagation();
 });

@@ -30,6 +30,10 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
     @Argument( index = 0, name = "container ID", multiValued = false, required = true, description = "Container ID" )
     private String containerId;
 
+    @Argument( index = 1, name = "alert type", multiValued = false, required = true, description =
+            "Alert type:  \"ram\" , \"cpu\" ,  \"diskOpt\" ," + "    \"diskHome\" ,  \"diskVar\" ,\"diskRootfs\"" )
+    private String type;
+
 
     public PutAlertCommand( final LocalPeer localPeer )
     {
@@ -45,8 +49,8 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
 
 
         QuotaAlertValue alertValue = new QuotaAlertValue(
-                new ExceededQuota( new HostId( host.getId() ), ContainerResourceType.RAM,
-                        new ByteValueResource( ByteValueResource.toBytes( "1.1", ByteUnit.MB ) ),
+                new ExceededQuota( new HostId( host.getId() ), ContainerResourceType.parse( type ),
+                        new ByteValueResource( ByteValueResource.toBytes( "2.3", ByteUnit.MB ) ),
                         new ByteValueResource( ByteValueResource.toBytes( "2.2", ByteUnit.MB ) ) ) );
         QuotaAlert value = new QuotaAlert( alertValue, System.currentTimeMillis() );
         AlertEvent alertEvent = new AlertEvent( localPeer.getId(), host.getEnvironmentId().getId(), host.getId(),

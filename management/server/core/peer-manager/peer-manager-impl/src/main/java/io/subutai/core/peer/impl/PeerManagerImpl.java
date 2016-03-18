@@ -2,7 +2,6 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -127,7 +126,6 @@ public class PeerManagerImpl implements PeerManager
         this.templateManager = templateManager;
         this.identityManager = identityManager;
         this.provider = provider;
-        //todo expose CommandResponseListener as service "RequestListener" and inject here
         commandResponseListener = new CommandResponseListener();
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
@@ -146,7 +144,6 @@ public class PeerManagerImpl implements PeerManager
             ownerId = securityManager.getKeyManager().getPeerOwnerId();
 
             PeerData localPeerData = peerDataService.find( localPeerId );
-
 
             if ( localPeerData == null )
             {
@@ -876,7 +873,7 @@ public class PeerManagerImpl implements PeerManager
             }
             catch ( Exception ignore )
             {
-                 //ignore
+                //ignore
             }
         }
 
