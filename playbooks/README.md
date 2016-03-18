@@ -37,7 +37,8 @@ TrackerPage         | UserManagementPage
 
 **Steps:** Using Web Elements from Pages we creating base steps: clicks, enters, waits, types, etc.
 
-**DefSteps:** Here we are using our Steps and concatenating them with JBehave high language level specification. (looks like as cucumber)
+**DefSteps:** Here we are using our Steps and concatenating them with JBehave high language level specification. 
+ (looks like as cucumber)
 
 **Stories:** Using DefSteps we are creating testing story and scenarios for any verifications.
 
