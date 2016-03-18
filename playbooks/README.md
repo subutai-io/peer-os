@@ -8,6 +8,7 @@ In our tests we are using two testing libraries: **Serenity** + **Sikuli**
 [http://thucydides.info](http://thucydides.info) based on JAVA.
 
 **Sikuli** automates anything we are see on the screen. It uses image recognition to identify and control GUI components.
+
 Open source too. 
 
 [http://www.sikuli.org/](http://www.sikuli.org/) supporting JAVA.
@@ -54,7 +55,7 @@ Parameter       | Description
 -r              | Start acceptance tests
 -h              | Get Help info
 
-Dependencies: **Maven3**, **Java7/8** also need additional packages **openVns**
+Dependencies: **Maven3**, **Java7/8** also need additional packages **OpenCV**
 
 For Ubuntu need install next packages:
 ```scss
@@ -92,7 +93,10 @@ What is Sikuli
 -------------------------------------------
 
 SikuliX automates anything you see on the screen of your desktop computer running Windows, Mac or some Linux/Unix.
-It uses image recognition powered by OpenCV to identify and control GUI components. This is handy in cases when there is no easy access to a GUI's internals or the source code of the application or web page you want to act on.
+It uses image recognition powered by OpenCV to identify and control GUI components. 
+
+This is handy in cases when there is no easy access to a GUI's internals or the source code of the application 
+or web page you want to act on.
 
 SikuliX supports as scripting languages
 Python language level 2.7 (supported by Jython)
