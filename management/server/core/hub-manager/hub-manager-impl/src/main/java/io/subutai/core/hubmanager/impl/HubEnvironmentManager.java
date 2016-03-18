@@ -51,8 +51,6 @@ import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.hub.share.dto.network.GatewayDto;
-import io.subutai.hub.share.dto.network.VniDto;
 
 
 public class HubEnvironmentManager
@@ -76,20 +74,15 @@ public class HubEnvironmentManager
     }
 
 
-    public Set<VniDto> getReservedVnis( EnvironmentPeerDto peerDto )
+    public Set<Long> getReservedVnis()
     {
-        Set<VniDto> vniDtos = new HashSet<>();
+        Set<Long> vniDtos = new HashSet<>();
         try
         {
             Vnis vnis = peerManager.getLocalPeer().getReservedVnis();
             for ( Vni vni : vnis.list() )
             {
-                VniDto vniDto = new VniDto();
-                vniDto.setPeerId( peerManager.getLocalPeer().getId() );
-                vniDto.setEnvironmentId( peerDto.getEnvironmentInfo().getId() );
-                vniDto.setVni( vni.getVni() );
-                vniDto.setVlan( vni.getVlan() );
-                vniDtos.add( vniDto );
+                vniDtos.add( vni.getVni() );
             }
             return vniDtos;
         }
@@ -132,20 +125,15 @@ public class HubEnvironmentManager
     }
 
 
-    public Set<GatewayDto> getReservedGateways( EnvironmentPeerDto peerDto )
+    public Set<String> getReservedGateways()
     {
-        Set<GatewayDto> gatewayDtos = new HashSet<>();
+        Set<String> gatewayDtos = new HashSet<>();
         try
         {
             Gateways gateways = peerManager.getLocalPeer().getGateways();
             for ( Gateway gateway : gateways.list() )
             {
-                GatewayDto gatewayDto = new GatewayDto();
-                gatewayDto.setIp( gateway.getIp() );
-                gatewayDto.setVlan( gateway.getVlan() );
-                gatewayDto.setPeerId( peerManager.getLocalPeer().getId() );
-                gatewayDto.setEnvironmentId( peerDto.getEnvironmentInfo().getId() );
-                gatewayDtos.add( gatewayDto );
+                gatewayDtos.add( gateway.getIp() );
             }
             return gatewayDtos;
         }
@@ -262,7 +250,7 @@ public class HubEnvironmentManager
                 getCompletionService( taskExecutor );
 
         LOG.debug( String.format( "Preparing templates on peer %s", peerManager.getLocalPeer().getId() ) );
-//        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
+        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( peerManager.getLocalPeer(), nodes ) );
 
         taskExecutor.shutdown();
 
@@ -288,30 +276,24 @@ public class HubEnvironmentManager
     {
         try
         {
-            SubnetUtils.SubnetInfo subnetInfo =
-                    new SubnetUtils( peerDto.getEnvironmentInfo().getSubnetCidr() ).getInfo();
-
-            String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
-
             CreateEnvironmentContainerGroupRequest containerGroupRequest =
                     new CreateEnvironmentContainerGroupRequest( peerDto.getEnvironmentInfo().getId() );
 
             for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
             {
                 ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-                String ip = subnetInfo.getAllAddresses()[( nodeDto.getIpAddressOffset() )];
                 try
                 {
                     CloneRequest cloneRequest =
                             new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                                    ip + "/" + maskLength, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
+                                    nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
                                     peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
 
                     containerGroupRequest.addRequest( cloneRequest );
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( e.getMessage() );
+                    LOG.error( "Could not create container clone request", e.getMessage() );
                 }
             }
 

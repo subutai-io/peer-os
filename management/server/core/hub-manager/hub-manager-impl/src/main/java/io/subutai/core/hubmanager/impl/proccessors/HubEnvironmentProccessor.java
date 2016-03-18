@@ -102,7 +102,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     infoExchange( peerDto );
                     break;
                 case BUILD_CONTAINER:
-                    buildContainer( peerDto );
+                    buildContainers( peerDto );
                     break;
             }
         }
@@ -124,13 +124,13 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             WebClient client = configManager.getTrustedWebClientWithAuth( exchangeURL, configManager.getHubIp() );
 
             LOG.debug( "env_via_hub: Collecting reserved VNIs..." );
-            peerDto.setVnis( hubEnvironmentManager.getReservedVnis( peerDto ) );
+            peerDto.setVnis( hubEnvironmentManager.getReservedVnis() );
 
             LOG.debug( "env_via_hub: Collecting used IPs..." );
             peerDto.setUsedIPs( hubEnvironmentManager.getTunnelNetworks() );
 
             LOG.debug( "env_via_hub: Collecting reserved gateways..." );
-            peerDto.setGateways( hubEnvironmentManager.getReservedGateways( peerDto ) );
+            peerDto.setGateways( hubEnvironmentManager.getReservedGateways() );
 
             LOG.debug( "env_via_hub: Generating PEK..." );
             peerDto.setPublicKey( hubEnvironmentManager.createPeerEnvironmentKeyPair( environmentId ) );
@@ -162,7 +162,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
-    private void buildContainer( EnvironmentPeerDto peerDto )
+    private void buildContainers( EnvironmentPeerDto peerDto )
     {
         String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow",
                 peerDto.getEnvironmentInfo().getId() );
