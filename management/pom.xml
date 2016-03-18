@@ -1010,16 +1010,6 @@
 
   <build>
     <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
-        <configuration>
-          <tagNameFormat>v@{project.version}</tagNameFormat>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
@@ -1193,7 +1183,7 @@
             <configuration>
               <localCheckout>true</localCheckout>
               <pushChanges>false</pushChanges>
-              <tagNameFormat>@${pom.version}</tagNameFormat>
+              <tagNameFormat>v@${pom.version}</tagNameFormat>
               <arguments>-Psubutai.release -Psonatype-oss-release</arguments>
               <autoVersionSubmodules>true</autoVersionSubmodules>
               <releaseProfiles>release</releaseProfiles>
