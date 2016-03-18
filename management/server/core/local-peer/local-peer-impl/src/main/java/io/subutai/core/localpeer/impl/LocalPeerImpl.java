@@ -1051,7 +1051,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
-        if ( initialized )
+        if ( initialized && peerInfo != null )
         {
             ResourceHostEntity host;
             try
