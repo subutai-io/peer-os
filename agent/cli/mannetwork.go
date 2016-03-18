@@ -186,7 +186,7 @@ func createVNIMap(tunnel, vni, vlan, envid string) {
 }
 
 func removeTunnel(tunnel string) {
-	log.Check(log.FatalLevel, "Removing port "+tunnel,
+	log.Check(log.WarnLevel, "Removing port "+tunnel,
 		exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
 }
 
@@ -204,5 +204,5 @@ func ClearVlan(vlan string) {
 		}
 	}
 	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", []byte(strings.Join(lines, "\n")), 0744)
-	log.Check(log.FatalLevel, "config.Agent.DataPrefix + /var/subutai-network/vni_reserve delete vni", err)
+	log.Check(log.WarnLevel, "config.Agent.DataPrefix + /var/subutai-network/vni_reserve delete vni", err)
 }
