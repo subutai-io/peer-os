@@ -23,11 +23,11 @@ var app = angular.module('subutai-app', [
 
     .run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$rootScope', '$http', 'SweetAlert'];
+CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
-function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
+function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog) {
 	var vm = this;
 	vm.currentUser = localStorage.getItem('currentUser');
 	vm.hubStatus = false;
@@ -97,17 +97,22 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 				vm.hubStatus = true;
 				hubPopupLoadScreen();
 
+				ngDialog.open({
+					template: 'subutai-app/common/partials/hubSuccessMessage.html',
+					scope: $scope
+				});
+
                 $http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
                     .success(function () {
                         //localStorage.setItem('hubRegistered', true);
                         //vm.hubStatus = true;
                         //hubPopupLoadScreen();
                         //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
-                    }).error (function (error) {
-                    console.log('hub/register error: ', error);
-                    vm.hubRegisterError = error;
-                    //hubPopupLoadScreen();
-                });
+					}).error (function (error) {
+						console.log('hub/register error: ', error);
+						vm.hubRegisterError = error;
+						//hubPopupLoadScreen();
+					});
 
                 $http.post( SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
                     .success(function () {
@@ -116,10 +121,10 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
                         //hubPopupLoadScreen();
                         //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
                     }).error (function (error) {
-                    console.log('hub/register error: ', error);
-                    vm.hubRegisterError = error;
-                    //hubPopupLoadScreen();
-                });
+						console.log('hub/register error: ', error);
+						vm.hubRegisterError = error;
+						//hubPopupLoadScreen();
+					});
 
 
             }).error (function (error) {
