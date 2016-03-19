@@ -49,20 +49,20 @@ public class SetupTunnelsTask implements Callable<Integer>
                             environmentId ) );
         }
 
-        for ( String peerIp : peerIps.keySet() )
+        for ( String peerId : peerIps.keySet() )
         {
-            if ( peerIp.equals( localPeer.getId() ) )
+            if ( peerId.equals( localPeer.getId() ) )
             {
                 LOG.debug( "Skipping local peer." );
                 continue;
             }
 
-            LOG.debug( String.format( "Setting up tunnel on : %s", peerIp ) );
+            LOG.debug( String.format( "Setting up tunnel on : %s", peerId ) );
 
             //setup tunnels to each remote peer
             Set<Tunnel> tunnels = networkManager.listTunnels();
 
-            String tunnelIp = peerIps.get( peerIp );
+            String tunnelIp = peerIps.get( peerId );
             int tunnelId = findTunnel( tunnelIp, tunnels );
             //tunnel not found, create new one
             if ( tunnelId == -1 )
@@ -77,7 +77,7 @@ public class SetupTunnelsTask implements Callable<Integer>
             }
 
             //create vni-vlan mapping
-            LOG.debug( String.format( "Setting up tunnel for %s: %s", peerIp, environmentVni ) );
+            LOG.debug( String.format( "Setting up tunnel for %s: %s", peerId, environmentVni ) );
             setupVniVlanMapping( tunnelId, environmentVni.getVni(), environmentVni.getVlan(),
                     environmentVni.getEnvironmentId() );
         }

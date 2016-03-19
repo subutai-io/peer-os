@@ -57,32 +57,50 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    //---------------- P2P SECTION BEGIN ------------------------
     @Override
-    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
-                                    long secretKeyTtlSec ) throws NetworkManagerException
+    public void setupP2PConnection( final String interfaceName, final String localIp, final String communityName,
+                                    final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
-        execute( getManagementHost(),
-                commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
-                        getUnixTimestampOffset( secretKeyTtlSec ) ) );
+        setupP2PConnection( getManagementHost(), interfaceName, localIp, communityName, secretKey, secretKeyTtlSec );
     }
 
 
-    private long getUnixTimestampOffset( long offsetSec )
+    @Override
+    public void setupP2PConnection( final Host host, final String interfaceName, final String localIp,
+                                    final String communityName, final String secretKey, final long secretKeyTtlSec )
+            throws NetworkManagerException
     {
-        long unixTimestamp = Instant.now().getEpochSecond();
-        return unixTimestamp + offsetSec;
+        execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
+                getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 
 
     @Override
     public void removeP2PConnection( final String communityName ) throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( communityName ) );
+        removeP2PConnection( getManagementHost(), communityName );
     }
 
 
     @Override
-    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws NetworkManagerException
+    public void removeP2PConnection( final Host host, final String communityName ) throws NetworkManagerException
+    {
+        execute( host, commands.getRemoveP2PConnectionCommand( communityName ) );
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
+            throws NetworkManagerException
+    {
+        resetP2PSecretKey( getManagementHost(), p2pHash, newSecretKey, ttlSeconds );
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( final Host host, final String p2pHash, final String newSecretKey,
+                                   final long ttlSeconds ) throws NetworkManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
@@ -96,9 +114,16 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<P2PConnection> listP2PConnections() throws NetworkManagerException
     {
+        return listP2PConnections( getManagementHost() );
+    }
+
+
+    @Override
+    public Set<P2PConnection> listP2PConnections( final Host host ) throws NetworkManagerException
+    {
         Set<P2PConnection> connections = Sets.newHashSet();
 
-        CommandResult result = execute( getManagementHost(), commands.getListP2PConnectionsCommand() );
+        CommandResult result = execute( host, commands.getListP2PConnectionsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -117,6 +142,42 @@ public class NetworkManagerImpl implements NetworkManager
         return connections;
     }
 
+
+    @Override
+    public Set<P2PPeerInfo> listPeersInEnvironment( final String communityName ) throws NetworkManagerException
+    {
+        return listPeersInEnvironment( getManagementHost(), communityName );
+    }
+
+
+    @Override
+    public Set<P2PPeerInfo> listPeersInEnvironment( final Host host, final String communityName )
+            throws NetworkManagerException
+    {
+        Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
+
+        CommandResult result = execute( host, commands.getListPeersInEnvironmentCommand( communityName ) );
+
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "(.+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.+)" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                p2PPeerInfos.add( new P2PPeerInfo( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+            }
+        }
+
+
+        return p2PPeerInfos;
+    }
+
+    //------------------ P2P SECTION END --------------------------------
 
     @Override
     public PingDistance getPingDistance( final Host host, final String sourceHostIp, final String targetHostIp )
@@ -143,34 +204,6 @@ public class NetworkManagerImpl implements NetworkManager
             }
         }
         return distance;
-    }
-
-
-    @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final String communityName ) throws NetworkManagerException
-    {
-        Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
-
-        CommandResult result =
-                execute( getManagementHost(), commands.getListPeersInEnvironmentCommand( communityName ) );
-
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile( "(.+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.+)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
-            {
-                p2PPeerInfos.add( new P2PPeerInfo( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
-            }
-        }
-
-
-        return p2PPeerInfos;
     }
 
 
@@ -313,7 +346,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void reserveVni( Vni vni ) throws NetworkManagerException
+    public void reserveVni( final Vni vni ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( vni );
         Preconditions.checkArgument( NumUtil.isIntBetween( vni.getVlan(), Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
@@ -508,66 +541,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected Host getManagementHost() throws NetworkManagerException
-    {
-        try
-        {
-            return peerManager.getLocalPeer().getManagementHost();
-        }
-        catch ( PeerException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-    }
-
-
-    protected ResourceHost getResourceHost( String containerName ) throws NetworkManagerException
-    {
-        try
-        {
-            ContainerHost containerHost = getContainerHost( containerName );
-            return peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
-        }
-        catch ( PeerException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-    }
-
-
-    protected ContainerHost getContainerHost( String containerName ) throws NetworkManagerException
-    {
-        try
-        {
-            return peerManager.getLocalPeer().getContainerHostByName( containerName );
-        }
-        catch ( PeerException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-    }
-
-
-    protected CommandResult execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
-    {
-        try
-        {
-            CommandResult result = host.execute( requestBuilder );
-            if ( !result.hasSucceeded() )
-            {
-                throw new NetworkManagerException(
-                        String.format( "Command failed: %s, %s", result.getStdErr(), result.getStatus() ) );
-            }
-
-            return result;
-        }
-        catch ( CommandException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-    }
-
-
     @Override
     public void exchangeSshKeys( final Set<ContainerHost> containers, final Set<String> additionalSshKeys )
             throws NetworkManagerException
@@ -613,6 +586,74 @@ public class NetworkManagerImpl implements NetworkManager
             throws NetworkManagerException
     {
         getHostManager( containerHosts, domainName ).execute();
+    }
+
+
+    private long getUnixTimestampOffset( final long offsetSec )
+    {
+        long unixTimestamp = Instant.now().getEpochSecond();
+        return unixTimestamp + offsetSec;
+    }
+
+
+    protected Host getManagementHost() throws NetworkManagerException
+    {
+        try
+        {
+            return peerManager.getLocalPeer().getManagementHost();
+        }
+        catch ( PeerException e )
+        {
+            throw new NetworkManagerException( e );
+        }
+    }
+
+
+    protected ResourceHost getResourceHost( final String containerName ) throws NetworkManagerException
+    {
+        try
+        {
+            ContainerHost containerHost = getContainerHost( containerName );
+            return peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
+        }
+        catch ( PeerException e )
+        {
+            throw new NetworkManagerException( e );
+        }
+    }
+
+
+    protected ContainerHost getContainerHost( final String containerName ) throws NetworkManagerException
+    {
+        try
+        {
+            return peerManager.getLocalPeer().getContainerHostByName( containerName );
+        }
+        catch ( PeerException e )
+        {
+            throw new NetworkManagerException( e );
+        }
+    }
+
+
+    protected CommandResult execute( final Host host, final RequestBuilder requestBuilder )
+            throws NetworkManagerException
+    {
+        try
+        {
+            CommandResult result = host.execute( requestBuilder );
+            if ( !result.hasSucceeded() )
+            {
+                throw new NetworkManagerException(
+                        String.format( "Command failed: %s, %s", result.getStdErr(), result.getStatus() ) );
+            }
+
+            return result;
+        }
+        catch ( CommandException e )
+        {
+            throw new NetworkManagerException( e );
+        }
     }
 
 

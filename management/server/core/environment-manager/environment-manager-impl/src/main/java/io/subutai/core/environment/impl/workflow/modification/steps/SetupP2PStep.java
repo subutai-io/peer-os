@@ -50,11 +50,15 @@ public class SetupP2PStep
         SubnetUtils.SubnetInfo info =
                 new SubnetUtils( environment.getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
+        //todo use proper p2p secret key here
         String sharedKey = DigestUtils.md5Hex( "secret" );
         final String[] addresses = info.getAllAddresses();
         int counter = environment.getPeerConfs().size();
+
         for ( Peer peer : peers )
         {
+            //todo remove this check since if there are new RHs in participating peers (env grow),
+            // P2P needs to be started on them too
             if ( !environment.isMember( peer ) )
             {
                 P2PConfig config =
@@ -63,6 +67,7 @@ public class SetupP2PStep
                                 Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
                 try
                 {
+                    //todo run this command in a thread
                     peer.setupP2PConnection( config );
                     environment.addEnvironmentPeer( new PeerConfImpl( config ) );
                 }
