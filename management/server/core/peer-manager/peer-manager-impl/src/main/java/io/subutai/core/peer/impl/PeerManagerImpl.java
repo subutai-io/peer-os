@@ -129,7 +129,7 @@ public class PeerManagerImpl implements PeerManager
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 60, TimeUnit.SECONDS );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 60, TimeUnit.MINUTES );
     }
 
 

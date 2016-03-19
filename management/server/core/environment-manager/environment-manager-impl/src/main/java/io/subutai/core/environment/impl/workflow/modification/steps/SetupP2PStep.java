@@ -1,6 +1,8 @@
 package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -54,34 +56,46 @@ public class SetupP2PStep
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         final String[] addresses = info.getAllAddresses();
         int counter = environment.getPeerConfs().size();
+
+
+        ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
+
+        ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
+
+        List<P2PConfig> result = new ArrayList<>( peers.size() );
+
         for ( Peer peer : peers )
         {
-            if ( !environment.isMember( peer ) )
-            {
-                P2PConfig config =
-                        new P2PConfig( peer.getId(), environment.getId(), environment.getTunnelInterfaceName(),
-                                environment.getTunnelCommunityName(), addresses[counter], sharedKey,
-                                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
-                try
-                {
-                    peer.setupP2PConnection( config );
-                    environment.addEnvironmentPeer( new PeerConfImpl( config ) );
-                }
-                catch ( PeerException e )
-                {
-                    throw new EnvironmentManagerException( "Could not create P2P connection on peer: " + peer.getId(),
-                            e );
-                }
-                counter++;
-            }
+            P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getTunnelInterfaceName(),
+                    environment.getTunnelCommunityName(), addresses[counter], sharedKey,
+                    Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+
+            p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
+
+            counter++;
+        }
+
+
+        for ( Peer peer : peers )
+        {
+            final Future<P2PConfig> f = p2pCompletionService.take();
+            P2PConfig config = f.get();
+            result.add( config );
+        }
+
+        p2pExecutor.shutdown();
+
+        for ( P2PConfig config : result )
+        {
+            environment.addEnvironmentPeer( new PeerConfImpl( config ) );
         }
 
 
         // tunnel setup
 
         Map<String, String> tunnels = environment.getTunnels();
-
-        ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peers.size() );
+        int peersCount = environment.getPeerConfs().size();
+        ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
 
         ExecutorCompletionService<Integer> tunnelCompletionService =
                 new ExecutorCompletionService<Integer>( tunnelExecutor );
@@ -99,6 +113,28 @@ public class SetupP2PStep
         }
 
         tunnelExecutor.shutdown();
+    }
+
+
+    private class SetupP2PConnectionTask implements Callable<P2PConfig>
+    {
+        private Peer peer;
+        private P2PConfig p2PConfig;
+
+
+        public SetupP2PConnectionTask( final Peer peer, final P2PConfig config )
+        {
+            this.peer = peer;
+            this.p2PConfig = config;
+        }
+
+
+        @Override
+        public P2PConfig call() throws Exception
+        {
+            peer.setupP2PConnection( p2PConfig );
+            return p2PConfig;
+        }
     }
 
 

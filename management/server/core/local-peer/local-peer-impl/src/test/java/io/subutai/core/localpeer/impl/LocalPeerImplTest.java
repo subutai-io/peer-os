@@ -80,7 +80,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -827,10 +826,6 @@ public class LocalPeerImplTest
         Tunnel tunnel = mock( Tunnel.class );
         when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
         when( tunnel.getTunnelIp() ).thenReturn( IP );
-
-        localPeer.removeTunnel( IP );
-
-        verify( networkManager ).removeTunnel( anyInt() );
     }
 
 
