@@ -1718,9 +1718,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                //todo check if RH already has p2p with this hash. if yes then just update the secret key & ttl
-                getNetworkManager().setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
-                        config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                Set<P2PConnection> p2PConnections = getNetworkManager().listP2PConnections( resourceHost );
+                boolean p2pHashExists = false;
+                for ( P2PConnection p2PConnection : p2PConnections )
+                {
+                    if ( p2PConnection.getCommunityName().equalsIgnoreCase( config.getCommunityName() ) )
+                    {
+                        p2pHashExists = true;
+                        break;
+                    }
+                }
+                if ( p2pHashExists )
+                {
+                    getNetworkManager()
+                            .resetP2PSecretKey( resourceHost, config.getCommunityName(), config.getSecretKey(),
+                                    config.getSecretKeyTtlSec() );
+                }
+                else
+                {
+                    //todo what to do with p2p IPs for RHs other than MH-RH?
+                    getNetworkManager()
+                            .setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
+                                    config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                }
             }
         }
         catch ( NetworkManagerException e )
