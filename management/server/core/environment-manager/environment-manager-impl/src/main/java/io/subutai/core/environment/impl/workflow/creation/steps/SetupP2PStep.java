@@ -85,6 +85,9 @@ public class SetupP2PStep
 
             // p2p setup
             List<P2PConfig> result = new ArrayList<>( peers.size() );
+
+            //todo first setup p2p connection on initiator peer's RH-with-MH
+
             for ( Peer peer : peers )
             {
                 P2PConfig config = new P2PConfig( peer.getId(), env.getId(), env.getTunnelInterfaceName(),

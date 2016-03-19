@@ -1736,7 +1736,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 else
                 {
-                    //todo what to do with p2p IPs for RHs other than MH-RH?
+                    //todo don't pass p2p IP here, p2p IP should be acquired dynamically
                     getNetworkManager()
                             .setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
                                     config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
