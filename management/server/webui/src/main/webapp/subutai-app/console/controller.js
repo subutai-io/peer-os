@@ -117,10 +117,11 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 			}
 
 			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut, vm.selectedEnvironment).success(function(data){
+				if(data.stdOut.length > 0) {
+					output = data.stdOut.split('\r');
+				}
 				if(data.stdErr.length > 0) {
 					output = data.stdErr.split('\r');
-				} else {
-					output = data.stdOut.split('\r');
 				}
 
 				var checkCommand = cmd.command.split(' ');
