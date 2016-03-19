@@ -782,24 +782,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        try
-        {
-            getNetworkManager().cleanupEnvironmentNetworkSettings( environmentId );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException(
-                    String.format( "Error cleaning up environment %s network settings", environmentId ), e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
@@ -1736,8 +1718,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                getNetworkManager().setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
-                        config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                Set<P2PConnection> p2PConnections = getNetworkManager().listP2PConnections( resourceHost );
+                boolean p2pHashExists = false;
+                for ( P2PConnection p2PConnection : p2PConnections )
+                {
+                    if ( p2PConnection.getCommunityName().equalsIgnoreCase( config.getCommunityName() ) )
+                    {
+                        p2pHashExists = true;
+                        break;
+                    }
+                }
+                if ( p2pHashExists )
+                {
+                    getNetworkManager()
+                            .resetP2PSecretKey( resourceHost, config.getCommunityName(), config.getSecretKey(),
+                                    config.getSecretKeyTtlSec() );
+                }
+                else
+                {
+                    //todo what to do with p2p IPs for RHs other than MH-RH?
+                    getNetworkManager()
+                            .setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
+                                    config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                }
             }
         }
         catch ( NetworkManagerException e )

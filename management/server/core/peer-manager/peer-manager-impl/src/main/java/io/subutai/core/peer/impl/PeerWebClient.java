@@ -177,27 +177,6 @@ public class PeerWebClient
     }
 
 
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
-    {
-
-        String path = String.format( "/network/%s", environmentId.getId() );
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            client.delete();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on cleaning up network settings", e );
-        }
-    }
-
-
     public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
         String path = "/pek";

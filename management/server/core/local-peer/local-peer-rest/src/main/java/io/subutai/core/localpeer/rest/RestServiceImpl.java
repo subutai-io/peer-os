@@ -387,20 +387,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void cleanupNetwork( final EnvironmentId environmentId )
-    {
-        try
-        {
-            localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-        }
-        catch ( Exception e )
-        {
-            throw new WebApplicationException( e );
-        }
-    }
-
-
-    @Override
     public Response putAlert( final AlertEvent alertEvent )
     {
         try

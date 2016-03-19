@@ -107,10 +107,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
 
-    @DELETE
-    @Path( "network/{environmentId}" )
-    void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
-
     @GET
     @Path( "container/info" )
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
