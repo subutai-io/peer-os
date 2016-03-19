@@ -433,9 +433,17 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            if( environmentManager.getEnvironmentDomain( environmentId ) == null )
+            {
+                return Response.serverError().entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
+            }
+
+
             return Response.ok( JsonUtil
                     .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
                            .build();
+
+
         }
         catch ( Exception e )
         {

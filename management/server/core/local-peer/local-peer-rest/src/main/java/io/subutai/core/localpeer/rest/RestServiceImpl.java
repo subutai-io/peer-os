@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import com.google.common.base.Strings;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -361,11 +359,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void removeP2PConnection( final EnvironmentId environmentId )
+    public void removeP2PConnection( final String communityName )
     {
         try
         {
-            localPeer.removeP2PConnection( environmentId );
+            localPeer.removeP2PConnection( communityName );
         }
         catch ( Exception e )
         {

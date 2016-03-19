@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl;
 
 
+import java.io.IOException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +13,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -43,6 +47,7 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -56,14 +61,20 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Host;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -90,6 +101,7 @@ import io.subutai.core.environment.impl.workflow.modification.EnvironmentModifyW
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.steps.P2PSecretKeyResetStep;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -133,6 +145,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
     private SecurityManager securityManager;
+    protected ScheduledExecutorService backgroundTasksExecutorService;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
@@ -157,6 +170,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
+        backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
     }
 
 
@@ -171,6 +186,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void dispose()
     {
         executor.shutdown();
+        backgroundTasksExecutorService.shutdown();
     }
 
 
@@ -1730,7 +1746,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void setContainersTransientFields( final Environment environment )
     {
-//        User activeUser = identityManager.getActiveUser();
+        //        User activeUser = identityManager.getActiveUser();
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
         for ( ContainerHost containerHost : containers )
         {
@@ -1738,7 +1754,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             environmentContainer.setEnvironmentManager( this );
 
-//            String peerId = environmentContainer.getPeerId();
+            //            String peerId = environmentContainer.getPeerId();
         }
         // remove containers which doesn't have trust relation
     }
@@ -2177,6 +2193,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
+        }
+    }
+
+
+    private class BackgroundTasksRunner implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            LOG.debug( "Environment background tasks started..." );
+
+            resetP2Pkey();
+
+            LOG.debug( "Environment background tasks finished." );
+        }
+    }
+
+
+    private void resetP2Pkey()
+    {
+        try
+        {
+            for ( Environment environment : getEnvironments() )
+            {
+                if ( environment.getStatus() != EnvironmentStatus.UNDER_MODIFICATION )
+                {
+
+                    final String secretKey = UUID.randomUUID().toString();
+                    final long keyTtl = TimeUnit.MINUTES.toSeconds( 120 );
+                    resetP2PSecretKey( environment.getId(), secretKey, keyTtl, true );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage() );
         }
     }
 }

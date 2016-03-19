@@ -21,6 +21,7 @@ public class CleanupEnvironmentStep
     {
         for ( Peer peer : environment.getPeers() )
         {
+            //todo run in a thread
             peer.cleanupEnvironment( environment.getEnvironmentId() );
         }
     }
