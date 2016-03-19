@@ -69,6 +69,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 		}
 
 		$scope.$apply();
+		$('.terminal-viewport').perfectScrollbar();
 	}, 100);
 
 	$scope.session = {
@@ -117,12 +118,16 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 			}
 
 			consoleService.sendCommand(cmd.command, vm.activeConsole, $scope.prompt.path(), vm.daemon, vm.timeOut, vm.selectedEnvironment).success(function(data){
-				output = "";
+				output = [];
 				if(data.stdOut.length > 0) {
-					output += data.stdOut.split('\r');
+					output = data.stdOut.split('\r');
 				}
 				if(data.stdErr.length > 0) {
-					output += data.stdErr.split('\r');
+					var errors = data.stdErr.split('\r');
+					for(var i = 0; i < errors.length; i++) {
+						errors[i] = '<span style="color: #ff0000;">' + errors[i] + '</span>';
+					}
+					output = output.concat( errors );
 				}
 
 				var checkCommand = cmd.command.split(' ');
