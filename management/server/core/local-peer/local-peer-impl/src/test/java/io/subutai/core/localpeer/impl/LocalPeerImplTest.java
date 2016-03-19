@@ -794,20 +794,6 @@ public class LocalPeerImplTest
 
 
     @Test( expected = PeerException.class )
-    public void testCleanupEnvironmentNetworkSettings() throws Exception
-    {
-        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-
-        verify( networkManager ).cleanupEnvironmentNetworkSettings( environmentId );
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager )
-                                                    .cleanupEnvironmentNetworkSettings( environmentId );
-
-        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-    }
-
-
-    @Test( expected = PeerException.class )
     public void testListTunnels() throws Exception
     {
         localPeer.listTunnels();

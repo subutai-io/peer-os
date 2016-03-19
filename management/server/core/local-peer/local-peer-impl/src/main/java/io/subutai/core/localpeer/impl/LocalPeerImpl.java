@@ -782,24 +782,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        try
-        {
-            getNetworkManager().cleanupEnvironmentNetworkSettings( environmentId );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException(
-                    String.format( "Error cleaning up environment %s network settings", environmentId ), e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
@@ -1736,6 +1718,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
+                //todo check if RH already has p2p with this hash. if yes then just update the secret key & ttl
                 getNetworkManager().setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
                         config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
             }
