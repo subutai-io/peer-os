@@ -1736,10 +1736,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 else
                 {
-                    //todo don't pass p2p IP here, p2p IP should be acquired dynamically
-                    getNetworkManager()
-                            .setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
-                                    config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                    //we don't supply p2p IP since it should get assigned dynamically
+                    getNetworkManager().setupP2PConnection( resourceHost, config.getInterfaceName(), null,
+                            config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
                 }
             }
         }

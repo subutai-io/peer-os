@@ -65,8 +65,8 @@ public class Commands
                                                         String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "p2p", "-c", interfaceName, localIp, communityName, secretKey,
-                        String.valueOf( secretKeyTtlSec ) ) );
+                Lists.newArrayList( "p2p", "-c", interfaceName, communityName, secretKey,
+                        String.valueOf( secretKeyTtlSec ), Strings.isNullOrEmpty( localIp ) ? "" : localIp ) );
     }
 
 
