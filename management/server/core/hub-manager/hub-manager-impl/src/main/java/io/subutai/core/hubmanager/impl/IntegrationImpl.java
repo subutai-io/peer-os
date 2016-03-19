@@ -102,6 +102,9 @@ public class IntegrationImpl implements Integration
 
             configManager = new ConfigManager( securityManager, peerManager, configDataService );
 
+            hubEnvironmentManager =
+                    new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager );
+
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
 
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
@@ -130,9 +133,9 @@ public class IntegrationImpl implements Integration
             containerEventExecutor
                     .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
 
-            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
-
-            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
+            //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
+            //
+            //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
         }
         catch ( Exception e )
         {
@@ -158,9 +161,9 @@ public class IntegrationImpl implements Integration
 
         containerEventProcessor.process();
 
-//        envBuilder.test();
+        //        envBuilder.test();
 
-        envDestroyer.test();
+        //        envDestroyer.test();
     }
 
 
