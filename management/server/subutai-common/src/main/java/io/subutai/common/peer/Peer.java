@@ -236,10 +236,6 @@ public interface Peer
      */
     public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
-    /**
-     * Removes a tunnel to remote peer
-     */
-    void removeTunnels( Set<String> peerIps ) throws PeerException;
 
     /* ************************************************
      * Returns all existing gateways of the peer

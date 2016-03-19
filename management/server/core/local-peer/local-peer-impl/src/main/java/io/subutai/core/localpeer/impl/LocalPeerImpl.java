@@ -1751,11 +1751,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void removeP2PConnection( final String communityName ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( communityName ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( communityName ), "Invalid community name" );
 
         try
         {
-            getNetworkManager().removeP2PConnection( communityName );
+            for ( ResourceHost resourceHost : getResourceHosts() )
+            {
+                getNetworkManager().removeP2PConnection( resourceHost, communityName );
+            }
         }
         catch ( NetworkManagerException e )
         {
@@ -2013,33 +2016,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 throw ( PeerException ) e.getCause();
             }
             throw new PeerException( "Error setting up tunnels", e.getCause() );
-        }
-    }
-
-
-    @Override
-    public void removeTunnels( final Set<String> peerIps ) throws PeerException
-    {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerIps ), "Invalid peer ips set" );
-
-        Set<Tunnel> tunnels = listTunnels();
-        try
-        {
-            for ( String peerIp : peerIps )
-            {
-                for ( Tunnel tunnel : tunnels )
-                {
-                    if ( peerIp.equals( tunnel.getTunnelIp() ) )
-                    {
-                        getNetworkManager().removeTunnel( tunnel.getTunnelId() );
-                        break;
-                    }
-                }
-            }
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException( "Error removing tunnels", e );
         }
     }
 

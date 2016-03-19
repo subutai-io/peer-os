@@ -333,11 +333,11 @@ public class PeerWebClient
     }
 
 
-    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final String communityName ) throws PeerException
     {
-        LOG.debug( String.format( "Removing remote peer from p2p community: %s", environmentId.getId() ) );
+        LOG.debug( String.format( "Removing remote peer from p2p community: %s", communityName ) );
 
-        String path = String.format( "/p2ptunnel/%s", environmentId.getId() );
+        String path = String.format( "/p2ptunnel/%s", communityName );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
@@ -354,6 +354,7 @@ public class PeerWebClient
             throw new PeerException( "Error removing p2p connection", e );
         }
     }
+
 
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {
