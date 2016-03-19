@@ -136,22 +136,25 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					}
 					for(i; i < logs.length; i++) {
 
-						var logTime = moment().format('HH:mm:ss');
-						var logStatus = 'success';
-						var logClasses = ['fa-check', 'g-text-green'];
-						if(i+1 == logs.length) {
-							logTime = '';
-							logStatus = 'in-progress';
-							logClasses = ['fa-spinner', 'fa-pulse'];
-						}
+						var logCheck = logs[i].replace(/ /g,'');
+						if(logCheck.length > 0) {
+							var logTime = moment().format('HH:mm:ss');
+							var logStatus = 'success';
+							var logClasses = ['fa-check', 'g-text-green'];
+							if(i+1 == logs.length) {
+								logTime = '';
+								logStatus = 'in-progress';
+								logClasses = ['fa-spinner', 'fa-pulse'];
+							}
 
-						var  currentLog = {
-							"time": logTime,
-							"status": logStatus,
-							"classes": logClasses,
-							"text": logs[i]
-						};
-						result.push(currentLog);
+							var  currentLog = {
+								"time": logTime,
+								"status": logStatus,
+								"classes": logClasses,
+								"text": logs[i]
+							};
+							result.push(currentLog);
+						}
 					}
 
 					vm.logMessages = vm.logMessages.concat(result);
