@@ -66,35 +66,38 @@ public class RestServiceImpl implements RestService {
                     .map( d -> new RegistrationDataDto( d ) )
                     .collect(Collectors.toList());
 
-            ExecutorService taskExecutor = Executors.newFixedThreadPool( registrationDatas.size() );
-
-            CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
-
-            registrationDatas.forEach(d -> {
-                taskCompletionService.submit( () -> {
-                    try {
-                        if (d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED) {
-                            d.setOnline(peerManager.getPeer(d.getRegistrationData().getPeerInfo().getId()).isOnline());
-                        }
-                    } catch (PeerException e) {
-                        LOGGER.error("Exceptions getting peer status", e);
-                    }
-
-                    return true;
-                });
-            });
-
-            taskExecutor.shutdown();
-
-            for ( RegistrationDataDto registrationData : registrationDatas )
+            if( registrationDatas.size() > 0 )
             {
-                try
+                ExecutorService taskExecutor = Executors.newFixedThreadPool( registrationDatas.size() );
+
+                CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
+
+                registrationDatas.forEach(d -> {
+                    taskCompletionService.submit( () -> {
+                        try {
+                            if (d.getRegistrationData().getStatus() == RegistrationStatus.APPROVED) {
+                                d.setOnline(peerManager.getPeer(d.getRegistrationData().getPeerInfo().getId()).isOnline());
+                            }
+                        } catch (PeerException e) {
+                            LOGGER.error("Exceptions getting peer status", e);
+                        }
+
+                        return true;
+                    });
+                });
+
+                taskExecutor.shutdown();
+
+                for ( RegistrationDataDto registrationData : registrationDatas )
                 {
-                    Future<Boolean> future = taskCompletionService.take();
-                    future.get();
-                }
-                catch ( ExecutionException | InterruptedException e )
-                {
+                    try
+                    {
+                        Future<Boolean> future = taskCompletionService.take();
+                        future.get();
+                    }
+                    catch ( ExecutionException | InterruptedException e )
+                    {
+                    }
                 }
             }
 

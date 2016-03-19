@@ -141,7 +141,9 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			controllerAs: 'identityUserFormCtrl',
 			data: user,
 			preCloseCallback: function(value) {
-				vm.dtInstance.reloadData(null, false);
+				if(Object.keys(vm.dtInstance).length !== 0 && JSON.stringify(vm.dtInstance) !== JSON.stringify({})) {
+					vm.dtInstance.reloadData(null, false);
+				}
 			}
 		});
 	}
