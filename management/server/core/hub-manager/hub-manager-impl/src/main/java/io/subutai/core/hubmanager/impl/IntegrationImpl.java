@@ -37,6 +37,7 @@ import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
+import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
@@ -84,6 +85,8 @@ public class IntegrationImpl implements Integration
 
     private EnvironmentBuilder envBuilder;
 
+    private EnvironmentDestroyer envDestroyer;
+
 
     public IntegrationImpl( DaoManager daoManager )
     {
@@ -126,6 +129,10 @@ public class IntegrationImpl implements Integration
 
             containerEventExecutor
                     .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+
+            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
+
+            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
         }
         catch ( Exception e )
         {
@@ -151,7 +158,9 @@ public class IntegrationImpl implements Integration
 
         containerEventProcessor.process();
 
-        //        envBuilder.test();
+//        envBuilder.test();
+
+        envDestroyer.test();
     }
 
 
@@ -169,6 +178,7 @@ public class IntegrationImpl implements Integration
         // todo revert
 
         configManager.addHubConfig( hupIp );
+
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
