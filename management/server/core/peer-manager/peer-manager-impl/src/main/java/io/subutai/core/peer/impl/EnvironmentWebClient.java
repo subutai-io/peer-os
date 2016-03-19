@@ -104,7 +104,7 @@ public class EnvironmentWebClient
 
         String path =
                 String.format( "/%s/container/%s/state", containerId.getEnvironmentId().getId(), containerId.getId() );
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 3000, 6000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -114,7 +114,7 @@ public class EnvironmentWebClient
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage(), e );
+            LOG.warn( e.getMessage() );
             throw new PeerException( "Error on reading container state: " + e.getMessage() );
         }
     }

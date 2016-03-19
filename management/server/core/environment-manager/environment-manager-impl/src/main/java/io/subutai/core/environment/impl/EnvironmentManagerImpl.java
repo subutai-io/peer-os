@@ -269,7 +269,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         for ( Environment environment : environmentDataService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
-            if ( environment.getUserId().equals( activeUser.getId() ) || trustedRelation )
+            final boolean b = environment.getUserId().equals( activeUser.getId() );
+            if ( b || trustedRelation )
             {
                 environments.add( environment );
 
@@ -1729,7 +1730,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void setContainersTransientFields( final Environment environment )
     {
-        User activeUser = identityManager.getActiveUser();
+//        User activeUser = identityManager.getActiveUser();
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
         for ( ContainerHost containerHost : containers )
         {
@@ -1737,7 +1738,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             environmentContainer.setEnvironmentManager( this );
 
-            String peerId = environmentContainer.getPeerId();
+//            String peerId = environmentContainer.getPeerId();
         }
         // remove containers which doesn't have trust relation
     }
