@@ -121,7 +121,7 @@ func reserveVNI(vni, vlan, envid string) {
 }
 
 func listTunnel() {
-	println("List of Tunnels\n--------")
+	fmt.Println("List of Tunnels\n--------")
 	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
 	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
 	ports := strings.Split(string(ret), "\n")
