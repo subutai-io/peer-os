@@ -19,7 +19,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
@@ -41,7 +40,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -204,18 +202,6 @@ public class NetworkManagerImplTest
         verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
         verify( commands ).getRemoveGatewayOnContainerCommand();
         verify( containerHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testCleanupEnvironmentNetworkSettings() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
-
-        networkManager.cleanupEnvironmentNetworkSettings( new EnvironmentId( ENVIRONMENT_ID ) );
-
-        verify( commands ).getCleanupEnvironmentNetworkSettingsCommand( VLAN_ID );
-        verify( managementHost, atLeastOnce() ).execute( any( RequestBuilder.class ) );
     }
 
 

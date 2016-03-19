@@ -8,7 +8,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PPeerInfo;
@@ -127,12 +126,6 @@ public interface NetworkManager
      */
     public void removeGateway( int vLanId ) throws NetworkManagerException;
 
-    /**
-     * Cleans up network settings left after environment
-     *
-     * @param environmentId - environment id
-     */
-    public void cleanupEnvironmentNetworkSettings( EnvironmentId environmentId ) throws NetworkManagerException;
 
     /**
      * Removes gateway IP on a container

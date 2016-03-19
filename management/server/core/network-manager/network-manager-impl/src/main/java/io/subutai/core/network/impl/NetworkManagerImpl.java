@@ -22,7 +22,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
@@ -179,6 +178,7 @@ public class NetworkManagerImpl implements NetworkManager
 
     //------------------ P2P SECTION END --------------------------------
 
+
     @Override
     public PingDistance getPingDistance( final Host host, final String sourceHostIp, final String targetHostIp )
             throws NetworkManagerException
@@ -234,22 +234,6 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         execute( getManagementHost(), commands.getRemoveGatewayCommand( vLanId ) );
-    }
-
-
-    @Override
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        for ( Vni vni : getReservedVnis().list() )
-        {
-            if ( vni.getEnvironmentId().equals( environmentId.getId() ) )
-            {
-                execute( getManagementHost(), commands.getCleanupEnvironmentNetworkSettingsCommand( vni.getVlan() ) );
-                break;
-            }
-        }
     }
 
 
