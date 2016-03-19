@@ -5,10 +5,8 @@ import java.util.Set;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.quota.ContainerQuota;
 
 

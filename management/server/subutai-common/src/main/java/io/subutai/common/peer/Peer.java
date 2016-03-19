@@ -34,12 +34,13 @@ import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.relation.RelationLink;
 
 
 /**
  * Peer interface
  */
-public interface Peer
+public interface Peer extends RelationLink
 {
 
     /**

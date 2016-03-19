@@ -3,22 +3,17 @@ package io.subutai.common.peer;
 
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
-import com.google.gson.annotations.SerializedName;
-
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.security.relation.RelationLink;
 
 
 /**
  * Container host interface.
  */
-public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
+public interface ContainerHost extends Host, ContainerHostInfo
 {
     ContainerSize getContainerSize();
 
