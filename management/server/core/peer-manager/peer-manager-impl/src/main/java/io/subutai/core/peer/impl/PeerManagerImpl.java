@@ -1210,7 +1210,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( controlNetworkTtl <= System.currentTimeMillis() )
             {
-                controlNetworkTtl = TimeUnit.MINUTES.toMillis( CONTROL_NETWORK_TTL_IN_MIN );
+                controlNetworkTtl = TimeUnit.MINUTES.toSeconds( CONTROL_NETWORK_TTL_IN_MIN );
                 key = DigestUtils.md5( UUID.randomUUID().toString() );
                 this.distances = null;
             }
