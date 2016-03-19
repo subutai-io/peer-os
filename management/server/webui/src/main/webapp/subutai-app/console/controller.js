@@ -10,7 +10,7 @@ angular.module('subutai.console.controller', [])
 		//terminalConfigurationProvider.config('vintage').startSoundUrl ='example/content/start.wav';
 	}]);
 
-ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'peerRegistrationService', '$stateParams', 'ngDialog', 'cfpLoadingBar'];
+ConsoleViewCtrl.$inject = ['$scope', 'consoleService', 'objectRelationService', '$stateParams', 'ngDialog', 'cfpLoadingBar'];
 
 function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $stateParams, ngDialog, cfpLoadingBar) {
 

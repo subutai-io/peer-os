@@ -4,10 +4,10 @@ angular.module('subutai.peer-registration.controller', [])
 	.controller('PeerRegistrationCtrl', PeerRegistrationCtrl)
 	.controller('PeerRegistrationPopupCtrl', PeerRegistrationPopupCtrl);
 
-PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog', 'cfpLoadingBar'];
-PeerRegistrationPopupCtrl.$inject = ['$scope', 'peerRegistrationService', 'ngDialog', 'SweetAlert'];
+PeerRegistrationCtrl.$inject = ['$scope', 'peerRegistrationService', 'objectRelationService', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'SweetAlert', 'ngDialog', 'cfpLoadingBar'];
+PeerRegistrationPopupCtrl.$inject = ['$scope', 'peerRegistrationService', 'objectRelationService', 'ngDialog', 'SweetAlert'];
 
-function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog, cfpLoadingBar) {
+function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationService, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, SweetAlert, ngDialog, cfpLoadingBar) {
 
 	var vm = this;
 
@@ -154,23 +154,33 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 }
 
-function PeerRegistrationPopupCtrl($scope, peerRegistrationService, ngDialog, SweetAlert) {
+function PeerRegistrationPopupCtrl($scope, peerRegistrationService, objectRelationService, ngDialog, SweetAlert) {
 
 	var vm = this;
 	vm.peerId = null;
+	vm.operationChallenge = null;
+	vm.challengeSigned = null;
+	vm.allowSubmit= allowSubmit;
 
-	if($scope.ngDialogData !== undefined) {
+	if ($scope.ngDialogData !== undefined) {
 		vm.peerId = $scope.ngDialogData.peerId;
-	}	
+	}
 
-	vm.addPeer = addPeer;	
-	vm.approvePeerRequest = approvePeerRequest;	
+	objectRelationService.issueChallenge().success(function (data) {
+		vm.operationChallenge = data;
+		autoSign();
+	}).error(function (err) {
+		SweetAlert.swal("ERROR!", "Couldn't issue operation challenge token: " + err, "error");
+	});
+
+	vm.addPeer = addPeer;
+	vm.approvePeerRequest = approvePeerRequest;
 
 	function addPeer(newPeer) {
-		var postData = 'ip=' + newPeer.ip + '&key_phrase=' + newPeer.keyphrase;
+		var postData = 'ip=' + newPeer.ip + '&key_phrase=' + newPeer.keyphrase + '&challenge=' + encodeURIComponent(vm.operationChallenge);
 		peerRegistrationService.registerRequest(postData).success(function (data) {
 			ngDialog.closeAll();
-		}).error(function(error){
+		}).error(function (error) {
 			SweetAlert.swal("ERROR!", "Peer request error: " + error, "error");
 		});
 	}
@@ -178,10 +188,17 @@ function PeerRegistrationPopupCtrl($scope, peerRegistrationService, ngDialog, Sw
 	function approvePeerRequest(keyPhrase) {
 		peerRegistrationService.approvePeerRequest(vm.peerId, keyPhrase).success(function (data) {
 			ngDialog.closeAll();
-		}).error(function(error){
+		}).error(function (error) {
 			SweetAlert.swal("ERROR!", "Peer approve error: " + error, "error");
 		});
 	}
 
+	function autoSign() {
+		$('.bp-sign-input.bp-sign-challenge').addClass('bp-sign-target');
+	}
+
+	function allowSubmit() {
+		vm.challengeSigned = true;
+	}
 }
 

@@ -20,6 +20,7 @@ var app = angular.module('subutai-app', [
 
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
+    .factory('objectRelationService', objectRelationService)
 
     .run(startup);
 
@@ -473,7 +474,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             files: [
                                 'subutai-app/peerRegistration/peerRegistration.js',
                                 'subutai-app/peerRegistration/controller.js',
-                                'subutai-app/peerRegistration/service.js'
+                                'subutai-app/peerRegistration/service.js',
+                                'subutai-app/relationService/service.js'
                             ]
                         }
                     ]);

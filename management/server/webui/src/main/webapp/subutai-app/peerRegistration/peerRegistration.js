@@ -2,5 +2,6 @@
 
 angular.module('subutai.peer-registration', [
     'subutai.peer-registration.controller',
-    'subutai.peer-registration.service'
+    'subutai.peer-registration.service',
+    'subutai.object-relation.service'
 ]);
