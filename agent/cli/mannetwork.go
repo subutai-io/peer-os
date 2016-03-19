@@ -190,6 +190,21 @@ func removeTunnel(tunnel string) {
 		exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
 }
 
+func delTunById(envId string) {
+	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
+	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
+	ports := strings.Split(string(ret), "\n")
+
+	for k, port := range ports {
+		if strings.Contains(string(port), envId) {
+			tunnel := strings.Split(ports[k-2], "\"")[1]
+			log.Check(log.WarnLevel, "Removing port "+tunnel,
+				exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
+		}
+	}
+
+}
+
 func ClearVlan(vlan string) {
 	var lines []string
 	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve")
@@ -198,6 +213,7 @@ func ClearVlan(vlan string) {
 		for k, v := range lines {
 			s := strings.Fields(v)
 			if len(s) > 2 && s[1] == vlan {
+				delTunById(s[2])
 				p2p.Remove(s[2])
 				lines[k] = ""
 			}
