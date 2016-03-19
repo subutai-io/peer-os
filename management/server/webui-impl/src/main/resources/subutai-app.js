@@ -63,8 +63,10 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
     }
 
     checkIfRegistered();
-    vm.login = "";
-    vm.pass = "";
+    vm.hub = {
+        login: "",
+        password: ""
+    };
 
 
     //function
@@ -88,7 +90,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 	function hubRegister() {
 		vm.hubRegisterError = false;
 		hubPopupLoadScreen(true);
-		var postData = 'hubIp=hub.subut.ai&email=' + vm.login + '&password=' + vm.pass;
+		var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + vm.hub.password;
 		$http.post( SERVER_URL + 'rest/v1/hub/register', postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
 			.success(function () {
 				localStorage.setItem('hubRegistered', true);

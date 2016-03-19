@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -50,11 +51,9 @@ public class SetupP2PStep
         SubnetUtils.SubnetInfo info =
                 new SubnetUtils( environment.getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
-        //todo use proper p2p secret key here
-        String sharedKey = DigestUtils.md5Hex( "secret" );
+        String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         final String[] addresses = info.getAllAddresses();
         int counter = environment.getPeerConfs().size();
-
         for ( Peer peer : peers )
         {
             //todo remove this check since if there are new RHs in participating peers (env grow),
