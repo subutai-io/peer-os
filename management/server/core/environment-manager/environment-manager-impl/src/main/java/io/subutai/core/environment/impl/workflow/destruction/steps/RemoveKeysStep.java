@@ -22,6 +22,7 @@ public class RemoveKeysStep
     {
         for ( final Peer peer : environment.getPeers() )
         {
+            //todo run in a thread
             peer.removePeerEnvironmentKeyPair( environment.getEnvironmentId() );
         }
     }

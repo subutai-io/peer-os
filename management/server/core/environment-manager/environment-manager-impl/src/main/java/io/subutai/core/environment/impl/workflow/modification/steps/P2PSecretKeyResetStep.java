@@ -24,6 +24,7 @@ public class P2PSecretKeyResetStep
     {
         for ( Peer peer : environment.getPeers() )
         {
+            //todo run in a thread
             peer.resetP2PSecretKey( p2PCredentials );
         }
     }
