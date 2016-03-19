@@ -33,21 +33,21 @@ public class EnvironmentBuilder
 
     public void test()
     {
-        long vniId = 4100000; // Same value for all peers within env
+        long vniId = 1100000; // Same value for all peers within env
 
-        String envId = "41e3e4de-2bf9-45e6-98f4-f09d65a86700"; // Should be UUID. Otherwise reserving VNI doesn't work.
+        String envId = "11e3e4de-2bf9-45e6-98f4-f09d65a86700"; // Should be UUID. Otherwise reserving VNI doesn't work.
 
-        String p2pSubnet = "10.11.41.0"; // Should be free on each peer
+        String p2pSubnet = "10.11.11.0"; // Should be free on each peer
 
-        String p2pIp = "10.11.41.1";
+        String p2pIp = "10.11.11.0";
 
         String p2pSharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
 
-        String containerHostname = "41c51c6d-8122-4f4d-8de1-c3dd8914df11";
+        String containerHostname = "11c51c6d-8122-4f4d-8de1-c3dd8914df11";
 
-        String containerName = "Container Name 41";
+        String containerName = "Container Name 11";
 
-        String containerIp = "192.168.41.2"; // Starts from 192.168.x.2.
+        String containerIp = "192.168.11.2"; // Starts from 192.168.x.2.
 
         String templateName = "master";
 

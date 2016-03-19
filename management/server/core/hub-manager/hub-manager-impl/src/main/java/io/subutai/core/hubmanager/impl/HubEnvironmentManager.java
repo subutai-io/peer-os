@@ -309,7 +309,10 @@ public class HubEnvironmentManager
                     {
                         nodeDto.setIp( cloneResponse.getIp() );
                         nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
-                        nodeDto.setAgentId( cloneResponse.getAgentId() );
+
+                        // TODO No getAgentId() method in CloneResponse
+//                        nodeDto.setAgentId( cloneResponse.getAgentId() );
+
                         nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
                     }
                 }
