@@ -84,7 +84,7 @@ import io.subutai.core.security.api.SecurityManager;
 @PermitAll
 public class PeerManagerImpl implements PeerManager
 {
-    final static int CONTROL_NETWORK_TTL_IN_MIN = 10;
+    final static int CONTROL_NETWORK_TTL_IN_MIN = 120;
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
