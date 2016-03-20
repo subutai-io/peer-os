@@ -67,6 +67,7 @@ public class VNISetupStep
             }
         }
 
+        //TODO: add gateway & p2p IP to reserve vni
         Vni environmentVni = new Vni( environment.getVni(), environment.getId() );
 
         //check reserved vnis

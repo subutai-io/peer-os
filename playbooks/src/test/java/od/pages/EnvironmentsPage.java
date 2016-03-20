@@ -108,9 +108,7 @@ public class EnvironmentsPage extends PageObject {
 
     //region Action: Wait for
 
-    public void waitTemplateMongo(){
-        waitFor(templateMongo);
-    }
+
 
     //endregion
 }

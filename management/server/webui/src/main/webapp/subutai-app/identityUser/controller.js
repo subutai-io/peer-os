@@ -141,7 +141,9 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			controllerAs: 'identityUserFormCtrl',
 			data: user,
 			preCloseCallback: function(value) {
-				vm.dtInstance.reloadData(null, false);
+				if(Object.keys(vm.dtInstance).length !== 0) {
+					vm.dtInstance.reloadData(null, false);
+				}
 			}
 		});
 	}
@@ -228,10 +230,10 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 
 	function approve() {
+		ngDialog.closeAll();
 		identitySrv.approve (vm.currentUser.userName, JSON.stringify (vm.currentUser.roles)).success (function (data) {
 			SweetAlert.swal ("Success!", "User was approved.", "success");
 			vm.dtInstance.reloadData(null, false);
-			ngDialog.closeAll();
 		}).error (function (error) {
 			SweetAlert.swal ("ERROR!", "User approve error: " + error.replace(/\\n/g, " "), "error");
 		});
@@ -322,9 +324,9 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 		if ($scope.addUserForm.$valid) {
 			var postData = userPostData(vm.user2Add);
 			LOADING_SCREEN();
+			ngDialog.closeAll();
 			identitySrv.addUser(postData).success(function (data) {
 				LOADING_SCREEN('none');
-				ngDialog.closeAll();
 			}).error(function(error){
 				LOADING_SCREEN('none');
 				SweetAlert.swal ("ERROR!", "Error: " + error, "error");

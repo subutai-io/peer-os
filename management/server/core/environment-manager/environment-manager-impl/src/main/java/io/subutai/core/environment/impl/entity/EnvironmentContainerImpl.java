@@ -287,7 +287,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         }
         catch ( PeerException e )
         {
-            logger.error( "Error getting container state #getState", e );
+            logger.warn( "Error getting container state #getState" );
             return ContainerHostState.UNKNOWN;
         }
     }

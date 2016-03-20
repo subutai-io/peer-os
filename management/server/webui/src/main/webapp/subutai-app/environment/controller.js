@@ -103,7 +103,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 				vm.containersTypeInfo[type][property] = data[i].value;
 			}
-			console.log(vm.containersTypeInfo);
 		});
 
 

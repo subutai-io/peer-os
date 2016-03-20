@@ -6,14 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -35,9 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -86,7 +81,6 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
@@ -147,7 +141,6 @@ import io.subutai.core.localpeer.impl.dao.TunnelDataService;
 import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
-import io.subutai.core.localpeer.impl.entity.TunnelEntity;
 import io.subutai.core.localpeer.impl.tasks.ReserveVniTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.lxc.quota.api.QuotaManager;
@@ -174,7 +167,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-    public static final String PEER_SUBNET_MASK = "255.255.255.0";
     private static final String GATEWAY_INTERFACE_NAME_REGEX = "^br-(\\d+)$";
     private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
 
@@ -434,8 +426,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         final CreateEnvironmentContainerResponseCollector response =
                 new CreateEnvironmentContainerResponseCollector( getId() );
-        final TaskCallbackHandler<CloneRequest, CloneResponse> successResultHandler =
-                getCloneSuccessHandler( this, response );
+        final TaskCallbackHandler<CloneRequest, CloneResponse> successResultHandler = getCloneSuccessHandler( this );
 
         final Vni environmentVni = getReservedVnis().findVniByEnvironmentId( requestGroup.getEnvironmentId() );
 
@@ -467,9 +458,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private TaskCallbackHandler<CloneRequest, CloneResponse> getCloneSuccessHandler( final LocalPeer localPeer,
-                                                                                     final
-                                                                                     CreateEnvironmentContainerResponseCollector responseGroup )
+    private TaskCallbackHandler<CloneRequest, CloneResponse> getCloneSuccessHandler( final LocalPeer localPeer )
     {
         return new TaskCallbackHandler<CloneRequest, CloneResponse>()
         {
@@ -492,7 +481,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     final HostInterfaces interfaces = new HostInterfaces();
                     interfaces.addHostInterface(
                             new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp() ) );
-                    final String hostId = response.getAgentId();
+                    final String hostId = response.getContainerId();
                     final String localPeerId = localPeer.getId();
                     final HostArchitecture arch = request.getTemplateArch();
                     final String hostname = request.getHostname();
@@ -817,24 +806,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        try
-        {
-            getNetworkManager().cleanupEnvironmentNetworkSettings( environmentId );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException(
-                    String.format( "Error cleaning up environment %s network settings", environmentId ), e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
@@ -1075,7 +1046,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
-        if ( initialized )
+        if ( initialized && peerInfo != null )
         {
             ResourceHostEntity host;
             try
@@ -1770,6 +1741,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    //----------- P2P SECTION BEGIN --------------------
     @Override
     public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
@@ -1778,8 +1750,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            getNetworkManager().resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
-                    p2PCredentials.getP2pTtlSeconds() );
+            for ( ResourceHost resourceHost : getResourceHosts() )
+            {
+                getNetworkManager()
+                        .resetP2PSecretKey( resourceHost, p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
+                                p2PCredentials.getP2pTtlSeconds() );
+            }
         }
         catch ( NetworkManagerException e )
         {
@@ -1792,167 +1768,66 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void setupP2PConnection( final P2PConfig config ) throws PeerException
     {
-        Preconditions.checkNotNull( config );
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
 
         LOG.debug( String.format( "Adding local peer to P2P community: %s %s %s", config.getInterfaceName(),
                 config.getCommunityName(), config.getAddress() ) );
 
         try
         {
-            getNetworkManager()
-                    .setupP2PConnection( config.getInterfaceName(), config.getAddress(), config.getCommunityName(),
-                            config.getSecretKey(), config.getSecretKeyTtlSec() );
+            for ( ResourceHost resourceHost : getResourceHosts() )
+            {
+                Set<P2PConnection> p2PConnections = getNetworkManager().listP2PConnections( resourceHost );
+                boolean p2pHashExists = false;
+                for ( P2PConnection p2PConnection : p2PConnections )
+                {
+                    if ( p2PConnection.getCommunityName().equalsIgnoreCase( config.getCommunityName() ) )
+                    {
+                        p2pHashExists = true;
+                        break;
+                    }
+                }
+                if ( p2pHashExists )
+                {
+                    getNetworkManager()
+                            .resetP2PSecretKey( resourceHost, config.getCommunityName(), config.getSecretKey(),
+                                    config.getSecretKeyTtlSec() );
+                }
+                else
+                {
+                    //todo what to do with p2p IPs for RHs other than MH-RH?
+                    getNetworkManager()
+                            .setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
+                                    config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                }
+            }
         }
         catch ( NetworkManagerException e )
         {
-            throw new PeerException( "Unable add host to P2P tunnel.", e );
-        }
-
-        TunnelEntity tunnel = new TunnelEntity();
-
-        tunnel.setEnvironmentId( config.getEnvironmentId() );
-        tunnel.setCommunityName( config.getCommunityName() );
-        tunnel.setInterfaceName( config.getInterfaceName() );
-        tunnel.setTunnelAddress( config.getAddress() );
-        tunnelDataService.saveOrUpdate( tunnel );
-    }
-
-
-    /**
-     * Returns set of currently used p2p subnets of given peers.
-     *
-     * @param peers set of peers
-     *
-     * @return set of currently used p2p subnets.
-     */
-    private Set<String> getP2PSubnets( final Set<Peer> peers ) throws PeerException
-    {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peers ) );
-
-        Set<String> result = new HashSet<>();
-
-        for ( Peer peer : peers )
-        {
-            HostInterfaces intfs = peer.getInterfaces();
-
-            Set<HostInterfaceModel> r = intfs.filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
-
-            Collection peerSubnets = CollectionUtils.<String>collect( r, new Transformer()
-            {
-                @Override
-                public Object transform( final Object o )
-                {
-                    HostInterface i = ( HostInterface ) o;
-                    SubnetUtils u = new SubnetUtils( i.getIp(), PEER_SUBNET_MASK );
-                    return u.getInfo().getNetworkAddress();
-                }
-            } );
-
-            result.addAll( peerSubnets );
-        }
-
-        return result;
-    }
-
-
-    @Override
-    public List<P2PConfig> setupP2PConnection( final String environmentId, final Set<Peer> peers ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peers ) );
-
-        Set<String> usedP2PSubnets = getP2PSubnets( peers );
-        LOG.debug( String.format( "Found %d p2p subnets:", usedP2PSubnets.size() ) );
-        for ( String s : usedP2PSubnets )
-        {
-            LOG.debug( s );
-        }
-
-        String freeSubnet = P2PUtil.findFreeTunnelNetwork( usedP2PSubnets );
-
-        LOG.debug( String.format( "Free subnet for peer: %s", freeSubnet ) );
-        try
-        {
-            if ( freeSubnet == null )
-            {
-                throw new IllegalStateException( "Could not calculate subnet." );
-            }
-            String interfaceName = P2PUtil.generateInterfaceName( freeSubnet );
-            String communityName = P2PUtil.generateCommunityName( environmentId );
-            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
-            final String[] addresses = subnetInfo.getAllAddresses();
-            int counter = 0;
-
-            ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
-
-            ExecutorCompletionService<P2PConfig> executorCompletionService =
-                    new ExecutorCompletionService<>( taskExecutor );
-
-
-            List<P2PConfig> result = new ArrayList<>( peers.size() );
-            for ( Peer peer : peers )
-            {
-                P2PConfig config =
-                        new P2PConfig( peer.getId(), environmentId, interfaceName, communityName, addresses[counter],
-                                sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
-                executorCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
-                counter++;
-            }
-
-            for ( Peer ignored : peers )
-            {
-                final Future<P2PConfig> f = executorCompletionService.take();
-                P2PConfig config = f.get();
-                result.add( config );
-                counter++;
-            }
-
-            taskExecutor.shutdown();
-
-            return result;
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Could not create P2P tunnel.", e );
+            throw new PeerException( "Failed to setup P2P connection", e );
         }
     }
 
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final String communityName ) throws PeerException
     {
-        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( communityName ), "Invalid community name" );
 
-        Collection<TunnelEntity> tunnels = tunnelDataService.findByEnvironmentId( environmentId );
-
-
-        for ( TunnelEntity tunnel : tunnels )
+        try
         {
-            try
+            for ( ResourceHost resourceHost : getResourceHosts() )
             {
-
-                LOG.debug( String.format( "Removing peer from P2P community:  %s %s %s", tunnel.getInterfaceName(),
-                        tunnel.getCommunityName(), tunnel.getTunnelAddress() ) );
-                try
-                {
-                    getNetworkManager().removeP2PConnection( tunnel.getCommunityName() );
-                }
-                catch ( PeerException | NetworkManagerException e )
-                {
-                    LOG.warn( "Unable remove host from P2P tunnel.", e );
-                }
-
-                removeTunnel( tunnel.getTunnelAddress() );
-                tunnelDataService.remove( tunnel.getId() );
-            }
-            catch ( Exception e )
-            {
-                LOG.warn( e.getMessage(), e );
+                getNetworkManager().removeP2PConnection( resourceHost, communityName );
             }
         }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Failed to remove P2P connection", e );
+        }
     }
+    //----------- P2P SECTION END --------------------
 
 
     @RolesAllowed( "Environment-Management|Delete" )
@@ -2013,15 +1888,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         return quotaManager.getResourceLimits( peerId );
-    }
-
-
-    @Override
-    public void addToTunnel( final P2PConfig config ) throws PeerException
-    {
-        Preconditions.checkNotNull( config );
-
-        setupP2PConnection( config );
     }
 
 
@@ -2185,31 +2051,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private class SetupP2PConnectionTask implements Callable<P2PConfig>
-    {
-        private Peer peer;
-        private P2PConfig p2PConfig;
-
-
-        public SetupP2PConnectionTask( final Peer peer, final P2PConfig config )
-        {
-            Preconditions.checkNotNull( peer );
-            Preconditions.checkNotNull( config );
-
-            this.peer = peer;
-            this.p2PConfig = config;
-        }
-
-
-        @Override
-        public P2PConfig call() throws Exception
-        {
-            peer.setupP2PConnection( p2PConfig );
-            return p2PConfig;
-        }
-    }
-
-
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
@@ -2237,32 +2078,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 throw ( PeerException ) e.getCause();
             }
             throw new PeerException( "Error setting up tunnels", e.getCause() );
-        }
-    }
-
-
-    @Override
-    public void removeTunnel( final String tunnelIp )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ) );
-
-        try
-        {
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( tunnelIp, "255.255.255.0" ).getInfo();
-            Set<Tunnel> tunnels = listTunnels();
-            LOG.debug( String.format( "Found %d tunnels.", tunnels.size() ) );
-            for ( final Tunnel tunnel : tunnels )
-            {
-                if ( subnetInfo.isInRange( tunnel.getTunnelIp() ) )
-                {
-                    getNetworkManager().removeTunnel( tunnel.getTunnelId() );
-                    LOG.debug( String.format( "Tunnel '%s' destroyed successfully.", tunnel.getTunnelName() ) );
-                }
-            }
-        }
-        catch ( PeerException | NetworkManagerException e )
-        {
-            LOG.warn( "Error removing tunnel", e );
         }
     }
 

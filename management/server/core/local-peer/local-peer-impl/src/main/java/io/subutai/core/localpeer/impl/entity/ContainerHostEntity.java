@@ -224,7 +224,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         }
         catch ( PeerException e )
         {
-            LOGGER.error( "Error getting container state #getState", e );
             return ContainerHostState.UNKNOWN;
         }
     }

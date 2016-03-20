@@ -85,7 +85,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -812,20 +811,6 @@ public class LocalPeerImplTest
 
 
     @Test( expected = PeerException.class )
-    public void testCleanupEnvironmentNetworkSettings() throws Exception
-    {
-        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-
-        verify( networkManager ).cleanupEnvironmentNetworkSettings( environmentId );
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager )
-                                                    .cleanupEnvironmentNetworkSettings( environmentId );
-
-        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-    }
-
-
-    @Test( expected = PeerException.class )
     public void testListTunnels() throws Exception
     {
         localPeer.listTunnels();
@@ -844,10 +829,6 @@ public class LocalPeerImplTest
         Tunnel tunnel = mock( Tunnel.class );
         when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
         when( tunnel.getTunnelIp() ).thenReturn( IP );
-
-        localPeer.removeTunnel( IP );
-
-        verify( networkManager ).removeTunnel( anyInt() );
     }
 
 
