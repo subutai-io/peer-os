@@ -339,6 +339,34 @@ public class PGPEncryptionUtilTest
         assertEquals( true, result );
     }
 
+    @Test
+    public void testVerifyClearSign() throws Exception
+    {
+        InputStream secondPublicStream = findFile( PLUGIN_PUBLIC_KEY );
+        PGPPublicKeyRingCollection secondPublicKeyRingCollection =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
+                .getPublicKeyRing( new BigInteger( PLUGIN_PUBLIC_KEY_ID, 16 ).longValue() );
+
+        String signedMessage = IOUtils.toString( findFile( "signedMessage.txt" ) );
+
+        logger.info( "\n" + signedMessage );
+
+        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage.getBytes(), pgpKeyring );
+        if ( result )
+        {
+            logger.info( "signature verified." );
+        }
+        else
+        {
+            logger.info( "signature verification failed." );
+        }
+
+        assertEquals( true, result );
+    }
+
 
     @Test
     public void testExtractingContentFromClearSign()
