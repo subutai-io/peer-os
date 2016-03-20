@@ -260,8 +260,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
     /**
      * Compare relationship depending on each relationship property, if relation ownership level differs then this
-     * relation is not comparable, the rest properties simply should match, and data format should come in key=value
-     * format 1 - a is greater 0 - equal -1 - a is less than -2 - incomparable
+     * relation is not comparable, other properties simply should match, and data should come in key=value format 1 - a
+     * is greater 0 - equal -1 - a is less -2 - incomparable TODO extract this method into RelationInfo.equals (PS.
+     * dynamic comparison will be possible)
      */
     private int compareRelationships( RelationInfo a, RelationInfo b )
     {
@@ -430,25 +431,18 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
 
     @Override
-    public boolean checkRelationValidity( final RelationLink source, final RelationLink targetObject,
-                                          final RelationInfoMeta relationInfoMeta, final String encodedToken )
+    public void checkRelationValidity( final RelationLink source, final RelationLink targetObject,
+                                       final RelationInfoMeta relationInfoMeta, final String encodedToken )
+            throws RelationVerificationException
     {
         if ( !SystemSettings.getKeyTrustCheckState() )
         {
-            return true;
+            return;
         }
 
         if ( !Strings.isNullOrEmpty( encodedToken ) )
         {
-            try
-            {
-                decryptAndVerifyChallenge( encodedToken, source.getKeyId() );
-            }
-            catch ( RelationVerificationException e )
-            {
-                logger.error( "Error decrypting/verifying message", e );
-                return false;
-            }
+            decryptAndVerifyChallenge( encodedToken, source.getKeyId() );
         }
 
         Set<RelationLink> relationLinks = Sets.newHashSet();
@@ -465,17 +459,23 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             if ( targetRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
             {
-                return false;
+                throw new RelationVerificationException( "You should pass relation token challenge first." );
             }
             if ( targetRelation.getTrustedObject().equals( object ) )
             {
                 // Requested relation should be less then or equal to relation that was granted
-                return compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0;
+                if ( !( compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0 ) )
+                {
+                    throw new RelationVerificationException( "Your relation has insufficient permissions." );
+                }
             }
             int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
             if ( result != -3 )
             {
-                return result >= 0;
+                if (!( result >= 0 ))
+                {
+                    throw new RelationVerificationException( "Your relation has insufficient permissions." );
+                }
             }
         }
 
@@ -488,15 +488,17 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             if ( sourceRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
             {
-                return false;
+                throw new RelationVerificationException( "You should pass relation token challenge first." );
             }
             if ( sourceRelation.getTrustedObject().equals( object ) )
             {
                 // Requested relation should be less then or equal to relation that was granted
-                return compareRelationships( sourceRelation.getRelationInfo(), relationInfo ) >= 0;
+
+                if ( !( compareRelationships( sourceRelation.getRelationInfo(), relationInfo ) >= 0 ) )
+                {
+                    throw new RelationVerificationException( "Your relation has insufficient permissions." );
+                }
             }
         }
-
-        return false;
     }
 }

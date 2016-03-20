@@ -12,8 +12,9 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
  */
 public interface RelationInfoManager
 {
-    public boolean checkRelationValidity( final RelationLink source, final RelationLink targetObject,
-                                          final RelationInfoMeta relationInfoMeta, final String encodedToken );
+    void checkRelationValidity( final RelationLink source, final RelationLink targetObject,
+                                          final RelationInfoMeta relationInfoMeta, final String encodedToken )
+            throws RelationVerificationException;
 
     /**
      * Used to check group write permissions
