@@ -73,7 +73,7 @@ public class RelationImpl implements Relation
         this.target = target;
         this.trustedObject = trustedObject;
         this.relationInfo = relationInfo;
-        this.relationStatus = RelationStatus.REQUESTED;
+        this.relationStatus = RelationStatus.STATED;
         this.keyId = keyId;
     }
 

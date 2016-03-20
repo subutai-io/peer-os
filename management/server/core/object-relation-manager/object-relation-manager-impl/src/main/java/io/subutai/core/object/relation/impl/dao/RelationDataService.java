@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.impl.model.RelationChallengeImpl;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 
@@ -119,7 +121,7 @@ public class RelationDataService
     }
 
 
-    public List<Relation> findBySource( final RelationLinkImpl source )
+    public List<Relation> findBySource( final RelationLink source )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         List<Relation> result = Lists.newArrayList();
@@ -141,7 +143,7 @@ public class RelationDataService
     }
 
 
-    public List<Relation> findByTarget( final RelationLinkImpl target )
+    public List<Relation> findByTarget( final RelationLink target )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         List<Relation> result = Lists.newArrayList();
@@ -163,15 +165,15 @@ public class RelationDataService
     }
 
 
-    public List<Relation> getTrustedRelationsByOwnership( final RelationLink trustedObject,
-                                                               Ownership ownership )
+    public List<Relation> getTrustedRelationsByOwnership( final RelationLink trustedObject, Ownership ownership )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject "
-                    + "and ss.relationInfo.ownershipLevel=:ownershipLevel" );
+            Query qr = em.createQuery                                              (
+                    "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject "
+                            + "and ss.relationInfo.ownershipLevel=:ownershipLevel" );
             qr.setParameter( "trustedObject", trustedObject.getLinkId() );
             qr.setParameter( "ownershipLevel", ownership.getLevel() );
             result.addAll( qr.getResultList() );
@@ -193,13 +195,13 @@ public class RelationDataService
     }
 
 
-    public List<Relation> findByObject( final RelationLinkImpl object )
+    public List<Relation> findByObject( final RelationLink object )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery(
+            Query qr = em.createQuery                                                                     (
                     "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject" );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
@@ -365,6 +367,34 @@ public class RelationDataService
             qr.setParameter( "uniqueIdentifier", relationLink.getUniqueIdentifier() );
             qr.setParameter( "classPath", relationLink.getClassPath() );
             List<RelationLink> list = qr.getResultList();
+
+            if ( list.size() > 0 )
+            {
+                result = list.get( 0 );
+            }
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust item.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
+
+    public RelationChallengeImpl getRelationToken( final String token )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        RelationChallengeImpl result = null;
+        try
+        {
+            TypedQuery<RelationChallengeImpl> qr = em.createQuery( "select rt from RelationChallengeImpl AS rt"
+                    + " where rt.token=:token", RelationChallengeImpl.class );
+            qr.setParameter( "token", token );
+            List<RelationChallengeImpl> list = qr.getResultList();
 
             if ( list.size() > 0 )
             {

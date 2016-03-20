@@ -16,8 +16,22 @@ public interface RelationManager
 
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;
 
+    /**
+     * Method for constructing relation parameters
+     * @deprecated use {@link #buildRelation(RelationInfoMeta, RelationMeta)} ()} instead.
+     */
+    @Deprecated
     RelationInfo createTrustRelationship( RelationInfoMeta relationInfoMeta );
 
+    String getRelationChallenge( long ttl ) throws RelationVerificationException;
+
+    Relation buildRelation(RelationInfoMeta relationInfoMeta, RelationMeta relationMeta);
+
+    /**
+     * Method for building trust relation between objects
+     * @deprecated use {@link #buildRelation(RelationInfoMeta, RelationMeta)} ()} instead.
+     */
+    @Deprecated
     Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
 
     Relation getRelation( RelationMeta relationMeta );
@@ -25,8 +39,6 @@ public interface RelationManager
     void saveRelation( Relation relation );
 
     RelationInfoManager getRelationInfoManager();
-
-    RelationLink getRelationLink( RelationLink relationLink );
 
     List<Relation> getRelationsByObject( RelationLink objectRelationLink );
 
