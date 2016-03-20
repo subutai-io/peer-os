@@ -78,7 +78,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 			controller: 'PeerRegistrationPopupCtrl',
 			controllerAs: 'peerRegistrationPopupCtrl',
 			preCloseCallback: function(value) {
-				if(Object.keys(vm.dtInstance).length !== 0 && JSON.stringify(vm.dtInstance) !== JSON.stringify({})) {
+				if(Object.keys(vm.dtInstance).length !== 0) {
 					vm.dtInstance.reloadData(null, false);
 				}
 			}
