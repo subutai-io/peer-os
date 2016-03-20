@@ -291,4 +291,11 @@ public class UserEntity implements User
     {
         return PermissionObject.IdentityManagement.getName();
     }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getSecurityKeyId();
+    }
 }

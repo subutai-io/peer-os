@@ -23,8 +23,8 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.Version;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -716,5 +716,12 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getContext()
     {
         return PermissionObject.EnvironmentManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getEnvironmentId().getId();
     }
 }

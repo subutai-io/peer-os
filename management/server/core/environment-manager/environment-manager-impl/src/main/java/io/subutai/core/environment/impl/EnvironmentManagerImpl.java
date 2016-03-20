@@ -62,7 +62,6 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -2098,9 +2097,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public List<ShareDto> getSharedUsers( final String objectId ) throws EnvironmentNotFoundException
     {
         Environment environment = loadEnvironment( objectId );
-        RelationLink objectRelationLink = relationManager.getRelationLink( environment );
 
-        List<Relation> relations = relationManager.getRelationsByObject( objectRelationLink );
+        List<Relation> relations = relationManager.getRelationsByObject( environment );
         List<ShareDto> sharedUsers = Lists.newArrayList();
 
         for ( final Relation relation : relations )
@@ -2168,12 +2166,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     new RelationInfoMeta( dto.isRead(), dto.isWrite(), dto.isUpdate(), dto.isDelete(),
                             Ownership.GROUP.getLevel() );
 
-            RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
-
             RelationMeta relationMeta =
                     new RelationMeta( delegatedUser, targetDelegate, environment, delegatedUser.getId() );
 
-            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
         }

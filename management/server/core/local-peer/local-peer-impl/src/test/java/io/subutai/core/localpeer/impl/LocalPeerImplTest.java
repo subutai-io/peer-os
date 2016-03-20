@@ -60,6 +60,7 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
@@ -69,6 +70,10 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -154,6 +159,12 @@ public class LocalPeerImplTest
     HostRegistry hostRegistry;
     @Mock
     RequestListener requestListener;
+    @Mock
+    RelationManager relationManager;
+    @Mock
+    User user;
+    @Mock
+    Relation relation;
 
     @Mock
     ResourceHostDataService resourceHostDataService;
@@ -247,6 +258,8 @@ public class LocalPeerImplTest
         peerMap.put( IP, P2P_IP );
         localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager,/* strategyManager,*/
                 commandExecutor, hostRegistry, monitor, securityManager ) );
+        localPeer.setIdentityManager( identityManager );
+        localPeer.setRelationManager( relationManager );
 
         localPeer.resourceHostDataService = resourceHostDataService;
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
@@ -304,6 +317,10 @@ public class LocalPeerImplTest
         localPeer.serviceLocator = serviceLocator;
         when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
         when( serviceLocator.getService( NetworkManager.class ) ).thenReturn( networkManager );
+
+        when( identityManager.getUserByKeyId( anyString() ) ).thenReturn( user );
+        when( relationManager.buildRelation( any( RelationInfoMeta.class ), any( RelationMeta.class ) ) )
+                .thenReturn( relation );
     }
 
 

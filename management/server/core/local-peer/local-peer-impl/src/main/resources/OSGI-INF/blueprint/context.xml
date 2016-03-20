@@ -2,10 +2,9 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
-    >
+>
 
   <!-- ***************************************************************** -->
   <authz:enable />
@@ -41,6 +40,9 @@
   <reference id="identityManager" availability="mandatory"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="relationManager"
+             interface="io.subutai.core.object.relation.api.RelationManager" />
+
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
 
@@ -54,6 +56,8 @@
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
+    <property name="identityManager" ref="identityManager" />
+    <property name="relationManager" ref="relationManager" />
 <!--
     <property name="externalIpInterface" value="${externalIpInterface}" />
 -->

@@ -18,6 +18,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.security.objects.PermissionObject;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -78,6 +79,41 @@ public class AbstractSubutaiHostTest
         public boolean isConnected()
         {
             return true;
+        }
+
+
+        @Override
+        public String getLinkId()
+        {
+            return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+        }
+
+
+        @Override
+        public String getUniqueIdentifier()
+        {
+            return getId();
+        }
+
+
+        @Override
+        public String getClassPath()
+        {
+            return this.getClass().getSimpleName();
+        }
+
+
+        @Override
+        public String getContext()
+        {
+            return PermissionObject.PeerManagement.getName();
+        }
+
+
+        @Override
+        public String getKeyId()
+        {
+            return getPeerId();
         }
     }
 

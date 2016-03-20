@@ -69,7 +69,6 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.RelationVerificationException;
 import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.security.api.SecurityManager;
@@ -163,7 +162,7 @@ public class IdentityManagerImpl implements IdentityManager
             //*********************************************
             role = createRole( "Administrator", UserType.Regular.getId() );
             assignUserRole( admin.getId(), role );
-            
+
             for ( int a = 0; a < permsp.length; a++ )
             {
                 per = createPermission( permsp[a].getId(), 1, true, true, true, true );
@@ -916,12 +915,11 @@ public class IdentityManagerImpl implements IdentityManager
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
 
             assert relationManager != null;
-            RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
 
             // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
-                    new RelationMeta( activeUser, delegatedUser, delegatedUser, delegatedUser.getId() );
-            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+                    new RelationMeta( activeUser, delegatedUser, delegatedUser, activeUser.getSecurityKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
 
             String relationJson = JsonUtil.toJson( relation );
 
@@ -931,16 +929,16 @@ public class IdentityManagerImpl implements IdentityManager
             String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
             delegatedUser.setRelationDocument( encryptedMessage );
             identityDataService.updateUserDelegate( delegatedUser );
-            LOGGER.info(encryptedMessage);
-            LOGGER.info(delegatedUser.getId());
+            LOGGER.debug( encryptedMessage );
+            LOGGER.debug( delegatedUser.getId() );
         }
         catch ( NamingException e )
         {
-            LOGGER.error("Relation Manager service is unavailable", e);
+            LOGGER.error( "Relation Manager service is unavailable", e );
         }
         catch ( UnsupportedEncodingException e )
         {
-            LOGGER.error("Error decoding byte array", e);
+            LOGGER.error( "Error decoding byte array", e );
         }
     }
 
@@ -999,7 +997,7 @@ public class IdentityManagerImpl implements IdentityManager
                 createUserDelegate( user,null,true );
             }
             //***************************************
-            
+
             if ( generateKeyPair && inited )
             {
                 TemplateManager templateManager = ServiceLocator.getServiceNoCache( TemplateManager.class );
@@ -1013,7 +1011,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         return user;
     }
-    
+
     /* *************************************************
      */
     @RolesAllowed( "Identity-Management|Read" )

@@ -28,6 +28,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
@@ -109,6 +110,8 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.Ownership;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
@@ -128,6 +131,8 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CloneTask;
@@ -150,6 +155,11 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -184,6 +194,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
     protected ServiceLocator serviceLocator = new ServiceLocator();
+    private IdentityManager identityManager;
+    private RelationManager relationManager;
 
 
     protected boolean initialized = false;
@@ -202,6 +214,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
+    }
+
+
+    public void setRelationManager( final RelationManager relationManager )
+    {
+        this.relationManager = relationManager;
     }
 
 
@@ -1066,6 +1090,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 Set<ResourceHost> a = Sets.newHashSet();
                 a.add( host );
                 setResourceHostTransientFields( a );
+                buildAdminHostRelation( host );
                 LOG.debug( String.format( "Resource host %s registered.", resourceHostInfo.getHostname() ) );
             }
             if ( host.updateHostInfo( resourceHostInfo ) )
@@ -1081,7 +1106,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     if ( managementLxc instanceof ContainerHostEntity )
                     {
                         managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
-
+                        buildAdminHostRelation( managementHost );
                         //todo save flag that exchange happened to db
                         exchangeMhKeysWithRH();
                     }
@@ -1092,6 +1117,40 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
             }
         }
+    }
+
+
+    private void buildAdminHostRelation(Host host)
+    {
+        // Build relation between Admin and management/resource host.
+
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+        if ( peerOwner != null )
+        {
+            // Simply pass key value object as map
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+            relationTraits.put( "bandwidthControl", "true" );
+
+            if ( "management".equalsIgnoreCase( host.getHostname() ) )
+            {
+                relationTraits.put( "managementSupervisor", "true" );
+            }
+            else
+            {
+                relationTraits.put( "resourceSupervisor", "true" );
+                relationTraits.put( "containerManagement", "true" );
+            }
+
+            RelationMeta relationMeta =
+                    new RelationMeta( peerOwner, peerOwner, host, peerOwner.getSecurityKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
+
+
     }
 
 
@@ -2347,6 +2406,42 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 return new PingDistance( sourceIp, targetIp, null, null, null, null );
             }
         }
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.PeerManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        PGPPublicKey publicKey = securityManager.getKeyManager().getPublicKey( null );
+        return PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
     }
 }
 

@@ -53,6 +53,7 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -622,5 +623,40 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.ResourceManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getId();
     }
 }
