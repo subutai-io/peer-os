@@ -188,7 +188,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             byte[] cborData = JsonUtil.toCbor( updatedNodes );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response response = client.post( encryptedData );
+            Response response = client.put( encryptedData );
 
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {

@@ -319,7 +319,7 @@ public class HubEnvironmentManager
         {
             LOG.error( "Could not clone containers" );
         }
-        return null;
+        return envNodes;
     }
 
 
