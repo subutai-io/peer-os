@@ -177,27 +177,6 @@ public class PeerWebClient
     }
 
 
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
-    {
-
-        String path = String.format( "/network/%s", environmentId.getId() );
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            client.delete();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on cleaning up network settings", e );
-        }
-    }
-
-
     public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
         String path = "/pek";
@@ -333,11 +312,11 @@ public class PeerWebClient
     }
 
 
-    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final String communityName ) throws PeerException
     {
-        LOG.debug( String.format( "Removing remote peer from p2p community: %s", environmentId.getId() ) );
+        LOG.debug( String.format( "Removing remote peer from p2p community: %s", communityName ) );
 
-        String path = String.format( "/p2ptunnel/%s", environmentId.getId() );
+        String path = String.format( "/p2ptunnel/%s", communityName );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
@@ -354,6 +333,7 @@ public class PeerWebClient
             throw new PeerException( "Error removing p2p connection", e );
         }
     }
+
 
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.task.Task;
 
@@ -29,12 +28,6 @@ public interface LocalPeer extends Peer
      * Removes a gateway
      */
     void removeGateway( int vlan ) throws PeerException;
-
-
-    /**
-     * Removes a tunnel to remote peer
-     */
-    void removeTunnel( String tunnelIp );
 
 
     /**
@@ -162,10 +155,6 @@ public interface LocalPeer extends Peer
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
-
-    List<P2PConfig> setupP2PConnection( String environmentId, Set<Peer> peers ) throws PeerException;
-
-    void addToTunnel( P2PConfig config ) throws PeerException;
 
     List<TemplateKurjun> getTemplates();
 

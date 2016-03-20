@@ -17,7 +17,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -41,9 +40,6 @@ public class PEKGenerationStep
         this.peerManager = peerManager;
         this.securityManager = securityManager;
     }
-
-
-    //TODO this EK should be uploaded by user when creating environment via UI. @Nurkaly!
 
 
     public Map<Peer, String> execute() throws PeerException

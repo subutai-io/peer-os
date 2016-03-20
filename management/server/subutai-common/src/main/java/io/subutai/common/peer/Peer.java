@@ -91,11 +91,6 @@ public interface Peer
      */
     public void setDefaultGateway( ContainerGateway containerGateway ) throws PeerException;
 
-    /**
-     * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
-     * up its settings on the local peer.
-     */
-    void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException;
 
     /**
      * Returns true of the host is connected, false otherwise
@@ -236,6 +231,7 @@ public interface Peer
      */
     public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
+
     /* ************************************************
      * Returns all existing gateways of the peer
      */
@@ -287,7 +283,7 @@ public interface Peer
 
     void setupP2PConnection( P2PConfig config ) throws PeerException;
 
-    void removeP2PConnection( EnvironmentId environmentId ) throws PeerException;
+    void removeP2PConnection( String communityName ) throws PeerException;
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
 
