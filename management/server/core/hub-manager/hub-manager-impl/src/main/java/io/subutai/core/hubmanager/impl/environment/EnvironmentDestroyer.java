@@ -36,7 +36,7 @@ public class EnvironmentDestroyer
             localPeer.cleanupEnvironment( envId );
 
             // Bug: p2p is not removed.
-            localPeer.removeP2PConnection( envId );
+//            localPeer.removeP2PConnection( envId );
 
             // Bug: Error getting public key by fingerprint
             localPeer.removePeerEnvironmentKeyPair( envId );
