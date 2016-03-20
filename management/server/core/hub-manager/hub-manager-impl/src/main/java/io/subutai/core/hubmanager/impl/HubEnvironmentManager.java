@@ -305,7 +305,7 @@ public class HubEnvironmentManager
             {
                 for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
                 {
-                    if ( cloneResponse.getContainerName().equals( nodeDto.getHostName() ) )
+                    if ( cloneResponse.getHostname().equals( nodeDto.getHostName() ) )
                     {
                         nodeDto.setIp( cloneResponse.getIp() );
                         nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
