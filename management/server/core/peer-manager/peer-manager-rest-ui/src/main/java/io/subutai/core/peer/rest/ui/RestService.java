@@ -15,7 +15,7 @@ public interface RestService
 {
     @POST
     @Produces( { MediaType.TEXT_PLAIN} )
-    Response processRegisterRequest( @FormParam( "ip" ) String ip, @FormParam( "key_phrase" ) String keyPhrase );
+    Response processRegisterRequest( @FormParam( "ip" ) String ip, @FormParam( "key_phrase" ) String keyPhrase, @FormParam( "challenge" ) String challenge );
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )

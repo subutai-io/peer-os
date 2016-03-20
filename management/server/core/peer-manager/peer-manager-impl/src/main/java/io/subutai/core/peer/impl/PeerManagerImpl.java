@@ -38,6 +38,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInterface;
@@ -65,6 +66,9 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.core.object.relation.api.RelationInfoManager;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
@@ -108,6 +112,7 @@ public class PeerManagerImpl implements PeerManager
     private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
+    private RelationManager relationManager;
 
     private String controlNetwork;
     private long controlNetworkTtl = 0;
@@ -190,6 +195,12 @@ public class PeerManagerImpl implements PeerManager
     {
         commandResponseListener.dispose();
         backgroundTasksExecutorService.shutdown();
+    }
+
+
+    public void setRelationManager( final RelationManager relationManager )
+    {
+        this.relationManager = relationManager;
     }
 
 
@@ -644,6 +655,52 @@ public class PeerManagerImpl implements PeerManager
 
         try
         {
+            final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
+
+            registrationData.setToken( generateActiveUserToken() );
+
+            RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
+
+            result.setKeyPhrase( keyPhrase );
+            addRequest( result );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( e.getMessage() );
+        }
+    }
+
+
+    @Override
+    public void doRegistrationRequest( final String destinationHost, final String keyPhrase, final String challenge )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( destinationHost );
+        Preconditions.checkNotNull( keyPhrase );
+        Preconditions.checkNotNull( challenge );
+
+        String destinationUrl = buildDestinationUrl( destinationHost );
+        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl );
+
+        if ( getRequest( peerInfo.getId() ) != null )
+        {
+            throw new PeerException( "Registration record already exists." );
+        }
+
+
+        try
+        {
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = Maps.newHashMap();
+            traits.put( "managementSupervisor", "true" );
+
+            RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
+            relationInfoManager
+                    .checkRelationValidity( identityManager.getActiveUser(), getLocalPeer(), relationInfoMeta,
+                            challenge );
+
+
             final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
 
             registrationData.setToken( generateActiveUserToken() );

@@ -45,6 +45,8 @@ public interface PeerManager
 
     void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
 
+    void doRegistrationRequest( String destinationHost, String keyPhrase, String challenge ) throws PeerException;
+
     void doApproveRequest( String keyPhrase, RegistrationData request ) throws PeerException;
 
     void doRejectRequest( RegistrationData request ) throws PeerException;

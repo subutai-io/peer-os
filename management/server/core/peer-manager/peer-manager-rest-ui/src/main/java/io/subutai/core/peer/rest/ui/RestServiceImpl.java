@@ -50,11 +50,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response processRegisterRequest( final String ip, final String keyPhrase )
+    public Response processRegisterRequest( final String ip, final String keyPhrase, final String challenge )
     {
         try
         {
-            peerManager.doRegistrationRequest( ip, keyPhrase );
+            peerManager.doRegistrationRequest( ip, keyPhrase, challenge );
         }
         catch ( Exception e )
         {
