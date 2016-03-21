@@ -668,9 +668,22 @@ public class PeerManagerImpl implements PeerManager
     {
         Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
+        URL destinationUrl;
+        try
+        {
+            destinationUrl = buildDestinationUrl( destinationHost );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new PeerException( "Invalid URL." );
+        }
 
-        String destinationUrl = buildDestinationUrl( destinationHost );
-        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl );
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( "Could not send registration request to ourselves." );
+        }
+
+        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
         if ( getRequest( peerInfo.getId() ) != null )
         {
@@ -684,7 +697,7 @@ public class PeerManagerImpl implements PeerManager
             registrationData.setToken( generateActiveUserToken() );
             registrationData.setKeyPhrase( "" );
 
-            RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
+            RegistrationData result = registrationClient.sendInitRequest( destinationUrl.toString(), registrationData );
 
             result.setKeyPhrase( keyPhrase );
             addRequest( result );
@@ -697,16 +710,16 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private String buildDestinationUrl( final String destinationHost )
+    private URL buildDestinationUrl( final String destinationHost ) throws MalformedURLException
     {
         try
         {
             URL url = new URL( destinationHost );
-            return destinationHost;
+            return url;
         }
         catch ( MalformedURLException e )
         {
-            return String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() );
+            return new URL( String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() ) );
         }
     }
 
