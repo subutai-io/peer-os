@@ -23,7 +23,7 @@ public class CleanupP2PStep
         for ( Peer peer : environment.getPeers() )
         {
             //todo run in a thread
-            peer.removeP2PConnection( environment.getTunnelCommunityName() );
+            peer.removeP2PConnection( environment.getP2PHash() );
         }
     }
 }

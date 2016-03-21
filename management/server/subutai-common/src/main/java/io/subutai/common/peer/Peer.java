@@ -292,9 +292,9 @@ public interface Peer
     /**
      * Removes p2p connection by hash from all RHs
      *
-     * @param communityName - hash of p2p swarm
+     * @param p2pHash - hash of p2p swarm
      */
-    void removeP2PConnection( String communityName ) throws PeerException;
+    void removeP2PConnection( String p2pHash ) throws PeerException;
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
 
@@ -319,7 +319,7 @@ public interface Peer
 
     boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
 
-    PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
+    PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
 
