@@ -199,6 +199,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	});
 
 	function destroyContainer(containerId, key) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your will not be able to recover this Container!",
@@ -212,6 +213,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				environmentService.destroyContainer(containerId).success(function (data) {
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");

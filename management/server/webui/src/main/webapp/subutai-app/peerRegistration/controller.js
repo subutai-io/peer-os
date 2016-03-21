@@ -110,6 +110,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function unregisterPeer(peerId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your unregister peer request!",
@@ -123,6 +124,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				peerRegistrationService.unregisterPeerRequest(peerId).success(function (data) {
 					SweetAlert.swal("Unregistered!", "Your peer request has been unregistered.", "success");
@@ -135,6 +137,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function cancelPeerRequest(peerId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your cancel peer request!",
@@ -148,6 +151,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				peerRegistrationService.cancelPeerRequest(peerId).success(function (data) {
 					SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");

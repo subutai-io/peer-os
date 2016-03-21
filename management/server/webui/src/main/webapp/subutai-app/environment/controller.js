@@ -285,6 +285,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function destroyEnvironment(environmentId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "You will not be able to recover this Environment!",
@@ -298,6 +299,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					SweetAlert.swal(
 						{
@@ -338,6 +340,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function removeSshKey(environmentId){
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Delete environment SSH keys!",
@@ -351,6 +354,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				environmentService.removeSshKey(environmentId).success(function () {
 					SweetAlert.swal("Destroyed!", "Your SSH keys has been deleted.", "success");
@@ -435,6 +439,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function removeDomain(environmentId) {
 		ngDialog.closeAll();
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Delete environment domain!",
@@ -449,6 +454,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		},
 		function (isConfirm) {
 			if (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				environmentService.removeDomain(environmentId).success(function (data) {
 					SweetAlert.swal("Deleted!", "Your domain has been deleted.", "success");
 				}).error(function (data) {
