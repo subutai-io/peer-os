@@ -36,10 +36,8 @@ func P2P(c, d, u, l, p bool, args []string) {
 		if len(args) > 4 {
 			p2p.Peers(args[4])
 		} else {
-			fmt.Println("Wrong usage")
+			p2p.Peers("")
 		}
-	} else if l {
-		p2p.Print()
 	}
 }
 
