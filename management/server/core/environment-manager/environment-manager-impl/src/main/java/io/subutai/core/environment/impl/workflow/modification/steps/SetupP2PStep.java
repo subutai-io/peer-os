@@ -51,7 +51,7 @@ public class SetupP2PStep
     {
         Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
         SubnetUtils.SubnetInfo info =
-                new SubnetUtils( environment.getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
+                new SubnetUtils( environment.getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         final String[] addresses = info.getAllAddresses();
@@ -66,9 +66,8 @@ public class SetupP2PStep
 
         for ( Peer peer : peers )
         {
-            P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getTunnelInterfaceName(),
-                    environment.getTunnelCommunityName(), addresses[counter], sharedKey,
-                    Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+            P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(),
+                    addresses[counter], sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
 

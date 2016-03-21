@@ -140,10 +140,10 @@ public interface RestService
     void setupP2PConnection( P2PConfig config );
 
     @DELETE
-    @Path( "p2ptunnel/{communityName}" )
+    @Path( "p2ptunnel/{p2pHash}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void removeP2PConnection( @PathParam( "communityName" ) String communityName );
+    void removeP2PConnection( @PathParam( "p2pHash" ) String p2pHash );
 
     @DELETE
     @Path( "cleanup/{environmentId}" )
@@ -184,11 +184,11 @@ public interface RestService
     Response updateControlNetworkConfig( ControlNetworkConfig config );
 
     @GET
-    @Path( "control/{communityName}/{count}/distance/" )
+    @Path( "control/{p2pHash}/{count}/distance/" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getCommunityDistances( @PathParam( "communityName" ) final String communityName,
-                                    @PathParam( "count" ) final Integer count );
+    Response getP2PSwarmDistances( @PathParam( "p2pHash" ) final String p2pHash,
+                                   @PathParam( "count" ) final Integer count );
 
 
     @GET

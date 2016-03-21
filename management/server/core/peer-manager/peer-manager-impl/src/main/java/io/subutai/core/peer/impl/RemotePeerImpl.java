@@ -864,11 +864,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeP2PConnection( final String communityName ) throws PeerException
+    public void removeP2PConnection( final String p2pHash ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( communityName ), "Invalid community name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
 
-        new PeerWebClient( peerInfo, provider ).removeP2PConnection( communityName );
+        new PeerWebClient( peerInfo, provider ).removeP2PConnection( p2pHash );
     }
 
 
@@ -941,10 +941,10 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
+    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress )
             throws PeerException
     {
-        return new PeerWebClient( peerInfo, provider ).getCommunityDistances( communityName, maxAddress );
+        return new PeerWebClient( peerInfo, provider ).getP2PSwarmDistances( p2pHash, maxAddress );
     }
 
 

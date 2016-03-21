@@ -69,7 +69,7 @@ public class P2PSecretKeyModificationWorkflow
         try
         {
             new P2PSecretKeyResetStep( environment,
-                    new P2PCredentials( environment.getTunnelCommunityName(), p2pSecretKey, p2pSecretKeyTtlSeconds ) )
+                    new P2PCredentials( environment.getP2PHash(), p2pSecretKey, p2pSecretKeyTtlSeconds ) )
                     .execute();
 
             environment = environmentManager.update( environment );

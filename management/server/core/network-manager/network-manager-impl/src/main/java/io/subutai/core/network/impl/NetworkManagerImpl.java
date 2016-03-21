@@ -57,34 +57,34 @@ public class NetworkManagerImpl implements NetworkManager
 
     //---------------- P2P SECTION BEGIN ------------------------
     @Override
-    public void setupP2PConnection( final String interfaceName, final String localIp, final String communityName,
+    public void setupP2PConnection( final String interfaceName, final String localIp, final String p2pHash,
                                     final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
-        setupP2PConnection( getManagementHost(), interfaceName, localIp, communityName, secretKey, secretKeyTtlSec );
+        setupP2PConnection( getManagementHost(), interfaceName, localIp, p2pHash, secretKey, secretKeyTtlSec );
     }
 
 
     @Override
     public void setupP2PConnection( final Host host, final String interfaceName, final String localIp,
-                                    final String communityName, final String secretKey, final long secretKeyTtlSec )
+                                    final String p2pHash, final String secretKey, final long secretKeyTtlSec )
             throws NetworkManagerException
     {
-        execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
+        execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 
 
     @Override
-    public void removeP2PConnection( final String communityName ) throws NetworkManagerException
+    public void removeP2PConnection( final String p2pHash ) throws NetworkManagerException
     {
-        removeP2PConnection( getManagementHost(), communityName );
+        removeP2PConnection( getManagementHost(), p2pHash );
     }
 
 
     @Override
-    public void removeP2PConnection( final Host host, final String communityName ) throws NetworkManagerException
+    public void removeP2PConnection( final Host host, final String p2pHash ) throws NetworkManagerException
     {
-        execute( host, commands.getRemoveP2PConnectionCommand( communityName ) );
+        execute( host, commands.getRemoveP2PConnectionCommand( p2pHash ) );
     }
 
 
@@ -142,19 +142,19 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final String communityName ) throws NetworkManagerException
+    public Set<P2PPeerInfo> listPeersInEnvironment( final String p2pHash ) throws NetworkManagerException
     {
-        return listPeersInEnvironment( getManagementHost(), communityName );
+        return listPeersInEnvironment( getManagementHost(), p2pHash );
     }
 
 
     @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final Host host, final String communityName )
+    public Set<P2PPeerInfo> listPeersInEnvironment( final Host host, final String p2pHash )
             throws NetworkManagerException
     {
         Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
 
-        CommandResult result = execute( host, commands.getListPeersInEnvironmentCommand( communityName ) );
+        CommandResult result = execute( host, commands.getListPeersInEnvironmentCommand( p2pHash ) );
 
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );

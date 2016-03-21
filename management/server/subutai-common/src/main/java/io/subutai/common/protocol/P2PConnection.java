@@ -11,5 +11,5 @@ public interface P2PConnection
 
     public String getLocalIp();
 
-    public String getCommunityName();
+    public String getP2pHash();
 }

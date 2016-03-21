@@ -877,7 +877,7 @@ public class PeerManagerImpl implements PeerManager
             }
         }
 
-        return new PeerGroupResources( resources, getCommunityDistances() );
+        return new PeerGroupResources( resources, getP2PSwarmDistances() );
     }
 
 
@@ -1119,7 +1119,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public PingDistances getCommunityDistances()
+    public PingDistances getP2PSwarmDistances()
     {
         if ( distances != null )
         {
@@ -1133,7 +1133,7 @@ public class PeerManagerImpl implements PeerManager
         ExecutorCompletionService<PingDistances> completionService = new ExecutorCompletionService<>( pool );
         for ( Peer peer : peers )
         {
-            completionService.submit( new CommunityDistanceTask( peer ) );
+            completionService.submit( new P2PSwarmDistanceTask( peer ) );
         }
 
         pool.shutdown();
@@ -1316,12 +1316,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private class CommunityDistanceTask implements Callable<PingDistances>
+    private class P2PSwarmDistanceTask implements Callable<PingDistances>
     {
         private Peer peer;
 
 
-        public CommunityDistanceTask( final Peer peer )
+        public P2PSwarmDistanceTask( final Peer peer )
         {
             this.peer = peer;
         }
@@ -1330,7 +1330,7 @@ public class PeerManagerImpl implements PeerManager
         @Override
         public PingDistances call() throws Exception
         {
-            return peer.getCommunityDistances( getLocalPeer().getId(), getMaxOrder() );
+            return peer.getP2PSwarmDistances( getLocalPeer().getId(), getMaxOrder() );
         }
     }
 }

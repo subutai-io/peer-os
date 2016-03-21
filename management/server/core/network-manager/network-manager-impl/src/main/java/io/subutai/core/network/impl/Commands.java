@@ -26,27 +26,27 @@ public class Commands
     private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
-    public RequestBuilder getListPeersInEnvironmentCommand( String communityName )
+    public RequestBuilder getListPeersInEnvironmentCommand( String p2pHash )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-p", communityName ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-p", p2pHash ) );
     }
 
 
-    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
+    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String p2pHash,
                                                         String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "p2p", "-c", interfaceName, communityName, secretKey,
+                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey,
                         String.valueOf( secretKeyTtlSec ), Strings.isNullOrEmpty( localIp ) ? "" : localIp ) )
                                                                     .withTimeout( 90 );
     }
 
 
-    public RequestBuilder getRemoveP2PConnectionCommand( String communityName )
+    public RequestBuilder getRemoveP2PConnectionCommand( String p2pHash )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-d", communityName ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-d", p2pHash ) );
     }
 
 
