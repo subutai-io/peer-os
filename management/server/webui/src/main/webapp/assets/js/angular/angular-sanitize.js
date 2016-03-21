@@ -417,9 +417,9 @@ function htmlParser(html, handler) {
 var hiddenPre=document.createElement("pre");
 var spaceRe = /^(\s*)([\s\S]*?)(\s*)$/;
 /**
- * decodes all entities into regular string
+ * decodes all entity into regular string
  * @param value
- * @returns {string} A string with decoded entities.
+ * @returns {string} A string with decoded entity.
  */
 function decodeEntities(value) {
   if (!value) { return ''; }

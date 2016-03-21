@@ -1,6 +1,6 @@
-package io.subutai.core.environment.rest.ui;
+package io.subutai.core.environment.rest.ui.entity;
 
-public class PeerDto {
+public class ResourceHostDto {
     private String id;
     private String cpu;
     private String cpuAvailable;
@@ -9,7 +9,7 @@ public class PeerDto {
     private String hdd;
     private String hddAvailable;
 
-    public PeerDto(String id, String cpu, String cpuAvailable, String memory, String memoryAvailable, String hdd, String hddAvailable) {
+    public ResourceHostDto(String id, String cpu, String cpuAvailable, String memory, String memoryAvailable, String hdd, String hddAvailable) {
         this.id = id;
         this.cpu = cpu;
         this.cpuAvailable = cpuAvailable;
