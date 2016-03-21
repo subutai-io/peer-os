@@ -141,6 +141,7 @@ public class SubutaiSteps extends ScenarioSteps {
         consolePage.selectorHostsItemManagementHost.click();
     }
 
+
     @Step
     public void clickOnLocalHost() {
         consolePage.selectorHostsItemRecourceHost.click();

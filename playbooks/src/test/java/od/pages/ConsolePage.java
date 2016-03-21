@@ -44,6 +44,7 @@ public class ConsolePage extends PageObject {
     @FindBy(xpath = "html/body/ng-include/div[1]/div[2]/div[3]/div/div[2]/div[1]/div[1]/div[3]/select/option[3]")
     public WebElementFacade selectorHostsItemRecourceHost;
 
+
     //endregion
 
     //region WEB ELEMENTS: Images
