@@ -57,6 +57,7 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.SecurityUtilities;
@@ -84,7 +85,7 @@ import io.subutai.core.security.api.SecurityManager;
 @PermitAll
 public class PeerManagerImpl implements PeerManager
 {
-    final static int CONTROL_NETWORK_TTL_IN_MIN = 10;
+    final static int CONTROL_NETWORK_TTL_IN_MIN = 120;
 
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
@@ -105,7 +106,6 @@ public class PeerManagerImpl implements PeerManager
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
     private String localPeerId;
-    private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
@@ -126,12 +126,11 @@ public class PeerManagerImpl implements PeerManager
         this.templateManager = templateManager;
         this.identityManager = identityManager;
         this.provider = provider;
-        //todo expose CommandResponseListener as service "RequestListener" and inject here
         commandResponseListener = new CommandResponseListener();
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 60, TimeUnit.SECONDS );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
     }
 
 
@@ -142,10 +141,9 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            ownerId = securityManager.getKeyManager().getPeerOwnerId();
+            String ownerId = securityManager.getKeyManager().getPeerOwnerId();
 
             PeerData localPeerData = peerDataService.find( localPeerId );
-
 
             if ( localPeerData == null )
             {
@@ -553,7 +551,27 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processRejectRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationData.getPeerInfo().getId() );
+        final String id = registrationData.getPeerInfo().getId();
+
+        final RegistrationData request = getRequest( id );
+
+        if ( request != null )
+        {
+            // try to decode with provided key phrase
+            final String keyPhrase = request.getKeyPhrase();
+            final Encrypted encryptedData = registrationData.getData();
+            try
+            {
+                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                encryptedData.decrypt( key, String.class );
+                removeRequest( id );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new PeerException( "Can not reject registration request." );
+            }
+        }
     }
 
 
@@ -561,7 +579,27 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processCancelRequest( final RegistrationData registrationData ) throws PeerException
     {
-        removeRequest( registrationData.getPeerInfo().getId() );
+        final String id = registrationData.getPeerInfo().getId();
+
+        final RegistrationData request = getRequest( id );
+
+        if ( request != null )
+        {
+            // try to decode with provided key phrase
+            final String keyPhrase = registrationData.getKeyPhrase();
+            final Encrypted encryptedData = request.getData();
+            try
+            {
+                byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
+                encryptedData.decrypt( key, String.class );
+                removeRequest( id );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage(), e );
+                throw new PeerException( "Can not cancel registration request." );
+            }
+        }
     }
 
 
@@ -576,8 +614,7 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( registrationData.getPeerInfo().getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( /*registrationData.getPeerInfo().getId(),*/
-                registrationData.getPeerInfo() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo() );
     }
 
 
@@ -647,6 +684,7 @@ public class PeerManagerImpl implements PeerManager
             final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
 
             registrationData.setToken( generateActiveUserToken() );
+            registrationData.setKeyPhrase( "" );
 
             RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
 
@@ -729,8 +767,12 @@ public class PeerManagerImpl implements PeerManager
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
         {
-            registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(),
-                    buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED ) );
+            final RegistrationData r = buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED );
+
+            // return received data
+            r.setData( request.getData() );
+
+            registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(), r );
         }
         catch ( Exception e )
         {
@@ -824,8 +866,15 @@ public class PeerManagerImpl implements PeerManager
         final List<PeerResources> resources = new ArrayList<>();
         for ( final Peer peer : getPeers() )
         {
-            PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( localPeerId );
-            resources.add( peerResources );
+            try
+            {
+                PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( localPeerId );
+                resources.add( peerResources );
+            }
+            catch ( Exception ignore )
+            {
+                //ignore
+            }
         }
 
         return new PeerGroupResources( resources, getCommunityDistances() );
@@ -1162,8 +1211,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( controlNetworkTtl <= System.currentTimeMillis() )
             {
-                controlNetworkTtl =
-                        System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( CONTROL_NETWORK_TTL_IN_MIN );
+                controlNetworkTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
                 key = DigestUtils.md5( UUID.randomUUID().toString() );
                 this.distances = null;
             }

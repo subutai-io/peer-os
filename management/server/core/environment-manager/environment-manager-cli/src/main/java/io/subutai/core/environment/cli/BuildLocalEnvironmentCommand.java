@@ -83,10 +83,10 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
         }
         String hostId = resourceHosts.iterator().next().getId();
         Node node =
-                new Node( UUID.randomUUID().toString(), "NodeGroup1", templateName, ContainerSize.TINY, 1, 1,
-                        peerId, hostId );
+                new Node( UUID.randomUUID().toString(), "NodeGroup1", templateName, ContainerSize.TINY, 1, 1, peerId,
+                        hostId );
 
-        Topology topology = new Topology( "Dummy environment name", 1, 1 );
+        Topology topology = new Topology( "Dummy environment name" );
         topology.addNodePlacement( peerId, node );
 
         Environment environment = environmentManager.createEnvironment( topology, async );

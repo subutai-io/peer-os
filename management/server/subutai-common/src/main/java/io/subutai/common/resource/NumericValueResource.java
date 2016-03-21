@@ -31,10 +31,34 @@ public class NumericValueResource implements ResourceValue<BigDecimal>
     }
 
 
+    public NumericValueResource( final int value )
+    {
+        this.value = new BigDecimal( value );
+    }
+
+
+    public NumericValueResource( final double value )
+    {
+        this.value = new BigDecimal( value );
+    }
+
+
     @Override
     public BigDecimal getValue()
     {
         return value;
+    }
+
+
+    public int intValue()
+    {
+        return value.intValue();
+    }
+
+
+    public double doubleValue()
+    {
+        return value.doubleValue();
     }
 
 

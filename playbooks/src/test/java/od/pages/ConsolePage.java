@@ -32,13 +32,16 @@ public class ConsolePage extends PageObject {
 
     //region WEB ELEMENTS: Selectors
 
+    @FindBy(xpath = "*//select[@ng-model=\"consoleViewCtrl.selectedEnvironment\"]")
+    public WebElementFacade selectorEnvironment;
+
     @FindBy(xpath = "*//div[@class=\"b-console-selects__item b-main-form__wrapper\"]")
     public WebElementFacade itemSelectorHost;
 
-    @FindBy(xpath = "*//option[contains(text(),\"management\")]")
+    @FindBy(xpath = "html/body/ng-include/div[1]/div[2]/div[3]/div/div[2]/div[1]/div[1]/div[3]/select/option[2]")
     public WebElementFacade selectorHostsItemManagementHost;
 
-    @FindBy(xpath = "*//option[contains(text(),\"intra\")]")
+    @FindBy(xpath = "html/body/ng-include/div[1]/div[2]/div[3]/div/div[2]/div[1]/div[1]/div[3]/select/option[3]")
     public WebElementFacade selectorHostsItemRecourceHost;
 
     //endregion
@@ -48,6 +51,8 @@ public class ConsolePage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Icons
+
+    public String sikuliIconSelectorHost = "src/test/resources/imgs/icons/iconSelectorHost.png";
 
     //endregion
 

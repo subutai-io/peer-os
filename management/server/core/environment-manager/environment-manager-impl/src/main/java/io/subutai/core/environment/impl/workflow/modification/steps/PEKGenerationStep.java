@@ -5,13 +5,11 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -43,6 +41,7 @@ public class PEKGenerationStep
 
         for ( final Peer peer : peers )
         {
+            //todo run in a thread
             peerPekPubKeys.put( peer, peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() ).getKey() );
         }
 

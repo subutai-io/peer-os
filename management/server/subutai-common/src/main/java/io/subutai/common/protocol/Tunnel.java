@@ -11,7 +11,6 @@ import com.google.common.base.Strings;
 public class Tunnel
 {
     public static final String TUNNEL_PREFIX = "tunnel";
-    private String peerId;
     private final String tunnelName;
     private final String tunnelIp;
     private final int tunnelId;
@@ -25,12 +24,6 @@ public class Tunnel
         this.tunnelName = tunnelName;
         this.tunnelIp = tunnelIp;
         this.tunnelId = Integer.parseInt( tunnelName.replace( TUNNEL_PREFIX, "" ) );
-    }
-
-
-    public String getPeerId()
-    {
-        return peerId;
     }
 
 

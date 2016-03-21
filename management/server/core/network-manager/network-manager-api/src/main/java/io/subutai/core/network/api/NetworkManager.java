@@ -8,7 +8,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PPeerInfo;
@@ -24,15 +23,26 @@ public interface NetworkManager
 
 
     /**
-     * Sets up an P2P connection to super node on management host
+     * Sets up an P2P connection on management host
      */
     public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
                                     long secretKeyTtlSec ) throws NetworkManagerException;
 
     /**
+     * Sets up an P2P connection on specified host
+     */
+    public void setupP2PConnection( Host host, String interfaceName, String localIp, String communityName,
+                                    String secretKey, long secretKeyTtlSec ) throws NetworkManagerException;
+
+    /**
      * Removes P2P connection
      */
     public void removeP2PConnection( String communityName ) throws NetworkManagerException;
+
+    /**
+     * Removes P2P connection on specified host
+     */
+    public void removeP2PConnection( Host host, String communityName ) throws NetworkManagerException;
 
 
     /**
@@ -45,16 +55,44 @@ public interface NetworkManager
     public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
+    /**
+     * Resets a secret key for a given P2P network
+     *
+     * @param host - host
+     * @param p2pHash - P2P network hash
+     * @param newSecretKey - new secret key to set
+     * @param ttlSeconds - time-to-live for the new secret key
+     */
+    public void resetP2PSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
+            throws NetworkManagerException;
+
 
     /**
      * Lists existing P2P connections on management host
      */
     public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
 
+    /**
+     * Lists existing P2P connections on specified host
+     */
+    public Set<P2PConnection> listP2PConnections( Host host ) throws NetworkManagerException;
 
     PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
+    /**
+     * Returns peers(hosts) participating in the p2p swarm
+     *
+     * @param communityName - hash of p2p swarm
+     */
     public Set<P2PPeerInfo> listPeersInEnvironment( String communityName ) throws NetworkManagerException;
+
+    /**
+     * Returns peers(hosts) participating in the p2p swarm
+     *
+     * @param host - host
+     * @param communityName - hash of p2p swarm
+     */
+    public Set<P2PPeerInfo> listPeersInEnvironment( Host host, String communityName ) throws NetworkManagerException;
 
     /**
      * Sets up tunnel to another peer on management host
@@ -66,39 +104,6 @@ public interface NetworkManager
      */
     public void removeTunnel( int tunnelId ) throws NetworkManagerException;
 
-    /**
-     * Sets container environment IP and VLAN ID on container
-     */
-    public void setContainerIp( String containerName, String ip, int netMask, int vLanId )
-            throws NetworkManagerException;
-
-    /**
-     * Removes container environment IP and VLAN ID on container
-     */
-    public void removeContainerIp( String containerName ) throws NetworkManagerException;
-
-    /**
-     * Returns container environment IP on container
-     */
-    public ContainerInfo getContainerIp( String containerName ) throws NetworkManagerException;
-
-
-    /**
-     * Removes gateway IP for specified VLAN on management host
-     */
-    public void removeGateway( int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Cleans up network settings left after environment
-     *
-     * @param environmentId - environment id
-     */
-    public void cleanupEnvironmentNetworkSettings( EnvironmentId environmentId ) throws NetworkManagerException;
-
-    /**
-     * Removes gateway IP on a container
-     */
-    public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;
 
     /**
      * Lists existing tunnels on management host

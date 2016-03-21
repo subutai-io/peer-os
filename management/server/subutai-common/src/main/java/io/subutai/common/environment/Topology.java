@@ -30,45 +30,33 @@ public class Topology
     private String subnet;
     @JsonProperty( "sshKey" )
     private String sshKey;
-/*    @JsonProperty( "sshGroupId" )
-    private int sshGroupId;
-    @JsonProperty( "hostGroupId" )
-    private int hostGroupId;*/
 
 
     public Topology( @JsonProperty( "id" ) final UUID id, @JsonProperty( "name" ) final String environmentName,
                      @JsonProperty( "placement" ) final Map<String, Set<Node>> nodeGroupPlacement,
-                     @JsonProperty( "subnet" ) final String subnet, @JsonProperty( "sshKey" ) final String sshKey/*,
-                     @JsonProperty( "sshGroupId" ) final int sshGroupId,
-                     @JsonProperty( "hostGroupId" ) final int hostGroupId*/ )
+                     @JsonProperty( "subnet" ) final String subnet, @JsonProperty( "sshKey" ) final String sshKey )
     {
         this.id = id;
         this.environmentName = environmentName;
         this.nodeGroupPlacement = nodeGroupPlacement;
         this.subnet = subnet;
         this.sshKey = sshKey;
-        //        this.sshGroupId = sshGroupId;
-        //        this.hostGroupId = hostGroupId;
     }
 
 
-    public Topology( final UUID id, final String environmentName, final String subnet, final String sshKey,
-                     final int sshGroupId, final int hostGroupId )
+    public Topology( final UUID id, final String environmentName, final String subnet, final String sshKey )
     {
         this.id = id;
         this.environmentName = environmentName;
         this.subnet = subnet;
         this.sshKey = sshKey;
-        //        this.sshGroupId = sshGroupId;
-        //        this.hostGroupId = hostGroupId;
     }
 
 
-    public Topology( final String environmentName, final int sshGroupId, final int hostGroupId )
+    public Topology( final String environmentName )
     {
+        this.id = UUID.randomUUID();
         this.environmentName = environmentName;
-        //        this.sshGroupId = sshGroupId;
-        //        this.hostGroupId = hostGroupId;
     }
 
 
@@ -140,18 +128,6 @@ public class Topology
     {
         this.subnet = subnet;
     }
-
-    //
-    //    public int getSshGroupId()
-    //    {
-    //        return sshGroupId;
-    //    }
-    //
-    //
-    //    public int getHostGroupId()
-    //    {
-    //        return hostGroupId;
-    //    }
 
 
     public void setId( final UUID id )

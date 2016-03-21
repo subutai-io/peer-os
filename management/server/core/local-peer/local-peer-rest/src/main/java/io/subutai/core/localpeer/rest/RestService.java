@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -20,7 +19,6 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -109,10 +107,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
 
-    @DELETE
-    @Path( "network/{environmentId}" )
-    void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
-
     @GET
     @Path( "container/info" )
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
@@ -146,10 +140,10 @@ public interface RestService
     void setupP2PConnection( P2PConfig config );
 
     @DELETE
-    @Path( "p2ptunnel/{environmentId}" )
+    @Path( "p2ptunnel/{communityName}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void removeP2PConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    void removeP2PConnection( @PathParam( "communityName" ) String communityName );
 
     @DELETE
     @Path( "cleanup/{environmentId}" )

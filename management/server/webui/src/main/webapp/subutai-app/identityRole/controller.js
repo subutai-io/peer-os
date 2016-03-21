@@ -38,7 +38,9 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 			controllerAs: 'identityRoleFormCtrl',
 			data: role,
 			preCloseCallback: function(value) {
-				vm.dtInstance.reloadData(null, false);
+				if(Object.keys(vm.dtInstance).length !== 0) {
+					vm.dtInstance.reloadData(null, false);
+				}
 			}
 		});
 	}

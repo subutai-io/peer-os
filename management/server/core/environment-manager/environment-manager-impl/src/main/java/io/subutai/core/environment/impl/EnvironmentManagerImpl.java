@@ -12,6 +12,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -133,6 +136,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
     private SecurityManager securityManager;
+    protected ScheduledExecutorService backgroundTasksExecutorService;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
@@ -157,6 +161,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
+        backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
     }
 
 
@@ -171,6 +177,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void dispose()
     {
         executor.shutdown();
+        backgroundTasksExecutorService.shutdown();
     }
 
 
@@ -269,7 +276,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         for ( Environment environment : environmentDataService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
-            if ( environment.getUserId().equals( activeUser.getId() ) || trustedRelation )
+            final boolean b = environment.getUserId().equals( activeUser.getId() );
+            if ( b || trustedRelation )
             {
                 environments.add( environment );
 
@@ -1729,7 +1737,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void setContainersTransientFields( final Environment environment )
     {
-        User activeUser = identityManager.getActiveUser();
+        //        User activeUser = identityManager.getActiveUser();
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
         for ( ContainerHost containerHost : containers )
         {
@@ -1737,7 +1745,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             environmentContainer.setEnvironmentManager( this );
 
-            String peerId = environmentContainer.getPeerId();
+            //            String peerId = environmentContainer.getPeerId();
         }
         // remove containers which doesn't have trust relation
     }
@@ -2176,6 +2184,42 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
+        }
+    }
+
+
+    private class BackgroundTasksRunner implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            LOG.debug( "Environment background tasks started..." );
+
+            resetP2Pkey();
+
+            LOG.debug( "Environment background tasks finished." );
+        }
+    }
+
+
+    private void resetP2Pkey()
+    {
+        try
+        {
+            for ( Environment environment : getEnvironments() )
+            {
+                if ( environment.getStatus() != EnvironmentStatus.UNDER_MODIFICATION )
+                {
+
+                    final String secretKey = UUID.randomUUID().toString();
+                    final long keyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
+                    resetP2PSecretKey( environment.getId(), secretKey, keyTtl, true );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage() );
         }
     }
 }

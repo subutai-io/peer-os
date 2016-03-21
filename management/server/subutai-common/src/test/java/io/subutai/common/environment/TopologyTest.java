@@ -27,7 +27,7 @@ public class TopologyTest
     @Before
     public void setUp() throws Exception
     {
-        topology = new Topology( "Name-" + ENVIRONMENT_ID, 0, 0 );
+        topology = new Topology( "Name-" + ENVIRONMENT_ID/*, 0, 0 */);
     }
 
 

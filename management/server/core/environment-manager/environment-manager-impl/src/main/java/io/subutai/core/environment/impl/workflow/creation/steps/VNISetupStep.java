@@ -13,7 +13,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
@@ -21,7 +20,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -80,11 +78,10 @@ public class VNISetupStep
         //calculate new vni
         long freeVni = findFreeVni( peers );
 
-        //TODO: add gateway to reserve vni
+        //TODO: add gateway & p2p IP to reserve vni
         Vni newVni = new Vni( freeVni, environment.getId() );
 
-        //reserve new vni and create gateway
-        LOGGER.debug( "Creating gateways..." );
+        //reserve new vni
         for ( final Peer peer : peers )
         {
             peer.reserveVni( newVni );
