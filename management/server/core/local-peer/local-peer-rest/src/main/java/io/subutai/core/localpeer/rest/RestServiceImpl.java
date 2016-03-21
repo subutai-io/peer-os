@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import com.google.common.base.Strings;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -361,11 +359,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void removeP2PConnection( final EnvironmentId environmentId )
+    public void removeP2PConnection( final String p2pHash )
     {
         try
         {
-            localPeer.removeP2PConnection( environmentId );
+            localPeer.removeP2PConnection( p2pHash );
         }
         catch ( Exception e )
         {
@@ -380,20 +378,6 @@ public class RestServiceImpl implements RestService
         try
         {
             localPeer.cleanupEnvironment( environmentId );
-        }
-        catch ( Exception e )
-        {
-            throw new WebApplicationException( e );
-        }
-    }
-
-
-    @Override
-    public void cleanupNetwork( final EnvironmentId environmentId )
-    {
-        try
-        {
-            localPeer.cleanupEnvironmentNetworkSettings( environmentId );
         }
         catch ( Exception e )
         {
@@ -472,7 +456,7 @@ public class RestServiceImpl implements RestService
 
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getAddress() );
-        Preconditions.checkNotNull( config.getCommunityName() );
+        Preconditions.checkNotNull( config.getP2pHash() );
         Preconditions.checkNotNull( config.getPeerId() );
         Preconditions.checkNotNull( config.getSecretKey() );
         Preconditions.checkArgument( config.getSecretKeyTtlSec() > 0 );
@@ -490,15 +474,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getCommunityDistances( final String communityName, final Integer count )
+    public Response getP2PSwarmDistances( final String p2pHash, final Integer count )
     {
 
-        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( p2pHash );
         Preconditions.checkNotNull( count );
 
         try
         {
-            return Response.ok( localPeer.getCommunityDistances( communityName, count ) ).build();
+            return Response.ok( localPeer.getP2PSwarmDistances( p2pHash, count ) ).build();
         }
         catch ( PeerException e )
         {

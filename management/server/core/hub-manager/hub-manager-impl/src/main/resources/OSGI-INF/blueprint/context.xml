@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
+           xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
            default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
-    >
+>
+
+  <authz:enable />
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="test/error">
+      <action class="io.subutai.core.test.cli.TestCommand" />
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="test/verify">
+      <action class="io.subutai.core.test.cli.TestRoleValidation" />
+    </command>
+  </command-bundle>
+
+  <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor" />
+  <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
+
 
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
@@ -20,6 +39,9 @@
   <reference id="environmentManager"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 
+  <reference id="identityManager"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
@@ -31,6 +53,7 @@
     <property name="securityManager" ref="securityManager" />
     <property name="peerManager" ref="peerManager" />
     <property name="environmentManager" ref="environmentManager" />
+    <property name="identityManager" ref="identityManager" />
     <property name="monitor" ref="monitor" />
     <argument ref="daoManagerHub" />
   </bean>

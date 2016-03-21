@@ -14,7 +14,9 @@ import (
 func P2P(c, d, u, l, p bool, args []string) {
 	if c {
 		if len(args) > 8 {
-			p2p.Create(args[4], args[5], args[6], args[7], args[8])
+			p2p.Create(args[4], args[8], args[5], args[6], args[7])
+		} else if len(args) > 7 {
+			p2p.Create(args[4], "dhcp", args[5], args[6], args[7])
 		} else {
 			fmt.Println("Wrong usage")
 		}
@@ -121,7 +123,7 @@ func reserveVNI(vni, vlan, envid string) {
 }
 
 func listTunnel() {
-	println("List of Tunnels\n--------")
+	fmt.Println("List of Tunnels\n--------")
 	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
 	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
 	ports := strings.Split(string(ret), "\n")
@@ -186,8 +188,23 @@ func createVNIMap(tunnel, vni, vlan, envid string) {
 }
 
 func removeTunnel(tunnel string) {
-	log.Check(log.FatalLevel, "Removing port "+tunnel,
+	log.Check(log.WarnLevel, "Removing port "+tunnel,
 		exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
+}
+
+func delTunById(envId string) {
+	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
+	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
+	ports := strings.Split(string(ret), "\n")
+
+	for k, port := range ports {
+		if strings.Contains(string(port), envId) {
+			tunnel := strings.Split(ports[k-2], "\"")[1]
+			log.Check(log.WarnLevel, "Removing port "+tunnel,
+				exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
+		}
+	}
+
 }
 
 func ClearVlan(vlan string) {
@@ -198,11 +215,12 @@ func ClearVlan(vlan string) {
 		for k, v := range lines {
 			s := strings.Fields(v)
 			if len(s) > 2 && s[1] == vlan {
+				delTunById(s[2])
 				p2p.Remove(s[2])
 				lines[k] = ""
 			}
 		}
 	}
 	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", []byte(strings.Join(lines, "\n")), 0744)
-	log.Check(log.FatalLevel, "config.Agent.DataPrefix + /var/subutai-network/vni_reserve delete vni", err)
+	log.Check(log.WarnLevel, "config.Agent.DataPrefix + /var/subutai-network/vni_reserve delete vni", err)
 }

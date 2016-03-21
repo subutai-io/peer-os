@@ -205,7 +205,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnIconTemplateMongo() throws FindFailed {
-        environmentsPage.waitTemplateMongo();
+        environmentsPage.waitFor(environmentsPage.sikuliTemplateMongo);
         screen.click(environmentsPage.sikuliTemplateMongo);
     }
 
@@ -557,7 +557,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void userShouldObservePluginMongo() {
-        environmentsPage.waitTemplateMongo();
+        environmentsPage.waitFor(environmentsPage.sikuliTemplateMongo);
         assertThat(environmentsPage.templateMongo.isVisible(), is(true));
     }
 

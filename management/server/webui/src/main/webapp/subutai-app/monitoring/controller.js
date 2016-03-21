@@ -66,13 +66,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		if (vm.period > 0 && vm.currentHost) {
 			LOADING_SCREEN();
 			monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
+
 				vm.charts = [];
 				if(data['Metrics']) {
 					for (var i = 0; i < data['Metrics'].length; i++) {
-						angular.equals(data['Metrics'][i], {}) ?
+						angular.equals(data['Metrics'][i], {}) || angular.equals(data['Metrics'][i], null) ||
+						angular.equals(data['Metrics'][i]['Series'], null)?
 							vm.charts.push({data: [], name: "NO DATA"}) :
 							vm.charts.push(getChartData(data['Metrics'][i]));
-				}
+					}
 				} else {
 					for (var i = 0; i < 4; i++) {
 						vm.charts.push({data: [], name: "NO DATA"});

@@ -13,5 +13,6 @@ func LxcDemote(name, ip, vlan string) {
 
 	LxcNetwork(name, ip, vlan, false, false)
 	fs.ReadOnly(name, false)
+	container.SetContainerUid(name)
 	log.Info(name + " demote succesfully")
 }

@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"os/user"
 	"strconv"
-	// "strings"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -58,7 +58,7 @@ type ResponseOptions struct {
 	ExitCode       string `json:"exitCode,omitempty"`
 }
 
-func Run(req RequestOptions, out_c chan<- ResponseOptions) {
+func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	cmd := buildCmd(&req)
 	if cmd == nil {
 		close(out_c)
@@ -80,7 +80,8 @@ func Run(req RequestOptions, out_c chan<- ResponseOptions) {
 		cmd.SysProcAttr.Credential = &syscall.Credential{Uid: 0, Gid: 0}
 	}
 	err := cmd.Start()
-	log.Check(log.WarnLevel, "Executing command: "+req.CommandId, err)
+	log.Check(log.WarnLevel, "Executing command: "+req.CommandId+" "+req.Command+" "+strings.Join(req.Args, " "), err)
+
 	wop.Close()
 	wep.Close()
 
@@ -216,16 +217,6 @@ func now() int64 {
 	return time.Now().Unix()
 }
 
-func (r *Request) Execute(isRh bool, sOut chan<- ResponseOptions) {
-	if isRh {
-		go Run(r.Request, sOut)
-	} else {
-		name, _ := container.PoolInstance().GetTargetHostName(r.Request.Id)
-		log.Debug("execute on contaner " + "Name " + name)
-		go AttachContainer(name, r.Request, sOut)
-	}
-}
-
 func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions) {
 	lxc_c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	opts := lxc.DefaultAttachOptions
@@ -251,8 +242,6 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 	var exitCode int
 	var cmd bytes.Buffer
 
-	cmd.WriteString("timeout ")
-	cmd.WriteString(strconv.Itoa(r.Timeout) + " ")
 	cmd.WriteString(r.Command)
 	for _, a := range r.Args {
 		cmd.WriteString(a + " ")
@@ -264,7 +253,7 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 			log.Debug("Container " + name + " is running")
 		}
 
-		exitCode, err = lxc_c.RunCommandStatus([]string{"/bin/bash", "-c", cmd.String()}, opts)
+		exitCode, err = lxc_c.RunCommandStatus([]string{"timeout", strconv.Itoa(r.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
 		log.Check(log.WarnLevel, "Execution command", err)
 
 		o_write.Close()

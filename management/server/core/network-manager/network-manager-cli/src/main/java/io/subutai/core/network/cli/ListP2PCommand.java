@@ -43,7 +43,7 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
             for ( P2PConnection connection : connections )
             {
                 System.out.println( String.format( "%s %s %s", connection.getInterfaceName(), connection.getLocalIp(),
-                        connection.getCommunityName() ) );
+                        connection.getP2pHash() ) );
             }
         }
         catch ( NetworkManagerException e )

@@ -25,6 +25,7 @@ import org.apache.commons.net.util.SubnetUtils;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
@@ -33,6 +34,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -46,13 +48,16 @@ public class SetupP2PStep
     private final Topology topology;
     private final EnvironmentImpl env;
     private final PeerManager peerManager;
+    private final NetworkManager networkManager;
 
 
-    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
+    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
+                         final NetworkManager networkManager )
     {
         this.topology = topology;
         this.env = environment;
         this.peerManager = peerManager;
+        this.networkManager = networkManager;
     }
 
 
@@ -65,35 +70,48 @@ public class SetupP2PStep
 
             peers.add( peerManager.getLocalPeer() );
             // creating new p2p tunnels
-            Set<String> existingNetworks = getTunnelNetworks( peers );
+            Set<String> usedSubnets = getUsedP2PSubnets( peers );
 
-            String freeTunnelNetwork = P2PUtil.findFreeTunnelNetwork( existingNetworks );
-            LOGGER.debug( String.format( "Free tunnel network: %s", freeTunnelNetwork ) );
-            if ( freeTunnelNetwork == null )
+            String freeP2pSubnet = P2PUtil.findFreeSubnet( usedSubnets );
+
+            LOGGER.debug( String.format( "Free p2p subnet: %s", freeP2pSubnet ) );
+
+            if ( freeP2pSubnet == null )
             {
-                throw new IllegalStateException( "Could not calculate tunnel network." );
+                throw new EnvironmentManagerException( "Free p2p subnet not found" );
             }
-            env.setTunnelNetwork( freeTunnelNetwork );
-            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeTunnelNetwork, P2PUtil.P2P_SUBNET_MASK ).getInfo();
-            final String[] addresses = subnetInfo.getAllAddresses();
-            int counter = 0;
+
+            env.setP2PSubnet( freeP2pSubnet );
+
+            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeP2pSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
             ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
 
             ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-            // p2p setup
-            List<P2PConfig> result = new ArrayList<>( peers.size() );
+
+            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
+            final String[] addresses = subnetInfo.getAllAddresses();
+
+            Vni reservedVni = networkManager.getReservedVnis().findVniByEnvironmentId( env.getEnvironmentId().getId() );
+
+            //setup initial p2p participant local peer MH
+            networkManager.setupP2PConnection( peerManager.getLocalPeer().getManagementHost(),
+                    P2PUtil.generateInterfaceName( reservedVni.getVlan() ), addresses[0], env.getP2PHash(),
+                    sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+
+            int counter = 1;
             for ( Peer peer : peers )
             {
-                P2PConfig config = new P2PConfig( peer.getId(), env.getId(), env.getTunnelInterfaceName(),
-                        env.getTunnelCommunityName(), addresses[counter], sharedKey,
-                        Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+                P2PConfig config =
+                        new P2PConfig( peer.getId(), env.getId(), env.getP2PHash(), addresses[counter],
+                                sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
                 p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
                 counter++;
             }
 
+            // p2p setup
+            List<P2PConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
                 final Future<P2PConfig> f = p2pCompletionService.take();
@@ -108,8 +126,6 @@ public class SetupP2PStep
                 env.addEnvironmentPeer( new PeerConfImpl( config ) );
             }
 
-            // tunnel setup
-            Map<String, String> tunnels = env.getTunnels();
 
             int peersCount = env.getPeerConfs().size();
             ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
@@ -117,8 +133,9 @@ public class SetupP2PStep
             ExecutorCompletionService<Integer> tunnelCompletionService =
                     new ExecutorCompletionService<Integer>( tunnelExecutor );
 
-
-            for ( Peer peer : peers )
+            // tunnel setup
+            Map<String, String> tunnels = env.getTunnels();
+            for ( Peer peer : env.getPeers() )
             {
                 tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnels ) );
             }
@@ -134,12 +151,12 @@ public class SetupP2PStep
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new EnvironmentManagerException( "Could not create P2P tunnel.", e );
+            throw new EnvironmentManagerException( "Error setting up p2p connection", e );
         }
     }
 
 
-    private Set<String> getTunnelNetworks( final Set<Peer> peers ) throws PeerException
+    private Set<String> getUsedP2PSubnets( final Set<Peer> peers ) throws PeerException
     {
         Set<String> result = new HashSet<>();
 

@@ -2,7 +2,6 @@ package io.subutai.core.peer.impl;
 
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -58,6 +57,7 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.SecurityUtilities;
@@ -85,8 +85,6 @@ import io.subutai.core.security.api.SecurityManager;
 @PermitAll
 public class PeerManagerImpl implements PeerManager
 {
-    final static int CONTROL_NETWORK_TTL_IN_MIN = 10;
-
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
     final int MAX_CONTAINER_LIMIT = 20;
@@ -106,7 +104,6 @@ public class PeerManagerImpl implements PeerManager
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
     private String localPeerId;
-    private String ownerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
@@ -127,12 +124,11 @@ public class PeerManagerImpl implements PeerManager
         this.templateManager = templateManager;
         this.identityManager = identityManager;
         this.provider = provider;
-        //todo expose CommandResponseListener as service "RequestListener" and inject here
         commandResponseListener = new CommandResponseListener();
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 60, TimeUnit.SECONDS );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
     }
 
 
@@ -143,10 +139,9 @@ public class PeerManagerImpl implements PeerManager
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            ownerId = securityManager.getKeyManager().getPeerOwnerId();
+            String ownerId = securityManager.getKeyManager().getPeerOwnerId();
 
             PeerData localPeerData = peerDataService.find( localPeerId );
-
 
             if ( localPeerData == null )
             {
@@ -673,9 +668,22 @@ public class PeerManagerImpl implements PeerManager
     {
         Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
+        URL destinationUrl;
+        try
+        {
+            destinationUrl = buildDestinationUrl( destinationHost );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new PeerException( "Invalid URL." );
+        }
 
-        String destinationUrl = buildDestinationUrl( destinationHost );
-        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl );
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( "Could not send registration request to ourselves." );
+        }
+
+        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
         if ( getRequest( peerInfo.getId() ) != null )
         {
@@ -689,7 +697,7 @@ public class PeerManagerImpl implements PeerManager
             registrationData.setToken( generateActiveUserToken() );
             registrationData.setKeyPhrase( "" );
 
-            RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
+            RegistrationData result = registrationClient.sendInitRequest( destinationUrl.toString(), registrationData );
 
             result.setKeyPhrase( keyPhrase );
             addRequest( result );
@@ -702,16 +710,16 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private String buildDestinationUrl( final String destinationHost )
+    private URL buildDestinationUrl( final String destinationHost ) throws MalformedURLException
     {
         try
         {
             URL url = new URL( destinationHost );
-            return destinationHost;
+            return url;
         }
         catch ( MalformedURLException e )
         {
-            return String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() );
+            return new URL( String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() ) );
         }
     }
 
@@ -876,11 +884,11 @@ public class PeerManagerImpl implements PeerManager
             }
             catch ( Exception ignore )
             {
-                 //ignore
+                //ignore
             }
         }
 
-        return new PeerGroupResources( resources, getCommunityDistances() );
+        return new PeerGroupResources( resources, getP2PSwarmDistances() );
     }
 
 
@@ -1122,7 +1130,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public PingDistances getCommunityDistances()
+    public PingDistances getP2PSwarmDistances()
     {
         if ( distances != null )
         {
@@ -1136,7 +1144,7 @@ public class PeerManagerImpl implements PeerManager
         ExecutorCompletionService<PingDistances> completionService = new ExecutorCompletionService<>( pool );
         for ( Peer peer : peers )
         {
-            completionService.submit( new CommunityDistanceTask( peer ) );
+            completionService.submit( new P2PSwarmDistanceTask( peer ) );
         }
 
         pool.shutdown();
@@ -1214,8 +1222,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( controlNetworkTtl <= System.currentTimeMillis() )
             {
-                controlNetworkTtl =
-                        System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( CONTROL_NETWORK_TTL_IN_MIN );
+                controlNetworkTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
                 key = DigestUtils.md5( UUID.randomUUID().toString() );
                 this.distances = null;
             }
@@ -1320,12 +1327,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private class CommunityDistanceTask implements Callable<PingDistances>
+    private class P2PSwarmDistanceTask implements Callable<PingDistances>
     {
         private Peer peer;
 
 
-        public CommunityDistanceTask( final Peer peer )
+        public P2PSwarmDistanceTask( final Peer peer )
         {
             this.peer = peer;
         }
@@ -1334,7 +1341,7 @@ public class PeerManagerImpl implements PeerManager
         @Override
         public PingDistances call() throws Exception
         {
-            return peer.getCommunityDistances( getLocalPeer().getId(), getMaxOrder() );
+            return peer.getP2PSwarmDistances( getLocalPeer().getId(), getMaxOrder() );
         }
     }
 }

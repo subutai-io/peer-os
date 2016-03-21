@@ -12,15 +12,15 @@ public class P2PConnectionImpl implements P2PConnection
 
     private final String interfaceName;
     private final String localIp;
-    private final String communityName;
+    private final String p2pHash;
 
 
-    public P2PConnectionImpl( final String interfaceName, final String localIp, final String communityName )
+    public P2PConnectionImpl( final String interfaceName, final String localIp, final String p2pHash )
     {
         this.localIp = localIp;
 
         this.interfaceName = interfaceName;
-        this.communityName = communityName;
+        this.p2pHash = p2pHash;
     }
 
 
@@ -39,8 +39,8 @@ public class P2PConnectionImpl implements P2PConnection
 
 
     @Override
-    public String getCommunityName()
+    public String getP2pHash()
     {
-        return communityName;
+        return p2pHash;
     }
 }

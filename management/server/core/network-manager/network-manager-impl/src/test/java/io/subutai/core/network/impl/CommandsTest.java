@@ -81,48 +81,6 @@ public class CommandsTest
 
 
     @Test
-    public void testGetSetContainerIpCommand() throws Exception
-    {
-        assertNotNull( commands.getSetContainerIpCommand( CONTAINER_NAME, GATEWAY_IP, NET_MASK, VLAN_ID ) );
-    }
-
-
-    @Test
-    public void testGetShowContainerIpCommand() throws Exception
-    {
-        assertNotNull( commands.getShowContainerIpCommand( CONTAINER_NAME ) );
-    }
-
-
-    @Test
-    public void testGetRemoveContainerIpCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveContainerIpCommand( CONTAINER_NAME ) );
-    }
-
-
-    @Test
-    public void testGetSetupGatewayOnContainerCommand() throws Exception
-    {
-        assertNotNull( commands.getSetupGatewayOnContainerCommand( GATEWAY_IP, INTERFACE_NAME ) );
-    }
-
-
-    @Test
-    public void testGetRemoveGatewayCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveGatewayCommand( VLAN_ID ) );
-    }
-
-
-    @Test
-    public void testGetRemoveGatewayOnContainerCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveGatewayOnContainerCommand() );
-    }
-
-
-    @Test
     public void testGetSetupVniVlanMappingCommand() throws Exception
     {
         assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID ) );
@@ -133,13 +91,6 @@ public class CommandsTest
     public void testGetRemoveVniVlanMappingCommand() throws Exception
     {
         assertNotNull( commands.getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
-    }
-
-
-    @Test
-    public void testGetCleanupEnvironmentNetworkSettingsCommand() throws Exception
-    {
-        assertNotNull( commands.getCleanupEnvironmentNetworkSettingsCommand( VLAN_ID ) );
     }
 
 

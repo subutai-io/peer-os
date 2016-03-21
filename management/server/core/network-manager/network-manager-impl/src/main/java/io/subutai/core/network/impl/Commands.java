@@ -26,54 +26,27 @@ public class Commands
     private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
-    //container commands
-
-
-    public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( containerName, "-s", String.format( "%s/%s", ip, netMask ),
-                        String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getShowContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
-    }
-
-
-    public RequestBuilder getRemoveContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-r" ) );
-    }
-
-
-    //management host commands
-
-
-    public RequestBuilder getListPeersInEnvironmentCommand( String communityName )
+    public RequestBuilder getListPeersInEnvironmentCommand( String p2pHash )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-p", communityName ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-p", p2pHash ) );
     }
 
 
-    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
+    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String p2pHash,
                                                         String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "p2p", "-c", interfaceName, localIp, communityName, secretKey,
-                        String.valueOf( secretKeyTtlSec ) ) );
+                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey,
+                        String.valueOf( secretKeyTtlSec ), Strings.isNullOrEmpty( localIp ) ? "" : localIp ) )
+                                                                    .withTimeout( 90 );
     }
 
 
-    public RequestBuilder getRemoveP2PConnectionCommand( String communityName )
+    public RequestBuilder getRemoveP2PConnectionCommand( String p2pHash )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-d", communityName ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-d", p2pHash ) );
     }
 
 
@@ -107,33 +80,6 @@ public class Commands
     public RequestBuilder getListTunnelsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
-    }
-
-
-    public RequestBuilder getSetupGatewayOnContainerCommand( String gatewayIp, String interfaceName )
-    {
-        return new RequestBuilder( "route add default gw" )
-                .withCmdArgs( Lists.newArrayList( gatewayIp, interfaceName ) );
-    }
-
-
-    public RequestBuilder getRemoveGatewayCommand( int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getCleanupEnvironmentNetworkSettingsCommand( int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getRemoveGatewayOnContainerCommand()
-    {
-        return new RequestBuilder( "route del default gw" );
     }
 
 

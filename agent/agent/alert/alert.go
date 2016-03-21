@@ -6,7 +6,6 @@ import (
 	"github.com/subutai-io/base/agent/agent/container"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/log"
-	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os/exec"
 	"runtime"
@@ -75,9 +74,12 @@ func ramQuota(cont string) []int {
 }
 
 func quotaCPU(name string) int {
-	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	cfsPeriod := 100000
-	quota, _ := strconv.Atoi(c.CgroupItem("cpu.cfs_quota_us")[0])
+	cfs_quota_us, err := ioutil.ReadFile("/sys/fs/cgroup/cpu,cpuacct/lxc/" + name + "/cpu.cfs_quota_us")
+	if err != nil {
+		return -1
+	}
+	quota, _ := strconv.Atoi(string(cfs_quota_us))
 	return quota * 100 / cfsPeriod / runtime.NumCPU()
 }
 

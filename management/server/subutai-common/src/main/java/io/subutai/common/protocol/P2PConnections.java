@@ -28,15 +28,15 @@ public class P2PConnections
     }
 
 
-    public P2PConnection findCommunityConnection( final String communityName )
+    public P2PConnection findConnectionByHash( final String hash )
     {
-        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( hash );
 
         P2PConnection result = null;
         for ( Iterator<P2PConnection> i = connections.iterator(); i.hasNext() && result == null; )
         {
             P2PConnection c = i.next();
-            if ( communityName.equalsIgnoreCase( c.getCommunityName() ) )
+            if ( hash.equalsIgnoreCase( c.getP2pHash() ) )
             {
                 result = c;
             }

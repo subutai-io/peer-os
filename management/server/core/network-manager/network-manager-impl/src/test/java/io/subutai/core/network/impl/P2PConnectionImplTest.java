@@ -20,6 +20,6 @@ public class P2PConnectionImplTest
 
         assertEquals( LOCAL_IP, connection.getLocalIp() );
         assertEquals( INTERFACE_NAME, connection.getInterfaceName() );
-        assertEquals( COMMUNITY_NAME, connection.getCommunityName() );
+        assertEquals( COMMUNITY_NAME, connection.getP2pHash() );
     }
 }

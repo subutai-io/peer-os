@@ -54,7 +54,7 @@ public class UpdateControlNetworkCommand extends SubutaiShellCommandSupport
         for ( ControlNetworkConfig config : result )
         {
             System.out.println(
-                    String.format( "%s %s %s", config.getPeerId(), config.getCommunityName(), config.getAddress() ) );
+                    String.format( "%s %s %s", config.getPeerId(), config.getP2pHash(), config.getAddress() ) );
         }
         return null;
     }
