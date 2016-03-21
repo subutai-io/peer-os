@@ -1,10 +1,17 @@
-package io.subutai.webui.impl;
+package io.subutai.webui.entity;
 
+
+import java.util.List;
 
 public class WebuiModuleResourse
 {
     private String img;
     private String name;
+    private String angularPath;
+    private List<AngularjsDependency> dependencies;
+
+    private String bodyClass;
+    private String layout;
 
 
     public String getImg()

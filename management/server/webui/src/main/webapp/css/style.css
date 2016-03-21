@@ -2697,6 +2697,7 @@ td.b-main-table__status-col {
     width: 200px;
     background-color: #fff;
 	z-index: 2;
+	height: 100%;
 }
 .b-tools-menu {
     height: 100%;
@@ -2759,6 +2760,7 @@ td.b-main-table__status-col {
 .b-progress-text {
     font-size: 11px;
     color: #04346E;
+	word-break: break-word;
 }
 .b-cloud-item {
     width: 40px;

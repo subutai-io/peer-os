@@ -184,6 +184,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	}
 
 	function deleteTemplate(template) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "Delete template!",
@@ -197,6 +198,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					LOADING_SCREEN();
 					kurjunSrv.deleteTemplate(template.md5Sum, template.repository).success(function (data) {
@@ -212,6 +214,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	}
 
 	function deleteAPT(apt) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "Delete template!",
@@ -225,6 +228,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					LOADING_SCREEN();
 					kurjunSrv.deleteAPT(apt.md5Sum).success(function (data) {
