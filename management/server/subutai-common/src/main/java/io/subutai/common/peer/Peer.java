@@ -91,11 +91,6 @@ public interface Peer
      */
     public void setDefaultGateway( ContainerGateway containerGateway ) throws PeerException;
 
-    /**
-     * Cleans up environment networking settings. This method is called when an environment is being destroyed to clean
-     * up its settings on the local peer.
-     */
-    void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException;
 
     /**
      * Returns true of the host is connected, false otherwise

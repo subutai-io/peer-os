@@ -353,16 +353,6 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        new PeerWebClient( peerInfo, provider ).cleanupEnvironmentNetworkSettings( environmentId );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
     public boolean isConnected( final HostId hostId )
     {
         Preconditions.checkNotNull( hostId, "Host id is null" );
