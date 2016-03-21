@@ -13,7 +13,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
@@ -21,7 +20,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.peer.api.PeerManager;
 
 

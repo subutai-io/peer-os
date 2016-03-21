@@ -108,8 +108,14 @@ public class SetupP2PStep
                 env.addEnvironmentPeer( new PeerConfImpl( config ) );
             }
 
-            // tunnel setup
+            //
+            // Tunnel setup
+            //
+
+            // <peerId, ip>
             Map<String, String> tunnels = env.getTunnels();
+
+            LOGGER.debug( "tunnels: {}", tunnels  );
 
             int peersCount = env.getPeerConfs().size();
             ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
