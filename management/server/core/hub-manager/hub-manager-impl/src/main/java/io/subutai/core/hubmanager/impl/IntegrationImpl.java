@@ -138,7 +138,7 @@ public class IntegrationImpl implements Integration
                     .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
 
             hubLoggerExecutorService
-                    .scheduleWithFixedDelay( hubLoggerProcessor, 5, 3600, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
 
             //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
