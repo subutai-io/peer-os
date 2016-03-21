@@ -52,7 +52,7 @@
 			ng-show="advEnvCtrl.activeCloudTab == 'peers'">
 				<ul>
 					<li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
-					ng-click="advEnvCtrl.showResources(peerId, peersResources, $index)">
+					ng-click="advEnvCtrl.showResources(peerId, peersResources.resourceHosts, $index)">
 						<span class="b-tools-menu__item" class="b-cloud-item-text g-margin-bottom-half">
 							Peer {{$index + 1}}
 						</span>
@@ -62,7 +62,7 @@
 								<div class="b-progress-cloud-fill" style="width: 0%"></div>
 							</div>-->
 							<div class="b-progress-text">
-								<span class="g-text-blue">{{ peerId }}</span>
+								<span class="g-text-blue">{{ peersResources.name }}</span>
 							</div>
 						</div>
 					</li>
