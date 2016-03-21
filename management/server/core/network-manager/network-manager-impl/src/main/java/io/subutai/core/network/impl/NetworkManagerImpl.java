@@ -26,7 +26,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PPeerInfo;
+import io.subutai.common.protocol.P2PConnectionImpl;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
@@ -110,6 +110,41 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
+    public Set<P2PConnection> listP2PConnectionsInSwarm( final String p2pHash ) throws NetworkManagerException
+    {
+        return listP2PConnectionsInSwarm( getManagementHost(), p2pHash );
+    }
+
+
+    @Override
+    public Set<P2PConnection> listP2PConnectionsInSwarm( final Host host, final String p2pHash )
+            throws NetworkManagerException
+    {
+        Set<P2PConnection> p2PConnections = Sets.newHashSet();
+
+        CommandResult result = execute( host, commands.getListPeersInEnvironmentCommand( p2pHash ) );
+
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "\\s*(\\S+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\S+)\\s*" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                p2PConnections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+            }
+        }
+
+
+        return p2PConnections;
+    }
+
+
+    @Override
     public Set<P2PConnection> listP2PConnections() throws NetworkManagerException
     {
         return listP2PConnections( getManagementHost() );
@@ -119,61 +154,9 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<P2PConnection> listP2PConnections( final Host host ) throws NetworkManagerException
     {
-        Set<P2PConnection> connections = Sets.newHashSet();
-
-        CommandResult result = execute( host, commands.getListP2PConnectionsCommand() );
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile( "(\\w+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.*)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
-            {
-                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
-            }
-        }
-
-        return connections;
+        return listP2PConnectionsInSwarm( host, null );
     }
 
-
-    @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final String p2pHash ) throws NetworkManagerException
-    {
-        return listPeersInEnvironment( getManagementHost(), p2pHash );
-    }
-
-
-    @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final Host host, final String p2pHash )
-            throws NetworkManagerException
-    {
-        Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
-
-        CommandResult result = execute( host, commands.getListPeersInEnvironmentCommand( p2pHash ) );
-
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile( "(.+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.+)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
-            {
-                p2PPeerInfos.add( new P2PPeerInfo( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
-            }
-        }
-
-
-        return p2PPeerInfos;
-    }
 
     //------------------ P2P SECTION END --------------------------------
 

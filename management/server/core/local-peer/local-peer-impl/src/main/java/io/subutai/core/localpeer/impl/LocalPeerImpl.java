@@ -1471,9 +1471,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
             for ( P2PConnection connection : connections )
             {
-                if ( getId().toLowerCase().equals( connection.getP2pHash() ) )
+                if ( getId().toLowerCase().equals( connection.getHash() ) )
                 {
-                    return ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
+                    return ControlNetworkUtil.extractNetwork( connection.getIp() );
                 }
             }
         }
@@ -1495,15 +1495,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             final Set<P2PConnection> connections = getNetworkManager().listP2PConnections();
             for ( P2PConnection connection : connections )
             {
-                if ( peerId.equals( connection.getP2pHash() ) )
+                if ( peerId.equals( connection.getHash() ) )
                 {
-                    address = connection.getLocalIp();
+                    address = connection.getIp();
                 }
                 else
                 {
-                    if ( connection.getLocalIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+                    if ( connection.getIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
                     {
-                        String usedNetwork = ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
+                        String usedNetwork = ControlNetworkUtil.extractNetwork( connection.getIp() );
                         usedNetworks.add( usedNetwork );
                     }
                 }
@@ -1529,10 +1529,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             boolean conflict = false;
             for ( P2PConnection connection : connections )
             {
-                if ( connection.getLocalIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+                if ( connection.getIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
                 {
-                    String net = ControlNetworkUtil.extractNetwork( connection.getLocalIp() );
-                    if ( suggestedNetwork.equals( net ) && !connection.getP2pHash().equals( config.getP2pHash() ) )
+                    String net = ControlNetworkUtil.extractNetwork( connection.getIp() );
+                    if ( suggestedNetwork.equals( net ) && !connection.getHash().equals( config.getP2pHash() ) )
                     {
                         conflict = true;
                         LOG.warn( "Conflicts control network between '%s' and '%s'.", getId(), config.getP2pHash() );
@@ -1709,8 +1709,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        LOG.debug(
-                String.format( "Adding local peer to P2P swarm: %s %s", config.getHash(), config.getAddress() ) );
+        LOG.debug( String.format( "Adding local peer to P2P swarm: %s %s", config.getHash(), config.getAddress() ) );
 
         try
         {
@@ -1723,11 +1722,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                Set<P2PConnection> p2PConnections = getNetworkManager().listP2PConnections( resourceHost );
+                Set<P2PConnection> p2PConnections =
+                        getNetworkManager().listP2PConnectionsInSwarm( resourceHost, envVni.getEnvironmentId() );
                 boolean p2pHashExists = false;
                 for ( P2PConnection p2PConnection : p2PConnections )
                 {
-                    if ( p2PConnection.getP2pHash().equalsIgnoreCase( config.getHash() ) )
+                    if ( p2PConnection.getHash().equalsIgnoreCase( config.getHash() ) )
                     {
                         p2pHashExists = true;
                         break;
@@ -2084,19 +2084,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 return result;
             }
-            String p2pIP = p2PConnection.getLocalIp();
-            final SubnetUtils.SubnetInfo info =
-                    new SubnetUtils( p2pIP, ControlNetworkUtil.NETWORK_MASK ).getInfo();
+            String p2pIP = p2PConnection.getIp();
+            final SubnetUtils.SubnetInfo info = new SubnetUtils( p2pIP, ControlNetworkUtil.NETWORK_MASK ).getInfo();
 
             ExecutorService pool = Executors.newCachedThreadPool();
             ExecutorCompletionService<PingDistance> completionService = new ExecutorCompletionService<>( pool );
             int counter = 0;
             for ( int i = 0; i < maxAddress; i++ )
             {
-                if ( !p2PConnection.getLocalIp().equals( info.getAllAddresses()[i] ) )
+                if ( !p2PConnection.getIp().equals( info.getAllAddresses()[i] ) )
                 {
                     completionService
-                            .submit( new PingDistanceTask( p2PConnection.getLocalIp(), info.getAllAddresses()[i] ) );
+                            .submit( new PingDistanceTask( p2PConnection.getIp(), info.getAllAddresses()[i] ) );
                     counter++;
                 }
             }
