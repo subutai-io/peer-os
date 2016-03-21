@@ -52,3 +52,13 @@ export SUBUTAI_APP_DATA_PATH="/opt/subutai-mng/"
 #export SUBUTAI_APP_DATA_PATH="/var/lib/subutai"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
 export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
+
+# JMX connection for Karaf -----------------------------------------------
+# Warning: use this for dev stage only since JMX port is left unsecured!
+# Note: To be able to connect to Karaf from your machine,you need to execute the following command on RH with MH
+# sudo iptables -t nat -A PREROUTING -i wan -p tcp -m tcp --dport {JMX_PORT} -j DNAT --to-destination 10.10.10.1:{JMX_PORT}
+# and enable the options below
+
+#export JMX_ENABLED=true
+#export JMX_PORT=10099
+#export JMX_HOST=192.168.0.102

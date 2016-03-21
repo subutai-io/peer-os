@@ -5,6 +5,7 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,16 +74,28 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKeyRing( final String identityId )
     {
-        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+        String key = "";
 
-        if ( Strings.isNullOrEmpty( key ) )
+        try
         {
+            key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+
+            if ( Strings.isNullOrEmpty( key ) )
+            {
+                logger.info( " ************* Public Key not found with id:" +  identityId);
+                return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+            }
+            else
+            {
+                return Response.ok( key ).build();
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.error( "************ Error in getPublicKeyRest identityId:" + identityId,ex);
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-        else
-        {
-            return Response.ok( key ).build();
-        }
+
     }
 
 
@@ -92,17 +105,29 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKey( final String identityId )
     {
-        String key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+        String key = "";
 
-        if ( Strings.isNullOrEmpty( key ) )
+        try
         {
+            key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+
+            if ( Strings.isNullOrEmpty( key ) )
+            {
+                logger.info( " ************* Public Key not found with id:" +  identityId);
+                return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+            }
+            else
+            {
+                return Response.ok( key ).build();
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.info( " ************* Error ! Public Key not found with id:" +  identityId,ex);
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-        else
-        {
-            return Response.ok( key ).build();
-        }
-    }
+
+ }
 
 
     /* ******************************
@@ -111,16 +136,28 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKeyId( final String identityId )
     {
-        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( identityId ).getPublicKey();
-
-        if ( key == null )
+        try
         {
+            PGPPublicKeyRing pubRing = securityManager.getKeyManager().getPublicKeyRing( identityId );
+            PGPPublicKey key = pubRing.getPublicKey();
+
+            if ( key == null )
+            {
+                logger.info( " ************* Public Key not found with id:" +  identityId);
+                return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
+            }
+            else
+            {
+                return Response.ok( PGPKeyUtil.encodeNumericKeyId( key.getKeyID() ) ).build();
+            }
+
+        }
+        catch(Exception ex)
+        {
+            logger.info( " ************* Error ! Public Key not found with id:" +  identityId,ex);
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-        else
-        {
-            return Response.ok( PGPKeyUtil.encodeNumericKeyId( key.getKeyID() ) ).build();
-        }
+
     }
 
 

@@ -19,9 +19,11 @@ public class CleanupP2PStep
 
     public void execute() throws PeerException
     {
+
         for ( Peer peer : environment.getPeers() )
         {
-            peer.removeP2PConnection( environment.getEnvironmentId() );
+            //todo run in a thread
+            peer.removeP2PConnection( environment.getP2PHash() );
         }
     }
 }

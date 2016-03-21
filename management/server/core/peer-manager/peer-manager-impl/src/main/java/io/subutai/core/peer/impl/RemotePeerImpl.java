@@ -353,16 +353,6 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        new PeerWebClient( peerInfo, provider ).cleanupEnvironmentNetworkSettings( environmentId );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
     public boolean isConnected( final HostId hostId )
     {
         Preconditions.checkNotNull( hostId, "Host id is null" );
@@ -685,7 +675,8 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
+    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request )
+            throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
 
@@ -694,9 +685,10 @@ public class RemotePeerImpl implements RemotePeer
         Map<String, String> headers = Maps.newHashMap();
         //************************************************************************
 
-        PrepareTemplatesResponseCollector response = sendRequest( request, RecipientType.PREPARE_TEMPLATE_REQUEST.name(),
-                Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, PrepareTemplatesResponseCollector.class,
-                Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
+        PrepareTemplatesResponseCollector response =
+                sendRequest( request, RecipientType.PREPARE_TEMPLATE_REQUEST.name(),
+                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, PrepareTemplatesResponseCollector.class,
+                        Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
         {
@@ -872,11 +864,13 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeP2PConnection( final EnvironmentId environmentId ) throws PeerException
+    public void removeP2PConnection( final String p2pHash ) throws PeerException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environment ID" );
-        new PeerWebClient( peerInfo, provider ).removeP2PConnection( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
+
+        new PeerWebClient( peerInfo, provider ).removeP2PConnection( p2pHash );
     }
+
 
     @Override
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
@@ -947,10 +941,10 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
+    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress )
             throws PeerException
     {
-        return new PeerWebClient( peerInfo, provider ).getCommunityDistances( communityName, maxAddress );
+        return new PeerWebClient( peerInfo, provider ).getP2PSwarmDistances( p2pHash, maxAddress );
     }
 
 

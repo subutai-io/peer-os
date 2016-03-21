@@ -66,12 +66,14 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		if (vm.period > 0 && vm.currentHost) {
 			LOADING_SCREEN();
 			monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
+
 				vm.charts = [];
-				if(data['metrics']) {
-					for (var i = 0; i < data['metrics'].length; i++) {
-						angular.equals(data['metrics'][i], {}) ?
+				if(data['Metrics']) {
+					for (var i = 0; i < data['Metrics'].length; i++) {
+						angular.equals(data['Metrics'][i], {}) || angular.equals(data['Metrics'][i], null) ||
+						angular.equals(data['Metrics'][i]['Series'], null)?
 							vm.charts.push({data: [], name: "NO DATA"}) :
-								vm.charts.push(getChartData(data['metrics'][i]));
+							vm.charts.push(getChartData(data['Metrics'][i]));
 					}
 				} else {
 					for (var i = 0; i < 4; i++) {
@@ -91,8 +93,8 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	};
 
 	function getChartData(obj) {
-		var series = obj.series;
-		var seriesName = obj.series[0].name;
+		var series = obj.Series;
+		var seriesName = obj.Series[0].name;
 
 		/** Chart options **/
 		var chartOptions = {
@@ -252,7 +254,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 
 		/** Calculate amount of incomplete data received form rest **/
 		start = moment(series[0].values[0][0]);
-		end = moment(getEndDate(obj));
+		end = moment(getEndDate(series));
 		duration = moment.duration(end.diff(start)).asMinutes();
 		diff = vm.period * 60 - duration;
 		leftLimit = moment(series[0].values[0][0]).subtract(diff, 'minutes');
@@ -270,9 +272,9 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 
 		/** Generate stub values if data is incomplete at the end **/
 		for(var item in series) {
-			if(moment(series[item].values[series[item].values.length - 1][0]).valueOf() < moment(getEndDate(obj)).valueOf()) {
+			if(moment(series[item].values[series[item].values.length - 1][0]).valueOf() < moment(getEndDate(series)).valueOf()) {
 				var from = moment(series[item].values[series[item].values.length - 1][0]);
-				var to = moment(getEndDate(obj)).valueOf();
+				var to = moment(getEndDate(series)).valueOf();
 
 				from.add(1, "minutes");
 				while(from.valueOf() <= to) {
@@ -503,11 +505,11 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	}
 
 	/** Get max timestamp of series **/
-	function getEndDate(data) {
+	function getEndDate(series) {
 		var maxValue = 0;
-		for (var serie in data.series) {
-			if(moment(data.series[serie].values[data.series[serie].values.length - 1][0]).valueOf() > maxValue) {
-				maxValue = moment(data.series[serie].values[data.series[serie].values.length - 1][0]).valueOf();
+		for (var serie in series) {
+			if(moment(series[serie].values[series[serie].values.length - 1][0]).valueOf() > maxValue) {
+				maxValue = moment(series[serie].values[series[serie].values.length - 1][0]).valueOf();
 			} else {
 				continue;
 			}

@@ -1,5 +1,6 @@
 /*Fonts*/
-@import url(https://fonts.googleapis.com/css?family=Ubuntu:500italic,500,400,400italic,700,700italic);
+/*@import url(https://fonts.googleapis.com/css?family=Ubuntu:500italic,500,400,400italic,700,700italic);*/
+@font-face { font-family: Ubuntu; src: url('ubuntu-font-family/Ubuntu-R.ttf'); }
 
 /*General*/
 
@@ -36,8 +37,8 @@ input[type=checkbox] {
 
 .b-personal-space {
 	position: absolute;
-	top: 10px;
-	right: 16px;
+	top: 27px;
+	right: 30px;
 	z-index: 10;
 }
 
@@ -105,6 +106,7 @@ input[type=checkbox] {
 
 .b-content {
     padding: 15px 15px 0;
+	position: relative;
 }
 
 .b-workspace {
@@ -334,7 +336,7 @@ input[type=checkbox] {
 }
 
 .b-btn:disabled {
-    background-color: #f8fbfd;
+    background-color: #EAEAEA;
     color: #333333;
 }
 
@@ -1084,6 +1086,13 @@ tip.description-tooltip {
 
 .b-popup-header-controls:last-child {
 	margin-left: 0;
+}
+
+.b-popup__text {
+	font-size: 14px;
+	color: #22B573;
+	padding: 0 0;
+	margin: 0 0 0 0;
 }
 
 .b-popup__header {
@@ -2269,7 +2278,7 @@ td.b-main-table__status-col {
     vertical-align: middle;
     height: 29px;
     line-height: 29px;
-    padding: 0 8px;
+    padding: 0 7px;
     display: inline-block;
     font-family: 'Ubuntu', sans-serif;
     font-size: 13px;
@@ -3415,20 +3424,22 @@ td.b-main-table__status-col {
 }
 
 /*template form*/
-.b-template-settings__dropdown {
+.b-template-settings {
 	display: none;
     line-height: normal;
     position: absolute;
     top: 40px;
-    right: 0;
-    width: 150px;
+	width: auto;
     border: 1px solid #CCCEEE;
     background-color: #fff;
     border-radius: 2px;
     z-index: 999;
     box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
+	line-height: 0;
+	font-size: 0;
+	vertical-align: top;
 }
-.b-template-settings__dropdown:before {
+.b-template-settings:before {
     content: "";
     position: absolute;
     bottom: 100%;
@@ -3437,7 +3448,7 @@ td.b-main-table__status-col {
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
 }
-.b-template-settings__dropdown:after {
+.b-template-settings:after {
     content: "";
     position: absolute;
     bottom: 100%;
@@ -3446,22 +3457,37 @@ td.b-main-table__status-col {
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
 }
-.b-template-settings__dropdown .header {
+.b-template-settings .header {
     padding: 10px;
     font-size: 14px;
+	line-height: normal;
     border-bottom: 1px solid #CCCEEE;
     background-color: #f8fbfd;
 	color: #3d3d3d;
 }
 
-.b-template-settings__dropdown .body,
-.b-template-settings__dropdown .footer {
-    font-size: 13px;
-    padding: 10px;
-
+.b-template-settings__text {
+	font-size: 12px;
+	color: #04346E;
+	line-height: 17px;
+	padding: 0 0 0 10px;
 }
 
-.b-template-settings__dropdown .footer a {
+.b-template-settings .body,
+.b-template-settings .footer {
+    font-size: 13px;
+    padding: 10px;
+}
+
+.b-template-settings__coll {
+	display: inline-block;
+	width: 150px;
+	line-height: normal;
+	vertical-align: top;
+	font-size: 14px;
+}
+
+.b-template-settings .footer a {
     font-size: 13px;
 }
 
@@ -3530,5 +3556,33 @@ td.b-main-table__status-col {
 
 .b-error-log {
 	color: #fa0000;
+}
+
+.b-tools-menu__inpit {
+	padding: 10px 10px 0 10px;
+	/*border-bottom: 1px solid #CCCEEE;	*/
+}
+
+.b-search-input {
+	box-sizing: border-box;
+	height: 29px;
+	border: 1px solid #CCCEEE;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 13px;
+	color: #04346E;
+	padding: 0 30px 0 5px;
+	width: 100%;
+	background: transparent;
+	background-image: url(../assets/elements/search-icon.png);
+	background-repeat: no-repeat;
+	background-position: 98% 50%;
+}
+
+select.b-search-input {
+	background-image: none;
+}
+
+.b-search-input:focus{
+    outline: none;
 }
 

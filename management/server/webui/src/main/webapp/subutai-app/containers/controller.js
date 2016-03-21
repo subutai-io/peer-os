@@ -51,6 +51,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			LOADING_SCREEN('none');
 		}).error(function(error){
 			LOADING_SCREEN('none');
+			SweetAlert.swal ("ERROR!", error.replace(/\\n/g, " "));
 			ngDialog.closeAll();
 		});
 	}

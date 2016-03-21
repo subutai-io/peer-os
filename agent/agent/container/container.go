@@ -66,13 +66,6 @@ func GetActiveContainers(details bool) []Container {
 		container.Hostname = c
 		container.Interfaces = GetContainerIfaces(c)
 
-		// PoolInstance().AddHost(container.Id, container.Name)
-		// vlan_id := cont.GetConfigItem(configpath, "#vlan_id")
-		// if len(vlan_id) > 0 {
-		// 	container.Vlan, _ = strconv.Atoi(vlan_id)
-		// } else {
-		// 	container.Vlan = 0
-		// }
 		contArr = append(contArr, *container)
 	}
 	return contArr

@@ -208,24 +208,11 @@ public class MonitorImpl implements Monitor, HostListener
     @Override
     public HistoricalMetrics getHistoricalMetrics( final Host host, Date startTime, Date endTime )
     {
-        Preconditions.checkNotNull( host );
-
         HistoricalMetrics result = new HistoricalMetrics();
 
         try
         {
-            RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
-
-            CommandResult commandResult;
-            if ( host instanceof ResourceHost )
-            {
-                commandResult = peerManager.getLocalPeer().getResourceHostById( host.getId() )
-                                           .execute( historicalMetricCommand );
-            }
-            else
-            {
-                commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
-            }
+            CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
 
 
             if ( null != commandResult && commandResult.hasSucceeded() )
@@ -251,6 +238,60 @@ public class MonitorImpl implements Monitor, HostListener
         return result;
     }
 
+
+    @Override
+    public String getPlainHistoricalMetrics( final Host host, final Date startTime, final Date endTime )
+    {
+
+
+        String result = null;
+
+        try
+        {
+            CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
+
+            if ( null != commandResult && commandResult.hasSucceeded() )
+            {
+                result = commandResult.getStdOut();
+            }
+            else
+            {
+                LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
+                        commandResult.getStdErr() ) );
+            }
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( "Could not run command successfully! Error: {}", e );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( "Could not find resource host of host {}!", host.getHostname() );
+        }
+
+
+        return result;
+    }
+
+    private CommandResult getHistoricalMetricsResp( final Host host, final Date startTime, final Date endTime ) throws CommandException, HostNotFoundException
+    {
+        Preconditions.checkNotNull( host );
+
+        RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
+
+        CommandResult commandResult;
+        if ( host instanceof ResourceHost )
+        {
+            commandResult = peerManager.getLocalPeer().getResourceHostById( host.getId() )
+                    .execute( historicalMetricCommand );
+        }
+        else
+        {
+            commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+        }
+
+        return commandResult;
+    }
 
     @Override
     public void addAlert( final AlertEvent alert )

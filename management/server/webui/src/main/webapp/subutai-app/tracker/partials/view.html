@@ -13,6 +13,7 @@
 			<div class="b-main-form__wrapper b-main-form__wrapper_margin-r">
 				<label class="b-popup-body-label b-popup-body-label_inline">Source</label>
 				<select class="b-popup-body-input b-popup-body-input_enviroment-name" 
+					tabindex=1 
 					ng-change="trackerCtrl.loadOperations()" 
 					ng-model="trackerCtrl.selectedModule">
 					<option ng-repeat="module in trackerCtrl.modules" value="{{ module }}">
@@ -28,6 +29,7 @@
 					ng-model="trackerCtrl.startDate" 
 					ng-change="trackerCtrl.loadOperations()" 
 					id="end" 
+					tabindex=2 
 					class="b-popup-body-input b-popup-body-input__enviroment-name">
 			</div>
 
@@ -37,6 +39,7 @@
 					ng-model="trackerCtrl.endDate" 
 					ng-change="trackerCtrl.loadOperations()" 
 					id="end" 
+					tabindex=3 
 					class="b-popup-body-input b-popup-body-input__enviroment-name">				
 			</div>
 		</div>

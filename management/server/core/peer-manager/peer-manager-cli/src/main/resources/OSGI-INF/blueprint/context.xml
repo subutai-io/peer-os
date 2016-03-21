@@ -9,15 +9,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/get-quota">
-      <action class="io.subutai.core.peer.cli.GetContainerQuotaCommand">
-        <argument ref="peerManager" />
-        <argument ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/ls">
       <action class="io.subutai.core.peer.cli.ListCommand">
         <property name="peerManager" ref="peerManager" />
@@ -37,7 +28,6 @@
     <command name="peer/hosts">
       <action class="io.subutai.core.peer.cli.HostsCommand">
         <property name="peerManager" ref="peerManager" />
-        <property name="identityManager" ref="identityManager" />
       </action>
     </command>
   </command-bundle>
@@ -100,7 +90,7 @@
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/distances">
-      <action class="io.subutai.core.peer.cli.GetCommunityDistancesCommand">
+      <action class="io.subutai.core.peer.cli.GetP2PSwarmDistancesCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>
@@ -130,12 +120,6 @@
     </command>
   </command-bundle>
 
-
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
-  <reference id="identityManager" availability="mandatory"
-             interface="io.subutai.core.identity.api.IdentityManager" />
-
-  <reference id="environmentManager" availability="mandatory"
-             interface="io.subutai.core.environment.api.EnvironmentManager" />
 
 </blueprint>
