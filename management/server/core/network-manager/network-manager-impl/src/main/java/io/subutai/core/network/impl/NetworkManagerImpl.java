@@ -26,7 +26,6 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PConnectionImpl;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
@@ -110,19 +109,19 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<P2PConnection> listP2PConnectionsInSwarm( final String p2pHash ) throws NetworkManagerException
+    public Set<P2PConnection> getP2PConnectionsInSwarm( final String p2pHash ) throws NetworkManagerException
     {
-        return listP2PConnectionsInSwarm( getManagementHost(), p2pHash );
+        return getP2PConnectionsInSwarm( getManagementHost(), p2pHash );
     }
 
 
     @Override
-    public Set<P2PConnection> listP2PConnectionsInSwarm( final Host host, final String p2pHash )
+    public Set<P2PConnection> getP2PConnectionsInSwarm( final Host host, final String p2pHash )
             throws NetworkManagerException
     {
         Set<P2PConnection> p2PConnections = Sets.newHashSet();
 
-        CommandResult result = execute( host, commands.getListPeersInEnvironmentCommand( p2pHash ) );
+        CommandResult result = execute( host, commands.getP2PConnectionsCommand( p2pHash ) );
 
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
@@ -145,16 +144,16 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException
+    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException
     {
-        return listP2PConnections( getManagementHost() );
+        return getP2PConnections( getManagementHost() );
     }
 
 
     @Override
-    public Set<P2PConnection> listP2PConnections( final Host host ) throws NetworkManagerException
+    public Set<P2PConnection> getP2PConnections( final Host host ) throws NetworkManagerException
     {
-        return listP2PConnectionsInSwarm( host, null );
+        return getP2PConnectionsInSwarm( host, null );
     }
 
 

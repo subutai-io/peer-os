@@ -1,4 +1,7 @@
-package io.subutai.common.protocol;
+package io.subutai.core.network.impl;
+
+
+import io.subutai.common.protocol.P2PConnection;
 
 
 public class P2PConnectionImpl implements P2PConnection

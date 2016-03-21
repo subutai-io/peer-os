@@ -73,7 +73,7 @@ public interface NetworkManager
      *
      * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PConnection> listP2PConnectionsInSwarm( String p2pHash ) throws NetworkManagerException;
+    public Set<P2PConnection> getP2PConnectionsInSwarm( String p2pHash ) throws NetworkManagerException;
 
     /**
      * Returns p2p connections in the p2p swarm running on the specified host
@@ -81,7 +81,7 @@ public interface NetworkManager
      * @param host - host
      * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PConnection> listP2PConnectionsInSwarm( Host host, String p2pHash ) throws NetworkManagerException;
+    public Set<P2PConnection> getP2PConnectionsInSwarm( Host host, String p2pHash ) throws NetworkManagerException;
 
     /**
      * Returns all p2p connections running on the specified host
@@ -89,13 +89,13 @@ public interface NetworkManager
      * @param host - host
      */
 
-    public Set<P2PConnection> listP2PConnections( Host host ) throws NetworkManagerException;
+    public Set<P2PConnection> getP2PConnections( Host host ) throws NetworkManagerException;
 
     /**
      * Returns all p2p connections running on MH
      */
 
-    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
+    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException;
 
 
     /**

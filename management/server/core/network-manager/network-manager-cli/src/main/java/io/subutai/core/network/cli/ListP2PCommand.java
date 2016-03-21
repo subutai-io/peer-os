@@ -38,7 +38,7 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            final Set<P2PConnection> connections = networkManager.listP2PConnections();
+            final Set<P2PConnection> connections = networkManager.getP2PConnections();
             System.out.println( String.format( "Found %d P2P connection(s).", connections.size() ) );
             for ( P2PConnection connection : connections )
             {

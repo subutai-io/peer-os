@@ -25,7 +25,7 @@ public class Commands
     private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
-    public RequestBuilder getListPeersInEnvironmentCommand( String p2pHash )
+    public RequestBuilder getP2PConnectionsCommand( String p2pHash )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "p2p", "-p", Strings.isNullOrEmpty( p2pHash ) ? "" : p2pHash ) );
