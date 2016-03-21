@@ -38,7 +38,7 @@ public class ConsolePage extends PageObject {
     @FindBy(xpath = "*//div[@class=\"b-console-selects__item b-main-form__wrapper\"]")
     public WebElementFacade itemSelectorHost;
 
-    @FindBy(xpath = "html/body/ng-include/div[1]/div[2]/div[3]/div/div[2]/div[1]/div[1]/div[3]/select/option[2]")
+    @FindBy(xpath = "*//option[@ ng-repeat=\"host in consoleViewCtrl.hosts\"]")
     public WebElementFacade selectorHostsItemManagementHost;
 
     @FindBy(xpath = "html/body/ng-include/div[1]/div[2]/div[3]/div/div[2]/div[1]/div[1]/div[3]/select/option[3]")

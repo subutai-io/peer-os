@@ -557,7 +557,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void userShouldObservePluginMongo() {
-        environmentsPage.waitFor(environmentsPage.sikuliTemplateMongo);
+        environmentsPage.waitTemplateMongo();
         assertThat(environmentsPage.templateMongo.isVisible(), is(true));
     }
 
