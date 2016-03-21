@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl;
 
 
-import java.io.IOException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +46,6 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -61,19 +59,13 @@ import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
@@ -100,7 +92,6 @@ import io.subutai.core.environment.impl.workflow.modification.EnvironmentModifyW
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
-import io.subutai.core.environment.impl.workflow.modification.steps.P2PSecretKeyResetStep;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -2217,7 +2208,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 {
 
                     final String secretKey = UUID.randomUUID().toString();
-                    final long keyTtl = TimeUnit.MINUTES.toSeconds( 120 );
+                    final long keyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
                     resetP2PSecretKey( environment.getId(), secretKey, keyTtl, true );
                 }
             }

@@ -25,12 +25,6 @@ public interface LocalPeer extends Peer
 
 
     /**
-     * Removes a gateway
-     */
-    void removeGateway( int vlan ) throws PeerException;
-
-
-    /**
      * Returns external IP of mgmt host
      */
     String getExternalIp() throws PeerException;

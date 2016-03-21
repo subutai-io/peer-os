@@ -133,7 +133,7 @@ public class EnvironmentImportWorkflow extends Workflow<EnvironmentImportWorkflo
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager ).execute();
+            new SetupP2PStep( topology, environment, peerManager, networkManager ).execute();
 
             environment = environmentManager.update( environment );
 

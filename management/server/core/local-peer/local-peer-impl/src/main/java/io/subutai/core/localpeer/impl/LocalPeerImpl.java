@@ -118,7 +118,6 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -396,7 +395,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request )
             throws PeerException
@@ -417,7 +417,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
             final CreateEnvironmentContainerGroupRequest requestGroup ) throws PeerException
@@ -741,7 +742,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
@@ -760,7 +762,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
@@ -779,7 +782,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
@@ -817,7 +821,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void setDefaultGateway( final ContainerGateway gateway ) throws PeerException
     {
@@ -1173,7 +1178,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
     {
@@ -1191,7 +1196,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
     {
@@ -1223,7 +1229,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Delete" )
     private Set<ContainerHost> destroyContainerGroup( final Set<ContainerHost> containerHosts,
                                                       final Set<Throwable> errors )
     {
@@ -1279,7 +1286,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Vni reserveVni( final Vni vni ) throws PeerException
     {
@@ -1345,7 +1353,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
+    //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeVniDomain( final Long vni ) throws PeerException
     {
@@ -1370,7 +1378,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setVniDomain( final Long vni, final String domain,
                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
@@ -1427,7 +1435,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void addIpToVniDomain( final String hostIp, final Long vni ) throws PeerException
     {
@@ -1454,7 +1462,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void removeIpFromVniDomain( final String hostIp, final Long vni ) throws PeerException
     {
@@ -1482,7 +1490,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public int setupContainerSsh( final String containerHostId, final int sshIdleTimeout ) throws PeerException
     {
@@ -1678,7 +1687,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     /* ***********************************************
      *  Create PEK
      */
-    @RolesAllowed( "Environment-Management|Write" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
     {
@@ -1764,7 +1774,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setupP2PConnection( final P2PConfig config ) throws PeerException
     {
@@ -1795,10 +1806,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 else
                 {
-                    //todo what to do with p2p IPs for RHs other than MH-RH?
-                    getNetworkManager()
-                            .setupP2PConnection( resourceHost, config.getInterfaceName(), config.getAddress(),
-                                    config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                    //we don't supply p2p IP since it should get assigned dynamically
+                    getNetworkManager().setupP2PConnection( resourceHost, config.getInterfaceName(), null,
+                            config.getCommunityName(), config.getSecretKey(), config.getSecretKeyTtlSec() );
                 }
             }
         }
@@ -1809,7 +1819,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removeP2PConnection( final String communityName ) throws PeerException
     {
@@ -1830,7 +1841,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION END --------------------
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
+    //TODO this is for basic environment via hub
+    //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {
@@ -1854,23 +1866,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 throw new PeerException( e.getMessage() );
             }
-        }
-    }
-
-
-    @Override
-    public void removeGateway( final int vlan ) throws PeerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                String.format( "VLAN must be in the range from %d to %d", Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        try
-        {
-            getNetworkManager().removeGateway( vlan );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException( String.format( "Error removing gateway tap device with VLAN %d", vlan ), e );
         }
     }
 

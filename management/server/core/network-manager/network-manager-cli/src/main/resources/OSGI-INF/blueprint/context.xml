@@ -25,20 +25,6 @@
     </command>
   </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/set-container-ip">
-      <action class="io.subutai.core.network.cli.SetContainerIpCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/remove-container-ip">
-      <action class="io.subutai.core.network.cli.RemoveContainerIpCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="p2p/list">
       <action class="io.subutai.core.network.cli.ListP2PCommand">
         <argument ref="networkManager" />

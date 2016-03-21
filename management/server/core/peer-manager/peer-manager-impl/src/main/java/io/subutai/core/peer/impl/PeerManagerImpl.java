@@ -58,6 +58,7 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.SecurityUtilities;
@@ -134,7 +135,7 @@ public class PeerManagerImpl implements PeerManager
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 60, TimeUnit.MINUTES );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
     }
 
 
@@ -1409,7 +1410,7 @@ public class PeerManagerImpl implements PeerManager
         {
             if ( controlNetworkTtl <= System.currentTimeMillis() )
             {
-                controlNetworkTtl = TimeUnit.MINUTES.toSeconds( CONTROL_NETWORK_TTL_IN_MIN );
+                controlNetworkTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
                 key = DigestUtils.md5( UUID.randomUUID().toString() );
                 this.distances = null;
             }

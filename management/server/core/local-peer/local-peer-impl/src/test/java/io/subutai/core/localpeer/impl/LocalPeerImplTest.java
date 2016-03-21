@@ -798,19 +798,6 @@ public class LocalPeerImplTest
 
 
     @Test( expected = PeerException.class )
-    public void testRemoveGateway() throws Exception
-    {
-        localPeer.removeGateway( VLAN );
-
-        verify( networkManager ).removeGateway( VLAN );
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).removeGateway( VLAN );
-
-        localPeer.removeGateway( VLAN );
-    }
-
-
-    @Test( expected = PeerException.class )
     public void testListTunnels() throws Exception
     {
         localPeer.listTunnels();
