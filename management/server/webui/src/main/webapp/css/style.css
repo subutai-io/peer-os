@@ -1119,7 +1119,7 @@ tip.description-tooltip {
 }
 
 .b-popup__footer {
-    padding: 0 15px 15px 30px;
+    padding: 0 15px 15px 15px;
 }
 
 .b-popup__footer_undertable {
