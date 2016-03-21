@@ -62,7 +62,7 @@ public class BazaarImpl implements Bazaar
 					e.printStackTrace ();
 				}
 			}
-		}, 0, 10, TimeUnit.MINUTES);
+		}, 0, 1, TimeUnit.HOURS);
 	}
 
 

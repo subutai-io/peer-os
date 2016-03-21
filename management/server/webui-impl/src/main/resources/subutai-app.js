@@ -219,7 +219,7 @@ function CurrentUserCtrl($location, $rootScope, $http, SweetAlert) {
 
 }
 
-var bazaarUpdate = false;
+
 
 function SubutaiController($rootScope) {
     var vm = this;
@@ -877,6 +877,8 @@ app.directive('checkbox-list-dropdown', function () {
 });
 
 //Global variables
+
+var bazaarUpdate = false;
 
 var SERVER_URL = '/';
 
