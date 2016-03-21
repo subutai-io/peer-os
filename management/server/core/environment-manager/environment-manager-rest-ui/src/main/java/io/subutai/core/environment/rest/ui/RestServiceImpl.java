@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.environment.rest.ui.entity.ContainerDto;
+import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
+import io.subutai.core.environment.rest.ui.entity.PeerDto;
+import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +46,6 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -669,32 +672,35 @@ public class RestServiceImpl implements RestService
     {
         List<Peer> peers = peerManager.getPeers();
 
+        String localId = peerManager.getLocalPeer().getId();
+
         ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
 
         CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
 
-        Map<String, List<PeerDto>> peerHostMap = Maps.newHashMap();
+        Map<String, PeerDto> peerHostMap = Maps.newHashMap();
 
         try
         {
             for ( Peer peer : peers )
             {
                 taskCompletionService.submit( () -> {
+                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(), peer.getId().equals( localId ) );
                     if ( peer.isOnline() )
                     {
                         Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                        peerHostMap.put( peer.getId(), Lists.newArrayList() );
                         for ( ResourceHostMetric metric : collection
                                 .toArray( new ResourceHostMetric[collection.size()] ) )
                         {
-                            peerHostMap.get( peer.getId() )
-                                       .add( new PeerDto( metric.getHostInfo().getId(), metric.getCpuModel(),
-                                                       metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
-                                                       metric.getAvailableRam().toString(),
-                                                       metric.getTotalSpace().toString(),
-                                                       metric.getAvailableSpace().toString() ) );
+                            peerDto.addResourceHostDto( new ResourceHostDto( metric.getHostInfo().getId(), metric.getCpuModel(),
+                                           metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
+                                           metric.getAvailableRam().toString(),
+                                           metric.getTotalSpace().toString(),
+                                           metric.getAvailableSpace().toString() ) );
                         }
                     }
+
+                    peerHostMap.put( peer.getId(), peerDto );
                     return true;
                 } );
             }
@@ -831,7 +837,7 @@ public class RestServiceImpl implements RestService
 
     /** AUX **************************************************** */
 
-    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    private Set<ContainerDto> convertContainersToContainerJson(Set<EnvironmentContainerHost> containerHosts )
     {
         Set<ContainerDto> containerDtos = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )

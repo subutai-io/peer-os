@@ -5,13 +5,17 @@ import java.util.List;
 
 public class PeerDto
 {
-    private int id;
+    private String id;
     private String name;
     private List<ResourceHostDto> resourceHosts;
+    private boolean isOnline;
+    private boolean isLocal;
 
-    public PeerDto(int id, String name) {
+    public PeerDto(String id, String name, boolean isOnline, boolean isLocal) {
         this.id = id;
         this.name = name;
+        this.isOnline = isOnline;
+        this.isLocal = isLocal;
         resourceHosts = new ArrayList<>();
     }
 

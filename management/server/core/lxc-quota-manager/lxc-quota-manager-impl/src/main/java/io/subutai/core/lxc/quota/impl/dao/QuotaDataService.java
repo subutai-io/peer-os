@@ -17,7 +17,7 @@ import io.subutai.core.lxc.quota.impl.entity.QuotaEntity;
 
 /**
  * {@link QuotaDataService} implements {@link DataService} interface. {@link
- * QuotaDataService} manages {@link io.subutai.core.lxc.quota.impl.entity.QuotaEntity} entities in database
+ * QuotaDataService} manages {@link io.subutai.core.lxc.quota.impl.entity.QuotaEntity} entity in database
  */
 public class QuotaDataService implements DataService<String, QuotaEntity>
 {
