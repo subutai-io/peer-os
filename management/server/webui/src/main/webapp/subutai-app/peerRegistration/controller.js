@@ -22,6 +22,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 	vm.approvePeerRequest = approvePeerRequest;
 	vm.unregisterPeer = unregisterPeer;
 	vm.cancelPeerRequest = cancelPeerRequest;
+	vm.issueRelationChallenge = issueRelationChallenge;
 
 	vm.dtInstance = {};
 	vm.users = {};
@@ -60,16 +61,76 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 
 	function actionButton(data, type, full, meta) {
 		var result = '';
+		var challengeStorage = '';
 		if(data.registrationData.status == 'APPROVED') {
-			result += '<a href class="b-btn b-btn_red subt_button__peer-unregister" ng-click="peerRegistrationCtrl.unregisterPeer(\'' + data.registrationData.peerInfo.id + '\')">Unregister</a>';
-		} else if(data.registrationData.status == 'WAIT') {
-			result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.cancelPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Cancel</a>';
-		} else if(data.registrationData.status == 'REQUESTED') {
-			result += '<a href class="b-btn b-btn_green subt_button__peer-approve" ng-click="peerRegistrationCtrl.approvePeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Approve</a>';
-			result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.rejectPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Reject</a>';
-		}
+			challengeStorage = '<div style="display: none">' +
+				'<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input bp-sign-challenge"' +
+				'data-challenge="'+data.registrationData.peerInfo.id +'"' +
+				'ng-model="data.operationChallenge"' +
+				'ng-change="peerRegistrationCtrl.unregisterPeer(\'' + data.registrationData.peerInfo.id + '\', $event)"' +
+				'style="width: 420px; height: 160px; font-family: monospace;">' +
+				'</textarea></div>';
 
+			result += '<a href class="b-btn b-btn_red subt_button__peer-unregister" ' +
+				'ng-click="peerRegistrationCtrl.issueRelationChallenge($event)">' +
+				'Unregister' +
+					challengeStorage +
+				'</a>';
+		} else if(data.registrationData.status == 'WAIT') {
+			challengeStorage = '<div style="display: none">' +
+				'<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input bp-sign-challenge"' +
+				'data-challenge="'+data.registrationData.peerInfo.id +'"' +
+				'ng-model="data.operationChallenge"' +
+				'ng-change="peerRegistrationCtrl.cancelPeerRequest(\'' + data.registrationData.peerInfo.id + '\')"' +
+				'style="width: 420px; height: 160px; font-family: monospace;">' +
+				'</textarea>' +
+				'</div>';
+
+			result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ' +
+				'ng-click="peerRegistrationCtrl.issueRelationChallenge($event)">' +
+				'Cancel' +
+					challengeStorage +
+				'</a>';
+		} else if(data.registrationData.status == 'REQUESTED') {
+			challengeStorage = '<div style="display: none">' +
+				'<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input bp-sign-challenge"' +
+				'data-challenge="'+data.registrationData.peerInfo.id +'"' +
+				'ng-model="data.operationChallenge"' +
+				'ng-change="peerRegistrationCtrl.approvePeerRequest(\'' + data.registrationData.peerInfo.id + '\', $event)"' +
+				'style="width: 420px; height: 160px; font-family: monospace;">' +
+				'</textarea></div>';
+
+			result += '<a href class="b-btn b-btn_green subt_button__peer-approve" ' +
+				'ng-click="peerRegistrationCtrl.issueRelationChallenge($event)">' +
+				'Approve' +
+				challengeStorage +
+				'</a>';
+
+			var challengeStorage1 = '<div style="display: none">' +
+				'<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input bp-sign-challenge"' +
+				'data-challenge="'+data.registrationData.peerInfo.id +'"' +
+				'ng-model="data.operationChallenge"' +
+				'ng-change="peerRegistrationCtrl.rejectPeerRequest(\'' + data.registrationData.peerInfo.id + '\', $event)"' +
+				'style="width: 420px; height: 160px; font-family: monospace;">' +
+				'</textarea></div>';
+			result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ' +
+				'ng-click="peerRegistrationCtrl.issueRelationChallenge($event)">' +
+				'Reject' +
+					challengeStorage1+
+				'</a>';
+		}
 		return result;
+	}
+
+	function issueRelationChallenge($event) {
+		objectRelationService.issueChallenge().success(function (data) {
+			var storage = $($event.target).find('.bp-sign-input.bp-sign-challenge');
+			$(storage).val(data);
+			$(storage).addClass('bp-sign-target');
+
+		}).error(function (err) {
+			SweetAlert.swal("ERROR!", "Couldn't issue operation challenge token: " + err, "error");
+		});
 	}
 
 	function peerFrom() {
@@ -86,7 +147,10 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 	}
 
 	function rejectPeerRequest(peerId) {
-		peerRegistrationService.rejectPeerRequest(peerId).success(function (data) {
+		var signedChallenge = $('.bp-sign-target[data-challenge="'+peerId+'"]').val();
+		$(signedChallenge).removeClass('bp-sign-target');
+		var putData = "peerId=" + peerId + '&challenge=' + encodeURIComponent(signedChallenge);
+		peerRegistrationService.rejectPeerRequest(putData).success(function (data) {
 			vm.dtInstance.reloadData(null, false);
 		}).error(function(error){
 			if(error.ERROR !== undefined) {
@@ -124,7 +188,10 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 		},
 		function (isConfirm) {
 			if (isConfirm) {
-				peerRegistrationService.unregisterPeerRequest(peerId).success(function (data) {
+				var signedChallenge = $('.bp-sign-target[data-challenge="'+peerId+'"]').val();
+				$(signedChallenge).removeClass('bp-sign-target');
+				var putData = "peerId=" + peerId + '&challenge=' + encodeURIComponent(signedChallenge);
+				peerRegistrationService.unregisterPeerRequest(putData).success(function (data) {
 					SweetAlert.swal("Unregistered!", "Your peer request has been unregistered.", "success");
 					vm.dtInstance.reloadData(null, false);
 				}).error(function (error) {
@@ -149,7 +216,10 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 		},
 		function (isConfirm) {
 			if (isConfirm) {
-				peerRegistrationService.cancelPeerRequest(peerId).success(function (data) {
+				var signedChallenge = $('.bp-sign-target[data-challenge="'+peerId+'"]').val();
+				$(signedChallenge).removeClass('bp-sign-target');
+				var postData = "peerId=" + peerId + '&challenge=' + encodeURIComponent(signedChallenge);
+				peerRegistrationService.cancelPeerRequest(postData).success(function (data) {
 					SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");
 					vm.dtInstance.reloadData(null, false);
 				}).error(function (error) {
@@ -175,7 +245,7 @@ function PeerRegistrationPopupCtrl($scope, peerRegistrationService, objectRelati
 
 	objectRelationService.issueChallenge().success(function (data) {
 		vm.operationChallenge = data;
-		autoSign();
+		$('.bp-sign-input.bp-sign-challenge[data-challenge="approve-register"]').addClass('bp-sign-target');
 	}).error(function (err) {
 		SweetAlert.swal("ERROR!", "Couldn't issue operation challenge token: " + err, "error");
 	});
@@ -193,18 +263,15 @@ function PeerRegistrationPopupCtrl($scope, peerRegistrationService, objectRelati
 	}
 
 	function approvePeerRequest(keyPhrase) {
-		peerRegistrationService.approvePeerRequest(vm.peerId, keyPhrase).success(function (data) {
+		peerRegistrationService.approvePeerRequest(vm.peerId, keyPhrase, vm.operationChallenge).success(function (data) {
 			ngDialog.closeAll();
 		}).error(function (error) {
 			SweetAlert.swal("ERROR!", "Peer approve error: " + error, "error");
 		});
 	}
 
-	function autoSign() {
-		$('.bp-sign-input.bp-sign-challenge').addClass('bp-sign-target');
-	}
-
 	function allowSubmit() {
+		$('.bp-sign-input.bp-sign-challenge[data-challenge="approve-register"]').removeClass('bp-sign-target');
 		vm.challengeSigned = true;
 	}
 }
