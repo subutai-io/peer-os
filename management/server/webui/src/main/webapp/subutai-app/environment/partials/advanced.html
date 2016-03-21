@@ -52,20 +52,17 @@
 			ng-show="advEnvCtrl.activeCloudTab == 'peers'">
 				<ul>
 					<li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
-					tooltips 
-					tooltip-template="{{ peerId }}" 
-					tooltip-side="left" 
 					ng-click="advEnvCtrl.showResources(peerId, peersResources, $index)">
 						<span class="b-tools-menu__item" class="b-cloud-item-text g-margin-bottom-half">
 							Peer {{$index + 1}}
 						</span>
 
 						<div class="b-progress__cloud">
-							<div class="b-progress-cloud g-margin-bottom-half">
+							<!--<div class="b-progress-cloud g-margin-bottom-half">
 								<div class="b-progress-cloud-fill" style="width: 0%"></div>
-							</div>
+							</div>-->
 							<div class="b-progress-text">
-								<span class="g-text-blue">0%</span> resources used
+								<span class="g-text-blue">{{ peerId }}</span>
 							</div>
 						</div>
 					</li>
@@ -83,7 +80,7 @@
 						</a>
 					</div>
 				</div>
-				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar-cloud">
+				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar">
 					<ul ng-show="advEnvCtrl.currentResourceHosts.length > 0">
 						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
 						ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
@@ -130,6 +127,7 @@
 							</div>
 						</li>
 					</ul>
+					<div style="height: 46px;"></div>
 				</div>
 			</div>
 		</div>
