@@ -41,12 +41,12 @@ public abstract class P2PUtil
 
     public static String generateHash( final String ip )
     {
-        return String.format( "com_%s", ip.replace( ".", "_" ) );
+        return String.format( "swarm-%s", ip.replace( ".", "_" ) );
     }
 
 
     public static String generateInterfaceName( final int vlan )
     {
-        return String.format( "p2p_%d", vlan );
+        return String.format( "p2p-%d", vlan );
     }
 }
