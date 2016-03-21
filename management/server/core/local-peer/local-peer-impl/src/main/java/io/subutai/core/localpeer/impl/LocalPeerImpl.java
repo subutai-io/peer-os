@@ -26,7 +26,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
@@ -2250,8 +2249,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public String getKeyId()
     {
-        PGPPublicKey publicKey = securityManager.getKeyManager().getPublicKey( null );
-        return PGPKeyUtil.getFingerprint( publicKey.getFingerprint() );
+        return getId();
     }
 }
 
