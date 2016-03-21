@@ -133,7 +133,7 @@ public class SetupP2PStep
 
             // tunnel setup
             Map<String, String> tunnels = env.getTunnels();
-            for ( Peer peer : peers )
+            for ( Peer peer : env.getPeers() )
             {
                 tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnels ) );
             }
