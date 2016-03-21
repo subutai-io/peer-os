@@ -104,33 +104,6 @@ public interface NetworkManager
      */
     public void removeTunnel( int tunnelId ) throws NetworkManagerException;
 
-    /**
-     * Sets container environment IP and VLAN ID on container
-     */
-    public void setContainerIp( String containerName, String ip, int netMask, int vLanId )
-            throws NetworkManagerException;
-
-    /**
-     * Removes container environment IP and VLAN ID on container
-     */
-    public void removeContainerIp( String containerName ) throws NetworkManagerException;
-
-    /**
-     * Returns container environment IP on container
-     */
-    public ContainerInfo getContainerIp( String containerName ) throws NetworkManagerException;
-
-
-    /**
-     * Removes gateway IP for specified VLAN on management host
-     */
-    public void removeGateway( int vLanId ) throws NetworkManagerException;
-
-
-    /**
-     * Removes gateway IP on a container
-     */
-    public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;
 
     /**
      * Lists existing tunnels on management host

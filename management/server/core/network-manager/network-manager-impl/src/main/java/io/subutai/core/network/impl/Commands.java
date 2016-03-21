@@ -26,34 +26,6 @@ public class Commands
     private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
-    //container commands
-
-
-    public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( containerName, "-s", String.format( "%s/%s", ip, netMask ),
-                        String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getShowContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
-    }
-
-
-    public RequestBuilder getRemoveContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-r" ) );
-    }
-
-
-    //management host commands
-
-
     public RequestBuilder getListPeersInEnvironmentCommand( String communityName )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
@@ -108,33 +80,6 @@ public class Commands
     public RequestBuilder getListTunnelsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
-    }
-
-
-    public RequestBuilder getSetupGatewayOnContainerCommand( String gatewayIp, String interfaceName )
-    {
-        return new RequestBuilder( "route add default gw" )
-                .withCmdArgs( Lists.newArrayList( gatewayIp, interfaceName ) );
-    }
-
-
-    public RequestBuilder getRemoveGatewayCommand( int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getCleanupEnvironmentNetworkSettingsCommand( int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getRemoveGatewayOnContainerCommand()
-    {
-        return new RequestBuilder( "route del default gw" );
     }
 
 
