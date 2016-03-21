@@ -26,7 +26,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
-import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -34,7 +33,6 @@ import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -178,80 +176,6 @@ public class NetworkManagerImplTest
         verify( localPeer ).getManagementHost();
         verify( commands ).getRemoveTunnelCommand( TUNNEL_NAME );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveGateway() throws Exception
-    {
-        networkManager.removeGateway( VLAN_ID );
-
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveGatewayCommand( VLAN_ID );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveGatewayOnContainer() throws Exception
-    {
-        networkManager.removeGatewayOnContainer( CONTAINER_NAME );
-
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( commands ).getRemoveGatewayOnContainerCommand();
-        verify( containerHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testSetContainerIp() throws Exception
-    {
-        networkManager.setContainerIp( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByContainerName( anyString() );
-        verify( commands ).getSetContainerIpCommand( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
-        verify( resourceHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveContainerIp() throws Exception
-    {
-        networkManager.removeContainerIp( CONTAINER_NAME );
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByContainerName( anyString() );
-        verify( commands ).getRemoveContainerIpCommand( CONTAINER_NAME );
-        verify( resourceHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testGetContainerIp() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( CONTAINER_IP_OUTPUT );
-
-        ContainerInfo containerInfo = networkManager.getContainerIp( CONTAINER_NAME );
-
-        assertNotNull( containerInfo );
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByContainerName( anyString() );
-        verify( commands ).getShowContainerIpCommand( CONTAINER_NAME );
-
-
-        when( commandResult.getStdOut() ).thenReturn( "" );
-
-        try
-        {
-            networkManager.getContainerIp( CONTAINER_NAME );
-            fail( "Expected NetworkManagerException" );
-        }
-        catch ( NetworkManagerException e )
-        {
-        }
     }
 
 

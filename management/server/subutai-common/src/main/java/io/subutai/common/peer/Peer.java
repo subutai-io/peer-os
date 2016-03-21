@@ -274,15 +274,26 @@ public interface Peer
     HostInterfaces getInterfaces() throws PeerException;
 
     /**
-     * Resets a secret key for a given P2P network
+     * Resets a secret key for a given P2P network on all RHs
      *
      * @param p2PCredentials - P2P network credentials
      */
     void resetP2PSecretKey( P2PCredentials p2PCredentials ) throws PeerException;
 
 
+    /**
+     * Sets up p2p connection on each RH.
+     *
+     * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
+     * dynamic IP acquisition for RHs
+     */
     void setupP2PConnection( P2PConfig config ) throws PeerException;
 
+    /**
+     * Removes p2p connection by hash from all RHs
+     *
+     * @param communityName - hash of p2p swarm
+     */
     void removeP2PConnection( String communityName ) throws PeerException;
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;

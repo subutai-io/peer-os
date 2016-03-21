@@ -35,33 +35,6 @@ public class CLITest extends SystemOutRedirectTest
 
 
     @Test
-    public void testRemoveContainerIpCommand() throws Exception
-    {
-        try
-        {
-            new RemoveContainerIpCommand( null );
-            fail( "Expected NullPointerException" );
-        }
-        catch ( NullPointerException e )
-        {
-        }
-
-        RemoveContainerIpCommand removeContainerIpCommand = new RemoveContainerIpCommand( networkManager );
-
-        removeContainerIpCommand.doExecute();
-
-        assertEquals( "OK", getSysOut() );
-
-
-        doThrow( exception ).when( networkManager ).removeContainerIp( anyString() );
-
-        removeContainerIpCommand.doExecute();
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
-    }
-
-
-    @Test
     public void testRemoveP2PCommand() throws Exception
     {
 
@@ -111,33 +84,6 @@ public class CLITest extends SystemOutRedirectTest
         doThrow( exception ).when( networkManager ).removeTunnel( anyInt() );
 
         removeTunnelCommand.doExecute();
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
-    }
-
-
-    @Test
-    public void testSetContainerIpCommand() throws Exception
-    {
-        try
-        {
-            new SetContainerIpCommand( null );
-            fail( "Expected NullPointerException" );
-        }
-        catch ( NullPointerException e )
-        {
-        }
-
-        SetContainerIpCommand setContainerIpCommand = new SetContainerIpCommand( networkManager );
-
-        setContainerIpCommand.doExecute();
-
-        assertEquals( "OK", getSysOut() );
-
-
-        doThrow( exception ).when( networkManager ).setContainerIp( anyString(), anyString(), anyInt(), anyInt() );
-
-        setContainerIpCommand.doExecute();
 
         verify( exception ).printStackTrace( any( PrintStream.class ) );
     }

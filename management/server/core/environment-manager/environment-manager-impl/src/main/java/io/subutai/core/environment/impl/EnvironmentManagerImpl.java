@@ -2212,7 +2212,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 {
 
                     final String secretKey = UUID.randomUUID().toString();
-                    final long keyTtl = TimeUnit.MINUTES.toSeconds( 120 );
+                    final long keyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
                     resetP2PSecretKey( environment.getId(), secretKey, keyTtl, true );
                 }
             }

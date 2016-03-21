@@ -31,7 +31,6 @@ import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
-import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -225,22 +224,6 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( getManagementHost(),
                 commands.getRemoveTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ) ) );
-    }
-
-
-    @Override
-    public void removeGateway( final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        execute( getManagementHost(), commands.getRemoveGatewayCommand( vLanId ) );
-    }
-
-
-    @Override
-    public void removeGatewayOnContainer( final String containerName ) throws NetworkManagerException
-    {
-        execute( getContainerHost( containerName ), commands.getRemoveGatewayOnContainerCommand() );
     }
 
 
@@ -482,46 +465,6 @@ public class NetworkManagerImpl implements NetworkManager
         }
 
         return reservedVnis;
-    }
-
-
-    @Override
-    public void setContainerIp( final String containerName, final String ip, final int netMask, final int vLanId )
-            throws NetworkManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        execute( getResourceHost( containerName ),
-                commands.getSetContainerIpCommand( containerName, ip, netMask, vLanId ) );
-    }
-
-
-    @Override
-    public void removeContainerIp( final String containerName ) throws NetworkManagerException
-    {
-        execute( getResourceHost( containerName ), commands.getRemoveContainerIpCommand( containerName ) );
-    }
-
-
-    @Override
-    public ContainerInfo getContainerIp( final String containerName ) throws NetworkManagerException
-    {
-        CommandResult result =
-                execute( getResourceHost( containerName ), commands.getShowContainerIpCommand( containerName ) );
-
-        Pattern pattern = Pattern.compile(
-                "Environment IP:\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})/(\\d+)\\s+Vlan ID:\\s+(\\d+)\\s+" );
-        Matcher m = pattern.matcher( result.getStdOut() );
-        if ( m.find() && m.groupCount() == 3 )
-        {
-            return new ContainerInfoImpl( m.group( 1 ), Integer.parseInt( m.group( 2 ) ),
-                    Integer.parseInt( m.group( 3 ) ) );
-        }
-        else
-        {
-            throw new NetworkManagerException( String.format( "Network info of %s not found", containerName ) );
-        }
     }
 
 

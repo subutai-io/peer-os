@@ -33,6 +33,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -46,13 +47,16 @@ public class SetupP2PStep
     private final Topology topology;
     private final EnvironmentImpl env;
     private final PeerManager peerManager;
+    private final NetworkManager networkManager;
 
 
-    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager )
+    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
+                         final NetworkManager networkManager )
     {
         this.topology = topology;
         this.env = environment;
         this.peerManager = peerManager;
+        this.networkManager = networkManager;
     }
 
 
@@ -68,23 +72,33 @@ public class SetupP2PStep
             Set<String> existingNetworks = getTunnelNetworks( peers );
 
             String freeTunnelNetwork = P2PUtil.findFreeTunnelNetwork( existingNetworks );
+
             LOGGER.debug( String.format( "Free tunnel network: %s", freeTunnelNetwork ) );
+
             if ( freeTunnelNetwork == null )
             {
                 throw new IllegalStateException( "Could not calculate tunnel network." );
             }
+
             env.setTunnelNetwork( freeTunnelNetwork );
-            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
+
             SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeTunnelNetwork, P2PUtil.P2P_SUBNET_MASK ).getInfo();
-            final String[] addresses = subnetInfo.getAllAddresses();
-            int counter = 0;
 
             ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
 
             ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-            // p2p setup
-            List<P2PConfig> result = new ArrayList<>( peers.size() );
+
+            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
+            final String[] addresses = subnetInfo.getAllAddresses();
+
+            //setup initial p2p participant local peer MH
+            networkManager
+                    .setupP2PConnection( peerManager.getLocalPeer().getManagementHost(), env.getTunnelInterfaceName(),
+                            addresses[0], env.getTunnelCommunityName(), sharedKey,
+                            Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+
+            int counter = 1;
             for ( Peer peer : peers )
             {
                 P2PConfig config = new P2PConfig( peer.getId(), env.getId(), env.getTunnelInterfaceName(),
@@ -94,6 +108,8 @@ public class SetupP2PStep
                 counter++;
             }
 
+            // p2p setup
+            List<P2PConfig> result = new ArrayList<>( peers.size() );
             for ( Peer peer : peers )
             {
                 final Future<P2PConfig> f = p2pCompletionService.take();
@@ -108,14 +124,6 @@ public class SetupP2PStep
                 env.addEnvironmentPeer( new PeerConfImpl( config ) );
             }
 
-            //
-            // Tunnel setup
-            //
-
-            // <peerId, ip>
-            Map<String, String> tunnels = env.getTunnels();
-
-            LOGGER.debug( "tunnels: {}", tunnels  );
 
             int peersCount = env.getPeerConfs().size();
             ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
@@ -123,7 +131,8 @@ public class SetupP2PStep
             ExecutorCompletionService<Integer> tunnelCompletionService =
                     new ExecutorCompletionService<Integer>( tunnelExecutor );
 
-
+            // tunnel setup
+            Map<String, String> tunnels = env.getTunnels();
             for ( Peer peer : peers )
             {
                 tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnels ) );
