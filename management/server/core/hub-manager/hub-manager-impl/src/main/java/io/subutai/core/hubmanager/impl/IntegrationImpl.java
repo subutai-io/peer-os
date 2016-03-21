@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.hubmanager.impl.proccessors.*;
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +39,6 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
-import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
@@ -69,12 +64,19 @@ public class IntegrationImpl implements Integration
 
     private ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
 
+    private ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
+
     private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
+
+
+
 
     private HeartbeatProcessor heartbeatProcessor;
     private ResourceHostConfProcessor resourceHostConfProcessor;
     private SystemConfProcessor systemConfProcessor;
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
+    private HubLoggerProcessor hubLoggerProcessor;
+
     private DaoManager daoManager;
     private ConfigDataService configDataService;
     private Monitor monitor;
@@ -109,6 +111,8 @@ public class IntegrationImpl implements Integration
 
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
 
+            hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
+
             resourceHostMonitorProcessor =
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
@@ -132,6 +136,10 @@ public class IntegrationImpl implements Integration
 
             containerEventExecutor
                     .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+
+            hubLoggerExecutorService
+                    .scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+
 
             //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
             //
