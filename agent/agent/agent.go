@@ -71,7 +71,6 @@ func Start(c *cli.Context) {
 	go http.ListenAndServe(":7070", nil)
 
 	initAgent()
-	go container.ContainersRestoreState()
 	go lib.Collect()
 	go connectionMonitor()
 
@@ -82,6 +81,7 @@ func Start(c *cli.Context) {
 		} else {
 			time.Sleep(5 * time.Second)
 		}
+		container.ContainersRestoreState(pool)
 	}
 }
 

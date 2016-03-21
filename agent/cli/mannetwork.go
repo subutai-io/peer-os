@@ -14,7 +14,9 @@ import (
 func P2P(c, d, u, l, p bool, args []string) {
 	if c {
 		if len(args) > 8 {
-			p2p.Create(args[4], args[5], args[6], args[7], args[8])
+			p2p.Create(args[4], args[8], args[5], args[6], args[7])
+		} else if len(args) > 7 {
+			p2p.Create(args[4], "dhcp", args[5], args[6], args[7])
 		} else {
 			fmt.Println("Wrong usage")
 		}

@@ -174,9 +174,7 @@ func GetParent(name string) string {
 	if !IsContainer(name) {
 		return "Container does not exists"
 	}
-	// c, _ := lxc.NewContainer(name)
 	configFileName := config.Agent.LxcPrefix + name + "/config"
-	// return GetConfigItem(c.ConfigFileName(), "subutai.parent")
 	return GetConfigItem(configFileName, "subutai.parent")
 }
 
