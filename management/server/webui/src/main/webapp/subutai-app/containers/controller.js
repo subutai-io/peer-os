@@ -1,7 +1,19 @@
 'use strict';
 
 angular.module('subutai.containers.controller', ['ngTagsInput'])
-	.controller('ContainerViewCtrl', ContainerViewCtrl);
+	.controller('ContainerViewCtrl', ContainerViewCtrl)
+	.filter('getEnvById', function() {
+		return function(input, id) {
+			console.log( input, id );
+			for ( var i = 0; i < input.length ; i++ )
+			{
+				if (input[i].id == id) {
+					return input[i].name;
+				}
+			}
+			return null;
+		}
+	});
 
 ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 
