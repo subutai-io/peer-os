@@ -20,6 +20,9 @@
   <reference id="environmentManager"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
 
+  <reference id="identityManager"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
@@ -31,6 +34,7 @@
     <property name="securityManager" ref="securityManager" />
     <property name="peerManager" ref="peerManager" />
     <property name="environmentManager" ref="environmentManager" />
+    <property name="identityManager" ref="identityManager" />
     <property name="monitor" ref="monitor" />
     <argument ref="daoManagerHub" />
   </bean>
