@@ -566,6 +566,19 @@ function imageExists(image_url){
 
 }
 
+function getDateFromString(string) {
+	var logTextTime = string.split(':');
+	var dateString = logTextTime[0].split(' ');
+	var temp = dateString[0].split('.');
+	dateString = [temp[1], temp[0], temp[2]].join('.') + ' ' + dateString[1];
+	var dateFullString = [dateString, logTextTime[1], logTextTime[2]].join(':');
+
+	var testDateUtc = moment.utc(dateFullString);
+	var localDate = moment(testDateUtc).local();
+
+	return localDate.format('HH:mm:ss');
+}
+
 function fileModel($parse) {
 	return {
 		restrict: 'A',
