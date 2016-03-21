@@ -67,7 +67,7 @@ public class Commands
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "p2p", "-c", interfaceName, communityName, secretKey,
                         String.valueOf( secretKeyTtlSec ), Strings.isNullOrEmpty( localIp ) ? "" : localIp ) )
-                                                                    .withTimeout( 180 );
+                                                                    .withTimeout( 90 );
     }
 
 
