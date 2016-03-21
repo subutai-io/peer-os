@@ -38,12 +38,12 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            final Set<P2PConnection> connections = networkManager.listP2PConnections();
+            final Set<P2PConnection> connections = networkManager.getP2PConnections();
             System.out.println( String.format( "Found %d P2P connection(s).", connections.size() ) );
             for ( P2PConnection connection : connections )
             {
-                System.out.println( String.format( "%s %s %s", connection.getInterfaceName(), connection.getLocalIp(),
-                        connection.getP2pHash() ) );
+                System.out.println(
+                        String.format( "%s %s %s", connection.getIp(), connection.getHash(), connection.getMac() ) );
             }
         }
         catch ( NetworkManagerException e )

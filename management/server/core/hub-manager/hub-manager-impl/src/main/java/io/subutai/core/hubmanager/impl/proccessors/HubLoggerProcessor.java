@@ -1,29 +1,32 @@
 package io.subutai.core.hubmanager.impl.proccessors;
 
 
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.ws.rs.core.Response;
+
+import org.bouncycastle.openpgp.PGPException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.http.HttpStatus;
+
 import io.subutai.core.appender.SubutaiErrorEvent;
 import io.subutai.core.appender.SubutaiErrorEventListener;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.IntegrationImpl;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.json.JsonUtil;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
-import org.bouncycastle.openpgp.PGPException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 
 public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
@@ -31,10 +34,10 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
     private static final Logger LOG = LoggerFactory.getLogger( HubLoggerProcessor.class.getName() );
     private ConfigManager configManager;
     private IntegrationImpl manager;
-    private static Map<String, String> errLogs = new HashMap<>();
+    private static Map<String, String> errLogs = new ConcurrentHashMap<>();
 
 
-    public HubLoggerProcessor(final ConfigManager configManager, final IntegrationImpl integration )
+    public HubLoggerProcessor( final ConfigManager configManager, final IntegrationImpl integration )
     {
         this.configManager = configManager;
         this.manager = integration;

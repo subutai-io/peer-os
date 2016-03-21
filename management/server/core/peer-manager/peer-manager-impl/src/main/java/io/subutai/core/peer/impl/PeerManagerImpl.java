@@ -1060,6 +1060,7 @@ public class PeerManagerImpl implements PeerManager
         }
 
 
+        //todo check this in another executor once in a minute
         private void checkPeers()
         {
             try

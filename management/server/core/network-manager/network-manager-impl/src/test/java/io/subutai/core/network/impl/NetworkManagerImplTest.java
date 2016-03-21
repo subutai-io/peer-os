@@ -23,13 +23,11 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -187,18 +185,6 @@ public class NetworkManagerImplTest
         Set<Tunnel> tunnels = networkManager.listTunnels();
 
         assertFalse( tunnels.isEmpty() );
-    }
-
-
-    @Test
-    public void testListP2PConnections() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( LIST_P2P_OUTPUT );
-
-
-        Set<P2PConnection> connections = networkManager.listP2PConnections();
-
-        TestCase.assertFalse( connections.isEmpty() );
     }
 
 
