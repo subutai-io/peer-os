@@ -92,18 +92,10 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 					challengeStorage +
 				'</a>';
 		} else if(data.registrationData.status == 'REQUESTED') {
-			challengeStorage = '<div style="display: none">' +
-				'<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input bp-sign-challenge"' +
-				'data-challenge="'+data.registrationData.peerInfo.id +'"' +
-				'ng-model="data.operationChallenge"' +
-				'ng-change="peerRegistrationCtrl.approvePeerRequest(\'' + data.registrationData.peerInfo.id + '\', $event)"' +
-				'style="width: 420px; height: 160px; font-family: monospace;">' +
-				'</textarea></div>';
 
 			result += '<a href class="b-btn b-btn_green subt_button__peer-approve" ' +
-				'ng-click="peerRegistrationCtrl.issueRelationChallenge($event)">' +
+				'ng-click="peerRegistrationCtrl.approvePeerRequest(\'' + data.registrationData.peerInfo.id + '\')"">' +
 				'Approve' +
-				challengeStorage +
 				'</a>';
 
 			var challengeStorage1 = '<div style="display: none">' +

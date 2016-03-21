@@ -789,6 +789,37 @@ public class PeerManagerImpl implements PeerManager
         }
     }
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
+    @Override
+    public void doCancelRequest( final RegistrationData request, final String challenge ) throws PeerException
+    {
+        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
+        try
+        {
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = Maps.newHashMap();
+
+            //#managementSupervisor => is simply performing all operations on peer
+            traits.put( "managementSupervisor", "true" );
+
+            RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
+            relationInfoManager
+                    .checkRelationValidity( identityManager.getActiveUser(), getLocalPeer(), relationInfoMeta,
+                            challenge );
+
+            registrationClient.sendCancelRequest( request.getPeerInfo().getPublicUrl(),
+                    buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.CANCELLED ) );
+
+            removeRequest( request.getPeerInfo().getId() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( e.getMessage() );
+        }
+    }
+
 
     @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
     @Override
@@ -797,6 +828,42 @@ public class PeerManagerImpl implements PeerManager
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
         {
+            RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
+
+            response.setToken( generateActiveUserToken() );
+
+            registrationClient.sendApproveRequest( request.getPeerInfo().getPublicUrl(), response );
+
+            register( keyPhrase, request );
+
+            removeRequest( request.getPeerInfo().getId() );
+            securityManager.getKeyManager().getRemoteHostPublicKey( request.getPeerInfo() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( e.getMessage() );
+        }
+    }
+
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
+    @Override
+    public void doApproveRequest( final String keyPhrase, final RegistrationData request, final String challenge ) throws PeerException
+    {
+        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        try
+        {
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = Maps.newHashMap();
+
+            //#managementSupervisor => is simply performing all operations on peer
+            traits.put( "managementSupervisor", "true" );
+
+            RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
+            relationInfoManager
+                    .checkRelationValidity( identityManager.getActiveUser(), getLocalPeer(), relationInfoMeta,
+                            challenge );
+
             RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
 
             response.setToken( generateActiveUserToken() );
@@ -842,6 +909,41 @@ public class PeerManagerImpl implements PeerManager
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
+    public void doRejectRequest( final RegistrationData request, String challenge ) throws PeerException
+    {
+        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        try
+        {
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = Maps.newHashMap();
+
+            //#managementSupervisor => is simply performing all operations on peer
+            traits.put( "managementSupervisor", "true" );
+
+            RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
+            relationInfoManager
+                    .checkRelationValidity( identityManager.getActiveUser(), getLocalPeer(), relationInfoMeta,
+                            challenge );
+
+            final RegistrationData r = buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED );
+
+            // return received data
+            r.setData( request.getData() );
+
+            registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(), r );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( e.getMessage() );
+        }
+
+        removeRequest( request.getPeerInfo().getId() );
+    }
+
+
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
+    @Override
     public void doUnregisterRequest( final RegistrationData request ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
@@ -854,6 +956,46 @@ public class PeerManagerImpl implements PeerManager
 
         try
         {
+            RegistrationClient registrationClient = new RegistrationClientImpl( provider );
+            PeerData peerData = loadPeerData( request.getPeerInfo().getId() );
+            registrationClient.sendUnregisterRequest( request.getPeerInfo().getPublicUrl(),
+                    buildRegistrationData( peerData.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage(), e );
+        }
+
+        unregister( request );
+        removeRequest( request.getPeerInfo().getId() );
+    }
+
+
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
+    @Override
+    public void doUnregisterRequest( final RegistrationData request, final String challenge ) throws PeerException
+    {
+        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
+        if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) )
+                .succeeded() )
+        {
+            throw new PeerException( "Could not unregister peer. Peer in use." );
+        }
+
+        try
+        {
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = Maps.newHashMap();
+
+            //#managementSupervisor => is simply performing all operations on peer
+            traits.put( "managementSupervisor", "true" );
+
+            RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
+            relationInfoManager
+                    .checkRelationValidity( identityManager.getActiveUser(), getLocalPeer(), relationInfoMeta,
+                            challenge );
+
             RegistrationClient registrationClient = new RegistrationClientImpl( provider );
             PeerData peerData = loadPeerData( request.getPeerInfo().getId() );
             registrationClient.sendUnregisterRequest( request.getPeerInfo().getPublicUrl(),

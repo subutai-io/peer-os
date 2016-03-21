@@ -14,8 +14,9 @@ import javax.ws.rs.core.Response;
 public interface RestService
 {
     @POST
-    @Produces( { MediaType.TEXT_PLAIN} )
-    Response processRegisterRequest( @FormParam( "ip" ) String ip, @FormParam( "key_phrase" ) String keyPhrase, @FormParam( "challenge" ) String challenge );
+    @Produces( { MediaType.TEXT_PLAIN } )
+    Response processRegisterRequest( @FormParam( "ip" ) String ip, @FormParam( "key_phrase" ) String keyPhrase,
+                                     @FormParam( "challenge" ) String challenge );
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -24,27 +25,28 @@ public interface RestService
     @PUT
     @Path( "reject" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response rejectForRegistrationRequest( @FormParam( "peerId" ) String peerId );
+    Response rejectForRegistrationRequest( @FormParam( "peerId" ) String peerId, @FormParam( "challenge" ) String challenge );
 
     @PUT
     @Path( "approve" )
     @Produces( { MediaType.TEXT_PLAIN } )
     Response approveForRegistrationRequest( @FormParam( "peerId" ) String peerId,
-                                            @FormParam( "key_phrase" ) String keyPhrase );
+                                            @FormParam( "key_phrase" ) String keyPhrase,
+                                            @FormParam( "challenge" ) String challenge );
 
     @PUT
     @Path( "cancel" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response cancelForRegistrationRequest( @FormParam( "peerId" ) String peerId );
+    Response cancelForRegistrationRequest( @FormParam( "peerId" ) String peerId, @FormParam( "challenge" ) String challenge );
 
     @PUT
     @Path( "unregister" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId );
+    Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId, @FormParam( "challenge" ) String challenge );
 
 
     @GET
     @Path( "resource_hosts" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getResourceHosts( );
+    Response getResourceHosts();
 }

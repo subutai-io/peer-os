@@ -20,7 +20,7 @@ var app = angular.module('subutai-app', [
 
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
-    .factory('objectRelationService', objectRelationService)
+    //.factory('objectRelationService', objectRelationService)
 
     .run(startup);
 

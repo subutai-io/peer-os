@@ -2,20 +2,25 @@ package io.subutai.core.peer.rest.ui;
 
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.RegistrationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.peer.api.PeerManager;
@@ -128,7 +133,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response rejectForRegistrationRequest( final String peerId )
+    public Response rejectForRegistrationRequest( final String peerId, final String challenge )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -137,7 +142,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doRejectRequest( data );
+            peerManager.doRejectRequest( data, challenge );
         }
         catch ( Exception e )
         {
@@ -149,7 +154,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response approveForRegistrationRequest( final String peerId, final String keyPhrase )
+    public Response approveForRegistrationRequest( final String peerId, final String keyPhrase, final String challenge )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -158,7 +163,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doApproveRequest( keyPhrase, data );
+            peerManager.doApproveRequest( keyPhrase, data, challenge );
         }
         catch ( Exception e )
         {
@@ -170,7 +175,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response cancelForRegistrationRequest( final String peerId )
+    public Response cancelForRegistrationRequest( final String peerId, final String challenge )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -179,7 +184,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doCancelRequest( data );
+            peerManager.doCancelRequest( data, challenge );
         }
         catch ( Exception e )
         {
@@ -191,7 +196,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response unregisterForRegistrationRequest( final String peerId )
+    public Response unregisterForRegistrationRequest( final String peerId, final String challenge )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
