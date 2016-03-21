@@ -115,7 +115,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
         if ( containerId == null )
         {
-            LOG.error( "Agent ID not found in output of subutai clone command. %s ", getStdErr() );
+            LOG.error( "Agent ID not found in output of subutai clone command." );
             throw new CommandException( "Agent ID not found in output of subutai clone command." );
         }
         return new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
