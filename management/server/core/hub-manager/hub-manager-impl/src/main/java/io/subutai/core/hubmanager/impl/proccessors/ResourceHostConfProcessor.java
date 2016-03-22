@@ -74,8 +74,6 @@ public class ResourceHostConfProcessor implements Runnable
                     resourceHostMetricDto.setPeerId( peerManager.getLocalPeer().getId() );
                     resourceHostMetricDto.setName( resourceHostMetric.getHostInfo().getHostname() );
                     resourceHostMetricDto.setHostId( resourceHostMetric.getHostInfo().getId() );
-                    resourceHostMetricDto
-                            .setHasAccessFromInternet( DiscoveryNAT.isOpenAccess( "jstun.javawi.de", 3478 ) );
 
                     try
                     {
