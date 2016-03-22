@@ -2150,5 +2150,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof LocalPeerImpl ) )
+        {
+            return false;
+        }
+
+        final LocalPeerImpl that = ( LocalPeerImpl ) o;
+
+        return getId().equals( that.getId() );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return getId().hashCode();
+    }
 }
 

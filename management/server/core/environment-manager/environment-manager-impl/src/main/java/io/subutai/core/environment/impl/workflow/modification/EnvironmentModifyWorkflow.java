@@ -23,7 +23,6 @@ import io.subutai.core.environment.impl.workflow.modification.steps.PEKGeneratio
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -134,7 +133,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -176,7 +175,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager ).execute();
+            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

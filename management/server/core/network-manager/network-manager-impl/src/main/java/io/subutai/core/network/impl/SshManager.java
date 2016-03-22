@@ -20,6 +20,8 @@ import io.subutai.core.network.api.NetworkManagerException;
 
 /**
  * Ssh manager for adding/exchanging ssh keys and enabling password-less communication
+ *
+ * todo use thread pool to parallelize operations (use CommandUtil.executeParallel possibly)
  */
 public class SshManager
 {

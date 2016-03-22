@@ -134,7 +134,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, networkManager ).execute();
+            new SetupP2PStep( topology, environment, peerManager, networkManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
