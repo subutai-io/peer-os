@@ -49,8 +49,9 @@ import io.subutai.core.security.impl.model.SecurityKeyData;
 
 
 /**
- * Implementation of KeyManager API todo use the same database for keys (currently keys are stored by both security
- * manager and key manager)
+ * Implementation of KeyManager API
+ *
+ * todo use the same database for keys (currently keys are stored by both security manager and key manager)
  */
 public class KeyManagerImpl implements KeyManager
 {
