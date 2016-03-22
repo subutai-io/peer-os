@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.core.hubmanager.impl.proccessors.*;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -156,6 +157,9 @@ public class IntegrationImpl implements Integration
 					generateChecksum();
 				}
 			}, 1, 3600000, TimeUnit.MILLISECONDS);
+			this.configManager.addHubConfig ("hub.subut.ai");
+			RegistrationManager registrationManager = new RegistrationManager (this, configManager, "hub.subut.ai");
+			registrationManager.registerPeerPubKey ();
         }
         catch ( Exception e )
         {
@@ -232,8 +236,8 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", hubIp );
+            //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", "hub.subut.ai" );
 
             Response r = client.get();
 
