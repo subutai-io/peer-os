@@ -1,7 +1,6 @@
 === Hardcoded Fixes Needed ===
 
-./server/server-karaf/src/main/assembly/bin/start:       java -jar /opt/subutai-mng/keys/peer-key-generator-1.0-SNAPSHOT.jar $folder subutai`date +%s`@subutai.io
-
+Done
 
 === Release Preparation Problem ===
 
