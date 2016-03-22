@@ -135,15 +135,18 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		}
 
 
+		//@todo need combine 2 controller into 1
 		ngDialog.open({
 			template: 'subutai-app/identityUser/partials/userForm.html',
 			controller: 'IdentityUserFormCtrl',
 			controllerAs: 'identityUserFormCtrl',
 			data: user,
 			preCloseCallback: function(value) {
-				if(Object.keys(vm.dtInstance).length !== 0) {
-					vm.dtInstance.reloadData(null, false);
-				}
+				setTimeout(function() {
+					if(Object.keys(vm.dtInstance).length !== 0) {
+						vm.dtInstance.reloadData(null, false);
+					}
+				}, 2000);
 			}
 		});
 	}
