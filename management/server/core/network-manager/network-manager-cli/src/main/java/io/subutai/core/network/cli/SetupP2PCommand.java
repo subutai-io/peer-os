@@ -15,7 +15,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
-@Command( scope = "net", name = "setup-p2p", description = "Sets up P2P connection with control peer" )
+@Command( scope = "net", name = "p2p-create", description = "Creates P2P connection" )
 public class SetupP2PCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetupP2PCommand.class.getName() );
@@ -35,7 +35,7 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
             description = "p2p secret key" )
     String secretKey;
     @Argument( index = 4, name = "secret key ttl", required = false, multiValued = false,
-            description = "p2p secret key tie-to-live in seconds" )
+            description = "p2p secret key time-to-live in seconds" )
     Long secretKeyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
 
 

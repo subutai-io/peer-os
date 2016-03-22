@@ -13,7 +13,7 @@ import org.apache.karaf.shell.commands.Command;
 import com.google.common.base.Preconditions;
 
 
-@Command( scope = "net", name = "setup-tunnel", description = "Sets up tunnel with peer" )
+@Command( scope = "net", name = "tunnel-create", description = "Creates tunnel with peer" )
 public class SetupTunnelCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetupTunnelCommand.class.getName() );

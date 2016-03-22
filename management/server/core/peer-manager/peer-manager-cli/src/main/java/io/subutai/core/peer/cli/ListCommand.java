@@ -33,7 +33,7 @@ public class ListCommand extends SubutaiShellCommandSupport
         System.out.println( "Found " + list.size() + " registered peer(s)" );
         if ( list.size() > 0 )
         {
-            System.out.println( "Status\tL/R\tID\tOwner ID\tHost name\tPeer name\tPublic URL" );
+            System.out.println( "Status\tL/R\tID\tOwner ID\tIP\tPeer name\tPublic URL" );
 
             for ( Peer peer : list )
             {
