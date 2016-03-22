@@ -467,6 +467,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 
 
 	function deletePlugin (plugin) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your will not be able to recover this plugin!",
@@ -481,6 +482,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 		},
 		function (isConfirm) {
 			if (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				BazaarSrv.deletePlugin (plugin.id).success (function (data) {
 					SweetAlert.swal ("Success!", "Your plugin was deleted.", "success");
 					getInstalledPlugins();
@@ -510,6 +512,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 			}
 			console.log (plugin.dependencies, arr);
 			if (arr.length > 0) {
+				var previousWindowKeyDown = window.onkeydown;
 				SweetAlert.swal({
 					title: "Additional dependencies",
 					text: "It seems that there are dependencies that need to be installed. Are you sure you want to continue?",
@@ -523,6 +526,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					showLoaderOnConfirm: false
 				},
 				function (isConfirm) {
+					window.onkeydown = previousWindowKeyDown;
 					if (isConfirm) {
 						var progress = 0,
 							interval = setInterval (function() {

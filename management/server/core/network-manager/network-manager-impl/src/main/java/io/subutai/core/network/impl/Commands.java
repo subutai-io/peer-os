@@ -20,16 +20,15 @@ import io.subutai.common.settings.Common;
 public class Commands
 {
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
-    private static final String RESOURCE_HOST_NETWORK_BINDING = "subutai network";
     private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
     private static final String SSH_FOLDER = "/root/.ssh";
     private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
-    public RequestBuilder getListPeersInEnvironmentCommand( String p2pHash )
+    public RequestBuilder getP2PConnectionsCommand( String p2pHash )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-p", p2pHash ) );
+                .withCmdArgs( Lists.newArrayList( "p2p", "-p", Strings.isNullOrEmpty( p2pHash ) ? "" : p2pHash ) );
     }
 
 
@@ -37,9 +36,8 @@ public class Commands
                                                         String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey,
-                        String.valueOf( secretKeyTtlSec ), Strings.isNullOrEmpty( localIp ) ? "" : localIp ) )
-                                                                    .withTimeout( 90 );
+                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ),
+                        Strings.isNullOrEmpty( localIp ) ? "" : localIp ) ).withTimeout( 90 );
     }
 
 
@@ -54,12 +52,6 @@ public class Commands
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "p2p", "-u", p2pHash, newSecretKey, String.valueOf( ttlSeconds ) ) );
-    }
-
-
-    public RequestBuilder getListP2PConnectionsCommand()
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "p2p", "-l" ) );
     }
 
 

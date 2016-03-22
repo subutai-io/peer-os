@@ -1,7 +1,19 @@
 'use strict';
 
 angular.module('subutai.containers.controller', ['ngTagsInput'])
-	.controller('ContainerViewCtrl', ContainerViewCtrl);
+	.controller('ContainerViewCtrl', ContainerViewCtrl)
+	.filter('getEnvById', function() {
+		return function(input, id) {
+			console.log( input, id );
+			for ( var i = 0; i < input.length ; i++ )
+			{
+				if (input[i].id == id) {
+					return input[i].name;
+				}
+			}
+			return null;
+		}
+	});
 
 ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 
@@ -187,6 +199,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	});
 
 	function destroyContainer(containerId, key) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your will not be able to recover this Container!",
@@ -200,6 +213,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				environmentService.destroyContainer(containerId).success(function (data) {
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
