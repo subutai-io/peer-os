@@ -323,6 +323,17 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
+		.state('main', {
+			url: '',
+			templateUrl: '',
+			data: {
+				bodyClass: '',
+				layout: 'default'
+			},
+			controller: function ($location ) {
+				$location.path('/');
+			}
+		})
         .state('environments', {
             url: '/environments/{activeTab}',
             templateUrl: 'subutai-app/environment/partials/view.html',

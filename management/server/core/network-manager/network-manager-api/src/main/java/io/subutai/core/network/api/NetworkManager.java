@@ -10,7 +10,6 @@ import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PPeerInfo;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 
@@ -31,8 +30,8 @@ public interface NetworkManager
     /**
      * Sets up an P2P connection on specified host
      */
-    public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash,
-                                    String secretKey, long secretKeyTtlSec ) throws NetworkManagerException;
+    public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException;
 
     /**
      * Removes P2P connection
@@ -67,32 +66,37 @@ public interface NetworkManager
             throws NetworkManagerException;
 
 
-    /**
-     * Lists existing P2P connections on management host
-     */
-    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
-
-    /**
-     * Lists existing P2P connections on specified host
-     */
-    public Set<P2PConnection> listP2PConnections( Host host ) throws NetworkManagerException;
-
     PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     /**
-     * Returns peers(hosts) participating in the p2p swarm
+     * Returns p2p connections in the p2p swarm running on MH
      *
      * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PPeerInfo> listPeersInEnvironment( String p2pHash ) throws NetworkManagerException;
+    public Set<P2PConnection> getP2PConnectionsInSwarm( String p2pHash ) throws NetworkManagerException;
 
     /**
-     * Returns peers(hosts) participating in the p2p swarm
+     * Returns p2p connections in the p2p swarm running on the specified host
      *
      * @param host - host
      * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PPeerInfo> listPeersInEnvironment( Host host, String p2pHash ) throws NetworkManagerException;
+    public Set<P2PConnection> getP2PConnectionsInSwarm( Host host, String p2pHash ) throws NetworkManagerException;
+
+    /**
+     * Returns all p2p connections running on the specified host
+     *
+     * @param host - host
+     */
+
+    public Set<P2PConnection> getP2PConnections( Host host ) throws NetworkManagerException;
+
+    /**
+     * Returns all p2p connections running on MH
+     */
+
+    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException;
+
 
     /**
      * Sets up tunnel to another peer on management host

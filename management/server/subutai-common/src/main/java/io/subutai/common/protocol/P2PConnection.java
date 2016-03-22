@@ -7,9 +7,9 @@ package io.subutai.common.protocol;
 public interface P2PConnection
 {
 
-    public String getInterfaceName();
+    public String getMac();
 
-    public String getLocalIp();
+    public String getIp();
 
-    public String getP2pHash();
+    public String getHash();
 }
