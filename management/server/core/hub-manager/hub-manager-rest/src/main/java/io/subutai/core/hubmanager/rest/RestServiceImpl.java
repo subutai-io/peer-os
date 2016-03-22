@@ -112,7 +112,12 @@ public class RestServiceImpl implements RestService
     public Response getRegistrationState()
     {
         RegistrationPojo pojo = new RegistrationPojo();
+        if ( integration.getRegistrationState() )
+        {
+            pojo.setOwnerId( integration.getHubConfiguration().getOwnerId() );
+        }
         pojo.setRegisteredToHub( integration.getRegistrationState() );
+
         String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( hubRegistrationInfo ).build();
