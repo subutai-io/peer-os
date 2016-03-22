@@ -25,54 +25,21 @@ public class BazaarImpl implements Bazaar
 	private static final Logger LOG = LoggerFactory.getLogger( BazaarImpl.class );
     private Integration integration;
     private DaoManager daoManager;
-    private ConfigDataService configDataService;
-    private String checksum = "";
-	private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+    private ConfigDataService configDataService;;
+
 
     public BazaarImpl( final Integration integration, final DaoManager daoManager )
     {
         this.daoManager = daoManager;
         this.configDataService = new ConfigDataServiceImpl( this.daoManager );
         this.integration = integration;
-        LOG.info ("Starting sumchecker");
-        this.sumChecker.scheduleWithFixedDelay (new Runnable ()
-		{
-			@Override
-			public void run ()
-			{
-				try
-				{
-					LOG.info ("Generating plugins list md5 checksum");
-					String productList = getProducts ();
-					MessageDigest md = MessageDigest.getInstance ("MD5");
-					byte[] bytes = md.digest (productList.getBytes ("UTF-8"));
-					StringBuilder hexString = new StringBuilder();
-
-					for (int i = 0; i < bytes.length; i++) {
-						String hex = Integer.toHexString(0xFF & bytes[i]);
-						if (hex.length() == 1) {
-							hexString.append('0');
-						}
-						hexString.append(hex);
-					}
-
-					checksum = hexString.toString();
-					LOG.info ("Checksum generated: " + checksum);
-				}
-				catch (NoSuchAlgorithmException | UnsupportedEncodingException e)
-				{
-					LOG.error (e.getMessage ());
-					e.printStackTrace ();
-				}
-			}
-		}, 1, 3600000, TimeUnit.MILLISECONDS);
 	}
 
 
 	@Override
 	public String getChecksum ()
 	{
-		return this.checksum;
+		return this.integration.getChecksum ();
 	}
 
 	@Override

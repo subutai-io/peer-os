@@ -20,4 +20,6 @@ public interface Integration
     void unregisterPeer() throws HubPluginException;
 
     boolean getRegistrationState();
+
+    String getChecksum();
 }
