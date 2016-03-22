@@ -28,8 +28,6 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -39,7 +37,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.RegistrationManager;
@@ -58,7 +55,7 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-public class RegistrationManagerImpl implements RegistrationManager, HostListener
+public class RegistrationManagerImpl implements RegistrationManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private SecurityManager securityManager;
@@ -257,61 +254,6 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         {
             LOGGER.error( "Error importing host public key", ex );
         }
-    }
-
-
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
-    {
-        //todo revise this method temporarily disabling it
-        //        RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
-        //        if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
-        //        {
-        //            try
-        //            {
-        //                ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
-        //                Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
-        //                for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
-        //                {
-        //                    if ( RegistrationStatus.APPROVED.equals( containerInfo.getState() )
-        //                            && containerInfo.getVlan() != 0 )
-        //                    {
-        //
-        //                        ContainerInfoImpl containerInfoImpl = containerInfoDataService.find( containerInfo
-        // .getId() );
-        //
-        //                        ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo
-        // .getId() );
-        //
-        //                        containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
-        //                        containerInfoDataService.update( containerInfoImpl );
-        //
-        //                        //we assume that newly imported environment has always default sshGroupId=1,
-        // hostsGroupId=1
-        //
-        //                        //configure hosts on each group | group containers by ssh group
-        //                        Set<ContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
-        //                        if ( containers == null )
-        //                        {
-        //                            containers = Sets.newHashSet();
-        //                        }
-        //                        containers.add( containerHost );
-        //                    }
-        //                }
-        //                for ( final Map.Entry<Integer, Set<ContainerHost>> entry : containerHostList.entrySet() )
-        //                {
-        //                    configureHosts( entry.getValue() );
-        //                }
-        //            }
-        //            catch ( HostNotFoundException e )
-        //            {
-        //                //ignore
-        //            }
-        //            catch ( NetworkManagerException e )
-        //            {
-        //                LOGGER.error( "Error configuring container hosts", e );
-        //            }
-        //        }
     }
 
 

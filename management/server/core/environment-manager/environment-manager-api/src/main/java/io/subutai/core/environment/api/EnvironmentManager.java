@@ -3,7 +3,6 @@ package io.subutai.core.environment.api;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,9 +12,7 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -64,22 +61,7 @@ public interface EnvironmentManager
     Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     @RolesAllowed( "Environment-Management|Write" )
-    UUID createEnvironmentAndGetTrackerID(Topology topology, boolean async)
-            throws EnvironmentCreationException;
-
-    /**
-     * Imports environment based on a passed topology
-     *
-     * @param name - environment name
-     * @param topology - {@code Topology} //@param subnetCidr - subnet in CIDR-notation string, e.g. "192.168.0.1/16"
-     * asynchronously to the calling party
-     *
-     * @return - created environment
-     *
-     * @throws EnvironmentCreationException - thrown if error occurs during environment creation
-     */
-    Environment importEnvironment( String name, Topology topology, Map<Node, Set<ContainerHostInfo>> containers,
-                                   Integer vlan ) throws EnvironmentCreationException;
+    UUID createEnvironmentAndGetTrackerID( Topology topology, boolean async ) throws EnvironmentCreationException;
 
 
     /**
@@ -98,7 +80,8 @@ public interface EnvironmentManager
 
 
     @RolesAllowed( "Environment-Management|Write" )
-    UUID modifyEnvironmentAndGetTrackerID(String environmentId, Topology topology, List<String> removedContainers, boolean async)
+    UUID modifyEnvironmentAndGetTrackerID( String environmentId, Topology topology, List<String> removedContainers,
+                                           boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     /**

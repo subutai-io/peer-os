@@ -442,10 +442,9 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    //TODO: remove environmentId param
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
-                                                          boolean async ) throws EnvironmentModificationException
+    public Set<EnvironmentContainerHost> growEnvironment( final Topology topology, boolean async )
+            throws EnvironmentModificationException
     {
         try
         {

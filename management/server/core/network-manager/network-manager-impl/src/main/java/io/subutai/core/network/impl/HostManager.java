@@ -18,7 +18,9 @@ import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
- * HostManager enables to register container's hostname in /etc/hosts file of other agents
+ * HostManager enables to register container's hostname in /etc/hosts file of other agents *
+ *
+ * todo use thread pool to parallelize operations (use CommandUtil.executeParallel possibly)
  */
 public class HostManager
 {

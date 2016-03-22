@@ -134,6 +134,7 @@ public class PeerManagerImpl implements PeerManager, HostListener
     }
 
 
+    //todo create peerinfo for local peer in localpeer#init
     public void init() throws PeerException
     {
         try

@@ -135,9 +135,9 @@ public interface RestService
 
     @POST
     @Path( "p2ptunnel" )
-    @Produces( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.TEXT_PLAIN )
     @Consumes( MediaType.APPLICATION_JSON )
-    void setupP2PConnection( P2PConfig config );
+    Response setupP2PConnection( P2PConfig config );
 
     @DELETE
     @Path( "p2ptunnel/{p2pHash}" )

@@ -42,7 +42,7 @@ public class ListTunnelCommand extends SubutaiShellCommandSupport
             System.out.format( "Found %d tunnel(s)%n", tunnels.size() );
             for ( Tunnel tunnel : tunnels )
             {
-                System.out.format( "%s %s%n", tunnel.getTunnelName(), tunnel.getTunnelIp() );
+                System.out.format( "%d %s %s%n", tunnel.getTunnelId(), tunnel.getTunnelName(), tunnel.getTunnelIp() );
             }
         }
         catch ( NetworkManagerException e )

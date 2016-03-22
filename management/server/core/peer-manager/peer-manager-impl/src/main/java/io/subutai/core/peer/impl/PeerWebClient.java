@@ -44,6 +44,8 @@ import io.subutai.common.util.DateTimeParam;
 
 /**
  * Peer REST client
+ *
+ * TODO throw exception if http code is not 2XX
  */
 public class PeerWebClient
 {
@@ -288,21 +290,21 @@ public class PeerWebClient
     }
 
 
-    public void setupP2PConnection( final P2PConfig config ) throws PeerException
+    public String setupP2PConnection( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding remote peer to p2p swarm: %s %s", config.getHash(),
-                config.getAddress() ) );
+        LOG.debug( String.format( "Adding remote peer to p2p swarm: %s %s", config.getHash(), config.getAddress() ) );
 
         String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.TEXT_PLAIN );
 
         try
         {
-            client.post( config );
+            Response response = client.post( config );
+            return response.readEntity( String.class );
         }
         catch ( Exception e )
         {
@@ -542,8 +544,7 @@ public class PeerWebClient
     }
 
 
-    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress )
-            throws PeerException
+    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
         Preconditions.checkNotNull( p2pHash );
         Preconditions.checkNotNull( maxAddress );

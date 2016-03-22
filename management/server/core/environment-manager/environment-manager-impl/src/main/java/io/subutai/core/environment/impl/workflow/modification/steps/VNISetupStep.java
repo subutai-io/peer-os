@@ -11,7 +11,6 @@ import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.peer.Peer;
@@ -71,7 +70,6 @@ public class VNISetupStep
         Vni environmentVni = new Vni( environment.getVni(), environment.getId() );
 
         //check reserved vnis
-
         for ( final Peer peer : newPeers )
         {
             for ( final Vni vni : peer.getReservedVnis().list() )
@@ -85,8 +83,6 @@ public class VNISetupStep
                 }
             }
         }
-
-        //try to reserve vni and create gateway
 
         for ( final Peer peer : newPeers )
         {

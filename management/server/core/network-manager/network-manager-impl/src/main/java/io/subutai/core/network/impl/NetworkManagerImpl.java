@@ -109,20 +109,48 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<P2PConnection> getP2PConnectionsInSwarm( final String p2pHash ) throws NetworkManagerException
+    public P2PConnection getP2PConnectionByHash( final String p2pHash ) throws NetworkManagerException
     {
-        return getP2PConnectionsInSwarm( getManagementHost(), p2pHash );
+        return getP2PConnectionByHash( getManagementHost(), p2pHash );
     }
 
 
     @Override
-    public Set<P2PConnection> getP2PConnectionsInSwarm( final Host host, final String p2pHash )
-            throws NetworkManagerException
+    public P2PConnection getP2PConnectionByHash( final Host host, final String p2pHash ) throws NetworkManagerException
+    {
+        CommandResult result = execute( host, commands.getP2PConnectionsCommand( p2pHash ) );
+
+        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+
+        Pattern p = Pattern.compile( "\\s*(\\S+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\S+)\\s*" );
+
+        while ( st.hasMoreTokens() )
+        {
+            Matcher m = p.matcher( st.nextToken() );
+
+            if ( m.find() && m.groupCount() == 3 )
+            {
+                return new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) );
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException
+    {
+        return getP2PConnections( getManagementHost() );
+    }
+
+
+    @Override
+    public Set<P2PConnection> getP2PConnections( final Host host ) throws NetworkManagerException
     {
         Set<P2PConnection> p2PConnections = Sets.newHashSet();
 
-        CommandResult result = execute( host, commands.getP2PConnectionsCommand( p2pHash ) );
-
+        CommandResult result = execute( host, commands.getP2PConnectionsCommand( null ) );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -138,22 +166,7 @@ public class NetworkManagerImpl implements NetworkManager
             }
         }
 
-
         return p2PConnections;
-    }
-
-
-    @Override
-    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException
-    {
-        return getP2PConnections( getManagementHost() );
-    }
-
-
-    @Override
-    public Set<P2PConnection> getP2PConnections( final Host host ) throws NetworkManagerException
-    {
-        return getP2PConnectionsInSwarm( host, null );
     }
 
 

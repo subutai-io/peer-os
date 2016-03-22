@@ -69,19 +69,19 @@ public interface NetworkManager
     PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     /**
-     * Returns p2p connections in the p2p swarm running on MH
+     * Returns p2p connection running on MH by hash
      *
      * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PConnection> getP2PConnectionsInSwarm( String p2pHash ) throws NetworkManagerException;
+    public P2PConnection getP2PConnectionByHash( String p2pHash ) throws NetworkManagerException;
 
     /**
-     * Returns p2p connections in the p2p swarm running on the specified host
+     * Returns p2p connection running on the specified host by hash
      *
      * @param host - host
      * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PConnection> getP2PConnectionsInSwarm( Host host, String p2pHash ) throws NetworkManagerException;
+    public P2PConnection getP2PConnectionByHash( Host host, String p2pHash ) throws NetworkManagerException;
 
     /**
      * Returns all p2p connections running on the specified host

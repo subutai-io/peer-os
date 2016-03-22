@@ -23,6 +23,7 @@ import io.subutai.core.security.api.SecurityManager;
 
 /**
  * PEK generation step
+ * todo use thread pool to parallelize PEK generation
  */
 public class PEKGenerationStep
 {

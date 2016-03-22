@@ -1,29 +1,86 @@
 package io.subutai.core.environment.impl.workflow.destruction.steps;
 
 
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
+
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
 public class RemoveKeysStep
 {
-
+    private static final Logger LOG = LoggerFactory.getLogger( RemoveKeysStep.class );
     private final EnvironmentImpl environment;
+    private final TrackerOperation trackerOperation;
 
 
-    public RemoveKeysStep( final EnvironmentImpl environment )
+    public RemoveKeysStep( final EnvironmentImpl environment, final TrackerOperation trackerOperation )
     {
         this.environment = environment;
+        this.trackerOperation = trackerOperation;
     }
 
 
     public void execute() throws PeerException
     {
-        for ( final Peer peer : environment.getPeers() )
+        Set<Peer> peers = environment.getPeers();
+        ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        for ( final Peer peer : peers )
         {
-            //todo run in a thread
-            peer.removePeerEnvironmentKeyPair( environment.getEnvironmentId() );
+            completionService.submit( new Callable<Peer>()
+            {
+                @Override
+                public Peer call() throws Exception
+                {
+                    peer.removePeerEnvironmentKeyPair( environment.getEnvironmentId() );
+
+                    return peer;
+                }
+            } );
+        }
+
+        Set<Peer> succeededPeers = Sets.newHashSet();
+        for ( Peer ignored : peers )
+        {
+            try
+            {
+                Future<Peer> f = completionService.take();
+                succeededPeers.add( f.get() );
+            }
+            catch ( ExecutionException | InterruptedException e )
+            {
+                LOG.error( "Problems removing key", e );
+            }
+        }
+
+
+        for ( Peer succeededPeer : succeededPeers )
+        {
+            trackerOperation.addLog(
+                    String.format( "Peer environment key removal succeeded on peer %s", succeededPeer.getName() ) );
+        }
+
+        peers.removeAll( succeededPeers );
+
+        for ( Peer failedPeer : peers )
+        {
+            trackerOperation
+                    .addLog( String.format( "Peer environment key removal failed on peer %s", failedPeer.getName() ) );
         }
     }
 }
