@@ -2163,17 +2163,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             return false;
         }
-
-        final LocalPeerImpl that = ( LocalPeerImpl ) o;
-
-        return getId().equals( that.getId() );
+        return true;
     }
 
 
     @Override
     public int hashCode()
     {
-        return getId().hashCode();
+        return super.hashCode();
     }
 }
 
