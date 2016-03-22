@@ -8,6 +8,8 @@ import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response;
 
 import io.subutai.core.hubmanager.impl.proccessors.*;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.dto.PeerDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -67,8 +71,6 @@ public class IntegrationImpl implements Integration
     private ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
-
-
 
 
     private HeartbeatProcessor heartbeatProcessor;
@@ -137,8 +139,7 @@ public class IntegrationImpl implements Integration
             containerEventExecutor
                     .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
 
-            hubLoggerExecutorService
-                    .scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+            hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
 
             //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
@@ -346,6 +347,44 @@ public class IntegrationImpl implements Integration
     public boolean getRegistrationState()
     {
         return getConfigDataService().getHubConfig( configManager.getPeerId() ) != null;
+    }
+
+
+    @Override
+    public Map<String, String> getPeerInfo() throws HubPluginException
+    {
+        Map<String, String> result = new HashMap<>(  );
+        try
+        {
+            String path = "/rest/v1/peers/" + configManager.getPeerId();
+
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+            Response r = client.get();
+
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                byte[] encryptedContent = configManager.readContent( r );
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+                PeerDto dto = JsonUtil.fromCbor( plainContent, PeerDto.class );
+                result.put( "OwnerId",dto.getOwnerId() );
+
+                LOG.debug( "PeerDto: " + result.toString() );
+            }
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            throw new HubPluginException( "Could not retrieve Peer info", e );
+        }
+        return result;
+    }
+
+
+    @Override
+    public Config getHubConfiguration()
+    {
+        return configDataService.getHubConfig( configManager.getPeerId() );
     }
 
 

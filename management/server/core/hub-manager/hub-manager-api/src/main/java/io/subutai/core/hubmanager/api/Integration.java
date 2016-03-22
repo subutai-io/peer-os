@@ -1,6 +1,12 @@
 package io.subutai.core.hubmanager.api;
 
 
+import java.util.Map;
+
+import io.subutai.common.metric.StringAlert;
+import io.subutai.core.hubmanager.api.model.Config;
+
+
 public interface Integration
 {
     void sendHeartbeat() throws HubPluginException;
@@ -20,4 +26,8 @@ public interface Integration
     void unregisterPeer() throws HubPluginException;
 
     boolean getRegistrationState();
+
+    Map<String, String> getPeerInfo() throws HubPluginException;
+
+    Config getHubConfiguration();
 }
