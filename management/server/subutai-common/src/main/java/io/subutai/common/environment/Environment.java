@@ -128,15 +128,13 @@ public interface Environment extends RelationLink
 
     Set<EnvironmentContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException;
 
-    String getTunnelNetwork();
+    String getP2pSubnet();
 
     Map<String, String> getTunnels();
 
     boolean isMember( Peer peer );
 
-    String getTunnelInterfaceName();
-
-    String getTunnelCommunityName();
+    String getP2PHash();
 
     EnvironmentId getEnvironmentId();
 

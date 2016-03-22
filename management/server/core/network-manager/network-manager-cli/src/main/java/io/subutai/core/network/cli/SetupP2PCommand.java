@@ -25,9 +25,9 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
     @Argument( index = 0, name = "interface name", required = true, multiValued = false,
             description = "interface name" )
     String interfaceName;
-    @Argument( index = 1, name = "community name", required = true, multiValued = false,
-            description = "community name" )
-    String communityName;
+    @Argument( index = 1, name = "p2p hash", required = true, multiValued = false,
+            description = "p2p hash" )
+    String p2pHash;
     @Argument( index = 2, name = "local peer IP", required = true, multiValued = false,
             description = "local peer IP" )
     String localIp;
@@ -53,7 +53,7 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager.setupP2PConnection( interfaceName, localIp, communityName, secretKey, secretKeyTtl );
+            networkManager.setupP2PConnection( interfaceName, localIp, p2pHash, secretKey, secretKeyTtl );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

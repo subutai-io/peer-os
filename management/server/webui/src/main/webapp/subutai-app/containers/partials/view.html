@@ -90,7 +90,7 @@
 							<a  ui-sref="console({ containerId: container.id })" 
 								tooltips 
 								tooltip-template='
-									<span class="b-nowrap">EnvironmentId: {{ container.environmentId }}</span><br>
+									<span class="b-nowrap">Environment: {{ containerViewCtrl.environments | getEnvById: container.environmentId }}</span><br>
 									<span class="b-nowrap">ID: {{ container.id }}</span><br>
 									<span class="b-nowrap">Host Name: {{ container.hostname }}</span>
 								' 

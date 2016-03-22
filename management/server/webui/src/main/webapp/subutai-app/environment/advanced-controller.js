@@ -102,9 +102,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			});		
 	}
 
-	function checkLastLog(status) {
+	function checkLastLog(status, date) {
+		if(date === undefined || date === null) date = false;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
-		lastLog.time = moment().format('HH:mm:ss');
+
+		if(date) {
+			lastLog.time = getDateFromString(date);
+		} else {
+			lastLog.time = moment().format('HH:mm:ss');
+		}
+
 		if(status === true) {
 			lastLog.status = 'success';
 			lastLog.classes = ['fa-check', 'g-text-green'];
@@ -138,7 +145,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
-							var logTime = moment().format('HH:mm:ss');
+
+							var logTextTime = logs[i].split(':');
+							var logTime = getDateFromString(logs[i]);
+
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
 							if(i+1 == logs.length) {
@@ -151,9 +161,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logs[i]
+								"text": logTextTime[3]
 							};
 							result.push(currentLog);
+
 						}
 					}
 
@@ -187,7 +198,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 							};
 						}
 
-						checkLastLog(true);
+						if(prevLogs) {
+							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+							if(logs.length > prevLogs.length) {
+								checkLastLog(true, logs[logs.length-1]);
+							}
+						} else {
+							checkLastLog(true);
+						}
 						var currentLog = {
 							"time": moment().format('HH:mm:ss'),
 							"status": 'success',

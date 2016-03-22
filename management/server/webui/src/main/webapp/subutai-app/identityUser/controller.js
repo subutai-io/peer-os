@@ -191,6 +191,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 
 	function deleteUser(userId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "You will not be able to recover this user!",
@@ -204,6 +205,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					identitySrv.deleteUser(userId).success(function (data) {
 						SweetAlert.swal("Deleted!", "User has been deleted.", "success");
@@ -253,6 +255,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 
 	function reject (user) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "Your will not be able to undo this!",
@@ -266,6 +269,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					identitySrv.deleteUser (user.id).success (function (data) {
 						SweetAlert.swal ("Success!", "User was rejected.", "success");

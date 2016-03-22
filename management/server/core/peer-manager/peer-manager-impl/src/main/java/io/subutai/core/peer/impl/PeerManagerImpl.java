@@ -89,8 +89,6 @@ import io.subutai.core.security.api.SecurityManager;
 @PermitAll
 public class PeerManagerImpl implements PeerManager
 {
-    final static int CONTROL_NETWORK_TTL_IN_MIN = 120;
-
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
     final int MAX_CONTAINER_LIMIT = 20;
@@ -681,9 +679,22 @@ public class PeerManagerImpl implements PeerManager
     {
         Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
+        URL destinationUrl;
+        try
+        {
+            destinationUrl = buildDestinationUrl( destinationHost );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new PeerException( "Invalid URL." );
+        }
 
-        String destinationUrl = buildDestinationUrl( destinationHost );
-        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl );
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( "Could not send registration request to ourselves." );
+        }
+
+        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
         if ( getRequest( peerInfo.getId() ) != null )
         {
@@ -697,7 +708,7 @@ public class PeerManagerImpl implements PeerManager
             registrationData.setToken( generateActiveUserToken() );
             registrationData.setKeyPhrase( "" );
 
-            RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
+            RegistrationData result = registrationClient.sendInitRequest( destinationUrl.toString(), registrationData );
 
             result.setKeyPhrase( keyPhrase );
             addRequest( result );
@@ -756,16 +767,16 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private String buildDestinationUrl( final String destinationHost )
+    private URL buildDestinationUrl( final String destinationHost ) throws MalformedURLException
     {
         try
         {
             URL url = new URL( destinationHost );
-            return destinationHost;
+            return url;
         }
         catch ( MalformedURLException e )
         {
-            return String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() );
+            return new URL( String.format( "https://%s:%d/", destinationHost, SystemSettings.getSecurePortX1() ) );
         }
     }
 
@@ -1076,7 +1087,7 @@ public class PeerManagerImpl implements PeerManager
             }
         }
 
-        return new PeerGroupResources( resources, getCommunityDistances() );
+        return new PeerGroupResources( resources, getP2PSwarmDistances() );
     }
 
 
@@ -1248,6 +1259,7 @@ public class PeerManagerImpl implements PeerManager
         }
 
 
+        //todo check this in another executor once in a minute
         private void checkPeers()
         {
             try
@@ -1318,7 +1330,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public PingDistances getCommunityDistances()
+    public PingDistances getP2PSwarmDistances()
     {
         if ( distances != null )
         {
@@ -1332,7 +1344,7 @@ public class PeerManagerImpl implements PeerManager
         ExecutorCompletionService<PingDistances> completionService = new ExecutorCompletionService<>( pool );
         for ( Peer peer : peers )
         {
-            completionService.submit( new CommunityDistanceTask( peer ) );
+            completionService.submit( new P2PSwarmDistanceTask( peer ) );
         }
 
         pool.shutdown();
@@ -1515,12 +1527,12 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private class CommunityDistanceTask implements Callable<PingDistances>
+    private class P2PSwarmDistanceTask implements Callable<PingDistances>
     {
         private Peer peer;
 
 
-        public CommunityDistanceTask( final Peer peer )
+        public P2PSwarmDistanceTask( final Peer peer )
         {
             this.peer = peer;
         }
@@ -1529,7 +1541,7 @@ public class PeerManagerImpl implements PeerManager
         @Override
         public PingDistances call() throws Exception
         {
-            return peer.getCommunityDistances( getLocalPeer().getId(), getMaxOrder() );
+            return peer.getP2PSwarmDistances( getLocalPeer().getId(), getMaxOrder() );
         }
     }
 }

@@ -185,8 +185,7 @@ public class HubEnvironmentManager
     {
         LocalPeer peer = peerManager.getLocalPeer();
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-        String tunInName = P2PUtil.generateInterfaceName( env.getTunnelNetwork() );
-        String tunComName = P2PUtil.generateCommunityName( env.getTunnelNetwork() );
+        String tunComName = P2PUtil.generateHash( env.getTunnelNetwork() );
 
         SubnetUtils.SubnetInfo subnetInfo =
                 new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
@@ -195,8 +194,8 @@ public class HubEnvironmentManager
         ExecutorService p2pExecutor = Executors.newFixedThreadPool( 1 );
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        P2PConfig config = new P2PConfig( peer.getId(), env.getId(), tunInName, tunComName, addresses, env.getP2pHash(),
-                env.getP2pTTL() );
+        P2PConfig config =
+                new P2PConfig( peer.getId(), env.getId(), tunComName, addresses, env.getP2pHash(), env.getP2pTTL() );
         p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
 
         try
@@ -206,8 +205,7 @@ public class HubEnvironmentManager
             p2pExecutor.shutdown();
 
             peerDto.setTunnelAddress( createdConfig.getAddress() );
-            peerDto.setCommunityName( createdConfig.getCommunityName() );
-            peerDto.setInterfaceName( createdConfig.getInterfaceName() );
+            peerDto.setCommunityName( createdConfig.getHash() );
             peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
 
             ExecutorService tunnelExecutor = Executors.newFixedThreadPool( 1 );

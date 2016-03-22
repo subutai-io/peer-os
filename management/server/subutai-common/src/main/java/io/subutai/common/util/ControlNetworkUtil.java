@@ -62,7 +62,7 @@ public class ControlNetworkUtil
                         String.format( "Illegal control network config on peer '%s'. Address already used.",
                                 config.getPeerId() ) );
             }
-            if ( !fingerprint.equals( config.getCommunityName() ) )
+            if ( !fingerprint.equals( config.getP2pHash() ) )
             {
                 throw new ControlNetworkException(
                         String.format( "Illegal control network config on peer '%s'. Invalid fingerprint.",
@@ -78,7 +78,7 @@ public class ControlNetworkUtil
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getUsedNetworks() );
 
-        return !fingerprint.equals( config.getCommunityName() ) && config.getUsedNetworks().contains( this.network );
+        return !fingerprint.equals( config.getP2pHash() ) && config.getUsedNetworks().contains( this.network );
     }
 
 

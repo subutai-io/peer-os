@@ -10,8 +10,8 @@ public class ControlNetworkConfig
 {
     @JsonProperty( "peerId" )
     private String peerId;
-    @JsonProperty( "communityName" )
-    private String communityName;
+    @JsonProperty( "p2pHash" )
+    private String p2pHash;
     @JsonProperty( "address" )
     private String address;
     @JsonProperty( "secretKey" )
@@ -24,36 +24,36 @@ public class ControlNetworkConfig
 
     public ControlNetworkConfig( @JsonProperty( "peerId" ) final String peerId,
                                  @JsonProperty( "address" ) final String address,
-                                 @JsonProperty( "communityName" ) final String communityName,
+                                 @JsonProperty( "p2pHash" ) final String p2pHash,
                                  @JsonProperty( "secretKey" ) final byte[] secretKey,
                                  @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec,
                                  @JsonProperty( "usedNetworks" ) final List<String> usedNetworks )
     {
         this.peerId = peerId;
         this.address = address;
-        this.communityName = communityName;
+        this.p2pHash = p2pHash;
         this.secretKey = secretKey;
         this.secretKeyTtlSec = secretKeyTtlSec;
         this.usedNetworks = usedNetworks;
     }
 
 
-    public ControlNetworkConfig( final String peerId, final String address, final String communityName,
+    public ControlNetworkConfig( final String peerId, final String address, final String p2pHash,
                                  final List<String> usedNetworks )
     {
         this.peerId = peerId;
         this.address = address;
-        this.communityName = communityName;
+        this.p2pHash = p2pHash;
         this.usedNetworks = usedNetworks;
     }
 
 
-    public ControlNetworkConfig( final String peerId, final String address, final String communityName,
+    public ControlNetworkConfig( final String peerId, final String address, final String p2pHash,
                                  final byte[] secretKey, final long secretKeyTtlSec )
     {
         this.peerId = peerId;
         this.address = address;
-        this.communityName = communityName;
+        this.p2pHash = p2pHash;
         this.secretKey = secretKey;
         this.secretKeyTtlSec = secretKeyTtlSec;
     }
@@ -77,9 +77,9 @@ public class ControlNetworkConfig
     }
 
 
-    public String getCommunityName()
+    public String getP2pHash()
     {
-        return communityName;
+        return p2pHash;
     }
 
 

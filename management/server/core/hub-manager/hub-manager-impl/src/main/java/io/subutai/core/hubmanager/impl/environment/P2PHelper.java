@@ -34,9 +34,10 @@ class P2PHelper extends Helper
     }
 
 
-    private void setupTunnel( LocalPeer localPeer, PeerEnvironmentDto dto ) throws InterruptedException, ExecutionException
+    private void setupTunnel( LocalPeer localPeer, PeerEnvironmentDto dto )
+            throws InterruptedException, ExecutionException
     {
-        log.debug( "P2P Tunnel Setup - START");
+        log.debug( "P2P Tunnel Setup - START" );
 
         Map<String, String> tunnels = ImmutableMap.of( localPeer.getId(), dto.getP2pIp() );
 
@@ -54,23 +55,17 @@ class P2PHelper extends Helper
 
         tunnelExecutor.shutdown();
 
-        log.debug( "P2P Tunnel Setup - END");
+        log.debug( "P2P Tunnel Setup - END" );
     }
 
 
-    private void runConnectionTask( LocalPeer localPeer, PeerEnvironmentDto dto ) throws InterruptedException, ExecutionException
+    private void runConnectionTask( LocalPeer localPeer, PeerEnvironmentDto dto )
+            throws InterruptedException, ExecutionException
     {
-        log.debug( "P2P Connection Task - START");
+        log.debug( "P2P Connection Task - START" );
 
-        P2PConfig config = new P2PConfig(
-                localPeer.getId(),
-                dto.getEnvironmentId(),
-                "p2p_" + dto.getP2pSubnet(),
-                "com_" + dto.getEnvironmentId(),
-                dto.getP2pIp(),
-                dto.getP2pSharedKey(),
-                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC
-        );
+        P2PConfig config = new P2PConfig( localPeer.getId(), dto.getEnvironmentId(), "com_" + dto.getEnvironmentId(),
+                dto.getP2pIp(), dto.getP2pSharedKey(), Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
         ExecutorService p2pExecutor = Executors.newSingleThreadScheduledExecutor();
 
@@ -84,7 +79,7 @@ class P2PHelper extends Helper
 
         p2pExecutor.shutdown();
 
-        log.debug( "P2P Connection Task - END");
+        log.debug( "P2P Connection Task - END" );
     }
 
 

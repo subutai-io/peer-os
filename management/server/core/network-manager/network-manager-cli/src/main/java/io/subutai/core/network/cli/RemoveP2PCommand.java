@@ -21,9 +21,9 @@ public class RemoveP2PCommand extends SubutaiShellCommandSupport
 
     private final NetworkManager networkManager;
 
-    @Argument( index = 0, name = "community name", required = true, multiValued = false,
-            description = "community name" )
-    String communityName;
+    @Argument( index = 0, name = "p2p hash", required = true, multiValued = false,
+            description = "p2p hash" )
+    String p2pHash;
 
 
     public RemoveP2PCommand( final NetworkManager networkManager )
@@ -40,7 +40,7 @@ public class RemoveP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager.removeP2PConnection( communityName );
+            networkManager.removeP2PConnection( p2pHash );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

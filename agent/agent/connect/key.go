@@ -3,13 +3,14 @@ package connect
 import (
 	"bufio"
 	"bytes"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/gpg"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 )
 
 type Key struct {

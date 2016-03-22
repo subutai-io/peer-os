@@ -166,6 +166,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 	}
 
 	function unregisterPeer(peerId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your unregister peer request!",
@@ -179,6 +180,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				var signedChallenge = $('.bp-sign-target[data-challenge="'+peerId+'"]').val();
 				$(signedChallenge).removeClass('bp-sign-target');
@@ -194,6 +196,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 	}
 
 	function cancelPeerRequest(peerId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your cancel peer request!",
@@ -207,6 +210,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, objectRelationSer
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				var signedChallenge = $('.bp-sign-target[data-challenge="'+peerId+'"]').val();
 				$(signedChallenge).removeClass('bp-sign-target');

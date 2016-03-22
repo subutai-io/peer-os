@@ -346,22 +346,22 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
             Set<String> existingNetworks = getTunnelNetworks( peers );
 
-            String freeTunnelNetwork = P2PUtil.findFreeTunnelNetwork( existingNetworks );
+            String freeP2PSubnet = P2PUtil.findFreeSubnet( existingNetworks );
             args.add( "-I" );
-            freeTunnelNetwork = freeTunnelNetwork.substring( 0, freeTunnelNetwork.length() - 1 ) + (
-                    Integer.valueOf( freeTunnelNetwork.substring( freeTunnelNetwork.length() - 1 ) ) + 1 );
-            args.add( freeTunnelNetwork );
+            freeP2PSubnet = freeP2PSubnet.substring( 0, freeP2PSubnet.length() - 1 ) + (
+                    Integer.valueOf( freeP2PSubnet.substring( freeP2PSubnet.length() - 1 ) ) + 1 );
+            args.add( freeP2PSubnet );
 
-            int ipOctet = ( Integer.valueOf( freeTunnelNetwork.substring( freeTunnelNetwork.length() - 1 ) ) + 1 );
-            String ipRh = freeTunnelNetwork.substring( 0, freeTunnelNetwork.length() - 1 ) + ipOctet;
+            int ipOctet = ( Integer.valueOf( freeP2PSubnet.substring( freeP2PSubnet.length() - 1 ) ) + 1 );
+            String ipRh = freeP2PSubnet.substring( 0, freeP2PSubnet.length() - 1 ) + ipOctet;
             args.add( "-i" );
             args.add( ipRh );
 
-            String communityName = P2PUtil.generateCommunityName( freeTunnelNetwork );
+            String p2pHash = P2PUtil.generateHash( freeP2PSubnet );
             args.add( "-n" );
-            args.add( communityName );
+            args.add( p2pHash );
 
-            String deviceName = P2PUtil.generateInterfaceName( freeTunnelNetwork );
+            String deviceName = "aws_rh_p2p_if";
             args.add( "-d" );
             args.add( deviceName );
             String runUser = "root";
