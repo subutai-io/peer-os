@@ -548,7 +548,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
             }
         })
         .state('console', {
-            url: '/console/{containerId}',
+			url: '/console:environmentId?containerId',
             templateUrl: 'subutai-app/console/partials/view.html',
             data: {
                 bodyClass: '',
