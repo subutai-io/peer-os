@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class BazaarImpl implements Bazaar
 {
-	private static final Logger LOG = LoggerFactory.getLogger( BazaarImpl.class.getName() );
+	private static final Logger LOG = LoggerFactory.getLogger( BazaarImpl.class );
     private Integration integration;
     private DaoManager daoManager;
     private ConfigDataService configDataService;
@@ -34,6 +34,7 @@ public class BazaarImpl implements Bazaar
         this.daoManager = daoManager;
         this.configDataService = new ConfigDataServiceImpl( this.daoManager );
         this.integration = integration;
+        LOG.info ("Starting sumchecker");
         this.sumChecker.scheduleWithFixedDelay (new Runnable ()
 		{
 			@Override
@@ -41,6 +42,7 @@ public class BazaarImpl implements Bazaar
 			{
 				try
 				{
+					LOG.info ("Generating plugins list md5 checksum");
 					String productList = getProducts ();
 					MessageDigest md = MessageDigest.getInstance ("MD5");
 					byte[] bytes = md.digest (productList.getBytes ("UTF-8"));
@@ -59,10 +61,11 @@ public class BazaarImpl implements Bazaar
 				}
 				catch (NoSuchAlgorithmException | UnsupportedEncodingException e)
 				{
+					LOG.error (e.getMessage ());
 					e.printStackTrace ();
 				}
 			}
-		}, 0, 1, TimeUnit.HOURS);
+		}, 1, 3600000, TimeUnit.MILLISECONDS);
 	}
 
 

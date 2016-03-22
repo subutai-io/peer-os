@@ -52,13 +52,22 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             console.log(data);
             vm.hubStatus = data.isRegisteredToHub;
             if (vm.hubStatus != "true" && vm.hubStatus != true) {
-                console.log("wrong check");
                 vm.hubStatus = false;
             }
             else {
-                console.log("something else");
                 vm.hubStatus = true;
             }
+            if (vm.hubStatus) {
+				if (localStorage.getItem ("bazaarMD5") === null) {
+					localStorage.setItem ("bazaarMD5", getBazaarChecksum());
+					bazaarUpdate = true;
+				}
+				else {
+					if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
+						bazaarUpdate = true;
+					}
+				}
+			}
         });
     }
 
@@ -212,18 +221,9 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         localStorage.removeItem('notifications');
     }
 
-
-	if (localStorage.getItem ("bazaarMD5") === null) {
-		localStorage.setItem (getBazaarChecksum());
-		bazaarUpdate = true;
-	}
-	else {
-		if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
-			bazaarUpdate = true;
-		}
-	}
    	function getBazaarChecksum() {
 		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
+			console.log (data);
 			return data;
 		});
 		return "";
