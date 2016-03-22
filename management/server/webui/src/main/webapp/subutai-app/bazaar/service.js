@@ -24,8 +24,8 @@ function BazaarSrv($http) {
 		restoreHubPlugin: restoreHubPlugin,
 		registerPeer: registerPeer,
 		checkRegistration: checkRegistration,
-		getRefOldPlugins: getRefOldPlugins,
-		uninstallHubPluginWOButton: uninstallHubPluginWOButton
+		getRefOldPlugins: getRefOldPlugins
+		//uninstallHubPluginWOButton: uninstallHubPluginWOButton
 	};
 
 	return BazaarSrv;
@@ -142,7 +142,7 @@ function BazaarSrv($http) {
 		return $http.get(PLUGINS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
-	function uninstallHubPluginWOButton (plugin) {
+/*	function uninstallHubPluginWOButton (plugin) {
 		console.log (plugin);
 		var postData = "id=" + plugin.hubId + "&kar=" + plugin.name.toLowerCase() + "&name=" + plugin.name.toLowerCase();
 		console.log (postData);
@@ -151,6 +151,6 @@ function BazaarSrv($http) {
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
-	}
+	}*/
 }
 

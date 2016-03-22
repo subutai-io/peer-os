@@ -8,6 +8,8 @@ import io.subutai.core.hubmanager.api.HubPluginException;
 
 public interface Bazaar
 {
+	String getChecksum();
+
 	String getProducts();
 
 	List <Plugin> getPlugins();

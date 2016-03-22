@@ -55,13 +55,22 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             vm.userId = data.ownerId;
             console.log(vm.userId);
             if (vm.hubStatus != "true" && vm.hubStatus != true) {
-                console.log("wrong check");
                 vm.hubStatus = false;
             }
             else {
-                console.log("something else");
                 vm.hubStatus = true;
             }
+            if (vm.hubStatus) {
+				if (localStorage.getItem ("bazaarMD5") === null) {
+					localStorage.setItem ("bazaarMD5", getBazaarChecksum());
+					bazaarUpdate = true;
+				}
+				else {
+					if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
+						bazaarUpdate = true;
+					}
+				}
+			}
         });
     }
 
@@ -224,7 +233,19 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         vm.notificationsCount = 0;
         localStorage.removeItem('notifications');
     }
+
+   	function getBazaarChecksum() {
+   		console.log ("Getting checksum");
+		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
+			console.log (data);
+			return data;
+		});
+		return "";
+	}
+
 }
+
+
 
 function SubutaiController($rootScope) {
     var vm = this;
@@ -912,6 +933,8 @@ app.directive('focusInput', function ($timeout, $parse) {
 });
 
 //Global variables
+
+var bazaarUpdate = false;
 
 var SERVER_URL = '/';
 

@@ -4,8 +4,10 @@ package io.subutai.core.hubmanager.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
@@ -90,8 +92,8 @@ public class IntegrationImpl implements Integration
     private EnvironmentBuilder envBuilder;
 
     private EnvironmentDestroyer envDestroyer;
-
-
+	private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+	private String checksum = "";
     public IntegrationImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
@@ -145,6 +147,15 @@ public class IntegrationImpl implements Integration
             //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
             //
             //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
+			this.sumChecker.scheduleWithFixedDelay (new Runnable ()
+			{
+				@Override
+				public void run ()
+				{
+					LOG.info ("Starting sumchecker");
+					generateChecksum();
+				}
+			}, 1, 3600000, TimeUnit.MILLISECONDS);
         }
         catch ( Exception e )
         {
@@ -194,6 +205,8 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
+
+        generateChecksum ();
     }
 
 
@@ -436,4 +449,47 @@ public class IntegrationImpl implements Integration
     {
         this.identityManager = identityManager;
     }
+
+    private void generateChecksum()
+	{
+		if (getRegistrationState ())
+		{
+			try
+			{
+				LOG.info ("Generating plugins list md5 checksum");
+				String productList = getProducts ();
+				MessageDigest md = MessageDigest.getInstance ("MD5");
+				byte[] bytes = md.digest (productList.getBytes ("UTF-8"));
+				StringBuilder hexString = new StringBuilder ();
+
+				for (int i = 0; i < bytes.length; i++)
+				{
+					String hex = Integer.toHexString (0xFF & bytes[i]);
+					if (hex.length () == 1)
+					{
+						hexString.append ('0');
+					}
+					hexString.append (hex);
+				}
+
+				checksum = hexString.toString ();
+				LOG.info ("Checksum generated: " + checksum);
+			}
+			catch (NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e)
+			{
+				LOG.error (e.getMessage ());
+				e.printStackTrace ();
+			}
+		}
+		else
+		{
+			LOG.info ("Peer not registered. Trying again in 1 hour.");
+		}
+	}
+
+	@Override
+	public String getChecksum()
+	{
+		return this.checksum;
+	}
 }
