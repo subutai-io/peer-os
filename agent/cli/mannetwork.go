@@ -214,7 +214,6 @@ func ClearVlan(vlan string) {
 			s := strings.Fields(v)
 			if len(s) > 2 && s[1] == vlan {
 				delTunById(s[2])
-				p2p.Remove(s[2])
 				lines[k] = ""
 			}
 		}

@@ -1,9 +1,14 @@
 package p2p
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
-	"github.com/subutai-io/base/agent/log"
+	"net"
 	"os/exec"
+	"strings"
+
+	"github.com/subutai-io/base/agent/log"
 )
 
 func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
@@ -16,6 +21,38 @@ func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
 
 func Remove(hash string) {
 	log.Check(log.WarnLevel, "Removing p2p interface", exec.Command("p2p", "stop", "-hash", hash).Run())
+}
+
+func RemoveByIface(name string) {
+	mac := ""
+	interfaces, _ := net.Interfaces()
+	for _, iface := range interfaces {
+		if iface.Name == name {
+			mac = iface.HardwareAddr.String()
+		}
+	}
+	out, _ := exec.Command("p2p", "show").Output()
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	for scanner.Scan() {
+		line := strings.Fields(scanner.Text())
+		if len(line) > 1 && line[0] == mac {
+			Remove(line[2])
+		}
+	}
+	IptablesCleanUp(name)
+}
+
+func IptablesCleanUp(name string) {
+	out, _ := exec.Command("iptables-save").Output()
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, name) {
+			args := strings.Fields(line)
+			args[0] = "-D"
+			exec.Command("iptables", append([]string{"-t", "nat"}, args...)...).Run()
+		}
+	}
 }
 
 func UpdateKey(hash, newkey, ttl string) {
