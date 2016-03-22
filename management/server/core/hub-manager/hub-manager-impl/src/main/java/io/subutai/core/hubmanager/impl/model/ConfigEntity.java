@@ -23,6 +23,10 @@ public class ConfigEntity implements Config
     @Column( name = "server_ip" )
     private String serverIp;
 
+    @Column( name = "user_id" )
+    private String ownerId;
+
+
 
     public String getPeerId()
     {
@@ -45,5 +49,17 @@ public class ConfigEntity implements Config
     public void setHubIp( final String serverIp )
     {
         this.serverIp = serverIp;
+    }
+
+
+    public String getOwnerId()
+    {
+        return ownerId;
+    }
+
+
+    public void setOwnerId( final String ownerId )
+    {
+        this.ownerId = ownerId;
     }
 }

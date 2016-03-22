@@ -45,7 +45,7 @@ public class TaskManagerImpl implements TaskManager
     public TaskManagerImpl( LocalPeer localPeer )
     {
         this.localPeer = localPeer;
-        cleaner = Executors.newScheduledThreadPool( 1 );
+        cleaner = Executors.newSingleThreadScheduledExecutor();
         cleaner.scheduleWithFixedDelay( new TaskCleaner(), 10, 600, TimeUnit.SECONDS );
     }
 

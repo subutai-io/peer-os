@@ -37,4 +37,12 @@
     </command>
   </command-bundle>
 
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="alert/put">
+      <action class="io.subutai.core.metric.cli.PutAlertCommand">
+        <argument ref="monitor" />
+      </action>
+    </command>
+  </command-bundle>
 </blueprint>
