@@ -4,7 +4,6 @@ angular.module('subutai.containers.controller', ['ngTagsInput'])
 	.controller('ContainerViewCtrl', ContainerViewCtrl)
 	.filter('getEnvById', function() {
 		return function(input, id) {
-			console.log( input, id );
 			for ( var i = 0; i < input.length ; i++ )
 			{
 				if (input[i].id == id) {
