@@ -123,8 +123,7 @@ public class SetupP2PStep
         int peersCount = environment.getPeerConfs().size();
         ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
 
-        ExecutorCompletionService<Integer> tunnelCompletionService =
-                new ExecutorCompletionService<Integer>( tunnelExecutor );
+        ExecutorCompletionService<Integer> tunnelCompletionService = new ExecutorCompletionService<>( tunnelExecutor );
 
         for ( Peer peer : environment.getPeers() )
         {
@@ -186,7 +185,7 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            peer.setupP2PConnection( p2PConfig );
+            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
             return p2PConfig;
         }
     }

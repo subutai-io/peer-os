@@ -58,7 +58,7 @@ public class SetupP2PStep
 
 
     public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
-                         final NetworkManager networkManager , final TrackerOperation trackerOperation)
+                         final NetworkManager networkManager, final TrackerOperation trackerOperation )
     {
         this.topology = topology;
         this.environment = environment;
@@ -91,12 +91,13 @@ public class SetupP2PStep
         SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeP2pSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         final String[] addresses = subnetInfo.getAllAddresses();
-        Vni reservedVni = networkManager.getReservedVnis().findVniByEnvironmentId( environment.getEnvironmentId().getId() );
+        Vni reservedVni =
+                networkManager.getReservedVnis().findVniByEnvironmentId( environment.getEnvironmentId().getId() );
 
-        //setup initial p2p participant local peer MH
+        //setup initial p2p participant on local peer MH with explicit IP
         networkManager.setupP2PConnection( peerManager.getLocalPeer().getManagementHost(),
-                P2PUtil.generateInterfaceName( reservedVni.getVlan() ), addresses[0], environment.getP2PHash(), sharedKey,
-                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+                P2PUtil.generateInterfaceName( reservedVni.getVlan() ), addresses[0], environment.getP2PHash(),
+                sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
         ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
@@ -105,8 +106,8 @@ public class SetupP2PStep
         for ( Peer peer : peers )
         {
             P2PConfig config =
-                    new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), addresses[counter], sharedKey,
-                            Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+                    new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), addresses[counter],
+                            sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
             counter++;
         }
@@ -202,7 +203,7 @@ public class SetupP2PStep
         if ( !peers.isEmpty() )
         {
             throw new EnvironmentCreationException( "Failed to setup tunnel across all peers" );
-        };
+        }
     }
 
 
@@ -248,7 +249,7 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            peer.setupP2PConnection( p2PConfig );
+            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
             return p2PConfig;
         }
     }

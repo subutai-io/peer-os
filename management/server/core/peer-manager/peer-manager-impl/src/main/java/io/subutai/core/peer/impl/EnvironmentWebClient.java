@@ -25,6 +25,8 @@ import io.subutai.common.security.WebClientBuilder;
 
 /**
  * Environment REST client
+ *
+ * TODO throw exception if http code is not 2XX
  */
 public class EnvironmentWebClient
 {

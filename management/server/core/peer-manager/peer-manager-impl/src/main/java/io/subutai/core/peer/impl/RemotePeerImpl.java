@@ -855,11 +855,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setupP2PConnection( final P2PConfig config ) throws PeerException
+    public String setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
+        return new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
     }
 
 
@@ -941,8 +941,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress )
-            throws PeerException
+    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
         return new PeerWebClient( peerInfo, provider ).getP2PSwarmDistances( p2pHash, maxAddress );
     }

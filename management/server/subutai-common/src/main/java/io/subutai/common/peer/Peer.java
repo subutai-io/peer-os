@@ -286,8 +286,10 @@ public interface Peer
      *
      * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
      * dynamic IP acquisition for RHs
+     *
+     * @return - P2P IP of RH with MH
      */
-    void setupP2PConnection( P2PConfig config ) throws PeerException;
+    String setupP2PConnection( P2PConfig config ) throws PeerException;
 
     /**
      * Removes p2p connection by hash from all RHs

@@ -345,11 +345,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void setupP2PConnection( final P2PConfig config )
+    public Response setupP2PConnection( final P2PConfig config )
     {
         try
         {
-            localPeer.setupP2PConnection( config );
+            String mhP2pIP = localPeer.setupP2PConnection( config );
+            return Response.ok( mhP2pIP ).build();
         }
         catch ( Exception e )
         {
