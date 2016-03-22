@@ -150,6 +150,7 @@ public class RegistrationManager
                 Config config = new ConfigEntity();
                 config.setHubIp( hubIp );
                 config.setPeerId( configManager.getPeerId() );
+                config.setOwnerId( manager.getPeerInfo().get( "OwnerId" ) );
 
                 manager.getConfigDataService().saveHubConfig( config );
                 LOG.debug( "Hub configuration saved successfully." );

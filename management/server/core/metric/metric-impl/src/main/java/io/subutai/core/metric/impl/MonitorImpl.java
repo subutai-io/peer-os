@@ -38,6 +38,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.AlertValue;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
@@ -494,5 +495,12 @@ public class MonitorImpl implements Monitor, HostListener
                 queueAlertResource( new QuotaAlert( quotaAlertValue, System.currentTimeMillis() ) );
             }
         }
+    }
+
+
+    @Override
+    public void putAlert( final Alert alert )
+    {
+        queueAlertResource( alert );
     }
 }

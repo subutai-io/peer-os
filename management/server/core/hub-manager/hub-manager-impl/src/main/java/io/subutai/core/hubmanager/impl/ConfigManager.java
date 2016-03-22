@@ -212,7 +212,8 @@ public class ConfigManager
 
     public String getHubIp()
     {
-        return configDataService.getHubConfig( peerId ).getHubIp();
+//        return configDataService.getHubConfig( peerId ).getHubIp();
+        return "hub.subut.ai";
     }
 
     public byte[] readContent( Response response ) throws IOException

@@ -1,18 +1,18 @@
 var app = angular.module('subutai-app', [
-    'ui.router',
-    'ngCookies',
-    'ngResource',
-    'oc.lazyLoad',
-    'oitozero.ngSweetAlert',
-    'ngDialog',
-    'datatables',
-    '720kb.tooltips',
-    'ngTagsInput',
-    'nvd3',
-    'cfp.loadingBar',
-    'uiSwitch',
-    'ngFileUpload'
-])
+        'ui.router',
+        'ngCookies',
+        'ngResource',
+        'oc.lazyLoad',
+        'oitozero.ngSweetAlert',
+        'ngDialog',
+        'datatables',
+        '720kb.tooltips',
+        'ngTagsInput',
+        'nvd3',
+        'cfp.loadingBar',
+        'uiSwitch',
+        'ngFileUpload'
+    ])
     .config(routesConf)
 
     .controller('SubutaiController', SubutaiController)
@@ -28,15 +28,16 @@ routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
 function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog) {
-	var vm = this;
-	vm.currentUser = localStorage.getItem('currentUser');
-	vm.hubStatus = false;
-	vm.notifications = [];
-	vm.notificationsCount = 0;
-	vm.notificationNew = false;
-	vm.currentUserRoles = [];
-	$rootScope.notifications = {};
-	vm.hubRegisterError = false;
+    var vm = this;
+    vm.currentUser = localStorage.getItem('currentUser');
+    vm.hubStatus = false;
+    vm.userId = "";
+    vm.notifications = [];
+    vm.notificationsCount = 0;
+    vm.notificationNew = false;
+    vm.currentUserRoles = [];
+    $rootScope.notifications = {};
+    vm.hubRegisterError = false;
     vm.isRegistrationFormVisible = false;
 
     vm.getRegistrationFormVisibilityStatus = function () {
@@ -51,6 +52,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         }).success(function (data) {
             console.log(data);
             vm.hubStatus = data.isRegisteredToHub;
+            vm.userId = data.ownerId;
+            console.log(vm.userId);
             if (vm.hubStatus != "true" && vm.hubStatus != true) {
                 console.log("wrong check");
                 vm.hubStatus = false;
@@ -77,91 +80,101 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.clearLogs = clearLogs;
 
 
-	function hubPopupLoadScreen(show) {
-		if(show == undefined || show == null) show = false;
-		if(show) {
-			$('.js-hub-screen').show();
-		} else {
-			$('.js-hub-screen').hide();
-		}
-	}
-
-
-	function hubRegister() {
-		vm.hubRegisterError = false;
-		hubPopupLoadScreen(true);
-		var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + vm.hub.password;
-		$http.post( SERVER_URL + 'rest/v1/hub/register', postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-			.success(function () {
-				localStorage.setItem('hubRegistered', true);
-				vm.hubStatus = true;
-				hubPopupLoadScreen();
-
-				ngDialog.open({
-					template: 'subutai-app/common/partials/hubSuccessMessage.html',
-					scope: $scope
-				});
-
-                $http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-                    .success(function () {
-                        //localStorage.setItem('hubRegistered', true);
-                        //vm.hubStatus = true;
-                        //hubPopupLoadScreen();
-                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
-					}).error (function (error) {
-						console.log('hub/register error: ', error);
-						vm.hubRegisterError = error;
-						//hubPopupLoadScreen();
-					});
-
-                $http.post( SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-                    .success(function () {
-                        //localStorage.setItem('hubRegistered', true);
-                        //vm.hubStatus = true;
-                        //hubPopupLoadScreen();
-                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
-                    }).error (function (error) {
-						console.log('hub/register error: ', error);
-						vm.hubRegisterError = error;
-						//hubPopupLoadScreen();
-					});
-
-
-            }).error (function (error) {
-				console.log('hub/register error: ', error);
-				vm.hubRegisterError = error;
-				hubPopupLoadScreen();
-			});
+    function hubPopupLoadScreen(show) {
+        if (show == undefined || show == null) show = false;
+        if (show) {
+            $('.js-hub-screen').show();
+        } else {
+            $('.js-hub-screen').hide();
+        }
     }
 
-	function hubUnregister() {
-		hubPopupLoadScreen(true);
-		$http.delete( SERVER_URL + 'rest/v1/hub/unregister' )
-			.success(function () {
-				hubPopupLoadScreen();
-				localStorage.removeItem('hubRegistered');
-				vm.hubStatus = false;
-				//SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
-			}).error (function (error) {
-				hubPopupLoadScreen();
-				SweetAlert.swal ("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
-			});
-	}
 
-	function hubHeartbeat() {
-		//should be rest/v1/hub no need to change
-		hubPopupLoadScreen(true);
-		$http.post( SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true} )
-			.success(function () {
-				hubPopupLoadScreen();
-				localStorage.setItem('hubRegistered', true);
-				vm.hubStatus = true;
-				SweetAlert.swal ("Success!", "Heartbeat sent successfully.", "success");
-			}).error (function (error) {
-				hubPopupLoadScreen();
-				SweetAlert.swal ("ERROR!", "Hub heartbeat error: " + error.replace(/\\n/g, " "), "error");
-			});
-	}
+    function hubRegister() {
+        vm.hubRegisterError = false;
+        hubPopupLoadScreen(true);
+        var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + vm.hub.password;
+        $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
+                withCredentials: true,
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            })
+            .success(function () {
+                localStorage.setItem('hubRegistered', true);
+                vm.hubStatus = true;
+                hubPopupLoadScreen();
+
+                ngDialog.open({
+                    template: 'subutai-app/common/partials/hubSuccessMessage.html',
+                    scope: $scope
+                });
+
+                $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {
+                        withCredentials: true,
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                    })
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error(function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+                $http.post(SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {
+                        withCredentials: true,
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                    })
+                    .success(function () {
+                        //localStorage.setItem('hubRegistered', true);
+                        //vm.hubStatus = true;
+                        //hubPopupLoadScreen();
+                        //SweetAlert.swal ("Success!", "Your peer was registered to Hub.", "success");
+                    }).error(function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                    //hubPopupLoadScreen();
+                });
+
+
+            }).error(function (error) {
+            console.log('hub/register error: ', error);
+            vm.hubRegisterError = error;
+            hubPopupLoadScreen();
+        });
+    }
+
+    function hubUnregister() {
+        hubPopupLoadScreen(true);
+        $http.delete(SERVER_URL + 'rest/v1/hub/unregister')
+            .success(function () {
+                hubPopupLoadScreen();
+                localStorage.removeItem('hubRegistered');
+                vm.hubStatus = false;
+                //SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
+            }).error(function (error) {
+            hubPopupLoadScreen();
+            SweetAlert.swal("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
+        });
+    }
+
+
+    function hubHeartbeat() {
+        //should be rest/v1/hub no need to change
+        hubPopupLoadScreen(true);
+        $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat', {withCredentials: true})
+            .success(function () {
+                hubPopupLoadScreen();
+                localStorage.setItem('hubRegistered', true);
+                vm.hubStatus = true;
+                SweetAlert.swal("Success!", "Heartbeat sent successfully.", "success");
+            }).error(function (error) {
+            hubPopupLoadScreen();
+            SweetAlert.swal("ERROR!", "Hub heartbeat error: " + error.replace(/\\n/g, " "), "error");
+        });
+    }
 
     function logout() {
         removeCookie('sptoken');
@@ -672,12 +685,12 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
             resolve: {
                 loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
-						{
-							files: ['scripts/libs/FileSaver.min.js']
-						},
-						{
-							name: 'vtortola.ng-terminal'
-						},
+                        {
+                            files: ['scripts/libs/FileSaver.min.js']
+                        },
+                        {
+                            name: 'vtortola.ng-terminal'
+                        },
                         {
                             name: 'subutai.settings-advanced',
                             files: [
@@ -747,27 +760,27 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
         })
         .state();
 
-	$stateProviderRef = $stateProvider;
+    $stateProviderRef = $stateProvider;
 
-	$httpProvider.interceptors.push(function($q, $location) {
-		return {
-			'responseError': function(rejection) {
-				if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
-					$location.path('/login');
-				}
-				return $q.reject(rejection);
-			}
-		};
-	});
+    $httpProvider.interceptors.push(function ($q, $location) {
+        return {
+            'responseError': function (rejection) {
+                if (rejection.status == 401 && $.inArray($location.path(), ['/login']) === -1) {
+                    $location.path('/login');
+                }
+                return $q.reject(rejection);
+            }
+        };
+    });
 }
 
 function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog) {
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         LOADING_SCREEN('none');
-		ngDialog.closeAll();
-		$('.sweet-overlay').remove();
-		$('.sweet-alert').remove();
+        ngDialog.closeAll();
+        $('.sweet-overlay').remove();
+        $('.sweet-alert').remove();
 
         $http.get(SERVER_URL + 'rest/v1/hub/registration_state', {withCredentials: true})
             .success(function (data) {
@@ -783,39 +796,39 @@ function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog) {
         }
     });
 
-	$rootScope.$on('reloadPluginsStates', function(event) {
-		location.reload();
-		/*var state = {
-			url: '/console/{containerId}',
-			templateUrl: 'subutai-app/console/partials/view.html',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			resolve: {
-				loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
-					return $ocLazyLoad.load([
-						{
-							name: 'vtortola.ng-terminal'
-						},
-						{
-							name: 'subutai.console',
-							files: [
-								'subutai-app/console/console.js',
-								'subutai-app/console/controller.js',
-								'subutai-app/console/service.js',
-								'subutai-app/environment/service.js',
-								'subutai-app/peerRegistration/service.js'
-							]
-						}
-					]);
-				}]
-			}
-		};
-		$stateProviderRef.state('console', state);*/
-	});
+    $rootScope.$on('reloadPluginsStates', function (event) {
+        location.reload();
+        /*var state = {
+         url: '/console/{containerId}',
+         templateUrl: 'subutai-app/console/partials/view.html',
+         data: {
+         bodyClass: '',
+         layout: 'default'
+         },
+         resolve: {
+         loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+         return $ocLazyLoad.load([
+         {
+         name: 'vtortola.ng-terminal'
+         },
+         {
+         name: 'subutai.console',
+         files: [
+         'subutai-app/console/console.js',
+         'subutai-app/console/controller.js',
+         'subutai-app/console/service.js',
+         'subutai-app/environment/service.js',
+         'subutai-app/peerRegistration/service.js'
+         ]
+         }
+         ]);
+         }]
+         }
+         };
+         $stateProviderRef.state('console', state);*/
+    });
 
-	$rootScope.$state = $state;
+    $rootScope.$state = $state;
 }
 
 function getCookie(cname) {

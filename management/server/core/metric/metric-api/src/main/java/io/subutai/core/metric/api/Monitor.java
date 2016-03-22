@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.AlertValue;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertEvent;
@@ -45,24 +47,21 @@ public interface Monitor
 
     /**
      * Adds alert event
-     *
-     * @param alert
      */
     void addAlert( AlertEvent alert );
 
     /**
      * Returns the queue of alerts emitted from local peer
-     *
-     * @return
      */
     List<AlertEvent> getAlertsQueue();
 
     /**
      * Returns the list of alert listeners
-     * @return
      */
     Set<AlertListener> getAlertListeners();
 
 
     String getPlainHistoricalMetrics( final Host host, final Date startTime, final Date endTime );
+
+    void putAlert( Alert alert );
 }
