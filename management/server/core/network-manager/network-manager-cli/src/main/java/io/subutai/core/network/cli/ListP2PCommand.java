@@ -16,7 +16,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
-@Command( scope = "p2p", name = "list", description = "List P2P connection" )
+@Command( scope = "net", name = "p2p-list", description = "List P2P connections" )
 public class ListP2PCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( ListP2PCommand.class.getName() );

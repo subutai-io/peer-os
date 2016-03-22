@@ -1,32 +1,30 @@
 package io.subutai.core.network.cli;
 
 
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
-@Command( scope = "net", name = "p2p-remove", description = "Removes P2P connection" )
-public class RemoveP2PCommand extends SubutaiShellCommandSupport
+@Command( scope = "net", name = "tunnel-list", description = "Lists tunnels" )
+public class ListTunnelCommand extends SubutaiShellCommandSupport
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RemoveP2PCommand.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ListTunnelCommand.class.getName() );
 
     private final NetworkManager networkManager;
 
-    @Argument( index = 0, name = "p2p hash", required = true, multiValued = false,
-            description = "p2p hash" )
-    String p2pHash;
 
-
-    public RemoveP2PCommand( final NetworkManager networkManager )
+    public ListTunnelCommand( final NetworkManager networkManager )
     {
         Preconditions.checkNotNull( networkManager );
 
@@ -40,13 +38,17 @@ public class RemoveP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager.removeP2PConnection( p2pHash );
-            System.out.println( "OK" );
+            Set<Tunnel> tunnels = networkManager.listTunnels();
+            System.out.format( "Found %d tunnel(s)%n", tunnels.size() );
+            for ( Tunnel tunnel : tunnels )
+            {
+                System.out.format( "%s %s%n", tunnel.getTunnelName(), tunnel.getTunnelIp() );
+            }
         }
         catch ( NetworkManagerException e )
         {
             System.out.println( e.getMessage() );
-            LOG.error( "Error in RemoveP2PCommand", e );
+            LOG.error( "Error in RemoveTunnelCommand", e );
         }
 
         return null;
