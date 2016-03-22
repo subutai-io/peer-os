@@ -30,4 +30,6 @@ public interface Integration
     Map<String, String> getPeerInfo() throws HubPluginException;
 
     Config getHubConfiguration();
+
+    String getChecksum();
 }
