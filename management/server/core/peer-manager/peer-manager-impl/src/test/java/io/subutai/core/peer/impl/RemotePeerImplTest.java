@@ -43,6 +43,7 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -142,6 +143,8 @@ public class RemotePeerImplTest
     private SecurityManager securityManager;
     @Mock
     private EnvironmentId envId;
+    @Mock
+    private PeerManagerImpl peerManager;
 
 
     @Before
@@ -155,7 +158,7 @@ public class RemotePeerImplTest
         headers = Maps.newHashMap();
         headers.put( HEADER_NAME, HEADER_VALUE );
         remotePeer = spy( new RemotePeerImpl( localPeer.getId(), securityManager, peerInfo, messenger,
-                commandResponseListener, messageResponseListener, null ) );
+                commandResponseListener, messageResponseListener, null, peerManager ) );
         remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );

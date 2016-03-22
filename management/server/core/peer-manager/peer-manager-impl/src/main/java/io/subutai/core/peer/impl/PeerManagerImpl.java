@@ -1,6 +1,8 @@
 package io.subutai.core.peer.impl;
 
 
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationMeta;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,6 +72,7 @@ import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.object.relation.api.RelationInfoManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
@@ -197,6 +200,11 @@ public class PeerManagerImpl implements PeerManager
     public void setRelationManager( final RelationManager relationManager )
     {
         this.relationManager = relationManager;
+    }
+
+    public RelationManager getRelationManager()
+    {
+        return relationManager;
     }
 
 
@@ -384,8 +392,21 @@ public class PeerManagerImpl implements PeerManager
                 return localPeer;
             }
 
-            return new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
-                    messageResponseListener, provider );
+            RemotePeerImpl remotePeer = new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
+                messageResponseListener, provider, this );
+
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            relationInfoMeta.getRelationTraits().put("receiveHeartbeats", "allow");
+            relationInfoMeta.getRelationTraits().put("sendHeartbeats", "allow");
+            relationInfoMeta.getRelationTraits().put("hostTemplates", "allow");
+
+            User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+            RelationMeta relationMeta = new RelationMeta(peerOwner,localPeer, remotePeer, localPeer.getKeyId());
+            Relation relation = relationManager.buildRelation(relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+
+            return remotePeer;
         }
         catch ( Exception e )
         {
@@ -727,10 +748,22 @@ public class PeerManagerImpl implements PeerManager
     {
         Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
-        Preconditions.checkNotNull( challenge );
+        URL destinationUrl;
+        try
+        {
+            destinationUrl = buildDestinationUrl( destinationHost );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new PeerException( "Invalid URL." );
+        }
 
-        String destinationUrl = buildDestinationUrl( destinationHost );
-        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl );
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( "Could not send registration request to ourselves." );
+        }
+
+        PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
         if ( getRequest( peerInfo.getId() ) != null )
         {
@@ -753,8 +786,9 @@ public class PeerManagerImpl implements PeerManager
             final RegistrationData registrationData = buildRegistrationData( keyPhrase, RegistrationStatus.REQUESTED );
 
             registrationData.setToken( generateActiveUserToken() );
+            registrationData.setKeyPhrase( "" );
 
-            RegistrationData result = registrationClient.sendInitRequest( destinationUrl, registrationData );
+            RegistrationData result = registrationClient.sendInitRequest( destinationUrl.toString(), registrationData );
 
             result.setKeyPhrase( keyPhrase );
             addRequest( result );

@@ -53,6 +53,7 @@ import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
@@ -79,6 +80,10 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.core.object.relation.api.RelationInfoManager;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.RelationVerificationException;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -105,11 +110,14 @@ public class RemotePeerImpl implements RemotePeer
     private String baseUrl;
     Object provider;
     private String localPeerId;
+    private RelationManager relationManager;
+    private LocalPeer localPeer;
 
 
     public RemotePeerImpl( String localPeerId, SecurityManager securityManager, final PeerInfo peerInfo,
                            final Messenger messenger, CommandResponseListener commandResponseListener,
-                           MessageResponseListener messageResponseListener, Object provider )
+                           MessageResponseListener messageResponseListener, Object provider,
+                           final PeerManagerImpl peerManager )
     {
         this.localPeerId = localPeerId;
         this.securityManager = securityManager;
@@ -117,6 +125,9 @@ public class RemotePeerImpl implements RemotePeer
         this.messenger = messenger;
         this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
+        this.relationManager = peerManager.getRelationManager();
+        this.localPeer = peerManager.getLocalPeer();
+
         String url;
 
         int port = peerInfo.getPort();
@@ -138,6 +149,21 @@ public class RemotePeerImpl implements RemotePeer
     protected String request( RestUtil.RequestType requestType, String path, String alias, Map<String, String> params,
                               Map<String, String> headers ) throws HTTPException
     {
+        RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
+
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+        relationInfoMeta.getRelationTraits().put("receiveHeartbeats", "allow");
+        relationInfoMeta.getRelationTraits().put("sendHeartbeats", "allow");
+        relationInfoMeta.getRelationTraits().put("hostTemplates", "allow");
+
+        try
+        {
+            relationInfoManager.checkRelationValidity( localPeer, this, relationInfoMeta, null );
+        }
+        catch ( RelationVerificationException e )
+        {
+            throw new HTTPException( e.getMessage() );
+        }
         return restUtil.request( requestType,
                 String.format( "%s/%s", baseUrl, path.startsWith( "/" ) ? path.substring( 1 ) : path ), alias, params,
                 headers, provider );

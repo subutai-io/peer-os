@@ -1,7 +1,6 @@
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-
 Clearsign test message
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
