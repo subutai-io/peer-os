@@ -23,7 +23,7 @@ func LxcUnregister(containerName string) {
 	fs.ReadOnly(containerName, true)
 	log.Info(containerName + " is removed from git repo")
 	// check: delete and unregister from rest end // $template/$version/remove
-	resp, err := http.Get(config.Management.Kurjun + containerName + "/" + config.Misc.Version + "/remove")
+	resp, err := http.Get(config.Management.Kurjun + containerName + "/" + config.Template.Version + "/remove")
 	if err != nil {
 		log.Error("delete git from rest: " + err.Error())
 	}
@@ -43,7 +43,7 @@ func checkUnregisterAvailability(containerName string) error {
 		return errors.New(containerName + " is not registered as template.")
 	}
 
-	resp, err := http.Get(config.Management.Kurjun + containerName + "/" + config.Misc.Version + "/children")
+	resp, err := http.Get(config.Management.Kurjun + containerName + "/" + config.Template.Version + "/children")
 	if err != nil {
 		log.Error("http get children: " + err.Error())
 	}
@@ -51,7 +51,7 @@ func checkUnregisterAvailability(containerName string) error {
 	if resp.StatusCode == 200 {
 		return errors.New(containerName + " has a child templates.")
 	}
-	resp, err = http.Get(config.Management.Kurjun + containerName + "/" + config.Misc.Version + "/is-used-on-fai")
+	resp, err = http.Get(config.Management.Kurjun + containerName + "/" + config.Template.Version + "/is-used-on-fai")
 	defer resp.Body.Close()
 	if err != nil {
 		log.Error("http in use check: " + err.Error())
