@@ -464,7 +464,11 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             if ( targetRelation.getTrustedObject().equals( object ) )
             {
                 // Requested relation should be less then or equal to relation that was granted
-                if ( !( compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0 ) )
+                if ( compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0 )
+                {
+                    return;
+                }
+                else
                 {
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
@@ -494,7 +498,11 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             {
                 // Requested relation should be less then or equal to relation that was granted
 
-                if ( !( compareRelationships( sourceRelation.getRelationInfo(), relationInfo ) >= 0 ) )
+                if ( compareRelationships( sourceRelation.getRelationInfo(), relationInfo ) >= 0 )
+                {
+                    return;
+                }
+                else
                 {
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }

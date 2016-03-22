@@ -127,7 +127,7 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.source.linkId=:source" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.source.linkId=:source ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "source", source.getLinkId() );
             result.addAll( qr.getResultList() );
         }
@@ -149,7 +149,7 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.target.linkId=:target" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.target.linkId=:target ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "target", target.getLinkId() );
             result.addAll( qr.getResultList() );
         }
@@ -173,7 +173,7 @@ public class RelationDataService
         {
             Query qr = em.createQuery                                              (
                     "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject "
-                            + "and ss.relationInfo.ownershipLevel=:ownershipLevel" );
+                            + "and ss.relationInfo.ownershipLevel=:ownershipLevel ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "trustedObject", trustedObject.getLinkId() );
             qr.setParameter( "ownershipLevel", ownership.getLevel() );
             result.addAll( qr.getResultList() );
@@ -202,7 +202,7 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery                                                                     (
-                    "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject" );
+                    "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
         }
@@ -286,7 +286,7 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject" );
+                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "source", source.getLinkId() );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
@@ -339,7 +339,7 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject" );
+                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "target", target.getLinkId() );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
