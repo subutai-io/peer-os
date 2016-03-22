@@ -161,7 +161,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
-        backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
+        backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
     }
 
