@@ -98,7 +98,7 @@ function BazaarSrv($http) {
 		}
 		var postData = "id=" + plugin.hubId + "&kar=" + kar + "&name=" + plugin.name.toLowerCase();
 		console.log (postData);
-		return $http.delete(
+		return $http.post(
 			BAZAAR_URL + "uninstall",
 			postData,
 			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}

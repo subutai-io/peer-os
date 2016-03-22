@@ -235,6 +235,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     }
 
    	function getBazaarChecksum() {
+   		console.log ("Getting checksum");
 		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
 			console.log (data);
 			return data;

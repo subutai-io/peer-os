@@ -10,7 +10,7 @@ public interface RestService
 {
 	@GET
 	@Path( "products/checksum" )
-	@Produces( { MediaType.APPLICATION_JSON } )
+	@Produces( { MediaType.TEXT_PLAIN } )
 	public Response getListMD5 ();
 
 
@@ -29,7 +29,7 @@ public interface RestService
 	@Produces( { MediaType.TEXT_PLAIN } )
 	public Response installPlugin (@FormParam ("name") String name, @FormParam ("version") String version, @FormParam ("kar") String kar, @FormParam ("url") String url, @FormParam ("uid") String uid);
 
-	@DELETE
+	@POST
 	@Path( "uninstall" )
 	@Produces( { MediaType.TEXT_PLAIN } )
 	public Response uninstallPlugin (@FormParam ("id") Long id, @FormParam ("kar") String kar, @FormParam ("name") String name);
