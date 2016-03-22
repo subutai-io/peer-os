@@ -5,7 +5,7 @@ import io.subutai.common.peer.ContainerSize;
 
 
 /**
- * Allocated conatiner holder
+ * Allocated container holder
  */
 public class AllocatedContainer
     {
