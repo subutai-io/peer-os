@@ -4,7 +4,7 @@ angular.module('subutai.monitoring.service', [])
 	.factory('monitoringSrv', monitoringSrv);
 
 
-monitoringSrv.$inject = ['$http', 'environmentService', 'objectRelationService'];
+monitoringSrv.$inject = ['$http', 'environmentService', 'peerRegistrationService'];
 
 function monitoringSrv($http, environmentService, peerRegistrationService) {
 	var BASE_URL = SERVER_URL + 'rest/ui/metrics/';
