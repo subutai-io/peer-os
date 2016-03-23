@@ -45,7 +45,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
@@ -74,7 +73,6 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -126,7 +124,6 @@ import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CloneTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
-import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.ImportTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
 import io.subutai.core.localpeer.impl.container.QuotaTask;
@@ -205,8 +202,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         //add create container requests listener
         addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
-        //add destroy environment containers requests listener
-        addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
 
         //add prepare templates listener
         addRequestListener( new PrepareTemplateRequestListener( this ) );
@@ -1123,39 +1118,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( e );
         }
-    }
-
-
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        Set<Throwable> errors = Sets.newHashSet();
-        Set<ContainerHost> destroyedContainers;
-
-        Set<ContainerHost> containerHosts = Sets.newHashSet();
-
-
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-            {
-                if ( environmentId.equals( containerHost.getEnvironmentId().getId() ) )
-                {
-                    containerHosts.add( containerHost );
-                }
-            }
-        }
-
-
-        destroyedContainers = destroyContainerGroup( containerHosts, errors );
-
-        String exception =
-                errors.isEmpty() ? null : String.format( "There were errors while destroying containers: %s", errors );
-        return new ContainersDestructionResultImpl( getId(), destroyedContainers, exception );
     }
 
 
