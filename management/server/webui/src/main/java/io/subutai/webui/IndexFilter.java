@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class IndexFilter implements Filter
@@ -32,6 +33,14 @@ public class IndexFilter implements Filter
             {
                 RequestDispatcher view = servletRequest.getRequestDispatcher("index.html");
                 view.forward(servletRequest, servletResponse);
+            }
+            if( !(url.startsWith("/rest") || url.startsWith("/subutai") ||
+                    url.startsWith("/fav") || url.startsWith("/plugin") ||
+                    url.startsWith("/assets") || url.startsWith("/css") ||
+                    url.startsWith("/fonts") || url.startsWith("/scripts") ||
+                    url.startsWith("/login")) )
+            {
+                ((HttpServletResponse)servletResponse).sendRedirect("/#" + url);
             }
             else
             {
