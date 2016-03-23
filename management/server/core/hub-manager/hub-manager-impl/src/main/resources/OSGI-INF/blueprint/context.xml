@@ -42,6 +42,9 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="networkManager"
+             interface="io.subutai.core.network.api.NetworkManager" />
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />

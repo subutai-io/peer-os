@@ -1,6 +1,7 @@
 package io.subutai.core.hubmanager.impl;
 
 
+import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.security.auth.Subject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.Node;
@@ -39,11 +46,14 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;
@@ -56,21 +66,28 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 public class HubEnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentManager.class.getName() );
+    private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
+    private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
+    private static final String SSH_FOLDER = "/root/.ssh";
+    private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
     private SecurityManager securityManager;
     private PeerManager peerManager;
     private ConfigManager configManager;
     private IdentityManager identityManager;
     private EnvironmentManager environmentManager;
+    private NetworkManager networkManager;
 
 
     public HubEnvironmentManager( final EnvironmentManager environmentManager, final ConfigManager hConfigManager,
-                                  final PeerManager peerManager, final IdentityManager identityManager )
+                                  final PeerManager peerManager, final IdentityManager identityManager,
+                                  final NetworkManager networkManager )
     {
         this.environmentManager = environmentManager;
         this.configManager = hConfigManager;
         this.peerManager = peerManager;
         this.identityManager = identityManager;
+        this.networkManager = networkManager;
     }
 
 
@@ -184,18 +201,38 @@ public class HubEnvironmentManager
     public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto )
     {
         LocalPeer peer = peerManager.getLocalPeer();
-        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        final EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
         String tunComName = P2PUtil.generateHash( env.getTunnelNetwork() );
 
         SubnetUtils.SubnetInfo subnetInfo =
                 new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
-        final String addresses = subnetInfo.getAddress();
+        final String address = subnetInfo.getAddress();
+        final Session session = identityManager.login( "internal", "secretSubutai" );
+        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
+        {
+            @Override
+            public Void run()
+            {
+                try
+                {
+                    Vni reservedVni = networkManager.getReservedVnis().findVniByEnvironmentId( env.getId() );
+                    networkManager.setupP2PConnection( peerManager.getLocalPeer().getManagementHost(),
+                            P2PUtil.generateInterfaceName( reservedVni.getVlan() ), address,
+                            env.getP2pHash(), env.getP2pKey(), Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+                }
+                catch ( Exception ex )
+                {
+                    LOG.error( ex.getMessage() );
+                }
+                return null;
+            }
+        } );
 
-        ExecutorService p2pExecutor = Executors.newFixedThreadPool( 1 );
+        ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
         P2PConfig config =
-                new P2PConfig( peer.getId(), env.getId(), tunComName, addresses, env.getP2pHash(), env.getP2pTTL() );
+                new P2PConfig( peer.getId(), env.getId(), env.getP2pKey(), address, env.getP2pHash(), env.getP2pTTL() );
         p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
 
         try
@@ -208,7 +245,7 @@ public class HubEnvironmentManager
             peerDto.setCommunityName( createdConfig.getHash() );
             peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
 
-            ExecutorService tunnelExecutor = Executors.newFixedThreadPool( 1 );
+            ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
 
             ExecutorCompletionService<Integer> tunnelCompletionService =
                     new ExecutorCompletionService<Integer>( tunnelExecutor );
@@ -243,7 +280,7 @@ public class HubEnvironmentManager
             nodes.add( node );
         }
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( 1 );
+        ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
         CompletionService<PrepareTemplatesResponseCollector> taskCompletionService =
                 getCompletionService( taskExecutor );
 
@@ -369,5 +406,14 @@ public class HubEnvironmentManager
     protected CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
+    }
+
+
+    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String p2pHash,
+                                                        String secretKey, long secretKeyTtlSec )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ),
+                        Strings.isNullOrEmpty( localIp ) ? "" : localIp ) ).withTimeout( 90 );
     }
 }
