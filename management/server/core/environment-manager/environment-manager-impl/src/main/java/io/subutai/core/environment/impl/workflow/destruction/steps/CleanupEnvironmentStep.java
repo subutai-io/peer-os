@@ -37,6 +37,12 @@ public class CleanupEnvironmentStep
     public void execute() throws PeerException
     {
         Set<Peer> peers = environment.getPeers();
+
+        if ( peers.isEmpty() )
+        {
+            return;
+        }
+
         ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 

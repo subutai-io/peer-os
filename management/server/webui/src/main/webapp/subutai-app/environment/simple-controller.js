@@ -63,7 +63,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			.success(function (data) {
 				for(var i = 0; i < data.length; i++) {
 					if(data[i].description.includes(environmentId)) {
-						console.log(data[i]);
 						getLogById(data[i].id, true);
 						break;
 					}
@@ -646,7 +645,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			vm.containers2Build.push(container2Build);
 		}
 
-		console.log(vm.containers2Build);
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
 			scope: $scope,
@@ -655,7 +653,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function editEnvironment(environment) {
-		console.log(environment);
 		clearWorkspace();
 		vm.isApplyingChanges = false;
 		vm.currentEnvironment = environment;

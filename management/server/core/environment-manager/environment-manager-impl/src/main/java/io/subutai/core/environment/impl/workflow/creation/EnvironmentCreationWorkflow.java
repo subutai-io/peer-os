@@ -94,7 +94,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager, securityManager ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

@@ -144,16 +144,15 @@ public class SetupP2PStep
             trackerOperation.addLog( String.format( "P2P setup failed on peer %s", failedPeer.getName() ) );
         }
 
-        if ( !peers.isEmpty() )
-        {
-            throw new EnvironmentCreationException( "Failed to setup P2P connection across all peers" );
-        }
-
         for ( P2PConfig config : result )
         {
             environment.addEnvironmentPeer( new PeerConfImpl( config ) );
         }
 
+        if ( !peers.isEmpty() )
+        {
+            throw new EnvironmentCreationException( "Failed to setup P2P connection across all peers" );
+        }
 
         //tunnel setup
 
