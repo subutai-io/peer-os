@@ -19,6 +19,7 @@ public class SystemSettings
     public static final String DEFAULT_MGMT_INTERFACE = "mng-net";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
+    public static final String DEFAULT_LOCAL_KURJUN_REPO = "http://localhost:8081/kurjun";
     public static final String DEFAULT_PEER_PWD = "12345678";
 
     private static PropertiesConfiguration PROPERTIES = null;
@@ -51,6 +52,28 @@ public class SystemSettings
     {
         return GLOBAL_KURJUN_URLS;
     }
+
+
+    public static String[] getLocalKurjunUrls() throws ConfigurationException
+    {
+        String[] globalKurjunUrls = PROPERTIES.getStringArray( "localKurjunUrls" );
+        if ( globalKurjunUrls.length < 1 )
+        {
+            globalKurjunUrls = new String[] {
+                    DEFAULT_LOCAL_KURJUN_REPO
+            };
+        }
+
+        return validateGlobalKurjunUrls( globalKurjunUrls );
+    }
+
+
+    public static void setLocalKurjunUrls( String[] urls ) throws ConfigurationException
+    {
+        String[] validated = validateGlobalKurjunUrls( urls );
+        saveProperty( "localKurjunUrls", validated );
+    }
+
 
 
     public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
