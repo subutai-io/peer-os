@@ -118,19 +118,13 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public P2PConnection getP2PConnectionByHash( final Host host, final String p2pHash ) throws NetworkManagerException
     {
-        CommandResult result = execute( host, commands.getP2PConnectionsCommand( p2pHash ) );
+        Set<P2PConnection> p2PConnections = getP2PConnections( host );
 
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile( "\\s*(\\S+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\S+)\\s*" );
-
-        while ( st.hasMoreTokens() )
+        for ( P2PConnection p2PConnection : p2PConnections )
         {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
+            if ( p2PConnection.getHash().equalsIgnoreCase( p2pHash ) )
             {
-                return new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) );
+                return p2PConnection;
             }
         }
 
