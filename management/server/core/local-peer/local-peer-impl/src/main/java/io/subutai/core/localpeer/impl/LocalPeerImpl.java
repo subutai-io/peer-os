@@ -1621,7 +1621,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
     {
         Preconditions.checkNotNull( envId );
-
+        //TODO don't generate PEK if already exists, return the existing one!!!
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
         String pairId = String.format( "%s-%s", getId(), envId.getId() );
