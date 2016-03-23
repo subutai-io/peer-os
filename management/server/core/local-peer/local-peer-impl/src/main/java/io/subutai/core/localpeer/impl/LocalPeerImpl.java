@@ -36,7 +36,6 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -123,7 +122,6 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CloneTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
-import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
 import io.subutai.core.localpeer.impl.container.ImportTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
 import io.subutai.core.localpeer.impl.container.QuotaTask;
@@ -1118,42 +1116,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( e );
         }
-    }
-
-
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
-    private Set<ContainerHost> destroyContainerGroup( final Set<ContainerHost> containerHosts,
-                                                      final Set<Throwable> errors )
-    {
-        Set<ContainerHost> destroyedContainers = new HashSet<>();
-        if ( !containerHosts.isEmpty() )
-        {
-            List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = getFixedPoolExecutor( containerHosts.size() );
-
-            for ( ContainerHost containerHost : containerHosts )
-            {
-
-                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-            }
-
-            for ( Future<ContainerHost> taskFuture : taskFutures )
-            {
-                try
-                {
-                    destroyedContainers.add( taskFuture.get() );
-                }
-                catch ( ExecutionException | InterruptedException e )
-                {
-                    errors.add( exceptionUtil.getRootCause( e ) );
-                }
-            }
-
-            executorService.shutdown();
-        }
-
-        return destroyedContainers;
     }
 
 
