@@ -20,6 +20,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.core.hubmanager.api.HubPluginException;
@@ -27,6 +28,7 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -103,6 +105,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
+                    break;
+                case DESTROY_CONTAINER:
+                    destroyContainers( peerDto );
                     break;
             }
         }
@@ -201,6 +206,35 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 e )
         {
             LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
+        }
+    }
+
+
+    private void destroyContainers( EnvironmentPeerDto peerDto )
+    {
+        String containerDestroyStateURL =
+                String.format( "/rest/v1/environments/%s/destroy", peerDto.getEnvironmentInfo().getId() );
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        try
+        {
+            localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
+            localPeer.removeP2PConnection( env.getP2pHash() );
+            localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
+
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
+            Response response = client.put( null );
+            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Container destroyed successfully" );
+            }
+        }
+        catch ( Exception e )
+        {
+
+            LOG.error( "Could not destroy container", e );
         }
     }
 

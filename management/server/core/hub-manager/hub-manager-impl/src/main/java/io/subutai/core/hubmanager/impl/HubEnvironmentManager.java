@@ -1,7 +1,6 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,8 +14,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import javax.security.auth.Subject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,11 +205,11 @@ public class HubEnvironmentManager
                 new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
         final String address = subnetInfo.getAddress();
         final Session session = identityManager.login( "internal", "secretSubutai" );
-        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
-        {
-            @Override
-            public Void run()
-            {
+//        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
+//        {
+//            @Override
+//            public Void run()
+//            {
                 try
                 {
                     Vni reservedVni = networkManager.getReservedVnis().findVniByEnvironmentId( env.getId() );
@@ -224,9 +221,9 @@ public class HubEnvironmentManager
                 {
                     LOG.error( ex.getMessage() );
                 }
-                return null;
-            }
-        } );
+//                return null;
+//            }
+//        } );
 
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
