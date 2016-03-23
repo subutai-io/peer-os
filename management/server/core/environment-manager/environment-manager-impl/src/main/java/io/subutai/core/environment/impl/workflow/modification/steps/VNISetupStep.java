@@ -58,6 +58,11 @@ public class VNISetupStep
         newPeers.removeAll( environment.getPeers() );
         newPeers.remove( peerManager.getLocalPeer() );
 
+        if ( newPeers.isEmpty() )
+        {
+            return;
+        }
+
         ExecutorService executorService = Executors.newFixedThreadPool( newPeers.size() );
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 

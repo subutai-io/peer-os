@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -16,7 +15,6 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
@@ -58,7 +56,7 @@ public class PEKGenerationStep
     }
 
 
-    public Map<Peer, String> execute() throws PeerException
+    public void execute() throws PeerException
     {
         PGPSecretKeyRing envSecKeyRing =
                 securityManager.getKeyManager().getSecretKeyRing( environment.getEnvironmentId().getId() );
@@ -66,8 +64,6 @@ public class PEKGenerationStep
         Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
 
         peers.remove( peerManager.getLocalPeer() );
-
-        Map<Peer, String> peerPekPubKeys = Maps.newHashMap();
 
         // first creating PEK for local peer
         PGPPublicKeyRing localPeerSignedPEK;
@@ -91,6 +87,10 @@ public class PEKGenerationStep
             throw new PeerException( "Could not create PEK for: " + peerManager.getLocalPeer().getId() );
         }
 
+        if ( peers.isEmpty() )
+        {
+            return;
+        }
 
         ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
@@ -134,8 +134,6 @@ public class PEKGenerationStep
         {
             throw new PeerException( "Failed to generate PEK across all peers" );
         }
-
-        return peerPekPubKeys;
     }
 
 
