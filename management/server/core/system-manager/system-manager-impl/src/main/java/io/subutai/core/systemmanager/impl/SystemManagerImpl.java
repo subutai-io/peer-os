@@ -103,16 +103,8 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public SystemInfo getSystemInfo() throws ConfigurationException, HostNotFoundException, CommandException
+    public SystemInfo getSystemInfo() throws ConfigurationException
     {
-        CommandResult result = null;
-
-        RequestBuilder requestBuilder = new RequestBuilder( "subutai -v" );
-        Host host = peerManager.getLocalPeer().getManagementHost();
-        result = peerManager.getLocalPeer().execute( requestBuilder, host );
-
-        String[] version = result.getStdOut().split( "\\s" );
-
         SystemInfo pojo = new SystemInfoPojo();
 
         pojo.setGitCommitId( SubutaiInfo.getCommitId() );
@@ -123,6 +115,22 @@ public class SystemManagerImpl implements SystemManager
         pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
         pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
         pojo.setProjectVersion( SubutaiInfo.getVersion() );
+
+        CommandResult result = null;
+        RequestBuilder requestBuilder = new RequestBuilder( "subutai -v" );
+        try
+        {
+            Host host = peerManager.getLocalPeer().getManagementHost();
+            result = peerManager.getLocalPeer().execute( requestBuilder, host );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            e.printStackTrace();
+            pojo.setRhVersion( "No RH connected" );
+            return pojo;
+        }
+
+        String[] version = result.getStdOut().split( "\\s" );
         pojo.setRhVersion( version[2] );
 
         return pojo;
