@@ -83,6 +83,8 @@ public class PEKGenerationStep
 
             peerManager.getLocalPeer()
                        .updatePeerEnvironmentPubKey( environment.getEnvironmentId(), localPeerSignedPEK );
+
+            trackerOperation.addLog( "PEK generation succeeded on Local Peer" );
         }
         catch ( PGPException e )
         {
