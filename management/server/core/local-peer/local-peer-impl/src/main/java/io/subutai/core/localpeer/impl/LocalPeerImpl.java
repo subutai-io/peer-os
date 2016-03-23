@@ -102,6 +102,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.task.ImportTemplateRequest;
@@ -194,6 +195,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
 
+        initPeerInfo();
+
         //add command request listener
         addRequestListener( new CommandRequestListener() );
         //add command response listener
@@ -227,6 +230,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         taskManager = new TaskManagerImpl( this );
         initialized = true;
+    }
+
+
+    protected void initPeerInfo()
+    {
+
+        peerInfo = new PeerInfo();
+        peerInfo.setId( securityManager.getKeyManager().getPeerId() );
+        peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
+        peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
+        peerInfo.setPort( SystemSettings.getPublicSecurePort() );
+        peerInfo.setName( String.format( "Peer %s on %s", peerInfo.getId(), SystemSettings.getPublicUrl() ) );
     }
 
 
@@ -1009,7 +1024,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
-        if ( initialized && peerInfo != null )
+        if ( initialized )
         {
             ResourceHostEntity host;
             try
@@ -2085,14 +2100,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             return false;
         }
-        return true;
+
+        final LocalPeerImpl that = ( LocalPeerImpl ) o;
+
+        return getId().equals( that.getId() );
     }
 
 
     @Override
     public int hashCode()
     {
-        return super.hashCode();
+        return getId().hashCode();
     }
 }
 
