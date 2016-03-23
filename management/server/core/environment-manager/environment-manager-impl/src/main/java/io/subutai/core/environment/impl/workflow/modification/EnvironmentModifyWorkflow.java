@@ -154,7 +154,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager ).execute();
+            new VNISetupStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
