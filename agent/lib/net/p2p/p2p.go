@@ -61,7 +61,11 @@ func UpdateKey(hash, newkey, ttl string) {
 }
 
 func Peers(hash string) {
-	out, err := exec.Command("p2p", "show", hash).Output()
+	args := []string{"show", "-hash", hash}
+	if hash == "" {
+		args = []string{"show"}
+	}
+	out, err := exec.Command("p2p", args...).Output()
 	log.Check(log.FatalLevel, "Getting list of p2p participants", err)
 	fmt.Println(string(out))
 }
