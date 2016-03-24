@@ -71,7 +71,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         this.sshKey = sshKey;
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
-        this.quotaManager = quotaManager;
     }
 
 
@@ -134,7 +133,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, networkManager, operationTracker ).execute();
+            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
