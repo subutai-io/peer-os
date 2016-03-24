@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -13,7 +12,6 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
@@ -44,7 +42,7 @@ public class PEKGenerationStep
     }
 
 
-    public Map<Peer, String> execute() throws PeerException
+    public void execute() throws PeerException
     {
         Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
 
@@ -52,7 +50,11 @@ public class PEKGenerationStep
         peers.removeAll( environment.getPeers() );
         peers.remove( peerManager.getLocalPeer() );
 
-        final Map<Peer, String> peerPekPubKeys = Maps.newConcurrentMap();
+        if ( peers.isEmpty() )
+        {
+            return;
+        }
+
 
         ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
@@ -65,9 +67,7 @@ public class PEKGenerationStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    peerPekPubKeys
-                            .put( peer, peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() ).getKey() );
-
+                    peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() ).getKey();
 
                     return peer;
                 }
@@ -105,7 +105,5 @@ public class PEKGenerationStep
         {
             throw new PeerException( "Failed to generate PEK across all peers" );
         }
-
-        return peerPekPubKeys;
     }
 }

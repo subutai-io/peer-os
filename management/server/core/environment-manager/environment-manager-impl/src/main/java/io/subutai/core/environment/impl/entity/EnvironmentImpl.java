@@ -155,6 +155,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    @Column( length = 1000 )
     @JsonIgnore
     private Set<String> sshKeys = new HashSet<>();
 

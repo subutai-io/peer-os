@@ -36,7 +36,6 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -45,7 +44,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
@@ -74,7 +72,6 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -105,6 +102,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.task.ImportTemplateRequest;
@@ -125,8 +123,6 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CloneTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
-import io.subutai.core.localpeer.impl.container.DestroyContainerWrapperTask;
-import io.subutai.core.localpeer.impl.container.DestroyEnvironmentContainerGroupRequestListener;
 import io.subutai.core.localpeer.impl.container.ImportTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
 import io.subutai.core.localpeer.impl.container.QuotaTask;
@@ -199,14 +195,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
 
+        initPeerInfo();
+
         //add command request listener
         addRequestListener( new CommandRequestListener() );
         //add command response listener
 
         //add create container requests listener
         addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
-        //add destroy environment containers requests listener
-        addRequestListener( new DestroyEnvironmentContainerGroupRequestListener( this ) );
 
         //add prepare templates listener
         addRequestListener( new PrepareTemplateRequestListener( this ) );
@@ -234,6 +230,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         taskManager = new TaskManagerImpl( this );
         initialized = true;
+    }
+
+
+    protected void initPeerInfo()
+    {
+
+        peerInfo = new PeerInfo();
+        peerInfo.setId( securityManager.getKeyManager().getPeerId() );
+        peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
+        peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
+        peerInfo.setPort( SystemSettings.getPublicSecurePort() );
+        peerInfo.setName( String.format( "Peer %s on %s", peerInfo.getId(), SystemSettings.getPublicUrl() ) );
     }
 
 
@@ -1016,7 +1024,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
-        if ( initialized && peerInfo != null )
+        if ( initialized )
         {
             ResourceHostEntity host;
             try
@@ -1123,75 +1131,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( e );
         }
-    }
-
-
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        Set<Throwable> errors = Sets.newHashSet();
-        Set<ContainerHost> destroyedContainers;
-
-        Set<ContainerHost> containerHosts = Sets.newHashSet();
-
-
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
-            {
-                if ( environmentId.equals( containerHost.getEnvironmentId().getId() ) )
-                {
-                    containerHosts.add( containerHost );
-                }
-            }
-        }
-
-
-        destroyedContainers = destroyContainerGroup( containerHosts, errors );
-
-        String exception =
-                errors.isEmpty() ? null : String.format( "There were errors while destroying containers: %s", errors );
-        return new ContainersDestructionResultImpl( getId(), destroyedContainers, exception );
-    }
-
-
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
-    private Set<ContainerHost> destroyContainerGroup( final Set<ContainerHost> containerHosts,
-                                                      final Set<Throwable> errors )
-    {
-        Set<ContainerHost> destroyedContainers = new HashSet<>();
-        if ( !containerHosts.isEmpty() )
-        {
-            List<Future<ContainerHost>> taskFutures = Lists.newArrayList();
-            ExecutorService executorService = getFixedPoolExecutor( containerHosts.size() );
-
-            for ( ContainerHost containerHost : containerHosts )
-            {
-
-                taskFutures.add( executorService.submit( new DestroyContainerWrapperTask( this, containerHost ) ) );
-            }
-
-            for ( Future<ContainerHost> taskFuture : taskFutures )
-            {
-                try
-                {
-                    destroyedContainers.add( taskFuture.get() );
-                }
-                catch ( ExecutionException | InterruptedException e )
-                {
-                    errors.add( exceptionUtil.getRootCause( e ) );
-                }
-            }
-
-            executorService.shutdown();
-        }
-
-        return destroyedContainers;
     }
 
 
@@ -2161,14 +2100,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             return false;
         }
-        return true;
+
+        final LocalPeerImpl that = ( LocalPeerImpl ) o;
+
+        return getId().equals( that.getId() );
     }
 
 
     @Override
     public int hashCode()
     {
-        return super.hashCode();
+        return getId().hashCode();
     }
 }
 
