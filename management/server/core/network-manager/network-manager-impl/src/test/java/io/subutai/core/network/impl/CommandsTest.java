@@ -109,30 +109,9 @@ public class CommandsTest
 
 
     @Test
-    public void testGetAppendSshKeyCommand() throws Exception
-    {
-        assertNotNull( commands.getAppendSshKeyCommand( KEY ) );
-    }
-
-
-    @Test
-    public void testGetRemoveSshKeyCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveSshKeyCommand( KEY ) );
-    }
-
-
-    @Test
     public void testGetConfigSSHCommand() throws Exception
     {
         assertNotNull( commands.getConfigSSHCommand() );
-    }
-
-
-    @Test
-    public void testGetReplaceSshKeyCommand() throws Exception
-    {
-        assertNotNull( commands.getReplaceSshKeyCommand( KEY, KEY ) );
     }
 
 

@@ -296,34 +296,6 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testAddSshKeyToAuthorizedKeys() throws Exception
-    {
-
-        spyNetworkManager.addSshKeyToAuthorizedKeys( containers, SSH_KEY );
-
-        verify( sshManager ).appendSshKey( SSH_KEY );
-    }
-
-
-    @Test
-    public void testReplaceSshKeyInAuthorizedKeys() throws Exception
-    {
-        spyNetworkManager.replaceSshKeyInAuthorizedKeys( containers, SSH_KEY, SSH_KEY );
-
-        verify( sshManager ).replaceSshKey( SSH_KEY, SSH_KEY );
-    }
-
-
-    @Test
-    public void testRemoveSshKeyFromAuthorizedKeys() throws Exception
-    {
-        spyNetworkManager.removeSshKeyFromAuthorizedKeys( containers, SSH_KEY );
-
-        verify( sshManager ).removeSshKey( SSH_KEY );
-    }
-
-
-    @Test
     public void testGetSshManager() throws Exception
     {
 

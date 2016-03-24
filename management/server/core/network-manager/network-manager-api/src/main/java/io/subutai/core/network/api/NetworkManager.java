@@ -160,34 +160,6 @@ public interface NetworkManager
      */
     public void appendSshKeys( Set<ContainerHost> containers, Set<String> sshKeys ) throws NetworkManagerException;
 
-    /**
-     * Adds supplied ssh key to authorized_keys file of given containers
-     *
-     * @param containers- set of {@code ContainerHost}
-     * @param sshKey - ssh key to add
-     */
-    public void addSshKeyToAuthorizedKeys( Set<ContainerHost> containers, String sshKey )
-            throws NetworkManagerException;
-
-    /**
-     * Replaces supplied old ssh key with new ssh key in authorized_keys file of given containers
-     *
-     * @param containers set of {@code ContainerHost}
-     * @param oldSshKey - old ssh key
-     * @param newSshKey - new ssh key
-     */
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
-                                               final String newSshKey ) throws NetworkManagerException;
-
-    /**
-     * Removes supplied ssh key from authorized_keys file of given containers
-     *
-     * @param containers set of {@code ContainerHost}
-     * @param sshKey - ssh key to remove
-     */
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException;
-
 
     /**
      * Returns reverse proxy domain assigned to vlan
