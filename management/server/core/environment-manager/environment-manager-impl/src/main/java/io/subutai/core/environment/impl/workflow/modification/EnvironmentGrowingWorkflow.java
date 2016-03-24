@@ -198,7 +198,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new RegisterHostsStep( environment, networkManager ).execute();
+            new RegisterHostsStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

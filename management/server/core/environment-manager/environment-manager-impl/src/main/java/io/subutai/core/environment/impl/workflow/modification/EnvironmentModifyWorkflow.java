@@ -238,7 +238,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new RegisterHostsStep( environment, networkManager ).execute();
+            new RegisterHostsStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
