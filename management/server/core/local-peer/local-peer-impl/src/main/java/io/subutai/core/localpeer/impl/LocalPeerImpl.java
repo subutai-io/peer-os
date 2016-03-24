@@ -1707,8 +1707,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
 
-            P2PConnection p2PConnection = getNetworkManager()
-                    .getP2PConnectionByHash( getManagementHost(), P2PUtil.generateHash( envVni.getEnvironmentId() ) );
+            P2PConnection p2PConnection =
+                    getNetworkManager().getP2PConnectionByHash( P2PUtil.generateHash( envVni.getEnvironmentId() ) );
 
             if ( p2PConnection != null )
             {
@@ -1717,9 +1717,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             else
             {
                 getNetworkManager()
-                        .setupP2PConnection( getManagementHost(), P2PUtil.generateInterfaceName( envVni.getVlan() ),
-                                config.getAddress(), config.getHash(), config.getSecretKey(),
-                                config.getSecretKeyTtlSec() );
+                        .setupP2PConnection( P2PUtil.generateInterfaceName( envVni.getVlan() ), config.getAddress(),
+                                config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
             }
         }
         catch ( NetworkManagerException e )
