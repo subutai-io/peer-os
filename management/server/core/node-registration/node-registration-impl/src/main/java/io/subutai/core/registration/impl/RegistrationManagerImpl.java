@@ -3,10 +3,14 @@ package io.subutai.core.registration.impl;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
@@ -25,9 +29,17 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.host.HeartBeat;
+import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.InstanceType;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -53,12 +65,15 @@ import io.subutai.core.security.api.crypto.KeyManager;
 
 public class RegistrationManagerImpl implements RegistrationManager
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private SecurityManager securityManager;
     private RequestDataService requestDataService;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
     private LocalPeer localPeer;
+    protected Set<HeartbeatListener> listeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
+    protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager,
@@ -70,10 +85,64 @@ public class RegistrationManagerImpl implements RegistrationManager
     }
 
 
+    public void addListener( HeartbeatListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( HeartbeatListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+
     public void init()
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
+    }
+
+
+    public void dispose()
+    {
+        notifier.shutdown();
+    }
+
+
+    public void processHeartbeat( final HeartBeat heartbeat )
+    {
+        try
+        {
+            for ( final HeartbeatListener listener : listeners )
+            {
+                notifier.submit( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            listener.onHeartbeat( heartbeat );
+                        }
+                        catch ( Exception e )
+                        {
+                            LOG.error( "Error notifying listener #processHeartbeat", e );
+                        }
+                    }
+                } );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error in #processHeartbeat", e );
+        }
     }
 
 
@@ -112,7 +181,7 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         if ( requestDataService.find( requestedHost.getId() ) != null )
         {
-            LOGGER.info( "Already requested registration" );
+            LOG.info( "Already requested registration" );
         }
         else
         {
@@ -153,7 +222,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error approving new connections request", e );
+            LOG.error( "Error approving new connections request", e );
         }
         client.query( "Message", encoded ).delete();
     }
@@ -227,7 +296,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error importing host SSL certificate", e );
+            LOG.error( "Error importing host SSL certificate", e );
         }
     }
 
@@ -241,7 +310,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "Error importing host public key", ex );
+            LOG.error( "Error importing host public key", ex );
         }
     }
 
@@ -315,7 +384,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "Error persisting container token", ex );
+            LOG.error( "Error persisting container token", ex );
         }
 
         return token;
@@ -364,6 +433,29 @@ public class RegistrationManagerImpl implements RegistrationManager
                         && requestedHost.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
                 {
                     approveRequest( requestId );
+
+                    Set<HostInterfaceModel> hostInterfaces = Sets.newHashSet();
+                    for ( HostInterface hostInterface : requestedHost.getNetHostInterfaces() )
+                    {
+                        hostInterfaces.add( new HostInterfaceModel( hostInterface ) );
+                    }
+
+                    ResourceHostInfoModel resourceHostInfoModel = new ResourceHostInfoModel(
+                            new HostInfoModel( requestedHost.getId(), requestedHost.getHostname(),
+                                    new HostInterfaces( requestedHost.getId(), hostInterfaces ),
+                                    requestedHost.getArch() ) );
+
+                    resourceHostInfoModel.setInstance( InstanceType.LOCAL );
+
+                    Set<ContainerHostInfoModel> containers = Sets.newHashSet();
+                    for ( ContainerHostInfo containerHostInfo : requestedHost.getHostInfos() )
+                    {
+                        containers.add( new ContainerHostInfoModel( containerHostInfo ) );
+                    }
+
+                    resourceHostInfoModel.setContainers( containers );
+
+                    processHeartbeat( new HeartBeat( resourceHostInfoModel ) );
                 }
             }
         }
