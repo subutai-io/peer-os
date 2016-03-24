@@ -213,16 +213,6 @@ public interface Peer
     public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
 
 
-    /**
-     * Destroys container group
-     *
-     * @param environmentId - id fo environment
-     *
-     * @return {@code ContainersDestructionResult}
-     */
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId )
-            throws PeerException;
-
     //networking
 
 

@@ -307,15 +307,6 @@ public class LocalPeerImplTest
 
 
     @Test
-    public void testInit() throws Exception
-    {
-        doReturn( resourceHostDataService ).when( localPeer ).createResourceHostDataService();
-
-        localPeer.init();
-    }
-
-
-    @Test
     public void testGetResourceHostDataService() throws Exception
     {
         assertNotNull( localPeer.createResourceHostDataService() );
