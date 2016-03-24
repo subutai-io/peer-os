@@ -10,7 +10,7 @@ import io.subutai.core.peer.api.PeerManager;
 
 
 @Command( scope = "peer", name = "distances" )
-public class GetCommunityDistancesCommand extends SubutaiShellCommandSupport
+public class GetP2PSwarmDistancesCommand extends SubutaiShellCommandSupport
 {
 
     private PeerManager peerManager;
@@ -25,7 +25,7 @@ public class GetCommunityDistancesCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        PingDistances distances = peerManager.getCommunityDistances();
+        PingDistances distances = peerManager.getP2PSwarmDistances();
         for ( PingDistance distance : distances.getAll() )
         {
             if ( distance.isValid() )

@@ -345,11 +345,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void setupP2PConnection( final P2PConfig config )
+    public Response setupP2PConnection( final P2PConfig config )
     {
         try
         {
-            localPeer.setupP2PConnection( config );
+            String mhP2pIP = localPeer.setupP2PConnection( config );
+            return Response.ok( mhP2pIP ).build();
         }
         catch ( Exception e )
         {
@@ -359,11 +360,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void removeP2PConnection( final String communityName )
+    public void removeP2PConnection( final String p2pHash )
     {
         try
         {
-            localPeer.removeP2PConnection( communityName );
+            localPeer.removeP2PConnection( p2pHash );
         }
         catch ( Exception e )
         {
@@ -456,7 +457,7 @@ public class RestServiceImpl implements RestService
 
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getAddress() );
-        Preconditions.checkNotNull( config.getCommunityName() );
+        Preconditions.checkNotNull( config.getP2pHash() );
         Preconditions.checkNotNull( config.getPeerId() );
         Preconditions.checkNotNull( config.getSecretKey() );
         Preconditions.checkArgument( config.getSecretKeyTtlSec() > 0 );
@@ -474,15 +475,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getCommunityDistances( final String communityName, final Integer count )
+    public Response getP2PSwarmDistances( final String p2pHash, final Integer count )
     {
 
-        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( p2pHash );
         Preconditions.checkNotNull( count );
 
         try
         {
-            return Response.ok( localPeer.getCommunityDistances( communityName, count ) ).build();
+            return Response.ok( localPeer.getP2PSwarmDistances( p2pHash, count ) ).build();
         }
         catch ( PeerException e )
         {

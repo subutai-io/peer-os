@@ -10,7 +10,6 @@ import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PPeerInfo;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 
@@ -25,24 +24,24 @@ public interface NetworkManager
     /**
      * Sets up an P2P connection on management host
      */
-    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
+    public void setupP2PConnection( String interfaceName, String localIp, String p2pHash, String secretKey,
                                     long secretKeyTtlSec ) throws NetworkManagerException;
 
     /**
      * Sets up an P2P connection on specified host
      */
-    public void setupP2PConnection( Host host, String interfaceName, String localIp, String communityName,
-                                    String secretKey, long secretKeyTtlSec ) throws NetworkManagerException;
+    public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException;
 
     /**
      * Removes P2P connection
      */
-    public void removeP2PConnection( String communityName ) throws NetworkManagerException;
+    public void removeP2PConnection( String p2pHash ) throws NetworkManagerException;
 
     /**
      * Removes P2P connection on specified host
      */
-    public void removeP2PConnection( Host host, String communityName ) throws NetworkManagerException;
+    public void removeP2PConnection( Host host, String p2pHash ) throws NetworkManagerException;
 
 
     /**
@@ -67,32 +66,37 @@ public interface NetworkManager
             throws NetworkManagerException;
 
 
-    /**
-     * Lists existing P2P connections on management host
-     */
-    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
-
-    /**
-     * Lists existing P2P connections on specified host
-     */
-    public Set<P2PConnection> listP2PConnections( Host host ) throws NetworkManagerException;
-
     PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     /**
-     * Returns peers(hosts) participating in the p2p swarm
+     * Returns p2p connection running on MH by hash
      *
-     * @param communityName - hash of p2p swarm
+     * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PPeerInfo> listPeersInEnvironment( String communityName ) throws NetworkManagerException;
+    public P2PConnection getP2PConnectionByHash( String p2pHash ) throws NetworkManagerException;
 
     /**
-     * Returns peers(hosts) participating in the p2p swarm
+     * Returns p2p connection running on the specified host by hash
      *
      * @param host - host
-     * @param communityName - hash of p2p swarm
+     * @param p2pHash - hash of p2p swarm
      */
-    public Set<P2PPeerInfo> listPeersInEnvironment( Host host, String communityName ) throws NetworkManagerException;
+    public P2PConnection getP2PConnectionByHash( Host host, String p2pHash ) throws NetworkManagerException;
+
+    /**
+     * Returns all p2p connections running on the specified host
+     *
+     * @param host - host
+     */
+
+    public Set<P2PConnection> getP2PConnections( Host host ) throws NetworkManagerException;
+
+    /**
+     * Returns all p2p connections running on MH
+     */
+
+    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException;
+
 
     /**
      * Sets up tunnel to another peer on management host

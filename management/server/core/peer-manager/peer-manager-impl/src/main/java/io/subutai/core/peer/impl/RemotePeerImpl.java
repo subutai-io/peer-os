@@ -26,11 +26,8 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
-import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.exception.HTTPException;
@@ -49,7 +46,6 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -701,36 +697,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //**************************************************************************
-
-
-        DestroyEnvironmentContainerGroupResponse response =
-                sendRequest( new DestroyEnvironmentContainerGroupRequest( environmentId ),
-                        RecipientType.DESTROY_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT, DestroyEnvironmentContainerGroupResponse.class,
-                        Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT, headers );
-
-        if ( response != null )
-        {
-            return new ContainersDestructionResultImpl( getId(), response.getDestroyedContainersIds(),
-                    response.getException() );
-        }
-        else
-        {
-            throw new PeerException( "Command timed out" );
-        }
-    }
-
-
     //networking
     @RolesAllowed( "Environment-Management|Write" )
     @Override
@@ -855,20 +821,20 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setupP2PConnection( final P2PConfig config ) throws PeerException
+    public String setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
+        return new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
     }
 
 
     @Override
-    public void removeP2PConnection( final String communityName ) throws PeerException
+    public void removeP2PConnection( final String p2pHash ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( communityName ), "Invalid community name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
 
-        new PeerWebClient( peerInfo, provider ).removeP2PConnection( communityName );
+        new PeerWebClient( peerInfo, provider ).removeP2PConnection( p2pHash );
     }
 
 
@@ -941,10 +907,9 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
-            throws PeerException
+    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
-        return new PeerWebClient( peerInfo, provider ).getCommunityDistances( communityName, maxAddress );
+        return new PeerWebClient( peerInfo, provider ).getP2PSwarmDistances( p2pHash, maxAddress );
     }
 
 

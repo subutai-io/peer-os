@@ -213,16 +213,6 @@ public interface Peer
     public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
 
 
-    /**
-     * Destroys container group
-     *
-     * @param environmentId - id fo environment
-     *
-     * @return {@code ContainersDestructionResult}
-     */
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId )
-            throws PeerException;
-
     //networking
 
 
@@ -286,15 +276,17 @@ public interface Peer
      *
      * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
      * dynamic IP acquisition for RHs
+     *
+     * @return - P2P IP of RH with MH
      */
-    void setupP2PConnection( P2PConfig config ) throws PeerException;
+    String setupP2PConnection( P2PConfig config ) throws PeerException;
 
     /**
      * Removes p2p connection by hash from all RHs
      *
-     * @param communityName - hash of p2p swarm
+     * @param p2pHash - hash of p2p swarm
      */
-    void removeP2PConnection( String communityName ) throws PeerException;
+    void removeP2PConnection( String p2pHash ) throws PeerException;
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
 
@@ -319,7 +311,7 @@ public interface Peer
 
     boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
 
-    PingDistances getCommunityDistances( String communityName, Integer maxAddress ) throws PeerException;
+    PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
 

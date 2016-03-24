@@ -26,7 +26,6 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PPeerInfo;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
@@ -57,34 +56,34 @@ public class NetworkManagerImpl implements NetworkManager
 
     //---------------- P2P SECTION BEGIN ------------------------
     @Override
-    public void setupP2PConnection( final String interfaceName, final String localIp, final String communityName,
+    public void setupP2PConnection( final String interfaceName, final String localIp, final String p2pHash,
                                     final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
-        setupP2PConnection( getManagementHost(), interfaceName, localIp, communityName, secretKey, secretKeyTtlSec );
+        setupP2PConnection( getManagementHost(), interfaceName, localIp, p2pHash, secretKey, secretKeyTtlSec );
     }
 
 
     @Override
     public void setupP2PConnection( final Host host, final String interfaceName, final String localIp,
-                                    final String communityName, final String secretKey, final long secretKeyTtlSec )
+                                    final String p2pHash, final String secretKey, final long secretKeyTtlSec )
             throws NetworkManagerException
     {
-        execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
+        execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 
 
     @Override
-    public void removeP2PConnection( final String communityName ) throws NetworkManagerException
+    public void removeP2PConnection( final String p2pHash ) throws NetworkManagerException
     {
-        removeP2PConnection( getManagementHost(), communityName );
+        removeP2PConnection( getManagementHost(), p2pHash );
     }
 
 
     @Override
-    public void removeP2PConnection( final Host host, final String communityName ) throws NetworkManagerException
+    public void removeP2PConnection( final Host host, final String p2pHash ) throws NetworkManagerException
     {
-        execute( host, commands.getRemoveP2PConnectionCommand( communityName ) );
+        execute( host, commands.getRemoveP2PConnectionCommand( p2pHash ) );
     }
 
 
@@ -110,22 +109,46 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException
+    public P2PConnection getP2PConnectionByHash( final String p2pHash ) throws NetworkManagerException
     {
-        return listP2PConnections( getManagementHost() );
+        return getP2PConnectionByHash( getManagementHost(), p2pHash );
     }
 
 
     @Override
-    public Set<P2PConnection> listP2PConnections( final Host host ) throws NetworkManagerException
+    public P2PConnection getP2PConnectionByHash( final Host host, final String p2pHash ) throws NetworkManagerException
     {
-        Set<P2PConnection> connections = Sets.newHashSet();
+        Set<P2PConnection> p2PConnections = getP2PConnections( host );
 
-        CommandResult result = execute( host, commands.getListP2PConnectionsCommand() );
+        for ( P2PConnection p2PConnection : p2PConnections )
+        {
+            if ( p2PConnection.getHash().equalsIgnoreCase( p2pHash ) )
+            {
+                return p2PConnection;
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException
+    {
+        return getP2PConnections( getManagementHost() );
+    }
+
+
+    @Override
+    public Set<P2PConnection> getP2PConnections( final Host host ) throws NetworkManagerException
+    {
+        Set<P2PConnection> p2PConnections = Sets.newHashSet();
+
+        CommandResult result = execute( host, commands.getP2PConnectionsCommand( null ) );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile( "(\\w+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.*)" );
+        Pattern p = Pattern.compile( "\\s*(\\S+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\S+)\\s*" );
 
         while ( st.hasMoreTokens() )
         {
@@ -133,47 +156,13 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 3 )
             {
-                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+                p2PConnections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
             }
         }
 
-        return connections;
+        return p2PConnections;
     }
 
-
-    @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final String communityName ) throws NetworkManagerException
-    {
-        return listPeersInEnvironment( getManagementHost(), communityName );
-    }
-
-
-    @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final Host host, final String communityName )
-            throws NetworkManagerException
-    {
-        Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
-
-        CommandResult result = execute( host, commands.getListPeersInEnvironmentCommand( communityName ) );
-
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile( "(.+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.+)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
-            {
-                p2PPeerInfos.add( new P2PPeerInfo( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
-            }
-        }
-
-
-        return p2PPeerInfos;
-    }
 
     //------------------ P2P SECTION END --------------------------------
 

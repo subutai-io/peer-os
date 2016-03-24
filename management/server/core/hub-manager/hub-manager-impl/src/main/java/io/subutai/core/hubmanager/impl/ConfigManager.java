@@ -50,7 +50,6 @@ public class ConfigManager
 
     public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/h.public.gpg";
     public static final String PEER_KEYSTORE = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.jks";
-    public static final String PEER_SECRET_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.secret.key";
     private static final String PEER_CERT_ALIAS = "peer_cert";
 
 
@@ -88,10 +87,7 @@ public class ConfigManager
         this.securityManager = securityManager;
         this.configDataService = configDataService;
 
-        PGPSecretKeyRing signingKeyRing = PGPKeyUtil.readSecretKeyRing( new FileInputStream( PEER_SECRET_KEY ) );
-        PGPSecretKey signingKey = signingKeyRing.getSecretKey();
-
-        this.sender = PGPEncryptionUtil.getPrivateKey( signingKey, SystemSettings.getPeerSecretKeyringPwd() );
+        this.sender = securityManager.getKeyManager().getPrivateKey( null );
 
         this.peerId = peerManager.getLocalPeer().getId();
 
@@ -212,7 +208,8 @@ public class ConfigManager
 
     public String getHubIp()
     {
-        return configDataService.getHubConfig( peerId ).getHubIp();
+//        return configDataService.getHubConfig( peerId ).getHubIp();
+        return "hub.subut.ai";
     }
 
     public byte[] readContent( Response response ) throws IOException

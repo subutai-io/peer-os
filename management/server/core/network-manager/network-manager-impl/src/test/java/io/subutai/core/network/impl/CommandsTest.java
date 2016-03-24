@@ -53,13 +53,6 @@ public class CommandsTest
 
 
     @Test
-    public void testGetListP2PConnectionsCommand() throws Exception
-    {
-        assertNotNull( commands.getListP2PConnectionsCommand() );
-    }
-
-
-    @Test
     public void testGetSetupTunnelCommand() throws Exception
     {
         assertNotNull( commands.getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, TUNNEL_TYPE ) );

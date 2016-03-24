@@ -1,4 +1,4 @@
-package io.subutai.core.environment.rest.ui;
+package io.subutai.core.environment.rest.ui.entity;
 
 
 import java.util.Set;

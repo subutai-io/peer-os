@@ -174,6 +174,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             LOG.debug( "env_via_hub: Setup P2P..." );
             peerDto = hubEnvironmentManager.setupP2P( peerDto );
 
+            updateEnvironmentPeerData( peerDto );
+
             WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );

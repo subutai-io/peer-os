@@ -44,6 +44,8 @@ import io.subutai.common.util.DateTimeParam;
 
 /**
  * Peer REST client
+ *
+ * TODO throw exception if http code is not 2XX
  */
 public class PeerWebClient
 {
@@ -288,21 +290,21 @@ public class PeerWebClient
     }
 
 
-    public void setupP2PConnection( final P2PConfig config ) throws PeerException
+    public String setupP2PConnection( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding remote peer to P2P community: %s %s %s", config.getInterfaceName(),
-                config.getCommunityName(), config.getAddress() ) );
+        LOG.debug( String.format( "Adding remote peer to p2p swarm: %s %s", config.getHash(), config.getAddress() ) );
 
         String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.TEXT_PLAIN );
 
         try
         {
-            client.post( config );
+            Response response = client.post( config );
+            return response.readEntity( String.class );
         }
         catch ( Exception e )
         {
@@ -312,11 +314,11 @@ public class PeerWebClient
     }
 
 
-    public void removeP2PConnection( final String communityName ) throws PeerException
+    public void removeP2PConnection( final String p2pHash ) throws PeerException
     {
-        LOG.debug( String.format( "Removing remote peer from p2p community: %s", communityName ) );
+        LOG.debug( String.format( "Removing remote peer from p2p swarm: %s", p2pHash ) );
 
-        String path = String.format( "/p2ptunnel/%s", communityName );
+        String path = String.format( "/p2ptunnel/%s", p2pHash );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
@@ -522,7 +524,7 @@ public class PeerWebClient
     {
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getAddress() );
-        Preconditions.checkNotNull( config.getCommunityName() );
+        Preconditions.checkNotNull( config.getP2pHash() );
         Preconditions.checkNotNull( config.getPeerId() );
         Preconditions.checkNotNull( config.getSecretKey() );
         Preconditions.checkArgument( config.getSecretKeyTtlSec() > 0 );
@@ -542,14 +544,13 @@ public class PeerWebClient
     }
 
 
-    public PingDistances getCommunityDistances( final String communityName, final Integer maxAddress )
-            throws PeerException
+    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
-        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( p2pHash );
         Preconditions.checkNotNull( maxAddress );
         try
         {
-            String path = String.format( "/control/%s/%d/distance", communityName, maxAddress );
+            String path = String.format( "/control/%s/%d/distance", p2pHash, maxAddress );
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
@@ -558,7 +559,7 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on getting community distances.", e );
+            throw new PeerException( "Error on getting p2p swarm distances.", e );
         }
     }
 

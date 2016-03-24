@@ -31,9 +31,14 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	vm.timeOut = 30;
 	vm.selectedEnvironment = '';
 	vm.selectedNodeType = '';
+	vm.selectedContainer = '';
+	vm.selectedPeer = '';
 
 	if($stateParams.containerId !== undefined && $stateParams.containerId.length > 0) {
+		setCurrentType('environments');
 		vm.activeConsole = $stateParams.containerId;
+		vm.selectedContainer = $stateParams.containerId;
+		vm.selectedEnvironment = $stateParams.environmentId;
 	}
 
 	peerRegistrationService.getResourceHosts().success(function (data) {
@@ -49,6 +54,9 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	consoleService.getEnvironments().success(function (data) {
 		vm.environments = data;
+		if(vm.selectedContainer.length > 0) {
+			showContainers(vm.selectedEnvironment);
+		}
 	});
 
 	//Console UI
@@ -192,6 +200,9 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	function setCurrentType(type) {
 		vm.containers = [];
 		vm.selectedEnvironment = '';
+		vm.selectedPeer = '';
+		vm.selectedContainer = '';
+		vm.selectedEnvironment = '';
 		vm.selectedNodeType = '';
 		vm.showSSHCommand = '';
 		vm.currentType = type;
@@ -215,6 +226,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	}
 
 	function showContainers(environmentId) {
+		console.log(environmentId);
 		vm.containers = [];
 		for(var i in vm.environments) {
 			if(environmentId == vm.environments[i].id) {

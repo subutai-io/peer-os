@@ -665,6 +665,7 @@ input[type=checkbox] {
 
 .b-status-icon_UNDER_MODIFICATION,
 .b-status-icon_WAIT,
+.b-status-icon_REQUESTED,
 .b-status-icon_STOPPING,
 .b-status-icon_STARTING {
     background-color: #efc94c;
@@ -672,7 +673,6 @@ input[type=checkbox] {
 
 .b-status-icon_UNHEALTHY,
 .b-status-icon_FAILED,
-.b-status-icon_REQUESTED,
 .b-status-icon_STOPPED,
 .b-status-icon_ABORTING,
 .b-status-icon_FREEZING,
@@ -1119,7 +1119,7 @@ tip.description-tooltip {
 }
 
 .b-popup__footer {
-    padding: 0 15px 15px 30px;
+    padding: 0 15px 15px 15px;
 }
 
 .b-popup__footer_undertable {
@@ -2697,6 +2697,7 @@ td.b-main-table__status-col {
     width: 200px;
     background-color: #fff;
 	z-index: 2;
+	height: 100%;
 }
 .b-tools-menu {
     height: 100%;
@@ -2759,6 +2760,7 @@ td.b-main-table__status-col {
 .b-progress-text {
     font-size: 11px;
     color: #04346E;
+	word-break: break-all;
 }
 .b-cloud-item {
     width: 40px;

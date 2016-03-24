@@ -94,7 +94,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager, securityManager ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -114,7 +114,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager ).execute();
+            new VNISetupStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -134,7 +134,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, networkManager ).execute();
+            new SetupP2PStep( topology, environment, peerManager, networkManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

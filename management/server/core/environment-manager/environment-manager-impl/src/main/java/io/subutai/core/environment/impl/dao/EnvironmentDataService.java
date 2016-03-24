@@ -18,7 +18,7 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 /**
  * {@link EnvironmentDataService} implements {@link io.subutai.common.protocol.api.DataService} interface. {@link
- * EnvironmentDataService} manages {@link io.subutai.core.environment.impl.entity.EnvironmentImpl} entities in database
+ * EnvironmentDataService} manages {@link io.subutai.core.environment.impl.entity.EnvironmentImpl} entity in database
  */
 public class EnvironmentDataService implements DataService<String, EnvironmentImpl>
 {

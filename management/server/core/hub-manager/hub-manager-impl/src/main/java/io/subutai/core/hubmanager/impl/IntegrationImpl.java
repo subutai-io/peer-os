@@ -4,15 +4,21 @@ package io.subutai.core.hubmanager.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
+
+import io.subutai.core.hubmanager.impl.proccessors.*;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
@@ -38,16 +44,11 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
-import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.dto.PeerDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -69,12 +70,17 @@ public class IntegrationImpl implements Integration
 
     private ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
 
+    private ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
+
     private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
+
 
     private HeartbeatProcessor heartbeatProcessor;
     private ResourceHostConfProcessor resourceHostConfProcessor;
     private SystemConfProcessor systemConfProcessor;
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
+    private HubLoggerProcessor hubLoggerProcessor;
+
     private DaoManager daoManager;
     private ConfigDataService configDataService;
     private Monitor monitor;
@@ -86,8 +92,8 @@ public class IntegrationImpl implements Integration
     private EnvironmentBuilder envBuilder;
 
     private EnvironmentDestroyer envDestroyer;
-
-
+	private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+	private String checksum = "";
     public IntegrationImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
@@ -108,6 +114,8 @@ public class IntegrationImpl implements Integration
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
 
             resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
+
+            hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
             resourceHostMonitorProcessor =
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
@@ -133,9 +141,21 @@ public class IntegrationImpl implements Integration
             containerEventExecutor
                     .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
 
+            hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+
+
             //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
             //
             //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
+			this.sumChecker.scheduleWithFixedDelay (new Runnable ()
+			{
+				@Override
+				public void run ()
+				{
+					LOG.info ("Starting sumchecker");
+					generateChecksum();
+				}
+			}, 1, 3600000, TimeUnit.MILLISECONDS);
         }
         catch ( Exception e )
         {
@@ -185,6 +205,8 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
+
+        generateChecksum ();
     }
 
 
@@ -341,6 +363,44 @@ public class IntegrationImpl implements Integration
     }
 
 
+    @Override
+    public Map<String, String> getPeerInfo() throws HubPluginException
+    {
+        Map<String, String> result = new HashMap<>(  );
+        try
+        {
+            String path = "/rest/v1/peers/" + configManager.getPeerId();
+
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+            Response r = client.get();
+
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                byte[] encryptedContent = configManager.readContent( r );
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+                PeerDto dto = JsonUtil.fromCbor( plainContent, PeerDto.class );
+                result.put( "OwnerId",dto.getOwnerId() );
+
+                LOG.debug( "PeerDto: " + result.toString() );
+            }
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            throw new HubPluginException( "Could not retrieve Peer info", e );
+        }
+        return result;
+    }
+
+
+    @Override
+    public Config getHubConfiguration()
+    {
+        return configDataService.getHubConfig( configManager.getPeerId() );
+    }
+
+
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
         this.environmentManager = environmentManager;
@@ -389,4 +449,47 @@ public class IntegrationImpl implements Integration
     {
         this.identityManager = identityManager;
     }
+
+    private void generateChecksum()
+	{
+		if (getRegistrationState ())
+		{
+			try
+			{
+				LOG.info ("Generating plugins list md5 checksum");
+				String productList = getProducts ();
+				MessageDigest md = MessageDigest.getInstance ("MD5");
+				byte[] bytes = md.digest (productList.getBytes ("UTF-8"));
+				StringBuilder hexString = new StringBuilder ();
+
+				for (int i = 0; i < bytes.length; i++)
+				{
+					String hex = Integer.toHexString (0xFF & bytes[i]);
+					if (hex.length () == 1)
+					{
+						hexString.append ('0');
+					}
+					hexString.append (hex);
+				}
+
+				checksum = hexString.toString ();
+				LOG.info ("Checksum generated: " + checksum);
+			}
+			catch (NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e)
+			{
+				LOG.error (e.getMessage ());
+				e.printStackTrace ();
+			}
+		}
+		else
+		{
+			LOG.info ("Peer not registered. Trying again in 1 hour.");
+		}
+	}
+
+	@Override
+	public String getChecksum()
+	{
+		return this.checksum;
+	}
 }
