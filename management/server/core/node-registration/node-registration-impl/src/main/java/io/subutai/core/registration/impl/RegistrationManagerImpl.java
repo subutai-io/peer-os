@@ -3,14 +3,10 @@ package io.subutai.core.registration.impl;
 
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
@@ -29,22 +25,15 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
-import io.subutai.common.host.HeartBeat;
-import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.InstanceType;
-import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
@@ -71,9 +60,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
     private LocalPeer localPeer;
-    protected Set<HeartbeatListener> listeners =
-            Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
-    protected ExecutorService notifier = Executors.newCachedThreadPool();
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager,
@@ -85,64 +71,10 @@ public class RegistrationManagerImpl implements RegistrationManager
     }
 
 
-    public void addListener( HeartbeatListener listener )
-    {
-        if ( listener != null )
-        {
-            listeners.add( listener );
-        }
-    }
-
-
-    public void removeListener( HeartbeatListener listener )
-    {
-        if ( listener != null )
-        {
-            listeners.remove( listener );
-        }
-    }
-
-
     public void init()
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
-    }
-
-
-    public void dispose()
-    {
-        notifier.shutdown();
-    }
-
-
-    public void processHeartbeat( final HeartBeat heartbeat )
-    {
-        try
-        {
-            for ( final HeartbeatListener listener : listeners )
-            {
-                notifier.submit( new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            listener.onHeartbeat( heartbeat );
-                        }
-                        catch ( Exception e )
-                        {
-                            LOG.error( "Error notifying listener #processHeartbeat", e );
-                        }
-                    }
-                } );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error in #processHeartbeat", e );
-        }
     }
 
 
@@ -177,7 +109,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
+    public synchronized void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
     {
         if ( requestDataService.find( requestedHost.getId() ) != null )
         {
@@ -195,6 +127,7 @@ public class RegistrationManagerImpl implements RegistrationManager
             {
                 throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
             }
+
             checkManagement( registrationRequest );
         }
     }
@@ -289,29 +222,15 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     private void importHostSslCert( String hostId, String cert )
     {
-        try
-        {
-            securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(), hostId, cert );
-            securityManager.getHttpContextManager().reloadKeyStore();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error importing host SSL certificate", e );
-        }
+        securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(), hostId, cert );
+        securityManager.getHttpContextManager().reloadKeyStore();
     }
 
 
     private void importHostPublicKey( String hostId, String publicKey )
     {
-        try
-        {
-            KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error importing host public key", ex );
-        }
+        KeyManager keyManager = securityManager.getKeyManager();
+        keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
     }
 
 
@@ -422,40 +341,15 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         try
         {
-            try
+            if ( requestedHost.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
             {
-                localPeer.getManagementHost();
-            }
-            catch ( HostNotFoundException nfe )
-            {
-                String requestId = findManagementNode( requestedHost );
-                if ( requestId != null
-                        && requestedHost.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+                for ( HostInfo info : requestedHost.getHostInfos() )
                 {
-                    approveRequest( requestId );
-
-                    Set<HostInterfaceModel> hostInterfaces = Sets.newHashSet();
-                    for ( HostInterface hostInterface : requestedHost.getNetHostInterfaces() )
+                    if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( info.getHostname() ) )
                     {
-                        hostInterfaces.add( new HostInterfaceModel( hostInterface ) );
+                        approveRequest( requestedHost.getId() );
+                        break;
                     }
-
-                    ResourceHostInfoModel resourceHostInfoModel = new ResourceHostInfoModel(
-                            new HostInfoModel( requestedHost.getId(), requestedHost.getHostname(),
-                                    new HostInterfaces( requestedHost.getId(), hostInterfaces ),
-                                    requestedHost.getArch() ) );
-
-                    resourceHostInfoModel.setInstance( InstanceType.LOCAL );
-
-                    Set<ContainerHostInfoModel> containers = Sets.newHashSet();
-                    for ( ContainerHostInfo containerHostInfo : requestedHost.getHostInfos() )
-                    {
-                        containers.add( new ContainerHostInfoModel( containerHostInfo ) );
-                    }
-
-                    resourceHostInfoModel.setContainers( containers );
-
-                    processHeartbeat( new HeartBeat( resourceHostInfoModel ) );
                 }
             }
         }
@@ -463,23 +357,5 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             // ignore
         }
-    }
-
-
-    private String findManagementNode( RequestedHost h )
-    {
-        String result = null;
-        if ( h.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
-        {
-            for ( HostInfo info : h.getHostInfos() )
-            {
-                if ( "management".equalsIgnoreCase( info.getHostname() ) )
-                {
-                    result = h.getId();
-                    break;
-                }
-            }
-        }
-        return result;
     }
 }
