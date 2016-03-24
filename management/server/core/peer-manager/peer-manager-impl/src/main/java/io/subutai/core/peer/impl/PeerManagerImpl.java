@@ -41,8 +41,6 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.NullHostInterface;
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -61,7 +59,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.SecurityUtilities;
-import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
@@ -84,7 +81,7 @@ import io.subutai.core.security.api.SecurityManager;
  * PeerManager implementation
  */
 @PermitAll
-public class PeerManagerImpl implements PeerManager, HostListener
+public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
@@ -107,6 +104,7 @@ public class PeerManagerImpl implements PeerManager, HostListener
     private String localPeerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService controlNetworkUpdaterService;
+    protected ScheduledExecutorService localIpSetter;
 
     private String controlNetwork;
     private long controlNetworkTtl = 0;
@@ -129,7 +127,9 @@ public class PeerManagerImpl implements PeerManager, HostListener
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         controlNetworkUpdaterService = Executors.newSingleThreadScheduledExecutor();
-        controlNetworkUpdaterService.scheduleWithFixedDelay( new ControlNetworkUpdater(), 1, 3, TimeUnit.MINUTES );
+        controlNetworkUpdaterService.scheduleWithFixedDelay( new ControlNetworkUpdater(), 1, 60, TimeUnit.MINUTES );
+        localIpSetter = Executors.newSingleThreadScheduledExecutor();
+        localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 5, 5, TimeUnit.SECONDS );
     }
 
 
@@ -1019,50 +1019,6 @@ public class PeerManagerImpl implements PeerManager, HostListener
     }
 
 
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
-    {
-        try
-        {
-            if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) && resourceHostInfo
-                    .getId().equals( localPeer.getManagementHost().getId() ) )
-            {
-                HostInterface externalInterface =
-                        localPeer.getManagementHost().getInterfaceByName( SystemSettings.getExternalIpInterface() );
-
-                if ( externalInterface == null || externalInterface instanceof NullHostInterface )
-                {
-                    return;
-                }
-
-                PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-
-                PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
-
-                peerInfo.setPublicUrl( externalInterface.getIp() );
-
-                peerInfo.setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
-
-                peerData.setInfo( toJson( peerInfo ) );
-
-                updatePeerData( peerData );
-
-                Peer newPeer = createPeer( peerData );
-
-                addPeer( newPeer );
-            }
-        }
-        catch ( HostNotFoundException e )
-        {
-            //ignore
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "Error updating local peer public url", e );
-        }
-    }
-
-
     private class ControlNetworkUpdater implements Runnable
     {
         @Override
@@ -1159,9 +1115,17 @@ public class PeerManagerImpl implements PeerManager, HostListener
             return;
         }
 
-        if ( controlNetwork == null )
+        try
         {
-            selectControlNetwork();
+            if ( controlNetwork == null )
+            {
+                controlNetwork = localPeer.getCurrentControlNetwork();
+                selectControlNetwork();
+            }
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( e.getMessage(), e );
         }
 
 
@@ -1291,6 +1255,63 @@ public class PeerManagerImpl implements PeerManager, HostListener
         public PingDistances call() throws Exception
         {
             return peer.getP2PSwarmDistances( getLocalPeer().getId(), getMaxOrder() );
+        }
+    }
+
+
+    private class LocalIpSetterTask implements Runnable
+    {
+        private final ScheduledExecutorService localIpSetter;
+
+
+        public LocalIpSetterTask( final ScheduledExecutorService localIpSetter )
+        {
+            this.localIpSetter = localIpSetter;
+        }
+
+
+        @Override
+        public void run()
+        {
+            try
+            {
+                if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
+                {
+                    HostInterface externalInterface =
+                            localPeer.getManagementHost().getInterfaceByName( SystemSettings.getExternalIpInterface() );
+
+                    if ( externalInterface == null || externalInterface instanceof NullHostInterface )
+                    {
+                        return;
+                    }
+
+                    PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
+
+                    PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
+
+                    peerInfo.setPublicUrl( externalInterface.getIp() );
+
+                    peerInfo.setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
+
+                    peerData.setInfo( toJson( peerInfo ) );
+
+                    updatePeerData( peerData );
+
+                    Peer newPeer = createPeer( peerData );
+
+                    addPeer( newPeer );
+
+                    localIpSetter.shutdown();
+                }
+            }
+            catch ( HostNotFoundException e )
+            {
+                //ignore
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Error updating local peer public url", e );
+            }
         }
     }
 }

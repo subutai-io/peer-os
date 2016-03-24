@@ -94,8 +94,6 @@ public class NetworkManagerImplTest
     RequestBuilder requestBuilder;
     @Mock
     SshManager sshManager;
-    @Mock
-    HostManager hostManager;
 
     private NetworkManagerImpl spyNetworkManager;
 
@@ -120,7 +118,6 @@ public class NetworkManagerImplTest
         containers = Sets.newHashSet( containerHost );
         spyNetworkManager = spy( networkManager );
         doReturn( sshManager ).when( spyNetworkManager ).getSshManager( containers );
-        doReturn( hostManager ).when( spyNetworkManager ).getHostManager( containers, DOMAIN );
     }
 
 
@@ -295,51 +292,6 @@ public class NetworkManagerImplTest
         spyNetworkManager.exchangeSshKeys( containers, Sets.<String>newHashSet() );
 
         verify( sshManager ).execute( Sets.<String>newHashSet(), false );
-    }
-
-
-    @Test
-    public void testAddSshKeyToAuthorizedKeys() throws Exception
-    {
-
-        spyNetworkManager.addSshKeyToAuthorizedKeys( containers, SSH_KEY );
-
-        verify( sshManager ).appendSshKey( SSH_KEY );
-    }
-
-
-    @Test
-    public void testReplaceSshKeyInAuthorizedKeys() throws Exception
-    {
-        spyNetworkManager.replaceSshKeyInAuthorizedKeys( containers, SSH_KEY, SSH_KEY );
-
-        verify( sshManager ).replaceSshKey( SSH_KEY, SSH_KEY );
-    }
-
-
-    @Test
-    public void testRemoveSshKeyFromAuthorizedKeys() throws Exception
-    {
-        spyNetworkManager.removeSshKeyFromAuthorizedKeys( containers, SSH_KEY );
-
-        verify( sshManager ).removeSshKey( SSH_KEY );
-    }
-
-
-    @Test
-    public void testRegisterHosts() throws Exception
-    {
-
-        spyNetworkManager.registerHosts( containers, DOMAIN );
-
-        verify( hostManager ).execute();
-    }
-
-
-    @Test
-    public void testGetHostManager() throws Exception
-    {
-        assertNotNull( networkManager.getHostManager( containers, DOMAIN ) );
     }
 
 

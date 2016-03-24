@@ -365,6 +365,29 @@ public class PeerWebClient
     }
 
 
+    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    {
+        LOG.debug( String.format( "Setting up initial p2p connection in swarm: %s %s", config.getHash(),
+                config.getAddress() ) );
+
+        String path = "/p2pinitial";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+
+        try
+        {
+            client.post( config );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error setting up initial P2P connection", e );
+        }
+    }
+
+
     public void removeP2PConnection( final String p2pHash ) throws PeerException
     {
         LOG.debug( String.format( "Removing remote peer from p2p swarm: %s", p2pHash ) );

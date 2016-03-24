@@ -365,6 +365,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response setupInitialP2PConnection( final P2PConfig config )
+    {
+        try
+        {
+            localPeer.setupInitialP2PConnection( config );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
     public void removeP2PConnection( final String p2pHash )
     {
         try

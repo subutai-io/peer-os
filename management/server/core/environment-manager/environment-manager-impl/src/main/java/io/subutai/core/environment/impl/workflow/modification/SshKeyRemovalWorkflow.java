@@ -69,7 +69,7 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
 
         try
         {
-            new RemoveSshKeyStep( sshKey, environment, networkManager ).execute();
+            new RemoveSshKeyStep( sshKey, environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

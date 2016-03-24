@@ -1689,6 +1689,44 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    {
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
+
+        LOG.debug( String.format( "Adding local peer MH to P2P swarm: %s %s", config.getHash(), config.getAddress() ) );
+
+        try
+        {
+            Vni envVni = getNetworkManager().getReservedVnis().findVniByEnvironmentId( config.getEnvironmentId() );
+
+            if ( envVni == null )
+            {
+                throw new PeerException( "Reserved vni not found for environment %s", config.getEnvironmentId() );
+            }
+
+
+            P2PConnection p2PConnection = getNetworkManager()
+                    .getP2PConnectionByHash( getManagementHost(), P2PUtil.generateHash( envVni.getEnvironmentId() ) );
+
+            if ( p2PConnection != null )
+            {
+                throw new PeerException( "Initial P2P connection is already setup with this hash" );
+            }
+            else
+            {
+                getNetworkManager()
+                        .setupP2PConnection( getManagementHost(), P2PUtil.generateInterfaceName( envVni.getVlan() ),
+                                config.getAddress(), config.getHash(), config.getSecretKey(),
+                                config.getSecretKeyTtlSec() );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Failed to setup P2P connection on MH", e );
+        }
+    }
+
+
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Delete" )
     @Override

@@ -450,38 +450,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    @Override
-    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).appendSshKey( sshKey );
-    }
-
-
-    @Override
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
-                                               final String newSshKey ) throws NetworkManagerException
-    {
-        getSshManager( containers ).replaceSshKey( oldSshKey, newSshKey );
-    }
-
-
-    @Override
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).removeSshKey( sshKey );
-    }
-
-
-    @Override
-    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
-            throws NetworkManagerException
-    {
-        getHostManager( containerHosts, domainName ).execute();
-    }
-
-
     private long getUnixTimestampOffset( final long offsetSec )
     {
         long unixTimestamp = Instant.now().getEpochSecond();
@@ -553,11 +521,5 @@ public class NetworkManagerImpl implements NetworkManager
     protected SshManager getSshManager( final Set<ContainerHost> containers )
     {
         return new SshManager( containers );
-    }
-
-
-    protected HostManager getHostManager( final Set<ContainerHost> containerHosts, final String domainName )
-    {
-        return new HostManager( containerHosts, domainName );
     }
 }

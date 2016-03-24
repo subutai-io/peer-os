@@ -180,37 +180,11 @@ public class Commands
     }
 
 
-    public RequestBuilder getAppendSshKeyCommand( String key )
-    {
-        return new RequestBuilder( String.format(
-                "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
-                        + "sort -u '%2$s' -o '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
-    }
-
-
-    public RequestBuilder getReplaceSshKeyCommand( String oldKey, String newKey )
-    {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "sed -i \"\\,%3$s,d\" %2$s ; " +
-                "echo '%4$s' >> %2$s && " +
-                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, oldKey, newKey ) );
-    }
-
-
     public RequestBuilder getConfigSSHCommand()
     {
         return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
                 "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
                 "chmod 644 %1$s/config", SSH_FOLDER ) );
-    }
-
-
-    public RequestBuilder getRemoveSshKeyCommand( final String key )
-    {
-        return new RequestBuilder( String.format( "chmod 700 %1$s && " +
-                "sed -i \"\\,%3$s,d\" %2$s && " +
-                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, key ) );
     }
 
 
