@@ -160,7 +160,7 @@ public interface LocalPeer extends Peer
 
     List<ContainerHost> getPeerContainers( String peerId );
 
-    String getCurrentControlNetwork() throws PeerException;
+//    String getCurrentControlNetwork() throws PeerException;
 
     Host findHostByName( String hostname ) throws HostNotFoundException;
 
