@@ -96,22 +96,15 @@ public class SystemManagerImpl implements SystemManager
         }
 
         pojo.setGlobalKurjunUrls( SystemSettings.getGlobalKurjunUrls() );
+        pojo.setLocalKurjunUrls( SystemSettings.getLocalKurjunUrls() );
 
         return pojo;
     }
 
 
     @Override
-    public SystemInfo getSystemInfo() throws ConfigurationException, HostNotFoundException, CommandException
+    public SystemInfo getSystemInfo() throws ConfigurationException
     {
-        CommandResult result = null;
-
-        RequestBuilder requestBuilder = new RequestBuilder( "subutai -v" );
-        Host host = peerManager.getLocalPeer().getManagementHost();
-        result = peerManager.getLocalPeer().execute( requestBuilder, host );
-
-        String[] version = result.getStdOut().split( "\\s" );
-
         SystemInfo pojo = new SystemInfoPojo();
 
         pojo.setGitCommitId( SubutaiInfo.getCommitId() );
@@ -122,6 +115,22 @@ public class SystemManagerImpl implements SystemManager
         pojo.setGitBuildUserEmail( SubutaiInfo.getBuilderUserEmail() );
         pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
         pojo.setProjectVersion( SubutaiInfo.getVersion() );
+
+        CommandResult result = null;
+        RequestBuilder requestBuilder = new RequestBuilder( "subutai -v" );
+        try
+        {
+            Host host = peerManager.getLocalPeer().getManagementHost();
+            result = peerManager.getLocalPeer().execute( requestBuilder, host );
+        }
+        catch ( HostNotFoundException | CommandException e )
+        {
+            e.printStackTrace();
+            pojo.setRhVersion( "No RH connected" );
+            return pojo;
+        }
+
+        String[] version = result.getStdOut().split( "\\s" );
         pojo.setRhVersion( version[2] );
 
         return pojo;
@@ -163,29 +172,6 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public boolean setKurjunSettings( final String[] globalKurjunUrls, final long publicDiskQuota,
-                                      final long publicThreshold, final long publicTimeFrame, final long trustDiskQuota,
-                                      final long trustThreshold, final long trustTimeFrame )
-            throws ConfigurationException
-    {
-        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
-
-        templateManager.setDiskQuota( publicDiskQuota, "public" );
-        templateManager.setDiskQuota( trustDiskQuota, "trust" );
-
-        KurjunTransferQuota publicTransferQuota =
-                new KurjunTransferQuota( publicThreshold, publicTimeFrame, TimeUnit.HOURS );
-        KurjunTransferQuota trustTransferQuota =
-                new KurjunTransferQuota( trustThreshold, trustTimeFrame, TimeUnit.HOURS );
-
-        boolean isPublicQuotaSaved = templateManager.setTransferQuota( publicTransferQuota, "public" );
-        boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
-
-        return isPublicQuotaSaved && isTrustQuotaSaved;
-    }
-
-
-    @Override
     public AdvancedSettings getAdvancedSettings()
     {
         AdvancedSettings pojo = new AdvancedSettingsPojo();
@@ -207,9 +193,10 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setKurjunSettingsUrls( final String[] globalKurjunUrls ) throws ConfigurationException
+    public void setKurjunSettingsUrls( final String[] globalKurjunUrls, final String[] localKurjunUrls ) throws ConfigurationException
     {
         SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
+        SystemSettings.setLocalKurjunUrls( localKurjunUrls );
     }
 
 

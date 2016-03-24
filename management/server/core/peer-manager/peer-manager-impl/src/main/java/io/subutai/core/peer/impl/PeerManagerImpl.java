@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.net.util.SubnetUtils;
 
@@ -134,7 +133,6 @@ public class PeerManagerImpl implements PeerManager, HostListener
     }
 
 
-    //todo create peerinfo for local peer in localpeer#init
     public void init() throws PeerException
     {
         try
@@ -142,27 +140,12 @@ public class PeerManagerImpl implements PeerManager, HostListener
             this.peerDataService = new PeerDataService( daoManager.getEntityManagerFactory() );
 
             localPeerId = securityManager.getKeyManager().getPeerId();
-            String ownerId = securityManager.getKeyManager().getPeerOwnerId();
 
             PeerData localPeerData = peerDataService.find( localPeerId );
 
             if ( localPeerData == null )
             {
-                PeerInfo localPeerInfo = new PeerInfo();
-                localPeerInfo.setId( localPeerId );
-                localPeerInfo.setOwnerId( ownerId );
-
-                if ( StringUtils.isEmpty( SystemSettings.getPublicUrl() ) )
-                {
-                    localPeerInfo.setName( String.format( "Peer %s ", localPeerId ) );
-                    localPeerInfo.setPublicUrl( SystemSettings.DEFAULT_PUBLIC_URL );
-                }
-                else
-                {
-                    localPeerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
-                    localPeerInfo
-                            .setName( String.format( "Peer %s on %s", localPeerId, SystemSettings.getPublicUrl() ) );
-                }
+                PeerInfo localPeerInfo = localPeer.getPeerInfo();
 
                 PeerPolicy policy = getDefaultPeerPolicy( localPeerId );
 
@@ -1051,10 +1034,10 @@ public class PeerManagerImpl implements PeerManager, HostListener
                 {
                     return;
                 }
+
                 PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
 
                 PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
-
 
                 peerInfo.setPublicUrl( externalInterface.getIp() );
 
@@ -1153,10 +1136,16 @@ public class PeerManagerImpl implements PeerManager, HostListener
             peerDataService.saveOrUpdate( peerData );
             Peer peer = createPeer( peerData );
             addPeer( peer );
+            //update settings
+            if ( getLocalPeer().getId().equalsIgnoreCase( peerId ) )
+            {
+                SystemSettings.setPublicUrl( publicUrl );
+                SystemSettings.setPublicSecurePort( securePort );
+            }
         }
-        catch ( IOException e )
+        catch ( Exception e )
         {
-            throw new PeerException( "Unexpected error: " + e.getMessage() );
+            throw new PeerException( "Error setting public url ", e );
         }
     }
 

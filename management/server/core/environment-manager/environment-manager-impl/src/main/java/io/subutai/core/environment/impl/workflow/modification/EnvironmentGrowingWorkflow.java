@@ -113,7 +113,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager ).execute();
+            new VNISetupStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

@@ -26,11 +26,8 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
-import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.exception.HTTPException;
@@ -49,7 +46,6 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -693,36 +689,6 @@ public class RemotePeerImpl implements RemotePeer
         if ( response != null )
         {
             return response;
-        }
-        else
-        {
-            throw new PeerException( "Command timed out" );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //**************************************************************************
-
-
-        DestroyEnvironmentContainerGroupResponse response =
-                sendRequest( new DestroyEnvironmentContainerGroupRequest( environmentId ),
-                        RecipientType.DESTROY_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT, DestroyEnvironmentContainerGroupResponse.class,
-                        Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT, headers );
-
-        if ( response != null )
-        {
-            return new ContainersDestructionResultImpl( getId(), response.getDestroyedContainersIds(),
-                    response.getException() );
         }
         else
         {

@@ -29,13 +29,9 @@ public interface SystemManager
     void setNetworkSettings( String securePortX1, String securePortX2, String securePortX3, final String publicUrl,
                              final String agentPort ) throws ConfigurationException;
 
-    boolean setKurjunSettings( String[] globalKurjunUrls, long publicDiskQuota, long publicThreshold,
-                               long publicTimeFrame, long trustDiskQuota, long trustThreshold, long trustTimeFrame )
-            throws ConfigurationException;
-
     AdvancedSettings getAdvancedSettings();
 
-    void setKurjunSettingsUrls( String[] globalKurjunUrls ) throws ConfigurationException;
+    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls ) throws ConfigurationException;
 
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
