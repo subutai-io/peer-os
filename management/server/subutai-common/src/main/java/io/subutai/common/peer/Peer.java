@@ -275,11 +275,21 @@ public interface Peer
      * Sets up p2p connection on each RH.
      *
      * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
-     * dynamic IP acquisition for RHs
+     * dynamic IP acquisition for RHs. If P2P connection already exists on RH, its secret key gets reset with new secret
+     * key and ttl from  @param config. To setup initial p2p connection with explicit IP, use
+     * Peer#setupInitialP2PConnection
      *
      * @return - P2P IP of RH with MH
      */
     String setupP2PConnection( P2PConfig config ) throws PeerException;
+
+
+    /**
+     * Sets up initial P2P connection in swarm on MH. P2P IP must be present!
+     *
+     * This method throws PeerException if initial P2P connection with the specified hash is already setup.
+     */
+    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException;
 
     /**
      * Removes p2p connection by hash from all RHs

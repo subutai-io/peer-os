@@ -94,8 +94,6 @@ public class NetworkManagerImplTest
     RequestBuilder requestBuilder;
     @Mock
     SshManager sshManager;
-    @Mock
-    HostManager hostManager;
 
     private NetworkManagerImpl spyNetworkManager;
 
@@ -120,7 +118,6 @@ public class NetworkManagerImplTest
         containers = Sets.newHashSet( containerHost );
         spyNetworkManager = spy( networkManager );
         doReturn( sshManager ).when( spyNetworkManager ).getSshManager( containers );
-        doReturn( hostManager ).when( spyNetworkManager ).getHostManager( containers, DOMAIN );
     }
 
 
@@ -323,23 +320,6 @@ public class NetworkManagerImplTest
         spyNetworkManager.removeSshKeyFromAuthorizedKeys( containers, SSH_KEY );
 
         verify( sshManager ).removeSshKey( SSH_KEY );
-    }
-
-
-    @Test
-    public void testRegisterHosts() throws Exception
-    {
-
-        spyNetworkManager.registerHosts( containers, DOMAIN );
-
-        verify( hostManager ).execute();
-    }
-
-
-    @Test
-    public void testGetHostManager() throws Exception
-    {
-        assertNotNull( networkManager.getHostManager( containers, DOMAIN ) );
     }
 
 

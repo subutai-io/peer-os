@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.ByteValueResource;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.NumericValueResource;
 
 
@@ -23,6 +23,12 @@ public class HeartBeat
     private static final Logger LOG = LoggerFactory.getLogger( HeartBeat.class );
     ResourceHostInfoModel response;
     Set<QuotaAlertValue> alerts;
+
+
+    public HeartBeat( final ResourceHostInfoModel response )
+    {
+        this.response = response;
+    }
 
 
     public ResourceHostInfo getHostInfo()

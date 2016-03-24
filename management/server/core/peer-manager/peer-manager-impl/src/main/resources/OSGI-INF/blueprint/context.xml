@@ -65,8 +65,6 @@
 
   <service ref="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
 
-  <service ref="peerManager" interface="io.subutai.core.hostregistry.api.HostListener" />
-
   <reference-list id="peerActionListener"
                   interface="io.subutai.core.peer.api.PeerActionListener"
                   availability="optional" ext:proxy-method="classes">

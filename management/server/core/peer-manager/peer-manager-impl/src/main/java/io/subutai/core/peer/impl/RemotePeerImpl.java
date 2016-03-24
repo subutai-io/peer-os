@@ -830,6 +830,15 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    {
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
+
+        new PeerWebClient( peerInfo, provider ).setupInitialP2PConnection( config );
+    }
+
+
+    @Override
     public void removeP2PConnection( final String p2pHash ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
