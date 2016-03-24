@@ -36,10 +36,8 @@ func P2P(c, d, u, l, p bool, args []string) {
 		if len(args) > 4 {
 			p2p.Peers(args[4])
 		} else {
-			fmt.Println("Wrong usage")
+			p2p.Peers("")
 		}
-	} else if l {
-		p2p.Print()
 	}
 }
 
@@ -216,7 +214,6 @@ func ClearVlan(vlan string) {
 			s := strings.Fields(v)
 			if len(s) > 2 && s[1] == vlan {
 				delTunById(s[2])
-				p2p.Remove(s[2])
 				lines[k] = ""
 			}
 		}

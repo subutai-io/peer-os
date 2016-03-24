@@ -3,7 +3,6 @@ package lib
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -16,6 +15,7 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 
 	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 )
 
 var (
@@ -31,22 +31,20 @@ var (
 
 func Collect() {
 	for {
-		CollectStats()
+		collectStats()
 		time.Sleep(time.Second * 30)
 	}
 }
 
-func CollectStats() {
+func collectStats() {
 	clnt, bp, err := initInfluxdb()
-	if err == nil {
+	if !log.Check(log.WarnLevel, "Initialization InfluxDB", err) {
 		netStat(clnt, bp)
 		cgroupStat(clnt, bp)
 		btrfsStat(clnt, bp)
 		diskFree(clnt, bp)
 		cpuStat(clnt, bp)
 		memStat(clnt, bp)
-	} else {
-		fmt.Println(err)
 	}
 }
 
@@ -146,7 +144,6 @@ func lxclist() map[string]string {
 }
 
 func netStat(clnt client.Client, bp client.BatchPoints) {
-	hostname, _ := os.Hostname()
 	lxcnic = lxclist()
 	file, err := os.Open("/proc/net/dev")
 	if err != nil {
@@ -157,11 +154,12 @@ func netStat(clnt client.Client, bp client.BatchPoints) {
 	lc := 0
 	traffic := make([]int, 2)
 	for scanner.Scan() {
+		hostname, _ := os.Hostname()
 		lc++
 		line := strings.Fields(scanner.Text())
 		if lc > 2 {
 			traffic[0], _ = strconv.Atoi(line[1])
-			traffic[1], _ = strconv.Atoi(line[10])
+			traffic[1], _ = strconv.Atoi(line[9])
 			nicname := strings.Split(line[0], ":")[0]
 			metric := "host_net"
 			if lxcnic[nicname] != "" {
