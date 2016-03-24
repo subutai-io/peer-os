@@ -141,7 +141,7 @@ public class KurjunManagerImpl implements KurjunManager
         {
             String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.add" ) );
             WebClient client = RestUtil.createTrustedWebClient( url );
-//            Response response = client.get();
+            //            Response response = client.get();
 
             //TODO get authID from client
             //authId = client Output;
@@ -203,15 +203,15 @@ public class KurjunManagerImpl implements KurjunManager
     public String getUser( int kurjunType, String fingerprint )
     {
         String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
-        WebClient client = RestUtil.createTrustedWebClient( url + "/" + fingerprint );
-        //        client.query( "fingerprint", fingerprint );
+        WebClient client = RestUtil.createTrustedWebClient( url /*+ "/" + fingerprint*/ );
+        client.query( "fingerprint", fingerprint );
 
-//        Response response = client.get();
-//
-//        if ( response.getStatus() != HttpStatus.SC_OK )
-//        {
-//            return null;
-//        }
+        Response response = client.get();
+        //
+        //        if ( response.getStatus() != HttpStatus.SC_OK )
+        //        {
+        //            return null;
+        //        }
 
         return null;
     }
@@ -233,7 +233,6 @@ public class KurjunManagerImpl implements KurjunManager
     {
         Properties configProp = new Properties();
         InputStream in = this.getClass().getClassLoader().getResourceAsStream( "rest.properties" );
-        System.out.println( "Read all properties from file" );
         try
         {
             configProp.load( in );
