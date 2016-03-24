@@ -497,14 +497,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    @Override
-    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
-            throws NetworkManagerException
-    {
-        getHostManager( containerHosts, domainName ).execute();
-    }
-
-
     private long getUnixTimestampOffset( final long offsetSec )
     {
         long unixTimestamp = Instant.now().getEpochSecond();
@@ -576,11 +568,5 @@ public class NetworkManagerImpl implements NetworkManager
     protected SshManager getSshManager( final Set<ContainerHost> containers )
     {
         return new SshManager( containers );
-    }
-
-
-    protected HostManager getHostManager( final Set<ContainerHost> containerHosts, final String domainName )
-    {
-        return new HostManager( containerHosts, domainName );
     }
 }
