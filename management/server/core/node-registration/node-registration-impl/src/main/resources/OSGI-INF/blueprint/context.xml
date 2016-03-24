@@ -7,7 +7,7 @@
   </bean>
 
   <bean id="registrationManager" scope="singleton" class="io.subutai.core.registration.impl.RegistrationManagerImpl"
-        init-method="init" destroy-method="dispose">
+        init-method="init">
     <argument ref="securityManagerRef" />
     <argument ref="daoManager" />
     <argument ref="localPeerRef" />
@@ -20,12 +20,5 @@
 
   <reference id="localPeerRef" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
-
-  <reference-list id="hbLstnr"
-                  interface="io.subutai.common.host.HeartbeatListener"
-                  availability="optional">
-    <reference-listener ref="registrationManager"
-                        bind-method="addListener" unbind-method="removeListener" />
-  </reference-list>
 
 </blueprint>

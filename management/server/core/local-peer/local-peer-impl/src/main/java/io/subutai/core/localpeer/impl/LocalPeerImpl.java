@@ -1692,9 +1692,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             else
             {
                 getNetworkManager()
-                        .setupP2PConnection( getManagementHost(), P2PUtil.generateInterfaceName( envVni.getVlan() ),
-                                config.getAddress(), config.getHash(), config.getSecretKey(),
-                                config.getSecretKeyTtlSec() );
+                        .setupP2PConnection( P2PUtil.generateInterfaceName( envVni.getVlan() ), config.getAddress(),
+                                config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
             }
         }
         catch ( NetworkManagerException e )

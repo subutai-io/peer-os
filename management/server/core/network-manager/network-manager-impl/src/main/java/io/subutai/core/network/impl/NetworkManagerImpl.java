@@ -100,12 +100,12 @@ public class NetworkManagerImpl implements NetworkManager
     public void resetP2PSecretKey( final Host host, final String p2pHash, final String newSecretKey,
                                    final long ttlSeconds ) throws NetworkManagerException
     {
+        Preconditions.checkNotNull( host );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
         Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
 
-        execute( getManagementHost(),
-                commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
+        execute( host, commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
     }
 
 
@@ -121,7 +121,7 @@ public class NetworkManagerImpl implements NetworkManager
     {
         P2PConnections connections = new P2PConnections();
 
-        CommandResult result = execute( host, commands.getP2PConnectionsCommand( null ) );
+        CommandResult result = execute( host, commands.getP2PConnectionsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -434,22 +434,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    @Override
-    public void exchangeSshKeys( final Set<ContainerHost> containers, final Set<String> additionalSshKeys )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).execute( additionalSshKeys, false );
-    }
-
-
-    @Override
-    public void appendSshKeys( final Set<ContainerHost> containers, final Set<String> sshKeys )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).execute( sshKeys, true );
-    }
-
-
     private long getUnixTimestampOffset( final long offsetSec )
     {
         long unixTimestamp = Instant.now().getEpochSecond();
@@ -515,11 +499,5 @@ public class NetworkManagerImpl implements NetworkManager
         {
             throw new NetworkManagerException( e );
         }
-    }
-
-
-    protected SshManager getSshManager( final Set<ContainerHost> containers )
-    {
-        return new SshManager( containers );
     }
 }

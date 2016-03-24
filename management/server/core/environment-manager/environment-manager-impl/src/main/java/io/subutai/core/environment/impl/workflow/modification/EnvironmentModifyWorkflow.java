@@ -22,7 +22,7 @@ import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDes
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
-import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -31,7 +31,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentModifyWorkflow.class );
 
-    private final NetworkManager networkManager;
+    private final TemplateManager templateRegistry;
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
@@ -59,7 +59,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public EnvironmentModifyWorkflow( String defaultDomain, NetworkManager networkManager, PeerManager peerManager,
+    public EnvironmentModifyWorkflow( String defaultDomain, TemplateManager templateRegistry, PeerManager peerManager,
                                       EnvironmentImpl environment, Topology topology, List<String> removedContainers,
                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
                                       boolean forceMetadataRemoval )
@@ -67,8 +67,8 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         super( EnvironmentGrowingPhase.INIT );
 
+        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
-        this.networkManager = networkManager;
         this.environment = environment;
         this.topology = topology;
         this.operationTracker = operationTracker;
@@ -212,8 +212,8 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
-                    operationTracker ).execute();
+            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
+                    environmentManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -255,7 +255,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
+            new RegisterSshStep( environment, operationTracker ).execute( environment.getSshKeys() );
 
             environment = environmentManager.update( environment );
 
