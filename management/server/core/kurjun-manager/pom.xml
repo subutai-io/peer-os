@@ -16,6 +16,7 @@
   <modules>
     <module>kurjun-manager-impl</module>
     <module>kurjun-manager-api</module>
+    <module>kurjun-manager-rest</module>
   </modules>
 
 </project>
