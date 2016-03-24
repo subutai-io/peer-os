@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +50,6 @@ import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -190,50 +190,42 @@ public class HubEnvironmentManager
         }
         catch ( PeerException e )
         {
-            LOG.error( "Could not setup VNI" );
+            LOG.error( "Could not setup VNI", e.getMessage() );
         }
     }
 
 
     public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto )
     {
-        LocalPeer peer = peerManager.getLocalPeer();
-        final EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-        String tunComName = P2PUtil.generateHash( env.getTunnelNetwork() );
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
         SubnetUtils.SubnetInfo subnetInfo =
                 new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
+
         final String address = subnetInfo.getAddress();
-        final Session session = identityManager.login( "internal", "secretSubutai" );
-//        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
-//        {
-//            @Override
-//            public Void run()
-//            {
-                try
-                {
-                    Vni reservedVni = networkManager.getReservedVnis().findVniByEnvironmentId( env.getId() );
-                    networkManager.setupP2PConnection( peerManager.getLocalPeer().getManagementHost(),
-                            P2PUtil.generateInterfaceName( reservedVni.getVlan() ), address,
-                            env.getP2pHash(), env.getP2pKey(), Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
-                }
-                catch ( Exception ex )
-                {
-                    LOG.error( ex.getMessage() );
-                }
-//                return null;
-//            }
-//        } );
+
+        try
+        {
+            localPeer.setupInitialP2PConnection(
+                    new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), address, env.getP2pKey(),
+                            Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
+        }
+        catch ( PeerException e )
+        {
+            e.printStackTrace();
+        }
 
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        P2PConfig config =
-                new P2PConfig( peer.getId(), env.getId(), env.getP2pKey(), address, env.getP2pHash(), env.getP2pTTL() );
-        p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
+        P2PConfig config = new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), address, env.getP2pKey(),
+                env.getP2pTTL() );
+        p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
 
         try
         {
+
             final Future<P2PConfig> f = p2pCompletionService.take();
             P2PConfig createdConfig = f.get();
             p2pExecutor.shutdown();
@@ -241,7 +233,13 @@ public class HubEnvironmentManager
             peerDto.setTunnelAddress( createdConfig.getAddress() );
             peerDto.setCommunityName( createdConfig.getHash() );
             peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
-
+        }
+        catch ( ExecutionException | InterruptedException e )
+        {
+            LOG.error( "Problems setting up p2p connection", e );
+        }
+        try
+        {
             ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
 
             ExecutorCompletionService<Integer> tunnelCompletionService =
@@ -249,16 +247,16 @@ public class HubEnvironmentManager
 
             Map<String, String> tunnel = new HashMap<>();
             tunnel.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
-            tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnel ) );
+            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, env.getId(), tunnel ) );
 
             final Future<Integer> fTunnel = tunnelCompletionService.take();
             fTunnel.get();
 
             tunnelExecutor.shutdown();
         }
-        catch ( Exception e )
+        catch ( ExecutionException | InterruptedException e )
         {
-            LOG.error( "Could not create P2P tunnel.", e.getMessage() );
+            LOG.error( "Problems setting up tunnels", e );
         }
 
         return peerDto;
