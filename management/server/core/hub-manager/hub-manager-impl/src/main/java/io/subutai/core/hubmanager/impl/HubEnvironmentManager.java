@@ -213,7 +213,7 @@ public class HubEnvironmentManager
         }
         catch ( PeerException e )
         {
-            e.printStackTrace();
+            LOG.error( "Could not setup initial p2p participant on local peer MH with explicit IP", e );
         }
 
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
