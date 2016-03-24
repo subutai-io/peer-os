@@ -45,65 +45,6 @@ public class SshManager
     }
 
 
-    public void appendSshKey( String key ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Invalid ssh key" );
-
-        for ( ContainerHost host : containerHosts )
-        {
-            try
-            {
-                commandUtil.execute( commands.getAppendSshKeyCommand( key ), host );
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( String.format( "Error in appendSshKey: %s", e.getMessage() ), e );
-                throw new NetworkManagerException( e );
-            }
-        }
-    }
-
-
-    public void replaceSshKey( String oldKey, String newKey ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldKey ), "Invalid old ssh key" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newKey ), "Invalid new ssh key" );
-
-        for ( ContainerHost host : containerHosts )
-        {
-            try
-            {
-                commandUtil.execute( commands.getReplaceSshKeyCommand( oldKey, newKey ), host );
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( String.format( "Error in replaceSshKey: %s", e.getMessage() ), e );
-                throw new NetworkManagerException( e );
-            }
-        }
-    }
-
-
-    public void removeSshKey( String key ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Invalid ssh key" );
-
-        for ( ContainerHost host : containerHosts )
-        {
-            try
-            {
-                //execute via host to ignore error if authorized_keys file does not exist
-                host.execute( commands.getRemoveSshKeyCommand( key ) );
-            }
-            catch ( CommandException e )
-            {
-                LOG.error( String.format( "Error in removeSshKey: %s", e.getMessage() ), e );
-                throw new NetworkManagerException( e );
-            }
-        }
-    }
-
-
     public void execute( Set<String> additionalSshKeys, boolean justAdd ) throws NetworkManagerException
     {
         if ( !justAdd )

@@ -71,45 +71,6 @@ public class SshManagerTest
 
 
     @Test( expected = NetworkManagerException.class )
-    public void testAppendSshKey() throws Exception
-    {
-        sshManager.appendSshKey( SSH_KEY );
-
-        verifyCommandUtilExec();
-
-        throwCommandException();
-
-        sshManager.appendSshKey( SSH_KEY );
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
-    public void testReplaceSshKey() throws Exception
-    {
-        sshManager.replaceSshKey( SSH_KEY, SSH_KEY );
-
-        verifyCommandUtilExec();
-
-        throwCommandException();
-
-        sshManager.replaceSshKey( SSH_KEY, SSH_KEY );
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
-    public void testRemoveSshKey() throws Exception
-    {
-        sshManager.removeSshKey( SSH_KEY );
-
-        verifyHostExec();
-
-        throwCommandException();
-
-        sshManager.removeSshKey( SSH_KEY );
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
     public void testWrite() throws Exception
     {
         sshManager.write( Sets.<String>newHashSet() );

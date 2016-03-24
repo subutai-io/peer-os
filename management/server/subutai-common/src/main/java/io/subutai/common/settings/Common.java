@@ -47,4 +47,7 @@ public class Common
     public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10;
     public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15;
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
+
+    public static final String CONTAINER_SSH_FOLDER = "/root/.ssh";
+    public static final String CONTAINER_SSH_FILE = String.format( "%s/authorized_keys", CONTAINER_SSH_FOLDER );
 }
