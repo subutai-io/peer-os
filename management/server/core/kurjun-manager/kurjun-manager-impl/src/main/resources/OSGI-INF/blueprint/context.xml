@@ -1,33 +1,36 @@
 <blueprint xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
            default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    >
+>
 
   <!--*****************************************************************-->
-  <reference id="securityManager" availability="mandatory"
+  <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
 
   <!--*****************************************************************-->
-  <reference id="identityManager" availability="mandatory"
+  <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <!--*****************************************************************-->
-  <bean id="daoManagerKurjun" init-method="init" activation="eager" scope="singleton"
+  <bean id="daoManager" init-method="init" activation="eager" scope="singleton"
         class="io.subutai.common.dao.DaoManager">
     <jpa:unit unitname="kurjunManagerPUnit" property="entityManagerFactory" />
   </bean>
   <!--*****************************************************************-->
 
   <!--*****************************************************************-->
-  <bean id="KurjunManager" scope="singleton" activation="eager" init-method="init"
+  <bean id="kurjunManager" scope="singleton" activation="eager" init-method="init"
         class="io.subutai.core.kurjun.manager.impl.KurjunManagerImpl">
-    <argument ref="identityManager" />
-    <argument ref="securityManager" />
-    <argument ref="daoManagerKurjun" />
+    <property name="daoManager" ref="daoManager" />
+    <property name="identityManager" ref="identityManager" />
+    <property name="securityManager" ref="securityManager" />
+    <!--<argument ref="identityManager" />-->
+    <!--<argument ref="securityManager" />-->
+    <!--<argument ref="daoManagerKurjun" />-->
   </bean>
 
   <!--*****************************************************************-->
-  <service ref="KurjunManager" activation="eager"
+  <service ref="kurjunManager"
            interface="io.subutai.core.kurjun.manager.api.KurjunManager" />
   <!--*****************************************************************-->
 
