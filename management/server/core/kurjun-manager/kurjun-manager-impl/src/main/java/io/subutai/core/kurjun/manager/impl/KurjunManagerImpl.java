@@ -13,11 +13,13 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
@@ -83,18 +85,48 @@ public class KurjunManagerImpl implements KurjunManager
     //****************************************
     private String getKurjunUrl( int kurjunType, String uri )
     {
-        if ( kurjunType == KurjunType.Local.getId() )
+        try
         {
-            return localKurjunURL + uri;
+            if ( kurjunType == KurjunType.Local.getId() )
+            {
+                for ( final String s : SystemSettings.getGlobalKurjunUrls() )
+                {
+                    return s + uri;
+                }
+            }
+            else if ( kurjunType == KurjunType.Global.getId() )
+            {
+                for ( final String s : SystemSettings.getLocalKurjunUrls() )
+                {
+                    return s + uri;
+                }
+            }
+            else
+            {
+                for ( final String s : SystemSettings.getGlobalKurjunUrls() )
+                {
+                    return s + uri;
+                }
+            }
         }
-        else if ( kurjunType == KurjunType.Global.getId() )
+        catch ( ConfigurationException e )
         {
-            return globalKurjunURL + uri;
+            e.printStackTrace();
         }
-        else
-        {
-            return globalKurjunURL + uri;
-        }
+
+        //        if ( kurjunType == KurjunType.Local.getId() )
+        //        {
+        //            return localKurjunURL + uri;
+        //        }
+        //        else if ( kurjunType == KurjunType.Global.getId() )
+        //        {
+        //            return globalKurjunURL + uri;
+        //        }
+        //        else
+        //        {
+        //            return globalKurjunURL + uri;
+        //        }
+        return null;
     }
 
 
@@ -171,8 +203,15 @@ public class KurjunManagerImpl implements KurjunManager
     public String getUser( int kurjunType, String fingerprint )
     {
         String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
-        WebClient client = RestUtil.createTrustedWebClient( url );
+        WebClient client = RestUtil.createTrustedWebClient( url + "/" + fingerprint );
+        //        client.query( "fingerprint", fingerprint );
 
+        Response response = client.get();
+
+        if ( response.getStatus() != HttpStatus.SC_OK )
+        {
+            return null;
+        }
 
         return null;
     }
