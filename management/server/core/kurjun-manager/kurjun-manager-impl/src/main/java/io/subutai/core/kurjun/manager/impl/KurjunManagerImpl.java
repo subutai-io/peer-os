@@ -141,7 +141,7 @@ public class KurjunManagerImpl implements KurjunManager
         {
             String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.add" ) );
             WebClient client = RestUtil.createTrustedWebClient( url );
-            Response response = client.get();
+//            Response response = client.get();
 
             //TODO get authID from client
             //authId = client Output;
@@ -206,12 +206,12 @@ public class KurjunManagerImpl implements KurjunManager
         WebClient client = RestUtil.createTrustedWebClient( url + "/" + fingerprint );
         //        client.query( "fingerprint", fingerprint );
 
-        Response response = client.get();
-
-        if ( response.getStatus() != HttpStatus.SC_OK )
-        {
-            return null;
-        }
+//        Response response = client.get();
+//
+//        if ( response.getStatus() != HttpStatus.SC_OK )
+//        {
+//            return null;
+//        }
 
         return null;
     }

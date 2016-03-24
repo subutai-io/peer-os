@@ -14,7 +14,7 @@
       <ref component-id="kurjunManagerRestServiceImpl" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
-  <bean id="bazaarRestServiceImpl" class="io.subutai.core.kurjun.manager.rest.RestServiceImpl">
+  <bean id="kurjunManagerRestServiceImpl" class="io.subutai.core.kurjun.manager.rest.RestServiceImpl">
     <property name="kurjunManager" ref="kurjunManager" />
   </bean>
   <reference id="kurjunManager" availability="mandatory"
