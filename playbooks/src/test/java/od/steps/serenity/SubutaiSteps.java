@@ -258,11 +258,12 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void typeInFieldsPgp(){
-        screen.type(pgpPlugin.sikuliFieldEnterKeyName, "test");
+    public void typeInFieldsPgp() throws FindFailed {
+//        screen.type(pgpPlugin.sikuliFieldEnterKeyName, "test");
         screen.type(pgpPlugin.sikuliFieldEnterEmail, "test@test.com");
-        screen.type(pgpPlugin.sikuliFieldEnterPassword, "secret");
-        screen.type(pgpPlugin.sikuliFieldConfirmPassword, "secret");
+        screen.click(pgpPlugin.sikuliCheckBoxProtectYourKeyWithPassword);
+        screen.type(pgpPlugin.sikuliFieldEnterPassword, "239668a");
+        screen.type(pgpPlugin.sikuliFieldConfirmPassword, "239668a");
     }
 
     @Step

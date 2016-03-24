@@ -37,7 +37,6 @@ public class DefSubutaiStepsGiven {
     public void configurePgpPlugin() throws FindFailed {
         subutaiSteps.clickOnIconPgp();
         subutaiSteps.clickOnButtonOptions();
-        subutaiSteps.clickOnButtonGenerate();
         subutaiSteps.typeInFieldsPgp();
         subutaiSteps.clickOnButtonSubmit();
         subutaiSteps.clickOnButtonOk();
