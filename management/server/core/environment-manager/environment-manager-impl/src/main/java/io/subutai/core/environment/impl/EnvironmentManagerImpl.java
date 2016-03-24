@@ -1493,7 +1493,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
-
         EnvironmentImpl environment =
                 new EnvironmentImpl( topology.getEnvironmentName(), topology.getSubnet(), topology.getSshKey(),
                         getUserId(), peerManager.getLocalPeer().getId() );

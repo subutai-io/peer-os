@@ -127,7 +127,7 @@ public class PeerManagerImpl implements PeerManager
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         controlNetworkUpdaterService = Executors.newSingleThreadScheduledExecutor();
-        controlNetworkUpdaterService.scheduleWithFixedDelay( new ControlNetworkUpdater(), 1, 60, TimeUnit.MINUTES );
+        controlNetworkUpdaterService.scheduleWithFixedDelay( new ControlNetworkUpdater(), 1, 3, TimeUnit.MINUTES );
         localIpSetter = Executors.newSingleThreadScheduledExecutor();
         localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 5, 5, TimeUnit.SECONDS );
     }
@@ -1115,17 +1115,9 @@ public class PeerManagerImpl implements PeerManager
             return;
         }
 
-        try
+        if ( controlNetwork == null )
         {
-            if ( controlNetwork == null )
-            {
-                controlNetwork = localPeer.getCurrentControlNetwork();
-                selectControlNetwork();
-            }
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( e.getMessage(), e );
+            selectControlNetwork();
         }
 
 

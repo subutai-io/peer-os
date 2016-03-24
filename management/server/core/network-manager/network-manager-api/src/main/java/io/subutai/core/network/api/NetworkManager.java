@@ -9,6 +9,7 @@ import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 
@@ -68,33 +69,18 @@ public interface NetworkManager
     PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     /**
-     * Returns p2p connection running on MH by hash
-     *
-     * @param p2pHash - hash of p2p swarm
-     */
-    public P2PConnection getP2PConnectionByHash( String p2pHash ) throws NetworkManagerException;
-
-    /**
-     * Returns p2p connection running on the specified host by hash
-     *
-     * @param host - host
-     * @param p2pHash - hash of p2p swarm
-     */
-    public P2PConnection getP2PConnectionByHash( Host host, String p2pHash ) throws NetworkManagerException;
-
-    /**
      * Returns all p2p connections running on the specified host
      *
      * @param host - host
      */
 
-    public Set<P2PConnection> getP2PConnections( Host host ) throws NetworkManagerException;
+    public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
 
     /**
      * Returns all p2p connections running on MH
      */
 
-    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException;
+    public P2PConnections getP2PConnections() throws NetworkManagerException;
 
 
     /**

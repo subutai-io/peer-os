@@ -26,6 +26,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
@@ -109,40 +110,16 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public P2PConnection getP2PConnectionByHash( final String p2pHash ) throws NetworkManagerException
-    {
-        return getP2PConnectionByHash( getManagementHost(), p2pHash );
-    }
-
-
-    @Override
-    public P2PConnection getP2PConnectionByHash( final Host host, final String p2pHash ) throws NetworkManagerException
-    {
-        Set<P2PConnection> p2PConnections = getP2PConnections( host );
-
-        for ( P2PConnection p2PConnection : p2PConnections )
-        {
-            if ( p2PConnection.getHash().equalsIgnoreCase( p2pHash ) )
-            {
-                return p2PConnection;
-            }
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException
+    public P2PConnections getP2PConnections() throws NetworkManagerException
     {
         return getP2PConnections( getManagementHost() );
     }
 
 
     @Override
-    public Set<P2PConnection> getP2PConnections( final Host host ) throws NetworkManagerException
+    public P2PConnections getP2PConnections( final Host host ) throws NetworkManagerException
     {
-        Set<P2PConnection> p2PConnections = Sets.newHashSet();
+        P2PConnections connections = new P2PConnections();
 
         CommandResult result = execute( host, commands.getP2PConnectionsCommand() );
 
@@ -156,11 +133,11 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 3 )
             {
-                p2PConnections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+                connections.addConnection( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
             }
         }
 
-        return p2PConnections;
+        return connections;
     }
 
 
