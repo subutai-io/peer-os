@@ -22,7 +22,6 @@ import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDes
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -32,7 +31,6 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentModifyWorkflow.class );
 
-    private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
@@ -61,8 +59,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public EnvironmentModifyWorkflow( String defaultDomain, TemplateManager templateRegistry,
-                                      NetworkManager networkManager, PeerManager peerManager,
+    public EnvironmentModifyWorkflow( String defaultDomain, NetworkManager networkManager, PeerManager peerManager,
                                       EnvironmentImpl environment, Topology topology, List<String> removedContainers,
                                       TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
                                       boolean forceMetadataRemoval )
@@ -70,7 +67,6 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         super( EnvironmentGrowingPhase.INIT );
 
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.networkManager = networkManager;
         this.environment = environment;
@@ -216,8 +212,8 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager, operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
+                    operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

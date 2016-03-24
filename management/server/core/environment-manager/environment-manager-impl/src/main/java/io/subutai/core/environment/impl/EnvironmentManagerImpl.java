@@ -1491,15 +1491,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             throw new AccessControlException( "You don't have enough permissions to create environment" );
         }
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, securityManager, environment, topology, sshKey, operationTracker );
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, networkManager, peerManager,
+                securityManager, environment, topology, sshKey, operationTracker );
     }
 
 
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
-
         EnvironmentImpl environment =
                 new EnvironmentImpl( topology.getEnvironmentName(), topology.getSubnet(), topology.getSshKey(),
                         getUserId(), peerManager.getLocalPeer().getId() );
@@ -1676,8 +1675,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                          final boolean removeMetaData )
 
     {
-        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager, peerManager,
-                environment, topology, removedContainers, operationTracker, this, removeMetaData );
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, networkManager, peerManager, environment,
+                topology, removedContainers, operationTracker, this, removeMetaData );
     }
 
 

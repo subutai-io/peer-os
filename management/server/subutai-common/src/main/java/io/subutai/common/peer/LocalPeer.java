@@ -15,12 +15,6 @@ import io.subutai.common.task.Task;
 public interface LocalPeer extends Peer
 {
 
-
-    /**
-     * Returns public IP of peer determined by internet service
-     */
-    String getPublicIp() throws PeerException;
-
     Task getTask( Integer id );
 
 
@@ -159,8 +153,6 @@ public interface LocalPeer extends Peer
     int setupContainerSsh( String containerHostId, int sshIdleTimeout ) throws PeerException;
 
     List<ContainerHost> getPeerContainers( String peerId );
-
-//    String getCurrentControlNetwork() throws PeerException;
 
     Host findHostByName( String hostname ) throws HostNotFoundException;
 

@@ -54,7 +54,6 @@ import io.subutai.core.peer.api.PeerManager;
 public class ContainerCloneStep
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ContainerCloneStep.class );
-    private final TemplateManager templateRegistry;
     private final String defaultDomain;
     private final Topology topology;
     private final EnvironmentImpl environment;
@@ -66,12 +65,10 @@ public class ContainerCloneStep
     private PeerManager peerManager;
 
 
-    public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,
-                               final Topology topology, final EnvironmentImpl environment,
+    public ContainerCloneStep( final String defaultDomain, final Topology topology, final EnvironmentImpl environment,
                                final PeerManager peerManager, final EnvironmentManagerImpl environmentManager,
                                final TrackerOperation operationTracker )
     {
-        this.templateRegistry = templateRegistry;
         this.defaultDomain = defaultDomain;
         this.topology = topology;
         this.environment = environment;
@@ -175,8 +172,11 @@ public class ContainerCloneStep
             }
         }
 
-        environment.addContainers( containers );
-        buildRelationChain( environment, containers );
+        if ( !containers.isEmpty() )
+        {
+            environment.addContainers( containers );
+            buildRelationChain( environment, containers );
+        }
     }
 
 

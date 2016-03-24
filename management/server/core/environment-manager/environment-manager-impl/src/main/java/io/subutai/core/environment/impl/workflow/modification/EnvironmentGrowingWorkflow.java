@@ -176,7 +176,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager,
                     environmentManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );

@@ -1401,28 +1401,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return result;
     }
 
-//
-//    @Override
-//    public String getCurrentControlNetwork() throws PeerException
-//    {
-//        try
-//        {
-//            P2PConnections connections = getNetworkManager().getP2PConnections();
-//
-//            P2PConnection connection = connections.findConnectionByHash( P2PUtil.generateHash( getId() ) );
-//
-//            if ( connection != null )
-//            {
-//                return ControlNetworkUtil.extractNetwork( connection.getIp() );
-//            }
-//        }
-//        catch ( NetworkManagerException e )
-//        {
-//            LOG.error( e.getMessage(), e );
-//        }
-//        return null;
-//    }
-
 
     @Override
     public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
@@ -1705,10 +1683,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
 
-            P2PConnection p2PConnection = getNetworkManager()
-                    .getP2PConnectionByHash( getManagementHost(), P2PUtil.generateHash( envVni.getEnvironmentId() ) );
+            P2PConnections p2PConnections = getNetworkManager().getP2PConnections();
 
-            if ( p2PConnection != null )
+            if ( p2PConnections.findConnectionByHash( P2PUtil.generateHash( envVni.getEnvironmentId() ) ) != null )
             {
                 throw new PeerException( "Initial P2P connection is already setup with this hash" );
             }
@@ -1996,39 +1973,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException( "Error retrieving peer tunnels", e );
         }
     }
-
-
-    @Override
-    public String getPublicIp() throws PeerException
-    {
-        BufferedReader in = null;
-        try
-        {
-            URL url = new URL( "http://checkip.amazonaws.com" );
-            in = new BufferedReader( new InputStreamReader( url.openStream() ) );
-            return in.readLine();
-        }
-        catch ( IOException e )
-        {
-            throw new PeerException( "Error getting public IP", e );
-        }
-        finally
-        {
-            if ( in != null )
-            {
-
-                try
-                {
-                    in.close();
-                }
-                catch ( IOException e )
-                {
-                    //ignore
-                }
-            }
-        }
-    }
-
 
     @Override
     public String getExternalIp() throws PeerException

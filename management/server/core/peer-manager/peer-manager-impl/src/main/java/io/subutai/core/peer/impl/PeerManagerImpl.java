@@ -1115,17 +1115,9 @@ public class PeerManagerImpl implements PeerManager
             return;
         }
 
-        try
+        if ( controlNetwork == null )
         {
-            if ( controlNetwork == null )
-            {
-                controlNetwork = localPeer.getCurrentControlNetwork();
-                selectControlNetwork();
-            }
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( e.getMessage(), e );
+            selectControlNetwork();
         }
 
 

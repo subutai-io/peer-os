@@ -15,7 +15,6 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsSte
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -24,7 +23,6 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    private final TemplateManager templateRegistry;
     private final NetworkManager networkManager;
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
@@ -53,16 +51,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationWorkflow( String defaultDomain, TemplateManager templateRegistry,
-                                        EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
-                                        PeerManager peerManager, SecurityManager securityManager,
-                                        EnvironmentImpl environment, Topology topology, String sshKey,
-                                        TrackerOperation operationTracker )
+    public EnvironmentCreationWorkflow( String defaultDomain, EnvironmentManagerImpl environmentManager,
+                                        NetworkManager networkManager, PeerManager peerManager,
+                                        SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
+                                        String sshKey, TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
 
         this.environmentManager = environmentManager;
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.networkManager = networkManager;
@@ -173,8 +169,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager, operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
+                    operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
