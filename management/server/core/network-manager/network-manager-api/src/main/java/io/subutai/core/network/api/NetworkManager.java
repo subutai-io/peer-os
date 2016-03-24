@@ -188,13 +188,6 @@ public interface NetworkManager
     public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
             throws NetworkManagerException;
 
-    /**
-     * Registers containers in /etc/hosts of each other
-     *
-     * @param containers - set of {@code ContainerHost}
-     * @param domainName - domain name e.g. "intra.lan"
-     */
-    public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
 
     /**
      * Returns reverse proxy domain assigned to vlan

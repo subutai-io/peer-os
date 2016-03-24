@@ -28,7 +28,6 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -37,15 +36,12 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.impl.dao.ContainerInfoDataService;
 import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
 import io.subutai.core.registration.impl.dao.RequestDataService;
 import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
@@ -60,23 +56,17 @@ public class RegistrationManagerImpl implements RegistrationManager
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private SecurityManager securityManager;
     private RequestDataService requestDataService;
-    private ContainerInfoDataService containerInfoDataService;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
-    private String domainName;
     private LocalPeer localPeer;
-    private NetworkManager networkManager;
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager,
-                                    final NetworkManager networkManager, final LocalPeer localPeer,
-                                    final String domainName )
+                                    final LocalPeer localPeer )
     {
         this.securityManager = securityManager;
         this.daoManager = daoManager;
-        this.networkManager = networkManager;
         this.localPeer = localPeer;
-        this.domainName = domainName;
     }
 
 
@@ -84,7 +74,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
-        containerInfoDataService = new ContainerInfoDataService( daoManager );
     }
 
 
@@ -254,16 +243,6 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             LOGGER.error( "Error importing host public key", ex );
         }
-    }
-
-
-    private void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
-    {
-        //assume that inside one host group the domain name must be the same for all containers
-        //so pick one container's domain name as the group domain name
-        networkManager.registerHosts( containerHosts, domainName );
-
-        networkManager.exchangeSshKeys( containerHosts, Sets.<String>newHashSet() );
     }
 
 

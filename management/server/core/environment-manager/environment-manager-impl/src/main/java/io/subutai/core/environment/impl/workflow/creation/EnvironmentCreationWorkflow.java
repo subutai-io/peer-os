@@ -195,7 +195,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new RegisterHostsStep( environment, networkManager ).execute();
+            new RegisterHostsStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
