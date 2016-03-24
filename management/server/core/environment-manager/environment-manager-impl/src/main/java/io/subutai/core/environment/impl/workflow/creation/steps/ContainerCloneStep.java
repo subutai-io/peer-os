@@ -134,21 +134,27 @@ public class ContainerCloneStep
 
         //collect results
 
+        boolean succeeded = true;
         for ( int i = 0; i < placement.size(); i++ )
         {
             try
             {
                 Future<CreateEnvironmentContainerResponseCollector> futures = taskCompletionService.take();
                 CreateEnvironmentContainerResponseCollector response = futures.get();
+                succeeded = succeeded && response.hasSucceeded();
                 addLogs( response );
                 processResponse( placement.get( response.getPeerId() ), response );
             }
             catch ( Exception e )
             {
                 LOGGER.error( e.getMessage(), e );
-                throw new EnvironmentCreationException(
-                        String.format( "There were errors during container creation. Unexpected error." ) );
+                succeeded = false;
             }
+        }
+
+        if ( !succeeded )
+        {
+            throw new EnvironmentCreationException( "There were errors during container creation." );
         }
     }
 
