@@ -7,7 +7,6 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.PingDistance;
@@ -142,23 +141,6 @@ public interface NetworkManager
      * Returns all reserved VNIs on management host
      */
     public Vnis getReservedVnis() throws NetworkManagerException;
-
-    /**
-     * Enables passwordless ssh access between containers
-     *
-     * @param containers - set of {@code ContainerHost}
-     * @param additionalSshKeys - set of additional ssh keys to add to each container
-     */
-    public void exchangeSshKeys( Set<ContainerHost> containers, Set<String> additionalSshKeys )
-            throws NetworkManagerException;
-
-    /**
-     * Appends ssh keys to each container
-     *
-     * @param containers - containers
-     * @param sshKeys - ssh keys
-     */
-    public void appendSshKeys( Set<ContainerHost> containers, Set<String> sshKeys ) throws NetworkManagerException;
 
 
     /**
