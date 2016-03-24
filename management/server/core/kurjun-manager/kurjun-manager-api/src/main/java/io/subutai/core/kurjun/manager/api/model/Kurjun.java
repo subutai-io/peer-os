@@ -21,4 +21,12 @@ public interface Kurjun
     String getToken();
 
     void setToken( String token );
+
+    long getId();
+
+    void setId( long id );
+
+    int getType();
+
+    void setType( int type );
 }

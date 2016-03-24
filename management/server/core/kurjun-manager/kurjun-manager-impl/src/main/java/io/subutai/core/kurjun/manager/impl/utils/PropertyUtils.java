@@ -34,7 +34,7 @@ public class PropertyUtils
         }
     }
 
-    public String getValue(String value)
+    public static String getValue(String value)
     {
         return properties.getProperty(value);
     }
