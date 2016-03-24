@@ -272,14 +272,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            new PeerWebClient( peerInfo, provider ).startContainer( containerId );
-        }
-        else
-        {
-            new EnvironmentWebClient( provider ).startContainer( peerInfo, containerId );
-        }
+        new EnvironmentWebClient( provider ).startContainer( peerInfo, containerId );
     }
 
 
@@ -290,14 +283,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            new PeerWebClient( peerInfo, provider ).stopContainer( containerId );
-        }
-        else
-        {
-            new EnvironmentWebClient( provider ).stopContainer( peerInfo, containerId );
-        }
+        new EnvironmentWebClient( provider ).stopContainer( peerInfo, containerId );
     }
 
 
@@ -305,15 +291,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
-
-        if ( containerId.getEnvironmentId() == null )
-        {
-            new PeerWebClient( peerInfo, provider ).destroyContainer( containerId );
-        }
-        else
-        {
-            new EnvironmentWebClient( provider ).destroyContainer( peerInfo, containerId );
-        }
+        new EnvironmentWebClient( provider ).destroyContainer( peerInfo, containerId );
     }
 
 
@@ -394,14 +372,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            return new PeerWebClient( peerInfo, provider ).getState( containerId );
-        }
-        else
-        {
-            return new EnvironmentWebClient( provider ).getState( peerInfo, containerId );
-        }
+        return new EnvironmentWebClient( provider ).getState( peerInfo, containerId );
     }
 
 
@@ -814,12 +785,13 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+            throw new PeerException( e.getMessage() );
         }
     }
 
 
     @Override
-    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek )
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek ) throws PeerException
     {
         Preconditions.checkNotNull( keyId, "Invalid key ID" );
         Preconditions.checkNotNull( pek, "Public key ring is null" );
@@ -832,6 +804,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+            throw new PeerException( e.getMessage() );
         }
     }
 

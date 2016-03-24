@@ -65,8 +65,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error updating local peer info #getLocalPeerInfo", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -96,8 +96,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting template #getTemplate", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -114,8 +114,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting default gateway #setDefaultGateway", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -131,8 +131,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting container host info by id #getContainerHostInfoById", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -148,8 +148,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting containers of environment", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -163,7 +163,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting reserved vnis #getReservedVnis", e );
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -178,7 +178,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting gateways #getGateways", e );
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -193,9 +193,10 @@ public class RestServiceImpl implements RestService
         {
             return localPeer.createPeerEnvironmentKeyPair( environmentId );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            throw new WebApplicationException( ex );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -213,9 +214,10 @@ public class RestServiceImpl implements RestService
             final PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
             localPeer.updatePeerEnvironmentPubKey( new EnvironmentId( publicKeyContainer.getHostId() ), pubKeyRing );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            throw new WebApplicationException( ex );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -229,6 +231,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -244,6 +247,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -258,7 +262,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error reserving vni #reserveVni", e );
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -277,8 +281,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting up tunnels #setupTunnels", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -292,6 +296,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -306,6 +311,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -323,9 +329,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting resource host id by container id #getResourceHostIdByContainerId", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -399,7 +404,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -416,7 +421,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -431,7 +436,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -446,7 +451,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -469,7 +474,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -488,7 +493,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 }

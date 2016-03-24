@@ -323,7 +323,7 @@ public interface Peer
 
     PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
-    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
+    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 
