@@ -15,7 +15,6 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 
 	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
 )
 
 var (
@@ -29,27 +28,30 @@ var (
 	memory      = map[string]bool{"Active": true, "Buffers": true, "Cached": true, "MemFree": true}
 )
 
+var (
+	dbclient client.Client
+	bp       client.BatchPoints
+)
+
 func Collect() {
+	initInfluxdb()
 	for {
-		collectStats()
+		netStat()
+		cgroupStat()
+		btrfsStat()
+		diskFree()
+		cpuStat()
+		memStat()
+		if dbclient.Write(bp) != nil {
+			initInfluxdb()
+		}
 		time.Sleep(time.Second * 30)
 	}
 }
 
-func collectStats() {
-	clnt, bp, err := initInfluxdb()
-	if !log.Check(log.WarnLevel, "Initialization InfluxDB", err) {
-		netStat(clnt, bp)
-		cgroupStat(clnt, bp)
-		btrfsStat(clnt, bp)
-		diskFree(clnt, bp)
-		cpuStat(clnt, bp)
-		memStat(clnt, bp)
-	}
-}
-
-func initInfluxdb() (clnt client.Client, bp client.BatchPoints, err error) {
-	clnt, err = client.NewHTTPClient(client.HTTPConfig{
+func initInfluxdb() {
+	var err error
+	dbclient, err = client.NewHTTPClient(client.HTTPConfig{
 		Addr:               "https://" + config.Influxdb.Server + ":8086",
 		Username:           config.Influxdb.User,
 		Password:           config.Influxdb.Pass,
@@ -65,7 +67,7 @@ func initInfluxdb() (clnt client.Client, bp client.BatchPoints, err error) {
 	return
 }
 
-func parsefile(hostname, lxc, cgtype, filename string, clnt client.Client, bp client.BatchPoints) {
+func parsefile(hostname, lxc, cgtype, filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return
@@ -89,17 +91,17 @@ func parsefile(hostname, lxc, cgtype, filename string, clnt client.Client, bp cl
 			bp.AddPoint(point)
 		}
 	}
-	clnt.Write(bp)
+
 }
 
-func cgroupStat(clnt client.Client, bp client.BatchPoints) {
+func cgroupStat() {
 	hostname, _ := os.Hostname()
 	for _, item := range cgtype {
 		path := "/sys/fs/cgroup/" + item + "/lxc/"
 		files, _ := ioutil.ReadDir(path)
 		for _, f := range files {
 			if f.IsDir() {
-				parsefile(hostname, f.Name(), item, path+f.Name()+"/"+item+".stat", clnt, bp)
+				parsefile(hostname, f.Name(), item, path+f.Name()+"/"+item+".stat")
 			}
 		}
 	}
@@ -143,7 +145,7 @@ func lxclist() map[string]string {
 	return list
 }
 
-func netStat(clnt client.Client, bp client.BatchPoints) {
+func netStat() {
 	lxcnic = lxclist()
 	file, err := os.Open("/proc/net/dev")
 	if err != nil {
@@ -175,10 +177,9 @@ func netStat(clnt client.Client, bp client.BatchPoints) {
 			}
 		}
 	}
-	clnt.Write(bp)
 }
 
-func btrfsStat(clnt client.Client, bp client.BatchPoints) {
+func btrfsStat() {
 	list := make(map[string]string)
 	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
@@ -200,10 +201,9 @@ func btrfsStat(clnt client.Client, bp client.BatchPoints) {
 			bp.AddPoint(point)
 		}
 	}
-	clnt.Write(bp)
 }
 
-func diskFree(clnt client.Client, bp client.BatchPoints) {
+func diskFree() {
 	hostname, _ := os.Hostname()
 	out, _ := exec.Command("df", "-B1").Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
@@ -220,10 +220,9 @@ func diskFree(clnt client.Client, bp client.BatchPoints) {
 			}
 		}
 	}
-	clnt.Write(bp)
 }
 
-func memStat(clnt client.Client, bp client.BatchPoints) {
+func memStat() {
 	hostname, _ := os.Hostname()
 	file, err := os.Open("/proc/meminfo")
 	if err != nil {
@@ -242,10 +241,9 @@ func memStat(clnt client.Client, bp client.BatchPoints) {
 			bp.AddPoint(point)
 		}
 	}
-	clnt.Write(bp)
 }
 
-func cpuStat(clnt client.Client, bp client.BatchPoints) {
+func cpuStat() {
 	hostname, _ := os.Hostname()
 	file, err := os.Open("/proc/stat")
 	if err != nil {
@@ -266,5 +264,4 @@ func cpuStat(clnt client.Client, bp client.BatchPoints) {
 			}
 		}
 	}
-	clnt.Write(bp)
 }
