@@ -2,15 +2,12 @@ package io.subutai.core.network.impl;
 
 
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.settings.Common;
 
 
 /**
@@ -21,14 +18,11 @@ public class Commands
 {
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
     private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
-    private static final String SSH_FOLDER = "/root/.ssh";
-    private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
-    public RequestBuilder getP2PConnectionsCommand( String p2pHash )
+    public RequestBuilder getP2PConnectionsCommand()
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-p", Strings.isNullOrEmpty( p2pHash ) ? "" : p2pHash ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "p2p", "-p" ) );
     }
 
 
@@ -159,70 +153,9 @@ public class Commands
     }
 
 
-    // ssh and hosts
-
-
-    public RequestBuilder getCreateNReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "rm -rf %1$s && " +
-                "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa && " + "cat %1$s/id_dsa.pub", SSH_FOLDER ) );
-    }
-
-
-    public RequestBuilder getCreateNewAuthKeysFileCommand( String keys )
-    {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && " +
-                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, keys ) );
-    }
-
-
-    public RequestBuilder getConfigSSHCommand()
-    {
-        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
-                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
-                "chmod 644 %1$s/config", SSH_FOLDER ) );
-    }
-
-
     public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
     {
         return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
-    }
-
-
-    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-
-        for ( ContainerHost host : containerHosts )
-        {
-            String ip = host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
-            String hostname = host.getHostname();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( domainName ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
-        }
-
-        if ( cleanHosts.length() > 0 )
-        {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
-        }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
-
-        return new RequestBuilder( appendHosts.toString() );
     }
 
 

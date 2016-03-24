@@ -36,7 +36,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -92,8 +91,7 @@ public class NetworkManagerImplTest
     Commands commands;
     @Mock
     RequestBuilder requestBuilder;
-    @Mock
-    SshManager sshManager;
+
 
     private NetworkManagerImpl spyNetworkManager;
 
@@ -117,7 +115,6 @@ public class NetworkManagerImplTest
         when( commandResult.hasSucceeded() ).thenReturn( true );
         containers = Sets.newHashSet( containerHost );
         spyNetworkManager = spy( networkManager );
-        doReturn( sshManager ).when( spyNetworkManager ).getSshManager( containers );
     }
 
 
@@ -283,22 +280,5 @@ public class NetworkManagerImplTest
         Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings();
 
         assertTrue( mappings.contains( new VniVlanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID ) ) );
-    }
-
-
-    @Test
-    public void testExchangeSshKeys() throws Exception
-    {
-        spyNetworkManager.exchangeSshKeys( containers, Sets.<String>newHashSet() );
-
-        verify( sshManager ).execute( Sets.<String>newHashSet(), false );
-    }
-
-
-    @Test
-    public void testGetSshManager() throws Exception
-    {
-
-        assertNotNull( networkManager.getSshManager( containers ) );
     }
 }

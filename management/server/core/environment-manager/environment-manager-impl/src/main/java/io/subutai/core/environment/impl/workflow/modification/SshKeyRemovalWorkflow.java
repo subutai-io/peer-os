@@ -11,7 +11,6 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.RemoveSshKeyStep;
-import io.subutai.core.network.api.NetworkManager;
 
 
 public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKeyAdditionPhase>
@@ -20,7 +19,6 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
 
     private EnvironmentImpl environment;
     private final String sshKey;
-    private final NetworkManager networkManager;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
@@ -34,14 +32,13 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
 
 
     public SshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
-                                  final NetworkManager networkManager, final TrackerOperation operationTracker,
+                                  final TrackerOperation operationTracker,
                                   final EnvironmentManagerImpl environmentManager )
     {
         super( SshKeyAdditionPhase.INIT );
 
         this.environment = environment;
         this.sshKey = sshKey;
-        this.networkManager = networkManager;
         this.operationTracker = operationTracker;
         this.environmentManager = environmentManager;
     }

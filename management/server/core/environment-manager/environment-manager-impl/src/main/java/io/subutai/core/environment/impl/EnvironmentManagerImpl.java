@@ -90,7 +90,6 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -117,7 +116,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
     private final PeerManager peerManager;
-    private final NetworkManager networkManager;
     private final Tracker tracker;
     private final TemplateManager templateRegistry;
     private final DaoManager daoManager;
@@ -133,13 +131,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
-                                   SecurityManager securityManager, final NetworkManager networkManager,
-                                   final DaoManager daoManager, final IdentityManager identityManager,
-                                   final Tracker tracker, final RelationManager relationManager )
+                                   SecurityManager securityManager, final DaoManager daoManager,
+                                   final IdentityManager identityManager, final Tracker tracker,
+                                   final RelationManager relationManager )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
@@ -149,7 +146,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
-        this.networkManager = networkManager;
         this.daoManager = daoManager;
         this.identityManager = identityManager;
         this.relationManager = relationManager;
@@ -808,8 +804,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
 
-        final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
-                getSshKeyAdditionWorkflow( environment, sshKey, networkManager, op );
+        final SshKeyAdditionWorkflow sshKeyAdditionWorkflow = getSshKeyAdditionWorkflow( environment, sshKey, op );
 
         executor.execute( new Runnable()
         {
@@ -852,8 +847,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
 
-        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
-                getSshKeyRemovalWorkflow( environment, sshKey, networkManager, op );
+        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow = getSshKeyRemovalWorkflow( environment, sshKey, op );
 
         executor.execute( new Runnable()
         {
@@ -935,18 +929,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     protected SshKeyAdditionWorkflow getSshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
-                                                                final NetworkManager networkManager,
+
                                                                 final TrackerOperation operationTracker )
     {
-        return new SshKeyAdditionWorkflow( environment, sshKey, networkManager, operationTracker, this );
+        return new SshKeyAdditionWorkflow( environment, sshKey, operationTracker, this );
     }
 
 
     protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
-                                                              final NetworkManager networkManager,
+
                                                               final TrackerOperation operationTracker )
     {
-        return new SshKeyRemovalWorkflow( environment, sshKey, networkManager, operationTracker, this );
+        return new SshKeyRemovalWorkflow( environment, sshKey, operationTracker, this );
     }
 
 
@@ -1491,8 +1485,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             throw new AccessControlException( "You don't have enough permissions to create environment" );
         }
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, networkManager,
-                peerManager, securityManager, environment, topology, sshKey, operationTracker );
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, peerManager,
+                securityManager, environment, topology, sshKey, operationTracker );
     }
 
 
@@ -1664,8 +1658,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                         final Topology topology,
                                                                         final TrackerOperation operationTracker )
     {
-        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager,
-                peerManager, environment, topology, operationTracker, this );
+        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, peerManager, environment,
+                topology, operationTracker, this );
     }
 
 
@@ -1676,8 +1670,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                          final boolean removeMetaData )
 
     {
-        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, networkManager, peerManager,
-                environment, topology, removedContainers, operationTracker, this, removeMetaData );
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, peerManager, environment,
+                topology, removedContainers, operationTracker, this, removeMetaData );
     }
 
 
