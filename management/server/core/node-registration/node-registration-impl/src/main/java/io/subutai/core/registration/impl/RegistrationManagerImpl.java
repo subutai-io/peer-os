@@ -341,15 +341,24 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         try
         {
-            if ( requestedHost.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+            if ( requestedHost.getStatus() == RegistrationStatus.REQUESTED && containsManagementContainer(
+                    requestedHost.getHostInfos() ) )
             {
-                for ( HostInfo info : requestedHost.getHostInfos() )
+                boolean managementAlreadyApproved = false;
+
+                for ( RequestedHostImpl requestedHostImpl : requestDataService.getAll() )
                 {
-                    if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( info.getHostname() ) )
+                    if ( requestedHostImpl.getStatus() == RegistrationStatus.APPROVED && containsManagementContainer(
+                            requestedHostImpl.getHostInfos() ) )
                     {
-                        approveRequest( requestedHost.getId() );
+                        managementAlreadyApproved = true;
                         break;
                     }
+                }
+
+                if ( !managementAlreadyApproved )
+                {
+                    approveRequest( requestedHost.getId() );
                 }
             }
         }
@@ -357,5 +366,19 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             // ignore
         }
+    }
+
+
+    private boolean containsManagementContainer( Set<ContainerInfo> containers )
+    {
+        for ( HostInfo hostInfo : containers )
+        {
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostInfo.getHostname() ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
