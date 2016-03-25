@@ -54,6 +54,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;
+import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
@@ -144,6 +145,7 @@ public class HubEnvironmentManager
         Set<String> gatewayDtos = new HashSet<>();
         try
         {
+
             Gateways gateways = peerManager.getLocalPeer().getGateways();
             for ( Gateway gateway : gateways.list() )
             {
@@ -229,7 +231,6 @@ public class HubEnvironmentManager
             final Future<P2PConfig> f = p2pCompletionService.take();
             P2PConfig createdConfig = f.get();
             p2pExecutor.shutdown();
-
             peerDto.setTunnelAddress( createdConfig.getAddress() );
             peerDto.setCommunityName( createdConfig.getHash() );
             peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
@@ -238,28 +239,30 @@ public class HubEnvironmentManager
         {
             LOG.error( "Problems setting up p2p connection", e );
         }
-        try
-        {
-            ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
-
-            ExecutorCompletionService<Integer> tunnelCompletionService =
-                    new ExecutorCompletionService<Integer>( tunnelExecutor );
-
-            Map<String, String> tunnel = new HashMap<>();
-            tunnel.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
-            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, env.getId(), tunnel ) );
-
-            final Future<Integer> fTunnel = tunnelCompletionService.take();
-            fTunnel.get();
-
-            tunnelExecutor.shutdown();
-        }
-        catch ( ExecutionException | InterruptedException e )
-        {
-            LOG.error( "Problems setting up tunnels", e );
-        }
-
         return peerDto;
+    }
+
+
+    public void setupTunnel( EnvironmentDto environmentDto ) throws InterruptedException, ExecutionException
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        Map<String, String> tunnels = new HashMap<>();
+
+        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
+        {
+            tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
+        }
+
+        ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Integer> tunnelCompletionService =
+                new ExecutorCompletionService<Integer>( tunnelExecutor );
+
+        tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), tunnels ) );
+
+        final Future<Integer> f = tunnelCompletionService.take();
+        f.get();
+
+        tunnelExecutor.shutdown();
     }
 
 
@@ -369,7 +372,7 @@ public class HubEnvironmentManager
         @Override
         public P2PConfig call() throws Exception
         {
-            peer.setupP2PConnection( p2PConfig );
+            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
             return p2PConfig;
         }
     }

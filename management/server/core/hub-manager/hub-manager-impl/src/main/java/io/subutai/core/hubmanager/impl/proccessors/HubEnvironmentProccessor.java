@@ -6,6 +6,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,7 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
@@ -103,6 +105,12 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 case EXCHANGE_INFO:
                     infoExchange( peerDto );
                     break;
+                case SETUP_P2P:
+                    setupP2P( peerDto );
+                    break;
+                case SETUP_TUNNEL:
+                    setupTunnel( peerDto );
+                    break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
                     break;
@@ -167,20 +175,57 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
+    private void setupP2P( EnvironmentPeerDto peerDto )
+    {
+        LOG.debug( "env_via_hub: Setup VNI..." );
+        hubEnvironmentManager.setupVNI( peerDto );
+
+        LOG.debug( "env_via_hub: Setup P2P..." );
+        peerDto = hubEnvironmentManager.setupP2P( peerDto );
+
+        updateEnvironmentPeerData( peerDto );
+    }
+
+
+    private void setupTunnel( EnvironmentPeerDto peerDto )
+    {
+        String containerDataURL =
+                String.format( "/rest/v1/environments/%s/setup-tunnel", peerDto.getEnvironmentInfo().getId() );
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
+            Response r = client.get();
+            byte[] encryptedContent = configManager.readContent( r );
+            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
+
+            LOG.debug( "env_via_hub: Setup tunnel..." );
+            try
+            {
+                hubEnvironmentManager.setupTunnel( environmentDto );
+                peerDto.setSetupTunnel( true );
+            }
+            catch ( ExecutionException | InterruptedException e )
+            {
+                LOG.error( "Problems setting up tunnel", e );
+                peerDto.setSetupTunnel( false );
+            }
+            updateEnvironmentPeerData( peerDto );
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            LOG.error( "Could not get environment data from Hub.", e.getMessage() );
+        }
+    }
+
+
     private void buildContainers( EnvironmentPeerDto peerDto )
     {
         String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow",
                 peerDto.getEnvironmentInfo().getId() );
         try
         {
-            LOG.debug( "env_via_hub: Setup VNI..." );
-            hubEnvironmentManager.setupVNI( peerDto );
-
-            LOG.debug( "env_via_hub: Setup P2P..." );
-            peerDto = hubEnvironmentManager.setupP2P( peerDto );
-
-            updateEnvironmentPeerData( peerDto );
-
             WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
