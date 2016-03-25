@@ -35,11 +35,11 @@ public class RegisterSshStep
 
     public void execute( Set<String> userKeys ) throws EnvironmentManagerException
     {
-        Set<Host> ch = Sets.newHashSet();
-        ch.addAll( environment.getContainerHosts() );
-        if ( ch.size() > 1 )
+        Set<Host> hosts = Sets.newHashSet();
+        hosts.addAll( environment.getContainerHosts() );
+        if ( hosts.size() > 1 )
         {
-            exchangeSshKeys( ch, userKeys );
+            exchangeSshKeys( hosts, userKeys );
         }
     }
 
@@ -189,9 +189,9 @@ public class RegisterSshStep
     public RequestBuilder getCreateNReadSSHCommand()
     {
         return new RequestBuilder( String.format( "rm -rf %1$s && " +
-                "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                        "mkdir -p %1$s && " +
+                        "chmod 700 %1$s && " +
+                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
                 Common.CONTAINER_SSH_FOLDER ) );
     }
 
