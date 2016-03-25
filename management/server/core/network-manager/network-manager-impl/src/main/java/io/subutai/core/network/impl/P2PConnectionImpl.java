@@ -4,43 +4,35 @@ package io.subutai.core.network.impl;
 import io.subutai.common.protocol.P2PConnection;
 
 
-/**
- * P2PConnection implementation
- */
 public class P2PConnectionImpl implements P2PConnection
 {
+    private String mac;
+    private String ip;
+    private String hash;
 
-    private final String interfaceName;
-    private final String localIp;
-    private final String communityName;
 
-
-    public P2PConnectionImpl( final String interfaceName, final String localIp, final String communityName )
+    public P2PConnectionImpl( final String mac, final String ip, final String hash )
     {
-        this.localIp = localIp;
-
-        this.interfaceName = interfaceName;
-        this.communityName = communityName;
+        this.mac = mac;
+        this.ip = ip;
+        this.hash = hash;
     }
 
 
-    @Override
-    public String getLocalIp()
+    public String getMac()
     {
-        return localIp;
+        return mac;
     }
 
 
-    @Override
-    public String getInterfaceName()
+    public String getIp()
     {
-        return interfaceName;
+        return ip;
     }
 
 
-    @Override
-    public String getCommunityName()
+    public String getHash()
     {
-        return communityName;
+        return hash;
     }
 }

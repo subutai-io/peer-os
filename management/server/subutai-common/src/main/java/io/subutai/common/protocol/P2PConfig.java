@@ -11,10 +11,8 @@ public class P2PConfig
 {
     @JsonProperty( "peerId" )
     private String peerId;
-    @JsonProperty( "interfaceName" )
-    private String interfaceName;
-    @JsonProperty( "communityName" )
-    private String communityName;
+    @JsonProperty( "hash" )
+    private String hash;
     @JsonProperty( "address" )
     private String address;
     @JsonProperty( "secretKey" )
@@ -27,16 +25,14 @@ public class P2PConfig
 
     public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
                       @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "interfaceName" ) final String interfaceName,
-                      @JsonProperty( "communityName" ) final String communityName,
+                      @JsonProperty( "hash" ) final String hash,
                       @JsonProperty( "address" ) final String address,
                       @JsonProperty( "secretKey" ) final String secretKey,
                       @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
-        this.interfaceName = interfaceName;
-        this.communityName = communityName;
+        this.hash = hash;
         this.address = address;
         this.secretKey = secretKey;
         this.secretKeyTtlSec = secretKeyTtlSec;
@@ -61,21 +57,9 @@ public class P2PConfig
     }
 
 
-    public String getInterfaceName()
+    public String getHash()
     {
-        return interfaceName;
-    }
-
-
-    public void setInterfaceName( final String interfaceName )
-    {
-        this.interfaceName = interfaceName;
-    }
-
-
-    public String getCommunityName()
-    {
-        return communityName;
+        return hash;
     }
 
 
@@ -94,6 +78,12 @@ public class P2PConfig
     public String getSecretKey()
     {
         return secretKey;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
     }
 
 
@@ -119,11 +109,5 @@ public class P2PConfig
     public int hashCode()
     {
         return address.hashCode();
-    }
-
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
     }
 }

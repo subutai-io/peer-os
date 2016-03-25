@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -20,7 +19,6 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -109,10 +107,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
 
-    @DELETE
-    @Path( "network/{environmentId}" )
-    void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
-
     @GET
     @Path( "container/info" )
     Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
@@ -141,15 +135,20 @@ public interface RestService
 
     @POST
     @Path( "p2ptunnel" )
-    @Produces( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.TEXT_PLAIN )
     @Consumes( MediaType.APPLICATION_JSON )
-    void setupP2PConnection( P2PConfig config );
+    Response setupP2PConnection( P2PConfig config );
+
+    @POST
+    @Path( "p2pinitial" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response setupInitialP2PConnection( P2PConfig config );
 
     @DELETE
-    @Path( "p2ptunnel/{environmentId}" )
+    @Path( "p2ptunnel/{p2pHash}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    void removeP2PConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    void removeP2PConnection( @PathParam( "p2pHash" ) String p2pHash );
 
     @DELETE
     @Path( "cleanup/{environmentId}" )
@@ -190,11 +189,11 @@ public interface RestService
     Response updateControlNetworkConfig( ControlNetworkConfig config );
 
     @GET
-    @Path( "control/{communityName}/{count}/distance/" )
+    @Path( "control/{p2pHash}/{count}/distance/" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getCommunityDistances( @PathParam( "communityName" ) final String communityName,
-                                    @PathParam( "count" ) final Integer count );
+    Response getP2PSwarmDistances( @PathParam( "p2pHash" ) final String p2pHash,
+                                   @PathParam( "count" ) final Integer count );
 
 
     @GET

@@ -1,10 +1,8 @@
 package io.subutai.core.hubmanager.impl.proccessors;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -20,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -95,7 +92,7 @@ public class ProductProccessor implements StateLinkProccessor
                 return result;
             }
 
-            byte[] encryptedContent = readContent( r );
+            byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
 
             result = JsonUtil.fromCbor( plainContent, PeerProductDataDto.class );
@@ -232,7 +229,7 @@ public class ProductProccessor implements StateLinkProccessor
                 return result;
             }
 
-            byte[] encryptedContent = readContent( r );
+            byte[] encryptedContent = configManager.readContent( r );
 
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             result = JsonUtil.fromCbor( plainContent, ProductDto.class );
@@ -274,18 +271,5 @@ public class ProductProccessor implements StateLinkProccessor
     }
 
 
-    private byte[] readContent( Response response ) throws IOException
-    {
-        if ( response.getEntity() == null )
-        {
-            return null;
-        }
 
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        InputStream is = ( ( InputStream ) response.getEntity() );
-
-        IOUtils.copy( is, bos );
-        return bos.toByteArray();
-    }
 }

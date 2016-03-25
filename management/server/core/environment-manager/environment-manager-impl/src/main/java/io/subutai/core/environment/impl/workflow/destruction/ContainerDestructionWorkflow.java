@@ -13,7 +13,7 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
 
-
+//todo use native fail for failing the workflow
 public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
 {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerDestructionWorkflow.class );

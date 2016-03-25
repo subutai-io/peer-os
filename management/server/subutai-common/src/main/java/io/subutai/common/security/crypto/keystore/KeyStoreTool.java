@@ -137,7 +137,7 @@ public class KeyStoreTool
         {
             if ( !keyStoreData.getKeyStoreType().isFileBased() )
             {
-                LOGGER.error( "NoCreateKeyStoreNotFile.exception.message" );
+                LOGGER.error( "Keystore is not file-based" );
             }
             else
             {
@@ -148,7 +148,7 @@ public class KeyStoreTool
         }
         catch ( IOException | KeyStoreException | CertificateException | NoSuchAlgorithmException ex )
         {
-            LOGGER.error( "NoSaveKeyStore.exception.message", ex );
+            LOGGER.error( "Error saving keystore", ex );
         }
         finally
         {
@@ -198,8 +198,8 @@ public class KeyStoreTool
      * @param x509Cert X509Certificate
      * @param keyPair KeyPair
      */
-    public void saveX509Certificate( KeyStore keyStore, KeyStoreData keyStoreData, X509Certificate x509Cert,
-                                     KeyPair keyPair )
+    public void addNSaveX509Certificate( KeyStore keyStore, KeyStoreData keyStoreData, X509Certificate x509Cert,
+                                         KeyPair keyPair )
     {
         try
         {

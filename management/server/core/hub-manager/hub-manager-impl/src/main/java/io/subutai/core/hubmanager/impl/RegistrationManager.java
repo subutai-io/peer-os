@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.model.Config;
@@ -93,7 +94,8 @@ public class RegistrationManager
 
             KeyStore keyStore = KeyStore.getInstance( "JKS" );
 
-            keyStore.load( new FileInputStream( ConfigManager.PEER_KEYSTORE ), "subutai".toCharArray() );
+            keyStore.load( new FileInputStream( ConfigManager.PEER_KEYSTORE ),
+                    SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
 
             WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
@@ -143,6 +145,7 @@ public class RegistrationManager
                 Config config = new ConfigEntity();
                 config.setHubIp( hubIp );
                 config.setPeerId( configManager.getPeerId() );
+                config.setOwnerId( manager.getPeerInfo().get( "OwnerId" ) );
 
                 manager.getConfigDataService().saveHubConfig( config );
                 LOG.debug( "Hub configuration saved successfully." );

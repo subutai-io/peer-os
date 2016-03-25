@@ -13,14 +13,27 @@ import (
 	"time"
 
 	"github.com/subutai-io/base/agent/config"
+	lxcContainer "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/fs"
 	"github.com/subutai-io/base/agent/lib/template"
 	"github.com/subutai-io/base/agent/log"
 )
 
-func BackupContainer(container string, full bool) {
+func BackupContainer(container string, full, stop bool) {
 	const backupDir = "/mnt/backups/"
 	var changelog []string
+
+	if !lxcContainer.IsContainer(container) {
+		log.Fatal("Container " + container + " not found!")
+	}
+
+	if _, err := os.Stat(config.Agent.LxcPrefix + container + "/.backup"); err == nil {
+		log.Fatal("Backup of container " + container + " already running")
+	} else {
+		f, err := os.Create(config.Agent.LxcPrefix + container + "/.backup")
+		log.Check(log.WarnLevel, "Creating .backup file to "+container+" container", err)
+		defer f.Close()
+	}
 
 	currentDT := strconv.Itoa(int(time.Now().Unix()))
 	if full {
@@ -54,6 +67,15 @@ func BackupContainer(container string, full bool) {
 
 	tarballName := backupDir + container + "_" + currentDT + ".tar.gz"
 	changelogName := backupDir + container + "_" + currentDT + "_changelog.txt"
+
+	if stop {
+		switch lxcContainer.State(container) {
+		case "STOPPED":
+			stop = false
+		case "RUNNING":
+			lxcContainer.Stop(container)
+		}
+	}
 
 	for _, subvol := range GetContainerMountPoints(container) {
 		subvolBase := path.Base(subvol)
@@ -90,9 +112,14 @@ func BackupContainer(container string, full bool) {
 	log.Check(log.FatalLevel, "Create Changelog file on tmpdir",
 		ioutil.WriteFile(changelogName, []byte(strings.Join(changelog, "\n")), 0644))
 
+	if stop {
+		lxcContainer.Start(container)
+	}
+
 	template.Tar(tmpBackupDir, tarballName)
 
-	log.Check(log.FatalLevel, "Remove tmpdir", os.RemoveAll(backupDir+"/tmpdir"))
+	log.Check(log.WarnLevel, "Remove tmpdir", os.RemoveAll(backupDir+"/tmpdir"))
+	log.Check(log.WarnLevel, "Deleting .backup file to "+container+" container", os.Remove(config.Agent.LxcPrefix+container+"/.backup"))
 }
 
 func GetContainerMountPoints(container string) []string {

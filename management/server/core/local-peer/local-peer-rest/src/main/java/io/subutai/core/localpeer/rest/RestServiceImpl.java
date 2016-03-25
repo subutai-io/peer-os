@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Collection;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ import com.google.common.base.Strings;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -67,8 +65,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error updating local peer info #getLocalPeerInfo", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -98,8 +96,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting template #getTemplate", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -116,8 +114,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting default gateway #setDefaultGateway", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -133,8 +131,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting container host info by id #getContainerHostInfoById", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -150,8 +148,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting containers of environment", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -165,7 +163,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting reserved vnis #getReservedVnis", e );
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -180,7 +178,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting gateways #getGateways", e );
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -195,9 +193,10 @@ public class RestServiceImpl implements RestService
         {
             return localPeer.createPeerEnvironmentKeyPair( environmentId );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            throw new WebApplicationException( ex );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -215,9 +214,10 @@ public class RestServiceImpl implements RestService
             final PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
             localPeer.updatePeerEnvironmentPubKey( new EnvironmentId( publicKeyContainer.getHostId() ), pubKeyRing );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            throw new WebApplicationException( ex );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -231,6 +231,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -246,6 +247,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -260,7 +262,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error reserving vni #reserveVni", e );
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -279,8 +281,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting up tunnels #setupTunnels", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -294,6 +296,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -308,6 +311,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -325,9 +329,8 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting resource host id by container id #getResourceHostIdByContainerId", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -347,11 +350,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void setupP2PConnection( final P2PConfig config )
+    public Response setupP2PConnection( final P2PConfig config )
     {
         try
         {
-            localPeer.setupP2PConnection( config );
+            String mhP2pIP = localPeer.setupP2PConnection( config );
+            return Response.ok( mhP2pIP ).build();
         }
         catch ( Exception e )
         {
@@ -361,11 +365,26 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void removeP2PConnection( final EnvironmentId environmentId )
+    public Response setupInitialP2PConnection( final P2PConfig config )
     {
         try
         {
-            localPeer.removeP2PConnection( environmentId );
+            localPeer.setupInitialP2PConnection( config );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
+    public void removeP2PConnection( final String p2pHash )
+    {
+        try
+        {
+            localPeer.removeP2PConnection( p2pHash );
         }
         catch ( Exception e )
         {
@@ -389,20 +408,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void cleanupNetwork( final EnvironmentId environmentId )
-    {
-        try
-        {
-            localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-        }
-        catch ( Exception e )
-        {
-            throw new WebApplicationException( e );
-        }
-    }
-
-
-    @Override
     public Response putAlert( final AlertEvent alertEvent )
     {
         try
@@ -414,7 +419,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -431,7 +436,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -446,7 +451,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -461,7 +466,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
@@ -472,7 +477,7 @@ public class RestServiceImpl implements RestService
 
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getAddress() );
-        Preconditions.checkNotNull( config.getCommunityName() );
+        Preconditions.checkNotNull( config.getP2pHash() );
         Preconditions.checkNotNull( config.getPeerId() );
         Preconditions.checkNotNull( config.getSecretKey() );
         Preconditions.checkArgument( config.getSecretKeyTtlSec() > 0 );
@@ -484,26 +489,26 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 
 
     @Override
-    public Response getCommunityDistances( final String communityName, final Integer count )
+    public Response getP2PSwarmDistances( final String p2pHash, final Integer count )
     {
 
-        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( p2pHash );
         Preconditions.checkNotNull( count );
 
         try
         {
-            return Response.ok( localPeer.getCommunityDistances( communityName, count ) ).build();
+            return Response.ok( localPeer.getP2PSwarmDistances( p2pHash, count ) ).build();
         }
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            return Response.serverError().build();
+            throw new WebApplicationException( e );
         }
     }
 }

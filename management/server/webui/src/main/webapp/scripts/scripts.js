@@ -30,6 +30,13 @@ $(document).on('click', function(event) {
 	}
 });
 
+$(document).keyup(function(e) {
+	if (e.keyCode == 27) {
+		$('.b-hub-status__dropdown').slideUp(100);
+		$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+	}
+});
+
 $(".b-form-input-dropdown-list").click(function(e) {
 	e.stopPropagation();
 });

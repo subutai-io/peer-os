@@ -134,7 +134,7 @@ public class RegistrationClientImpl implements RegistrationClient
             Response response = client.post( registrationData );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+                throw new PeerException( response.readEntity( String.class ) );
             }
         }
         catch ( Exception e )

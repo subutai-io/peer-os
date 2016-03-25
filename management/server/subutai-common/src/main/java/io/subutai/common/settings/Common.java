@@ -37,7 +37,7 @@ public class Common
     public static final String MANAGEMENT_HOSTNAME = "management";
     public static final String GIT_REPO_URL = "git@gw.intra.lan:/opt/git/project.git";
     public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
-    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 60 * 60;
+    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 90 * 60;// 1.5 hour
     public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";
@@ -47,4 +47,7 @@ public class Common
     public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10;
     public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15;
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
+
+    public static final String CONTAINER_SSH_FOLDER = "/root/.ssh";
+    public static final String CONTAINER_SSH_FILE = String.format( "%s/authorized_keys", CONTAINER_SSH_FOLDER );
 }

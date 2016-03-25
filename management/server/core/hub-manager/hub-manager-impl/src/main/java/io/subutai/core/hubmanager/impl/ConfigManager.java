@@ -1,8 +1,10 @@
 package io.subutai.core.hubmanager.impl;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -10,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
@@ -19,6 +23,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.security.crypto.certificate.CertificateData;
@@ -30,6 +35,7 @@ import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.peer.api.PeerManager;
@@ -44,19 +50,7 @@ public class ConfigManager
 
     public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/h.public.gpg";
     public static final String PEER_KEYSTORE = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.jks";
-    public static final String PEER_SECRET_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.secret.key";
-
-
-    public SecurityManager getSecurityManager()
-    {
-        return securityManager;
-    }
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
-    }
+    private static final String PEER_CERT_ALIAS = "peer_cert";
 
 
     private SecurityManager securityManager;
@@ -73,94 +67,78 @@ public class ConfigManager
     private String hubIp;
 
 
-    public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager, final
-    ConfigDataService configDataService )
+    public SecurityManager getSecurityManager()
+    {
+        return securityManager;
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager,
+                          final ConfigDataService configDataService )
             throws IOException, PGPException, KeyStoreException, CertificateException, NoSuchAlgorithmException
     {
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.configDataService = configDataService;
 
-        if ( sender == null )
-        {
-            PGPSecretKeyRing signingKeyRing = PGPKeyUtil.readSecretKeyRing( new FileInputStream( PEER_SECRET_KEY ) );
-            PGPSecretKey signingKey = signingKeyRing.getSecretKey();
-            this.sender = PGPEncryptionUtil.getPrivateKey( signingKey, SystemSettings.getPeerSecretKeyringPwd() );
-        }
+        this.sender = securityManager.getKeyManager().getPrivateKey( null );
 
-        if ( peerId == null )
-        {
-            this.peerId = peerManager.getLocalPeer().getId();
-            LOG.debug( "Getting peer id: " + peerId );
-        }
+        this.peerId = peerManager.getLocalPeer().getId();
 
-        if ( hPublicKey == null )
-        {
-            this.hPublicKey = PGPKeyHelper.readPublicKey( H_PUB_KEY );
-            LOG.debug( "Getting hPublicKey from keystores folder: " + hPublicKey.toString() );
-        }
+        this.hPublicKey = PGPKeyHelper.readPublicKey( H_PUB_KEY );
+        LOG.debug( "Getting hPublicKey from keystores folder: " + hPublicKey.toString() );
 
-        if ( ownerPublicKey == null )
-        {
-            this.ownerPublicKey =
-                    securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
-                                   .getPublicKey();
-        }
+        this.ownerPublicKey =
+                securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
+                               .getPublicKey();
 
-        if ( peerPublicKey == null )
-        {
-            this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
-        }
+        this.peerPublicKey = securityManager.getKeyManager().getPublicKey( null );
 
-        if ( keyStore == null )
-        {
-            generateX509Certificate();
-            this.keyStore = KeyStore.getInstance( "JKS" );
-            this.keyStore.load( new FileInputStream( PEER_KEYSTORE ), "subutai".toCharArray() );
-        }
+        this.messenger = new PGPMessenger( sender, hPublicKey );
 
-        if ( messenger == null )
-        {
-            this.messenger = new PGPMessenger( sender, hPublicKey );
-        }
+        this.keyStore = loadKeyStore();
     }
 
 
-    private void generateX509Certificate()
+    private KeyStore loadKeyStore() throws KeyStoreException
     {
-        try
+        KeyStoreData keyStoreData = new KeyStoreData();
+        keyStoreData.setKeyStoreFile( PEER_KEYSTORE );
+        keyStoreData.setAlias( PEER_CERT_ALIAS );
+        keyStoreData.setPassword( SecuritySettings.KEYSTORE_PX1_PSW );
+        keyStoreData.setKeyStoreType( KeyStoreType.JKS );
+
+        KeyStoreTool keyStoreTool = new KeyStoreTool();
+        KeyStore sslkeyStore = keyStoreTool.load( keyStoreData );
+
+        //generate X509 cert for mutual SSL connection with Hub
+        if ( sslkeyStore.size() == 0 )
         {
             String fingerprint = PGPKeyUtil.getFingerprint( peerPublicKey.getFingerprint() );
 
-            //**************Saving X509 certificate******************************************
             io.subutai.common.security.crypto.key.KeyManager sslkeyMan =
                     new io.subutai.common.security.crypto.key.KeyManager();
             KeyPairGenerator keyPairGenerator = sslkeyMan.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
             java.security.KeyPair sslKeyPair = sslkeyMan.generateKeyPair( keyPairGenerator );
 
-            KeyStoreData keyStoreData = new KeyStoreData();
-            keyStoreData.setKeyStoreFile( PEER_KEYSTORE );
-            keyStoreData.setAlias( "root_server_px1" );
-            keyStoreData.setPassword( "subutai" );
-            keyStoreData.setKeyStoreType( KeyStoreType.JKS );
-
-            KeyStoreTool keyStoreTool = new KeyStoreTool();
-            KeyStore sslkeyStore = keyStoreTool.load( keyStoreData );
-
-
             CertificateData certificateData = new CertificateData();
+
             certificateData.setCommonName( fingerprint );
 
             CertificateTool certificateTool = new CertificateTool();
 
             X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
 
-            keyStoreTool.saveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
+            keyStoreTool.addNSaveX509Certificate( sslkeyStore, keyStoreData, x509cert, sslKeyPair );
         }
-        catch ( Exception ex )
-        {
-            ex.printStackTrace();
-        }
+
+        return sslkeyStore;
     }
 
 
@@ -210,8 +188,8 @@ public class ConfigManager
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
         String baseUrl = String.format( "https://%s", hubIp );
-        return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore, "subutai".toCharArray(),
-                hPublicKey.getFingerprint() );
+        return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore,
+                SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), hPublicKey.getFingerprint() );
     }
 
 
@@ -230,6 +208,22 @@ public class ConfigManager
 
     public String getHubIp()
     {
-        return configDataService.getHubConfig( peerId ).getHubIp();
+//        return configDataService.getHubConfig( peerId ).getHubIp();
+        return "hub.subut.ai";
+    }
+
+    public byte[] readContent( Response response ) throws IOException
+    {
+        if ( response.getEntity() == null )
+        {
+            return null;
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        InputStream is = ( ( InputStream ) response.getEntity() );
+
+        IOUtils.copy( is, bos );
+        return bos.toByteArray();
     }
 }

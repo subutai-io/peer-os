@@ -13,12 +13,27 @@ import com.google.common.base.Preconditions;
  */
 public class P2PConnections
 {
-    private Set<P2PConnection> connections;
+    private Set<P2PConnection> connections = new HashSet<>();
 
 
     public P2PConnections( final Set<P2PConnection> connections )
     {
         this.connections = connections;
+    }
+
+
+    public P2PConnections()
+    {
+    }
+
+
+    public void addConnection( P2PConnection p2PConnection )
+    {
+        if ( p2PConnection == null )
+        {
+            throw new IllegalArgumentException( "P2P connection could not be null." );
+        }
+        connections.add( p2PConnection );
     }
 
 
@@ -28,15 +43,15 @@ public class P2PConnections
     }
 
 
-    public P2PConnection findCommunityConnection( final String communityName )
+    public P2PConnection findConnectionByHash( final String hash )
     {
-        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( hash );
 
         P2PConnection result = null;
         for ( Iterator<P2PConnection> i = connections.iterator(); i.hasNext() && result == null; )
         {
             P2PConnection c = i.next();
-            if ( communityName.equalsIgnoreCase( c.getCommunityName() ) )
+            if ( hash.equalsIgnoreCase( c.getHash() ) )
             {
                 result = c;
             }
