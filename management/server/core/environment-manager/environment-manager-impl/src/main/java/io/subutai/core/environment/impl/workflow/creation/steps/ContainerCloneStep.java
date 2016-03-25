@@ -133,7 +133,6 @@ public class ContainerCloneStep
         taskExecutor.shutdown();
 
         //collect results
-
         boolean succeeded = true;
         for ( int i = 0; i < placement.size(); i++ )
         {

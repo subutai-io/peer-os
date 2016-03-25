@@ -1,6 +1,7 @@
 package io.subutai.core.peer.impl;
 
 
+import java.awt.Container;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.Containers;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -89,6 +91,7 @@ public class PeerWebClient
             throw new PeerException( "Error getting peer info", e );
         }
     }
+
 
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
@@ -705,7 +708,7 @@ public class PeerWebClient
     }
 
 
-    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    public Containers getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
     {
         String path = String.format( "/containers/%s", environmentId.getId() );
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
@@ -714,7 +717,15 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return new HashSet<>( client.getCollection( ContainerHostInfo.class ) );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( Containers.class );
+            }
         }
         catch ( Exception e )
         {

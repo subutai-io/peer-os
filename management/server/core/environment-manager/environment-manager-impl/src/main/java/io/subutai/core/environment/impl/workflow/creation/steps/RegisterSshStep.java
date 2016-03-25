@@ -1,24 +1,20 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
@@ -39,57 +35,11 @@ public class RegisterSshStep
 
     public void execute( Set<String> userKeys ) throws EnvironmentManagerException
     {
-        Map<Integer, Set<EnvironmentContainerHost>> sshGroups = Maps.newHashMap();
-
-        //group containers by ssh group
-        for ( EnvironmentContainerHost containerHost : environment.getContainerHosts() )
-        {
-            int sshGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getSshGroupId();
-            Set<EnvironmentContainerHost> groupedContainers = sshGroups.get( sshGroupId );
-
-            if ( groupedContainers == null )
-            {
-                groupedContainers = Sets.newHashSet();
-                sshGroups.put( sshGroupId, groupedContainers );
-            }
-
-            groupedContainers.add( containerHost );
-        }
-
-        //configure ssh on each group
-        for ( Map.Entry<Integer, Set<EnvironmentContainerHost>> sshGroup : sshGroups.entrySet() )
-        {
-            int sshGroupId = sshGroup.getKey();
-            Set<EnvironmentContainerHost> groupedContainers = sshGroup.getValue();
-            Set<Host> hosts = Sets.newHashSet();
-            hosts.addAll( groupedContainers );
-
-            if ( sshGroupId > 0 )
-            {
-                exchangeSshKeys( hosts, userKeys );
-            }
-            else if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
-            {
-                appendSshKeys( hosts, userKeys );
-            }
-        }
-
-        exchangeAllContainerKeys();
-    }
-
-
-    /**
-     * Workaround for: https://github.com/optdyn/hub/issues/413.
-     * We always need containers accessible to each other via SSH.
-     */
-    private void exchangeAllContainerKeys() throws EnvironmentManagerException
-    {
         Set<Host> ch = Sets.newHashSet();
         ch.addAll( environment.getContainerHosts() );
-
         if ( ch.size() > 1 )
         {
-            exchangeSshKeys( ch, Collections.EMPTY_SET );
+            exchangeSshKeys( ch, userKeys );
         }
     }
 
@@ -241,7 +191,8 @@ public class RegisterSshStep
         return new RequestBuilder( String.format( "rm -rf %1$s && " +
                 "mkdir -p %1$s && " +
                 "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub", Common.CONTAINER_SSH_FOLDER ) );
+                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                Common.CONTAINER_SSH_FOLDER ) );
     }
 
 

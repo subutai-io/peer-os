@@ -56,25 +56,17 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getLocalPeerInfo()
+    public PeerInfo getPeerInfo() throws PeerException
     {
         try
         {
-            PeerInfo selfInfo = localPeer.getPeerInfo();
-            return Response.ok( selfInfo ).build();
+            return localPeer.getPeerInfo();
         }
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
-    }
-
-
-    @Override
-    public PeerInfo getPeerInfo() throws PeerException
-    {
-        return localPeer.getPeerInfo();
     }
 
 
@@ -344,6 +336,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -359,6 +352,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -374,6 +368,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -388,6 +383,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
@@ -402,6 +398,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( e );
         }
     }
