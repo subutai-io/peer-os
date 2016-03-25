@@ -1,25 +1,19 @@
 package io.subutai.core.kurjun.manager.impl;
 
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Properties;
 
-import javax.security.auth.Subject;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -31,10 +25,10 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
+import io.subutai.core.kurjun.manager.api.dao.KurjunDataService;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
-import io.subutai.core.kurjun.manager.impl.dao.KurjunDataService;
+import io.subutai.core.kurjun.manager.impl.dao.KurjunDataServiceImpl;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 import io.subutai.core.kurjun.manager.impl.model.KurjunType;
 import io.subutai.core.security.api.SecurityManager;
@@ -51,6 +45,7 @@ public class KurjunManagerImpl implements KurjunManager
     private IdentityManager identityManager;
     private SecurityManager securityManager;
     private DaoManager daoManager;
+
     private KurjunDataService dataService;
     private static Properties properties;
     private static String ownerKey;
@@ -60,8 +55,9 @@ public class KurjunManagerImpl implements KurjunManager
     //****************************************
     public void init()
     {
-        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
-                       .getPublicKey();
+        PGPPublicKey key =
+                securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
+                               .getPublicKey();
 
         String fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
 
@@ -77,7 +73,7 @@ public class KurjunManagerImpl implements KurjunManager
 
         properties = loadProperties();
 
-        dataService = new KurjunDataService( daoManager );
+        dataService = new KurjunDataServiceImpl( daoManager );
 
 
         if ( Strings.isNullOrEmpty( getUser( KurjunType.Local.getId(), fingerprint ) ) )
@@ -167,19 +163,7 @@ public class KurjunManagerImpl implements KurjunManager
 
         if ( dataService.getKurjunData( fingerprint ) == null )
         {
-            byte[] message = authId.getBytes();
-            String armorSignedMessage = null;
             byte[] signedMessage = null;
-            try
-            {
-                signedMessage = securityManager.getEncryptionTool().clearSign( message,
-                        securityManager.getKeyManager().getSecretKey( null ), "12345678" );
-                armorSignedMessage = PGPEncryptionUtil.armorByteArrayToString( signedMessage );
-            }
-            catch ( PGPException e )
-            {
-                e.printStackTrace();
-            }
 
             Kurjun kurjun = new KurjunEntity();
             kurjun.setType( kurjunType );
@@ -304,5 +288,11 @@ public class KurjunManagerImpl implements KurjunManager
     public void setDaoManager( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
+    }
+
+
+    public KurjunDataService getDataService()
+    {
+        return dataService;
     }
 }

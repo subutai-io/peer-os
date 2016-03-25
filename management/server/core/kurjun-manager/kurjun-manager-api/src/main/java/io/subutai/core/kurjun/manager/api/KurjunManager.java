@@ -1,6 +1,9 @@
 package io.subutai.core.kurjun.manager.api;
 
 
+import io.subutai.core.kurjun.manager.api.dao.KurjunDataService;
+
+
 /**
  *
  */
@@ -26,4 +29,5 @@ public interface KurjunManager
     //****************************************
     String getUser( int kurjunType, String fingerprint );
 
+    public KurjunDataService getDataService();
 }

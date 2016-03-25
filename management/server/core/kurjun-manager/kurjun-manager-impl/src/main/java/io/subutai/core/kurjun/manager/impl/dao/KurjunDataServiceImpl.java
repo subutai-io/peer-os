@@ -12,16 +12,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.core.kurjun.manager.api.dao.*;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 
 
-/**
- *
- */
-public class KurjunDataService
+public class KurjunDataServiceImpl implements KurjunDataService
 {
-    private static final Logger LOG = LoggerFactory.getLogger( KurjunDataService.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( KurjunDataServiceImpl.class.getName() );
 
     private DaoManager daoManager = null;
 
@@ -29,7 +27,7 @@ public class KurjunDataService
     /* *************************************************
      *
      */
-    public KurjunDataService( DaoManager daoManager )
+    public KurjunDataServiceImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -45,8 +43,7 @@ public class KurjunDataService
         Kurjun result = null;
         try
         {
-            Query query = em.createQuery( "SELECT c FROM KurjunEntity c" )
-                            .setParameter( "owner_fprint", id );
+            Query query = em.createQuery( "SELECT c FROM KurjunEntity c" ).setParameter( "owner_fprint", id );
             //            daoManager.startTransaction( em );
             result = ( Kurjun ) query.getSingleResult();
             //                    result = em.find( KurjunEntity.class, id );
