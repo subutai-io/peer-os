@@ -1630,7 +1630,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( envVni == null )
             {
-                throw new PeerException( "Reserved vni not found for environment %s", config.getEnvironmentId() );
+                throw new PeerException(
+                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
 
@@ -1677,7 +1678,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( envVni == null )
             {
-                throw new PeerException( "Reserved vni not found for environment %s", config.getEnvironmentId() );
+                throw new PeerException(
+                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
 
