@@ -72,6 +72,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
+import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.dao.TopologyDataService;
@@ -260,20 +261,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         User activeUser = identityManager.getActiveUser();
 
-
         Set<Environment> environments = new HashSet<>();
+
         for ( Environment environment : environmentDataService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
+
             final boolean b = environment.getUserId().equals( activeUser.getId() );
+
             if ( b || trustedRelation )
             {
                 environments.add( environment );
 
                 setEnvironmentTransientFields( environment );
+
                 setContainersTransientFields( environment );
             }
         }
+
+        environments = new EnvironmentAdapter().getEnvironments();
 
         return environments;
     }
