@@ -11,6 +11,7 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
@@ -183,7 +184,7 @@ public interface Peer
     /**
      * Returns set of container information of the environment
      */
-    public Set<ContainerHostInfo> getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
+    public Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
 

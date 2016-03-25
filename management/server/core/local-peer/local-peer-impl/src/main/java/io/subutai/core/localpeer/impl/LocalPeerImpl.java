@@ -44,6 +44,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
@@ -331,11 +332,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    public Containers getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
 
-        Set<ContainerHostInfo> result = new HashSet<>();
+        Containers result = new Containers();
         try
         {
             Set<ContainerHost> containers = findContainersByEnvironmentId( environmentId.getId() );
@@ -351,7 +352,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     info = new ContainerHostInfoModel( c );
                 }
-                result.add( info );
+                result.addContainer( info );
             }
             return result;
         }
@@ -1972,6 +1973,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException( "Error retrieving peer tunnels", e );
         }
     }
+
 
     @Override
     public String getExternalIp() throws PeerException

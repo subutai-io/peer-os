@@ -39,11 +39,6 @@ import io.subutai.common.util.DateTimeParam;
 
 public interface RestService
 {
-    @Deprecated
-    @GET
-    @Path( "me" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getLocalPeerInfo();
 
     @GET
     @Path( "/info" )
