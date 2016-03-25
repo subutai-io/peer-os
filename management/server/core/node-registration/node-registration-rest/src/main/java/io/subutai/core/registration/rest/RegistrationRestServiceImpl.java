@@ -64,6 +64,22 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
 
     @Override
+    public Response approveRegistrationRequest( final String requestId )
+    {
+        try
+        {
+            registrationManager.approveRequest( requestId );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error approving registration request", e );
+            return Response.serverError().build();
+        }
+    }
+
+
+    @Override
     public Response verifyContainerToken( final String message )
     {
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();

@@ -223,7 +223,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
         try
         {
-
             return localPeer.getResourceHostIdByContainerId( containerId );
         }
         catch ( Exception e )
