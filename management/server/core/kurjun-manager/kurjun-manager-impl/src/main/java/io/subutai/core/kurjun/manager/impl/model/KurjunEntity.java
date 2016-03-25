@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 
 
@@ -26,19 +27,19 @@ public class KurjunEntity implements Kurjun
     @Column( name = "id" )
     private long id;
 
-    @Column( name = "owner_fprint")
+    @Column( name = "owner_fprint" )
     private String ownerFingerprint;
 
     @Column( name = "owner_authid" )
     private String authID;
 
-    @Column( name = "owner_message")
-    private String signedMessage;
+    @Column( name = "owner_message" )
+    private byte[] signedMessage;
 
-    @Column( name = "token")
+    @Column( name = "token" )
     private String token;
 
-    @Column( name = "type")
+    @Column( name = "type" )
     private int type = KurjunType.Local.getId();
 
 
@@ -67,20 +68,6 @@ public class KurjunEntity implements Kurjun
     public void setAuthID( final String authID )
     {
         this.authID = authID;
-    }
-
-
-    @Override
-    public String getSignedMessage()
-    {
-        return signedMessage;
-    }
-
-
-    @Override
-    public void setSignedMessage( final String signedMessage )
-    {
-        this.signedMessage = signedMessage;
     }
 
 
@@ -123,5 +110,19 @@ public class KurjunEntity implements Kurjun
     public void setType( final int type )
     {
         this.type = type;
+    }
+
+
+    @Override
+    public byte[] getSignedMessage()
+    {
+        return signedMessage;
+    }
+
+
+    @Override
+    public void setSignedMessage( final byte[] signedMessage )
+    {
+        this.signedMessage = signedMessage;
     }
 }

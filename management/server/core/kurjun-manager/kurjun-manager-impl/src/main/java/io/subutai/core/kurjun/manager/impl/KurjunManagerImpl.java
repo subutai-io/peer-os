@@ -4,26 +4,34 @@ package io.subutai.core.kurjun.manager.impl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.PrivilegedAction;
+import java.util.List;
 import java.util.Properties;
 
+import javax.security.auth.Subject;
 import javax.ws.rs.core.Response;
 
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 import io.subutai.core.kurjun.manager.impl.dao.KurjunDataService;
@@ -45,14 +53,28 @@ public class KurjunManagerImpl implements KurjunManager
     private DaoManager daoManager;
     private KurjunDataService dataService;
     private static Properties properties;
+    private static String ownerKey;
     //**********************************
-
 
 
     //****************************************
     public void init()
     {
-        String fingerprint = securityManager.getKeyManager().getFingerprint( null );
+        PGPPublicKey key = securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
+                       .getPublicKey();
+
+        String fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
+
+        try
+        {
+            ownerKey = PGPKeyUtil.exportAscii( key );
+        }
+        catch ( PGPException e )
+        {
+            e.printStackTrace();
+        }
+
+
         properties = loadProperties();
 
         dataService = new KurjunDataService( daoManager );
@@ -128,24 +150,42 @@ public class KurjunManagerImpl implements KurjunManager
         {
             String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.add" ) );
             WebClient client = RestUtil.createTrustedWebClient( url );
-            //            Response response = client.get();
+            client.query( "key", ownerKey );
 
-            //TODO get authID from client
-            //authId = client Output;
+            Response response = client.post( null );
+
+            if ( response.getStatus() == HttpStatus.SC_OK )
+            {
+                authId = response.readEntity( String.class );
+            }
+            else
+            {
+                return null;
+            }
         }
 
 
         if ( dataService.getKurjunData( fingerprint ) == null )
         {
-
-            //************* Sign *********************
-            String signedMessage = ""; //securityManager.getEncryptionTool().
-            //****************************************
+            byte[] message = authId.getBytes();
+            String armorSignedMessage = null;
+            byte[] signedMessage = null;
+            try
+            {
+                signedMessage = securityManager.getEncryptionTool().clearSign( message,
+                        securityManager.getKeyManager().getSecretKey( null ), "12345678" );
+                armorSignedMessage = PGPEncryptionUtil.armorByteArrayToString( signedMessage );
+            }
+            catch ( PGPException e )
+            {
+                e.printStackTrace();
+            }
 
             Kurjun kurjun = new KurjunEntity();
             kurjun.setType( kurjunType );
             kurjun.setOwnerFingerprint( fingerprint );
             kurjun.setAuthID( authId );
+            //            kurjun.setSignedMessage(  null );
             kurjun.setSignedMessage( signedMessage );
             dataService.persistKurjunData( kurjun );
         }
@@ -158,10 +198,37 @@ public class KurjunManagerImpl implements KurjunManager
     @Override
     public String authorizeUser( int kurjunType, String fingerprint )
     {
-        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
+        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
         WebClient client = RestUtil.createTrustedWebClient( url );
 
-        return null;
+        byte[] signedMsg = null;
+
+        List<Kurjun> list = dataService.getAllKurjunData();
+        for ( final Kurjun kurjun : list )
+        {
+            signedMsg = kurjun.getSignedMessage();
+            break;
+        }
+
+        try
+        {
+            client.query( "fingerprint", fingerprint );
+            client.query( "message", PGPEncryptionUtil.armorByteArrayToString( signedMsg ) );
+
+            Response response = client.post( null );
+
+            if ( response.getStatus() != HttpStatus.SC_OK )
+            {
+                return null;
+            }
+        }
+        catch ( PGPException e )
+        {
+            e.printStackTrace();
+        }
+
+
+        return "success";
     }
 
 
@@ -190,8 +257,8 @@ public class KurjunManagerImpl implements KurjunManager
     public String getUser( int kurjunType, String fingerprint )
     {
         String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
-        WebClient client = RestUtil.createTrustedWebClient( url + "?fingerprint=" + fingerprint );
-        //        client.query( "fingerprint", fingerprint );
+        WebClient client = RestUtil.createTrustedWebClient( url );
+        client.query( "fingerprint", fingerprint );
 
         Response response = client.get();
 

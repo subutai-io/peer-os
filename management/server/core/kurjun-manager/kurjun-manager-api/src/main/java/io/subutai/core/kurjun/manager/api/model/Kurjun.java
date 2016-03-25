@@ -14,9 +14,9 @@ public interface Kurjun
 
     void setAuthID( String authID );
 
-    String getSignedMessage();
+    byte[] getSignedMessage();
 
-    void setSignedMessage( String signedMessage );
+    void setSignedMessage( byte[] signedMessage );
 
     String getToken();
 

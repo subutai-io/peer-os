@@ -4,7 +4,13 @@ package io.subutai.core.kurjun.manager.impl.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
@@ -15,13 +21,15 @@ import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
  */
 public class KurjunDataService
 {
+    private static final Logger LOG = LoggerFactory.getLogger( KurjunDataService.class.getName() );
+
     private DaoManager daoManager = null;
 
 
     /* *************************************************
      *
      */
-    public KurjunDataService(DaoManager daoManager)
+    public KurjunDataService( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -37,9 +45,12 @@ public class KurjunDataService
         Kurjun result = null;
         try
         {
-            daoManager.startTransaction( em );
-            result = em.find( KurjunEntity.class, id );
-            daoManager.commitTransaction( em );
+            Query query = em.createQuery( "SELECT c FROM KurjunEntity c" )
+                            .setParameter( "owner_fprint", id );
+            //            daoManager.startTransaction( em );
+            result = ( Kurjun ) query.getSingleResult();
+            //                    result = em.find( KurjunEntity.class, id );
+            //            daoManager.commitTransaction( em );
         }
         catch ( Exception e )
         {
@@ -51,6 +62,7 @@ public class KurjunDataService
         }
         return result;
     }
+
 
     /* *************************************************
      *
@@ -92,6 +104,8 @@ public class KurjunDataService
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+            e.printStackTrace();
+            LOG.error( "Error while saving Kurjun Data:" + e.getMessage() );
         }
         finally
         {
@@ -145,5 +159,4 @@ public class KurjunDataService
             daoManager.closeEntityManager( em );
         }
     }
-
 }
