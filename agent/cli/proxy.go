@@ -228,7 +228,7 @@ func addLine(path, after, line string, replace bool) bool {
 func delLine(path, line string) {
 	var lines2 []string
 	f, err := ioutil.ReadFile(path)
-	if !log.Check(log.DebugLevel, "Cannot read file "+path, err) {
+	if !log.Check(log.DebugLevel, "Reading config "+path, err) {
 
 		lines := strings.Split(string(f), "\n")
 		for _, v := range lines {
