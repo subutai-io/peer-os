@@ -29,4 +29,8 @@ public interface RestService
     @Path( "requests/{hostId}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getRequests( @PathParam( "hostId" ) String hostId );
+
+    @GET
+    @Path( "check/{hostId}" )
+    Response check( @PathParam( "hostId" ) String hostId );
 }

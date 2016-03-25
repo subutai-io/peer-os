@@ -10,12 +10,15 @@ public class Resource
     private String md5Sum;
     @Expose
     private String name;
+    @Expose
+    private long size;
 
 
-    public Resource( String md5Sum, String name )
+    public Resource( String md5Sum, String name, long size )
     {
         this.md5Sum = md5Sum;
         this.name = name;
+        this.size = size;
     }
 
 
@@ -40,6 +43,18 @@ public class Resource
     public void setName( String name )
     {
         this.name = name;
+    }
+
+
+    public long getSize()
+    {
+        return size;
+    }
+
+
+    public void setSize( long size )
+    {
+        this.size = size;
     }
 
 }

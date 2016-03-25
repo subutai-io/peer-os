@@ -30,9 +30,9 @@ func templId(templ, arch, version, token string) string {
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	url := config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token
-	if len(version) != 0 {
-		url = config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
+	url := config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
+	if version == "stable" || len(version) == 0 {
+		url = config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token
 	}
 	response, err := client.Get(url)
 	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token)
@@ -66,7 +66,7 @@ func checkLocal(templ, md5, arch string) string {
 		file := strings.Split(f.Name(), "-subutai-template_")
 		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
 			if len(md5) == 0 {
-				fmt.Println("Cannot check md5 of local template. Trust anyway? (y/n)")
+				fmt.Print("Cannot check md5 of local template. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
@@ -137,10 +137,13 @@ func LxcImport(templ, version, token string) {
 	}
 
 	config.CheckKurjun()
-	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
+	fullname := templ + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
 	// if len(token) == 0 {
 	token = gpg.GetToken()
 	// }
+	if len(version) == 0 && templ == "management" {
+		version = config.Management.Version
+	}
 	id := templId(templ, runtime.GOARCH, version, token)
 	md5 := ""
 	if len(strings.Split(id, ".")) > 1 {
@@ -162,7 +165,7 @@ func LxcImport(templ, version, token string) {
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
 		log.Info("Parent template required: " + parent)
-		LxcImport(parent, "", token)
+		LxcImport(parent, "stable", token)
 	}
 
 	log.Info("Installing template " + templ)

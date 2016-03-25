@@ -36,8 +36,8 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.nodeStatus = 'Add to';
 	vm.nodeList = [];
 	vm.colors = quotaColors;
-	vm.templates = [];
 	vm.containersType = [];
+	vm.containersTypeInfo = [];
 	vm.listOfUsers = [];
 	vm.users2Add = [];
 	vm.installedContainers = [];
@@ -79,14 +79,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		vm.currentUser = data;
 	});
 
-	environmentService.getTemplates()
-		.success(function (data) {
-			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		});
-
 	environmentService.getContainersType()
 		.success(function (data) {
 			vm.containersType = data;
@@ -94,6 +86,25 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		.error(function (data) {
 			VARS_MODAL_ERROR( SweetAlert, data );
 		});
+
+	environmentService.getContainersTypesInfo()
+		.success(function (data) {
+			vm.containersTypeInfo = [];
+
+			for( var i = 0; i < data.length; i++ )
+			{
+				var type = data[i].key.split(/\.(.+)?/)[0];
+				var property = data[i].key.split(/\.(.+)?/)[1];
+
+				if( vm.containersTypeInfo[type] === undefined )
+				{
+					vm.containersTypeInfo[type] = {};
+				}
+
+				vm.containersTypeInfo[type][property] = data[i].value;
+			}
+		});
+
 
 	vm.containersTotal = [];
 	function loadEnvironments() {
@@ -147,7 +158,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	reloadTableData();
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
-		console.log('cancel');
 		$timeout.cancel(refreshTable);
 	});
 
@@ -182,7 +192,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				vm.listOfUsers[i].delete = true;
 			}
 			environmentService.getShared(environment.id).success(function (data2) {
-				console.log(data2);
 				vm.users2Add = data2;
 				for (var i = 0; i < vm.users2Add.length; ++i) {
 					if (vm.users2Add[i].id === vm.currentUser.id) {
@@ -276,6 +285,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function destroyEnvironment(environmentId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "You will not be able to recover this Environment!",
@@ -289,6 +299,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					SweetAlert.swal(
 						{
@@ -329,6 +340,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function removeSshKey(environmentId){
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Delete environment SSH keys!",
@@ -342,6 +354,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				environmentService.removeSshKey(environmentId).success(function () {
 					SweetAlert.swal("Destroyed!", "Your SSH keys has been deleted.", "success");
@@ -386,7 +399,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	function deleteSSHKey(sshKey, index) {
 		LOADING_SCREEN();
 		environmentService.removeSshKey(vm.sshKeyForEnvironment, sshKey).success( function (data) {
-			console.log(data);
+
 			vm.sshKeysList.splice(index, 1);
 			LOADING_SCREEN('none');
 		}).error( function(error) {
@@ -426,6 +439,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function removeDomain(environmentId) {
 		ngDialog.closeAll();
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Delete environment domain!",
@@ -440,6 +454,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		},
 		function (isConfirm) {
 			if (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				environmentService.removeDomain(environmentId).success(function (data) {
 					SweetAlert.swal("Deleted!", "Your domain has been deleted.", "success");
 				}).error(function (data) {
@@ -544,6 +559,30 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			});
 		}
 	}
+}
+
+function imageExists(image_url){
+
+    var http = new XMLHttpRequest();
+
+    http.open('HEAD', image_url, false);
+    http.send();
+
+    return http.status != 404;
+
+}
+
+function getDateFromString(string) {
+	var logTextTime = string.split(':');
+	var dateString = logTextTime[0].split(' ');
+	var temp = dateString[0].split('.');
+	dateString = [temp[1], temp[0], temp[2]].join('.') + ' ' + dateString[1];
+	var dateFullString = [dateString, logTextTime[1], logTextTime[2]].join(':');
+
+	var testDateUtc = moment.utc(dateFullString);
+	var localDate = moment(testDateUtc).local();
+
+	return localDate.format('HH:mm:ss');
 }
 
 function fileModel($parse) {

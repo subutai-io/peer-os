@@ -4,9 +4,9 @@ angular.module('subutai.environment.service', [])
 	.factory('environmentService', environmentService);
 
 
-environmentService.$inject = ['$http'];
+environmentService.$inject = ['$http', '$q'];
 
-function environmentService($http) {
+function environmentService($http, $q) {
 
 	var ENVIRONMENTS_URL = SERVER_URL + 'rest/ui/environments/';
 
@@ -22,6 +22,15 @@ function environmentService($http) {
 	var TEMPLATES_URL = ENVIRONMENTS_URL + 'templates/';
 
 	var PEERS_URL = ENVIRONMENTS_URL + 'peers/';
+
+
+	// @todo workaround for kurjun to return categorized templates
+	var categories = {
+		'apps' : [ 'zabbix', 'webdemo', 'kurjun', 'mysite', 'apache', 'ceph', 'management' ],
+		'bigdata' : [ 'mongo', 'storm', 'zookeeper', 'kurjun', 'elasticsearch', 'ceph', 'cassandra', 'solr', 'hadoop' ],
+		'packages' : [ 'master', 'openjre7', 'debian' ],
+		'other' : [ 'master' ]
+	};
 
 
 	var environmentService = {
@@ -56,6 +65,7 @@ function environmentService($http) {
 
 
 		getContainersType : getContainersType,
+		getContainersTypesInfo : getContainersTypesInfo,
 		setTags : setTags,
 		removeTag : removeTag,
 
@@ -82,8 +92,48 @@ function environmentService($http) {
 
 	//// Implementation
 
+	// @todo workaround for kurjun to return categorized templates
 	function getTemplates() {
-		return $http.get(TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		var callF = $q.defer();
+
+		$http.get(TEMPLATES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}})
+			.success(function(data) {
+				var res = {};
+
+				for (var key in categories) {
+					res[key] = [];
+				}
+
+				for( var i = 0; i < data.length; i++ )
+				{
+					res[ getCategory( data[i] )].push( data[i] );
+				}
+
+				callF.resolve(res);
+			});
+
+		return callF.promise;
+	}
+	// @todo workaround for kurjun to return categorized templates
+	function getCategory(data)
+	{
+		var cat = null;
+		for (var key in categories) {
+			for( var i = 0; i < categories[key].length; i++ )
+			{
+				if( categories[key][i] == data )
+				{
+					cat = key;
+					break;
+				}
+			}
+
+			if( cat !== null ) break;
+		}
+
+		if( cat === null ) return 'other';
+
+		return cat;
 	}
 
 
@@ -213,6 +263,11 @@ function environmentService($http) {
 	function getContainersType() {
 		return $http.get(CONTAINER_TYPES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
+
+	function getContainersTypesInfo() {
+		return $http.get(CONTAINER_TYPES_URL + "info", {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
 
 	function getEnvQuota(containerId) {
 		return $http.get(

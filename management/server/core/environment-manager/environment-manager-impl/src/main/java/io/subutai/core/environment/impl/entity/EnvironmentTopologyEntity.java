@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
-import io.subutai.core.strategy.api.Blueprint;
+import io.subutai.common.environment.Blueprint;
 
 
 /**

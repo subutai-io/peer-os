@@ -17,7 +17,6 @@
 
   <modules>
     <module>subutai-appender</module>
-    <module>blueprint-authz</module>
     <module>lxc-quota-manager</module>
     <module>network-manager</module>
     <module>local-peer</module>
@@ -42,6 +41,7 @@
     <module>bazaar-integration</module>
     <module>hub-manager</module>
     <module>common-plugin</module>
+    <module>karaf-manager</module>
   </modules>
 
 </project>

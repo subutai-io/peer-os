@@ -141,7 +141,7 @@ func main() {
 			Name:  "p2p",
 			Usage: "p2p network operation",
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName localPeepIPAddr hash key ttl)"},
+				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr)"},
 				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
 				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
 				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
@@ -219,10 +219,9 @@ func main() {
 
 		Name: "quota", Usage: "set quotas for Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
-			cli.StringFlag{Name: "m", Usage: "get the maximum quota can be set to the specified container and resource_type in their default units"}},
+			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"}},
 		Action: func(c *cli.Context) {
-			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("m"))
+			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"))
 		}}, {
 
 		Name: "rename", Usage: "rename Subutai container",
@@ -264,9 +263,10 @@ func main() {
 
 		Name: "backup", Usage: "backup Subutai container",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "full", Usage: "make full backup"}},
+			cli.BoolFlag{Name: "full", Usage: "make full backup"},
+			cli.BoolFlag{Name: "stop", Usage: "stop container at the time of backup"}},
 		Action: func(c *cli.Context) {
-			lib.BackupContainer(c.Args().Get(0), c.Bool("full"))
+			lib.BackupContainer(c.Args().Get(0), c.Bool("full"), c.Bool("stop"))
 		}}, {
 
 		Name: "restore", Usage: "restore Subutai container",

@@ -73,9 +73,7 @@ public interface PeerManager
 
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
 
-    PingDistances getCommunityDistances();
-
-    void updateControlNetwork();
+    PingDistances getP2PSwarmDistances();
 
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
 }

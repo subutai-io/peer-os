@@ -17,8 +17,6 @@ import io.subutai.common.resource.PeerResources;
  */
 public class RandomAllocator extends PeerResources
 {
-    private Collection<HostResources> result;
-
     private List<AllocatedContainer> containers = new ArrayList<>();
 
 

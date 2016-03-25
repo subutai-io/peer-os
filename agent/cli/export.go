@@ -16,7 +16,7 @@ import (
 func LxcExport(name string) {
 	tmpDIR := config.Agent.LxcPrefix + "lxc-data/tmpdir/"
 	packageName := tmpDIR + name + "-subutai-template"
-	packageVersion := config.Misc.Version
+	packageVersion := config.Template.Version
 	packageArch := runtime.GOARCH
 	tarPackageName := packageName + "_" + packageVersion + "_" + packageArch
 	tarFile := tarPackageName + ".tar.gz"

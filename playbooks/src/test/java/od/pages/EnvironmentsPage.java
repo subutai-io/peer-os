@@ -38,8 +38,10 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliButtonClosePopupBuild = "src/test/resources/imgs/buttons/buttonClosePopupBuild.png";
     public String sikuliButtonDelete = "src/test/resources/imgs/buttons/buttonDelete.png";
     public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
+    public String sikuliButtonAdvanced = "src/test/resources/imgs/buttons/buttonAdvanced.png";
 
-
+    @FindBy(xpath = "*//div[@class=\"b-toggle b-toggle_cloud\"]")
+    public WebElementFacade buttonModes;
 
     //endregion
 
@@ -71,11 +73,18 @@ public class EnvironmentsPage extends PageObject {
 
     public String sikuliIconDeleteEnvironment = "src/test/resources/imgs/icons/iconDeleteEnvironment.png";
 
-    @FindBy(xpath = "*//span[contains(text(), \"mongo\")]")
-    public WebElementFacade iconTemplateMongo;
+    //endregion
 
-    @FindBy(xpath = "//a[@class=\"b-icon b-icon_remove\"]")
-    public WebElementFacade iconDeleteEnvironment;
+    //region SIKULI IMAGES: Titles
+
+    public String sikuliTitleTemplates = "src/test/resources/imgs/titles/titleTemplates.png";
+
+    //endregion
+
+    //region Templates
+
+    @FindBy(xpath = "*//span[contains(text(),\"mongo\")]")
+    public WebElementFacade templateMongo;
 
     //endregion
 
@@ -91,6 +100,15 @@ public class EnvironmentsPage extends PageObject {
 
     @FindBy(xpath = "*//h1[contains(text(),\"Environment Manager\")]")
     public WebElementFacade headerEnvironments;
+
+    @FindBy(xpath = "*//li[contains(text(),\"Peers\")]")
+    public WebElementFacade titlePeers;
+
+    //endregion
+
+    //region Action: Wait for
+
+
 
     //endregion
 }

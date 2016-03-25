@@ -20,8 +20,14 @@
 			<td>{{ plugin.version }}</td>
 			<td>{{ plugin.description }}</td>
 			<td class="b-main-table_200">
-				<div class="progress-button" ng-show = "!plugin.installed && plugin.metadata.length !== 0">
+				<div class="progress-button" ng-show = "!plugin.installed && plugin.metadata.length !== 0 && !plugin.restore">
 					<button class = "loading-button" ng-show = "plugin.name !== 'Plugin-common'" ng-click = "bazaarCtrl.installPlugin (plugin)"><span>Install</span></button>
+					<svg class="progress-circle" width="30" height="30"><path d="M 15 15 m 0, -13.5 a 13.5,13.5 0 0,1 0,27 a 13.5,13.5 0 0,1 0,-27 " stroke-width = "1.5"/></svg>
+					<svg class="checkmark" width="30" height="30"><path d="M7.5,15 L13.5,22.5 "/><path d="M13.5,22.5 L22.5,7.5 "/></svg>
+					<svg class="cross" width="30" height="30"><path d="M7.5,7.5 L15,15 "/><path d="M15,15 L22.5,22.5"/><path d="M15,15 L22.5,7.5 "/><path d="M7.5,22.5 L15,15 "/></svg>
+				</div>
+				<div class="progress-button" ng-show = "plugin.restore">
+					<button class = "loading-button" ng-show = "plugin.name !== 'Plugin-common'" ng-click = "bazaarCtrl.restorePlugin (plugin)"><span>Restore</span></button>
 					<svg class="progress-circle" width="30" height="30"><path d="M 15 15 m 0, -13.5 a 13.5,13.5 0 0,1 0,27 a 13.5,13.5 0 0,1 0,-27 " stroke-width = "1.5"/></svg>
 					<svg class="checkmark" width="30" height="30"><path d="M7.5,15 L13.5,22.5 "/><path d="M13.5,22.5 L22.5,7.5 "/></svg>
 					<svg class="cross" width="30" height="30"><path d="M7.5,7.5 L15,15 "/><path d="M15,15 L22.5,22.5"/><path d="M15,15 L22.5,7.5 "/><path d="M7.5,22.5 L15,15 "/></svg>

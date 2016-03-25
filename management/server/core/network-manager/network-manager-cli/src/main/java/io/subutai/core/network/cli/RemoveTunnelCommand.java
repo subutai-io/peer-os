@@ -13,7 +13,7 @@ import org.apache.karaf.shell.commands.Command;
 import com.google.common.base.Preconditions;
 
 
-@Command( scope = "net", name = "remove-tunnel", description = "Removes tunnel" )
+@Command( scope = "net", name = "tunnel-remove", description = "Removes tunnel" )
 public class RemoveTunnelCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( RemoveTunnelCommand.class.getName() );

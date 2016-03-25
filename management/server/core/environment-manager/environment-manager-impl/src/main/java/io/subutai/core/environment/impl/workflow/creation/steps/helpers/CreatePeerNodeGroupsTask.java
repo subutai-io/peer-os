@@ -48,7 +48,8 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
         SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( environment.getSubnetCidr() ).getInfo();
         String maskLength = subnetInfo.getCidrSignature().split( "/" )[1];
 
-        final CreateEnvironmentContainerGroupRequest request = new CreateEnvironmentContainerGroupRequest();
+        final CreateEnvironmentContainerGroupRequest request =
+                new CreateEnvironmentContainerGroupRequest( environment.getId() );
         try
         {
             int currentIpAddressOffset = 0;
@@ -58,6 +59,8 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
 
                 final String ip = subnetInfo.getAllAddresses()[( ipAddressOffset + currentIpAddressOffset )];
                 ContainerSize size = node.getType();
+                //todo put common fields to CreateEnvironmentContainerGroupRequest instead of duplicating in
+                // CloneRequest
                 CloneRequest cloneRequest =
                         new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
                                 environment.getId(), localPeer.getId(), localPeer.getOwnerId(), node.getTemplateName(),

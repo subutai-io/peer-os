@@ -135,13 +135,18 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		}
 
 
+		//@todo need combine 2 controller into 1
 		ngDialog.open({
 			template: 'subutai-app/identityUser/partials/userForm.html',
 			controller: 'IdentityUserFormCtrl',
 			controllerAs: 'identityUserFormCtrl',
 			data: user,
 			preCloseCallback: function(value) {
-				vm.dtInstance.reloadData(null, false);
+				setTimeout(function() {
+					if(Object.keys(vm.dtInstance).length !== 0) {
+						vm.dtInstance.reloadData(null, false);
+					}
+				}, 2000);
 			}
 		});
 	}
@@ -189,6 +194,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 
 	function deleteUser(userId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "You will not be able to recover this user!",
@@ -202,6 +208,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					identitySrv.deleteUser(userId).success(function (data) {
 						SweetAlert.swal("Deleted!", "User has been deleted.", "success");
@@ -228,10 +235,10 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 
 	function approve() {
+		ngDialog.closeAll();
 		identitySrv.approve (vm.currentUser.userName, JSON.stringify (vm.currentUser.roles)).success (function (data) {
 			SweetAlert.swal ("Success!", "User was approved.", "success");
 			vm.dtInstance.reloadData(null, false);
-			ngDialog.closeAll();
 		}).error (function (error) {
 			SweetAlert.swal ("ERROR!", "User approve error: " + error.replace(/\\n/g, " "), "error");
 		});
@@ -251,6 +258,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 
 	function reject (user) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "Your will not be able to undo this!",
@@ -264,6 +272,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					identitySrv.deleteUser (user.id).success (function (data) {
 						SweetAlert.swal ("Success!", "User was rejected.", "success");
@@ -322,9 +331,9 @@ function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
 		if ($scope.addUserForm.$valid) {
 			var postData = userPostData(vm.user2Add);
 			LOADING_SCREEN();
+			ngDialog.closeAll();
 			identitySrv.addUser(postData).success(function (data) {
 				LOADING_SCREEN('none');
-				ngDialog.closeAll();
 			}).error(function(error){
 				LOADING_SCREEN('none');
 				SweetAlert.swal ("ERROR!", "Error: " + error, "error");

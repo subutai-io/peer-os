@@ -12,26 +12,26 @@ import (
 )
 
 type agentConfig struct {
-	DataPrefix  string
+	Debug       bool
+	GpgUser     string
 	AppPrefix   string
 	LxcPrefix   string
-	Version     string
-	GpgUser     string
+	DataPrefix  string
 	GpgPassword string
-	Debug       bool
 }
 type managementConfig struct {
 	Cdn           string
 	Host          string
 	Port          string
 	Login         string
-	Password      string
-	GpgUser       string
-	RestToken     string
-	RestPublicKey string
-	RestVerify    string
 	Secret        string
 	Kurjun        string
+	GpgUser       string
+	Version       string
+	Password      string
+	RestToken     string
+	RestVerify    string
+	RestPublicKey string
 }
 type brokerConfig struct {
 	Url               string
@@ -50,7 +50,7 @@ type influxdbConfig struct {
 	User   string
 	Pass   string
 }
-type miscConfig struct {
+type templateConfig struct {
 	Version string
 	Arch    string
 }
@@ -58,13 +58,12 @@ type configFile struct {
 	Agent      agentConfig
 	Management managementConfig
 	Broker     brokerConfig
-	Misc       miscConfig
+	Template   templateConfig
 	Influxdb   influxdbConfig
 }
 
 const defaultConfig = `
 	[agent]
-	version = 4.0.0
 	gpgUser =
 	gpgPassword = 12345678
 	debug = true
@@ -73,6 +72,7 @@ const defaultConfig = `
 	lxcPrefix = /mnt/lib/lxc/
 
 	[management]
+	version = stable
 	gpgUser =
 	port = 8443
 	host = 10.10.10.1
@@ -82,8 +82,7 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-	kurjun = http://repo.critical-factor.com:8081/rest/kurjun/templates
-    cdn = cdn.helper.subutai.io
+    cdn = kurjun.cdn.subutai.io
 
 	[broker]
 	port = 8883
@@ -102,7 +101,7 @@ const defaultConfig = `
 	pass = root
 	db = metrics
 
-	[misc]
+	[template]
 	version = 4.0.0
 	arch = amd64
 `
@@ -117,8 +116,8 @@ var (
 	Broker brokerConfig
 	// Influxdb describes configuration options for InluxDB server
 	Influxdb influxdbConfig
-	// Misc describes misc configuration options
-	Misc miscConfig
+	// Template describes template configuration options
+	Template templateConfig
 )
 
 func init() {
@@ -141,10 +140,10 @@ func init() {
 	name, _ := os.Hostname()
 	config.Agent.GpgUser = name + "@subutai.io"
 
-	Misc = config.Misc
 	Agent = config.Agent
 	Broker = config.Broker
 	Influxdb = config.Influxdb
+	Template = config.Template
 	Management = config.Management
 }
 
@@ -155,8 +154,10 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() {
-	_, err := net.DialTimeout("tcp", "10.10.10.1:8551", time.Duration(3)*time.Second)
+	_, err := net.DialTimeout("tcp", Management.Host+":8551", time.Duration(3)*time.Second)
 	if !log.Check(log.InfoLevel, "Connecting to local Kurjun", err) {
-		Management.Kurjun = "http://10.10.10.1:8551/rest/kurjun/templates"
+		Management.Kurjun = "http://" + Management.Host + ":8551/rest/kurjun/templates"
+	} else {
+		Management.Kurjun = "http://" + Management.Cdn + ":8081/rest/kurjun/templates"
 	}
 }

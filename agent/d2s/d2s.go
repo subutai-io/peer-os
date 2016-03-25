@@ -6,7 +6,6 @@ import (
 	"github.com/subutai-io/base/agent/lib/template"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 )
 
@@ -23,14 +22,14 @@ func main() {
 	}
 
 	head := `#!/bin/bash
-mkdir -p /opt/docker2subutai/
+#mkdir -p /opt/docker2subutai/
 cd /opt/docker2subutai/
-uudecode $0 |tar zxf -
+#uudecode $0 |tar zxf -
 . .env
 `
 
 	//parse
-	out, env, cmd, _ := parser.Parce(dockerfile)
+	out, env, cmd, _, user, wdir := parser.Parce(dockerfile)
 
 	// if img != "" {
 	// 	cmd := exec.Command("subutai", "import", img)
@@ -47,7 +46,11 @@ cat > /opt/docker2subutai/cmd <<- EndOfCMD
 #!/bin/bash
 cd /opt/docker2subutai/
 . .env
-` + cmd + `
+`
+	if wdir != "" {
+		out = out + `cd ` + wdir + "\n"
+	}
+	out = out + cmd + `
 EndOfCMD
 
 chmod a+x /opt/docker2subutai/cmd
@@ -100,23 +103,25 @@ if [ -f "/etc/init/ssh.conf" ]; then
 	sed -i 's/start on runlevel \[2/start on runlevel \[12/g' /etc/init/ssh.conf
 fi
 `
-
+	if user != "" {
+		out = out + "sed -i 's/User=root/User=" + user + "/g' /etc/systemd/system/docker2subutai.service\n"
+		out = out + "sed -i -e '$i setuid=" + user + "\n' /etc/init/docker2subutai.conf\n"
+	}
+	out = head + out + "\nexit 0\n\n"
 	// create .env
 	ioutil.WriteFile(strings.Trim(dockerfile, "Dockerfile")+".env", []byte(env), 0644)
 
-	// make arch
-	template.Tar(strings.Trim(dockerfile, "Dockerfile"), tmpdir+"archive.tar.gz")
-	out = head + out + "\nexit 0\n\n"
-
 	// compress arch into script
-	data, _ := exec.Command("uuencode", tmpdir+"archive.tar.gz", "-").Output()
-	out = out + string(data) // add archived data
+	// data, _ := exec.Command("uuencode", tmpdir+"archive.tar.gz", "-").Output()
+	// out = out + string(data) // add archived data
 
 	// write script
-	// ioutil.WriteFile(strings.Trim(dockerfile, "Dockerfile")+"install.sh", []byte(out), 0755)
-	ioutil.WriteFile(tmpdir+"install.sh", []byte(out), 0755)
+	ioutil.WriteFile(strings.Trim(dockerfile, "Dockerfile")+"install.sh", []byte(out), 0755)
+
+	// make arch
+	template.Tar(strings.Trim(dockerfile, "Dockerfile"), tmpdir+"archive.tar.gz")
 
 	// clean
-	_ = os.Remove(tmpdir + "archive.tar.gz")
+	// _ = os.Remove(tmpdir + "archive.tar.gz")
 
 }

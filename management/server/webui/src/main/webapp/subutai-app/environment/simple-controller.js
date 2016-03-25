@@ -22,13 +22,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.applyChanges = applyChanges;
 
 	vm.environments = [];
-	vm.domainStrategies = [];
-	vm.strategies = [];
 
 	vm.colors = quotaColors;
 	vm.templates = [];
 
 	vm.activeCloudTab = 'templates';
+	vm.templatesType = 'all';
 
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
@@ -45,21 +44,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.addContainer = addContainer;
 	vm.closePopup = closePopup;
 
+	// @todo workaround
 	environmentService.getTemplates()
-		.success(function (data) {
+		.then(function (data) {
 			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
-	});
+		//.error(function (data) {
+		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
+		//});
 
 	function closePopup() {
 		vm.buildCompleted = false;
@@ -71,7 +63,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			.success(function (data) {
 				for(var i = 0; i < data.length; i++) {
 					if(data[i].description.includes(environmentId)) {
-						console.log(data[i]);
 						getLogById(data[i].id, true);
 						break;
 					}
@@ -82,9 +73,17 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			});		
 	}
 
-	function checkLastLog(status) {
+	var timezone = new Date().getTimezoneOffset();
+	function checkLastLog(status, date) {
+		if(date === undefined || date === null) date = false;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
-		lastLog.time = moment().format('HH:mm:ss');
+
+		if(date) {
+			lastLog.time = getDateFromString(date);
+		} else {
+			lastLog.time = moment().format('HH:mm:ss');
+		}
+
 		if(status === true) {
 			lastLog.status = 'success';
 			lastLog.classes = ['fa-check', 'g-text-green'];
@@ -111,27 +110,35 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					if(prevLogs) {
 						i = prevLogs.length;
 						if(logs.length > prevLogs.length) {
-							checkLastLog(true);
+							checkLastLog(true, logs[i-1]);
 						}
 					}
 					for(i; i < logs.length; i++) {
 
-						var logTime = moment().format('HH:mm:ss');
-						var logStatus = 'success';
-						var logClasses = ['fa-check', 'g-text-green'];
-						if(i+1 == logs.length) {
-							logTime = '';
-							logStatus = 'in-progress';
-							logClasses = ['fa-spinner', 'fa-pulse'];
-						}
+						var logCheck = logs[i].replace(/ /g,'');
+						if(logCheck.length > 0) {
 
-						var  currentLog = {
-							"time": logTime,
-							"status": logStatus,
-							"classes": logClasses,
-							"text": logs[i]
-						};
-						result.push(currentLog);
+							var logTextTime = logs[i].split(':');
+							var logTime = getDateFromString(logs[i]);
+
+							var logStatus = 'success';
+							var logClasses = ['fa-check', 'g-text-green'];
+
+							if(i+1 == logs.length) {
+								logTime = '';
+								logStatus = 'in-progress';
+								logClasses = ['fa-spinner', 'fa-pulse'];
+							}
+
+							var  currentLog = {
+								"time": logTime,
+								"status": logStatus,
+								"classes": logClasses,
+								"text": logTextTime[3]
+							};
+							result.push(currentLog);
+
+						}
 					}
 
 					vm.logMessages = vm.logMessages.concat(result);
@@ -164,7 +171,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 							};
 						}
 
-						checkLastLog(true);
+						if(prevLogs) {
+							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+							if(logs.length > prevLogs.length) {
+								checkLastLog(true, logs[logs.length-1]);
+							}
+						} else {
+							checkLastLog(true);
+						}
 						var currentLog = {
 							"time": moment().format('HH:mm:ss'),
 							"status": 'success',
@@ -631,7 +645,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			vm.containers2Build.push(container2Build);
 		}
 
-		console.log(vm.containers2Build);
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
 			scope: $scope,
@@ -640,7 +653,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function editEnvironment(environment) {
-		console.log(environment);
 		clearWorkspace();
 		vm.isApplyingChanges = false;
 		vm.currentEnvironment = environment;
@@ -649,6 +661,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.isEditing = true;
 		for(var container in environment.containers) {
 			var pos = vm.findEmptyCubePostion();
+			var img = 'assets/templates/' + environment.containers[container].templateName + '.jpg';
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 				templateName: environment.containers[container].templateName,
@@ -656,7 +672,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
 				attrs: {
-					image: { 'xlink:href': 'assets/templates/' + environment.containers[container].templateName + '.jpg' },
+					image: { 'xlink:href': img },
 					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
 					title: {text: environment.containers[container].templateName}
 				}

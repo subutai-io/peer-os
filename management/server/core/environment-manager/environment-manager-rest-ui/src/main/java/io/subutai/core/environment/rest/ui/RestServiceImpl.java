@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.environment.rest.ui.entity.ContainerDto;
+import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
+import io.subutai.core.environment.rest.ui.entity.PeerDto;
+import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +41,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Node;
+import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.ContainerHostState;
@@ -59,9 +64,8 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.core.strategy.api.NodeSchema;
+import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.UnlimitedStrategy;
 
 
 public class RestServiceImpl implements RestService
@@ -145,7 +149,7 @@ public class RestServiceImpl implements RestService
         {
             checkName( name );
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
@@ -153,14 +157,15 @@ public class RestServiceImpl implements RestService
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-            Topology topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+            Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
 
             eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
         catch ( Exception e )
         {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, (e.getMessage() == null ?
-                    "Internal error" : e.getMessage()) ) ).build();
+            return Response.serverError().entity(
+                    JsonUtil.toJson( ERROR_KEY, ( e.getMessage() == null ? "Internal error" : e.getMessage() ) ) )
+                           .build();
         }
 
         return Response.ok( JsonUtil.toJson( eventId ) ).build();
@@ -178,7 +183,7 @@ public class RestServiceImpl implements RestService
 
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
 
-            Topology topology = new Topology( name, 0, 0 );
+            Topology topology = new Topology( name );
 
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
@@ -204,7 +209,7 @@ public class RestServiceImpl implements RestService
                                             .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
                                             .findFirst().get().getName();
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
@@ -219,7 +224,7 @@ public class RestServiceImpl implements RestService
                 final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
                 final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
-                topology = placementStrategy.distribute( name, 0, 0, schema, peerGroupResources, quotas );
+                topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
 
             eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
@@ -251,7 +256,7 @@ public class RestServiceImpl implements RestService
                     JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
 
 
-            Topology topology = new Topology( name, 0, 0 );
+            Topology topology = new Topology( name );
 
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
@@ -431,8 +436,17 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( JsonUtil.toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
+            if( environmentManager.getEnvironmentDomain( environmentId ) == null )
+            {
+                return Response.serverError().entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
+            }
+
+
+            return Response.ok( JsonUtil
+                    .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
                            .build();
+
+
         }
         catch ( Exception e )
         {
@@ -624,6 +638,20 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response listContainerTypesInfo()
+    {
+        try
+        {
+            return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( gson.toJson( e.getMessage() ) ).build();
+        }
+    }
+
+
     /** Peers strategy **************************************************** */
     @Override
     public Response listPlacementStrategies()
@@ -644,27 +672,35 @@ public class RestServiceImpl implements RestService
     {
         List<Peer> peers = peerManager.getPeers();
 
+        String localId = peerManager.getLocalPeer().getId();
+
         ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
 
         CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
 
-        Map<String, List<String>> peerHostMap = Maps.newHashMap();
+        Map<String, PeerDto> peerHostMap = Maps.newHashMap();
 
         try
         {
             for ( Peer peer : peers )
             {
                 taskCompletionService.submit( () -> {
+                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(), peer.getId().equals( localId ) );
                     if ( peer.isOnline() )
                     {
                         Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                        peerHostMap.put( peer.getId(), Lists.newArrayList() );
                         for ( ResourceHostMetric metric : collection
                                 .toArray( new ResourceHostMetric[collection.size()] ) )
                         {
-                            peerHostMap.get( peer.getId() ).add( metric.getHostInfo().getId() );
+                            peerDto.addResourceHostDto( new ResourceHostDto( metric.getHostInfo().getId(), metric.getCpuModel(),
+                                           metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
+                                           metric.getAvailableRam().toString(),
+                                           metric.getTotalSpace().toString(),
+                                           metric.getAvailableSpace().toString() ) );
                         }
                     }
+
+                    peerHostMap.put( peer.getId(), peerDto );
                     return true;
                 } );
             }
@@ -801,46 +837,40 @@ public class RestServiceImpl implements RestService
 
     /** AUX **************************************************** */
 
-    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
+    private Set<ContainerDto> convertContainersToContainerJson(Set<EnvironmentContainerHost> containerHosts )
     {
         Set<ContainerDto> containerDtos = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            ContainerHostState state = containerHost.getState();
-
-            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-
-            String rhId = null;
-            for ( Peer peer : peerManager.getPeers() )
+            try
             {
-                if ( peer.getId().equals( containerHost.getPeerId() ) )
-                {
-                    try
-                    {
-                        rhId = peer.getResourceHostIdByContainerId( containerHost.getContainerId() ).getId();
-                    }
-                    catch ( PeerException e )
-                    {
-                        LOG.error( "cannot get resourceHostByContainerId", e );
-                    }
-                }
+                ContainerHostState state = containerHost.getState();
+
+                HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                        containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
+                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
+                        containerHost.getPeerId(), /*rhId*/ containerHost.getResourceHostId().getId() ) );
             }
-
-
-            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
-                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                    containerHost.getPeerId(), rhId ) );
+            catch ( Exception e )
+            {
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                        containerHost.getHostname(), ContainerHostState.UNKNOWN, "UNKNOWN",
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        "UNKNOWN" ) );
+            }
         }
         return containerDtos;
     }
 
+
     private void checkName( final String name ) throws Exception
     {
-        if( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals(name) ).count() > 0 )
+        if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
         {
-            throw new Exception("Duplicated environment name");
+            throw new Exception( "Duplicated environment name" );
         }
     }
 }

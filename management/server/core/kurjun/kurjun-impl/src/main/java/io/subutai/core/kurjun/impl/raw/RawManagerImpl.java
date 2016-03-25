@@ -25,6 +25,7 @@ import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.common.service.KurjunProperties;
 import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
+import ai.subut.kurjun.metadata.common.raw.RawMetadata;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreFactory;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.Metadata;
@@ -147,7 +148,7 @@ public class RawManagerImpl implements RawManager
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        SerializableMetadata meta = getRepository( isKurjunClient ).getPackageInfo( m );
+        RawMetadata meta = (RawMetadata) getRepository( isKurjunClient ).getPackageInfo( m );
         if ( meta != null )
         {
             return convertToResource( meta );
@@ -168,7 +169,7 @@ public class RawManagerImpl implements RawManager
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
 
-        SerializableMetadata meta = getRepository( isKurjunClient ).getPackageInfo( m );
+        RawMetadata meta = (RawMetadata) getRepository( isKurjunClient ).getPackageInfo( m );
         if ( meta != null )
         {
             return convertToResource( meta );
@@ -201,7 +202,7 @@ public class RawManagerImpl implements RawManager
 
         for ( SerializableMetadata metadata : metadatas )
         {
-            result.add( convertToResource( metadata ) );
+            result.add( convertToResource( (RawMetadata) metadata ) );
         }
 
         return result;
@@ -251,9 +252,9 @@ public class RawManagerImpl implements RawManager
     }
 
 
-    private Resource convertToResource( SerializableMetadata meta )
+    private Resource convertToResource( RawMetadata meta )
     {
-        return new Resource( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName() );
+        return new Resource( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getSize() );
     }
 
 

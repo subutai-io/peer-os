@@ -165,6 +165,12 @@ public interface RestService
     Response listContainerTypes();
 
 
+    @GET
+    @Path( "containers/types/info" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response listContainerTypesInfo();
+
+
     /** Peers strategy **************************************************** */
 
     @GET

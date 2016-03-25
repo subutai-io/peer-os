@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
@@ -148,6 +149,31 @@ public class RelationDataService
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.target.linkId=:target" );
             qr.setParameter( "target", target.getLinkId() );
+            result.addAll( qr.getResultList() );
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
+
+    public List<Relation> getTrustedRelationsByOwnership( final RelationLink trustedObject,
+                                                               Ownership ownership )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        List<Relation> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject "
+                    + "and ss.relationInfo.ownershipLevel=:ownershipLevel" );
+            qr.setParameter( "trustedObject", trustedObject.getLinkId() );
+            qr.setParameter( "ownershipLevel", ownership.getLevel() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )

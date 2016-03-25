@@ -7,6 +7,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import io.subutai.common.host.HostId;
 import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.resource.CpuResource;
+import io.subutai.common.resource.NumericValueResource;
 import io.subutai.common.resource.ResourceValue;
 
 
@@ -49,15 +51,43 @@ public class ExceededQuota
     }
 
 
-    public ResourceValue getCurrentValue()
+    @SuppressWarnings( "unchecked" )
+    public <T> T getQuotaValue( final Class<T> format )
     {
-        return currentValue;
+        try
+        {
+            return ( T ) quotaValue;
+        }
+        catch ( ClassCastException cce )
+        {
+            return null;
+        }
+    }
+
+
+    @SuppressWarnings( "unchecked" )
+    public <T> T getCurrentValue( final Class<T> format )
+    {
+        try
+        {
+            return ( T ) currentValue;
+        }
+        catch ( ClassCastException cce )
+        {
+            return null;
+        }
     }
 
 
     public ResourceValue getQuotaValue()
     {
         return quotaValue;
+    }
+
+
+    public ResourceValue getCurrentValue()
+    {
+        return currentValue;
     }
 
 

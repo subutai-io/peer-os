@@ -61,6 +61,7 @@ public class Node
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Resource host id is null" );
         Preconditions.checkNotNull( type );
 
         this.hostname = hostname;
@@ -119,7 +120,7 @@ public class Node
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "NodeGroup{" );
+        final StringBuffer sb = new StringBuffer( "Node{" );
         sb.append( "name='" ).append( name ).append( '\'' );
         sb.append( ", templateName='" ).append( templateName ).append( '\'' );
         sb.append( ", type=" ).append( type );
@@ -127,6 +128,7 @@ public class Node
         sb.append( ", hostsGroupId=" ).append( hostsGroupId );
         sb.append( ", peerId='" ).append( peerId ).append( '\'' );
         sb.append( ", hostId='" ).append( hostId ).append( '\'' );
+        sb.append( ", hostname='" ).append( hostname ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
     }

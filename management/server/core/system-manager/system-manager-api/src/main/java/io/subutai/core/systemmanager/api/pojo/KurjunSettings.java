@@ -58,4 +58,10 @@ public interface KurjunSettings
 
 
     public void setTrustTimeUnit( final TimeUnit trustTimeUnit );
+
+
+    public String[] getLocalKurjunUrls();
+
+
+    public void setLocalKurjunUrls( final String[] localKurjunUrls );
 }

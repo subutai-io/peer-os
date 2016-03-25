@@ -39,7 +39,8 @@ public interface RestService
     @POST
     @Path( "update_kurjun_settings_urls" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setKurjunSettingsUrls( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls )
+    public Response setKurjunSettingsUrls( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls,
+                                           @FormParam( "localKurjunUrls" ) String localKurjunUrls )
             throws ConfigurationException;
 
 

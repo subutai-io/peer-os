@@ -23,7 +23,6 @@ public class CloneRequest implements TaskRequest
     private final ContainerSize containerSize;
 
 
-    // todo: add vlan at request creation time
     public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
                          final String ip, final String environmentId, final String initiatorPeerId,
                          final String ownerId, final String templateName, HostArchitecture templateArch,
@@ -33,13 +32,11 @@ public class CloneRequest implements TaskRequest
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
         Preconditions.checkNotNull( templateName );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.CIDR_REGEX ) );
-        //        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
         this.containerName = containerName;
         this.ip = ip;
-        //        this.vlan = vlan;
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
         this.ownerId = ownerId;
@@ -71,12 +68,6 @@ public class CloneRequest implements TaskRequest
     {
         return ip;
     }
-
-    //
-    //    public Integer getVlan()
-    //    {
-    //        return vlan;
-    //    }
 
 
     public String getEnvironmentId()

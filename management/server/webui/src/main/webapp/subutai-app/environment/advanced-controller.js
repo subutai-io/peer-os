@@ -26,9 +26,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 
-	vm.domainStrategies = [];
-	vm.strategies = [];
 	vm.activeCloudTab = 'peers';
+	vm.templatesType = 'all';
 
 	vm.peerIds = [];
 	vm.resourceHosts = [];
@@ -59,27 +58,19 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.addResource2Build = addResource2Build;
 	vm.closePopup = closePopup;
 
+	// @todo workaround
 	environmentService.getTemplates()
-		.success(function (data) {
+		.then(function (data) {
 			vm.templates = data;
-		})
-		.error(function (data) {
-			VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
 		});
-
-	environmentService.getStrategies().success(function (data) {
-		vm.strategies = data;
-	});
-
-	environmentService.getDomainStrategies().success(function (data) {
-		vm.domainStrategies = data;
-	});
+		//.error(function (data) {
+		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
+		//});
 
 	function getPeers() {
 		$('.js-peer-load-screen').show();
 		environmentService.getPeers().success(function (data) {
 			vm.peerIds = data;
-			//vm.peerIds['testPeer'] = ['rh1', 'rh2', 'rh3'];
 			$('.js-peer-load-screen').hide();
 		}).error(function(error){
 			$('.js-peer-load-screen').hide();
@@ -111,9 +102,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			});		
 	}
 
-	function checkLastLog(status) {
+	function checkLastLog(status, date) {
+		if(date === undefined || date === null) date = false;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
-		lastLog.time = moment().format('HH:mm:ss');
+
+		if(date) {
+			lastLog.time = getDateFromString(date);
+		} else {
+			lastLog.time = moment().format('HH:mm:ss');
+		}
+
 		if(status === true) {
 			lastLog.status = 'success';
 			lastLog.classes = ['fa-check', 'g-text-green'];
@@ -145,22 +143,29 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					}
 					for(i; i < logs.length; i++) {
 
-						var logTime = moment().format('HH:mm:ss');
-						var logStatus = 'success';
-						var logClasses = ['fa-check', 'g-text-green'];
-						if(i+1 == logs.length) {
-							logTime = '';
-							logStatus = 'in-progress';
-							logClasses = ['fa-spinner', 'fa-pulse'];
-						}
+						var logCheck = logs[i].replace(/ /g,'');
+						if(logCheck.length > 0) {
 
-						var  currentLog = {
-							"time": logTime,
-							"status": logStatus,
-							"classes": logClasses,
-							"text": logs[i]
-						};
-						result.push(currentLog);
+							var logTextTime = logs[i].split(':');
+							var logTime = getDateFromString(logs[i]);
+
+							var logStatus = 'success';
+							var logClasses = ['fa-check', 'g-text-green'];
+							if(i+1 == logs.length) {
+								logTime = '';
+								logStatus = 'in-progress';
+								logClasses = ['fa-spinner', 'fa-pulse'];
+							}
+
+							var  currentLog = {
+								"time": logTime,
+								"status": logStatus,
+								"classes": logClasses,
+								"text": logTextTime[3]
+							};
+							result.push(currentLog);
+
+						}
 					}
 
 					vm.logMessages = vm.logMessages.concat(result);
@@ -193,7 +198,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 							};
 						}
 
-						checkLastLog(true);
+						if(prevLogs) {
+							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+							if(logs.length > prevLogs.length) {
+								checkLastLog(true, logs[logs.length-1]);
+							}
+						} else {
+							checkLastLog(true);
+						}
 						var currentLog = {
 							"time": moment().format('HH:mm:ss'),
 							"status": 'success',
@@ -384,7 +396,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}
 		}
 
-		return pos[pos.length - 1];
+		return pos[pos.length - 1] + 1;
 	}
 
 	//custom shapes
@@ -481,7 +493,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				case 'element-tool-remove':
 					if (this.model.attributes.containerId) {
 						vm.excludedContainers.push(this.model);
-						console.log(vm.excludedContainers);
 					}
 
 					var rh = this.model.attributes.rh;
@@ -507,7 +518,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					return;
 					break;
 				case 'rotatable':
-					console.log(this.model);
 					/*vm.currentTemplate = this.model;
 					ngDialog.open({
 						template: 'subutai-app/environment/partials/popups/templateSettingsAdvanced.html',
@@ -727,12 +737,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 		if(vm.editingEnv) {
 			var removeContainers = getContainers2Build(vm.excludedContainers, false, true);
-			console.log(removeContainers);
 			vm.env2Remove = removeContainers.containersObj;
 			vm.containers2Remove = removeContainers.containersList;
 		}
 
-		console.log(vm.containers2Build);
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info-advanced.html',
 			scope: $scope,
@@ -810,7 +818,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function clearWorkspace() {
 		vm.cubeGrowth = 0;
-		PEER_MAP = [];
+		PEER_MAP = {};
 
 		vm.env2Build = {};
 		vm.containers2Build = [];
@@ -830,17 +838,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		//ngDialog.closeAll();
 		containerSettingMenu.hide();
 	}
-}
-
-function imageExists(image_url){
-
-    var http = new XMLHttpRequest();
-
-    http.open('HEAD', image_url, false);
-    http.send();
-
-    return http.status != 404;
-
 }
 
 function placeRhSimple( model ) {
@@ -889,6 +886,8 @@ function movePeer(peerId, posMod, counter) {
 			x = counter * posMod;
 			counter++;
 		}
+
+		PEER_MAP[peerKeys[i]].position--;
 
 		for(var key in PEER_MAP[peerKeys[i]].rh) {
 			var resourceHost = graph.getCell(PEER_MAP[peerKeys[i]].rh[key]);

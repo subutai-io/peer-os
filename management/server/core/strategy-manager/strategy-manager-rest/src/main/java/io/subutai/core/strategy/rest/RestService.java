@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.strategy.api.Blueprint;
+import io.subutai.common.environment.Blueprint;
 
 
 /**

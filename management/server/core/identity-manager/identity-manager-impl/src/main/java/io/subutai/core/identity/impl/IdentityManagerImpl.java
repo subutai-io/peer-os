@@ -75,6 +75,7 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.security.api.model.SecurityKey;
 
 
 /**
@@ -535,8 +536,26 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User getUserByFingerprint( String fingerprint )
     {
-        String keyId = securityManager.getKeyManager().getKeyDataByFingerprint( fingerprint ).getIdentityId();
-        return identityDataService.getUserByKeyId( keyId);
+        try
+        {
+            SecurityKey key = securityManager.getKeyManager().getKeyDataByFingerprint( fingerprint );
+
+            if(key != null)
+            {
+                return identityDataService.getUserByKeyId( key.getIdentityId());
+            }
+            else
+            {
+                LOGGER.info( "******* User not found with fingerpint:" + fingerprint);
+                return null;
+            }
+
+        }
+        catch(Exception ex)
+        {
+            LOGGER.error("******* Error !! Error getting User by fingerprint",ex);
+            return null;
+        }
     }
 
 

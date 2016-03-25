@@ -15,8 +15,13 @@ public class CommonPages extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
-    //endregion
+    @FindBy(xpath = "*//div[@class=\"b-hub-status__dropdown b-hub-status__dropdown_open\"]//button[@class=\"b-btn b-btn_green g-right\"]")
+    public WebElementFacade buttonRegister;
 
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
+    public WebElementFacade buttonGreen;
+
+    //endregion
     //region SIKULI IMAGES: Buttons
 
     public String sikuliButtonLogin = "src/test/resources/imgs/buttons/buttonLogin.png";
@@ -77,19 +82,53 @@ public class CommonPages extends PageObject {
     @FindBy(id = "subt-link__about")
     public WebElementFacade linkAbout;
 
+    @FindBy(xpath = "*//div[@class=\"b-hub-status__dropdown b-hub-status__dropdown_open\"]//a[@class=\"b-form-label\"]")
+    public WebElementFacade linkSignUp;
+
+    @FindBy(xpath = "*//div[@class=\"b-hub-status__dropdown b-hub-status__dropdown_open\"]//a[@class=\"show-more\"]")
+    public WebElementFacade linkClear;
+
+    @FindBy(xpath = "*//a[@class=\"b-header-userbar-name ng-binding\"]")
+    public WebElementFacade linkAdmin;
+
     //endregion
     //region SIKULI IMAGES: Menu Links
 
+    public String sikuliUpperMenuItemRegisterPeer = "src/test/resources/imgs/menuItems/upperMenuItemRegisterPeer.png";
+
+    public String sikuliMenuItemMonitoring = "src/test/resources/imgs/menuItems/menuItemMonitoring.png";
     public String sikuliMenuItemEnvironment = "src/test/resources/imgs/menuItems/menuItemEnvironment.png";
     public String sikuliMenuItemEnvironments = "src/test/resources/imgs/menuItems/menuItemEnvironments.png";
-    public String sikuliMenuItemUserManagement = "src/test/resources/imgs/menuItems/menuItemUserIdentity.png";
+    public String sikuliMenuItemContainers = "src/test/resources/imgs/menuItems/menuItemContainers.png";
+    public String sikuliMenuItemKurjun = "src/test/resources/imgs/menuItems/menuItemKurjun.png";
+    public String sikuliMenuItemConsole = "src/test/resources/imgs/menuItems/menuItemConsole.png";
+    public String sikuliMenuItemUserIdentity = "src/test/resources/imgs/menuItems/menuItemUserIdentity.png";
+    public String sikuliMenuItemUserManagement = "src/test/resources/imgs/menuItems/menuItemUserManagement.png";
+    public String sikuliMenuItemRoleManagement = "src/test/resources/imgs/menuItems/menuItemRoleManagement.png";
     public String sikuliMenuItemAccountSettings = "src/test/resources/imgs/menuItems/menuItemAccountSettings.png";
+    public String sikuliMenuItemTokens = "src/test/resources/imgs/menuItems/menuItemTokens.png";
+    public String sikuliMenuItemPeerRegistration = "src/test/resources/imgs/menuItems/menuItemPeerRegistration.png";
+    public String sikuliMenuItemResourceHosts = "src/test/resources/imgs/menuItems/menuItemResourceHosts.png";
+    public String sikuliMenuItemTracker = "src/test/resources/imgs/menuItems/menuItemTracker.png";
+    public String sikuliMenuItemBazaar = "src/test/resources/imgs/menuItems/menuItemBazaar.png";
+    public String sikuliMenuItemSystemSettings = "src/test/resources/imgs/menuItems/menuItemSystemSettings.png";
+    public String sikuliMenuItemPeerSettings = "src/test/resources/imgs/menuItems/menuItemPeerSettings.png";
+    public String sikuliMenuItemKurjunSettings = "src/test/resources/imgs/menuItems/menuItemKurjunSettings.png";
+    public String sikuliMenuItemNetworkSettings = "src/test/resources/imgs/menuItems/menuItemNetworkSettings.png";
+    public String sikuliMenuItemAdvanced = "src/test/resources/imgs/menuItems/menuItemAdvanced.png";
+    public String sikuliMenuItemAbout = "src/test/resources/imgs/menuItems/menuItemAbout.png";
 
 //    public String sikuliTest = returnAbsoluteFilePath.GetPath("src/test/resources/imgs/menuItems/menuItemEnvironment.png");
 
     //endregion
 
     //region WEB ELEMENTS: Tables
+
+    @FindBy(xpath = "*//div[@class=\"b-hub-status__dropdown b-hub-status__dropdown_open\"]//div[@class=\"body\"]")
+    public WebElementFacade upperMenuLoginBody;
+
+    @FindBy(xpath = "*//div[@class=\"b-hub-status__dropdown b-hub-status__dropdown_open\"]//li[@class=\"ng-scope\"]")
+    public WebElementFacade upperMenuNotificationsBody;
 
     //endregion
 
@@ -107,6 +146,8 @@ public class CommonPages extends PageObject {
 
     //region WEB ELEMENTS: Icons
 
+    public String sikuliIconNotifications = "src/test/resources/imgs/icons/iconNotification.png";
+
     //endregion
 
     //region WEB ELEMENTS: Headers
@@ -121,5 +162,7 @@ public class CommonPages extends PageObject {
     @FindBy(xpath = "*//p[contains(text(), \"Your environment has been destroyed.\")]")
     public WebElementFacade textEnvironmentHasBeenDestroyed;
 
+    @FindBy(xpath = "*//div[@class=\"b-hub-status__dropdown b-hub-status__dropdown_open\"]//div[contains(text(),\"Register Peer\")]")
+    public WebElementFacade titleUpperMenuRegisterPeer;
     //endregion
 }

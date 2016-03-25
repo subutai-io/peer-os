@@ -22,17 +22,15 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PPeerInfo;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
-import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
@@ -57,52 +55,77 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
+    //---------------- P2P SECTION BEGIN ------------------------
     @Override
-    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
-                                    long secretKeyTtlSec ) throws NetworkManagerException
+    public void setupP2PConnection( final String interfaceName, final String localIp, final String p2pHash,
+                                    final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
-        execute( getManagementHost(),
-                commands.getSetupP2PConnectionCommand( interfaceName, localIp, communityName, secretKey,
-                        getUnixTimestampOffset( secretKeyTtlSec ) ) );
-    }
-
-
-    private long getUnixTimestampOffset( long offsetSec )
-    {
-        long unixTimestamp = Instant.now().getEpochSecond();
-        return unixTimestamp + offsetSec;
+        setupP2PConnection( getManagementHost(), interfaceName, localIp, p2pHash, secretKey, secretKeyTtlSec );
     }
 
 
     @Override
-    public void removeP2PConnection( final String communityName ) throws NetworkManagerException
+    public void setupP2PConnection( final Host host, final String interfaceName, final String localIp,
+                                    final String p2pHash, final String secretKey, final long secretKeyTtlSec )
+            throws NetworkManagerException
     {
-        execute( getManagementHost(), commands.getRemoveP2PConnectionCommand( communityName ) );
+        execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, p2pHash, secretKey,
+                getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 
 
     @Override
-    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws NetworkManagerException
+    public void removeP2PConnection( final String p2pHash ) throws NetworkManagerException
     {
+        removeP2PConnection( getManagementHost(), p2pHash );
+    }
+
+
+    @Override
+    public void removeP2PConnection( final Host host, final String p2pHash ) throws NetworkManagerException
+    {
+        execute( host, commands.getRemoveP2PConnectionCommand( p2pHash ) );
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
+            throws NetworkManagerException
+    {
+        resetP2PSecretKey( getManagementHost(), p2pHash, newSecretKey, ttlSeconds );
+    }
+
+
+    @Override
+    public void resetP2PSecretKey( final Host host, final String p2pHash, final String newSecretKey,
+                                   final long ttlSeconds ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
         Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
 
-        execute( getManagementHost(),
-                commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
+        execute( host, commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
     }
 
 
     @Override
-    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException
+    public P2PConnections getP2PConnections() throws NetworkManagerException
     {
-        Set<P2PConnection> connections = Sets.newHashSet();
+        return getP2PConnections( getManagementHost() );
+    }
 
-        CommandResult result = execute( getManagementHost(), commands.getListP2PConnectionsCommand() );
+
+    @Override
+    public P2PConnections getP2PConnections( final Host host ) throws NetworkManagerException
+    {
+        P2PConnections connections = new P2PConnections();
+
+        CommandResult result = execute( host, commands.getP2PConnectionsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile( "(\\w+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.*)" );
+        Pattern p = Pattern.compile( "\\s*(\\S+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\S+)\\s*" );
 
         while ( st.hasMoreTokens() )
         {
@@ -110,12 +133,15 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 3 )
             {
-                connections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+                connections.addConnection( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
             }
         }
 
         return connections;
     }
+
+
+    //------------------ P2P SECTION END --------------------------------
 
 
     @Override
@@ -147,34 +173,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public Set<P2PPeerInfo> listPeersInEnvironment( final String communityName ) throws NetworkManagerException
-    {
-        Set<P2PPeerInfo> p2PPeerInfos = Sets.newHashSet();
-
-        CommandResult result =
-                execute( getManagementHost(), commands.getListPeersInEnvironmentCommand( communityName ) );
-
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        Pattern p = Pattern.compile( "(.+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(.+)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
-            {
-                p2PPeerInfos.add( new P2PPeerInfo( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
-            }
-        }
-
-
-        return p2PPeerInfos;
-    }
-
-
-    @Override
     public void setupTunnel( final int tunnelId, final String tunnelIp ) throws NetworkManagerException
     {
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
@@ -192,38 +190,6 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( getManagementHost(),
                 commands.getRemoveTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ) ) );
-    }
-
-
-    @Override
-    public void removeGateway( final int vLanId ) throws NetworkManagerException
-    {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        execute( getManagementHost(), commands.getRemoveGatewayCommand( vLanId ) );
-    }
-
-
-    @Override
-    public void cleanupEnvironmentNetworkSettings( final EnvironmentId environmentId ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
-
-        for ( Vni vni : getReservedVnis().list() )
-        {
-            if ( vni.getEnvironmentId().equals( environmentId.getId() ) )
-            {
-                execute( getManagementHost(), commands.getCleanupEnvironmentNetworkSettingsCommand( vni.getVlan() ) );
-                break;
-            }
-        }
-    }
-
-
-    @Override
-    public void removeGatewayOnContainer( final String containerName ) throws NetworkManagerException
-    {
-        execute( getContainerHost( containerName ), commands.getRemoveGatewayOnContainerCommand() );
     }
 
 
@@ -313,7 +279,7 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void reserveVni( Vni vni ) throws NetworkManagerException
+    public void reserveVni( final Vni vni ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( vni );
         Preconditions.checkArgument( NumUtil.isIntBetween( vni.getVlan(), Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
@@ -468,43 +434,10 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    @Override
-    public void setContainerIp( final String containerName, final String ip, final int netMask, final int vLanId )
-            throws NetworkManagerException
+    private long getUnixTimestampOffset( final long offsetSec )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) && ip.matches( Common.IP_REGEX ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        execute( getResourceHost( containerName ),
-                commands.getSetContainerIpCommand( containerName, ip, netMask, vLanId ) );
-    }
-
-
-    @Override
-    public void removeContainerIp( final String containerName ) throws NetworkManagerException
-    {
-        execute( getResourceHost( containerName ), commands.getRemoveContainerIpCommand( containerName ) );
-    }
-
-
-    @Override
-    public ContainerInfo getContainerIp( final String containerName ) throws NetworkManagerException
-    {
-        CommandResult result =
-                execute( getResourceHost( containerName ), commands.getShowContainerIpCommand( containerName ) );
-
-        Pattern pattern = Pattern.compile(
-                "Environment IP:\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})/(\\d+)\\s+Vlan ID:\\s+(\\d+)\\s+" );
-        Matcher m = pattern.matcher( result.getStdOut() );
-        if ( m.find() && m.groupCount() == 3 )
-        {
-            return new ContainerInfoImpl( m.group( 1 ), Integer.parseInt( m.group( 2 ) ),
-                    Integer.parseInt( m.group( 3 ) ) );
-        }
-        else
-        {
-            throw new NetworkManagerException( String.format( "Network info of %s not found", containerName ) );
-        }
+        long unixTimestamp = Instant.now().getEpochSecond();
+        return unixTimestamp + offsetSec;
     }
 
 
@@ -521,7 +454,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected ResourceHost getResourceHost( String containerName ) throws NetworkManagerException
+    protected ResourceHost getResourceHost( final String containerName ) throws NetworkManagerException
     {
         try
         {
@@ -535,7 +468,7 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected ContainerHost getContainerHost( String containerName ) throws NetworkManagerException
+    protected ContainerHost getContainerHost( final String containerName ) throws NetworkManagerException
     {
         try
         {
@@ -548,7 +481,8 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    protected CommandResult execute( Host host, RequestBuilder requestBuilder ) throws NetworkManagerException
+    protected CommandResult execute( final Host host, final RequestBuilder requestBuilder )
+            throws NetworkManagerException
     {
         try
         {
@@ -565,65 +499,5 @@ public class NetworkManagerImpl implements NetworkManager
         {
             throw new NetworkManagerException( e );
         }
-    }
-
-
-    @Override
-    public void exchangeSshKeys( final Set<ContainerHost> containers, final Set<String> additionalSshKeys )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).execute( additionalSshKeys, false );
-    }
-
-
-    @Override
-    public void appendSshKeys( final Set<ContainerHost> containers, final Set<String> sshKeys )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).execute( sshKeys, true );
-    }
-
-
-    @Override
-    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).appendSshKey( sshKey );
-    }
-
-
-    @Override
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
-                                               final String newSshKey ) throws NetworkManagerException
-    {
-        getSshManager( containers ).replaceSshKey( oldSshKey, newSshKey );
-    }
-
-
-    @Override
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).removeSshKey( sshKey );
-    }
-
-
-    @Override
-    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
-            throws NetworkManagerException
-    {
-        getHostManager( containerHosts, domainName ).execute();
-    }
-
-
-    protected SshManager getSshManager( final Set<ContainerHost> containers )
-    {
-        return new SshManager( containers );
-    }
-
-
-    protected HostManager getHostManager( final Set<ContainerHost> containerHosts, final String domainName )
-    {
-        return new HostManager( containerHosts, domainName );
     }
 }

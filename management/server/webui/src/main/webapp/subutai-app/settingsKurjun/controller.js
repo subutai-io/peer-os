@@ -37,13 +37,19 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
 
 
 
-    vm.addUrl = addUrl;
-    function addUrl() {
+    vm.addGlobalUrl = addGlobalUrl;
+    function addGlobalUrl() {
         vm.config.globalKurjunUrls.push("");
     }
 
-    vm.removeUrl = removeUrl;
-    function removeUrl(index) {
+    vm.addLocalUrl = addLocalUrl;
+    function addLocalUrl() {
+        vm.config.localKurjunUrls.push("");
+    }
+
+
+    vm.removeGlobalUrl = removeGlobalUrl;
+    function removeGlobalUrl(index) {
         if (vm.config.globalKurjunUrls.length !== 1) {
             vm.config.globalKurjunUrls.splice(index, 1);
         }
@@ -51,6 +57,17 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert) {
             vm.config.globalKurjunUrls[0] = "";
         }
     }
+
+    vm.removeLocalUrl = removeLocalUrl;
+    function removeLocalUrl(index) {
+        if (vm.config.localKurjunUrls.length !== 1) {
+            vm.config.localKurjunUrls.splice(index, 1);
+        }
+        else {
+            vm.config.localKurjunUrls[0] = "";
+        }
+    }
+
 
 
 }

@@ -26,7 +26,14 @@ $(document).on('click', function(event) {
 		$(event.target).closest('g').attr('class') != 'element-call-menu' && 
 		$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
 	){
-		$('.b-template-settings__dropdown').slideUp(100);
+		$('.b-template-settings').slideUp(100);
+	}
+});
+
+$(document).keyup(function(e) {
+	if (e.keyCode == 27) {
+		$('.b-hub-status__dropdown').slideUp(100);
+		$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
 	}
 });
 
