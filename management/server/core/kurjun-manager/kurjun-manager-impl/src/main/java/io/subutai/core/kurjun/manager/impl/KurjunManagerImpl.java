@@ -44,23 +44,6 @@ public class KurjunManagerImpl implements KurjunManager
     //**********************************
 
 
-    //TODO getValues from SystemManager;
-
-    private String localKurjunURL;
-    private String globalKurjunURL;
-
-
-    //****************************************
-    //    public void KurjunManagerImpl( /*IdentityManager identityManager, SecurityManager securityManager,*/
-    //                                   DaoManager daoManager )
-    //    {
-    //        this.identityManager = identityManager;
-    //        this.securityManager = securityManager;
-    //        this.daoManager = daoManager;
-    //
-    //        dataService = new KurjunDataService( daoManager );
-    //    }
-
 
     //****************************************
     public void init()
