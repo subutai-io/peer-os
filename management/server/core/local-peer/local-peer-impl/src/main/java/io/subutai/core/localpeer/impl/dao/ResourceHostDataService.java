@@ -29,7 +29,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public ResourceHostEntity find( final String id )
+    public synchronized ResourceHostEntity find( final String id )
     {
         ResourceHostEntity result = null;
         EntityManager em = emf.createEntityManager();
@@ -56,7 +56,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public Collection<ResourceHostEntity> getAll()
+    public synchronized Collection<ResourceHostEntity> getAll()
     {
         Collection<ResourceHostEntity> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
@@ -83,7 +83,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public void persist( final ResourceHostEntity item )
+    public synchronized void persist( final ResourceHostEntity item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -109,7 +109,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public void remove( final String id )
+    public synchronized void remove( final String id )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -135,7 +135,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
 
 
     @Override
-    public void update( ResourceHostEntity item )
+    public synchronized void update( ResourceHostEntity item )
     {
         EntityManager em = emf.createEntityManager();
         try
@@ -159,7 +159,7 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
     }
 
 
-    public ResourceHostEntity saveOrUpdate( ResourceHost item )
+    public synchronized ResourceHostEntity saveOrUpdate( ResourceHost item )
     {
         EntityManager em = emf.createEntityManager();
 

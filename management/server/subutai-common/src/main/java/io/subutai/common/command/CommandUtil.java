@@ -13,6 +13,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
@@ -25,6 +28,9 @@ import io.subutai.common.util.CollectionUtil;
  */
 public class CommandUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger( CommandUtil.class );
+
+
     /**
      * Allows to execute command on host. Throws CommandException if command has completed with status other then
      * SUCCEEDED.
@@ -235,7 +241,7 @@ public class CommandUtil
             }
             catch ( Exception e )
             {
-                //ignore
+                LOG.error( "Error in #executeParallelSilent", e );
             }
         }
 

@@ -4,6 +4,9 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
@@ -20,6 +23,7 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 public class RegisterSshStep
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RegisterSshStep.class );
 
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
@@ -88,7 +92,12 @@ public class RegisterSshStep
 
                 succeededHosts.add( host );
             }
+            else
+            {
+                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
+            }
         }
+
 
         failedHosts.removeAll( succeededHosts );
 
