@@ -189,11 +189,12 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private void setupTunnel( EnvironmentPeerDto peerDto )
     {
-        String containerDataURL =
-                String.format( "/rest/v1/environments/%s/setup-tunnel", peerDto.getEnvironmentInfo().getId() );
+        String setupTunnelDataURL =
+                String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( setupTunnelDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
@@ -288,12 +289,13 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     {
         try
         {
-            String envPeerDataUrl = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+            String envPeerDataUrl = String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
+                    peerManager.getLocalPeer().getId() );
             WebClient client = configManager.getTrustedWebClientWithAuth( envPeerDataUrl, configManager.getHubIp() );
 
             byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response r = client.post( encryptedData );
+            Response r = client.put( encryptedData );
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
                 LOG.debug( "Environment peer data successfully sent to hub" );
