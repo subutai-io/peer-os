@@ -1657,10 +1657,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             P2PConnection mhP2pConnection =
                     getNetworkManager().getP2PConnections().findConnectionByHash( config.getHash() );
 
+            if ( mhP2pConnection == null )
+            {
+                throw new PeerException( "P2P connection on management host not found." );
+            }
+
             return mhP2pConnection.getIp();
         }
         catch ( NetworkManagerException e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Failed to setup P2P connection", e );
         }
     }
