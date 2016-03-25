@@ -20,7 +20,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
 
 
@@ -85,7 +84,7 @@ public class EnvironmentAdapter
     }
 
 
-    public EnvironmentImpl get( final String id, EnvironmentManagerImpl environmentManager )
+    public ProxyEnvironment get( final String id, EnvironmentManagerImpl environmentManager )
     {
         ProxyEnvironment e = new ProxyEnvironment(
                 "Mock Env",
@@ -102,7 +101,6 @@ public class EnvironmentAdapter
         e.setStatus( EnvironmentStatus.HEALTHY );
         e.getEnvironmentId();
 
-
         HashSet<EnvironmentContainerImpl> set3 = new HashSet<>();
         set3.add( getContainer( environmentManager ) );
         e.addContainers( set3 );
@@ -116,6 +114,8 @@ public class EnvironmentAdapter
         e.addEnvironmentPeer( peerConf );
 
         e.setEnvironmentManager( environmentManager );
+
+        log.debug( "env: {}", e );
 
         return e;
     }
