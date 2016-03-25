@@ -1,11 +1,8 @@
 package io.subutai.core.peer.impl;
 
 
-import java.awt.Container;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -19,8 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Containers;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -255,6 +250,37 @@ public class PeerWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error resetting P2P secret key", e );
+        }
+    }
+
+
+    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
+
+        String path = String.format( "/p2pip/%s/%s", resourceHostId, swarmHash );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.accept( MediaType.TEXT_PLAIN );
+
+        try
+        {
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( String.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error getting P2P IP", e );
         }
     }
 

@@ -1616,6 +1616,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
+
+        try
+        {
+            String p2pIp = getNetworkManager().getP2PConnections( getResourceHostById( resourceHostId ) )
+                                              .findConnectionByHash( swarmHash ).getIp();
+            if ( p2pIp == null )
+            {
+                throw new PeerException( "P2P connection not found" );
+            }
+
+            return p2pIp;
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Error getting p2p connection", e );
+        }
+    }
+
+
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Update" )
     @Override
@@ -1631,7 +1655,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( envVni == null )
             {
-                throw new PeerException( "Reserved vni not found for environment %s", config.getEnvironmentId() );
+                throw new PeerException(
+                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
 
@@ -1684,7 +1709,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( envVni == null )
             {
-                throw new PeerException( "Reserved vni not found for environment %s", config.getEnvironmentId() );
+                throw new PeerException(
+                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
 
