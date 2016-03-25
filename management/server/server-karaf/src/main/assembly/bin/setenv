@@ -53,6 +53,9 @@ export SUBUTAI_APP_DATA_PATH="/opt/subutai-mng/"
 export SUBUTAI_APP_KEYSTORE_PATH="${SUBUTAI_APP_DATA_PATH}/keystores"
 export SUBUTAI_APP_CERTS_PATH="${SUBUTAI_APP_DATA_PATH}/certs"
 
+#memory optimization
+export MALLOC_ARENA_MAX=4
+
 # JMX connection for Karaf -----------------------------------------------
 # Warning: use this for dev stage only since JMX port is left unsecured!
 # Note: To be able to connect to Karaf from your machine,you need to execute the following command on RH with MH
