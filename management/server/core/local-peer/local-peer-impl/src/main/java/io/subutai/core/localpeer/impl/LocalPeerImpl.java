@@ -475,7 +475,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected void registerContainer( String resourceHostId, ContainerHostEntity containerHostEntity )
+    protected synchronized void registerContainer( String resourceHostId, ContainerHostEntity containerHostEntity )
             throws PeerException
     {
         ResourceHost resourceHost = getResourceHostById( resourceHostId );

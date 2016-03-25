@@ -4,18 +4,15 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
@@ -35,75 +32,43 @@ public class RegisterHostsStep
 
     public void execute() throws EnvironmentManagerException
     {
-        configureHosts( environment.getContainerHosts() );
+        Set<Host> hosts = Sets.newHashSet();
+        hosts.addAll( environment.getContainerHosts() );
+        if ( hosts.size() > 1 )
+        {
+            registerHosts( Common.DEFAULT_DOMAIN_NAME, hosts );
+        }
     }
 
 
-    public void configureHosts( final Set<EnvironmentContainerHost> containerHosts ) throws EnvironmentManagerException
+    protected void registerHosts( String localDomain, Set<Host> hosts ) throws EnvironmentManagerException
     {
-        Map<Integer, Set<EnvironmentContainerHost>> hostGroups = Maps.newHashMap();
 
-        //group containers by host group
-        for ( EnvironmentContainerHost containerHost : containerHosts )
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( getAddIpHostToEtcHostsCommand( localDomain, hosts ), hosts );
+
+        Set<Host> succeededHosts = Sets.newHashSet();
+        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
         {
-            int hostGroupId = ( ( EnvironmentContainerImpl ) containerHost ).getHostsGroupId();
-            Set<EnvironmentContainerHost> groupedContainers = hostGroups.get( hostGroupId );
+            CommandResult result = resultEntry.getValue();
+            Host host = resultEntry.getKey();
 
-            if ( groupedContainers == null )
+            if ( result.hasSucceeded() )
             {
-                groupedContainers = Sets.newHashSet();
-                hostGroups.put( hostGroupId, groupedContainers );
+                succeededHosts.add( host );
             }
-
-            groupedContainers.add( containerHost );
         }
 
-        //configure hosts on each group
-        for ( Map.Entry<Integer, Set<EnvironmentContainerHost>> hostGroup : hostGroups.entrySet() )
+        hosts.removeAll( succeededHosts );
+
+        for ( Host failedHost : hosts )
         {
-            int hostGroupId = hostGroup.getKey();
-            Set<EnvironmentContainerHost> groupedContainers = hostGroup.getValue();
+            trackerOperation.addLog( String.format( "Host registration failed on host %s", failedHost.getHostname() ) );
+        }
 
-            //ignore group ids <= 0
-            if ( hostGroupId > 0 )
-            {
-                Set<Host> hosts = Sets.newHashSet();
-                hosts.addAll( groupedContainers );
-
-                //assume that inside one host group the domain name must be the same for all containers
-                //so pick one container's domain name as the group domain name
-
-                String localDomain =
-                        ( ( EnvironmentContainerImpl ) groupedContainers.iterator().next() ).getDomainName();
-
-                Map<Host, CommandResult> results =
-                        commandUtil.executeParallelSilent( getAddIpHostToEtcHostsCommand( localDomain, hosts ), hosts );
-
-                Set<Host> succeededHosts = Sets.newHashSet();
-                for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
-                {
-                    CommandResult result = resultEntry.getValue();
-                    Host host = resultEntry.getKey();
-
-                    if ( result.hasSucceeded() )
-                    {
-                        succeededHosts.add( host );
-                    }
-                }
-
-                hosts.removeAll( succeededHosts );
-
-                for ( Host failedHost : hosts )
-                {
-                    trackerOperation
-                            .addLog( String.format( "Host registration failed on host %s", failedHost.getHostname() ) );
-                }
-
-                if ( !hosts.isEmpty() )
-                {
-                    throw new EnvironmentManagerException( "Failed to register all hosts" );
-                }
-            }
+        if ( !hosts.isEmpty() )
+        {
+            throw new EnvironmentManagerException( "Failed to register all hosts" );
         }
     }
 
