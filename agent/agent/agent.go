@@ -142,7 +142,9 @@ func heartbeat() bool {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
 		resp.Body.Close()
-		return true
+		if resp.StatusCode == http.StatusAccepted {
+			return true
+		}
 	}
 	lastHeartbeat = []byte{}
 	return false
@@ -234,7 +236,7 @@ func tlsConfig() *http.Client {
 
 func response(msg []byte) {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
-	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) {
+	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) && resp.StatusCode == http.StatusAccepted {
 		resp.Body.Close()
 	} else {
 		time.Sleep(time.Second * 5)
