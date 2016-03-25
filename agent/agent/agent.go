@@ -236,12 +236,15 @@ func tlsConfig() *http.Client {
 
 func response(msg []byte) {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
-	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) && resp.StatusCode == http.StatusAccepted {
+	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) {
 		resp.Body.Close()
-	} else {
-		time.Sleep(time.Second * 5)
-		go response(msg)
+		if resp.StatusCode == http.StatusAccepted {
+			return
+		}
 	}
+	time.Sleep(time.Second * 5)
+	go response(msg)
+
 }
 
 func command() {
