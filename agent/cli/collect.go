@@ -36,35 +36,30 @@ var (
 func Collect() {
 	initInfluxdb()
 	for {
-		netStat()
-		cgroupStat()
-		btrfsStat()
-		diskFree()
-		cpuStat()
-		memStat()
-		if dbclient.Write(bp) != nil {
+		_, _, err := dbclient.Ping(time.Second)
+		if err == nil {
+			bp, _ = client.NewBatchPoints(client.BatchPointsConfig{Database: config.Influxdb.Db, RetentionPolicy: "hour"})
+			netStat()
+			cgroupStat()
+			btrfsStat()
+			diskFree()
+			cpuStat()
+			memStat()
+		}
+		if err != nil || dbclient.Write(bp) != nil {
 			initInfluxdb()
 		}
-		time.Sleep(time.Second * 30)
+		time.Sleep(time.Second * 1)
 	}
 }
 
 func initInfluxdb() {
-	var err error
-	dbclient, err = client.NewHTTPClient(client.HTTPConfig{
+	dbclient, _ = client.NewHTTPClient(client.HTTPConfig{
 		Addr:               "https://" + config.Influxdb.Server + ":8086",
 		Username:           config.Influxdb.User,
 		Password:           config.Influxdb.Pass,
 		InsecureSkipVerify: true,
 	})
-	if err != nil {
-		return
-	}
-	bp, _ = client.NewBatchPoints(client.BatchPointsConfig{
-		Database:        config.Influxdb.Db,
-		RetentionPolicy: "hour",
-	})
-	return
 }
 
 func parsefile(hostname, lxc, cgtype, filename string) {
