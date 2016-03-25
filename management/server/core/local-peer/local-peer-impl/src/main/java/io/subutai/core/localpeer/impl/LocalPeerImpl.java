@@ -1,10 +1,7 @@
 package io.subutai.core.localpeer.impl;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -1479,8 +1476,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     {
                         return false;
                     }
-                    getNetworkManager().setupP2PConnection( "control_network", config.getAddress(), config.getP2pHash(),
-                            Hex.encodeHexString( config.getSecretKey() ), config.getSecretKeyTtlSec() );
+                    getNetworkManager().setupP2PConnection( Common.CONTROL_NETWORK_INTERFACE_NAME, config.getAddress(),
+                            config.getP2pHash(), Hex.encodeHexString( config.getSecretKey() ),
+                            config.getSecretKeyTtlSec() );
                 }
             }
             else
@@ -1972,6 +1970,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             throw new PeerException( "Error retrieving peer tunnels", e );
         }
     }
+
 
     @Override
     public String getExternalIp() throws PeerException
