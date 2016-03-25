@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,6 +72,24 @@ public class RegisterSshStep
             {
                 appendSshKeys( hosts, userKeys );
             }
+        }
+
+        exchangeAllContainerKeys();
+    }
+
+
+    /**
+     * Workaround for: https://github.com/optdyn/hub/issues/413.
+     * We always need containers accessible to each other via SSH.
+     */
+    private void exchangeAllContainerKeys() throws EnvironmentManagerException
+    {
+        Set<Host> ch = Sets.newHashSet();
+        ch.addAll( environment.getContainerHosts() );
+
+        if ( ch.size() > 1 )
+        {
+            exchangeSshKeys( ch, Collections.EMPTY_SET );
         }
     }
 
@@ -222,7 +241,7 @@ public class RegisterSshStep
         return new RequestBuilder( String.format( "rm -rf %1$s && " +
                 "mkdir -p %1$s && " +
                 "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa && " + "cat %1$s/id_dsa.pub", Common.CONTAINER_SSH_FOLDER ) );
+                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub", Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
