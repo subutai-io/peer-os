@@ -1480,7 +1480,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     {
                         return false;
                     }
-                    getNetworkManager().setupP2PConnection( "control_network", config.getAddress(), config.getP2pHash(),
+                    getNetworkManager().setupP2PConnection( "ctl_net", config.getAddress(), config.getP2pHash(),
                             Hex.encodeHexString( config.getSecretKey() ), config.getSecretKeyTtlSec() );
                 }
             }

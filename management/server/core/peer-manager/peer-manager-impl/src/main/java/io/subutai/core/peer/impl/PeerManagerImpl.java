@@ -6,14 +6,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,9 +30,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 
@@ -50,14 +46,11 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
-import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -103,7 +96,6 @@ public class PeerManagerImpl implements PeerManager
     private ObjectMapper mapper = new ObjectMapper();
     private String localPeerId;
     private RegistrationClient registrationClient;
-    protected ScheduledExecutorService controlNetworkUpdaterService;
     protected ScheduledExecutorService localIpSetter;
 
     private String controlNetwork;
@@ -126,8 +118,6 @@ public class PeerManagerImpl implements PeerManager
         commandResponseListener = new CommandResponseListener();
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
-        controlNetworkUpdaterService = Executors.newSingleThreadScheduledExecutor();
-        controlNetworkUpdaterService.scheduleWithFixedDelay( new ControlNetworkUpdater(), 1, 3, TimeUnit.MINUTES );
         localIpSetter = Executors.newSingleThreadScheduledExecutor();
         localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 5, 5, TimeUnit.SECONDS );
     }
@@ -171,7 +161,6 @@ public class PeerManagerImpl implements PeerManager
     public void destroy()
     {
         commandResponseListener.dispose();
-        controlNetworkUpdaterService.shutdown();
     }
 
 
@@ -1019,23 +1008,6 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private class ControlNetworkUpdater implements Runnable
-    {
-        @Override
-        public void run()
-        {
-            try
-            {
-                updateControlNetwork();
-            }
-            catch ( Exception e )
-            {
-                LOG.warn( "Error updating control network", e );
-            }
-        }
-    }
-
-
     @Override
     public PingDistances getP2PSwarmDistances()
     {
@@ -1103,132 +1075,6 @@ public class PeerManagerImpl implements PeerManager
         {
             throw new PeerException( "Error setting public url ", e );
         }
-    }
-
-
-    @Override
-    public void updateControlNetwork()
-    {
-        if ( getPeers().size() < 2 )
-        {
-            // standalone peer
-            return;
-        }
-
-        if ( controlNetwork == null )
-        {
-            selectControlNetwork();
-        }
-
-
-        boolean isOk = false;
-        byte[] key = null;
-        while ( !isOk )
-        {
-            if ( controlNetworkTtl <= System.currentTimeMillis() )
-            {
-                controlNetworkTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
-                key = DigestUtils.md5( UUID.randomUUID().toString() );
-                this.distances = null;
-            }
-            String[] addresses =
-                    new SubnetUtils( controlNetwork, ControlNetworkUtil.NETWORK_MASK ).getInfo().getAllAddresses();
-            List<UpdateControlNetworkTask> updateTasks = new ArrayList<>();
-            for ( Peer peer : getPeers() )
-            {
-                PeerData data = loadPeerData( peer.getId() );
-                if ( data.getOrder() == null )
-                {
-                    continue;
-                }
-                ControlNetworkConfig config = new ControlNetworkConfig( peer.getId(), addresses[data.getOrder() - 1],
-                        localPeerId.toLowerCase(), key, controlNetworkTtl );
-                updateTasks.add( new UpdateControlNetworkTask( config ) );
-            }
-            final ExecutorService pool = Executors.newFixedThreadPool( updateTasks.size() );
-            final ExecutorCompletionService<Boolean> executor = new ExecutorCompletionService<Boolean>( pool );
-            for ( UpdateControlNetworkTask task : updateTasks )
-            {
-                executor.submit( task );
-            }
-
-            pool.shutdown();
-
-            for ( UpdateControlNetworkTask task : updateTasks )
-            {
-                try
-                {
-                    final Future<Boolean> result = executor.take();
-                    isOk = result.get();
-                    if ( !isOk )
-                    {
-                        // Network conflict. Skipping other result. Needs renew network.
-                        break;
-                    }
-                }
-                catch ( InterruptedException | ExecutionException e )
-                {
-                    // ignore
-                }
-            }
-
-            if ( !isOk )
-            {
-                LOG.warn( "Control network config conflict. Selecting another network." );
-                selectControlNetwork();
-                LOG.warn( "New control network: " + controlNetwork );
-            }
-            else if ( key != null )
-            {
-                Arrays.fill( key, ( byte ) 0 );
-            }
-        }
-    }
-
-
-    private class UpdateControlNetworkTask implements Callable<Boolean>
-    {
-        private ControlNetworkConfig config;
-
-
-        public UpdateControlNetworkTask( final ControlNetworkConfig config )
-        {
-            this.config = config;
-        }
-
-
-        @Override
-        public Boolean call() throws Exception
-        {
-            try
-            {
-                return getPeer( config.getPeerId() ).updateControlNetworkConfig( config );
-            }
-            catch ( Exception e )
-            {
-                // Ignoring any exception.
-                return true;
-            }
-        }
-    }
-
-
-    protected void selectControlNetwork()
-    {
-        List<ControlNetworkConfig> configs = new ArrayList<>();
-        for ( Peer peer : getPeers() )
-        {
-            try
-            {
-                configs.add( peer.getControlNetworkConfig( localPeer.getId() ) );
-            }
-            catch ( PeerException e )
-            {
-                //ignore
-            }
-        }
-        controlNetwork = ControlNetworkUtil.findFreeNetwork( configs );
-        controlNetworkTtl = 0;
     }
 
 

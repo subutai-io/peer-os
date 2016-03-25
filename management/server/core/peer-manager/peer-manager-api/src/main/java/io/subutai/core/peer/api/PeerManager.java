@@ -75,7 +75,5 @@ public interface PeerManager
 
     PingDistances getP2PSwarmDistances();
 
-    void updateControlNetwork();
-
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
 }
