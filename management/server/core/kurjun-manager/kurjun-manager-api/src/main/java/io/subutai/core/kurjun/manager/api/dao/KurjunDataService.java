@@ -9,6 +9,7 @@ import javax.persistence.Query;
 import com.google.common.collect.Lists;
 
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
+import io.subutai.core.kurjun.manager.api.model.KurjunConfig;
 
 
 public interface KurjunDataService
@@ -39,4 +40,9 @@ public interface KurjunDataService
      */
     public void updateKurjunData( final Kurjun item );
 
+
+    /* *************************************************
+     *
+    */
+    public void persistKurjunConfig( final KurjunConfig item );
 }

@@ -28,7 +28,9 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
 import io.subutai.core.kurjun.manager.api.dao.KurjunDataService;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
+import io.subutai.core.kurjun.manager.api.model.KurjunConfig;
 import io.subutai.core.kurjun.manager.impl.dao.KurjunDataServiceImpl;
+import io.subutai.core.kurjun.manager.impl.model.KurjunConfigEntity;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 import io.subutai.core.kurjun.manager.impl.model.KurjunType;
 import io.subutai.core.security.api.SecurityManager;
@@ -55,6 +57,39 @@ public class KurjunManagerImpl implements KurjunManager
     //****************************************
     public void init()
     {
+        dataService = new KurjunDataServiceImpl( daoManager );
+
+        if ( dataService.getAllKurjunData().isEmpty() )
+        try
+        {
+
+            for ( final String url : SystemSettings.getGlobalKurjunUrls() )
+            {
+                Kurjun kurjun = new KurjunEntity();
+
+                kurjun.setType( KurjunType.Global.getId() );
+                kurjun.setState( false );
+                kurjun.setUrl( url );
+
+                dataService.persistKurjunData( kurjun );
+            }
+
+            for ( final String url : SystemSettings.getLocalKurjunUrls() )
+            {
+                Kurjun kurjun = new KurjunEntity();
+
+                kurjun.setType( KurjunType.Local.getId() );
+                kurjun.setState( false );
+                kurjun.setUrl( url );
+
+                dataService.persistKurjunData( kurjun );
+            }
+        }
+        catch ( ConfigurationException e )
+        {
+            e.printStackTrace();
+        }
+
         PGPPublicKey key =
                 securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
                                .getPublicKey();
@@ -73,17 +108,16 @@ public class KurjunManagerImpl implements KurjunManager
 
         properties = loadProperties();
 
-        dataService = new KurjunDataServiceImpl( daoManager );
 
 
-        if ( Strings.isNullOrEmpty( getUser( KurjunType.Local.getId(), fingerprint ) ) )
-        {
-            registerUser( KurjunType.Local.getId(), fingerprint );
-        }
-        else
-        {
-            authorizeUser( KurjunType.Local.getId(), fingerprint );
-        }
+//        if ( Strings.isNullOrEmpty( getUser( KurjunType.Local.getId(), fingerprint ) ) )
+//        {
+//            registerUser( KurjunType.Local.getId(), fingerprint );
+//        }
+//        else
+//        {
+//            authorizeUser( KurjunType.Local.getId(), fingerprint );
+//        }
     }
 
 
@@ -161,18 +195,25 @@ public class KurjunManagerImpl implements KurjunManager
         }
 
 
-        if ( dataService.getKurjunData( fingerprint ) == null )
-        {
-            byte[] signedMessage = null;
+        KurjunConfig config = new KurjunConfigEntity();
 
-            Kurjun kurjun = new KurjunEntity();
-            kurjun.setType( kurjunType );
-            kurjun.setOwnerFingerprint( fingerprint );
-            kurjun.setAuthID( authId );
-            //            kurjun.setSignedMessage(  null );
-            kurjun.setSignedMessage( signedMessage );
-            dataService.persistKurjunData( kurjun );
-        }
+        config.setAuthID( authId );
+        config.setOwnerFingerprint( fingerprint );
+        config.setType( kurjunType );
+
+        dataService.persistKurjunConfig( config );
+        //        if ( dataService.getKurjunData( fingerprint ) == null )
+        //        {
+        //            byte[] signedMessage = null;
+        //
+        //            Kurjun kurjun = new KurjunEntity();
+        //            kurjun.setType( kurjunType );
+        //            kurjun.setOwnerFingerprint( fingerprint );
+        //            kurjun.setAuthID( authId );
+        //            //            kurjun.setSignedMessage(  null );
+        //            kurjun.setSignedMessage( signedMessage );
+        //            dataService.persistKurjunData( kurjun );
+        //        }
 
         return null;
     }
@@ -190,7 +231,7 @@ public class KurjunManagerImpl implements KurjunManager
         List<Kurjun> list = dataService.getAllKurjunData();
         for ( final Kurjun kurjun : list )
         {
-            signedMsg = kurjun.getSignedMessage();
+//            signedMsg = kurjun.getSignedMessage();
             break;
         }
 

@@ -19,6 +19,13 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getAuthId();
 
+
+    @GET
+    @Path( "urls" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response getKurjunUrl();
+
+
     @POST
     @Path( "public-key" )
     @Produces( { MediaType.TEXT_PLAIN } )
@@ -28,5 +35,7 @@ public interface RestService
     @Path( "signed-msg" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg );
+
+
 
 }

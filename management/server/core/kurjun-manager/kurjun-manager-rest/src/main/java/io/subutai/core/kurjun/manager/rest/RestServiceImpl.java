@@ -1,6 +1,8 @@
 package io.subutai.core.kurjun.manager.rest;
 
 
+import java.util.List;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
@@ -22,6 +24,17 @@ public class RestServiceImpl implements RestService
 
         }
         return Response.status( Response.Status.OK ).entity( "35492d26-f1a5-11e5-9ce9-5e5517507c66" ).build();
+    }
+
+
+    @Override
+    public Response getKurjunUrl()
+    {
+        List<Kurjun> urls = kurjunManager.getDataService().getAllKurjunData();
+
+        String info = JsonUtil.GSON.toJson( urls );
+
+        return Response.status( Response.Status.OK ).entity( info ).build();
     }
 
 

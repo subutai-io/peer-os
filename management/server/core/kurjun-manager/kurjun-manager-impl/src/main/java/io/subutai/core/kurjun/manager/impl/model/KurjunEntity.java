@@ -27,62 +27,14 @@ public class KurjunEntity implements Kurjun
     @Column( name = "id" )
     private long id;
 
-    @Column( name = "owner_fprint" )
-    private String ownerFingerprint;
+    @Column( name = "url" )
+    private String url;
 
-    @Column( name = "owner_authid" )
-    private String authID;
-
-    @Column( name = "owner_message" )
-    private byte[] signedMessage;
-
-    @Column( name = "token" )
-    private String token;
+    @Column( name = "state" )
+    private boolean state;
 
     @Column( name = "type" )
     private int type = KurjunType.Local.getId();
-
-
-    @Override
-    public String getOwnerFingerprint()
-    {
-        return ownerFingerprint;
-    }
-
-
-    @Override
-    public void setOwnerFingerprint( final String ownerFingerprint )
-    {
-        this.ownerFingerprint = ownerFingerprint;
-    }
-
-
-    @Override
-    public String getAuthID()
-    {
-        return authID;
-    }
-
-
-    @Override
-    public void setAuthID( final String authID )
-    {
-        this.authID = authID;
-    }
-
-
-    @Override
-    public String getToken()
-    {
-        return token;
-    }
-
-
-    @Override
-    public void setToken( final String token )
-    {
-        this.token = token;
-    }
 
 
     @Override
@@ -113,16 +65,26 @@ public class KurjunEntity implements Kurjun
     }
 
 
-    @Override
-    public byte[] getSignedMessage()
+    public String getUrl()
     {
-        return signedMessage;
+        return url;
     }
 
 
-    @Override
-    public void setSignedMessage( final byte[] signedMessage )
+    public void setUrl( final String url )
     {
-        this.signedMessage = signedMessage;
+        this.url = url;
+    }
+
+
+    public boolean getState()
+    {
+        return state;
+    }
+
+
+    public void setState( final boolean state )
+    {
+        this.state = state;
     }
 }

@@ -6,21 +6,13 @@ package io.subutai.core.kurjun.manager.api.model;
  */
 public interface Kurjun
 {
-    String getOwnerFingerprint();
+    public String getUrl();
 
-    void setOwnerFingerprint( String ownerFingerprint );
+    public void setUrl( final String url );
 
-    String getAuthID();
+    public boolean getState();
 
-    void setAuthID( String authID );
-
-    byte[] getSignedMessage();
-
-    void setSignedMessage( byte[] signedMessage );
-
-    String getToken();
-
-    void setToken( String token );
+    public void setState( final boolean state );
 
     long getId();
 

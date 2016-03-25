@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.kurjun.manager.api.dao.*;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
+import io.subutai.core.kurjun.manager.api.model.KurjunConfig;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 
 
@@ -36,6 +37,7 @@ public class KurjunDataServiceImpl implements KurjunDataService
     /* *************************************************
      *
      */
+    @Override
     public Kurjun getKurjunData( final String id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -64,6 +66,7 @@ public class KurjunDataServiceImpl implements KurjunDataService
     /* *************************************************
      *
      */
+    @Override
     public List<Kurjun> getAllKurjunData()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -87,6 +90,7 @@ public class KurjunDataServiceImpl implements KurjunDataService
     /* *************************************************
      *
      */
+    @Override
     public void persistKurjunData( Kurjun item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -114,6 +118,7 @@ public class KurjunDataServiceImpl implements KurjunDataService
     /* *************************************************
      *
      */
+    @Override
     public void removeKurjunData( final String id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -138,6 +143,7 @@ public class KurjunDataServiceImpl implements KurjunDataService
     /* *************************************************
      *
      */
+    @Override
     public void updateKurjunData( final Kurjun item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -155,5 +161,29 @@ public class KurjunDataServiceImpl implements KurjunDataService
         {
             daoManager.closeEntityManager( em );
         }
+    }
+
+
+    @Override
+    public void persistKurjunConfig( final KurjunConfig item )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            em.merge( item );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+            LOG.error( "ConfigDataService saveProfile:" + e.toString() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
     }
 }
