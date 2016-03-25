@@ -9,6 +9,8 @@ import java.util.Properties;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -35,6 +37,8 @@ import io.subutai.core.security.api.SecurityManager;
  */
 public class KurjunManagerImpl implements KurjunManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( KurjunManagerImpl.class.getName() );
+
     //**********************************
     private IdentityManager identityManager;
     private SecurityManager securityManager;
@@ -89,14 +93,14 @@ public class KurjunManagerImpl implements KurjunManager
         {
             if ( kurjunType == KurjunType.Local.getId() )
             {
-                for ( final String s : SystemSettings.getGlobalKurjunUrls() )
+                for ( final String s : SystemSettings.getLocalKurjunUrls() )
                 {
                     return s + uri;
                 }
             }
             else if ( kurjunType == KurjunType.Global.getId() )
             {
-                for ( final String s : SystemSettings.getLocalKurjunUrls() )
+                for ( final String s : SystemSettings.getGlobalKurjunUrls() )
                 {
                     return s + uri;
                 }
@@ -203,15 +207,16 @@ public class KurjunManagerImpl implements KurjunManager
     public String getUser( int kurjunType, String fingerprint )
     {
         String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
-        WebClient client = RestUtil.createTrustedWebClient( url /*+ "/" + fingerprint*/ );
-        client.query( "fingerprint", fingerprint );
+        WebClient client = RestUtil.createTrustedWebClient( url + "?fingerprint=" + fingerprint );
+        //        client.query( "fingerprint", fingerprint );
 
         Response response = client.get();
-        //
-        //        if ( response.getStatus() != HttpStatus.SC_OK )
-        //        {
-        //            return null;
-        //        }
+
+        if ( response.getStatus() != HttpStatus.SC_OK )
+        {
+            LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
+            return null;
+        }
 
         return null;
     }
