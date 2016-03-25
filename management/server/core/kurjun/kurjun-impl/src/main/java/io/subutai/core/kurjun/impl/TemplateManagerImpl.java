@@ -66,7 +66,7 @@ import ai.subut.kurjun.repo.LocalTemplateRepository;
 import ai.subut.kurjun.repo.RepositoryFactory;
 import ai.subut.kurjun.repo.RepositoryModule;
 import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
-import ai.subut.kurjun.security.SecurityModule;
+
 import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
@@ -714,7 +714,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         bootstrap.addModule( new RepositoryModule() );
         bootstrap.addModule( new TrustedWebClientFactoryModule() );
-        bootstrap.addModule( new SecurityModule() );
+
         bootstrap.addModule( new QuotaManagementModule() );
 
         bootstrap.boot();

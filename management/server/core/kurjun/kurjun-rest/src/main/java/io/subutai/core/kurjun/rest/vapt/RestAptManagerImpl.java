@@ -182,6 +182,13 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
 
 
     @Override
+    public Response md5()
+    {
+        return null;
+    }
+
+
+    @Override
     public Response deletePackage( String md5 )
     {
         byte[] md5bytes = decodeMd5( md5 );

@@ -58,19 +58,6 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     }
 
 
-    @Override
-    public Response checkUploadAllowed( String repository )
-    {
-        try
-        {
-            return Response.ok( templateManager.isUploadAllowed( repository ) ).build();
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            return badRequest( ex.getMessage() );
-        }
-    }
-
 
     @Override
     public Response getTemplate( String repository, String id, String name, String version,
@@ -204,8 +191,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         }
         return Response.ok( "No templates" ).build();
     }
-    
-    
+
+
     @Override
     public Response getSharedTemplateInfos( String id )
     {
@@ -232,8 +219,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         }
         return packageNotFoundResponse();
     }
-    
-    
+
+
 
     @Override
     public Response getTemplateListSimple( String repository )

@@ -1,31 +1,38 @@
 package io.subutai.core.kurjun.api.raw;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import io.subutai.common.protocol.Resource;
+import ai.subut.kurjun.metadata.common.raw.RawMetadata;
+import ai.subut.kurjun.model.metadata.SerializableMetadata;
 
 
 public interface RawManager
 {
 
-    Resource getFile( byte[] md5, boolean isKurjunClient ) throws IOException;
 
+    InputStream getFile( String repository, byte[] md5 ) throws IOException;
 
-    Resource getFile( String name, boolean isKurjunClient ) throws IOException;
+    List<SerializableMetadata> list( String repository ) throws IOException;
 
+    boolean delete( byte[] md5 ) throws IOException;
 
-    InputStream getFileData( byte[] md5, boolean isKurjunClient ) throws IOException;
+    boolean delete( String repository, final byte[] md5 );
 
+    String md5();
 
-    List<Resource> getFileList( boolean isKurjunClient ) throws IOException;
+    RawMetadata getInfo( String repository, byte[] md5 );
 
+    RawMetadata getInfo( final RawMetadata metadata );
 
-    String uploadFile( InputStream inputStream, String fileName ) throws IOException;
+    RawMetadata getInfo( final byte[] md5 );
 
+    RawMetadata put( final File file, final String filename, final String repository );
 
-    boolean deleteFile( byte[] md5 ) throws IOException;
+    RawMetadata put( final File file );
 
+    RawMetadata put( final File file, final String repository );
 }

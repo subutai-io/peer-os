@@ -75,17 +75,19 @@ import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 public class AptManagerImpl implements AptManager
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( AptManagerImpl.class );
-    
-    private static final String VAPT_PATH = "/vapt";
+
+    private static final String VAPT_PATH = "/deb";
 
     private static final KurjunContext APT_CONTEXT = new KurjunContext( "vapt" );
 
     private Injector injector;
 
     private final LocalPeer localPeer;
+
     private Set<RepoUrl> remoteRepoUrls;
+
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
-    
+
 
     public AptManagerImpl( LocalPeer localPeer )
     {
@@ -99,11 +101,11 @@ public class AptManagerImpl implements AptManager
 
         KurjunProperties properties = injector.getInstance( KurjunProperties.class );
         setContexts( properties );
-        
+
         initRepoUrls();
     }
-    
-    
+
+
     public void dispose()
     {
     }
@@ -269,8 +271,8 @@ public class AptManagerImpl implements AptManager
                                        .collect( Collectors.toList() );
         return deflist;
     }
-    
-    
+
+
     @Override
     public boolean delete( byte[] md5 ) throws IOException
     {
@@ -377,8 +379,8 @@ public class AptManagerImpl implements AptManager
             LOGGER.error( "Failed to remove remote apr repo: {}", url, ex );
         }
     }
-    
-    
+
+
     private String getExternalIp()
     {
         try
@@ -399,7 +401,7 @@ public class AptManagerImpl implements AptManager
             return null;
         }
     }
-    
+
 
     @Override
     public Long getDiskQuota( String context )
@@ -481,7 +483,7 @@ public class AptManagerImpl implements AptManager
         }
     }
 
-    
+
     private UnifiedRepository getRepository()
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
@@ -521,8 +523,8 @@ public class AptManagerImpl implements AptManager
         kcp.setProperty( FileStoreFactory.TYPE, FileStoreFactory.FILE_SYSTEM );
         kcp.setProperty( PackageMetadataStoreModule.PACKAGE_METADATA_STORE_TYPE, PackageMetadataStoreFactory.FILE_DB );
     }
-    
-    
+
+
     private void initRepoUrls()
     {
         try
@@ -565,5 +567,4 @@ public class AptManagerImpl implements AptManager
             throw new IllegalArgumentException( "Invalid global kurjun url", e );
         }
     }
-    
 }

@@ -63,6 +63,9 @@ public interface RestAptManager
     @Path( "list" )
     Response listPackages();
 
+    @GET
+    @Path( "md5" )
+    Response md5();
 
     @POST
     @Path( "upload" )
