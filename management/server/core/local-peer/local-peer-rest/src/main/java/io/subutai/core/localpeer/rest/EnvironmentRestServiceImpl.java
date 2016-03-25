@@ -46,9 +46,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error destroying container #destroyContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -63,9 +62,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error starting container #startContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -80,9 +78,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error stopping container #stopContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -98,9 +95,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting container state #getContainerState", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -117,9 +113,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting processing resource usage #getProcessResourceUsage", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -138,8 +133,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting cpu set #getCpuSet", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -157,8 +152,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting cpu set #setCpuSet", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -175,8 +170,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -195,8 +190,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -214,8 +209,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 
@@ -233,9 +228,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting resource host id by container id #getResourceHostIdByContainerId", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
         }
     }
 }
