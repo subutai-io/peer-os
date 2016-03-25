@@ -13,6 +13,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -44,18 +45,19 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
+            final P2PConnections connections = networkManager.getP2PConnections();
             if ( Strings.isNullOrEmpty( p2pHash ) )
             {
-                final Set<P2PConnection> connections = networkManager.getP2PConnections();
-                System.out.format( "Found %d P2P connection(s)%n", connections.size() );
-                for ( P2PConnection connection : connections )
+
+                System.out.format( "Found %d P2P connection(s)%n", connections.getConnections().size() );
+                for ( P2PConnection connection : connections.getConnections() )
                 {
                     System.out.format( "%s %s %s%n", connection.getIp(), connection.getHash(), connection.getMac() );
                 }
             }
             else
             {
-                final P2PConnection connection = networkManager.getP2PConnectionByHash( p2pHash );
+                final P2PConnection connection = connections.findConnectionByHash( p2pHash );
                 if ( connection == null )
                 {
                     System.out.println( "Connection not found" );

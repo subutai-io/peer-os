@@ -79,13 +79,19 @@ public class RegisterHostsStep
                 Map<Host, CommandResult> results =
                         commandUtil.executeParallelSilent( getAddIpHostToEtcHostsCommand( localDomain, hosts ), hosts );
 
-                for ( Host succeededHost : results.keySet() )
+                Set<Host> succeededHosts = Sets.newHashSet();
+                for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
                 {
-                    trackerOperation.addLog(
-                            String.format( "Host registration succeeded on host %s", succeededHost.getHostname() ) );
+                    CommandResult result = resultEntry.getValue();
+                    Host host = resultEntry.getKey();
+
+                    if ( result.hasSucceeded() )
+                    {
+                        succeededHosts.add( host );
+                    }
                 }
 
-                hosts.removeAll( results.keySet() );
+                hosts.removeAll( succeededHosts );
 
                 for ( Host failedHost : hosts )
                 {
