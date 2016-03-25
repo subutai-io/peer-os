@@ -151,7 +151,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Transient
     @JsonIgnore
-    private EnvironmentManagerImpl environmentManager;
+    protected EnvironmentManagerImpl environmentManager;
 
     @Transient
     @JsonIgnore
@@ -665,7 +665,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                           .add( "templateName", templateName ).add( "environmentId", environment.getId() )
                           .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
                           .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
-                          .add( "hostArchitecture", hostArchitecture ).add( "state", state ).toString();
+                          .add( "hostArchitecture", hostArchitecture ).add( "state", state )
+                          .add( "resourceHostId", resourceHostId ).toString();
     }
 
 
