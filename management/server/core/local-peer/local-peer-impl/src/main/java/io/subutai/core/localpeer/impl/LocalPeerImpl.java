@@ -1,10 +1,7 @@
 package io.subutai.core.localpeer.impl;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -44,6 +41,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
@@ -331,11 +329,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    public Containers getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId );
 
-        Set<ContainerHostInfo> result = new HashSet<>();
+        Containers result = new Containers();
         try
         {
             Set<ContainerHost> containers = findContainersByEnvironmentId( environmentId.getId() );
@@ -351,7 +349,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 {
                     info = new ContainerHostInfoModel( c );
                 }
-                result.add( info );
+                result.addContainer( info );
             }
             return result;
         }
@@ -1403,57 +1401,33 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public String getCurrentControlNetwork() throws PeerException
+    public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
     {
         try
         {
-            Set<P2PConnection> connections = getNetworkManager().getP2PConnections();
-            for ( P2PConnection connection : connections )
-            {
-                if ( getId().toLowerCase().equals( connection.getHash() ) )
-                {
-                    return ControlNetworkUtil.extractNetwork( connection.getIp() );
-                }
-            }
+            final P2PConnections connections = getNetworkManager().getP2PConnections();
+            return getControlNetworkConfig( connections, getId() );
         }
         catch ( NetworkManagerException e )
         {
             LOG.error( e.getMessage(), e );
         }
+
         return null;
     }
 
 
-    @Override
-    public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
+    protected ControlNetworkConfig getControlNetworkConfig( P2PConnections connections, final String hash )
+            throws PeerException
     {
-        String address = null;
-        final List<String> usedNetworks = new ArrayList<>();
-        try
-        {
-            final Set<P2PConnection> connections = getNetworkManager().getP2PConnections();
-            for ( P2PConnection connection : connections )
-            {
-                if ( peerId.equalsIgnoreCase( connection.getHash() ) )
-                {
-                    address = connection.getIp();
-                }
-                else
-                {
-                    if ( connection.getIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
-                    {
-                        String usedNetwork = ControlNetworkUtil.extractNetwork( connection.getIp() );
-                        usedNetworks.add( usedNetwork );
-                    }
-                }
-            }
-        }
-        catch ( NetworkManagerException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
+        Preconditions.checkNotNull( connections );
+        Preconditions.checkNotNull( hash );
 
-        return new ControlNetworkConfig( getId(), address, peerId, usedNetworks );
+        final P2PConnection peerConnection = connections.findConnectionByHash( hash );
+        String address = peerConnection != null ? peerConnection.getIp() : null;
+        List<String> usedNetworks = ControlNetworkUtil.getUsedNetworks( connections );
+
+        return new ControlNetworkConfig( getId(), address, hash, usedNetworks );
     }
 
 
@@ -1464,9 +1438,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             String suggestedNetwork = ControlNetworkUtil.extractNetwork( config.getAddress() );
 
-            final Set<P2PConnection> connections = getNetworkManager().getP2PConnections();
+            final P2PConnections connections = getNetworkManager().getP2PConnections();
             boolean conflict = false;
-            for ( P2PConnection connection : connections )
+            for ( P2PConnection connection : connections.getConnections() )
             {
                 if ( connection.getIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
                 {
@@ -1483,9 +1457,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 LOG.info( "Updating control network." );
                 LOG.debug( JsonUtil.toJson( config ) );
-                // update control network
 
-                ControlNetworkConfig currentConfig = getControlNetworkConfig( config.getP2pHash() );
+                // update control network
+                ControlNetworkConfig currentConfig = getControlNetworkConfig( connections, config.getP2pHash() );
                 if ( config.getAddress().equals( currentConfig.getAddress() ) )
                 {
                     if ( config.getSecretKey() != null )
@@ -1503,8 +1477,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     {
                         return false;
                     }
-                    getNetworkManager().setupP2PConnection( "control_network", config.getAddress(), config.getP2pHash(),
-                            Hex.encodeHexString( config.getSecretKey() ), config.getSecretKeyTtlSec() );
+                    getNetworkManager().setupP2PConnection( Common.CONTROL_NETWORK_INTERFACE_NAME, config.getAddress(),
+                            config.getP2pHash(), Hex.encodeHexString( config.getSecretKey() ),
+                            config.getSecretKeyTtlSec() );
                 }
             }
             else
@@ -1641,6 +1616,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
+
+        try
+        {
+            String p2pIp = getNetworkManager().getP2PConnections( getResourceHostById( resourceHostId ) )
+                                              .findConnectionByHash( swarmHash ).getIp();
+            if ( p2pIp == null )
+            {
+                throw new PeerException( "P2P connection not found" );
+            }
+
+            return p2pIp;
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new PeerException( "Error getting p2p connection", e );
+        }
+    }
+
+
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Update" )
     @Override
@@ -1656,16 +1655,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( envVni == null )
             {
-                throw new PeerException( "Reserved vni not found for environment %s", config.getEnvironmentId() );
+                throw new PeerException(
+                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
 
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                P2PConnection p2PConnection = getNetworkManager()
-                        .getP2PConnectionByHash( resourceHost, P2PUtil.generateHash( envVni.getEnvironmentId() ) );
+                P2PConnections p2PConnections = getNetworkManager().getP2PConnections( resourceHost );
 
-                if ( p2PConnection != null )
+                if ( p2PConnections.findConnectionByHash( P2PUtil.generateHash( envVni.getEnvironmentId() ) ) != null )
                 {
                     getNetworkManager().resetP2PSecretKey( resourceHost, config.getHash(), config.getSecretKey(),
                             config.getSecretKeyTtlSec() );
@@ -1680,12 +1679,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             //obtain p2p connection on MH-RH
-            P2PConnection mhP2pConnection = getNetworkManager().getP2PConnectionByHash( config.getHash() );
+            P2PConnection mhP2pConnection =
+                    getNetworkManager().getP2PConnections().findConnectionByHash( config.getHash() );
+
+            if ( mhP2pConnection == null )
+            {
+                throw new PeerException( "P2P connection on management host not found." );
+            }
 
             return mhP2pConnection.getIp();
         }
         catch ( NetworkManagerException e )
         {
+            LOG.error( e.getMessage(), e );
             throw new PeerException( "Failed to setup P2P connection", e );
         }
     }
@@ -1703,23 +1709,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             if ( envVni == null )
             {
-                throw new PeerException( "Reserved vni not found for environment %s", config.getEnvironmentId() );
+                throw new PeerException(
+                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
 
-            P2PConnection p2PConnection = getNetworkManager()
-                    .getP2PConnectionByHash( getManagementHost(), P2PUtil.generateHash( envVni.getEnvironmentId() ) );
+            P2PConnections p2PConnections = getNetworkManager().getP2PConnections();
 
-            if ( p2PConnection != null )
+            if ( p2PConnections.findConnectionByHash( P2PUtil.generateHash( envVni.getEnvironmentId() ) ) != null )
             {
                 throw new PeerException( "Initial P2P connection is already setup with this hash" );
             }
             else
             {
                 getNetworkManager()
-                        .setupP2PConnection( getManagementHost(), P2PUtil.generateInterfaceName( envVni.getVlan() ),
-                                config.getAddress(), config.getHash(), config.getSecretKey(),
-                                config.getSecretKeyTtlSec() );
+                        .setupP2PConnection( P2PUtil.generateInterfaceName( envVni.getVlan() ), config.getAddress(),
+                                config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
             }
         }
         catch ( NetworkManagerException e )
@@ -2001,38 +2006,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public String getPublicIp() throws PeerException
-    {
-        BufferedReader in = null;
-        try
-        {
-            URL url = new URL( "http://checkip.amazonaws.com" );
-            in = new BufferedReader( new InputStreamReader( url.openStream() ) );
-            return in.readLine();
-        }
-        catch ( IOException e )
-        {
-            throw new PeerException( "Error getting public IP", e );
-        }
-        finally
-        {
-            if ( in != null )
-            {
-
-                try
-                {
-                    in.close();
-                }
-                catch ( IOException e )
-                {
-                    //ignore
-                }
-            }
-        }
-    }
-
-
-    @Override
     public String getExternalIp() throws PeerException
     {
         return getPeerInfo().getIp();
@@ -2052,8 +2025,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         PingDistances result = new PingDistances();
         try
         {
-            final P2PConnection p2PConnection =
-                    new P2PConnections( getNetworkManager().getP2PConnections() ).findConnectionByHash( p2pHash );
+            final P2PConnections p2PConnections = getNetworkManager().getP2PConnections();
+
+            final P2PConnection p2PConnection = p2PConnections.findConnectionByHash( p2pHash );
 
             if ( p2PConnection == null )
             {

@@ -2,9 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -17,8 +15,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -73,89 +70,20 @@ public class PeerWebClient
 
         try
         {
-            return client.get( PeerInfo.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( PeerInfo.class );
+            }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting peer info", e );
-        }
-    }
-
-
-    void startContainer( ContainerId containerId ) throws PeerException
-    {
-
-        String path = "/container/start";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            client.post( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error starting container", e );
-        }
-    }
-
-
-    void stopContainer( ContainerId containerId ) throws PeerException
-    {
-        String path = "/container/stop";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            client.post( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error stopping container", e );
-        }
-    }
-
-
-    void destroyContainer( ContainerId containerId ) throws PeerException
-    {
-        String path = "/container/destroy";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            client.post( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error destroying container", e );
-        }
-    }
-
-
-    public ContainerHostState getState( final ContainerId containerId ) throws PeerException
-    {
-        String path = "/container/state";
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            return client.post( containerId, ContainerHostState.class );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting container state ", e );
         }
     }
 
@@ -169,7 +97,15 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( ProcessResourceUsage.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( ProcessResourceUsage.class );
+            }
         }
         catch ( Exception e )
         {
@@ -190,7 +126,15 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.post( environmentId, PublicKeyContainer.class );
+            final Response response = client.post( environmentId );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( PublicKeyContainer.class );
+            }
         }
         catch ( Exception e )
         {
@@ -211,7 +155,11 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.put( publicKeyContainer );
+            final Response response = client.put( publicKeyContainer );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
@@ -234,7 +182,11 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.delete();
+            final Response response = client.delete();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
@@ -254,7 +206,15 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( HostInterfaces.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( HostInterfaces.class );
+            }
         }
         catch ( Exception e )
         {
@@ -280,12 +240,47 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
+            final Response response = client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error resetting P2P secret key", e );
+        }
+    }
+
+
+    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
+
+        String path = String.format( "/p2pip/%s/%s", resourceHostId, swarmHash );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.accept( MediaType.TEXT_PLAIN );
+
+        try
+        {
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( String.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error getting P2P IP", e );
         }
     }
 
@@ -303,8 +298,15 @@ public class PeerWebClient
 
         try
         {
-            Response response = client.post( config );
-            return response.readEntity( String.class );
+            final Response response = client.post( config );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( String.class );
+            }
         }
         catch ( Exception e )
         {
@@ -350,7 +352,11 @@ public class PeerWebClient
 
         try
         {
-            client.delete();
+            final Response response = client.delete();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
@@ -373,7 +379,11 @@ public class PeerWebClient
 
         try
         {
-            client.delete();
+            final Response response = client.delete();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
@@ -393,7 +403,15 @@ public class PeerWebClient
 
         try
         {
-            return client.get( ResourceHostMetrics.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( ResourceHostMetrics.class );
+            }
         }
         catch ( Exception e )
         {
@@ -413,7 +431,15 @@ public class PeerWebClient
 
         try
         {
-            return client.get( Gateways.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( Gateways.class );
+            }
         }
         catch ( Exception e )
         {
@@ -433,7 +459,15 @@ public class PeerWebClient
 
         try
         {
-            return client.get( Vnis.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( Vnis.class );
+            }
         }
         catch ( Exception e )
         {
@@ -453,7 +487,15 @@ public class PeerWebClient
 
         try
         {
-            return client.post( vni, Vni.class );
+            final Response response = client.post( vni );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( Vni.class );
+            }
         }
         catch ( Exception e )
         {
@@ -498,7 +540,16 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            return client.get( HistoricalMetrics.class );
+
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( HistoricalMetrics.class );
+            }
         }
         catch ( Exception e )
         {
@@ -516,7 +567,15 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            return client.get( PeerResources.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( PeerResources.class );
+            }
         }
         catch ( Exception e )
         {
@@ -534,7 +593,15 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            return client.get( ControlNetworkConfig.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( ControlNetworkConfig.class );
+            }
         }
         catch ( Exception e )
         {
@@ -558,7 +625,15 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            return client.put( config, Boolean.class );
+            final Response response = client.put( config );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( Boolean.class );
+            }
         }
         catch ( Exception e )
         {
@@ -578,7 +653,15 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            return client.get( PingDistances.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( PingDistances.class );
+            }
         }
         catch ( Exception e )
         {
@@ -587,7 +670,7 @@ public class PeerWebClient
     }
 
 
-    public int setupTunnels( final Map<String, String> peerIps, final String environmentId )
+    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( peerIps );
         Preconditions.checkNotNull( environmentId );
@@ -596,11 +679,19 @@ public class PeerWebClient
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.TEXT_PLAIN );
-        return client.post( peerIps, Integer.class );
+        final Response response = client.post( peerIps );
+        if ( response.getStatus() == 500 )
+        {
+            throw new PeerException( response.readEntity( String.class ) );
+        }
+        else
+        {
+            return response.readEntity( Integer.class );
+        }
     }
 
 
-    public void addPeerEnvironmentPubKey( final String keyId, final String pubKeyRing )
+    public void addPeerEnvironmentPubKey( final String keyId, final String pubKeyRing ) throws PeerException
     {
         Preconditions.checkNotNull( keyId );
         Preconditions.checkNotNull( pubKeyRing );
@@ -609,7 +700,11 @@ public class PeerWebClient
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
-        client.post( pubKeyRing );
+        final Response response = client.post( pubKeyRing );
+        if ( response.getStatus() == 500 )
+        {
+            throw new PeerException( response.readEntity( String.class ) );
+        }
     }
 
 
@@ -622,7 +717,15 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( HostId.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( HostId.class );
+            }
         }
         catch ( Exception e )
         {
@@ -631,7 +734,7 @@ public class PeerWebClient
     }
 
 
-    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    public Containers getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
     {
         String path = String.format( "/containers/%s", environmentId.getId() );
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
@@ -640,7 +743,15 @@ public class PeerWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return new HashSet<>( client.getCollection( ContainerHostInfo.class ) );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( Containers.class );
+            }
         }
         catch ( Exception e )
         {

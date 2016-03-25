@@ -11,11 +11,11 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
@@ -183,7 +183,7 @@ public interface Peer
     /**
      * Returns set of container information of the environment
      */
-    public Set<ContainerHostInfo> getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
+    public Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
 
@@ -263,6 +263,15 @@ public interface Peer
 
     HostInterfaces getInterfaces() throws PeerException;
 
+
+    /**
+     * Returns p2p IP of the specified p2p swarm on the specified RH
+     *
+     * @param resourceHostId - id of RH
+     * @param swarmHash - hash of p2p swarm
+     */
+    String getP2PIP( String resourceHostId, String swarmHash ) throws PeerException;
+
     /**
      * Resets a secret key for a given P2P network on all RHs
      *
@@ -323,7 +332,7 @@ public interface Peer
 
     PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
-    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
+    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 

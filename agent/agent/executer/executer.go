@@ -13,6 +13,7 @@ import (
 	"os/user"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 	"unsafe"
@@ -89,8 +90,10 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	end := time.Now().Add(time.Duration(req.Timeout) * time.Second).Unix()
 	var response = genericResponse(&req)
 	response.ResponseNumber = 1
-	flagOut := true
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		r := bufio.NewReader(rop)
 		for line, isPrefix, err := r.ReadLine(); err == nil; line, isPrefix, err = r.ReadLine() {
 			response.StdOut = response.StdOut + string(line)
@@ -107,11 +110,11 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 				break
 			}
 		}
-		flagOut = false
 	}()
 
-	flagErr := true
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		scanErr := bufio.NewScanner(rep)
 		for scanErr.Scan() {
 			response.StdErr = response.StdErr + scanErr.Text() + "\n"
@@ -125,11 +128,12 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 				break
 			}
 		}
-		flagErr = false
 	}()
 
+	wg.Add(1)
 	go func() {
-		for end-now() > 0 && (flagOut || flagErr) {
+		defer wg.Done()
+		for end-now() > 0 {
 			if now()-start > 10 {
 				out_c <- response
 				start = now()
@@ -144,14 +148,12 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	go func() { done <- cmd.Wait() }()
 	select {
 	case <-done:
-		for flagOut || flagErr {
-			time.Sleep(time.Second)
-		}
 		response.ExitCode = "0"
 		if req.IsDaemon != 1 {
 			response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
 		}
 		out_c <- response
+		end = -1
 	case <-time.After(time.Duration(req.Timeout) * time.Second):
 		if req.IsDaemon == 1 {
 			response.ExitCode = "0"
@@ -169,9 +171,7 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 			out_c <- response
 		}
 	}
-	for flagOut || flagErr {
-		time.Sleep(time.Second)
-	}
+	wg.Wait()
 	close(out_c)
 }
 
