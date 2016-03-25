@@ -16,7 +16,6 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
@@ -263,6 +262,15 @@ public interface Peer
      */
 
     HostInterfaces getInterfaces() throws PeerException;
+
+
+    /**
+     * Returns p2p IP of the specified p2p swarm on the specified RH
+     *
+     * @param resourceHostId - id of RH
+     * @param swarmHash - hash of p2p swarm
+     */
+    String getP2PIP( String resourceHostId, String swarmHash ) throws PeerException;
 
     /**
      * Resets a secret key for a given P2P network on all RHs

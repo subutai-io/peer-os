@@ -343,6 +343,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response getP2PIP( final String resourceHostId, final String swarmHash )
+    {
+        try
+        {
+            String p2pIp = localPeer.getP2PIP( resourceHostId, swarmHash );
+            return Response.ok( p2pIp ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( e );
+        }
+    }
+
+
+    @Override
     public Response setupP2PConnection( final P2PConfig config )
     {
         try
