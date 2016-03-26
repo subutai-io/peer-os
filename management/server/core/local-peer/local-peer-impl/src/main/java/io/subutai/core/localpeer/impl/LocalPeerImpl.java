@@ -486,10 +486,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         ResourceHostInfoModel resourceHostInfoModel =
                 ( ResourceHostInfoModel ) hostRegistry.getResourceHostInfoById( resourceHostId );
 
-        resourceHostInfoModel.addContainer(
+        ContainerHostInfoModel containerHostInfoModel =
                 new ContainerHostInfoModel( containerHostEntity.getId(), containerHostEntity.getHostname(),
                         containerHostEntity.getHostInterfaces(), containerHostEntity.getArch(),
-                        ContainerHostState.RUNNING ) );
+                        ContainerHostState.RUNNING );
+
+        LOG.debug( "Adding container host to registry {}", containerHostInfoModel );
+
+        resourceHostInfoModel.addContainer( containerHostInfoModel );
 
         LOG.debug( "New container host registered: " + containerHostEntity.getHostname() );
     }
@@ -880,30 +884,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
-        Host host;
-        try
-        {
-            host = bindHost( aHost.getId() );
-        }
-        catch ( PeerException e )
-        {
-            throw new CommandException( "Host is not registered" );
-        }
-        if ( !host.isConnected() )
-        {
-            throw new CommandException( "Host is not connected" );
-        }
-
-
         CommandResult result;
 
         if ( callback == null )
         {
-            result = commandExecutor.execute( host.getId(), requestBuilder );
+            result = commandExecutor.execute( aHost.getId(), requestBuilder );
         }
         else
         {
-            result = commandExecutor.execute( host.getId(), requestBuilder, callback );
+            result = commandExecutor.execute( aHost.getId(), requestBuilder, callback );
         }
 
         return result;
@@ -917,28 +906,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
-        Host host;
-        try
-        {
-            host = bindHost( aHost.getId() );
-        }
-        catch ( PeerException e )
-        {
-            throw new CommandException( "Host not register." );
-        }
-        if ( !host.isConnected() )
-        {
-            throw new CommandException( "Host disconnected." );
-        }
-
-
         if ( callback == null )
         {
-            commandExecutor.executeAsync( host.getId(), requestBuilder );
+            commandExecutor.executeAsync( aHost.getId(), requestBuilder );
         }
         else
         {
-            commandExecutor.executeAsync( host.getId(), requestBuilder, callback );
+            commandExecutor.executeAsync( aHost.getId(), requestBuilder, callback );
         }
     }
 

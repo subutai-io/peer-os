@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.identity.rest.ui.entity.KeyDataDto;
+import io.subutai.core.identity.rest.ui.entity.PermissionDto;
+import io.subutai.core.identity.rest.ui.entity.UserTokenDto;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +103,7 @@ public class RestServiceImpl implements RestService
     public Response getPublicKeyData( final Long userId )
     {
         User user = identityManager.getUser( userId );
-        KeyDataJson keyData = new KeyDataJson();
+        KeyDataDto keyData = new KeyDataDto();
 
         try
         {
@@ -362,8 +365,8 @@ public class RestServiceImpl implements RestService
 
             if ( !Strings.isNullOrEmpty( permissionJson ) )
             {
-                ArrayList<PermissionJson> permissions =
-                        JsonUtil.fromJson( permissionJson, new TypeToken<ArrayList<PermissionJson>>()
+                ArrayList<PermissionDto> permissions =
+                        JsonUtil.fromJson( permissionJson, new TypeToken<ArrayList<PermissionDto>>()
                         {
                         }.getType() );
 
@@ -443,8 +446,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            List<UserTokenJson> list = identityManager.getAllUserTokens().stream()
-                                                      .map( p -> new UserTokenJson( p.getUserId(),
+            List<UserTokenDto> list = identityManager.getAllUserTokens().stream()
+                                                      .map( p -> new UserTokenDto( p.getUserId(),
                                                               identityManager.getUser( p.getUserId() ).getUserName(),
                                                               p.getToken(), p.getFullToken(), p.getType(),
                                                               p.getHashAlgorithm(), p.getIssuer(), p.getValidDate() ) )
