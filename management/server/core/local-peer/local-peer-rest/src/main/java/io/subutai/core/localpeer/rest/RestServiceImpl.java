@@ -30,7 +30,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -460,44 +459,6 @@ public class RestServiceImpl implements RestService
         try
         {
             return Response.ok( localPeer.getResourceLimits( peerId ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
-        }
-    }
-
-
-    @Override
-    public Response getControlNetworkConfig( final String peerId )
-    {
-        try
-        {
-            return Response.ok( localPeer.getControlNetworkConfig( peerId ) ).build();
-        }
-        catch ( PeerException e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
-        }
-    }
-
-
-    @Override
-    public Response updateControlNetworkConfig( final ControlNetworkConfig config )
-    {
-
-        Preconditions.checkNotNull( config );
-        Preconditions.checkNotNull( config.getAddress() );
-        Preconditions.checkNotNull( config.getP2pHash() );
-        Preconditions.checkNotNull( config.getPeerId() );
-        Preconditions.checkNotNull( config.getSecretKey() );
-        Preconditions.checkArgument( config.getSecretKeyTtlSec() > 0 );
-
-        try
-        {
-            return Response.ok( localPeer.updateControlNetworkConfig( config ) ).build();
         }
         catch ( PeerException e )
         {

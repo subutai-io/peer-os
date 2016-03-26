@@ -10,6 +10,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
@@ -33,12 +34,12 @@ public class ListHostsCommand extends SubutaiShellCommandSupport
     {
         Set<ResourceHostInfo> resourceHostsInfo = hostRegistry.getResourceHostsInfo();
 
-        System.out.println("Connected hosts:" );
+        System.out.println( "Connected hosts:" );
         for ( ResourceHostInfo resourceHostInfo : resourceHostsInfo )
         {
             System.out.println( String.format( "%s\t%s", resourceHostInfo.getHostname(), resourceHostInfo.getId() ) );
 
-            System.out.println( "\tNetwork interfaces:");
+            System.out.println( "\tNetwork interfaces:" );
             for ( HostInterface hostInterface : resourceHostInfo.getHostInterfaces().getAll() )
             {
                 System.out.println( String.format( "\t\t%s: %s", hostInterface.getName(), hostInterface.getIp() ) );
@@ -50,8 +51,9 @@ public class ListHostsCommand extends SubutaiShellCommandSupport
             for ( ContainerHostInfo containerHostInfo : containerHostInfos )
             {
                 System.out.println(
-                        String.format( "\t\t%s\t%s\t%s", containerHostInfo.getHostname(), containerHostInfo.getId(),
-                                containerHostInfo.getState() ) );
+                        String.format( "\t\t%s\t%s\t%s\t%s", containerHostInfo.getHostname(), containerHostInfo.getId(),
+                                containerHostInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE )
+                                                 .getIp(), containerHostInfo.getState() ) );
             }
         }
         return null;
