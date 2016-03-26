@@ -28,7 +28,7 @@ function SettingsKurjunSrv($http) {
     }
 
     function registerUrl(url, type) {
-        var postData = "&url=" + url + "&type=" + type;
+        var postData = "url=" + url + "&type=" + type;
         return $http.post(
             REGISTER_URL,
             postData,
