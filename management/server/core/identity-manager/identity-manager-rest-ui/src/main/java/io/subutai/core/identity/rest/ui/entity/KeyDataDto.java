@@ -1,10 +1,10 @@
-package io.subutai.core.identity.rest.ui;
+package io.subutai.core.identity.rest.ui.entity;
 
 
 /**
  *
  */
-public class KeyDataJson
+public class KeyDataDto
 {
     private int keyType = 1;
     private String key = "";
