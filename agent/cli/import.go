@@ -61,7 +61,7 @@ func md5sum(file string) string {
 
 func checkLocal(templ, md5, arch string) string {
 	var response string
-	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "lxc-data/tmpdir")
+	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
 		file := strings.Split(f.Name(), "-subutai-template_")
 		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
@@ -70,11 +70,11 @@ func checkLocal(templ, md5, arch string) string {
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
-					return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + f.Name()
+					return config.Agent.LxcPrefix + "tmpdir/" + f.Name()
 				}
 			}
-			if md5 == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+f.Name()) {
-				return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + f.Name()
+			if md5 == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
+				return config.Agent.LxcPrefix + "tmpdir/" + f.Name()
 			}
 		}
 	}
@@ -82,7 +82,7 @@ func checkLocal(templ, md5, arch string) string {
 }
 
 func download(file, id, token string) string {
-	out, err := os.Create(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file)
+	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + file)
 	log.Check(log.FatalLevel, "Creating file "+file, err)
 	defer out.Close()
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -93,8 +93,8 @@ func download(file, id, token string) string {
 	defer response.Body.Close()
 	_, err = io.Copy(out, response.Body)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
-	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+file) {
-		return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file
+	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+file) {
+		return config.Agent.LxcPrefix + "tmpdir/" + file
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return ""
@@ -160,8 +160,8 @@ func LxcImport(templ, version, token string) {
 
 	log.Info("Unpacking template " + templ)
 	tgz := extractor.NewTgz()
-	tgz.Extract(archive, config.Agent.LxcPrefix+"lxc-data/tmpdir/"+templ)
-	templdir := config.Agent.LxcPrefix + "lxc-data/tmpdir/" + templ
+	tgz.Extract(archive, config.Agent.LxcPrefix+"tmpdir/"+templ)
+	templdir := config.Agent.LxcPrefix + "tmpdir/" + templ
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
 		log.Info("Parent template required: " + parent)

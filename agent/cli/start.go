@@ -10,9 +10,10 @@ func LxcStart(name string) {
 	if container.IsContainer(name) && container.State(name) == "STOPPED" {
 		container.Start(name)
 	}
-	if container.State(name) == "RUNNING" {
+	state := container.State(name)
+	if state == "RUNNING" || state == "STARTING" {
 		log.Info(name + " started")
 	} else {
-		log.Error(name + " start failed")
+		log.Error(name + " start failed. State: " + state)
 	}
 }
