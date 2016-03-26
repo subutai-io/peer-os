@@ -164,7 +164,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
 
         // Not NULL makes mocking
-//        environmentAdapter = new EnvironmentAdapter( this, peerManager );
+        environmentAdapter = new EnvironmentAdapter( this, peerManager );
     }
 
 

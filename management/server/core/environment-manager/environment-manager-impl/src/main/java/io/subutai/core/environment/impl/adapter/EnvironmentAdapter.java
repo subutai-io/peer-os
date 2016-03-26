@@ -16,10 +16,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -33,14 +30,15 @@ public class EnvironmentAdapter
 
     private final EnvironmentManagerImpl environmentManager;
 
-    private final PeerManager peerManager;
+//    private final PeerManager peerManager;
+    private final ProxyContainerHelper proxyContainerHelper;
 
 
     public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager )
     {
         this.environmentManager = environmentManager;
 
-        this.peerManager = peerManager;
+        proxyContainerHelper = new ProxyContainerHelper( peerManager );
     }
 
 
@@ -109,55 +107,9 @@ public class EnvironmentAdapter
 
         envContainers.add( getContainer() );
 
-        Set<String> localContainerIds = getLocalContainerIds();
-
-        Host proxyContainer = getProxyContainer( envContainers, localContainerIds );
-
-        setProxyToRemoteContainers( envContainers, localContainerIds, proxyContainer );
+        proxyContainerHelper.setProxyToRemoteContainers( envContainers );
 
         return envContainers;
-    }
-
-
-    private void setProxyToRemoteContainers( Set<ProxyEnvironmentContainer> envContainers, Set<String> localContainerIds, Host proxyContainer )
-    {
-        for ( ProxyEnvironmentContainer c : envContainers )
-        {
-//            if ( !localContainerIds.contains( c.getId() ) )
-//            {
-                c.setProxyContainer( proxyContainer );
-//            }
-        }
-    }
-
-
-    // Returns a first local container which will be used as to execute SSH commands to remote containers
-    private Host getProxyContainer( Set<ProxyEnvironmentContainer> envContainers, Set<String> localHostIds )
-    {
-        for ( ProxyEnvironmentContainer host : envContainers )
-        {
-            if ( localHostIds.contains( host.getId() ) && host.getState() == ContainerHostState.RUNNING ) {
-                return host;
-            }
-        }
-
-        return null;
-    }
-
-
-    private Set<String> getLocalContainerIds()
-    {
-        HashSet<String> ids = new HashSet<>();
-
-        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
-        {
-            for ( ContainerHost ch : rh.getContainerHosts() )
-            {
-                ids.add( ch.getId() );
-            }
-        }
-
-        return ids;
     }
 
 
