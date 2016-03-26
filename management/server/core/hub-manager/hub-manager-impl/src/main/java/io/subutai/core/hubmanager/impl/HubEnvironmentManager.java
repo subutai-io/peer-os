@@ -44,7 +44,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
@@ -211,7 +210,7 @@ public class HubEnvironmentManager
         {
             localPeer.setupInitialP2PConnection(
                     new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[0], env.getP2pKey(),
-                            Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
+                            env.getP2pTTL() ) );
         }
         catch ( PeerException e )
         {
