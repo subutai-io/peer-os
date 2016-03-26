@@ -11,12 +11,15 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.Host;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
 
 public class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
+
+    private Host proxyContainer;
 
 
     public ProxyEnvironmentContainer( String creatorPeerId, String peerId, String nodeGroupName, ContainerHostInfoModel hostInfo, String templateName,
@@ -38,24 +41,14 @@ public class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     @Override
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException
     {
-        log.debug( "id: {}", getId() );
-
-        log.debug( "environment.: {}", environment );
-
-//        LocalPeer localPeer = environmentManager.getPeerManager().getLocalPeer();
-//
-//        for ( ResourceHost rh : localPeer.getResourceHosts() )
-//        {
-//            for ( ContainerHost ch : rh.getContainerHosts() )
-//            {
-//                log.debug( "ch: id={}, state={}", ch.getId(), ch.getState() );
-//            }
-//        }
-
-
-
-//        log.debug( "requestBuilder: {}", requestBuilder );
+        log.debug( "proxyContainer: {}", proxyContainer );
 
         return getPeer().execute( requestBuilder, this );
+    }
+
+
+    void setProxyContainer( Host proxyContainer )
+    {
+        this.proxyContainer = proxyContainer;
     }
 }

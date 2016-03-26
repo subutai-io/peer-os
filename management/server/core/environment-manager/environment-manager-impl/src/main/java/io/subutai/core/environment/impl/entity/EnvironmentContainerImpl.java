@@ -660,9 +660,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         ContainerHostState state = getState();
 
+        String envId = environment != null ? environment.getId() : null;
+
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
-                          .add( "templateName", templateName ).add( "environmentId", environment.getId() )
+                          .add( "templateName", templateName ).add( "environmentId", envId )
                           .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
                           .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
                           .add( "hostArchitecture", hostArchitecture ).add( "state", state )
