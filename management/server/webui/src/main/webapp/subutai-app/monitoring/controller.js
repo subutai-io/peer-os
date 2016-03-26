@@ -93,6 +93,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	};
 
 	function getChartData(obj) {
+		console.log(obj);
 		var series = obj.Series;
 		var seriesName = obj.Series[0].name;
 
@@ -417,7 +418,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 						break;
 				}
 				chartSerie.values.push({
-					x: moment.unix((values[value].x)).valueOf(),
+					x: moment((values[value].x)).valueOf(),
 					y: values[value].y == undefined ? 0 : parseFloat((values[value].y / unitCoefficient).toFixed(2))
 				});
 			}
@@ -439,15 +440,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		var labelStepCoefficient = vm.parseOptions[parseInt(vm.period)].labelStep;
 		var valueStepCoefficient = vm.parseOptions[vm.period].labelStep;
 		for (var index = 0; index < data.length; index++) {
-			if (moment.unix((data[index].x)).get('minute') == 0 ||
-					moment.unix((data[index].x)).get('minute') % labelStepCoefficient == 0 ||
-					parseInt(vm.period) == 1 && moment.unix((data[index].x)).get('minute') % valueStepCoefficient == 0
+			if (moment((data[index].x)).get('minute') == 0 ||
+					moment((data[index].x)).get('minute') % labelStepCoefficient == 0 ||
+					parseInt(vm.period) == 1 && moment((data[index].x)).get('minute') % valueStepCoefficient == 0
 			   ) {
-				labels.push(moment.unix((data[index].x)).valueOf());
-				var tempStore = moment.unix((data[index].x)).valueOf();
+				labels.push(moment((data[index].x)).valueOf());
+				var tempStore = moment((data[index].x)).valueOf();
 				while (true) {
 					tempStore += labelStepCoefficient * 60000;
-					if (tempStore > moment.unix((data[data.length - 1].x)).valueOf()) {
+					if (tempStore > moment((data[data.length - 1].x)).valueOf()) {
 						return labels;
 					}
 					labels.push(tempStore);
@@ -462,15 +463,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		var chartDataMap = getChartDataMap(data);
 		var scaledData = [];
 		var valueStepCoefficient = vm.parseOptions[parseInt(vm.period)].valueStep;
-		var maxValue = moment.unix((data[data.length - 1].x)).valueOf();
+		var maxValue = moment((data[data.length - 1].x)).valueOf();
 
 		for (var index = 0; index < data.length; index++) {
-			if (moment.unix((data[index].x)).get('minute') % valueStepCoefficient == 0) {
+			if (moment((data[index].x)).get('minute') % valueStepCoefficient == 0) {
 				scaledData.push({
-					x: moment.unix((data[index].x)).valueOf(),
+					x: moment((data[index].x)).valueOf(),
 					y: data[index].y
 				});
-				var tempStore = moment.unix((data[index].x));
+				var tempStore = moment((data[index].x));
 				while (tempStore.add(valueStepCoefficient, 'minutes').valueOf() <= maxValue) {
 					scaledData.push({
 						x: tempStore.valueOf(),
@@ -489,7 +490,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 			}
 			if (index == 0) {
 				scaledData.push({
-					x: moment.unix((data[index].x)).valueOf(),
+					x: moment((data[index].x)).valueOf(),
 					y: data[index].y
 				});
 			}
