@@ -38,7 +38,23 @@ public class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     @Override
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException
     {
-        log.debug( "requestBuilder: {}", requestBuilder );
+        log.debug( "id: {}", getId() );
+
+        log.debug( "environment.: {}", environment );
+
+//        LocalPeer localPeer = environmentManager.getPeerManager().getLocalPeer();
+//
+//        for ( ResourceHost rh : localPeer.getResourceHosts() )
+//        {
+//            for ( ContainerHost ch : rh.getContainerHosts() )
+//            {
+//                log.debug( "ch: id={}, state={}", ch.getId(), ch.getState() );
+//            }
+//        }
+
+
+
+//        log.debug( "requestBuilder: {}", requestBuilder );
 
         return getPeer().execute( requestBuilder, this );
     }

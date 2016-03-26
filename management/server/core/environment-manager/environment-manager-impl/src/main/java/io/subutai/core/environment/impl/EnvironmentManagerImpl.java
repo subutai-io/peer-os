@@ -188,6 +188,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
     @Override
     public String getName()
     {

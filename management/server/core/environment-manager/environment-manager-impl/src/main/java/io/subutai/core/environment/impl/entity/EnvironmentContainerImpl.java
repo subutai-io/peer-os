@@ -120,7 +120,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
     @JsonIgnore
-    private Environment environment;
+    protected Environment environment;
 
     @Column( name = "arch", nullable = false )
     @Enumerated
