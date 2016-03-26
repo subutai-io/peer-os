@@ -15,12 +15,6 @@ import org.apache.commons.configuration.ConfigurationException;
 public interface RestService
 {
     @GET
-    @Path( "authid" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getAuthId( @FormParam( "url" ) String url, @FormParam( "type" ) int type );
-
-
-    @GET
     @Path( "urls" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getKurjunUrl();
@@ -34,5 +28,6 @@ public interface RestService
     @POST
     @Path( "signed-msg" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg );
+    public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg, @FormParam( "url" ) String url,
+                                      @FormParam( "type" ) int type );
 }
