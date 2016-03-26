@@ -26,15 +26,12 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.ContainersDestructionResultImpl;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
-import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.DestroyEnvironmentContainerGroupResponse;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.exception.HTTPException;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -49,7 +46,6 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.ContainersDestructionResult;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -272,14 +268,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            new PeerWebClient( peerInfo, provider ).startContainer( containerId );
-        }
-        else
-        {
-            new EnvironmentWebClient( provider ).startContainer( peerInfo, containerId );
-        }
+        new EnvironmentWebClient( provider ).startContainer( peerInfo, containerId );
     }
 
 
@@ -290,14 +279,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            new PeerWebClient( peerInfo, provider ).stopContainer( containerId );
-        }
-        else
-        {
-            new EnvironmentWebClient( provider ).stopContainer( peerInfo, containerId );
-        }
+        new EnvironmentWebClient( provider ).stopContainer( peerInfo, containerId );
     }
 
 
@@ -305,15 +287,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
-
-        if ( containerId.getEnvironmentId() == null )
-        {
-            new PeerWebClient( peerInfo, provider ).destroyContainer( containerId );
-        }
-        else
-        {
-            new EnvironmentWebClient( provider ).destroyContainer( peerInfo, containerId );
-        }
+        new EnvironmentWebClient( provider ).destroyContainer( peerInfo, containerId );
     }
 
 
@@ -394,19 +368,12 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            return new PeerWebClient( peerInfo, provider ).getState( containerId );
-        }
-        else
-        {
-            return new EnvironmentWebClient( provider ).getState( peerInfo, containerId );
-        }
+        return new EnvironmentWebClient( provider ).getState( peerInfo, containerId );
     }
 
 
     @Override
-    public Set<ContainerHostInfo> getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
+    public Containers getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
@@ -701,36 +668,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //**************************************************************************
-
-
-        DestroyEnvironmentContainerGroupResponse response =
-                sendRequest( new DestroyEnvironmentContainerGroupRequest( environmentId ),
-                        RecipientType.DESTROY_ENVIRONMENT_CONTAINER_GROUP_REQUEST.name(),
-                        Timeouts.DESTROY_CONTAINER_REQUEST_TIMEOUT, DestroyEnvironmentContainerGroupResponse.class,
-                        Timeouts.DESTROY_CONTAINER_RESPONSE_TIMEOUT, headers );
-
-        if ( response != null )
-        {
-            return new ContainersDestructionResultImpl( getId(), response.getDestroyedContainersIds(),
-                    response.getException() );
-        }
-        else
-        {
-            throw new PeerException( "Command timed out" );
-        }
-    }
-
-
     //networking
     @RolesAllowed( "Environment-Management|Write" )
     @Override
@@ -814,12 +751,13 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+            throw new PeerException( e.getMessage() );
         }
     }
 
 
     @Override
-    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek )
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek ) throws PeerException
     {
         Preconditions.checkNotNull( keyId, "Invalid key ID" );
         Preconditions.checkNotNull( pek, "Public key ring is null" );
@@ -832,6 +770,7 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+            throw new PeerException( e.getMessage() );
         }
     }
 
@@ -855,11 +794,30 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setupP2PConnection( final P2PConfig config ) throws PeerException
+    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
+
+        return new PeerWebClient( peerInfo, provider ).getP2PIP( resourceHostId, swarmHash );
+    }
+
+
+    @Override
+    public String setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
+        return new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
+    }
+
+
+    @Override
+    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    {
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
+
+        new PeerWebClient( peerInfo, provider ).setupInitialP2PConnection( config );
     }
 
 
@@ -941,8 +899,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress )
-            throws PeerException
+    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
         return new PeerWebClient( peerInfo, provider ).getP2PSwarmDistances( p2pHash, maxAddress );
     }

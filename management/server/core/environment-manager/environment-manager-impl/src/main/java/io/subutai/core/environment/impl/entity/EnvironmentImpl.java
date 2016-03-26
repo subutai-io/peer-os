@@ -85,7 +85,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Id
     @Column( name = "environment_id" )
     @JsonProperty( "environmentId" )
-    private String environmentId;
+    protected String environmentId;
 
     @Version
     @JsonIgnore
@@ -155,6 +155,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    @Column( length = 1000 )
     @JsonIgnore
     private Set<String> sshKeys = new HashSet<>();
 
@@ -442,10 +443,9 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    //TODO: remove environmentId param
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
-                                                          boolean async ) throws EnvironmentModificationException
+    public Set<EnvironmentContainerHost> growEnvironment( final Topology topology, boolean async )
+            throws EnvironmentModificationException
     {
         try
         {

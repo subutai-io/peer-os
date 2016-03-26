@@ -16,8 +16,6 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -25,7 +23,6 @@ import io.subutai.core.security.api.SecurityManager;
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
     private final TemplateManager templateRegistry;
-    private final NetworkManager networkManager;
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
     private EnvironmentImpl environment;
@@ -34,7 +31,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
-    private QuotaManager quotaManager;
 
 
     //environment creation phases
@@ -54,10 +50,9 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
 
     public EnvironmentCreationWorkflow( String defaultDomain, TemplateManager templateRegistry,
-                                        EnvironmentManagerImpl environmentManager, NetworkManager networkManager,
-                                        PeerManager peerManager, SecurityManager securityManager,
-                                        EnvironmentImpl environment, Topology topology, String sshKey,
-                                        TrackerOperation operationTracker )
+                                        EnvironmentManagerImpl environmentManager, PeerManager peerManager,
+                                        SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
+                                        String sshKey, TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
 
@@ -65,13 +60,11 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
-        this.networkManager = networkManager;
         this.environment = environment;
         this.topology = topology;
         this.sshKey = sshKey;
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
-        this.quotaManager = quotaManager;
     }
 
 
@@ -94,7 +87,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager, securityManager ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -114,7 +107,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager ).execute();
+            new VNISetupStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -134,7 +127,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, networkManager ).execute();
+            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -174,8 +167,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager, operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
+                    operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -195,7 +188,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new RegisterHostsStep( environment, networkManager ).execute();
+            new RegisterHostsStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -217,7 +210,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             environment.addSshKey( sshKey );
 
-            new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
+            new RegisterSshStep( environment, operationTracker ).execute( environment.getSshKeys() );
 
             environment = environmentManager.update( environment );
 

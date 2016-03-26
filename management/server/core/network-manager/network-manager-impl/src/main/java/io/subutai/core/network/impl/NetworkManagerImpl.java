@@ -26,6 +26,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
@@ -99,30 +100,28 @@ public class NetworkManagerImpl implements NetworkManager
     public void resetP2PSecretKey( final Host host, final String p2pHash, final String newSecretKey,
                                    final long ttlSeconds ) throws NetworkManagerException
     {
+        Preconditions.checkNotNull( host );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
         Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
 
-        execute( getManagementHost(),
-                commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
+        execute( host, commands.getResetP2PSecretKey( p2pHash, newSecretKey, getUnixTimestampOffset( ttlSeconds ) ) );
     }
 
 
     @Override
-    public Set<P2PConnection> getP2PConnectionsInSwarm( final String p2pHash ) throws NetworkManagerException
+    public P2PConnections getP2PConnections() throws NetworkManagerException
     {
-        return getP2PConnectionsInSwarm( getManagementHost(), p2pHash );
+        return getP2PConnections( getManagementHost() );
     }
 
 
     @Override
-    public Set<P2PConnection> getP2PConnectionsInSwarm( final Host host, final String p2pHash )
-            throws NetworkManagerException
+    public P2PConnections getP2PConnections( final Host host ) throws NetworkManagerException
     {
-        Set<P2PConnection> p2PConnections = Sets.newHashSet();
+        P2PConnections connections = new P2PConnections();
 
-        CommandResult result = execute( host, commands.getP2PConnectionsCommand( p2pHash ) );
-
+        CommandResult result = execute( host, commands.getP2PConnectionsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -134,26 +133,11 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 3 )
             {
-                p2PConnections.add( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+                connections.addConnection( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
             }
         }
 
-
-        return p2PConnections;
-    }
-
-
-    @Override
-    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException
-    {
-        return getP2PConnections( getManagementHost() );
-    }
-
-
-    @Override
-    public Set<P2PConnection> getP2PConnections( final Host host ) throws NetworkManagerException
-    {
-        return getP2PConnectionsInSwarm( host, null );
+        return connections;
     }
 
 
@@ -450,54 +434,6 @@ public class NetworkManagerImpl implements NetworkManager
     }
 
 
-    @Override
-    public void exchangeSshKeys( final Set<ContainerHost> containers, final Set<String> additionalSshKeys )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).execute( additionalSshKeys, false );
-    }
-
-
-    @Override
-    public void appendSshKeys( final Set<ContainerHost> containers, final Set<String> sshKeys )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).execute( sshKeys, true );
-    }
-
-
-    @Override
-    public void addSshKeyToAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).appendSshKey( sshKey );
-    }
-
-
-    @Override
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
-                                               final String newSshKey ) throws NetworkManagerException
-    {
-        getSshManager( containers ).replaceSshKey( oldSshKey, newSshKey );
-    }
-
-
-    @Override
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException
-    {
-        getSshManager( containers ).removeSshKey( sshKey );
-    }
-
-
-    @Override
-    public void registerHosts( final Set<ContainerHost> containerHosts, final String domainName )
-            throws NetworkManagerException
-    {
-        getHostManager( containerHosts, domainName ).execute();
-    }
-
-
     private long getUnixTimestampOffset( final long offsetSec )
     {
         long unixTimestamp = Instant.now().getEpochSecond();
@@ -563,17 +499,5 @@ public class NetworkManagerImpl implements NetworkManager
         {
             throw new NetworkManagerException( e );
         }
-    }
-
-
-    protected SshManager getSshManager( final Set<ContainerHost> containers )
-    {
-        return new SshManager( containers );
-    }
-
-
-    protected HostManager getHostManager( final Set<ContainerHost> containerHosts, final String domainName )
-    {
-        return new HostManager( containerHosts, domainName );
     }
 }

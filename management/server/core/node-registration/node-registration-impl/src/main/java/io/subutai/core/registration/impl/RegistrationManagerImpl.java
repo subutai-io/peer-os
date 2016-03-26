@@ -28,27 +28,21 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
-import io.subutai.core.hostregistry.api.HostListener;
-import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
-import io.subutai.core.registration.impl.dao.ContainerInfoDataService;
 import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
 import io.subutai.core.registration.impl.dao.RequestDataService;
 import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
@@ -58,28 +52,22 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-public class RegistrationManagerImpl implements RegistrationManager, HostListener
+public class RegistrationManagerImpl implements RegistrationManager
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationManagerImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManagerImpl.class );
     private SecurityManager securityManager;
     private RequestDataService requestDataService;
-    private ContainerInfoDataService containerInfoDataService;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
-    private String domainName;
     private LocalPeer localPeer;
-    private NetworkManager networkManager;
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager,
-                                    final NetworkManager networkManager, final LocalPeer localPeer,
-                                    final String domainName )
+                                    final LocalPeer localPeer )
     {
         this.securityManager = securityManager;
         this.daoManager = daoManager;
-        this.networkManager = networkManager;
         this.localPeer = localPeer;
-        this.domainName = domainName;
     }
 
 
@@ -87,7 +75,6 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     {
         containerTokenDataService = new ContainerTokenDataService( daoManager );
         requestDataService = new RequestDataService( daoManager );
-        containerInfoDataService = new ContainerInfoDataService( daoManager );
     }
 
 
@@ -122,11 +109,11 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
 
     @Override
-    public void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
+    public synchronized void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
     {
         if ( requestDataService.find( requestedHost.getId() ) != null )
         {
-            LOGGER.info( "Already requested registration" );
+            LOG.info( "Already requested registration" );
         }
         else
         {
@@ -140,6 +127,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
             {
                 throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
             }
+
             checkManagement( registrationRequest );
         }
     }
@@ -167,7 +155,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error approving new connections request", e );
+            LOG.error( "Error approving new connections request", e );
         }
         client.query( "Message", encoded ).delete();
     }
@@ -234,94 +222,15 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
 
     private void importHostSslCert( String hostId, String cert )
     {
-        try
-        {
-            securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(), hostId, cert );
-            securityManager.getHttpContextManager().reloadKeyStore();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error importing host SSL certificate", e );
-        }
+        securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(), hostId, cert );
+        securityManager.getHttpContextManager().reloadKeyStore();
     }
 
 
     private void importHostPublicKey( String hostId, String publicKey )
     {
-        try
-        {
-            KeyManager keyManager = securityManager.getKeyManager();
-            keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "Error importing host public key", ex );
-        }
-    }
-
-
-    @Override
-    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
-    {
-        //todo revise this method temporarily disabling it
-        //        RequestedHostImpl requestedHost = requestDataService.find( resourceHostInfo.getId() );
-        //        if ( requestedHost != null && requestedHost.getStatus() == RegistrationStatus.APPROVED )
-        //        {
-        //            try
-        //            {
-        //                ResourceHost resourceHost = localPeer.getResourceHostById( resourceHostInfo.getId() );
-        //                Map<Integer, Set<ContainerHost>> containerHostList = Maps.newHashMap();
-        //                for ( final ContainerInfo containerInfo : requestedHost.getHostInfos() )
-        //                {
-        //                    if ( RegistrationStatus.APPROVED.equals( containerInfo.getState() )
-        //                            && containerInfo.getVlan() != 0 )
-        //                    {
-        //
-        //                        ContainerInfoImpl containerInfoImpl = containerInfoDataService.find( containerInfo
-        // .getId() );
-        //
-        //                        ContainerHost containerHost = resourceHost.getContainerHostById( containerInfo
-        // .getId() );
-        //
-        //                        containerInfoImpl.setStatus( RegistrationStatus.REGISTERED );
-        //                        containerInfoDataService.update( containerInfoImpl );
-        //
-        //                        //we assume that newly imported environment has always default sshGroupId=1,
-        // hostsGroupId=1
-        //
-        //                        //configure hosts on each group | group containers by ssh group
-        //                        Set<ContainerHost> containers = containerHostList.get( containerInfoImpl.getVlan() );
-        //                        if ( containers == null )
-        //                        {
-        //                            containers = Sets.newHashSet();
-        //                        }
-        //                        containers.add( containerHost );
-        //                    }
-        //                }
-        //                for ( final Map.Entry<Integer, Set<ContainerHost>> entry : containerHostList.entrySet() )
-        //                {
-        //                    configureHosts( entry.getValue() );
-        //                }
-        //            }
-        //            catch ( HostNotFoundException e )
-        //            {
-        //                //ignore
-        //            }
-        //            catch ( NetworkManagerException e )
-        //            {
-        //                LOGGER.error( "Error configuring container hosts", e );
-        //            }
-        //        }
-    }
-
-
-    private void configureHosts( final Set<ContainerHost> containerHosts ) throws NetworkManagerException
-    {
-        //assume that inside one host group the domain name must be the same for all containers
-        //so pick one container's domain name as the group domain name
-        networkManager.registerHosts( containerHosts, domainName );
-
-        networkManager.exchangeSshKeys( containerHosts, Sets.<String>newHashSet() );
+        KeyManager keyManager = securityManager.getKeyManager();
+        keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
     }
 
 
@@ -394,7 +303,7 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
         }
         catch ( Exception ex )
         {
-            LOGGER.error( "Error persisting container token", ex );
+            LOG.error( "Error persisting container token", ex );
         }
 
         return token;
@@ -432,17 +341,24 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     {
         try
         {
-            try
+            if ( requestedHost.getStatus() == RegistrationStatus.REQUESTED && containsManagementContainer(
+                    requestedHost.getHostInfos() ) )
             {
-                localPeer.getManagementHost();
-            }
-            catch ( HostNotFoundException nfe )
-            {
-                String requestId = findManagementNode( requestedHost );
-                if ( requestId != null
-                        && requestedHost.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+                boolean managementAlreadyApproved = false;
+
+                for ( RequestedHostImpl requestedHostImpl : requestDataService.getAll() )
                 {
-                    approveRequest( requestId );
+                    if ( requestedHostImpl.getStatus() == RegistrationStatus.APPROVED && containsManagementContainer(
+                            requestedHostImpl.getHostInfos() ) )
+                    {
+                        managementAlreadyApproved = true;
+                        break;
+                    }
+                }
+
+                if ( !managementAlreadyApproved )
+                {
+                    approveRequest( requestedHost.getId() );
                 }
             }
         }
@@ -453,20 +369,16 @@ public class RegistrationManagerImpl implements RegistrationManager, HostListene
     }
 
 
-    private String findManagementNode( RequestedHost h )
+    private boolean containsManagementContainer( Set<ContainerInfo> containers )
     {
-        String result = null;
-        if ( h.getStatus() == io.subutai.core.registration.api.RegistrationStatus.REQUESTED )
+        for ( HostInfo hostInfo : containers )
         {
-            for ( HostInfo info : h.getHostInfos() )
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( hostInfo.getHostname() ) )
             {
-                if ( "management".equalsIgnoreCase( info.getHostname() ) )
-                {
-                    result = h.getId();
-                    break;
-                }
+                return true;
             }
         }
-        return result;
+
+        return false;
     }
 }

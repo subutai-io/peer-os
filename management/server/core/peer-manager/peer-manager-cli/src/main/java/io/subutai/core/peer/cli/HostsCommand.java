@@ -49,14 +49,14 @@ public class HostsCommand extends SubutaiShellCommandSupport
 
     protected void print( Host host, String padding ) throws PeerException
     {
-        String containerInfo = String.format( "%s ", host.isConnected() ? " CONNECTED" : " DISCONNECTED" );
+        String connectionState = String.format( "%s ", host.isConnected() ? " CONNECTED" : " DISCONNECTED" );
         if ( host instanceof ContainerHost )
         {
             ContainerHost c = ( ContainerHost ) host;
-            containerInfo += c.getState();
+            connectionState += c.getState();
         }
 
         System.out
-                .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), containerInfo ) );
+                .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), connectionState ) );
     }
 }

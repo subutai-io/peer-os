@@ -13,11 +13,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import io.subutai.common.peer.Host;
-import io.subutai.common.util.CollectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+
+import io.subutai.common.peer.Host;
+import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -25,6 +28,9 @@ import com.google.common.collect.Maps;
  */
 public class CommandUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger( CommandUtil.class );
+
+
     /**
      * Allows to execute command on host. Throws CommandException if command has completed with status other then
      * SUCCEEDED.
@@ -192,6 +198,50 @@ public class CommandUtil
             catch ( ExecutionException | InterruptedException e )
             {
                 throw new CommandException( e );
+            }
+        }
+
+        taskExecutor.shutdown();
+
+        return resultMap;
+    }
+
+
+    /**
+     * Allows to execute command on all hosts in parallel. If any exception is thrown, ignores is and collects results
+     * of only succeeded executions
+     *
+     * @param requestBuilder - request
+     * @param hosts - hosts
+     *
+     * @return -  map containing command results
+     */
+    public Map<Host, CommandResult> executeParallelSilent( RequestBuilder requestBuilder, Set<Host> hosts )
+
+    {
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
+
+        final Map<Host, CommandResult> resultMap = Maps.newConcurrentMap();
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
+        CompletionService<HostCommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
+
+        for ( Host host : hosts )
+        {
+            taskCompletionService.submit( new CommandTask( host, requestBuilder ) );
+        }
+
+        for ( int i = 0; i < hosts.size(); i++ )
+        {
+            try
+            {
+                Future<HostCommandResult> result = taskCompletionService.take();
+                HostCommandResult hostCommandResult = result.get();
+                resultMap.put( hostCommandResult.getHost(), hostCommandResult.getCommandResult() );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error in #executeParallelSilent", e );
             }
         }
 

@@ -4,6 +4,7 @@ import (
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/net"
+	"github.com/subutai-io/base/agent/lib/net/p2p"
 )
 
 func Cleanup(vlan string) {
@@ -15,5 +16,6 @@ func Cleanup(vlan string) {
 
 	net.DeleteGateway(vlan)
 	ClearVlan(vlan)
+	p2p.RemoveByIface("p2p-" + vlan)
 	ProxyDel(vlan, "", true)
 }

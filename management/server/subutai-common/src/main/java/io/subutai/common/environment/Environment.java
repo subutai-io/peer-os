@@ -74,11 +74,10 @@ public interface Environment extends RelationLink
     /**
      * Grows environment according to the passed blueprint
      *
-     * @param environmentId = environment id to use when growing
      * @param topology = topology to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
             throws EnvironmentModificationException;
 
 
