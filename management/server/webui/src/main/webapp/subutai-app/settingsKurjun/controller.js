@@ -86,24 +86,25 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 
 	function autoSign() {
 		SettingsKurjunSrv.signedMsg(vm.currentUrl, vm.currentType, vm.uid).success(function (data) {
-			vm.uid = '';
-			vm.currentUrl = '';
-			vm.currentType = '';
-			$('#js-uid-sign-area').removeClass('bp-sign-target');
+			resetSignField();
 			if(Object.keys(vm.dtInstance).length !== 0) {
 				vm.dtInstance.reloadData(null, false);
 			}
 			LOADING_SCREEN('none');
 			SweetAlert.swal("Success!", "URL was successfully authorized.", "success");
 		}).error(function(error) {
-			vm.uid = '';
-			vm.currentUrl = '';
-			vm.currentType = '';
-			$('#js-uid-sign-area').removeClass('bp-sign-target');
+			resetSignField();
 			SweetAlert.swal("ERROR!", "Register URL error: " + error.replace(/\\n/g, " "), "error");
 			LOADING_SCREEN('none');
 			console.log(error);
 		});
+	}
+
+	function resetSignField() {
+		vm.uid = '';
+		vm.currentUrl = '';
+		vm.currentType = '';
+		$('#js-uid-sign-area').removeClass('bp-sign-target');
 	}
 
     function updateConfigQuotas() {
