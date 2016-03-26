@@ -55,6 +55,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.showSSHKeyForm = showSSHKeyForm;
 	vm.showSSHKeysPopup = showSSHKeysPopup;
 	vm.deleteSSHKey = deleteSSHKey;
+	vm.sshKeyFormat = sshKeyFormat;
 	vm.showDomainForm = showDomainForm;
 	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
@@ -407,6 +408,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			ngDialog.closeAll();
 			LOADING_SCREEN('none');
 		});
+	}
+
+	function sshKeyFormat(sshKey) {
+		var splitedSSH = sshKey.split('==');
+		return splitedSSH[0];
 	}
 
 	function showDomainForm(environmentId) {
