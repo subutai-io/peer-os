@@ -71,7 +71,6 @@ public class RequestBuilder
     }
 
 
-
     /**
      * Returns command explicit timeout in seconds
      *
