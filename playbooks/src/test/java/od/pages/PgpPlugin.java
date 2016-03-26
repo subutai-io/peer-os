@@ -16,5 +16,7 @@ public class PgpPlugin extends PageObject {
     public String sikuliMessageKeyPairSuccessfullyGenerated = "src/test/resources/imgs/messageKeyPairSuccessfullyGenerated.png";
     public String sikuliSubutaiSocialTab = "src/test/resources/imgs/subutaiSocialTab.png";
     public String sikuliCheckBoxProtectYourKeyWithPassword = "src/test/resources/imgs/checkBoxProtectYourKeyWithPassword.png";
-
+    public String sikuliGeneratedE2EKeyTest = "src/test/resources/imgs/generatedE2EKey.png";
+    public String sikuliFieldConfirmPasswordPopup = "src/test/resources/imgs/fieldConfirmPasswordPopup.png";
+    public String sikuliButtonOkE2EPopup = "src/test/resources/imgs/buttonOkE2E.png";
 }

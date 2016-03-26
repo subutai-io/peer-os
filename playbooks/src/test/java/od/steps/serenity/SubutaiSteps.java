@@ -206,7 +206,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnIconTemplateMongo() throws FindFailed {
-        environmentsPage.waitFor(environmentsPage.sikuliTemplateMongo);
+        environmentsPage.waitFor(environmentsPage.templateMongo);
         screen.click(environmentsPage.sikuliTemplateMongo);
     }
 
@@ -265,6 +265,11 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(pgpPlugin.sikuliCheckBoxProtectYourKeyWithPassword);
         screen.type(pgpPlugin.sikuliFieldEnterPassword, "239668a");
         screen.type(pgpPlugin.sikuliFieldConfirmPassword, "239668a");
+    }
+
+    @Step
+    public void typeInFieldConfirmPasswordE2EKey(){
+        screen.type(pgpPlugin.sikuliFieldConfirmPasswordPopup, "test@test.com");
     }
 
     @Step
@@ -387,6 +392,11 @@ public class SubutaiSteps extends ScenarioSteps {
     //endregion
 
     //region ACTION: Wait
+
+    @Step
+    public void waitGeneratedE2EKey() throws InterruptedException {
+        waitABit(30000);
+    }
 
     //endregion
 
@@ -662,6 +672,21 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
 
-
     //endregion
+
+    @Step
+    public void inputConfirmPasswordE2E() {
+        screen.type(pgpPlugin.sikuliFieldConfirmPasswordPopup, "239668a");
+    }
+
+    @Step
+    public void clickOnButtonOkE2EKeyPopup() throws FindFailed {
+        screen.click(pgpPlugin.sikuliButtonOkE2EPopup);
+    }
+
+    @Step
+    public void run_bash_script(String file) throws FileNotFoundException {
+        ExecuteShellCommand executeShellCommand = new ExecuteShellCommand();
+        System.out.println(executeShellCommand.executeCommand(file));
+    }
 }
