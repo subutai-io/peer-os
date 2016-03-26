@@ -5,7 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,24 +36,30 @@ import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
 import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
-import io.subutai.core.kurjun.api.RepositoryContext;
+import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.kurjun.api.Utils;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.impl.TemplateManagerImpl;
 import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
+import io.subutai.core.kurjun.impl.model.RepoUrl;
+import io.subutai.core.kurjun.impl.store.RepoUrlStore;
 
 
 public class RawManagerImpl implements RawManager
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
+
     private static final String DEFAULT_RAW_REPO_NAME = "raw";
+    private static final String RAW_PATH = "/file";
 
     private RepositoryFactory repositoryFactory;
     private LocalRawRepository localPublicRawRepository;
     private UnifiedRepository unifiedRepository;
-    private RepositoryContext artifactContext;
 
+    private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
+    private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
     private Injector injector;
 
@@ -63,10 +75,6 @@ public class RawManagerImpl implements RawManager
 
     public void init()
     {
-        //        KurjunProperties properties = injector.getInstance( KurjunProperties.class );
-        //        setContexts( properties );
-        //
-        //        initRepoUrls();
     }
 
 
@@ -110,7 +118,7 @@ public class RawManagerImpl implements RawManager
     {
         this.unifiedRepository = this.repositoryFactory.createUnifiedRepo();
         unifiedRepository.getRepositories().add( this.localPublicRawRepository );
-//        unifiedRepository.getRepositories().addAll( artifactContext.getRemoteRawRepositories() );
+        //        unifiedRepository.getRepositories().addAll( artifactContext.getRemoteRawRepositories() );
     }
 
 
@@ -312,5 +320,65 @@ public class RawManagerImpl implements RawManager
     public boolean delete( final byte[] md5 ) throws IOException
     {
         return false;
+    }
+
+
+    private UnifiedRepository getRepository( KurjunContext context, boolean isKurjunClient ) throws IOException
+    {
+        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
+        unifiedRepo.getRepositories().add( getLocalRepository( context ) );
+
+        if ( !isKurjunClient )
+        {
+            for ( RepoUrl repoUrl : remoteRepoUrls )
+            {
+                unifiedRepo.getRepositories().add( repositoryFactory
+                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(),
+                                repoUrl.getToken() ) );
+            }
+
+            // shuffle the global repo list to randomize and normalize usage of them
+            List<RepoUrl> list = new ArrayList<>( getGlobalKurjunUrls() );
+            Collections.shuffle( list );
+
+            for ( RepoUrl repoUrl : list )
+            {
+                unifiedRepo.getSecondaryRepositories().add( repositoryFactory
+                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(),
+                                repoUrl.getToken() ) );
+            }
+        }
+        return unifiedRepo;
+    }
+    private List<RepoUrl> getGlobalKurjunUrls()
+    {
+        try
+        {
+            List<RepoUrl> list = new ArrayList<>();
+            for ( String url : SystemSettings.getGlobalKurjunUrls() )
+            {
+                String templateUrl = url + RAW_PATH;
+                list.add( new RepoUrl( new URL( templateUrl ), null ) );
+            }
+            return list;
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new IllegalArgumentException( "Invalid global kurjun url", e );
+        }
+    }
+
+    private LocalRawRepository getLocalRepository( KurjunContext context ) throws IOException
+    {
+        try
+        {
+            RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+            return repositoryFactory.createLocalRaw( context );
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            throw new IOException( ex );
+        }
     }
 }

@@ -53,7 +53,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.kurjun.api</Bundle-SymbolicName>
-            <Embed-Dependency>ai.subut.kurjun.metadata.common.raw.RawMetadata</Embed-Dependency>
+            <Embed-Dependency>*</Embed-Dependency>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
