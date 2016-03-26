@@ -205,12 +205,12 @@ public class HubEnvironmentManager
         SubnetUtils.SubnetInfo subnetInfo =
                 new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
-        final String address = subnetInfo.getAddress();
+        final String[] addresses = subnetInfo.getAllAddresses();
 
         try
         {
             localPeer.setupInitialP2PConnection(
-                    new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), address, env.getP2pKey(),
+                    new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[0], env.getP2pKey(),
                             Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
         }
         catch ( PeerException e )
@@ -221,7 +221,7 @@ public class HubEnvironmentManager
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        P2PConfig config = new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), address, env.getP2pKey(),
+        P2PConfig config = new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[1], env.getP2pKey(),
                 env.getP2pTTL() );
         p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
 
