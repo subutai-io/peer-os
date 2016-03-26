@@ -141,6 +141,7 @@ func heartbeat() bool {
 
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
+		log.Debug(resp.Status)
 		resp.Body.Close()
 		if resp.StatusCode == http.StatusAccepted {
 			return true
@@ -263,7 +264,7 @@ func command() {
 	if !log.Check(log.WarnLevel, "Reading body", err) {
 		log.Check(log.WarnLevel, "Unmarshal payload", json.Unmarshal(data, &rsp))
 		for _, request := range rsp {
-			execute(request)
+			go execute(request)
 		}
 	}
 }
