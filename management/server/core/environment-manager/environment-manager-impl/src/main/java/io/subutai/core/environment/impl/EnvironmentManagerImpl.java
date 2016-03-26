@@ -164,7 +164,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
 
         // Not NULL makes mocking
-        environmentAdapter = new EnvironmentAdapter( this, peerManager );
+//        environmentAdapter = new EnvironmentAdapter( this, peerManager );
     }
 
 
@@ -257,6 +257,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
+        // === START ===
+
+        if ( environmentAdapter != null )
+        {
+            return environmentAdapter.getEnvironments();
+        }
+
+        // === END ===
+
         User activeUser = identityManager.getActiveUser();
 
         Set<Environment> environments = new HashSet<>();
@@ -278,15 +287,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             LOG.debug( "environment: {}", environment );
         }
-
-        // ===
-
-        if ( environmentAdapter != null )
-        {
-            environments = environmentAdapter.getEnvironments();
-        }
-
-        // ===
 
         return environments;
     }
@@ -1128,6 +1128,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
+        // === START ===
+
+        if ( environmentAdapter != null )
+        {
+            return environmentAdapter.get( environmentId );
+        }
+
+        // === END ===
+
         EnvironmentImpl environment = environmentDataService.find( environmentId );
 
         if ( environment == null )
@@ -1147,15 +1156,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //set container's transient fields
         setContainersTransientFields( environment );
-
-        // ===
-
-        if ( environmentAdapter != null )
-        {
-            environment = environmentAdapter.get( environmentId );
-        }
-
-        // ===
 
         return environment;
     }
