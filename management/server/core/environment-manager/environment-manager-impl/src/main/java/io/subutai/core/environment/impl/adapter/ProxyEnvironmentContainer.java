@@ -48,24 +48,24 @@ public class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     @Override
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException
     {
-        log.debug( "ip: {}", getHostInterfaces().getAll().iterator().next().getIp() );
-
         log.debug( "proxyContainer: {}", proxyContainer );
 
         Host host = this;
 
         if ( proxyContainer != null )
         {
+            String ip = getHostInterfaces().getAll().iterator().next().getIp();
+
             Request r = requestBuilder.build( "id" );
 
-            String command = "date; " + r.getCommand();
+            String command = String.format( "ssh root@%s %s", ip, r.getCommand() );
 
-            log.debug( "command: {}", command );
-
-            requestBuilder = new RequestBuilder( command, requestBuilder );
+            requestBuilder = new RequestBuilder( command );
 
             host = proxyContainer;
         }
+
+        log.debug( "command: {}", requestBuilder.build( "id" ).getCommand() );
 
         return getPeer().execute( requestBuilder, host );
     }
