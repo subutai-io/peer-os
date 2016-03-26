@@ -37,6 +37,10 @@ public class RestServiceImpl implements RestService
         {
             authId = kurjunManager.registerUser( url, type );
         }
+        else
+        {
+            authId = kurjunManager.getDataService().getKurjunData( url ).getAuthID();
+        }
         return Response.status( Response.Status.OK ).entity( authId ).build();
     }
 

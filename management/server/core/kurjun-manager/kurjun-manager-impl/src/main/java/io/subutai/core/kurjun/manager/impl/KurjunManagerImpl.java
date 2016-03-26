@@ -93,22 +93,6 @@ public class KurjunManagerImpl implements KurjunManager
             }
         }
 
-        PGPPublicKey key =
-                securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
-                               .getPublicKey();
-
-        fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
-
-        try
-        {
-            ownerKey = PGPKeyUtil.exportAscii( key );
-        }
-        catch ( PGPException e )
-        {
-            e.printStackTrace();
-        }
-
-
         properties = loadProperties();
 
 
@@ -180,6 +164,20 @@ public class KurjunManagerImpl implements KurjunManager
     @Override
     public String registerUser( final String url, final int kurjunType )
     {
+        PGPPublicKey key =
+                securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
+                               .getPublicKey();
+        String ownerKey = null;
+        try
+        {
+            ownerKey = PGPKeyUtil.exportAscii( key );
+        }
+        catch ( PGPException e )
+        {
+            e.printStackTrace();
+        }
+
+
         String authId = "";
         String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.add" ) );
 
@@ -197,7 +195,7 @@ public class KurjunManagerImpl implements KurjunManager
             return null;
         }
 
-        dataService.updateKurjunData( fingerprint, authId, url );
+        dataService.updateKurjunData( PGPKeyUtil.getFingerprint( key.getFingerprint() ), authId, url );
 
         return authId;
     }
@@ -206,11 +204,13 @@ public class KurjunManagerImpl implements KurjunManager
     @Override
     public String authorizeUser( final String url, final int kurjunType, final String signedMessage )
     {
+        Kurjun kurjun = getDataService().getKurjunData( url );
+
         String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.auth" ) );
 
         WebClient client = RestUtil.createTrustedWebClient( path );
 
-        client.query( "fingerprint", fingerprint );
+        client.query( "fingerprint", kurjun.getOwnerFingerprint().toLowerCase() );
         client.query( "message", signedMessage );
 
         Response response = client.post( null );
@@ -248,6 +248,12 @@ public class KurjunManagerImpl implements KurjunManager
     @Override
     public String getUser( final String url, final int kurjunType )
     {
+        PGPPublicKey key =
+                securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
+                               .getPublicKey();
+
+        String fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
+
         String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.get" ) );
         WebClient client = RestUtil.createTrustedWebClient( path );
         client.query( "fingerprint", fingerprint );
@@ -261,7 +267,8 @@ public class KurjunManagerImpl implements KurjunManager
         }
         else
         {
-            return response.readEntity( String.class );
+            return null;
+            //            return response.readEntity( String.class );
         }
     }
 
