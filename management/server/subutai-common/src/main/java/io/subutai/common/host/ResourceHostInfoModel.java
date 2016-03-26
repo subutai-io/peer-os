@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.util.CollectionUtil;
@@ -84,6 +84,14 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
     public Set<Alert> getAlerts()
     {
         return alert;
+    }
+
+
+    public void addContainer( ContainerHostInfo containerHostInfo )
+    {
+        Preconditions.checkNotNull( containerHostInfo );
+
+        this.containers.add( new ContainerHostInfoModel( containerHostInfo ) );
     }
 
 
