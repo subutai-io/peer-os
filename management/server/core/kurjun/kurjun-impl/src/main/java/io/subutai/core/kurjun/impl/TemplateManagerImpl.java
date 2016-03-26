@@ -95,7 +95,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
 
-    private static final String TEMPLATE_PATH = "/templates";
+    private static final String TEMPLATE_PATH = "/template";
 
     private Set<UserRepoContext> GLOBAL_CONTEXTS;
     private Set<UserRepoContext> PRIVATE_CONTEXTS;
@@ -1004,6 +1004,7 @@ public class TemplateManagerImpl implements TemplateManager
                         meta.getPackage(), meta.getOwnerFprint() );
         template.setConfigContents( meta.getConfigContents() );
         template.setPackagesContents( meta.getPackagesContents() );
+        template.setSize( meta.getSize() );
         return template;
     }
 }

@@ -29,6 +29,8 @@ public class TemplateKurjun
     @Expose
     private String packagesContents;
 
+    @Expose
+    private long size;
 
     public TemplateKurjun( String id, String md5Sum, String name, String version, String architecture, String parent,
             String packageName, String ownerFprint )
@@ -41,6 +43,18 @@ public class TemplateKurjun
         this.parent = parent;
         this.packageName = packageName;
         this.ownerFprint = ownerFprint;
+    }
+
+
+    public void setSize( final long size )
+    {
+        this.size = size;
+    }
+
+
+    public long getSize()
+    {
+        return size;
     }
 
 

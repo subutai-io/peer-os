@@ -58,10 +58,9 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     }
 
 
-
     @Override
-    public Response getTemplate( String repository, String id, String name, String version,
-            String type, boolean isKurjunClient )
+    public Response getTemplate( String repository, String id, String name, String version, String type,
+                                 boolean isKurjunClient )
     {
         byte[] buffer = new byte[8192];
         try
@@ -72,10 +71,12 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 byte[] md5bytes = decodeMd5( tid.getMd5() );
                 if ( md5bytes != null )
                 {
-                    TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                    TemplateKurjun template =
+                            templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                     if ( template != null )
                     {
-                        InputStream is = templateManager.getTemplateData( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                        InputStream is = templateManager
+                                .getTemplateData( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                         if ( is != null )
                         {
                             StreamingOutput stream = output -> {
@@ -92,10 +93,10 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                                 outputStream.flush();
                             };
 
-                            return Response.ok( stream )
-                                    .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
-                                    .header( "Content-Type", "application/octet-stream" )
-                                    .build();
+                            return Response.ok( stream ).header( "Content-Disposition",
+                                    "attachment; filename=" + makeFilename( template ) )
+                                           .header( "Content-Type", "application/octet-stream" )
+                                           .header( "Content-Length", template.getSize() ).build();
                         }
                     }
                 }
@@ -136,7 +137,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 byte[] md5bytes = decodeMd5( tid.getMd5() );
                 if ( md5bytes != null )
                 {
-                    TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                    TemplateKurjun template =
+                            templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                     if ( template != null )
                     {
                         return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
@@ -174,7 +176,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             List<TemplateKurjun> list = templateManager.list( repository, isKurjunClient );
             if ( list != null )
             {
-                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
+                List<DefaultTemplate> deflist =
+                        list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }
@@ -202,7 +205,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             byte[] md5bytes = decodeMd5( tid.getMd5() );
             if ( md5bytes != null )
             {
-                List<Map<String, Object>> list = templateManager.getSharedTemplateInfos( md5bytes, tid.getOwnerFprint() );
+                List<Map<String, Object>> list =
+                        templateManager.getSharedTemplateInfos( md5bytes, tid.getOwnerFprint() );
                 return Response.ok( GSON.toJson( list ) ).build();
             }
         }
@@ -219,7 +223,6 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         }
         return packageNotFoundResponse();
     }
-
 
 
     @Override
@@ -396,5 +399,4 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     {
         return LOGGER;
     }
-
 }

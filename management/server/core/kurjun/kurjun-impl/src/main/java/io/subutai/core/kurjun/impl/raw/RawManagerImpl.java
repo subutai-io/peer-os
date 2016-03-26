@@ -10,20 +10,31 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Injector;
+
 import ai.subut.kurjun.ar.CompressionType;
+import ai.subut.kurjun.cfparser.ControlFileParserModule;
+import ai.subut.kurjun.common.KurjunBootstrap;
 import ai.subut.kurjun.common.service.KurjunContext;
+import ai.subut.kurjun.index.PackagesIndexParserModule;
 import ai.subut.kurjun.metadata.common.DefaultMetadata;
 import ai.subut.kurjun.metadata.common.raw.RawMetadata;
-import ai.subut.kurjun.model.identity.UserSession;
+import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.repo.LocalRawRepository;
 import ai.subut.kurjun.repo.RepositoryFactory;
+import ai.subut.kurjun.repo.RepositoryModule;
+import ai.subut.kurjun.riparser.ReleaseIndexParserModule;
+import ai.subut.kurjun.snap.SnapMetadataParserModule;
+import ai.subut.kurjun.storage.factory.FileStoreModule;
+import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.core.kurjun.api.RepositoryContext;
 import io.subutai.core.kurjun.api.Utils;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.impl.TemplateManagerImpl;
+import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 
 
 public class RawManagerImpl implements RawManager
@@ -37,18 +48,59 @@ public class RawManagerImpl implements RawManager
     private UnifiedRepository unifiedRepository;
     private RepositoryContext artifactContext;
 
-    private UserSession userSession;
+
+    private Injector injector;
 
 
     public RawManagerImpl()
     {
+        injector = bootstrapDI();
+
         _local();
         _unified();
     }
 
 
+    public void init()
+    {
+        //        KurjunProperties properties = injector.getInstance( KurjunProperties.class );
+        //        setContexts( properties );
+        //
+        //        initRepoUrls();
+    }
+
+
+    public void dispose()
+    {
+    }
+
+
+    private Injector bootstrapDI()
+    {
+        KurjunBootstrap bootstrap = new KurjunBootstrap();
+        bootstrap.addModule( new ControlFileParserModule() );
+        bootstrap.addModule( new ReleaseIndexParserModule() );
+        bootstrap.addModule( new PackagesIndexParserModule() );
+        bootstrap.addModule( new SubutaiTemplateParserModule() );
+
+        bootstrap.addModule( new FileStoreModule() );
+        bootstrap.addModule( new PackageMetadataStoreModule() );
+        bootstrap.addModule( new SnapMetadataParserModule() );
+
+        bootstrap.addModule( new RepositoryModule() );
+        bootstrap.addModule( new TrustedWebClientFactoryModule() );
+
+
+        bootstrap.boot();
+
+        return bootstrap.getInjector();
+    }
+
+
     private void _local()
     {
+        this.repositoryFactory = injector.getInstance( RepositoryFactory.class );
+
         this.localPublicRawRepository =
                 this.repositoryFactory.createLocalRaw( new KurjunContext( DEFAULT_RAW_REPO_NAME ) );
     }
@@ -58,7 +110,7 @@ public class RawManagerImpl implements RawManager
     {
         this.unifiedRepository = this.repositoryFactory.createUnifiedRepo();
         unifiedRepository.getRepositories().add( this.localPublicRawRepository );
-        unifiedRepository.getRepositories().addAll( artifactContext.getRemoteRawRepositories() );
+//        unifiedRepository.getRepositories().addAll( artifactContext.getRemoteRawRepositories() );
     }
 
 
@@ -150,6 +202,7 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
+    @Deprecated
     public RawMetadata put( final File file, final String repository )
     {
         Metadata metadata = null;

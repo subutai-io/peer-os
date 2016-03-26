@@ -94,7 +94,11 @@
       <artifactId>kurjun-quota</artifactId>
       <version>${ai.subut.kurjun.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.6.1</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -108,9 +112,10 @@
             <Export-Package>{local-packages};version=${project.version};-noimport:=true</Export-Package>
             <Embed-Dependency>
               commons-compress,
-              groupId=ai.subut.kurjun|com.amazonaws|com.datastax.cassandra|org.yaml
+              groupId=ai.subut.kurjun*|com.amazonaws|com.datastax.cassandra|org.yaml
               |com.zaxxer|com.google.inject*|javax.inject|aopalliance|org.vafer|org.tukaani
-              |commons-configuration|org.mapdb|org.mybatis|org.bouncycastle
+              |commons-configuration|org.mapdb|org.mybatis|org.bouncycastle|com.fasterxml.jackson.core
+              |io.subutai.core.kurjun.api*
             </Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
 
