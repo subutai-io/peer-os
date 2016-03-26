@@ -1,6 +1,6 @@
-package io.subutai.core.identity.rest.ui;
+package io.subutai.core.identity.rest.ui.entity;
 
-public class PermissionJson {
+public class PermissionDto {
     private int object;
     private int scope;
     private boolean read;
@@ -8,8 +8,8 @@ public class PermissionJson {
     private boolean update;
     private boolean delete;
 
-    public PermissionJson( final int object, final int scope, final boolean read,
-                          final boolean write, final boolean update, final boolean delete )
+    public PermissionDto(final int object, final int scope, final boolean read,
+                         final boolean write, final boolean update, final boolean delete )
     {
         this.object = object;
         this.scope = scope;
