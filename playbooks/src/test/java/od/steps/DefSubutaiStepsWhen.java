@@ -5,6 +5,8 @@ import od.steps.serenity.SubutaiSteps;
 import org.jbehave.core.annotations.When;
 import org.sikuli.script.FindFailed;
 
+import java.io.FileNotFoundException;
+
 public class DefSubutaiStepsWhen {
 
     @Steps
@@ -106,13 +108,15 @@ public class DefSubutaiStepsWhen {
     public void user_sets_pgp_key() throws FindFailed {
         subutaiSteps.clickOnMenuItemUserManagement();
         subutaiSteps.clickOnMenuItemAccountSettings();
-        subutaiSteps.waitFor(5000);
-        subutaiSteps.clickOnButtonSetPublicKey();
+        subutaiSteps.waitABit(5000);
+//        subutaiSteps.clickOnButtonSetPublicKey();
+//        subutaiSteps.waitABit(5000);
+//        subutaiSteps.inputConfirmPasswordE2E();
+//        subutaiSteps.clickOnButtonOkE2EKeyPopup();
     }
 
     @When("the user creates environment using template: Mongo")
-    public void user_creates_environment_using_template_mongo() throws FindFailed {
-
+    public void user_creates_environment_using_template_mongo() throws FindFailed, FileNotFoundException {
         subutaiSteps.clickOnIconTemplateMongo();
         subutaiSteps.clickOnButtonApply();
         subutaiSteps.inputEnvironmentName("Test Environment Mongo");

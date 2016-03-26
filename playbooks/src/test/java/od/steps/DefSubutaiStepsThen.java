@@ -5,6 +5,8 @@ import od.steps.serenity.SubutaiSteps;
 import org.jbehave.core.annotations.Then;
 import org.sikuli.script.FindFailed;
 
+import java.io.FileNotFoundException;
+
 public class DefSubutaiStepsThen {
 
     @Steps
@@ -174,5 +176,10 @@ public class DefSubutaiStepsThen {
 //        subutaiSteps.userShouldObserveHeaderAdvanced();
         subutaiSteps.clickOnTitleLogs();
         subutaiSteps.userShouldObserveButtonExport();
+    }
+
+    @Then("the user stop record video and save the file")
+    public void stopRecordVideo() throws FileNotFoundException {
+        subutaiSteps.run_bash_script("src/test/resources/files/recordScreenStop.sh");
     }
 }
