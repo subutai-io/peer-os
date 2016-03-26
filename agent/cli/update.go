@@ -3,7 +3,6 @@ package lib
 import (
 	"crypto/tls"
 	"encoding/json"
-	// "fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
@@ -24,7 +24,6 @@ func getBody(url string) (response *http.Response) {
 	client := &http.Client{Transport: tr}
 	response, err := client.Get(url)
 	log.Check(log.FatalLevel, "Getting response from "+url, err)
-	// defer response.Body.Close()
 	return
 }
 
@@ -40,6 +39,7 @@ func getList() (list []map[string]interface{}) {
 func Update(name string, check bool) {
 	switch name {
 	case "rh":
+		var date int64
 		avlb := 0
 		lcl := 0
 
@@ -63,17 +63,22 @@ func Update(name string, check bool) {
 				trim := strings.TrimPrefix(name, "subutai_")
 				trim = strings.TrimRight(trim, ".snap")
 				if version := strings.Split(trim, "-"); len(version) > 1 {
-					avlb, err = strconv.Atoi(version[1])
+					tmp, err := strconv.Atoi(version[1])
 					log.Check(log.FatalLevel, "Converting timestamp to int", err)
+					if tmp > avlb {
+						avlb = tmp
+						date, err = strconv.ParseInt(version[1], 10, 64)
+						log.Check(log.FatalLevel, "Getting update info", err)
+					}
 				}
 			}
 		}
 
-		if avlb <= lcl {
+		if lcl > avlb {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update is avalable")
+			log.Info("Update from " + time.Unix(date, 0).String() + " is avalable")
 			os.Exit(0)
 		}
 
@@ -87,6 +92,7 @@ func Update(name string, check bool) {
 
 		log.Check(log.FatalLevel, "Installing update",
 			exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+name).Start())
+		log.Check(log.FatalLevel, "Removing update file", os.Remove("/tmp/"+name))
 
 	default:
 		if !container.IsContainer(name) {
