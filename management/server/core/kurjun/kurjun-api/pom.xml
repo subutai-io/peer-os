@@ -53,11 +53,10 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.kurjun.api</Bundle-SymbolicName>
-            <Embed-Dependency>ai.subut.kurjun.metadata.common.raw.RawMetadata</Embed-Dependency>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>
+            <Import-Package>ai.subut.kurjun.model.metadata.Metadata,
               io.subutai.*, com.google.gson*, !*
             </Import-Package>
           </instructions>

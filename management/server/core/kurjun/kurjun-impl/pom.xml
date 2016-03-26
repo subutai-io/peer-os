@@ -94,6 +94,7 @@
       <artifactId>kurjun-quota</artifactId>
       <version>${ai.subut.kurjun.version}</version>
     </dependency>
+
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>

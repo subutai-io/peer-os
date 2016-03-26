@@ -5,9 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
-import ai.subut.kurjun.metadata.common.raw.RawMetadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
+//import ai.subut.kurjun.model.metadata.Metadata;
 
 
 public interface RawManager
@@ -24,15 +23,15 @@ public interface RawManager
 
     String md5();
 
-    RawMetadata getInfo( String repository, byte[] md5 );
+    Object getInfo( String repository, byte[] md5 );
 
-    RawMetadata getInfo( final RawMetadata metadata );
+    Object getInfo( final Object metadata );
 
-    RawMetadata getInfo( final byte[] md5 );
+    Object getInfo( final byte[] md5 );
 
-    RawMetadata put( final File file, final String filename, final String repository );
+    Object put( final File file, final String filename, final String repository );
 
-    RawMetadata put( final File file );
+    Object put( final File file );
 
-    RawMetadata put( final File file, final String repository );
+    Object put( final File file, final String repository );
 }

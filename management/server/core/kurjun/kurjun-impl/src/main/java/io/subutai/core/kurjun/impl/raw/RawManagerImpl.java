@@ -161,10 +161,10 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public RawMetadata getInfo( final RawMetadata metadata )
+    public Metadata getInfo( final Object metadata )
     {
 
-        return ( RawMetadata ) unifiedRepository.getPackageInfo( metadata );
+        return ( RawMetadata ) unifiedRepository.getPackageInfo( (Metadata)metadata );
     }
 
 
