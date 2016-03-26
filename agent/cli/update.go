@@ -17,6 +17,12 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+type update struct {
+	id        string
+	name      string
+	timestamp int
+}
+
 func getBody(url string) (response *http.Response) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -40,10 +46,9 @@ func getList() (list []map[string]interface{}) {
 func Update(name string, check bool) {
 	switch name {
 	case "rh":
+		var lcl int
+		var rmt update
 		var date int64
-		var update, id string
-		avlb := 0
-		lcl := 0
 
 		f, err := ioutil.ReadFile(config.Agent.AppPrefix + "/meta/package.yaml")
 		if !log.Check(log.DebugLevel, "Reading file package.yaml", err) {
@@ -59,25 +64,23 @@ func Update(name string, check bool) {
 		}
 
 		for _, v := range getList() {
-			update = v["name"].(string)
-			id = v["id"].(string)
-			if strings.HasPrefix(update, "subutai") && strings.HasSuffix(update, ".snap") {
-				trim := strings.TrimPrefix(update, "subutai_")
-				trim = strings.TrimRight(trim, "_amd64.snap")
-				if version := strings.Split(trim, "-"); len(version) > 1 {
+			item := v["name"].(string)
+			if strings.HasPrefix(item, "subutai") && strings.HasSuffix(item, ".snap") {
+				if version := strings.Split(strings.Trim(item, "subutai_ _amd64.snap"), "-"); len(version) > 1 {
 					tmp, err := strconv.Atoi(version[1])
 					log.Check(log.FatalLevel, "Converting timestamp to int", err)
-					if tmp > avlb {
-						avlb = tmp
+					if tmp > rmt.timestamp {
+						rmt.id = v["id"].(string)
+						rmt.name = item
+						rmt.timestamp = tmp
 						date, err = strconv.ParseInt(version[1], 10, 64)
 						log.Check(log.FatalLevel, "Getting update info", err)
-						break
 					}
 				}
 			}
 		}
 
-		if lcl > avlb {
+		if lcl > rmt.timestamp {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
@@ -85,18 +88,18 @@ func Update(name string, check bool) {
 			os.Exit(0)
 		}
 
-		file, err := os.Create("/tmp/" + update)
+		file, err := os.Create("/tmp/" + rmt.name)
 		log.Check(log.FatalLevel, "Creating update file", err)
 		defer file.Close()
 		//replace peer.noip.me with cdn after kurjun update
-		resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/get?id=" + id)
+		resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/get?id=" + rmt.id)
 		defer resp.Body.Close()
 		_, err = io.Copy(file, resp.Body)
 		log.Check(log.FatalLevel, "Writing response to file", err)
 
-		log.Check(log.FatalLevel, "Installing update /tmp/"+update,
-			exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+update).Run())
-		log.Check(log.FatalLevel, "Removing update file /tmp/"+update, os.Remove("/tmp/"+update))
+		log.Check(log.FatalLevel, "Installing update /tmp/"+rmt.name,
+			exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+rmt.name).Run())
+		log.Check(log.FatalLevel, "Removing update file /tmp/"+rmt.name, os.Remove("/tmp/"+rmt.name))
 
 	default:
 		if !container.IsContainer(name) {
