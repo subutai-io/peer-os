@@ -271,8 +271,7 @@ public class KurjunManagerImpl implements KurjunManager
         }
         else
         {
-            return null;
-            //            return response.readEntity( String.class );
+            return "success";
         }
     }
 
