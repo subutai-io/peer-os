@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.Request;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -38,17 +39,35 @@ public class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     }
 
 
-    @Override
-    public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException
-    {
-        log.debug( "proxyContainer: {}", proxyContainer );
-
-        return getPeer().execute( requestBuilder, this );
-    }
-
-
     void setProxyContainer( Host proxyContainer )
     {
         this.proxyContainer = proxyContainer;
     }
+
+
+    @Override
+    public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException
+    {
+        log.debug( "ip: {}", getHostInterfaces().getAll().iterator().next().getIp() );
+
+        log.debug( "proxyContainer: {}", proxyContainer );
+
+        Host host = this;
+
+        if ( proxyContainer != null )
+        {
+            Request r = requestBuilder.build( "id" );
+
+            String command = "date; " + r.getCommand();
+
+            log.debug( "command: {}", command );
+
+            requestBuilder = new RequestBuilder( command, requestBuilder );
+
+            host = proxyContainer;
+        }
+
+        return getPeer().execute( requestBuilder, host );
+    }
+
 }

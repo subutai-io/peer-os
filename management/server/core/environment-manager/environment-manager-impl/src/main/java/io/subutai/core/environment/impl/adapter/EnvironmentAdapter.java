@@ -46,23 +46,23 @@ public class EnvironmentAdapter
 
     // ===
 
-    static String envId = "7c6d49b8-047a-4ccd-91f2-df384e116921";
+    static String envId = "c326a0ee-db5a-493d-be42-d61c59685be9";
 
-    static String peerId = "7367531C1CF348904D774F3EFD1AF00CA34B2E33";
+    static String peerId = "AC1BC9D5F025E3AA84B6B088B20136F12C2FD06F";
 
-    static String subnetCidr = "192.168.1.1/24";
+    static String subnetCidr = "192.168.2.1/24";
 
-    static long vni = 1914385;
+    static long vni = 1372649;
 
     static String p2pSubnet = "10.11.1.0";
 
-    static String peerP2p = "10.11.0.1";
+    static String peerP2p = "10.11.1.1";
 
-    static String chIp = "192.168.1.2";
+    static String chIp = "192.168.2.2";
 
-    static String chId = "0B68578CBD04E89AD4C0215CDBCAF9BE363FD7D3";
+    static String chId = "4FCEEC86A960A99D5520F6C38C01426EEB73BF13";
 
-    static String lxcName = "5f5597ac-ccea-4d87-ae51-e4c619c47363";
+    static String lxcName = "92b51495-e1d9-4dff-b01a-fe395ddd359f";
 
     static String templateName = "elasticsearch";
 
