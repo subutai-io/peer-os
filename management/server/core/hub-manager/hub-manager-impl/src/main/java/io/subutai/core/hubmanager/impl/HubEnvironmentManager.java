@@ -221,8 +221,9 @@ public class HubEnvironmentManager
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        P2PConfig config = new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[1], env.getP2pKey(),
-                env.getP2pTTL() );
+        P2PConfig config =
+                new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[1], env.getP2pKey(),
+                        env.getP2pTTL() );
         p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
 
         try
@@ -250,19 +251,25 @@ public class HubEnvironmentManager
 
         for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
         {
-            tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
+            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
+            {
+                tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
+            }
         }
 
-        ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
-        ExecutorCompletionService<Integer> tunnelCompletionService =
-                new ExecutorCompletionService<Integer>( tunnelExecutor );
+        if ( !tunnels.isEmpty() )
+        {
+            ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
+            ExecutorCompletionService<Integer> tunnelCompletionService =
+                    new ExecutorCompletionService<Integer>( tunnelExecutor );
 
-        tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), tunnels ) );
+            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), tunnels ) );
 
-        final Future<Integer> f = tunnelCompletionService.take();
-        f.get();
+            final Future<Integer> f = tunnelCompletionService.take();
+            f.get();
 
-        tunnelExecutor.shutdown();
+            tunnelExecutor.shutdown();
+        }
     }
 
 
