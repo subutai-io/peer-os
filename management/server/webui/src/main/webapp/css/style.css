@@ -1,5 +1,6 @@
 /*Fonts*/
-@import url(https://fonts.googleapis.com/css?family=Ubuntu:500italic,500,400,400italic,700,700italic);
+/*@import url(https://fonts.googleapis.com/css?family=Ubuntu:500italic,500,400,400italic,700,700italic);*/
+@font-face { font-family: Ubuntu; src: url('ubuntu-font-family/Ubuntu-R.ttf'); }
 
 /*General*/
 
@@ -36,9 +37,9 @@ input[type=checkbox] {
 
 .b-personal-space {
 	position: absolute;
-	top: 10px;
-	right: 16px;
-	z-index: 10;
+	top: 27px;
+	right: 30px;
+	z-index: 8;
 }
 
 .b-header {
@@ -105,6 +106,7 @@ input[type=checkbox] {
 
 .b-content {
     padding: 15px 15px 0;
+	position: relative;
 }
 
 .b-workspace {
@@ -334,7 +336,7 @@ input[type=checkbox] {
 }
 
 .b-btn:disabled {
-    background-color: #f8fbfd;
+    background-color: #EAEAEA;
     color: #333333;
 }
 
@@ -663,6 +665,7 @@ input[type=checkbox] {
 
 .b-status-icon_UNDER_MODIFICATION,
 .b-status-icon_WAIT,
+.b-status-icon_REQUESTED,
 .b-status-icon_STOPPING,
 .b-status-icon_STARTING {
     background-color: #efc94c;
@@ -670,7 +673,6 @@ input[type=checkbox] {
 
 .b-status-icon_UNHEALTHY,
 .b-status-icon_FAILED,
-.b-status-icon_REQUESTED,
 .b-status-icon_STOPPED,
 .b-status-icon_ABORTING,
 .b-status-icon_FREEZING,
@@ -1086,6 +1088,13 @@ tip.description-tooltip {
 	margin-left: 0;
 }
 
+.b-popup__text {
+	font-size: 14px;
+	color: #22B573;
+	padding: 0 0;
+	margin: 0 0 0 0;
+}
+
 .b-popup__header {
     box-sizing: border-box;
     width: 100%;
@@ -1110,7 +1119,7 @@ tip.description-tooltip {
 }
 
 .b-popup__footer {
-    padding: 0 15px 15px 30px;
+    padding: 0 15px 15px 15px;
 }
 
 .b-popup__footer_undertable {
@@ -2070,7 +2079,7 @@ td.b-main-table__status-col {
 
 .b-tabs-menu {
     position: relative;
-    z-index: 8;
+    z-index: 7;
 	background-color: #FFF;
 }
 
@@ -2688,6 +2697,7 @@ td.b-main-table__status-col {
     width: 200px;
     background-color: #fff;
 	z-index: 2;
+	height: 100%;
 }
 .b-tools-menu {
     height: 100%;
@@ -2750,6 +2760,7 @@ td.b-main-table__status-col {
 .b-progress-text {
     font-size: 11px;
     color: #04346E;
+	word-break: break-all;
 }
 .b-cloud-item {
     width: 40px;

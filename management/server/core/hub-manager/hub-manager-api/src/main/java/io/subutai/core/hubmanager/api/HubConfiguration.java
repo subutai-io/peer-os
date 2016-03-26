@@ -55,6 +55,20 @@ public class HubConfiguration implements Config
     }
 
 
+    @Override
+    public String getOwnerId()
+    {
+        return null;
+    }
+
+
+    @Override
+    public void setOwnerId( final String ownerId )
+    {
+
+    }
+
+
     public String getNodeIp()
     {
         return nodeIp;

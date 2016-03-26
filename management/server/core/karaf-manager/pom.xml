@@ -14,7 +14,6 @@
   <name>Subutai Karaf Manager Parent</name>
   <description>Subutai Karaf Manager Parent</description>
   <packaging>pom</packaging>
-  <version>4.0.0-RC7-SNAPSHOT</version>
   <modules>
     <module>karaf-manager-api</module>
     <module>karaf-manager-cli</module>

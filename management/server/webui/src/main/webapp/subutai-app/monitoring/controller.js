@@ -66,13 +66,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		if (vm.period > 0 && vm.currentHost) {
 			LOADING_SCREEN();
 			monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
+
 				vm.charts = [];
 				if(data['Metrics']) {
 					for (var i = 0; i < data['Metrics'].length; i++) {
-						angular.equals(data['Metrics'][i], {}) ?
+						angular.equals(data['Metrics'][i], {}) || angular.equals(data['Metrics'][i], null) ||
+						angular.equals(data['Metrics'][i]['Series'], null)?
 							vm.charts.push({data: [], name: "NO DATA"}) :
 							vm.charts.push(getChartData(data['Metrics'][i]));
-				}
+					}
 				} else {
 					for (var i = 0; i < 4; i++) {
 						vm.charts.push({data: [], name: "NO DATA"});
@@ -91,6 +93,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	};
 
 	function getChartData(obj) {
+		console.log(obj);
 		var series = obj.Series;
 		var seriesName = obj.Series[0].name;
 
@@ -164,7 +167,6 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		
 		function getCustomTooltip(firstValue, secondValue) {
 			return {"tooltip": {"contentGenerator": function(d) {
-				//console.log(d);
 
 				var values = {};
 				for (var i = 0; i < d.series.length; i++) {
@@ -251,15 +253,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		}
 
 		/** Calculate amount of incomplete data received form rest **/
-		start = moment(series[0].values[0][0]);
-		end = moment(getEndDate(series));
+		start = moment.unix((series[0].values[0][0]));
+		end = moment.unix((getEndDate(series)));
 		duration = moment.duration(end.diff(start)).asMinutes();
 		diff = vm.period * 60 - duration;
-		leftLimit = moment(series[0].values[0][0]).subtract(diff, 'minutes');
+		leftLimit = moment.unix((series[0].values[0][0])).subtract(diff, 'minutes');
 
 		/** Generate stub values if data is incomplete at the begining **/
 		if (diff > 0) {
-			var startPoint = moment(series[0].values[0][0]);
+			var startPoint = moment.unix((series[0].values[0][0]));
 			while (startPoint.subtract(1, "minutes") >= leftLimit) {
 				stubValues.unshift({
 					x: startPoint.valueOf(),
@@ -270,9 +272,11 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 
 		/** Generate stub values if data is incomplete at the end **/
 		for(var item in series) {
-			if(moment(series[item].values[series[item].values.length - 1][0]).valueOf() < moment(getEndDate(series)).valueOf()) {
-				var from = moment(series[item].values[series[item].values.length - 1][0]);
-				var to = moment(getEndDate(series)).valueOf();
+
+			if(moment.unix((series[item].values[series[item].values.length - 1][0])).valueOf() < moment.unix((getEndDate(series))).valueOf()) {
+				var from = moment.unix((series[item].values[series[item].values.length - 1][0])).valueOf();
+				var to = moment.unix((getEndDate(series)).valueOf());
+
 
 				from.add(1, "minutes");
 				while(from.valueOf() <= to) {
@@ -290,7 +294,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 			var realValues = [];
 			for (var value in values) {
 				realValues.push({
-					x: moment(values[value][0]).valueOf(),
+					x: moment.unix((values[value][0])).valueOf(),
 					y: values[value][1]
 				});
 			}
@@ -373,7 +377,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 						break;
 					default:
 						chartOptions.chart.yAxis.axisLabel = "Byte";
-						chartOptions.chart.forceY = maxValuez;
+						chartOptions.chart.forceY = maxValue;
 						chartSeries.unit = "Byte";
 						unitCoefficient = 1;
 						break;
@@ -414,7 +418,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 						break;
 				}
 				chartSerie.values.push({
-					x: moment(values[value].x).valueOf(),
+					x: moment((values[value].x)).valueOf(),
 					y: values[value].y == undefined ? 0 : parseFloat((values[value].y / unitCoefficient).toFixed(2))
 				});
 			}
@@ -436,15 +440,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		var labelStepCoefficient = vm.parseOptions[parseInt(vm.period)].labelStep;
 		var valueStepCoefficient = vm.parseOptions[vm.period].labelStep;
 		for (var index = 0; index < data.length; index++) {
-			if (moment(data[index].x).get('minute') == 0 ||
-					moment(data[index].x).get('minute') % labelStepCoefficient == 0 ||
-					parseInt(vm.period) == 1 && moment(data[index].x).get('minute') % valueStepCoefficient == 0
+			if (moment((data[index].x)).get('minute') == 0 ||
+					moment((data[index].x)).get('minute') % labelStepCoefficient == 0 ||
+					parseInt(vm.period) == 1 && moment((data[index].x)).get('minute') % valueStepCoefficient == 0
 			   ) {
-				labels.push(moment(data[index].x).valueOf());
-				var tempStore = moment(data[index].x).valueOf();
+				labels.push(moment((data[index].x)).valueOf());
+				var tempStore = moment((data[index].x)).valueOf();
 				while (true) {
 					tempStore += labelStepCoefficient * 60000;
-					if (tempStore > moment(data[data.length - 1].x).valueOf()) {
+					if (tempStore > moment((data[data.length - 1].x)).valueOf()) {
 						return labels;
 					}
 					labels.push(tempStore);
@@ -459,15 +463,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		var chartDataMap = getChartDataMap(data);
 		var scaledData = [];
 		var valueStepCoefficient = vm.parseOptions[parseInt(vm.period)].valueStep;
-		var maxValue = moment(data[data.length - 1].x).valueOf();
+		var maxValue = moment((data[data.length - 1].x)).valueOf();
 
 		for (var index = 0; index < data.length; index++) {
-			if (moment(data[index].x).get('minute') % valueStepCoefficient == 0) {
+			if (moment((data[index].x)).get('minute') % valueStepCoefficient == 0) {
 				scaledData.push({
-					x: moment(data[index].x).valueOf(),
+					x: moment((data[index].x)).valueOf(),
 					y: data[index].y
 				});
-				var tempStore = moment(data[index].x);
+				var tempStore = moment((data[index].x));
 				while (tempStore.add(valueStepCoefficient, 'minutes').valueOf() <= maxValue) {
 					scaledData.push({
 						x: tempStore.valueOf(),
@@ -486,7 +490,7 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 			}
 			if (index == 0) {
 				scaledData.push({
-					x: moment(data[index].x).valueOf(),
+					x: moment((data[index].x)).valueOf(),
 					y: data[index].y
 				});
 			}
@@ -506,8 +510,8 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	function getEndDate(series) {
 		var maxValue = 0;
 		for (var serie in series) {
-			if(moment(series[serie].values[series[serie].values.length - 1][0]).valueOf() > maxValue) {
-				maxValue = moment(series[serie].values[series[serie].values.length - 1][0]).valueOf();
+			if(series[serie].values[series[serie].values.length - 1][0] > maxValue) {
+				maxValue = series[serie].values[series[serie].values.length - 1][0];
 			} else {
 				continue;
 			}
@@ -516,3 +520,20 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	}
 };
 
+function timestampConverter(timestamp){
+	var a = new Date(timestamp * 1000);
+	var year = a.getFullYear();
+	var month = a.getMonth() + 1;
+	var date = a.getDate();
+	var hour = a.getHours();
+	var min = a.getMinutes();
+	var sec = a.getSeconds();
+
+	if( month < 10 )
+	{
+		month = "0" + month;
+	}
+
+	var time = year + '-' + month + '-' + date + "T" + hour + ":" + min + ":" + sec + ".000Z";
+	return time;
+}

@@ -21,6 +21,11 @@ public interface RegistrationRestService
     @Path( "public-key" )
     public Response registerPublicKey( String message );
 
+
+    @POST
+    @Path( "requests/{id}/approve" )
+    public Response approveRegistrationRequest( @PathParam( "id" ) String requestId );
+
     @POST
     @Path( "verify/container-token" )
     @Produces( { MediaType.APPLICATION_JSON } )
@@ -30,9 +35,4 @@ public interface RegistrationRestService
     @Path( "requests" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getRegistrationRequests();
-
-    @POST
-    @Path( "requests/{id}/approve" )
-    public Response approveRegistrationRequest( @PathParam( "id" ) String requestId );
-
 }

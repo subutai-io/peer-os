@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import io.subutai.common.security.WebClientBuilder;
 
 /**
  * Environment REST client
+ *
+ * TODO throw exception if http code is not 2XX
  */
 public class EnvironmentWebClient
 {
@@ -48,7 +51,11 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.get();
+            Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
@@ -68,7 +75,11 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.post( containerId );
+            final Response response = client.post( containerId );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
@@ -87,7 +98,11 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            client.post( containerId );
+            final Response response = client.post( containerId );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
@@ -104,17 +119,25 @@ public class EnvironmentWebClient
 
         String path =
                 String.format( "/%s/container/%s/state", containerId.getEnvironmentId().getId(), containerId.getId() );
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 3000, 6000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( ContainerHostState.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( ContainerHostState.class );
+            }
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage(), e );
+            LOG.warn( e.getMessage() );
             throw new PeerException( "Error on reading container state: " + e.getMessage() );
         }
     }
@@ -132,7 +155,15 @@ public class EnvironmentWebClient
         client.accept( MediaType.APPLICATION_JSON );
         try
         {
-            return client.get( ProcessResourceUsage.class );
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( ProcessResourceUsage.class );
+            }
         }
         catch ( Exception e )
         {

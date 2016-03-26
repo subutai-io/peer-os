@@ -68,8 +68,18 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>identity-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>hub-manager-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-appender</artifactId>
     </dependency>
   </dependencies>
 

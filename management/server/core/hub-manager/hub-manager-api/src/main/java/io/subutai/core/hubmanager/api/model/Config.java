@@ -10,4 +10,8 @@ public interface Config
     public String getHubIp();
 
     public void setHubIp( final String serverIp );
+
+    public String getOwnerId();
+
+    public void setOwnerId( final String ownerId );
 }

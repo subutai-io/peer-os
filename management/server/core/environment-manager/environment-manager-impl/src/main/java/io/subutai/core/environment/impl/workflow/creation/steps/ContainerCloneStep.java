@@ -39,7 +39,6 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePe
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -54,7 +53,6 @@ import io.subutai.core.peer.api.PeerManager;
 public class ContainerCloneStep
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ContainerCloneStep.class );
-    private final TemplateManager templateRegistry;
     private final String defaultDomain;
     private final Topology topology;
     private final EnvironmentImpl environment;
@@ -66,12 +64,10 @@ public class ContainerCloneStep
     private PeerManager peerManager;
 
 
-    public ContainerCloneStep( final TemplateManager templateRegistry, final String defaultDomain,
-                               final Topology topology, final EnvironmentImpl environment,
+    public ContainerCloneStep( final String defaultDomain, final Topology topology, final EnvironmentImpl environment,
                                final PeerManager peerManager, final EnvironmentManagerImpl environmentManager,
                                final TrackerOperation operationTracker )
     {
-        this.templateRegistry = templateRegistry;
         this.defaultDomain = defaultDomain;
         this.topology = topology;
         this.environment = environment;
@@ -136,22 +132,27 @@ public class ContainerCloneStep
         taskExecutor.shutdown();
 
         //collect results
-
+        boolean succeeded = true;
         for ( int i = 0; i < placement.size(); i++ )
         {
             try
             {
                 Future<CreateEnvironmentContainerResponseCollector> futures = taskCompletionService.take();
                 CreateEnvironmentContainerResponseCollector response = futures.get();
+                succeeded = succeeded && response.hasSucceeded();
                 addLogs( response );
                 processResponse( placement.get( response.getPeerId() ), response );
             }
             catch ( Exception e )
             {
                 LOGGER.error( e.getMessage(), e );
-                throw new EnvironmentCreationException(
-                        String.format( "There were errors during container creation. Unexpected error." ) );
+                succeeded = false;
             }
+        }
+
+        if ( !succeeded )
+        {
+            throw new EnvironmentCreationException( "There were errors during container creation." );
         }
     }
 
@@ -175,8 +176,11 @@ public class ContainerCloneStep
             }
         }
 
-        environment.addContainers( containers );
-        buildRelationChain( environment, containers );
+        if ( !containers.isEmpty() )
+        {
+            environment.addContainers( containers );
+            buildRelationChain( environment, containers );
+        }
     }
 
 
@@ -197,8 +201,8 @@ public class ContainerCloneStep
         interfaces.addHostInterface(
                 new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
         final ContainerHostInfoModel infoModel =
-                new ContainerHostInfoModel( cloneResponse.getAgentId(), cloneResponse.getHostname(), interfaces,
-                        cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
+                new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(), interfaces,
+                        cloneResponse.getTemplateArch(), ContainerHostState.RUNNING );
         return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
                 cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
                 node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(), node.getName() );

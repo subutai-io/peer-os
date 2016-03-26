@@ -100,7 +100,11 @@ function choice_stories(){
 }
 
 function run_tests(){
-    mvn clean; mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF; mvn serenity:aggregate;
+     mvn clean
+     recordmydesktop -o ~/base/playbooks/src/test/resources/video/playbooks.ogv &
+     mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
+     pkill recordmydesktop &
+     mvn serenity:aggregate
 }
 
 if [ $# = 0 ]; then

@@ -23,10 +23,8 @@ func LxcPromote(name string) {
 		// log.Info("Container " + name + " is started")
 	}
 	// check: write package list to packages
-	pkgCmmdResult, errResult := container.AttachExec(name, []string{"dpkg", "-l"})
-	if errResult != nil {
-		log.Error("There is no result from dpkg -l command")
-	}
+	pkgCmmdResult, _ := container.AttachExec(name, []string{"dpkg", "-l"})
+
 	strCmdRes := strings.Join(pkgCmmdResult, "\n")
 	log.Check(log.FatalLevel, "Write packages",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/packages",
@@ -39,7 +37,7 @@ func LxcPromote(name string) {
 	cleanupFS(config.Agent.LxcPrefix+name+"/rootfs/.git", 0000)
 	cleanupFS(config.Agent.LxcPrefix+name+"/var/log/", 0775)
 	cleanupFS(config.Agent.LxcPrefix+name+"/var/cache", 0775)
-	cleanupFS(config.Agent.LxcPrefix+name+"/var/lib/apt/lists/", 0775)
+	cleanupFS(config.Agent.LxcPrefix+name+"/var/lib/apt/lists/", 0000)
 
 	makeDiff(name)
 

@@ -127,6 +127,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	}
 
 	function deleteToken(token) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: 'Delete "' + token + '" token!',
@@ -140,6 +141,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				try {
 					identitySrv.deleteToken(token).success(function (data) {

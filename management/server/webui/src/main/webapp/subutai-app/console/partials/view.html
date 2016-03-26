@@ -31,7 +31,10 @@
 						ng-model="consoleViewCtrl.selectedEnvironment" 
 						ng-change="consoleViewCtrl.showContainers(consoleViewCtrl.selectedEnvironment)">
 						<option value="">Select environment</option>
-						<option ng-repeat="environment in consoleViewCtrl.environments" value="{{ environment.id }}">
+						<option 
+						ng-repeat="environment in consoleViewCtrl.environments" 
+						ng-selected="environment.id == consoleViewCtrl.selectedEnvironment" 
+						value="{{ environment.id }}">
 							{{ environment.name }}
 						</option>
 					</select>
@@ -39,12 +42,15 @@
 				</div>
 
 				<div class="b-console-selects__item b-main-form__wrapper" 
-				ng-show="consoleViewCtrl.containers.length > 0">
+				ng-show="consoleViewCtrl.containers.length > 0 || consoleViewCtrl.selectedContainer">
 					<select class="b-popup-body-input" 
-						ng-model="selectedContainer" 
-						ng-change="consoleViewCtrl.setConsole(selectedContainer, 'container')">
+						ng-model="consoleViewCtrl.selectedContainer" 
+						ng-change="consoleViewCtrl.setConsole(consoleViewCtrl.selectedContainer, 'container')">
 						<option value="">Select container</option>
-						<option ng-repeat="container in consoleViewCtrl.containers" value="{{ container.id }}">
+						<option 
+						ng-repeat="container in consoleViewCtrl.containers" 
+						ng-selected="container.id == consoleViewCtrl.selectedContainer" 
+						value="{{ container.id }}">
 							{{ container.hostname }}
 						</option>
 					</select>
@@ -54,8 +60,8 @@
 				<div class="b-console-selects__item b-main-form__wrapper" 
 				ng-show="consoleViewCtrl.currentType == 'peer'">
 					<select class="b-popup-body-input" 
-						ng-model="selectedPeer" 
-						ng-change="consoleViewCtrl.setConsole(selectedPeer)">
+						ng-model="consoleViewCtrl.selectedPeer" 
+						ng-change="consoleViewCtrl.setConsole(consoleViewCtrl.selectedPeer)">
 						<option value="">Select Host</option>
 						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
 							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
@@ -98,12 +104,12 @@
 						id="terminal-as-daemon" 
 						class="b-popup-body-checkbox">
 				</div>
-				<div class="clear"></div>
 
 				<div class="b-main-form__wrapper" 
 					ng-show="consoleViewCtrl.selectedEnvironment.length > 0 && consoleViewCtrl.activeConsole !== undefinded && consoleViewCtrl.activeConsole.length > 0 && consoleViewCtrl.selectedNodeType == 'container'">
 					<button class="b-btn b-btn_green" ng-click="consoleViewCtrl.showSSH()">SSH</button>
 				</div>				
+				<div class="clear"></div>
 			</div>
 			
 			<div class="clear"></div>

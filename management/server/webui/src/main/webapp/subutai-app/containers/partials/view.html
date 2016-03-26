@@ -87,10 +87,10 @@
 							</div>
 						</td>
 						<td>
-							<a  ui-sref="console({ containerId: container.id })" 
+							<a  ui-sref="console({ containerId: container.id,  environmentId: container.environmentId })" 
 								tooltips 
 								tooltip-template='
-									<span class="b-nowrap">EnvironmentId: {{ container.environmentId }}</span><br>
+									<span class="b-nowrap">Environment: {{ containerViewCtrl.environments | getEnvById: container.environmentId }}</span><br>
 									<span class="b-nowrap">ID: {{ container.id }}</span><br>
 									<span class="b-nowrap">Host Name: {{ container.hostname }}</span>
 								' 

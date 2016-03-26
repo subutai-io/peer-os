@@ -11,6 +11,8 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.protocol.ControlNetworkConfig;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
 
 
 /**
@@ -62,7 +64,7 @@ public class ControlNetworkUtil
                         String.format( "Illegal control network config on peer '%s'. Address already used.",
                                 config.getPeerId() ) );
             }
-            if ( !fingerprint.equals( config.getCommunityName() ) )
+            if ( !fingerprint.equals( config.getP2pHash() ) )
             {
                 throw new ControlNetworkException(
                         String.format( "Illegal control network config on peer '%s'. Invalid fingerprint.",
@@ -78,7 +80,7 @@ public class ControlNetworkUtil
         Preconditions.checkNotNull( config );
         Preconditions.checkNotNull( config.getUsedNetworks() );
 
-        return !fingerprint.equals( config.getCommunityName() ) && config.getUsedNetworks().contains( this.network );
+        return !fingerprint.equals( config.getP2pHash() ) && config.getUsedNetworks().contains( this.network );
     }
 
 
@@ -171,5 +173,22 @@ public class ControlNetworkUtil
         }
 
         return new SubnetUtils( ip, NETWORK_MASK ).getInfo().getNetworkAddress();
+    }
+
+
+    public static List<String> getUsedNetworks( final P2PConnections connections )
+    {
+        Preconditions.checkNotNull( connections );
+
+        final List<String> usedNetworks = new ArrayList<>();
+        for ( P2PConnection connection : connections.getConnections() )
+        {
+            if ( connection.getIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+            {
+                String usedNetwork = ControlNetworkUtil.extractNetwork( connection.getIp() );
+                usedNetworks.add( usedNetwork );
+            }
+        }
+        return usedNetworks;
     }
 }

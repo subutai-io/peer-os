@@ -17,13 +17,13 @@ public class CloneResponse implements TaskResponse
     private HostArchitecture templateArch;
     private String containerName;
     private String ip;
-    private String agentId;
+    private String containerId;
     private long elapsedTime;
 
 
     public CloneResponse( final String resourceHostId, final String hostname, final String containerName,
                           final String templateName, final HostArchitecture templateArch, final String ip,
-                          final String agentId, final long elapsedTime )
+                          final String containerId, final long elapsedTime )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
@@ -31,7 +31,7 @@ public class CloneResponse implements TaskResponse
         this.templateArch = templateArch;
         this.containerName = containerName;
         this.ip = ip;
-        this.agentId = agentId;
+        this.containerId = containerId;
         this.elapsedTime = elapsedTime;
     }
 
@@ -61,9 +61,9 @@ public class CloneResponse implements TaskResponse
     }
 
 
-    public String getAgentId()
+    public String getContainerId()
     {
-        return agentId;
+        return containerId;
     }
 
 
@@ -96,7 +96,7 @@ public class CloneResponse implements TaskResponse
         sb.append( ", templateArch=" ).append( templateArch );
         sb.append( ", containerName='" ).append( containerName ).append( '\'' );
         sb.append( ", ip='" ).append( ip ).append( '\'' );
-        sb.append( ", agentId='" ).append( agentId ).append( '\'' );
+        sb.append( ", containerId='" ).append( containerId ).append( '\'' );
         sb.append( '}' );
         return sb.toString();
     }

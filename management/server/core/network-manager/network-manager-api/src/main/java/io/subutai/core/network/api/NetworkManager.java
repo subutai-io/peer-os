@@ -7,11 +7,9 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PPeerInfo;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 
@@ -24,15 +22,26 @@ public interface NetworkManager
 
 
     /**
-     * Sets up an P2P connection to super node on management host
+     * Sets up an P2P connection on management host
      */
-    public void setupP2PConnection( String interfaceName, String localIp, String communityName, String secretKey,
+    public void setupP2PConnection( String interfaceName, String localIp, String p2pHash, String secretKey,
+                                    long secretKeyTtlSec ) throws NetworkManagerException;
+
+    /**
+     * Sets up an P2P connection on specified host
+     */
+    public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
                                     long secretKeyTtlSec ) throws NetworkManagerException;
 
     /**
      * Removes P2P connection
      */
-    public void removeP2PConnection( String communityName ) throws NetworkManagerException;
+    public void removeP2PConnection( String p2pHash ) throws NetworkManagerException;
+
+    /**
+     * Removes P2P connection on specified host
+     */
+    public void removeP2PConnection( Host host, String p2pHash ) throws NetworkManagerException;
 
 
     /**
@@ -45,16 +54,34 @@ public interface NetworkManager
     public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
-
     /**
-     * Lists existing P2P connections on management host
+     * Resets a secret key for a given P2P network
+     *
+     * @param host - host
+     * @param p2pHash - P2P network hash
+     * @param newSecretKey - new secret key to set
+     * @param ttlSeconds - time-to-live for the new secret key
      */
-    public Set<P2PConnection> listP2PConnections() throws NetworkManagerException;
+    public void resetP2PSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
+            throws NetworkManagerException;
 
 
     PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
-    public Set<P2PPeerInfo> listPeersInEnvironment( String communityName ) throws NetworkManagerException;
+    /**
+     * Returns all p2p connections running on the specified host
+     *
+     * @param host - host
+     */
+
+    public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
+
+    /**
+     * Returns all p2p connections running on MH
+     */
+
+    public P2PConnections getP2PConnections() throws NetworkManagerException;
+
 
     /**
      * Sets up tunnel to another peer on management host
@@ -66,39 +93,6 @@ public interface NetworkManager
      */
     public void removeTunnel( int tunnelId ) throws NetworkManagerException;
 
-    /**
-     * Sets container environment IP and VLAN ID on container
-     */
-    public void setContainerIp( String containerName, String ip, int netMask, int vLanId )
-            throws NetworkManagerException;
-
-    /**
-     * Removes container environment IP and VLAN ID on container
-     */
-    public void removeContainerIp( String containerName ) throws NetworkManagerException;
-
-    /**
-     * Returns container environment IP on container
-     */
-    public ContainerInfo getContainerIp( String containerName ) throws NetworkManagerException;
-
-
-    /**
-     * Removes gateway IP for specified VLAN on management host
-     */
-    public void removeGateway( int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Cleans up network settings left after environment
-     *
-     * @param environmentId - environment id
-     */
-    public void cleanupEnvironmentNetworkSettings( EnvironmentId environmentId ) throws NetworkManagerException;
-
-    /**
-     * Removes gateway IP on a container
-     */
-    public void removeGatewayOnContainer( String containerName ) throws NetworkManagerException;
 
     /**
      * Lists existing tunnels on management host
@@ -134,58 +128,6 @@ public interface NetworkManager
      */
     public Vnis getReservedVnis() throws NetworkManagerException;
 
-    /**
-     * Enables passwordless ssh access between containers
-     *
-     * @param containers - set of {@code ContainerHost}
-     * @param additionalSshKeys - set of additional ssh keys to add to each container
-     */
-    public void exchangeSshKeys( Set<ContainerHost> containers, Set<String> additionalSshKeys )
-            throws NetworkManagerException;
-
-    /**
-     * Appends ssh keys to each container
-     *
-     * @param containers - containers
-     * @param sshKeys - ssh keys
-     */
-    public void appendSshKeys( Set<ContainerHost> containers, Set<String> sshKeys ) throws NetworkManagerException;
-
-    /**
-     * Adds supplied ssh key to authorized_keys file of given containers
-     *
-     * @param containers- set of {@code ContainerHost}
-     * @param sshKey - ssh key to add
-     */
-    public void addSshKeyToAuthorizedKeys( Set<ContainerHost> containers, String sshKey )
-            throws NetworkManagerException;
-
-    /**
-     * Replaces supplied old ssh key with new ssh key in authorized_keys file of given containers
-     *
-     * @param containers set of {@code ContainerHost}
-     * @param oldSshKey - old ssh key
-     * @param newSshKey - new ssh key
-     */
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
-                                               final String newSshKey ) throws NetworkManagerException;
-
-    /**
-     * Removes supplied ssh key from authorized_keys file of given containers
-     *
-     * @param containers set of {@code ContainerHost}
-     * @param sshKey - ssh key to remove
-     */
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException;
-
-    /**
-     * Registers containers in /etc/hosts of each other
-     *
-     * @param containers - set of {@code ContainerHost}
-     * @param domainName - domain name e.g. "intra.lan"
-     */
-    public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
 
     /**
      * Returns reverse proxy domain assigned to vlan
