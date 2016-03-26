@@ -163,6 +163,59 @@ public class KurjunDataServiceImpl implements KurjunDataService
 
 
     @Override
+    public void updateKurjunData( final String fingerprint, final String authId, final String url )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Kurjun entity = getKurjunData( url );
+
+            entity.setOwnerFingerprint( fingerprint );
+            entity.setAuthID( authId );
+
+            em.merge( entity );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    @Override
+    public void updateKurjunData( final String signedMessage, final String url )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Kurjun entity = getKurjunData( url );
+
+            entity.setSignedMessage( signedMessage );
+
+            em.merge( entity );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    @Override
     public void persistKurjunConfig( final KurjunConfig item )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
@@ -182,6 +235,5 @@ public class KurjunDataServiceImpl implements KurjunDataService
         {
             daoManager.closeEntityManager( em );
         }
-
     }
 }

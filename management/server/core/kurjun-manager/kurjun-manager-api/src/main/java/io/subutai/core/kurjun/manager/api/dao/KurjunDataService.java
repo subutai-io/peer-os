@@ -44,5 +44,17 @@ public interface KurjunDataService
     /* *************************************************
      *
     */
+    public void updateKurjunData( final String fingerprint, final String authId, final String url );
+
+
+    /* *************************************************
+     *
+    */
+    public void updateKurjunData( final String signedMessage, final String url );
+
+
+    /* *************************************************
+     *
+    */
     public void persistKurjunConfig( final KurjunConfig item );
 }

@@ -124,106 +124,66 @@ public class KurjunManagerImpl implements KurjunManager
 
 
     //****************************************
-    private String getKurjunUrl( int kurjunType, String uri )
+    private String getKurjunUrl( String url, String uri )
     {
-        try
-        {
-            if ( kurjunType == KurjunType.Local.getId() )
-            {
-                for ( final String s : SystemSettings.getLocalKurjunUrls() )
-                {
-                    return s + uri;
-                }
-            }
-            else if ( kurjunType == KurjunType.Global.getId() )
-            {
-                for ( final String s : SystemSettings.getGlobalKurjunUrls() )
-                {
-                    return s + uri;
-                }
-            }
-            else
-            {
-                for ( final String s : SystemSettings.getGlobalKurjunUrls() )
-                {
-                    return s + uri;
-                }
-            }
-        }
-        catch ( ConfigurationException e )
-        {
-            e.printStackTrace();
-        }
-
-        //        if ( kurjunType == KurjunType.Local.getId() )
-        //        {
-        //            return localKurjunURL + uri;
-        //        }
-        //        else if ( kurjunType == KurjunType.Global.getId() )
-        //        {
-        //            return globalKurjunURL + uri;
-        //        }
-        //        else
-        //        {
-        //            return globalKurjunURL + uri;
-        //        }
-        return null;
+        return url + uri;
     }
 
 
     //****************************************
-//    @Override
-//    public String authorizeUser( int kurjunType, String fingerprint )
-//    {
-//        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
-//        WebClient client = RestUtil.createTrustedWebClient( url );
-//
-//        byte[] signedMsg = null;
-//
-//        List<Kurjun> list = dataService.getAllKurjunData();
-//        for ( final Kurjun kurjun : list )
-//        {
-//            //            signedMsg = kurjun.getSignedMessage();
-//            break;
-//        }
-//
-//        try
-//        {
-//            client.query( "fingerprint", fingerprint );
-//            client.query( "message", PGPEncryptionUtil.armorByteArrayToString( signedMsg ) );
-//
-//            Response response = client.post( null );
-//
-//            if ( response.getStatus() != HttpStatus.SC_OK )
-//            {
-//                return null;
-//            }
-//        }
-//        catch ( PGPException e )
-//        {
-//            e.printStackTrace();
-//        }
-//
-//
-//        return "success";
-//    }
+    //    @Override
+    //    public String authorizeUser( int kurjunType, String fingerprint )
+    //    {
+    //        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
+    //        WebClient client = RestUtil.createTrustedWebClient( url );
+    //
+    //        byte[] signedMsg = null;
+    //
+    //        List<Kurjun> list = dataService.getAllKurjunData();
+    //        for ( final Kurjun kurjun : list )
+    //        {
+    //            //            signedMsg = kurjun.getSignedMessage();
+    //            break;
+    //        }
+    //
+    //        try
+    //        {
+    //            client.query( "fingerprint", fingerprint );
+    //            client.query( "message", PGPEncryptionUtil.armorByteArrayToString( signedMsg ) );
+    //
+    //            Response response = client.post( null );
+    //
+    //            if ( response.getStatus() != HttpStatus.SC_OK )
+    //            {
+    //                return null;
+    //            }
+    //        }
+    //        catch ( PGPException e )
+    //        {
+    //            e.printStackTrace();
+    //        }
+    //
+    //
+    //        return "success";
+    //    }
 
 
     //****************************************
-//    @Override
-//    public boolean setSystemOwner( int kurjunType, String fingerprint )
-//    {
-//
-//        return true;
-//    }
+    //    @Override
+    //    public boolean setSystemOwner( int kurjunType, String fingerprint )
+    //    {
+    //
+    //        return true;
+    //    }
 
 
     @Override
     public String registerUser( final String url, final int kurjunType )
     {
         String authId = "";
+        String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.add" ) );
 
-        WebClient client = RestUtil.createTrustedWebClient( url );
+        WebClient client = RestUtil.createTrustedWebClient( path );
         client.query( "key", ownerKey );
 
         Response response = client.post( null );
@@ -237,16 +197,7 @@ public class KurjunManagerImpl implements KurjunManager
             return null;
         }
 
-        Kurjun kurjun = getDataService().getKurjunData( url );
-
-        kurjun.setUrl( url );
-        kurjun.setType( kurjunType );
-        kurjun.setAuthID( authId );
-        kurjun.setState( false );
-        kurjun.setOwnerFingerprint( fingerprint );
-
-
-        dataService.updateKurjunData( kurjun );
+        dataService.updateKurjunData( fingerprint, authId, url );
 
         return authId;
     }
@@ -255,7 +206,24 @@ public class KurjunManagerImpl implements KurjunManager
     @Override
     public String authorizeUser( final String url, final int kurjunType, final String signedMessage )
     {
-        return null;
+        String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.auth" ) );
+
+        WebClient client = RestUtil.createTrustedWebClient( path );
+
+        client.query( "fingerprint", fingerprint );
+        client.query( "message", signedMessage );
+
+        Response response = client.post( null );
+
+        if ( response.getStatus() != HttpStatus.SC_OK )
+        {
+            return null;
+        }
+        else
+        {
+            dataService.updateKurjunData( signedMessage, url );
+            return response.readEntity( String.class );
+        }
     }
 
 
@@ -270,8 +238,8 @@ public class KurjunManagerImpl implements KurjunManager
     @Override
     public String getSystemOwner( int kurjunType )
     {
-        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
-        WebClient client = RestUtil.createTrustedWebClient( url );
+        //        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
+        //        WebClient client = RestUtil.createTrustedWebClient( url );
 
         return null;
     }
@@ -280,7 +248,8 @@ public class KurjunManagerImpl implements KurjunManager
     @Override
     public String getUser( final String url, final int kurjunType )
     {
-        WebClient client = RestUtil.createTrustedWebClient( url );
+        String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.get" ) );
+        WebClient client = RestUtil.createTrustedWebClient( path );
         client.query( "fingerprint", fingerprint );
 
         Response response = client.get();
@@ -298,23 +267,23 @@ public class KurjunManagerImpl implements KurjunManager
 
 
     //****************************************
-//    @Override
-//    public String getUser( int kurjunType, String fingerprint )
-//    {
-//        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
-//        WebClient client = RestUtil.createTrustedWebClient( url );
-//        client.query( "fingerprint", fingerprint );
-//
-//        Response response = client.get();
-//
-//        if ( response.getStatus() != HttpStatus.SC_OK )
-//        {
-//            LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
-//            return null;
-//        }
-//
-//        return null;
-//    }
+    //    @Override
+    //    public String getUser( int kurjunType, String fingerprint )
+    //    {
+    //        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
+    //        WebClient client = RestUtil.createTrustedWebClient( url );
+    //        client.query( "fingerprint", fingerprint );
+    //
+    //        Response response = client.get();
+    //
+    //        if ( response.getStatus() != HttpStatus.SC_OK )
+    //        {
+    //            LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
+    //            return null;
+    //        }
+    //
+    //        return null;
+    //    }
 
 
     public void setIdentityManager( final IdentityManager identityManager )

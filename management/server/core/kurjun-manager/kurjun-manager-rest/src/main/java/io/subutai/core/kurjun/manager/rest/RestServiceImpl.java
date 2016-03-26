@@ -19,15 +19,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getAuthId( final String url, final int type )
-    {
-        Kurjun kurjunInfo = kurjunManager.getDataService().getKurjunData( url );
-
-        return Response.status( Response.Status.OK ).entity( kurjunInfo.getAuthID() ).build();
-    }
-
-
-    @Override
     public Response getKurjunUrl()
     {
         List<Kurjun> urls = kurjunManager.getDataService().getAllKurjunData();
@@ -41,7 +32,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response register( final String url, final int type )
     {
-        String authId= "";
+        String authId = "";
         if ( Strings.isNullOrEmpty( kurjunManager.getUser( url, type ) ) )
         {
             authId = kurjunManager.registerUser( url, type );
@@ -51,9 +42,9 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getSignedMessage( final String signedMsg )
+    public Response getSignedMessage( final String signedMsg, final String url, final int type )
     {
-
+        kurjunManager.authorizeUser( url, type, signedMsg );
 
         return null;
     }
