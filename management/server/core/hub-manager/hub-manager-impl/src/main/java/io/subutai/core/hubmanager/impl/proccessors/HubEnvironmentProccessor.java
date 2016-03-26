@@ -40,8 +40,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
 
-    private static final Pattern ENVIRONMENT_DATA_PATTERN =
-            Pattern.compile( "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
+    private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
+            "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
+                    + "[a-zA-z0-9]{1,100}" );
     private ConfigManager configManager;
     private PeerManager peerManager;
     private HubEnvironmentManager hubEnvironmentManager;
@@ -61,8 +62,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     {
         for ( String link : stateLinks )
         {
-            // Environment Data     GET /rest/v1/environments/{environment-id}
-            Matcher environmentDataMatcher = ENVIRONMENT_DATA_PATTERN.matcher( link );
+            // Environment Data     GET /rest/v1/environments/{environment-id}/peers/{peer-id}
+            Matcher environmentDataMatcher = ENVIRONMENT_PEER_DATA_PATTERN.matcher( link );
             if ( environmentDataMatcher.matches() )
             {
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
@@ -189,8 +190,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private void setupTunnel( EnvironmentPeerDto peerDto )
     {
-        String setupTunnelDataURL =
-                String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+        String setupTunnelDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
         try
         {
             WebClient client =
@@ -289,8 +289,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     {
         try
         {
-            String envPeerDataUrl = String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
-                    peerManager.getLocalPeer().getId() );
+            String envPeerDataUrl =
+                    String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
+                            peerManager.getLocalPeer().getId() );
             WebClient client = configManager.getTrustedWebClientWithAuth( envPeerDataUrl, configManager.getHubIp() );
 
             byte[] cborData = JsonUtil.toCbor( peerDto );
