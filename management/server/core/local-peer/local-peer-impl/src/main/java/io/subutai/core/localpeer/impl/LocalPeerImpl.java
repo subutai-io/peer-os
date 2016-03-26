@@ -459,7 +459,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                             new ContainerHostEntity( localPeerId, hostId, hostname, arch, interfaces,
                                     request.getContainerName(), request.getTemplateName(), arch.name(),
                                     request.getEnvironmentId(), request.getOwnerId(), request.getInitiatorPeerId(),
-                                    request.getContainerSize(), ContainerHostState.CLONING );
+                                    request.getContainerSize(), ContainerHostState.RUNNING );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
                 }
@@ -485,7 +485,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ResourceHostInfoModel resourceHostInfoModel =
                 ( ResourceHostInfoModel ) hostRegistry.getResourceHostInfoById( resourceHostId );
-        resourceHostInfoModel.addContainer( containerHostEntity );
+
+        resourceHostInfoModel.addContainer(
+                new ContainerHostInfoModel( containerHostEntity.getId(), containerHostEntity.getHostname(),
+                        containerHostEntity.getHostInterfaces(), containerHostEntity.getArch(),
+                        ContainerHostState.RUNNING ) );
 
         LOG.debug( "New container host registered: " + containerHostEntity.getHostname() );
     }

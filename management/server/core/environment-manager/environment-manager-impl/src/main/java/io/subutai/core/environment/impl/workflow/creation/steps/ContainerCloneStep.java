@@ -39,7 +39,6 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePe
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -203,7 +202,7 @@ public class ContainerCloneStep
                 new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
         final ContainerHostInfoModel infoModel =
                 new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(), interfaces,
-                        cloneResponse.getTemplateArch(), ContainerHostState.CLONING );
+                        cloneResponse.getTemplateArch(), ContainerHostState.RUNNING );
         return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
                 cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
                 node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(), node.getName() );
