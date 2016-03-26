@@ -76,7 +76,13 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 		SettingsKurjunSrv.registerUrl(url, type).success(function (data) {
 			vm.uid = data;
 			if (vm.uid) {
-				$('#js-uid-sign-area').addClass('bp-sign-target');
+				//$('#js-uid-sign-area').addClass('bp-sign-target');
+				var textarea = angular.element('<textarea class="bp-sign-target" ng-model="settingsKurjunCtrl.uid" ng-change="settingsKurjunCtrl.autoSign()"></textarea>');
+				$('#js-uid-sign-area').append(textarea);
+				$compile(textarea)($scope);
+			} else {
+				SweetAlert.swal("ERROR!", "Register URL error: UID is empty", "error");
+				LOADING_SCREEN('none');
 			}
 		}).error(function(error) {
 			SweetAlert.swal("ERROR!", "Register URL error: " + error.replace(/\\n/g, " "), "error");
@@ -85,26 +91,26 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 	}
 
 	function autoSign() {
+		LOADING_SCREEN();
 		SettingsKurjunSrv.signedMsg(vm.currentUrl, vm.currentType, vm.uid).success(function (data) {
-			resetSignField();
 			if(Object.keys(vm.dtInstance).length !== 0) {
 				vm.dtInstance.reloadData(null, false);
 			}
 			LOADING_SCREEN('none');
 			SweetAlert.swal("Success!", "URL was successfully authorized.", "success");
 		}).error(function(error) {
-			resetSignField();
 			SweetAlert.swal("ERROR!", "Register URL error: " + error.replace(/\\n/g, " "), "error");
 			LOADING_SCREEN('none');
 			console.log(error);
 		});
+		resetSignField();
 	}
 
 	function resetSignField() {
 		vm.uid = '';
 		vm.currentUrl = '';
 		vm.currentType = '';
-		$('#js-uid-sign-area').removeClass('bp-sign-target');
+		$('#js-uid-sign-area').find('textarea').remove();
 	}
 
     function updateConfigQuotas() {
