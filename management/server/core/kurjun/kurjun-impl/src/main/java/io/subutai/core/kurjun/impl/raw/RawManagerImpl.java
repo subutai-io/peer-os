@@ -59,6 +59,7 @@ public class RawManagerImpl implements RawManager
     private UnifiedRepository unifiedRepository;
 
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
+
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
     private Injector injector;
@@ -351,6 +352,7 @@ public class RawManagerImpl implements RawManager
         }
         return unifiedRepo;
     }
+
     private List<RepoUrl> getGlobalKurjunUrls()
     {
         try
