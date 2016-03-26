@@ -85,7 +85,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Id
     @Column( name = "environment_id" )
     @JsonProperty( "environmentId" )
-    private String environmentId;
+    protected String environmentId;
 
     @Version
     @JsonIgnore

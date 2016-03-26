@@ -176,17 +176,6 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
 
-    @GET
-    @Path( "control/config/{peerId}" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getControlNetworkConfig( @PathParam( "peerId" ) final String peerId );
-
-    @PUT
-    @Path( "control/update" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response updateControlNetworkConfig( ControlNetworkConfig config );
 
     @GET
     @Path( "control/{p2pHash}/{count}/distance/" )

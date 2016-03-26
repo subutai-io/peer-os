@@ -260,20 +260,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         User activeUser = identityManager.getActiveUser();
 
-
         Set<Environment> environments = new HashSet<>();
+
         for ( Environment environment : environmentDataService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
+
             final boolean b = environment.getUserId().equals( activeUser.getId() );
+
             if ( b || trustedRelation )
             {
                 environments.add( environment );
 
                 setEnvironmentTransientFields( environment );
+
                 setContainersTransientFields( environment );
             }
+
+            LOG.debug( "environment: {}", environment );
         }
+
+        // ===
+
+//        environments = new EnvironmentAdapter().getEnvironments( this );
+
+        // ===
 
         return environments;
     }
@@ -1134,6 +1145,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //set container's transient fields
         setContainersTransientFields( environment );
+
+        // ===
+
+//        environment = new EnvironmentAdapter().get( environmentId, this );
+
+        // ===
 
         return environment;
     }

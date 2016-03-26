@@ -25,7 +25,6 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.PingDistances;
@@ -321,14 +320,9 @@ public interface Peer
 
     void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
 
-
     void alert( AlertEvent alert ) throws PeerException;
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
-
-    ControlNetworkConfig getControlNetworkConfig( String localPeerId ) throws PeerException;
-
-    boolean updateControlNetworkConfig( ControlNetworkConfig config ) throws PeerException;
 
     PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
