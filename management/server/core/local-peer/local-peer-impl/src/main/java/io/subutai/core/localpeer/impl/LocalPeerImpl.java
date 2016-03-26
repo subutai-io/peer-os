@@ -56,7 +56,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
@@ -462,6 +461,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                     request.getContainerSize(), ContainerHostState.RUNNING );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
+
+                    //wait for container
+                    boolean isRunning = false;
+                    long waitStart = System.currentTimeMillis();
+                    while ( !isRunning
+                            && System.currentTimeMillis() - waitStart < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 )
+                    {
+                        try
+                        {
+                            isRunning = hostRegistry.getContainerHostInfoById( hostId ).getState()
+                                    == ContainerHostState.RUNNING;
+                        }
+                        catch ( HostDisconnectedException e )
+                        {
+                            //ignore
+                        }
+                        if ( !isRunning )
+                        {
+                            Thread.sleep( 100 );
+                        }
+                    }
                 }
                 catch ( Exception e )
                 {
@@ -482,18 +502,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
 
         resourceHostDataService.saveOrUpdate( resourceHost );
-
-        ResourceHostInfoModel resourceHostInfoModel =
-                ( ResourceHostInfoModel ) hostRegistry.getResourceHostInfoById( resourceHostId );
-
-        ContainerHostInfoModel containerHostInfoModel =
-                new ContainerHostInfoModel( containerHostEntity.getId(), containerHostEntity.getHostname(),
-                        containerHostEntity.getHostInterfaces(), containerHostEntity.getArch(),
-                        ContainerHostState.RUNNING );
-
-        LOG.debug( "Adding container host to registry {}", containerHostInfoModel );
-
-        resourceHostInfoModel.addContainer( containerHostInfoModel );
 
         LOG.debug( "New container host registered: " + containerHostEntity.getHostname() );
     }

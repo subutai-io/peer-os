@@ -62,7 +62,7 @@ public class PeerWebClient
     {
         String path = "/info";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -563,7 +563,7 @@ public class PeerWebClient
         {
             String path = String.format( "/limits/%s", peerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             final Response response = client.get();
@@ -591,7 +591,7 @@ public class PeerWebClient
         {
             String path = String.format( "/control/%s/%d/distance", p2pHash, maxAddress );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             final Response response = client.get();
@@ -617,7 +617,7 @@ public class PeerWebClient
         Preconditions.checkNotNull( environmentId );
         String path = String.format( "/tunnels/%s", environmentId );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.TEXT_PLAIN );
         final Response response = client.post( peerIps );
@@ -638,7 +638,7 @@ public class PeerWebClient
         Preconditions.checkNotNull( pubKeyRing );
         String path = String.format( "/pek/add/%s", keyId );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         final Response response = client.post( pubKeyRing );
