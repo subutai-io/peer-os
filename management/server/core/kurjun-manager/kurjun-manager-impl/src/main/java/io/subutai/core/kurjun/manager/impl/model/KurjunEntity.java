@@ -36,6 +36,18 @@ public class KurjunEntity implements Kurjun
     @Column( name = "type" )
     private int type = KurjunType.Local.getId();
 
+    @Column( name = "owner_fprint")
+    private String ownerFingerprint;
+
+    @Column( name = "owner_authid" )
+    private String authID;
+
+    @Column( name = "owner_message")
+    private String signedMessage;
+
+    @Column( name = "token")
+    private String token;
+
 
     @Override
     public long getId()
@@ -86,5 +98,53 @@ public class KurjunEntity implements Kurjun
     public void setState( final boolean state )
     {
         this.state = state;
+    }
+
+
+    public String getOwnerFingerprint()
+    {
+        return ownerFingerprint;
+    }
+
+
+    public void setOwnerFingerprint( final String ownerFingerprint )
+    {
+        this.ownerFingerprint = ownerFingerprint;
+    }
+
+
+    public String getAuthID()
+    {
+        return authID;
+    }
+
+
+    public void setAuthID( final String authID )
+    {
+        this.authID = authID;
+    }
+
+
+    public String getSignedMessage()
+    {
+        return signedMessage;
+    }
+
+
+    public void setSignedMessage( final String signedMessage )
+    {
+        this.signedMessage = signedMessage;
+    }
+
+
+    public String getToken()
+    {
+        return token;
+    }
+
+
+    public void setToken( final String token )
+    {
+        this.token = token;
     }
 }

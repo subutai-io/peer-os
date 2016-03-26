@@ -6,6 +6,8 @@ import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
@@ -17,13 +19,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getAuthId()
+    public Response getAuthId( final String url, final int type )
     {
-        for ( final Kurjun kurjun : kurjunManager.getDataService().getAllKurjunData() )
-        {
+        Kurjun kurjunInfo = kurjunManager.getDataService().getKurjunData( url );
 
-        }
-        return Response.status( Response.Status.OK ).entity( "35492d26-f1a5-11e5-9ce9-5e5517507c66" ).build();
+        return Response.status( Response.Status.OK ).entity( kurjunInfo.getAuthID() ).build();
     }
 
 
@@ -39,9 +39,14 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getPublicKey( final String publicKey )
+    public Response register( final String url, final int type )
     {
-        return null;
+        String authId= "";
+        if ( Strings.isNullOrEmpty( kurjunManager.getUser( url, type ) ) )
+        {
+            authId = kurjunManager.registerUser( url, type );
+        }
+        return Response.status( Response.Status.OK ).entity( authId ).build();
     }
 
 

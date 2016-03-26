@@ -38,18 +38,16 @@ public class KurjunDataServiceImpl implements KurjunDataService
      *
      */
     @Override
-    public Kurjun getKurjunData( final String id )
+    public Kurjun getKurjunData( final String url )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
         Kurjun result = null;
         try
         {
-            Query query = em.createQuery( "SELECT c FROM KurjunEntity c" ).setParameter( "owner_fprint", id );
-            //            daoManager.startTransaction( em );
+            Query query = em.createQuery( "SELECT c FROM KurjunEntity c where c.url = :url" );
+            query.setParameter( "url", url );
             result = ( Kurjun ) query.getSingleResult();
-            //                    result = em.find( KurjunEntity.class, id );
-            //            daoManager.commitTransaction( em );
         }
         catch ( Exception e )
         {

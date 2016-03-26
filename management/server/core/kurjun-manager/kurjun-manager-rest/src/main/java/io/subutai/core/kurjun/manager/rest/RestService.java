@@ -17,7 +17,7 @@ public interface RestService
     @GET
     @Path( "authid" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getAuthId();
+    public Response getAuthId( @FormParam( "url" ) String url, @FormParam( "type" ) int type );
 
 
     @GET
@@ -27,15 +27,12 @@ public interface RestService
 
 
     @POST
-    @Path( "public-key" )
+    @Path( "register" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getPublicKey( @FormParam( "publicKey" ) String publicKey );
+    public Response register( @FormParam( "url" ) String url, @FormParam( "type" ) int type );
 
     @POST
     @Path( "signed-msg" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg );
-
-
-
 }

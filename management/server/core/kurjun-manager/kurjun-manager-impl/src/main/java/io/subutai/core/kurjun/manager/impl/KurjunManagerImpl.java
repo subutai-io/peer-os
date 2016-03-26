@@ -51,6 +51,7 @@ public class KurjunManagerImpl implements KurjunManager
     private KurjunDataService dataService;
     private static Properties properties;
     private static String ownerKey;
+    private static String fingerprint;
     //**********************************
 
 
@@ -60,41 +61,43 @@ public class KurjunManagerImpl implements KurjunManager
         dataService = new KurjunDataServiceImpl( daoManager );
 
         if ( dataService.getAllKurjunData().isEmpty() )
-        try
         {
-
-            for ( final String url : SystemSettings.getGlobalKurjunUrls() )
+            try
             {
-                Kurjun kurjun = new KurjunEntity();
 
-                kurjun.setType( KurjunType.Global.getId() );
-                kurjun.setState( false );
-                kurjun.setUrl( url );
+                for ( final String url : SystemSettings.getGlobalKurjunUrls() )
+                {
+                    Kurjun kurjun = new KurjunEntity();
 
-                dataService.persistKurjunData( kurjun );
+                    kurjun.setType( KurjunType.Global.getId() );
+                    kurjun.setState( false );
+                    kurjun.setUrl( url );
+
+                    dataService.persistKurjunData( kurjun );
+                }
+
+                for ( final String url : SystemSettings.getLocalKurjunUrls() )
+                {
+                    Kurjun kurjun = new KurjunEntity();
+
+                    kurjun.setType( KurjunType.Local.getId() );
+                    kurjun.setState( false );
+                    kurjun.setUrl( url );
+
+                    dataService.persistKurjunData( kurjun );
+                }
             }
-
-            for ( final String url : SystemSettings.getLocalKurjunUrls() )
+            catch ( ConfigurationException e )
             {
-                Kurjun kurjun = new KurjunEntity();
-
-                kurjun.setType( KurjunType.Local.getId() );
-                kurjun.setState( false );
-                kurjun.setUrl( url );
-
-                dataService.persistKurjunData( kurjun );
+                e.printStackTrace();
             }
-        }
-        catch ( ConfigurationException e )
-        {
-            e.printStackTrace();
         }
 
         PGPPublicKey key =
                 securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
                                .getPublicKey();
 
-        String fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
+        fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
 
         try
         {
@@ -109,15 +112,14 @@ public class KurjunManagerImpl implements KurjunManager
         properties = loadProperties();
 
 
-
-//        if ( Strings.isNullOrEmpty( getUser( KurjunType.Local.getId(), fingerprint ) ) )
-//        {
-//            registerUser( KurjunType.Local.getId(), fingerprint );
-//        }
-//        else
-//        {
-//            authorizeUser( KurjunType.Local.getId(), fingerprint );
-//        }
+        //        if ( Strings.isNullOrEmpty( getUser( KurjunType.Local.getId(), fingerprint ) ) )
+        //        {
+        //            registerUser( KurjunType.Local.getId(), fingerprint );
+        //        }
+        //        else
+        //        {
+        //            authorizeUser( KurjunType.Local.getId(), fingerprint );
+        //        }
     }
 
 
@@ -170,99 +172,97 @@ public class KurjunManagerImpl implements KurjunManager
 
 
     //****************************************
+//    @Override
+//    public String authorizeUser( int kurjunType, String fingerprint )
+//    {
+//        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
+//        WebClient client = RestUtil.createTrustedWebClient( url );
+//
+//        byte[] signedMsg = null;
+//
+//        List<Kurjun> list = dataService.getAllKurjunData();
+//        for ( final Kurjun kurjun : list )
+//        {
+//            //            signedMsg = kurjun.getSignedMessage();
+//            break;
+//        }
+//
+//        try
+//        {
+//            client.query( "fingerprint", fingerprint );
+//            client.query( "message", PGPEncryptionUtil.armorByteArrayToString( signedMsg ) );
+//
+//            Response response = client.post( null );
+//
+//            if ( response.getStatus() != HttpStatus.SC_OK )
+//            {
+//                return null;
+//            }
+//        }
+//        catch ( PGPException e )
+//        {
+//            e.printStackTrace();
+//        }
+//
+//
+//        return "success";
+//    }
+
+
+    //****************************************
+//    @Override
+//    public boolean setSystemOwner( int kurjunType, String fingerprint )
+//    {
+//
+//        return true;
+//    }
+
+
     @Override
-    public String registerUser( int kurjunType, String fingerprint )
+    public String registerUser( final String url, final int kurjunType )
     {
-        //*****************************************
         String authId = "";
 
-        if ( Strings.isNullOrEmpty( getUser( kurjunType, fingerprint ) ) )
+        WebClient client = RestUtil.createTrustedWebClient( url );
+        client.query( "key", ownerKey );
+
+        Response response = client.post( null );
+
+        if ( response.getStatus() == HttpStatus.SC_OK )
         {
-            String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.add" ) );
-            WebClient client = RestUtil.createTrustedWebClient( url );
-            client.query( "key", ownerKey );
-
-            Response response = client.post( null );
-
-            if ( response.getStatus() == HttpStatus.SC_OK )
-            {
-                authId = response.readEntity( String.class );
-            }
-            else
-            {
-                return null;
-            }
+            authId = response.readEntity( String.class );
+        }
+        else
+        {
+            return null;
         }
 
+        Kurjun kurjun = getDataService().getKurjunData( url );
 
-        KurjunConfig config = new KurjunConfigEntity();
+        kurjun.setUrl( url );
+        kurjun.setType( kurjunType );
+        kurjun.setAuthID( authId );
+        kurjun.setState( false );
+        kurjun.setOwnerFingerprint( fingerprint );
 
-        config.setAuthID( authId );
-        config.setOwnerFingerprint( fingerprint );
-        config.setType( kurjunType );
 
-        dataService.persistKurjunConfig( config );
-        //        if ( dataService.getKurjunData( fingerprint ) == null )
-        //        {
-        //            byte[] signedMessage = null;
-        //
-        //            Kurjun kurjun = new KurjunEntity();
-        //            kurjun.setType( kurjunType );
-        //            kurjun.setOwnerFingerprint( fingerprint );
-        //            kurjun.setAuthID( authId );
-        //            //            kurjun.setSignedMessage(  null );
-        //            kurjun.setSignedMessage( signedMessage );
-        //            dataService.persistKurjunData( kurjun );
-        //        }
+        dataService.updateKurjunData( kurjun );
 
+        return authId;
+    }
+
+
+    @Override
+    public String authorizeUser( final String url, final int kurjunType, final String signedMessage )
+    {
         return null;
     }
 
 
-    //****************************************
     @Override
-    public String authorizeUser( int kurjunType, String fingerprint )
+    public boolean setSystemOwner( final String url, final int kurjunType )
     {
-        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
-        WebClient client = RestUtil.createTrustedWebClient( url );
-
-        byte[] signedMsg = null;
-
-        List<Kurjun> list = dataService.getAllKurjunData();
-        for ( final Kurjun kurjun : list )
-        {
-//            signedMsg = kurjun.getSignedMessage();
-            break;
-        }
-
-        try
-        {
-            client.query( "fingerprint", fingerprint );
-            client.query( "message", PGPEncryptionUtil.armorByteArrayToString( signedMsg ) );
-
-            Response response = client.post( null );
-
-            if ( response.getStatus() != HttpStatus.SC_OK )
-            {
-                return null;
-            }
-        }
-        catch ( PGPException e )
-        {
-            e.printStackTrace();
-        }
-
-
-        return "success";
-    }
-
-
-    //****************************************
-    @Override
-    public boolean setSystemOwner( int kurjunType, String fingerprint )
-    {
-
-        return true;
+        return false;
     }
 
 
@@ -277,11 +277,9 @@ public class KurjunManagerImpl implements KurjunManager
     }
 
 
-    //****************************************
     @Override
-    public String getUser( int kurjunType, String fingerprint )
+    public String getUser( final String url, final int kurjunType )
     {
-        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
         WebClient client = RestUtil.createTrustedWebClient( url );
         client.query( "fingerprint", fingerprint );
 
@@ -292,9 +290,31 @@ public class KurjunManagerImpl implements KurjunManager
             LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
             return null;
         }
-
-        return null;
+        else
+        {
+            return response.readEntity( String.class );
+        }
     }
+
+
+    //****************************************
+//    @Override
+//    public String getUser( int kurjunType, String fingerprint )
+//    {
+//        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
+//        WebClient client = RestUtil.createTrustedWebClient( url );
+//        client.query( "fingerprint", fingerprint );
+//
+//        Response response = client.get();
+//
+//        if ( response.getStatus() != HttpStatus.SC_OK )
+//        {
+//            LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
+//            return null;
+//        }
+//
+//        return null;
+//    }
 
 
     public void setIdentityManager( final IdentityManager identityManager )
