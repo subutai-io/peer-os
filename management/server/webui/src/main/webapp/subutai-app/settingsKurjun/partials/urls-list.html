@@ -1,0 +1,21 @@
+<div class="b-workspace-content__row" style="display: none;" >
+	<div class="b-form-label">Message</div>
+	<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input" 
+		id="js-uid-sign-area" 
+		ng-model="settingsKurjunCtrl.uid" 
+		ng-change="settingsKurjunCtrl.autoSign()"
+		style="width: 420px; height: 160px; font-family: monospace;">
+	</textarea>
+</div>
+
+<div class="b-workspace-content__row">
+	<div class="b-data-table">
+		<table datatable="" 
+			dt-options="settingsKurjunCtrl.dtOptions" 
+			dt-columns="settingsKurjunCtrl.dtColumns" 
+			dt-instance="settingsKurjunCtrl.dtInstance" 
+			class="row-border hover">
+		</table>
+	</div>
+</div>
+
