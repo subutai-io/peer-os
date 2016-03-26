@@ -20,7 +20,7 @@ function SettingsKurjunSrv($http) {
     }
 
     function updateConfigUrls(config) {
-        var postData = "globalKurjunUrls=" + config.globalKurjunUrls;
+        var postData = "globalKurjunUrls=" + config.globalKurjunUrls + "&localKurjunUrls=" + config.localKurjunUrls;
         return $http.post(
             SERVER_URL + "rest/v1/system/update_kurjun_settings_urls",
             postData,

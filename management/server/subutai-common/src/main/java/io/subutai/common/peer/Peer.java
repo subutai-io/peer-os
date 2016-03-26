@@ -11,11 +11,11 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
@@ -183,7 +183,7 @@ public interface Peer
     /**
      * Returns set of container information of the environment
      */
-    public Set<ContainerHostInfo> getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
+    public Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
 
@@ -212,16 +212,6 @@ public interface Peer
      */
     public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
 
-
-    /**
-     * Destroys container group
-     *
-     * @param environmentId - id fo environment
-     *
-     * @return {@code ContainersDestructionResult}
-     */
-    public ContainersDestructionResult destroyContainersByEnvironment( final String environmentId )
-            throws PeerException;
 
     //networking
 
@@ -273,6 +263,15 @@ public interface Peer
 
     HostInterfaces getInterfaces() throws PeerException;
 
+
+    /**
+     * Returns p2p IP of the specified p2p swarm on the specified RH
+     *
+     * @param resourceHostId - id of RH
+     * @param swarmHash - hash of p2p swarm
+     */
+    String getP2PIP( String resourceHostId, String swarmHash ) throws PeerException;
+
     /**
      * Resets a secret key for a given P2P network on all RHs
      *
@@ -285,11 +284,21 @@ public interface Peer
      * Sets up p2p connection on each RH.
      *
      * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
-     * dynamic IP acquisition for RHs
+     * dynamic IP acquisition for RHs. If P2P connection already exists on RH, its secret key gets reset with new secret
+     * key and ttl from  @param config. To setup initial p2p connection with explicit IP, use
+     * Peer#setupInitialP2PConnection
      *
      * @return - P2P IP of RH with MH
      */
     String setupP2PConnection( P2PConfig config ) throws PeerException;
+
+
+    /**
+     * Sets up initial P2P connection in swarm on MH. P2P IP must be present!
+     *
+     * This method throws PeerException if initial P2P connection with the specified hash is already setup.
+     */
+    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException;
 
     /**
      * Removes p2p connection by hash from all RHs
@@ -323,7 +332,7 @@ public interface Peer
 
     PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
-    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek );
+    void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 

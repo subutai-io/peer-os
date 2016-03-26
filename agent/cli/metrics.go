@@ -25,8 +25,9 @@ var (
 // queryDB convenience function to query the database
 func queryInfluxDB(clnt client.Client, cmd string) (res []client.Result, err error) {
 	q := client.Query{
-		Command:  cmd,
-		Database: config.Influxdb.Db,
+		Command:   cmd,
+		Database:  config.Influxdb.Db,
+		Precision: "s",
 	}
 	if response, err := clnt.Query(q); err == nil {
 		if response.Error() != nil {
@@ -66,7 +67,7 @@ func HostMetrics(host, start, end string) {
 		timeGroup = "5m"
 	}
 
-	fmt.Println("{\"Metrics\":")
+	fmt.Print("{\"Metrics\":")
 	res, _ := queryInfluxDB(c, `
 			SELECT non_negative_derivative(mean(value),1s) as value
 			FROM `+timeRange+`.`+tableCPU+`
@@ -89,6 +90,6 @@ func HostMetrics(host, start, end string) {
 			GROUP BY time(`+timeGroup+`), mount, type fill(none);
 		`)
 	out, _ := json.Marshal(res)
-	fmt.Println(string(out))
+	fmt.Print(string(out))
 	fmt.Println("}")
 }
