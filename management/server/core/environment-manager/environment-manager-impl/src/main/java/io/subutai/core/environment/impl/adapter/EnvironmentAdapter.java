@@ -46,27 +46,27 @@ public class EnvironmentAdapter
 
     // ===
 
-    static String envId = "c326a0ee-db5a-493d-be42-d61c59685be9";
+    static String envId = "3eaa9177-8481-412e-a1a6-aa05ef62121c";
 
-    static String peerId = "AC1BC9D5F025E3AA84B6B088B20136F12C2FD06F";
+    static String peerId = "2B2EB47D706A5671DF8A0AA63A0A11CA0AAB8AFD";
 
     static String subnetCidr = "192.168.2.1/24";
 
-    static long vni = 1372649;
+    static long vni = 1693132;
 
     static String p2pSubnet = "10.11.1.0";
 
-    static String peerP2p = "10.11.1.1";
+    static String peerP2p = "10.11.2.1";
 
     static String chIp = "192.168.2.2";
 
-    static String chId = "4FCEEC86A960A99D5520F6C38C01426EEB73BF13";
+    static String chId = "82FF224E950BBF69268B0DF53FE99BA01909809B";
 
-    static String lxcName = "92b51495-e1d9-4dff-b01a-fe395ddd359f";
+    static String lxcName = "d80a084e-3a29-4a31-add0-28b9a67fcab9";
 
     static String templateName = "elasticsearch";
 
-    static String rhId = "93C21AEAA7A89798DE38836AFDAFEB0013F7F03B";
+    static String rhId = "1298EFCDD2E6309DF4DB63517264544C273A1A16";
 
 
     private ProxyEnvironmentContainer getContainer()
@@ -188,13 +188,13 @@ public class EnvironmentAdapter
 
         e.setEnvironmentManager( environmentManager );
 
-        log.debug( "env: {}", e );
-
         Set<EnvironmentContainerImpl> containers = new HashSet<>();
 
         containers.addAll( getContainers() );
 
         e.addContainers( containers );
+
+        log.debug( "env: {}", e );
 
         return e;
     }

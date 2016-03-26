@@ -75,14 +75,6 @@ public class RequestBuilder
     }
 
 
-    public RequestBuilder( String command, RequestBuilder another )
-    {
-        this.command = command;
-//        this.cwd = another.cwd;
-//        this.type = another.type;
-    }
-
-
     /**
      * Returns command explicit timeout in seconds
      *
