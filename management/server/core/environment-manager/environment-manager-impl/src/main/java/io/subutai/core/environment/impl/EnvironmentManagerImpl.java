@@ -72,7 +72,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
-import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.dao.TopologyDataService;
@@ -277,9 +276,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
                 setContainersTransientFields( environment );
             }
+
+            LOG.debug( "environment: {}", environment );
         }
 
-        environments = new EnvironmentAdapter().getEnvironments();
+        // ===
+
+//        environments = new EnvironmentAdapter().getEnvironments( this );
+
+        // ===
 
         return environments;
     }
@@ -1140,6 +1145,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //set container's transient fields
         setContainersTransientFields( environment );
+
+        // ===
+
+//        environment = new EnvironmentAdapter().get( environmentId, this );
+
+        // ===
 
         return environment;
     }

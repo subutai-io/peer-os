@@ -18,8 +18,8 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
 
 
@@ -27,103 +27,110 @@ public class EnvironmentAdapter
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
+    static String envId = "e3c47046-75ae-46b5-adf3-4b2b7012f6c6";
 
-    public EnvironmentImpl get( final String id )
+    static String peerId = "AFAE43FE560D309809EE238D6B598523E31B8AAA";
+
+    static String subnetCidr = "192.168.2.1/24";
+
+    static long vni = 15444522;
+
+    static String p2pSubnet = "10.11.1.0";
+
+    static String peerP2p = "10.11.1.1";
+
+    static String chIp = "192.168.2.2";
+
+    static String chId = "F428C7754FC7AE90188EC42E43BFBDF54D99936E";
+
+    static String lxcName = "4f268646-0faf-45e7-8f21-0056668169b8";
+
+    static String templateName = "elasticsearch";
+
+    static String rhId = "F6E3A586B7B74F704DC40EE2698A25F71EF711F3";
+
+
+    private ProxyEnvironmentContainer getContainer( EnvironmentManagerImpl environmentManager )
     {
-        HostInterfaceModel him = new HostInterfaceModel( "eth0", "192.168.1.3" );
+        HostInterfaceModel him = new HostInterfaceModel( "eth0", chIp );
 
         Set<HostInterfaceModel> set = Sets.newHashSet();
         set.add( him );
 
-        HostInterfaces hi = new HostInterfaces( "F7D931A6E757092632AFB3ADE80831A7E9C62A34", set );
+        HostInterfaces hi = new HostInterfaces( chId, set );
 
         ProxyEnvironmentContainer ec = new ProxyEnvironmentContainer(
-                "5104E12FA7FE92ECEFFCD9C73437F6BCEC556FE4",
-                "5104E12FA7FE92ECEFFCD9C73437F6BCEC556FE4",
-                "461f49b8-480b-40ad-a56d-464d3e21227f",
+                peerId,
+                peerId,
+                lxcName,
 
                 new ContainerHostInfoModel(
-                        "F7D931A6E757092632AFB3ADE80831A7E9C62A34",
-                        "461f49b8-480b-40ad-a56d-464d3e21227f", hi,
+                        chId,
+                        lxcName, hi,
                         HostArchitecture.AMD64,
                         ContainerHostState.RUNNING
                 ),
 
-                "elasticsearch",
+                templateName,
                 HostArchitecture.AMD64, 0, 0,
                 "intra.lan", ContainerSize.SMALL,
-                "F6E3A586B7B74F704DC40EE2698A25F71EF711F3",
+                rhId,
                 "Container 2"
         );
 
+        ec.setEnvironmentManager( environmentManager );
+
+        return ec;
+    }
 
 
-
-        HostInterfaceModel him2 = new HostInterfaceModel( "eth0", "192.168.1.2" );
-
-        Set<HostInterfaceModel> set2 = Sets.newHashSet();
-        set2.add( him2 );
-
-        HostInterfaces hi2 = new HostInterfaces( "9D0281ABD6742B47D87D0D9E2F763ACCD9B913F9", set2 );
-
-        ProxyEnvironmentContainer ec2 = new ProxyEnvironmentContainer(
-                "5104E12FA7FE92ECEFFCD9C73437F6BCEC556FE4",
-                "5104E12FA7FE92ECEFFCD9C73437F6BCEC556FE4",
-                "3697b6ee-54c2-43bb-bdef-f4d83a03dfc0",
-
-                new ContainerHostInfoModel(
-                        "9D0281ABD6742B47D87D0D9E2F763ACCD9B913F9",
-                        "3697b6ee-54c2-43bb-bdef-f4d83a03dfc0", hi2,
-                        HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING
-                ),
-
-                "elasticsearch",
-                HostArchitecture.AMD64, 0, 0,
-                "intra.lan", ContainerSize.SMALL,
-                "F6E3A586B7B74F704DC40EE2698A25F71EF711F3",
-                "Container 1"
-        );
-
-
-
+    public ProxyEnvironment get( final String id, EnvironmentManagerImpl environmentManager )
+    {
         ProxyEnvironment e = new ProxyEnvironment(
                 "Mock Env",
-                "192.168.1.1/24",
+                subnetCidr,
                 null,
                 3L,
-                "5104E12FA7FE92ECEFFCD9C73437F6BCEC556FE4"
+                peerId
         );
 
         e.setId( id );
-        e.setP2PSubnet( "10.11.1.0" );
-        e.setVni( 1234567 );
+        e.setP2PSubnet( p2pSubnet );
+        e.setVni( vni );
         e.setVersion( 1L );
         e.setStatus( EnvironmentStatus.HEALTHY );
         e.getEnvironmentId();
 
         HashSet<EnvironmentContainerImpl> set3 = new HashSet<>();
-        set3.add( ec );
-        set3.add( ec2 );
-
+        set3.add( getContainer( environmentManager ) );
         e.addContainers( set3 );
 
-        P2PConfig p2PConfig = new P2PConfig( "5104E12FA7FE92ECEFFCD9C73437F6BCEC556FE4", null, null, "10.11.1.1", null, 0 );
+
+        P2PConfig p2PConfig = new P2PConfig( peerId, null, null, peerP2p, null, 0 );
 
         PeerConfImpl peerConf = new PeerConfImpl( p2PConfig );
-        peerConf.setId( 10L );
+        peerConf.setId( 51L );
 
         e.addEnvironmentPeer( peerConf );
+
+        e.setEnvironmentManager( environmentManager );
+
+        log.debug( "env: {}", e );
 
         return e;
     }
 
 
-    public Set<Environment> getEnvironments()
+    public Set<Environment> getEnvironments( EnvironmentManagerImpl environmentManager )
     {
+        log.debug( "=== Giving mock environments ===" );
+
         HashSet<Environment> set = new HashSet<>();
 
-        set.add( get( "729c6e58-3d25-40a9-8abc-e6384ab1d535" ) );
+        Environment env = get( envId, environmentManager );
+        set.add( env );
+
+        log.debug( "env: {}", env );
 
         return set;
     }
