@@ -1,10 +1,10 @@
-package io.subutai.core.identity.rest.ui;
+package io.subutai.core.identity.rest.ui.entity;
 
 
 import java.util.Date;
 
 
-public class UserTokenJson
+public class UserTokenDto
 {
     private long userId;
 
@@ -23,8 +23,8 @@ public class UserTokenJson
     private Date validDate;
 
 
-    public UserTokenJson( final long userId, final String userName, final String token, final String secret, final int type,
-                          final String hashAlgorithm, final String issuer, final Date validDate )
+    public UserTokenDto(final long userId, final String userName, final String token, final String secret, final int type,
+                        final String hashAlgorithm, final String issuer, final Date validDate )
     {
         this.userId = userId;
         this.userName = userName;
