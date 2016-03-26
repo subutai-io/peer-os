@@ -7,18 +7,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.test.SystemOutRedirectTest;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.common.host.ResourceHostInfo;
-
 import com.google.common.collect.Sets;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
+import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.core.hostregistry.api.HostRegistry;
+
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,8 +45,10 @@ public class ListHostsCommandTest extends SystemOutRedirectTest
         command = new ListHostsCommand( hostRegistry );
         when( hostRegistry.getResourceHostsInfo() ).thenReturn( Sets.newHashSet( resourceHostInfo ) );
         when( resourceHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
-        when( hostInterfaces.getAll() ).thenReturn( Sets.<HostInterfaceModel>newHashSet(hostInterface) );
+        when( containerHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
+        when( hostInterfaces.getAll() ).thenReturn( Sets.<HostInterfaceModel>newHashSet( hostInterface ) );
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
+        when( hostInterfaces.findByName( anyString() ) ).thenReturn( hostInterface );
     }
 
 
