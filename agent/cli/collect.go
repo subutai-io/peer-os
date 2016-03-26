@@ -49,7 +49,7 @@ func Collect() {
 		if err != nil || dbclient.Write(bp) != nil {
 			initInfluxdb()
 		}
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second * 30)
 	}
 }
 
