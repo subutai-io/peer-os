@@ -28,7 +28,8 @@ func getBody(url string) (response *http.Response) {
 }
 
 func getList() (list []map[string]interface{}) {
-	resp := getBody("https://peer.noip.me:8338/kurjun/rest/file/list")
+	//replace peer.noip.me with cdn after kurjun update
+	resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/list")
 	defer resp.Body.Close()
 	jsonlist, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
@@ -40,6 +41,7 @@ func Update(name string, check bool) {
 	switch name {
 	case "rh":
 		var date int64
+		var update, id string
 		avlb := 0
 		lcl := 0
 
@@ -57,11 +59,11 @@ func Update(name string, check bool) {
 		}
 
 		for _, v := range getList() {
-			name := v["name"].(string)
-			// md5 := strings.TrimPrefix(v["id"].(string), "raw.")
-			if strings.HasPrefix(name, "subutai") && strings.HasSuffix(name, ".snap") {
-				trim := strings.TrimPrefix(name, "subutai_")
-				trim = strings.TrimRight(trim, ".snap")
+			update = v["name"].(string)
+			id = v["id"].(string)
+			if strings.HasPrefix(update, "subutai") && strings.HasSuffix(update, ".snap") {
+				trim := strings.TrimPrefix(update, "subutai_")
+				trim = strings.TrimRight(trim, "_amd64.snap")
 				if version := strings.Split(trim, "-"); len(version) > 1 {
 					tmp, err := strconv.Atoi(version[1])
 					log.Check(log.FatalLevel, "Converting timestamp to int", err)
@@ -69,6 +71,7 @@ func Update(name string, check bool) {
 						avlb = tmp
 						date, err = strconv.ParseInt(version[1], 10, 64)
 						log.Check(log.FatalLevel, "Getting update info", err)
+						break
 					}
 				}
 			}
@@ -82,17 +85,18 @@ func Update(name string, check bool) {
 			os.Exit(0)
 		}
 
-		file, err := os.Create("/tmp/" + name)
+		file, err := os.Create("/tmp/" + update)
 		log.Check(log.FatalLevel, "Creating update file", err)
 		defer file.Close()
-		resp := getBody("http://peer.noip.me:8338/kurjun/rest/file/get?id=" + name)
+		//replace peer.noip.me with cdn after kurjun update
+		resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/get?id=" + id)
 		defer resp.Body.Close()
 		_, err = io.Copy(file, resp.Body)
 		log.Check(log.FatalLevel, "Writing response to file", err)
 
-		log.Check(log.FatalLevel, "Installing update",
-			exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+name).Start())
-		log.Check(log.FatalLevel, "Removing update file", os.Remove("/tmp/"+name))
+		log.Check(log.FatalLevel, "Installing update /tmp/"+update,
+			exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+update).Run())
+		log.Check(log.FatalLevel, "Removing update file /tmp/"+update, os.Remove("/tmp/"+update))
 
 	default:
 		if !container.IsContainer(name) {
