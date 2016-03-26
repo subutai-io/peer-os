@@ -48,9 +48,15 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSignedMessage( final String signedMsg, final String url, final int type )
     {
-        kurjunManager.authorizeUser( url, type, signedMsg );
 
-        return null;
+        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.OK ).build();
+        }
     }
 
 

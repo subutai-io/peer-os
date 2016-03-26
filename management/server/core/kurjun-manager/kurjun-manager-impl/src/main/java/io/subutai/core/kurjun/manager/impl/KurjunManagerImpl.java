@@ -221,8 +221,12 @@ public class KurjunManagerImpl implements KurjunManager
         }
         else
         {
-            dataService.updateKurjunData( signedMessage, url );
-            return response.readEntity( String.class );
+            kurjun.setSignedMessage( signedMessage );
+            kurjun.setToken( response.readEntity( String.class ) );
+            kurjun.setState( true );
+
+            dataService.updateKurjunData( kurjun );
+            return "success";
         }
     }
 
