@@ -462,6 +462,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                                     request.getContainerSize(), ContainerHostState.RUNNING );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
+
+                    //wait for container
+                    boolean isRunning = false;
+                    long waitStart = System.currentTimeMillis();
+                    while ( !isRunning
+                            && System.currentTimeMillis() - waitStart < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 )
+                    {
+                        try
+                        {
+                            isRunning = hostRegistry.getContainerHostInfoById( hostId ).getState()
+                                    == ContainerHostState.RUNNING;
+                        }
+                        catch ( HostDisconnectedException e )
+                        {
+                            //ignore
+                        }
+                        if ( !isRunning )
+                        {
+                            Thread.sleep( 100 );
+                        }
+                    }
                 }
                 catch ( Exception e )
                 {
