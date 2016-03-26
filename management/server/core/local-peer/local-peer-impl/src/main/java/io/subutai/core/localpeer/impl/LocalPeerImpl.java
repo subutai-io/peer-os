@@ -56,6 +56,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
@@ -462,7 +463,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
                 }
-                catch ( PeerException e )
+                catch ( Exception e )
                 {
                     LOG.error( "Error on registering container.", e );
                     throw new PeerException( "Error on registering container.", e );
@@ -472,8 +473,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected void registerContainer( String resourceHostId, ContainerHostEntity containerHostEntity )
-            throws PeerException
+    protected void registerContainer( String resourceHostId, ContainerHostEntity containerHostEntity ) throws Exception
     {
         ResourceHost resourceHost = getResourceHostById( resourceHostId );
 
@@ -482,6 +482,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
 
         resourceHostDataService.saveOrUpdate( resourceHost );
+
+        ResourceHostInfoModel resourceHostInfoModel =
+                ( ResourceHostInfoModel ) hostRegistry.getResourceHostInfoById( resourceHostId );
+        resourceHostInfoModel.addContainer( containerHostEntity );
 
         LOG.debug( "New container host registered: " + containerHostEntity.getHostname() );
     }
