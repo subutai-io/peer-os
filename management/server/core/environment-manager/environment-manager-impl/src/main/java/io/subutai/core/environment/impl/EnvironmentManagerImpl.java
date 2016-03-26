@@ -72,6 +72,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
+import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.dao.TopologyDataService;
@@ -129,6 +130,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
+    private EnvironmentAdapter environmentAdapter;
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final DaoManager daoManager,
@@ -160,6 +162,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.topologyDataService = new TopologyDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+
+        // Not NULL makes mocking
+        environmentAdapter = new EnvironmentAdapter( this );
     }
 
 
@@ -167,12 +172,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         executor.shutdown();
         backgroundTasksExecutorService.shutdown();
-    }
-
-
-    public SecurityManager getSecurityManager()
-    {
-        return securityManager;
     }
 
 
@@ -185,12 +184,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public RelationManager getRelationManager()
     {
         return relationManager;
-    }
-
-
-    public PeerManager getPeerManager()
-    {
-        return peerManager;
     }
 
 
@@ -288,7 +281,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         // ===
 
-//        environments = new EnvironmentAdapter().getEnvironments( this );
+        if ( environmentAdapter != null )
+        {
+            environments = environmentAdapter.getEnvironments();
+        }
 
         // ===
 
@@ -1154,7 +1150,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         // ===
 
-//        environment = new EnvironmentAdapter().get( environmentId, this );
+        if ( environmentAdapter != null )
+        {
+            environment = environmentAdapter.get( environmentId );
+        }
 
         // ===
 

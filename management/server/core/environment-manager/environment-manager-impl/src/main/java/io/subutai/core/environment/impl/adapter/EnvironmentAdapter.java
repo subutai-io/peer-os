@@ -27,30 +27,41 @@ public class EnvironmentAdapter
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    static String envId = "e3c47046-75ae-46b5-adf3-4b2b7012f6c6";
+    private EnvironmentManagerImpl environmentManager;
 
-    static String peerId = "AFAE43FE560D309809EE238D6B598523E31B8AAA";
+
+    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager )
+    {
+        this.environmentManager = environmentManager;
+    }
+
+
+    // ===
+
+    static String envId = "738b897b-d99d-40b1-b6f2-59a520ddec5e";
+
+    static String peerId = "7367531C1CF348904D774F3EFD1AF00CA34B2E33";
 
     static String subnetCidr = "192.168.2.1/24";
 
-    static long vni = 15444522;
+    static long vni = 6759079;
 
     static String p2pSubnet = "10.11.1.0";
 
-    static String peerP2p = "10.11.1.1";
+    static String peerP2p = "10.11.0.1";
 
     static String chIp = "192.168.2.2";
 
-    static String chId = "F428C7754FC7AE90188EC42E43BFBDF54D99936E";
+    static String chId = "3C6F5D514B51E789940FD7A8659A708659EFC551";
 
-    static String lxcName = "4f268646-0faf-45e7-8f21-0056668169b8";
+    static String lxcName = "5bf15be3-1254-4ede-ad0c-d017f4741c16";
 
     static String templateName = "elasticsearch";
 
-    static String rhId = "F6E3A586B7B74F704DC40EE2698A25F71EF711F3";
+    static String rhId = "93C21AEAA7A89798DE38836AFDAFEB0013F7F03B";
 
 
-    private ProxyEnvironmentContainer getContainer( EnvironmentManagerImpl environmentManager )
+    private ProxyEnvironmentContainer getContainer()
     {
         HostInterfaceModel him = new HostInterfaceModel( "eth0", chIp );
 
@@ -84,7 +95,7 @@ public class EnvironmentAdapter
     }
 
 
-    public ProxyEnvironment get( final String id, EnvironmentManagerImpl environmentManager )
+    public ProxyEnvironment get( final String id )
     {
         ProxyEnvironment e = new ProxyEnvironment(
                 "Mock Env",
@@ -102,7 +113,7 @@ public class EnvironmentAdapter
         e.getEnvironmentId();
 
         HashSet<EnvironmentContainerImpl> set3 = new HashSet<>();
-        set3.add( getContainer( environmentManager ) );
+        set3.add( getContainer() );
         e.addContainers( set3 );
 
 
@@ -121,13 +132,13 @@ public class EnvironmentAdapter
     }
 
 
-    public Set<Environment> getEnvironments( EnvironmentManagerImpl environmentManager )
+    public Set<Environment> getEnvironments()
     {
         log.debug( "=== Giving mock environments ===" );
 
         HashSet<Environment> set = new HashSet<>();
 
-        Environment env = get( envId, environmentManager );
+        Environment env = get( envId );
         set.add( env );
 
         log.debug( "env: {}", env );
