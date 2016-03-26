@@ -99,32 +99,30 @@ func download(file, id, token string) string {
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return ""
 }
-func lockImport(templ string) bool {
-	var err error
-
-	lock, err = lockfile.New("/var/run/lock/subutai-" + templ + ".import")
-	if log.Check(log.DebugLevel, "Init lock file for "+templ, err) {
+func lockSubutai(file string) bool {
+	lock, err := lockfile.New("/var/run/lock/subutai." + file)
+	if log.Check(log.DebugLevel, "Init lock "+file, err) {
 		return false
 	}
 
 	err = lock.TryLock()
-	if log.Check(log.DebugLevel, "Locking file for "+templ, err) {
+	if log.Check(log.DebugLevel, "Locking file "+file, err) {
 		return false
 	}
 
 	return true
 }
 
-func unlockImport(templ string) {
+func unlockSubutai() {
 	lock.Unlock()
 }
 
 func LxcImport(templ, version, token string) {
 	log.Info("Importing " + templ)
-	for !lockImport(templ) {
+	for !lockSubutai(templ + ".import") {
 		time.Sleep(time.Second * 1)
 	}
-	defer unlockImport(templ)
+	defer unlockSubutai()
 
 	if container.IsContainer(templ) && templ == "management" && len(token) > 1 {
 		gpg.ExchageAndEncrypt("management", token)

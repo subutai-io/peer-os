@@ -46,6 +46,11 @@ func getList() (list []map[string]interface{}) {
 func Update(name string, check bool) {
 	switch name {
 	case "rh":
+		for !lockSubutai("rh.update") {
+			log.Error("Another update process is already running")
+		}
+		defer unlockSubutai()
+
 		var lcl int
 		var rmt update
 		var date int64
@@ -88,6 +93,7 @@ func Update(name string, check bool) {
 			os.Exit(0)
 		}
 
+		log.Info("Updating Resource host")
 		file, err := os.Create("/tmp/" + rmt.name)
 		log.Check(log.FatalLevel, "Creating update file", err)
 		defer file.Close()
