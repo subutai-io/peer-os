@@ -8,14 +8,12 @@ package io.subutai.common.command;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.NumUtil;
 
 
@@ -56,8 +54,6 @@ public class RequestBuilder
     //PID for terminate_request
     private int pid;
 
-    // Config points for inotify
-    private Set<String> configPoints;
 
     private int isDaemon = 0;
 
@@ -78,8 +74,8 @@ public class RequestBuilder
     public RequestBuilder( String command, RequestBuilder another )
     {
         this.command = command;
-//        this.cwd = another.cwd;
-//        this.type = another.type;
+        //        this.cwd = another.cwd;
+        //        this.type = another.type;
     }
 
 
@@ -226,19 +222,6 @@ public class RequestBuilder
     }
 
 
-    /**
-     * Sets file paths to track via I_NOTIFY.
-     */
-    public RequestBuilder withConfigPoints( Set<String> confPoints )
-    {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( confPoints ), "Config points are empty" );
-
-        this.configPoints = confPoints;
-
-        return this;
-    }
-
-
     public RequestBuilder daemon()
     {
         this.isDaemon = 1;
@@ -250,7 +233,7 @@ public class RequestBuilder
     public Request build( String id )
     {
         return new RequestImpl( type, id, cwd, command, cmdArgs, envVars, outputRedirection, errRedirection, runAs,
-                timeout, isDaemon, configPoints, pid );
+                timeout, isDaemon, pid );
     }
 
 
@@ -280,10 +263,6 @@ public class RequestBuilder
         {
             return false;
         }
-        if ( configPoints != null ? !configPoints.equals( that.configPoints ) : that.configPoints != null )
-        {
-            return false;
-        }
         if ( cwd != null ? !cwd.equals( that.cwd ) : that.cwd != null )
         {
             return false;
@@ -309,12 +288,7 @@ public class RequestBuilder
         {
             return false;
         }
-        if ( type != that.type )
-        {
-            return false;
-        }
-
-        return true;
+        return type == that.type;
     }
 
 
@@ -331,7 +305,6 @@ public class RequestBuilder
         result = 31 * result + ( cmdArgs != null ? cmdArgs.hashCode() : 0 );
         result = 31 * result + ( envVars != null ? envVars.hashCode() : 0 );
         result = 31 * result + pid;
-        result = 31 * result + ( configPoints != null ? configPoints.hashCode() : 0 );
         return result;
     }
 
@@ -351,17 +324,15 @@ public class RequestBuilder
         private Integer timeout;
         private Integer isDaemon;
         private Integer pid;
-        private Set<String> configPoints;
 
 
         public RequestImpl( final RequestType type, final String id, final String workingDirectory,
                             final String command, final List<String> args, final Map<String, String> environment,
                             final OutputRedirection stdOut, final OutputRedirection stdErr, final String runAs,
-                            final Integer timeout, final Integer isDaemon, final Set<String> configPoints,
-                            final int pid )
+                            final Integer timeout, final Integer isDaemon, final int pid )
         {
             this( type, id, UUID.randomUUID(), workingDirectory, command, args, environment, stdOut, stdErr, runAs,
-                    timeout, isDaemon, configPoints, pid );
+                    timeout, isDaemon, pid );
         }
 
 
@@ -369,7 +340,7 @@ public class RequestBuilder
                             final String workingDirectory, final String command, final List<String> args,
                             final Map<String, String> environment, final OutputRedirection stdOut,
                             final OutputRedirection stdErr, final String runAs, final Integer timeout,
-                            final Integer isDaemon, final Set<String> configPoints, final int pid )
+                            final Integer isDaemon, final int pid )
         {
             this.type = type;
             this.id = id;
@@ -383,7 +354,6 @@ public class RequestBuilder
             this.runAs = runAs;
             this.timeout = timeout;
             this.isDaemon = isDaemon;
-            this.configPoints = configPoints;
             this.pid = pid;
         }
 
@@ -473,13 +443,6 @@ public class RequestBuilder
 
 
         @Override
-        public Set<String> getConfigPoints()
-        {
-            return configPoints;
-        }
-
-
-        @Override
         public Integer getPid()
         {
             return pid;
@@ -500,12 +463,7 @@ public class RequestBuilder
 
             final RequestImpl request = ( RequestImpl ) o;
 
-            if ( !commandId.equals( request.commandId ) )
-            {
-                return false;
-            }
-
-            return true;
+            return commandId.equals( request.commandId );
         }
 
 
