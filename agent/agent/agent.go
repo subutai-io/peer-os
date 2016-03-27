@@ -73,6 +73,7 @@ func Start(c *cli.Context) {
 	initAgent()
 	go lib.Collect()
 	go connectionMonitor()
+	go alert.AlertProcessing()
 
 	for {
 		Instance()
@@ -110,7 +111,7 @@ func connectionMonitor() {
 
 func heartbeat() bool {
 	if time.Since(lastHeartbeatTime) < time.Second*3 {
-		return true
+		return false
 	}
 	lastHeartbeatTime = time.Now()
 	mutex.Lock()
@@ -125,7 +126,7 @@ func heartbeat() bool {
 		Instance:   instanceType,
 		Containers: pool,
 		Interfaces: utils.GetInterfaces(),
-		Alert:      alert.Alert(pool),
+		Alert:      alert.CurrentAlerts(pool),
 	}
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
