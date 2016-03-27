@@ -46,6 +46,7 @@ public interface RestTemplateManager
     @Produces( MediaType.APPLICATION_JSON )
     Response getTemplateInfo( @QueryParam( "repository" ) String repository, @QueryParam( ID_PARAM ) String id,
                               @QueryParam( NAME_PARAM ) String name, @QueryParam( VERSION_PARAM ) String version,
+                              @QueryParam( "type") String type,
                               @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient );
 
     @GET
