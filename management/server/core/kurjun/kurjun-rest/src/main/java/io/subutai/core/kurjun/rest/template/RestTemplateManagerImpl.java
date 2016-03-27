@@ -122,13 +122,17 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getTemplateInfo( String repository, String id, String name, String version, boolean isKurjunClient )
+    public Response getTemplateInfo( String repository, String id, String name, String version, String type,
+                                     boolean isKurjunClient )
     {
         if ( repository == null )
         {
             repository = "public";
         }
-
+        if ( type == null )
+        {
+            type = "all";
+        }
         try
         {
             if ( id != null )
@@ -150,7 +154,15 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
             if ( template != null )
             {
-                return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
+                switch ( type )
+                {
+                    case "json":
+                        return Response.ok( GSON.toJson( convertToDefaultTemplate( template ).getId() ) ).build();
+                    case "text":
+                        return Response.ok( convertToDefaultTemplate( template ).getId() ).build();
+                    default:
+                        return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
+                }
             }
         }
         catch ( IllegalArgumentException ex )

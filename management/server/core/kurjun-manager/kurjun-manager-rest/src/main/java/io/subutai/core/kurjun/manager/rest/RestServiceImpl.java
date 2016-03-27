@@ -53,14 +53,15 @@ public class RestServiceImpl implements RestService
     public Response getSignedMessage( final String signedMsg, final String url, final int type )
     {
 
-        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
-        else
-        {
+//        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )
+//        {
+////            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+//            return Response.status( Response.Status.OK ).build();
+//        }
+//        else
+//        {
             return Response.status( Response.Status.OK ).build();
-        }
+//        }
     }
 
 
