@@ -53,6 +53,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;
+import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
@@ -320,19 +321,22 @@ public class HubEnvironmentManager
 
             for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
             {
-                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-                try
+                if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
                 {
-                    CloneRequest cloneRequest =
-                            new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                                    nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
-                                    peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
+                    ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+                    try
+                    {
+                        CloneRequest cloneRequest = new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(),
+                                nodeDto.getContainerName(), nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(),
+                                peerDto.getPeerId(), peerDto.getOwnerId(), nodeDto.getTemplateName(),
+                                HostArchitecture.AMD64, contSize );
 
-                    containerGroupRequest.addRequest( cloneRequest );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Could not create container clone request", e.getMessage() );
+                        containerGroupRequest.addRequest( cloneRequest );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Could not create container clone request", e.getMessage() );
+                    }
                 }
             }
 
@@ -359,6 +363,18 @@ public class HubEnvironmentManager
             LOG.error( "Could not clone containers" );
         }
         return envNodes;
+    }
+
+
+    public void configureSsh( EnvironmentPeerDto peerDto )
+    {
+
+    }
+
+
+    public void configureHash( EnvironmentPeerDto peerDto )
+    {
+
     }
 
 

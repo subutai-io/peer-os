@@ -115,6 +115,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
                     break;
+                case CONFIGURE_SSH:
+                    configureContainer( peerDto );
+                    break;
                 case DESTROY_CONTAINER:
                     destroyContainers( peerDto );
                     break;
@@ -252,6 +255,30 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 e )
         {
             LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
+        }
+    }
+
+
+    private void configureContainer( EnvironmentPeerDto peerDto )
+    {
+        String containerDestroyStateURL = String.format( "/rest/v1/environments/%s/container-configuration",
+                peerDto.getEnvironmentInfo().getId() );
+        try
+        {
+            hubEnvironmentManager.configureSsh( peerDto );
+            hubEnvironmentManager.configureHash( peerDto );
+
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
+            Response response = client.put( null );
+            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "SSH configuration successfully done" );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not configure SSH/Hash", e );
         }
     }
 
