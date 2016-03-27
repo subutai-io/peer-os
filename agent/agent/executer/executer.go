@@ -106,9 +106,6 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 				response.StdErr, response.StdOut = "", ""
 				response.ResponseNumber++
 			}
-			if end-now() < 0 {
-				break
-			}
 		}
 	}()
 
@@ -124,9 +121,6 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 				response.StdErr, response.StdOut = "", ""
 				response.ResponseNumber++
 			}
-			if end-now() < 0 {
-				break
-			}
 		}
 	}()
 
@@ -140,7 +134,7 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 				response.StdErr, response.StdOut = "", ""
 				response.ResponseNumber++
 			}
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}()
 
@@ -148,12 +142,13 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	go func() { done <- cmd.Wait() }()
 	select {
 	case <-done:
+		end = -1
+		wg.Wait()
 		response.ExitCode = "0"
 		if req.IsDaemon != 1 {
 			response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
 		}
 		out_c <- response
-		end = -1
 	case <-time.After(time.Duration(req.Timeout) * time.Second):
 		if req.IsDaemon == 1 {
 			response.ExitCode = "0"
@@ -170,8 +165,8 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 			}
 			out_c <- response
 		}
+		wg.Wait()
 	}
-	wg.Wait()
 	close(out_c)
 }
 
