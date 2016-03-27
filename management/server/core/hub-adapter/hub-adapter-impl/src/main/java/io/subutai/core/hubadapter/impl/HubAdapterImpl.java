@@ -50,10 +50,20 @@ public class HubAdapterImpl implements HubAdapter
     {
         String peerId = peerManager.getLocalPeer().getId();
 
-        String s = "" + daoHelper.isPeerRegisteredToHub( peerId );
-//        String s = daoHelper.getPeerOwnerId( peerId );
+        boolean registered = daoHelper.isPeerRegisteredToHub( peerId );
 
-        return s;
+        if ( registered )
+        {
+            String ownerId = daoHelper.getPeerOwnerId( peerId );
+
+            log.debug( "Registered to Hub. Owner id: {}", ownerId );
+        }
+        else
+        {
+            log.debug( "Not registered to Hub" );
+        }
+
+        return "Hello";
     }
 
 
