@@ -138,6 +138,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         // schedule metadata cache updater
         metadataCacheUpdater = Executors.newSingleThreadScheduledExecutor();
+
         metadataCacheUpdater.scheduleWithFixedDelay( () -> {
             for ( KurjunContext context : GLOBAL_CONTEXTS )
             {
