@@ -149,6 +149,18 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
+    public RawMetadata getInfo( final String repository, final String name, final String version, final byte[] md5 )
+    {
+        RawMetadata rawMetadata = new RawMetadata();
+        rawMetadata.setFingerprint( repository );
+        rawMetadata.setMd5Sum( md5 );
+        rawMetadata.setName( name );
+
+        return ( RawMetadata ) unifiedRepository.getPackageInfo( rawMetadata );
+    }
+
+
+    @Override
     public Object getInfo( final Object metadata )
     {
         return null;

@@ -23,9 +23,6 @@ public interface RestAptManager
     String ID = "id";
     String NAME_PARAM = "name";
     String VERSION_PARAM = "version";
-    String TYPE_PARAM = "type";
-
-    String RESPONSE_TYPE_MD5 = "md5";
     String PACKAGE_FILE_PART_NAME = "package";
 
 
