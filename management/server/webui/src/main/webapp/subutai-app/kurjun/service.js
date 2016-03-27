@@ -29,7 +29,8 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 		deleteAPT: deleteAPT,
 		isUploadAllowed: isUploadAllowed,
 		getShared: getShared,
-		getRawFiles: getRawFiles
+		getRawFiles: getRawFiles,
+		uploadFile: uploadFile
 	};
 
 	return kurjunService;
@@ -63,12 +64,16 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 		});
 	}
 
+	function uploadFile(file) {
+		return uploadFile(file, RAW_URL + 'upload');
+	}
+
 	function addTemplate(repository, file) {
-		return uploadFile(file, TEMPLATE_URL + 'upload', repository);
+		return uploadTemplate(file, TEMPLATE_URL + 'upload', repository);
 	}
 
 	function addApt(file) {
-		return uploadFile(file, DEB_URL + 'upload');
+		return uploadApt(file, DEB_URL + 'upload');
 	}
 
 	function deleteTemplate(id) {
@@ -118,6 +123,15 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function uploadApt(file, url) {
+		return Upload.upload({
+			url: url,
+			data: {file: file},
+			headers: {withCredentials: false, 'Content-Type': undefined},
+			transformRequest: angular.identity
+		});
+	}
+
+	function uploadFile(file, url) {
 		return Upload.upload({
 			url: url,
 			data: {file: file},
