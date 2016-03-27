@@ -204,7 +204,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					LOADING_SCREEN();
-					kurjunSrv.deleteTemplate(template.md5Sum, template.repository).success(function (data) {
+					kurjunSrv.deleteTemplate(template.id).success(function (data) {
 						LOADING_SCREEN('none');
 						SweetAlert.swal("Deleted!", "Template has been deleted.", "success");
 						getTemplates();
