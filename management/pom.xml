@@ -123,17 +123,27 @@
 
   <dependencyManagement>
     <dependencies>
+
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- blueprint-authz -->
+
       <dependency>
         <groupId>org.apache.aries.blueprint</groupId>
         <artifactId>org.apache.aries.blueprint.authz</artifactId>
         <version>1.0.1-CUSTOM</version>
       </dependency>
+
       <!-- subutai-common -->
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>subutai-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- subutai-hub-share -->
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>subutai-hub-share</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -515,6 +525,19 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+      <!-- hub-adapter -->
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hub-adapter-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hub-adapter-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--Karaf-manager -->

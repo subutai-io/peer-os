@@ -87,6 +87,7 @@ import io.subutai.core.environment.impl.workflow.modification.EnvironmentModifyW
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -132,10 +133,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private EnvironmentAdapter environmentAdapter;
 
+    private HubAdapter hubAdapter;
+
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final DaoManager daoManager,
                                    final IdentityManager identityManager, final Tracker tracker,
-                                   final RelationManager relationManager )
+                                   final RelationManager relationManager, HubAdapter hubAdapter )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -154,6 +157,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.tracker = tracker;
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
+
+        // Not NULL makes mocking
+//        environmentAdapter = new EnvironmentAdapter( this, peerManager );
+
+        this.hubAdapter = hubAdapter;
     }
 
 
@@ -162,9 +170,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.topologyDataService = new TopologyDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
-
-        // Not NULL makes mocking
-//        environmentAdapter = new EnvironmentAdapter( this, peerManager );
     }
 
 
@@ -258,6 +263,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public Set<Environment> getEnvironments()
     {
         // === START ===
+
+        LOG.debug( ">> hubAdapter: {}", hubAdapter.sayHello() );
 
         if ( environmentAdapter != null )
         {
