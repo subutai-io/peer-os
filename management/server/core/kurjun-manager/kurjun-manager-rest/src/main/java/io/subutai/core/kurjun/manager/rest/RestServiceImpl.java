@@ -6,9 +6,13 @@ import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.http.HttpStatus;
+
 import com.google.common.base.Strings;
 
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 
@@ -56,6 +60,23 @@ public class RestServiceImpl implements RestService
         else
         {
             return Response.status( Response.Status.OK ).build();
+        }
+    }
+
+
+    @Override
+    public Response getTemplates()
+    {
+        WebClient client = RestUtil.createTrustedWebClient( "https://peer.noip.me:8339/kurjun/rest/template/list" );
+        Response response = client.get();
+
+        if ( response.getStatus() == HttpStatus.SC_OK )
+        {
+            return Response.status( Response.Status.OK ).entity( response.readEntity( String.class ) ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
 

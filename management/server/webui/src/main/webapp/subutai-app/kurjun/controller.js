@@ -43,23 +43,8 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 
 	/*** Get templates according to repositories ***/
 	function getTemplates() {
-		kurjunSrv.getRepositories().success(function (repositories) {
-			vm.repositories = repositories;
-			vm.templates = [];
-			var getTemplatesRecursively = function (index, repositories) {
-				kurjunSrv.getTemplates(repositories[index]).then(function (templates) {
-					for (var template in templates.data) {
-						templates.data[template].repository = repositories[index];
-						vm.templates.push(templates.data[template]);
-					}
-					if (( index + 1 ) < repositories.length) {
-						getTemplatesRecursively(index + 1, repositories);
-					} else {
-						return;
-					}
-				});
-			};
-			getTemplatesRecursively(0, repositories);
+		kurjunSrv.getTemplates().success(function (data) {
+			vm.templates = data;
 		});
 	}
 	getTemplates();

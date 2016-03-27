@@ -30,4 +30,10 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg, @FormParam( "url" ) String url,
                                       @FormParam( "type" ) int type );
+
+    @GET
+    @Path( "template/list" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response getTemplates();
+
 }
