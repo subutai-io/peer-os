@@ -18,9 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.hubmanager.impl.model.ConfigEntity;
-import io.subutai.core.hubmanager.impl.proccessors.*;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +42,13 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
+import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
+import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.network.api.NetworkManager;
@@ -238,12 +242,8 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-			configManager.addHubConfig( "hub.subut.ai" );
-
-			RegistrationManager registrationManager = new RegistrationManager( this, configManager, "hub.subut.ai" );
-			registrationManager.registerPeerPubKey ();
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", "hub.subut.ai" );
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
