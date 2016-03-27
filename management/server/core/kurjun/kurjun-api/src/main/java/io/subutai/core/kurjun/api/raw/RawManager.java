@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 //import ai.subut.kurjun.model.metadata.Metadata;
 
@@ -24,6 +25,8 @@ public interface RawManager
     String md5();
 
     Object getInfo( String repository, byte[] md5 );
+
+    Object getInfo( String repository, String name, String version, byte[]md5 );
 
     Object getInfo( final Object metadata );
 
