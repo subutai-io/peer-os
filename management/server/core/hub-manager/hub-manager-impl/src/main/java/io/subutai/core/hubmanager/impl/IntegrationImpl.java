@@ -18,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.hubmanager.impl.model.ConfigEntity;
+import io.subutai.core.hubmanager.impl.proccessors.*;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +45,6 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
-import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.network.api.NetworkManager;
@@ -63,7 +59,7 @@ public class IntegrationImpl implements Integration
 {
     private static final long TIME_15_MINUTES = 900;
 
-    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class );
 
     private SecurityManager securityManager;
     private EnvironmentManager environmentManager;
@@ -242,8 +238,12 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", hubIp );
+			configManager.addHubConfig( "hub.subut.ai" );
+
+			RegistrationManager registrationManager = new RegistrationManager( this, configManager, "hub.subut.ai" );
+			registrationManager.registerPeerPubKey ();
+            //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -468,16 +468,16 @@ public class IntegrationImpl implements Integration
 
 
     private void generateChecksum()
-    {
-        if ( getRegistrationState() )
-        {
-            try
-            {
-                LOG.info( "Generating plugins list md5 checksum" );
-                String productList = getProducts();
-                MessageDigest md = MessageDigest.getInstance( "MD5" );
-                byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
-                StringBuilder hexString = new StringBuilder();
+	{
+/*		if (getRegistrationState ())
+		{*/
+			try
+			{
+				LOG.info ("Generating plugins list md5 checksum");
+				String productList = getProducts ();
+				MessageDigest md = MessageDigest.getInstance ("MD5");
+				byte[] bytes = md.digest (productList.getBytes ("UTF-8"));
+				StringBuilder hexString = new StringBuilder ();
 
                 for ( int i = 0; i < bytes.length; i++ )
                 {
@@ -489,20 +489,20 @@ public class IntegrationImpl implements Integration
                     hexString.append( hex );
                 }
 
-                checksum = hexString.toString();
-                LOG.info( "Checksum generated: " + checksum );
-            }
-            catch ( NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e )
-            {
-                LOG.error( e.getMessage() );
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            LOG.info( "Peer not registered. Trying again in 1 hour." );
-        }
-    }
+				checksum = hexString.toString ();
+				LOG.info ("Checksum generated: " + checksum);
+			}
+			catch (NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e)
+			{
+				LOG.error (e.getMessage ());
+				e.printStackTrace ();
+			}
+/*		}
+		else
+		{
+			LOG.info ("Peer not registered. Trying again in 1 hour.");
+		}*/
+	}
 
 
     @Override
