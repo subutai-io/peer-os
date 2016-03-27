@@ -19,6 +19,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
@@ -56,8 +57,13 @@ public class EnvironmentManagerTest
     DaoManager daoManager;
     @Mock
     IdentityManager identityManager;
+
     @Mock
     RelationManager relationManager;
+
+    @Mock
+    private HubAdapter hubAdapter;
+
     @Mock
     Tracker tracker;
     @Mock
@@ -94,7 +100,7 @@ public class EnvironmentManagerTest
 
         environmentManager =
                 spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, daoManager,
-                        identityManager, tracker, relationManager ) );
+                        identityManager, tracker, relationManager, hubAdapter ) );
         doReturn( environment ).when( environmentManager )
                                .createEmptyEnvironment( anyString(), anyString(), anyString() );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );

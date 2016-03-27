@@ -23,7 +23,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostMetricDto;
 import io.subutai.hub.share.json.JsonUtil;
-import jstun.DiscoveryNAT;
 
 
 public class ResourceHostConfProcessor implements Runnable
