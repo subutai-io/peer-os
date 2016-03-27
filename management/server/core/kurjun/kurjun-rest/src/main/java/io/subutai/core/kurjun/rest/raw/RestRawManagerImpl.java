@@ -55,7 +55,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
             byte[] md5bytes = decodeMd5( md5 );
 
-            RawMetadata raw = (RawMetadata)rawManager.getInfo( repository, md5bytes );
+            RawMetadata raw = ( RawMetadata ) rawManager.getInfo( repository, md5bytes );
 
             if ( raw != null )
             {
@@ -100,7 +100,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
             rawMetadata.setMd5Sum( Utils.MD5.toByteArray( md5 ) );
             rawMetadata.setFingerprint( repository );
 
-            Metadata metadata = (Metadata)rawManager.getInfo( repository, decodeMd5( md5 ) );
+            Metadata metadata = ( Metadata ) rawManager.getInfo( repository, decodeMd5( md5 ) );
 
             if ( metadata != null )
             {
@@ -120,6 +120,10 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
     @Override
     public Response list( String repository )
     {
+        if ( repository == null )
+        {
+            repository = "all";
+        }
         try
         {
             List<SerializableMetadata> list = rawManager.list( repository );
@@ -156,7 +160,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
             temp = Files.createTempFile( null, null ).toFile();
             attachment.transferTo( temp );
 
-            RawMetadata rawMetadata = (RawMetadata)rawManager.put( temp, filename, repository );
+            RawMetadata rawMetadata = ( RawMetadata ) rawManager.put( temp, filename, repository );
 
             if ( rawMetadata != null )
             {

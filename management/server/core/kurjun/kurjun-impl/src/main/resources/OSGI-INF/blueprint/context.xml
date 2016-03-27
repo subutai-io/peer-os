@@ -10,23 +10,12 @@
 
   <reference id="locaPeer" availability="mandatory"
              interface="io.subutai.common.peer.LocalPeer" />
-  
-  <reference id="identityManager" availability="mandatory"
-             interface="io.subutai.core.identity.api.IdentityManager" />
-  
-  <reference id="relationManager" availability="mandatory"
-             interface="io.subutai.core.object.relation.api.RelationManager" />
-  
-  <reference id="securityManager" availability="mandatory"
-             interface="io.subutai.core.security.api.SecurityManager" />
+
 
   <bean id="templateManager" scope="singleton" activation="eager" 
           init-method="init" destroy-method="dispose"
           class="io.subutai.core.kurjun.impl.TemplateManagerImpl">
     <argument ref="locaPeer" />
-    <argument ref="identityManager" />
-    <argument ref="relationManager" />
-    <argument ref="securityManager" />
   </bean>
     
   <bean id="aptManager" scope="singleton" activation="eager" 

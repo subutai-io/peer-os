@@ -5,10 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -70,12 +66,39 @@ public class RawManagerImpl implements RawManager
         injector = bootstrapDI();
 
         _local();
-        _unified();
+
+        _remote();
     }
 
 
     public void init()
     {
+        injector = bootstrapDI();
+
+        _local();
+
+        _remote();
+    }
+
+
+    private void _local()
+    {
+        this.repositoryFactory = injector.getInstance( RepositoryFactory.class );
+
+        this.localPublicRawRepository =
+                this.repositoryFactory.createLocalRaw( new KurjunContext( DEFAULT_RAW_REPO_NAME ) );
+    }
+
+
+    private void _remote()
+    {
+        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+        this.unifiedRepository = repositoryFactory.createUnifiedRepo();
+
+        for ( String s : SystemSettings.getGlobalKurjunUrls() )
+        {
+            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalRaw( s, null ) );
+        }
     }
 
 
@@ -106,23 +129,6 @@ public class RawManagerImpl implements RawManager
     }
 
 
-    private void _local()
-    {
-        this.repositoryFactory = injector.getInstance( RepositoryFactory.class );
-
-        this.localPublicRawRepository =
-                this.repositoryFactory.createLocalRaw( new KurjunContext( DEFAULT_RAW_REPO_NAME ) );
-    }
-
-
-    private void _unified()
-    {
-        this.unifiedRepository = this.repositoryFactory.createUnifiedRepo();
-        unifiedRepository.getRepositories().add( this.localPublicRawRepository );
-        //        unifiedRepository.getRepositories().addAll( artifactContext.getRemoteRawRepositories() );
-    }
-
-
     @Override
     public String md5()
     {
@@ -133,8 +139,25 @@ public class RawManagerImpl implements RawManager
     @Override
     public RawMetadata getInfo( final String repository, final byte[] md5 )
     {
+        RawMetadata rawMetadata = new RawMetadata();
+        rawMetadata.setFingerprint( repository );
+        rawMetadata.setMd5Sum( md5 );
 
+        return ( RawMetadata ) unifiedRepository.getPackageInfo( rawMetadata );
+    }
+
+
+    @Override
+    public Object getInfo( final Object metadata )
+    {
         return null;
+    }
+
+
+    //    @Override
+    public SerializableMetadata getInfo( final SerializableMetadata metadata )
+    {
+        return unifiedRepository.getPackageInfo( metadata );
     }
 
 
@@ -146,11 +169,7 @@ public class RawManagerImpl implements RawManager
         defaultMetadata.setMd5sum( md5 );
         try
         {
-            //***** Check permissions (DELETE) *****************
-            //            if ( checkRepoPermissions( "raw", defaultMetadata.getId().toString(), Permission.Delete ) )
-            //            {
             return localPublicRawRepository.delete( defaultMetadata.getId(), md5 );
-            //            }
         }
         catch ( IOException e )
         {
@@ -170,37 +189,12 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public Metadata getInfo( final Object metadata )
-    {
-
-        return ( RawMetadata ) unifiedRepository.getPackageInfo( (Metadata)metadata );
-    }
-
-
-    @Override
     public RawMetadata put( final File file )
     {
         Metadata metadata = null;
         try
         {
-            //            // *******CheckRepoOwner ***************
-            //            relationManagerService.checkRelationOwner( userSession, "raw", RelationObjectType
-            // .RepositoryRaw.getId() );
-            //            //**************************************
-
-            //***** Check permissions (WRITE) *****************
-            //            if ( checkRepoPermissions( "raw", null, Permission.Write ) )
-            //            {
             metadata = localPublicRawRepository.put( file, CompressionType.NONE, DEFAULT_RAW_REPO_NAME );
-
-            //***** Build Relation ****************
-            //                relationManagerService
-            //                        .buildTrustRelation( userSession.getUser(), userSession.getUser(), metadata
-            // .getId().toString(),
-            //                                RelationObjectType.RepositoryContent.getId(),
-            //                                relationManagerService.buildPermissions( 4 ) );
-            //*************************************
-
         }
         catch ( IOException e )
         {
@@ -217,24 +211,7 @@ public class RawManagerImpl implements RawManager
         Metadata metadata = null;
         try
         {
-            //            // *******CheckRepoOwner ***************
-            //            relationManagerService.checkRelationOwner( userSession, "raw", RelationObjectType
-            // .RepositoryRaw.getId() );
-            //            //**************************************
-
-            //***** Check permissions (WRITE) *****************
-            //            if ( checkRepoPermissions( "raw", null, Permission.Write ) )
-            //            {
             metadata = localPublicRawRepository.put( new FileInputStream( file ), CompressionType.NONE, repository );
-
-            //***** Build Relation ****************
-            //                relationManagerService
-            //                        .buildTrustRelation( userSession.getUser(), userSession.getUser(), metadata
-            // .getId().toString(),
-            //                                RelationObjectType.RepositoryContent.getId(),
-            //                                relationManagerService.buildPermissions( 4 ) );
-            //                //*************************************
-            //            }
         }
         catch ( IOException e )
         {
@@ -248,33 +225,12 @@ public class RawManagerImpl implements RawManager
     public RawMetadata put( final File file, final String filename, final String repository )
     {
 
-        //        if ( userSession.getUser().equals( identityManagerService.getPublicUser() ) )
-        //        {
-        //            return null;
-        //        }
-
         Metadata metadata = null;
         try
         {
-            //            // *******CheckRepoOwner ***************
-            //            relationManagerService.checkRelationOwner( userSession, "raw", RelationObjectType
-            // .RepositoryRaw.getId() );
-            //            //**************************************
-            //
-            //            //***** Check permissions (WRITE) *****************
-            //            if ( checkRepoPermissions( "raw", null, Permission.Write ) )
-            //            {
+
             LocalRawRepository localRawRepository = getLocalPublicRawRepository( new KurjunContext( repository ) );
             metadata = localRawRepository.put( file, filename, repository );
-            //
-            //                //***** Build Relation ****************
-            //                relationManagerService
-            //                        .buildTrustRelation( userSession.getUser(), userSession.getUser(), metadata
-            // .getId().toString(),
-            //                                RelationObjectType.RepositoryContent.getId(),
-            //                                relationManagerService.buildPermissions( 4 ) );
-            //                //*************************************
-            //            }
         }
         catch ( IOException e )
         {
@@ -320,67 +276,10 @@ public class RawManagerImpl implements RawManager
     @Override
     public boolean delete( final byte[] md5 ) throws IOException
     {
-        return false;
+        DefaultMetadata defaultMetadata = new DefaultMetadata();
+
+        defaultMetadata.setMd5sum( md5 );
+        return localPublicRawRepository.delete( md5 );
     }
 
-
-    private UnifiedRepository getRepository( KurjunContext context, boolean isKurjunClient ) throws IOException
-    {
-        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
-        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
-        unifiedRepo.getRepositories().add( getLocalRepository( context ) );
-
-        if ( !isKurjunClient )
-        {
-            for ( RepoUrl repoUrl : remoteRepoUrls )
-            {
-                unifiedRepo.getRepositories().add( repositoryFactory
-                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(),
-                                repoUrl.getToken() ) );
-            }
-
-            // shuffle the global repo list to randomize and normalize usage of them
-            List<RepoUrl> list = new ArrayList<>( getGlobalKurjunUrls() );
-            Collections.shuffle( list );
-
-            for ( RepoUrl repoUrl : list )
-            {
-                unifiedRepo.getSecondaryRepositories().add( repositoryFactory
-                        .createNonLocalTemplate( repoUrl.getUrl().toString(), null, context.getName(),
-                                repoUrl.getToken() ) );
-            }
-        }
-        return unifiedRepo;
-    }
-
-    private List<RepoUrl> getGlobalKurjunUrls()
-    {
-        try
-        {
-            List<RepoUrl> list = new ArrayList<>();
-            for ( String url : SystemSettings.getGlobalKurjunUrls() )
-            {
-                String templateUrl = url + RAW_PATH;
-                list.add( new RepoUrl( new URL( templateUrl ), null ) );
-            }
-            return list;
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new IllegalArgumentException( "Invalid global kurjun url", e );
-        }
-    }
-
-    private LocalRawRepository getLocalRepository( KurjunContext context ) throws IOException
-    {
-        try
-        {
-            RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
-            return repositoryFactory.createLocalRaw( context );
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            throw new IOException( ex );
-        }
-    }
 }

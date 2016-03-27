@@ -5,7 +5,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -67,31 +66,31 @@ public interface RestTemplateManager
     @Produces( MediaType.TEXT_PLAIN )
     Response deleteTemplate( @QueryParam( "repository" ) String repository, @QueryParam( ID_PARAM ) String id );
 
-    @GET
-    @Path( "list-simple" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getTemplateListSimple( @QueryParam( "repository" ) String repository );
-
-    @PUT
-    @Path( "share" )
-    @Produces( MediaType.TEXT_PLAIN )
-    Response shareTemplate( @QueryParam( "targetUserName" ) String targetUserName, @QueryParam( ID_PARAM ) String id );
-
-
-    @DELETE
-    @Path( "share" )
-    @Produces( MediaType.TEXT_PLAIN )
-    Response unshareTemplate( @QueryParam( "targetUserName" ) String targetUserName,
-                              @QueryParam( ID_PARAM ) String id );
-
-    @GET
-    @Path( "repositories" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getRepositories();
-
-
-    @GET
-    @Path( "shared-info" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getSharedTemplateInfos( @QueryParam( ID_PARAM ) String id );
+//    @GET
+//    @Path( "list-simple" )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    Response getTemplateListSimple( @QueryParam( "repository" ) String repository );
+//
+//    @PUT
+//    @Path( "share" )
+//    @Produces( MediaType.TEXT_PLAIN )
+//    Response shareTemplate( @QueryParam( "targetUserName" ) String targetUserName, @QueryParam( ID_PARAM ) String id );
+//
+//
+//    @DELETE
+//    @Path( "share" )
+//    @Produces( MediaType.TEXT_PLAIN )
+//    Response unshareTemplate( @QueryParam( "targetUserName" ) String targetUserName,
+//                              @QueryParam( ID_PARAM ) String id );
+//
+//    @GET
+//    @Path( "repositories" )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    Response getRepositories();
+//
+//
+//    @GET
+//    @Path( "shared-info" )
+//    @Produces( MediaType.APPLICATION_JSON )
+//    Response getSharedTemplateInfos( @QueryParam( ID_PARAM ) String id );
 }
