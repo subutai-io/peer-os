@@ -3,7 +3,6 @@ package io.subutai.core.kurjun.manager.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 
 import javax.ws.rs.core.Response;
@@ -17,10 +16,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.google.common.base.Strings;
-
 import io.subutai.common.dao.DaoManager;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
@@ -28,9 +24,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
 import io.subutai.core.kurjun.manager.api.dao.KurjunDataService;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
-import io.subutai.core.kurjun.manager.api.model.KurjunConfig;
 import io.subutai.core.kurjun.manager.impl.dao.KurjunDataServiceImpl;
-import io.subutai.core.kurjun.manager.impl.model.KurjunConfigEntity;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 import io.subutai.core.kurjun.manager.impl.model.KurjunType;
 import io.subutai.core.security.api.SecurityManager;
@@ -108,9 +102,18 @@ public class KurjunManagerImpl implements KurjunManager
 
 
     //****************************************
-    private String getKurjunUrl( String url, String uri )
+    private String getKurjunUrl( String url, String uri, final int kurjunType )
     {
-        return url + uri;
+        if ( kurjunType == KurjunType.Local.getId() )
+        {
+            return url + properties.getProperty( "local." + uri );
+        }
+        else if ( kurjunType == KurjunType.Global.getId() )
+        {
+            return url + properties.getProperty( "global." + uri );
+        }
+
+        return null;
     }
 
 
@@ -179,7 +182,7 @@ public class KurjunManagerImpl implements KurjunManager
 
 
         String authId = "";
-        String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.add" ) );
+        String path = getKurjunUrl( url, "url.identity.user.add", kurjunType );
 
         WebClient client = RestUtil.createTrustedWebClient( path );
         client.query( "key", ownerKey );
@@ -206,7 +209,7 @@ public class KurjunManagerImpl implements KurjunManager
     {
         Kurjun kurjun = getDataService().getKurjunData( url );
 
-        String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.auth" ) );
+        String path = getKurjunUrl( url, "url.identity.user.auth", kurjunType );
 
         WebClient client = RestUtil.createTrustedWebClient( path );
 
@@ -258,7 +261,7 @@ public class KurjunManagerImpl implements KurjunManager
 
         String fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
 
-        String path = getKurjunUrl( url, properties.getProperty( "url.identity.user.get" ) );
+        String path = getKurjunUrl( url, "url.identity.user.get", kurjunType );
         WebClient client = RestUtil.createTrustedWebClient( path );
         client.query( "fingerprint", fingerprint );
 
