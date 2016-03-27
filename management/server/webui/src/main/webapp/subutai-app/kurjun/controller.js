@@ -97,6 +97,13 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(4).notSortable()
 				];
 				break;
+			case 'raw':
+				vm.dtColumnDefs = [
+					DTColumnDefBuilder.newColumnDef(0),
+					DTColumnDefBuilder.newColumnDef(1),
+					DTColumnDefBuilder.newColumnDef(2).notSortable(),
+					DTColumnDefBuilder.newColumnDef(3).notSortable(),
+				];
 			default:
 				break;
 		}
