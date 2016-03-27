@@ -56,8 +56,7 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>ai.subut.kurjun.model.metadata.Metadata,
-              io.subutai.*, com.google.gson*, !*
+            <Import-Package>io.subutai.*, com.google.gson*, !*
             </Import-Package>
           </instructions>
         </configuration>
