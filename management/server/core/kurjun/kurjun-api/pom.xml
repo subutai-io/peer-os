@@ -58,8 +58,8 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.kurjun.api</Bundle-SymbolicName>
-            <Export-Package>
-              {local-packages};version=${project.version};-noimport:=true
+            <Export-Package>org.apache.commons.codec*;version=1.10;
+                            {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>io.subutai.*, com.google.gson*,commons-codec*, !*
             </Import-Package>

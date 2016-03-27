@@ -116,7 +116,7 @@
             <Bundle-SymbolicName>${project.groupId}.core.kurjun.impl</Bundle-SymbolicName>
             <Export-Package>{local-packages};version=${project.version};-noimport:=true</Export-Package>
             <Embed-Dependency>
-              commons-compress,
+              commons-compress,org.apache.commons.codec*,
               groupId=ai.subut.kurjun*|com.amazonaws|com.datastax.cassandra|org.yaml
               |com.zaxxer|com.google.inject*|javax.inject|aopalliance|org.vafer|org.tukaani
               |commons-configuration|org.mapdb|org.mybatis|org.bouncycastle|com.fasterxml.jackson.core
