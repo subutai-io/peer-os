@@ -1041,7 +1041,7 @@ function toggle(source, name) {
 
 function hasPGPplugin() {
     if ($('#bp-plugin-version').val().length > 0) {
-        return true;
+		return $('#bp-plugin-version').val();
     } else {
         return false;
     }

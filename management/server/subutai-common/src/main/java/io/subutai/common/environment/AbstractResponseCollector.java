@@ -25,7 +25,7 @@ public abstract class AbstractResponseCollector<R extends TaskRequest, T extends
     private List<T> responses = new ArrayList<>();
     transient private List<Future<Task>> tasks = new ArrayList<>();
     protected AtomicInteger counter = new AtomicInteger( 0 );
-    protected boolean succeeded = true;
+    protected volatile boolean succeeded = true;
     private List<OperationMessage> messages = new CopyOnWriteArrayList<>();
 
 

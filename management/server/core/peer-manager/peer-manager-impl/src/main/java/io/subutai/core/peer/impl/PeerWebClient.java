@@ -28,7 +28,6 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.PingDistances;
@@ -63,7 +62,7 @@ public class PeerWebClient
     {
         String path = "/info";
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -564,7 +563,7 @@ public class PeerWebClient
         {
             String path = String.format( "/limits/%s", peerId );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             final Response response = client.get();
@@ -584,64 +583,6 @@ public class PeerWebClient
     }
 
 
-    public ControlNetworkConfig getControlNetworkConfig( final String localPeerId ) throws PeerException
-    {
-        try
-        {
-            String path = String.format( "/control/config/%s", localPeerId );
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( ControlNetworkConfig.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on retrieving control network config.", e );
-        }
-    }
-
-
-    public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
-    {
-        Preconditions.checkNotNull( config );
-        Preconditions.checkNotNull( config.getAddress() );
-        Preconditions.checkNotNull( config.getP2pHash() );
-        Preconditions.checkNotNull( config.getPeerId() );
-        Preconditions.checkNotNull( config.getSecretKey() );
-        Preconditions.checkArgument( config.getSecretKeyTtlSec() > 0 );
-        try
-        {
-            String path = "/control/update";
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.put( config );
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Boolean.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on updating control network config.", e );
-        }
-    }
-
-
     public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
         Preconditions.checkNotNull( p2pHash );
@@ -650,7 +591,7 @@ public class PeerWebClient
         {
             String path = String.format( "/control/%s/%d/distance", p2pHash, maxAddress );
 
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 4000, 7000, 1 );
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             final Response response = client.get();
@@ -676,7 +617,7 @@ public class PeerWebClient
         Preconditions.checkNotNull( environmentId );
         String path = String.format( "/tunnels/%s", environmentId );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.TEXT_PLAIN );
         final Response response = client.post( peerIps );
@@ -697,7 +638,7 @@ public class PeerWebClient
         Preconditions.checkNotNull( pubKeyRing );
         String path = String.format( "/pek/add/%s", keyId );
 
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 500, 7000, 1 );
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
         final Response response = client.post( pubKeyRing );

@@ -28,7 +28,6 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
@@ -80,7 +79,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PConnection;
@@ -110,7 +108,6 @@ import io.subutai.common.task.TaskCallbackHandler;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -461,11 +458,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                             new ContainerHostEntity( localPeerId, hostId, hostname, arch, interfaces,
                                     request.getContainerName(), request.getTemplateName(), arch.name(),
                                     request.getEnvironmentId(), request.getOwnerId(), request.getInitiatorPeerId(),
-                                    request.getContainerSize(), ContainerHostState.CLONING );
+                                    request.getContainerSize(), ContainerHostState.RUNNING );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
+
+                    //wait for container
+                    boolean isRunning = false;
+                    long waitStart = System.currentTimeMillis();
+                    while ( !isRunning
+                            && System.currentTimeMillis() - waitStart < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 )
+                    {
+                        try
+                        {
+                            isRunning = hostRegistry.getContainerHostInfoById( hostId ).getState()
+                                    == ContainerHostState.RUNNING;
+                        }
+                        catch ( HostDisconnectedException e )
+                        {
+                            //ignore
+                        }
+                        if ( !isRunning )
+                        {
+                            Thread.sleep( 100 );
+                        }
+                    }
                 }
-                catch ( PeerException e )
+                catch ( Exception e )
                 {
                     LOG.error( "Error on registering container.", e );
                     throw new PeerException( "Error on registering container.", e );
@@ -475,8 +493,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected void registerContainer( String resourceHostId, ContainerHostEntity containerHostEntity )
-            throws PeerException
+    protected void registerContainer( String resourceHostId, ContainerHostEntity containerHostEntity ) throws Exception
     {
         ResourceHost resourceHost = getResourceHostById( resourceHostId );
 
@@ -875,30 +892,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
-        Host host;
-        try
-        {
-            host = bindHost( aHost.getId() );
-        }
-        catch ( PeerException e )
-        {
-            throw new CommandException( "Host is not registered" );
-        }
-        if ( !host.isConnected() )
-        {
-            throw new CommandException( "Host is not connected" );
-        }
-
-
         CommandResult result;
 
         if ( callback == null )
         {
-            result = commandExecutor.execute( host.getId(), requestBuilder );
+            result = commandExecutor.execute( aHost.getId(), requestBuilder );
         }
         else
         {
-            result = commandExecutor.execute( host.getId(), requestBuilder, callback );
+            result = commandExecutor.execute( aHost.getId(), requestBuilder, callback );
         }
 
         return result;
@@ -912,28 +914,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
-        Host host;
-        try
-        {
-            host = bindHost( aHost.getId() );
-        }
-        catch ( PeerException e )
-        {
-            throw new CommandException( "Host not register." );
-        }
-        if ( !host.isConnected() )
-        {
-            throw new CommandException( "Host disconnected." );
-        }
-
-
         if ( callback == null )
         {
-            commandExecutor.executeAsync( host.getId(), requestBuilder );
+            commandExecutor.executeAsync( aHost.getId(), requestBuilder );
         }
         else
         {
-            commandExecutor.executeAsync( host.getId(), requestBuilder, callback );
+            commandExecutor.executeAsync( aHost.getId(), requestBuilder, callback );
         }
     }
 
@@ -1397,105 +1384,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             result.addAll( resourceHost.getContainerHostsByPeerId( peerId ) );
         }
         return result;
-    }
-
-
-    @Override
-    public ControlNetworkConfig getControlNetworkConfig( final String peerId ) throws PeerException
-    {
-        try
-        {
-            final P2PConnections connections = getNetworkManager().getP2PConnections();
-            return getControlNetworkConfig( connections, getId() );
-        }
-        catch ( NetworkManagerException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-
-        return null;
-    }
-
-
-    protected ControlNetworkConfig getControlNetworkConfig( P2PConnections connections, final String hash )
-            throws PeerException
-    {
-        Preconditions.checkNotNull( connections );
-        Preconditions.checkNotNull( hash );
-
-        final P2PConnection peerConnection = connections.findConnectionByHash( hash );
-        String address = peerConnection != null ? peerConnection.getIp() : null;
-        List<String> usedNetworks = ControlNetworkUtil.getUsedNetworks( connections );
-
-        return new ControlNetworkConfig( getId(), address, hash, usedNetworks );
-    }
-
-
-    @Override
-    public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
-    {
-        try
-        {
-            String suggestedNetwork = ControlNetworkUtil.extractNetwork( config.getAddress() );
-
-            final P2PConnections connections = getNetworkManager().getP2PConnections();
-            boolean conflict = false;
-            for ( P2PConnection connection : connections.getConnections() )
-            {
-                if ( connection.getIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
-                {
-                    String net = ControlNetworkUtil.extractNetwork( connection.getIp() );
-                    if ( suggestedNetwork.equals( net ) && !connection.getHash().equals( config.getP2pHash() ) )
-                    {
-                        conflict = true;
-                        LOG.warn( "Conflicts control network between '%s' and '%s'.", getId(), config.getP2pHash() );
-                    }
-                }
-            }
-
-            if ( !conflict )
-            {
-                LOG.info( "Updating control network." );
-                LOG.debug( JsonUtil.toJson( config ) );
-
-                // update control network
-                ControlNetworkConfig currentConfig = getControlNetworkConfig( connections, config.getP2pHash() );
-                if ( config.getAddress().equals( currentConfig.getAddress() ) )
-                {
-                    if ( config.getSecretKey() != null )
-                    {
-                        // connection already exists, just resetting hash and TTL
-                        getNetworkManager()
-                                .resetP2PSecretKey( config.getP2pHash(), Hex.encodeHexString( config.getSecretKey() ),
-                                        config.getSecretKeyTtlSec() );
-                    }
-                }
-                else
-                {
-                    getNetworkManager().removeP2PConnection( config.getP2pHash() );
-                    if ( config.getSecretKey() == null )
-                    {
-                        return false;
-                    }
-                    getNetworkManager().setupP2PConnection( Common.CONTROL_NETWORK_INTERFACE_NAME, config.getAddress(),
-                            config.getP2pHash(), Hex.encodeHexString( config.getSecretKey() ),
-                            config.getSecretKeyTtlSec() );
-                }
-            }
-            else
-            {
-                // send conflict
-                LOG.warn( "Conflict of control networks." );
-                LOG.debug( JsonUtil.toJson( config ) );
-                return false;
-            }
-        }
-        catch ( NetworkManagerException e )
-        {
-            LOG.error( e.getMessage(), e );
-        }
-
-        return true;
     }
 
 
