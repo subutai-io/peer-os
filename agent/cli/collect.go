@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -15,10 +14,10 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 
 	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
 )
 
 var (
-	lxcnic      map[string]string
 	traff       = []string{"in", "out"}
 	cgtype      = []string{"cpuacct", "memory"}
 	metrics     = []string{"total", "used", "available"}
@@ -102,67 +101,33 @@ func cgroupStat() {
 	}
 }
 
-func grepnic(filename string) string {
-	regex, err := regexp.Compile("lxc.network.veth.pair")
-	if err != nil {
-		return ""
-	}
-	fh, err := os.Open(filename)
-	f := bufio.NewReader(fh)
-	if err != nil {
-		return ""
-	}
-	defer fh.Close()
-	buf := make([]byte, 64)
-	for {
-		buf, _, err = f.ReadLine()
-		if err != nil {
-			return ""
-		}
-		if regex.MatchString(string(buf)) {
-			return string(buf)
-		}
-	}
-}
-
-func lxclist() map[string]string {
-	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix)
-	list := make(map[string]string)
-	for _, f := range files {
-		line := grepnic(config.Agent.LxcPrefix + f.Name() + "/config")
-		if line != "" {
-			nic := strings.Split(line, "=")
-			if len(nic) >= 2 {
-				list[strings.Fields(nic[1])[0]] = f.Name()
-			}
-		}
-	}
-	return list
-}
-
 func netStat() {
-	lxcnic = lxclist()
-	file, err := os.Open("/proc/net/dev")
+	lxcnic := make(map[string]string)
+	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix)
+	for _, f := range files {
+		lxcnic[container.GetConfigItem(config.Agent.LxcPrefix+f.Name()+"/config", "lxc.network.veth.pair")] = f.Name()
+	}
+
+	out, err := ioutil.ReadFile("/proc/net/dev")
 	if err != nil {
 		return
 	}
-	defer file.Close()
-	scanner := bufio.NewScanner(bufio.NewReader(file))
-	lc := 0
+	scanner := bufio.NewScanner(bytes.NewReader(out))
 	traffic := make([]int, 2)
 	for scanner.Scan() {
-		hostname, _ := os.Hostname()
-		lc++
-		line := strings.Fields(scanner.Text())
-		if lc > 2 {
+		if strings.Contains(scanner.Text(), ":") {
+			line := strings.Fields(scanner.Text())
 			traffic[0], _ = strconv.Atoi(line[1])
 			traffic[1], _ = strconv.Atoi(line[9])
 			nicname := strings.Split(line[0], ":")[0]
+
 			metric := "host_net"
+			hostname, _ := os.Hostname()
 			if lxcnic[nicname] != "" {
 				metric = "lxc_net"
 				hostname = lxcnic[nicname]
 			}
+
 			for i := range traffic {
 				point, _ := client.NewPoint(metric,
 					map[string]string{"hostname": hostname, "iface": nicname, "type": traff[i]},
