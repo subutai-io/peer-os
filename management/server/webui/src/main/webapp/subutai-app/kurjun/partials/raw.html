@@ -21,17 +21,16 @@
 				<td>{{ file.size }}</td>
 				<td>
 					<a href
-					   class="b-icon b-icon_share"
-					   tooltips
-					   tooltip-template='Download'
+					   class="b-icon"
 					   ng-click="kurjunCtrl.downloadFile(file)">
+						<i class="fa fa-floppy-o" style = "height: 15px; width: 16px; font-size: 16px"></i>
 					</a>
 					<a href
 					   class="b-icon b-icon_remove"
-					   ng-if="template.deletable"
-					   ng-click="kurjunCtrl.deleteFile(file)">
+					   ng-click="kurjunCtrl.deleteFile(file)" style = "margin-top: 4px">
 					</a>
 				</td>
+				<td></td>
 			</tr>
 			</tbody>
 		</table>
