@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,16 +16,21 @@ import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
@@ -31,6 +38,7 @@ import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
+import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -40,20 +48,22 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
 
-    private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
-            "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
-                    + "[a-zA-z0-9]{1,100}" );
+    private static final Pattern ENVIRONMENT_DATA_PATTERN =
+            Pattern.compile( "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
     private ConfigManager configManager;
     private PeerManager peerManager;
     private HubEnvironmentManager hubEnvironmentManager;
+    private CommandExecutor commandExecutor;
 
 
     public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
-                                     final ConfigManager hConfigManager, final PeerManager peerManager )
+                                     final ConfigManager hConfigManager, final PeerManager peerManager,
+                                     final CommandExecutor commandExecutor )
     {
         this.configManager = hConfigManager;
         this.peerManager = peerManager;
         this.hubEnvironmentManager = hubEnvironmentManager;
+        this.commandExecutor = commandExecutor;
     }
 
 
@@ -62,8 +72,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     {
         for ( String link : stateLinks )
         {
-            // Environment Data     GET /rest/v1/environments/{environment-id}/peers/{peer-id}
-            Matcher environmentDataMatcher = ENVIRONMENT_PEER_DATA_PATTERN.matcher( link );
+            // Environment Data     GET /rest/v1/environments/{environment-id}
+            Matcher environmentDataMatcher = ENVIRONMENT_DATA_PATTERN.matcher( link );
             if ( environmentDataMatcher.matches() )
             {
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
@@ -239,6 +249,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             LOG.debug( "env_via_hub: Clone containers..." );
             EnvironmentNodesDto updatedNodes = hubEnvironmentManager.cloneContainers( peerDto, envNodes );
 
+            setupVEHS( updatedNodes, peerDto );
+
             byte[] cborData = JsonUtil.toCbor( updatedNodes );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response response = client.put( encryptedData );
@@ -254,6 +266,91 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             LOG.error( "Could not get container creation data from Hub.", e.getMessage() );
         }
     }
+
+    private EnvironmentNodesDto setupVEHS( final EnvironmentNodesDto updatedNodes, EnvironmentPeerDto peerDto )
+    {
+        String pull = "bash pullMySite.sh %s %s %s \"%s\"";
+
+        JSONObject jsonpObject = null;
+        String githubProjectUrl = "";
+        String githubUserName = "";
+        String githubPassword = "";
+        String githubProjectOwner = "";
+        String state = "";
+        String dns = "";
+
+        String conf =
+                "echo " + "'# put this into /var/lib/apps/subutai/current/nginx-includes with name like 'blabla.conf'\n"
+                        + "upstream %s-upstream {\n" + "#Add new host here\n" + "server %s;\n" + "\n" + "}\n" + "\n"
+                        + "server{\n" + "listen 80;\n" + "server_name %s;\n" + "\n" + "location / {\n"
+                        + "proxy_pass http://%s-upstream/;\n" + "proxy_set_header X-Real-IP $remote_addr;\n"
+                        + "proxy_set_header Host $http_host;\n"
+                        + "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n" + "}\n" + "}\n'"
+                        + " > /var/lib/apps/subutai/current/nginx-includes/101.conf";
+
+
+        List<EnvironmentNodeDto> nodes = updatedNodes.getNodes();
+        for ( EnvironmentNodeDto environmentNodeDto : nodes )
+        {
+
+            try
+            {
+                jsonpObject = new JSONObject( peerDto.getEnvironmentInfo().getVEHS() );
+                githubProjectUrl = jsonpObject.getString( "githubProjectUrl" );
+                githubUserName = jsonpObject.getString( "githubUserName" );
+                githubPassword = jsonpObject.getString( "githubPassword" );
+                githubProjectOwner = jsonpObject.getString( "githubProjectOwner" );
+                state = jsonpObject.getString( "state" );
+                dns = jsonpObject.getString( "dns" );
+            }
+            catch ( JSONException e )
+            {
+                e.printStackTrace();
+            }
+
+
+            try
+            {
+                UUID.fromString( environmentNodeDto.getContainerId() );
+            }
+            catch ( Exception e )
+            {
+                if ( state.equals( "DEPLOY" ) )
+                {
+                    try
+                    {
+                        CommandResult result = commandExecutor
+                                .execute( environmentNodeDto.getContainerId(), new RequestBuilder( "ifconfig" ) );
+                        LOG.info( result.getStdOut().toString() );
+
+
+                        result = commandExecutor.execute( environmentNodeDto.getHostId(),
+                                new RequestBuilder( "mkdir -p /var/lib/apps/subutai/current/nginx-includes/" ) );
+                        LOG.info( result.getStdOut().toString() );
+
+                        result = commandExecutor.execute( environmentNodeDto.getHostId(), new RequestBuilder(
+                                String.format( conf, dns, environmentNodeDto.getIp(), dns, dns ) ) );
+
+                        LOG.info( result.getStdOut().toString() );
+
+                        result = commandExecutor.execute( environmentNodeDto.getHostId(),
+                                new RequestBuilder( "systemctl restart *nginx*" ) );
+
+                        LOG.info( result.getStdOut().toString() );
+
+                        updatedNodes.setVEHS( "READY" );
+                    }
+                    catch ( Exception e1 )
+                    {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        return updatedNodes;
+    }
+
 
 
     private void destroyContainers( EnvironmentPeerDto peerDto )

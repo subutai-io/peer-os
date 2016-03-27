@@ -34,6 +34,7 @@ import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
@@ -69,6 +70,7 @@ public class IntegrationImpl implements Integration
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
     private ConfigManager configManager;
+    private CommandExecutor commandExecutor;
 
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -133,7 +135,7 @@ public class IntegrationImpl implements Integration
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager );
+                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
@@ -401,6 +403,18 @@ public class IntegrationImpl implements Integration
             throw new HubPluginException( "Could not retrieve Peer info", e );
         }
         return result;
+    }
+
+
+    public CommandExecutor getCommandExecutor()
+    {
+        return commandExecutor;
+    }
+
+
+    public void setCommandExecutor( final CommandExecutor commandExecutor )
+    {
+        this.commandExecutor = commandExecutor;
     }
 
 

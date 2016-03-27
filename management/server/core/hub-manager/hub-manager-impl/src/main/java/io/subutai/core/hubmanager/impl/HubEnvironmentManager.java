@@ -339,6 +339,8 @@ public class HubEnvironmentManager
             final CreateEnvironmentContainerResponseCollector containerCollector =
                     peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
 
+
+
             List<CloneResponse> cloneResponseList = containerCollector.getResponses();
             for ( CloneResponse cloneResponse : cloneResponseList )
             {
@@ -404,6 +406,11 @@ public class HubEnvironmentManager
         {
             return peer.setupTunnels( tunnels, environmentId );
         }
+    }
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
     }
 
 
