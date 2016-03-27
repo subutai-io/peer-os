@@ -22,6 +22,9 @@ public class ChannelSettings
             "/rest/v1/security/keyman/getpublickeyring", "/rest/v1/security/keyman/getpublickey",
             "/rest/v1/handshake/info", "/rest/v1/handshake/register", "/rest/v1/handshake/approve",
             "/rest/v1/handshake/cancel", "/rest/v1/handshake/reject", "/rest/v1/handshake/unregister"
+
+
+
     };
 
 
