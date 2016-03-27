@@ -50,8 +50,8 @@ public class HubAdapterImpl implements HubAdapter
     {
         String peerId = peerManager.getLocalPeer().getId();
 
-//        String s = "" + daoHelper.isPeerRegisteredToHub( peerId );
-        String s = daoHelper.getPeerOwnerId( peerId );
+        String s = "" + daoHelper.isPeerRegisteredToHub( peerId );
+//        String s = daoHelper.getPeerOwnerId( peerId );
 
         return s;
     }

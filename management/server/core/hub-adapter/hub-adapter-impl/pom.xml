@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <parent>
-    <artifactId>mgmt-server-core-parent</artifactId>
+    <artifactId>hub-adapter</artifactId>
     <groupId>io.subutai</groupId>
     <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
@@ -13,13 +13,17 @@
   <artifactId>hub-adapter-impl</artifactId>
   <packaging>bundle</packaging>
   <name>Subutai Hub Adapter Impl</name>
-  <description>Subutai Hub Adapter Impl</description>
 
   <dependencies>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-hub-share</artifactId>
     </dependency>
 
     <dependency>
@@ -35,21 +39,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hub-adapter-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- Include subutai-hub-common and it dependencies until getting that in the internal maven repo -->
-    <dependency>
-      <groupId>io.subutai</groupId>
-      <artifactId>subutai-hub-share</artifactId>
-      <version>0.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../lib/subutai-hub-share-0.1.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>io.subutai</groupId>
-      <artifactId>subutai-hub-share</artifactId>
-      <version>0.1</version>
     </dependency>
 
   </dependencies>
@@ -70,7 +59,6 @@
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Embed-Dependency>subutai-hub-share</Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>
