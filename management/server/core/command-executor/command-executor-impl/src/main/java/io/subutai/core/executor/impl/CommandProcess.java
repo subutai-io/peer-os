@@ -2,6 +2,8 @@ package io.subutai.core.executor.impl;
 
 
 import java.security.PrivilegedAction;
+import java.util.Comparator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -41,6 +44,8 @@ public class CommandProcess
     protected ExecutorService executor;
     private Request request;
     private Session userSession;
+    private int expectedResponseNumber = 1;
+    private Set<Response> queuedResponses;
 
 
     public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback,
@@ -59,12 +64,15 @@ public class CommandProcess
 
         this.request = request;
         this.userSession = userSession;
-    }
 
-
-    public Request getRequest()
-    {
-        return request;
+        queuedResponses = Sets.newTreeSet( new Comparator<Response>()
+        {
+            @Override
+            public int compare( final Response o1, final Response o2 )
+            {
+                return Integer.compare( o1.getResponseNumber(), o2.getResponseNumber() );
+            }
+        } );
     }
 
 
@@ -96,7 +104,34 @@ public class CommandProcess
     }
 
 
-    public void processResponse( final Response response )
+    public synchronized void processResponse( final Response response )
+    {
+
+        if ( expectedResponseNumber == response.getResponseNumber() )
+        {
+            expectedResponseNumber++;
+
+            processNextResponse( response );
+
+            for ( Response queuedResponse : queuedResponses )
+            {
+                if ( expectedResponseNumber == queuedResponse.getResponseNumber() )
+                {
+                    expectedResponseNumber++;
+
+                    processNextResponse( queuedResponse );
+                }
+            }
+        }
+        else
+        {
+            //queue this response to feed in the next round
+            queuedResponses.add( response );
+        }
+    }
+
+
+    private void processNextResponse( final Response response )
     {
         final CommandProcess THIS = this;
         if ( userSession != null )

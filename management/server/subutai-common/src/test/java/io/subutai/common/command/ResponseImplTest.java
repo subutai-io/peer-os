@@ -26,7 +26,6 @@ public class ResponseImplTest
     private static final String STD_OUT = "out";
     private static final String STD_ERR = "err";
     private static final Integer EXIT_CODE = 0;
-    private static final String CONFIG_POINT = "/etc";
 
     @Mock
     Response response;
@@ -45,7 +44,6 @@ public class ResponseImplTest
         Mockito.when( response.getStdOut() ).thenReturn( STD_OUT );
         Mockito.when( response.getStdErr() ).thenReturn( STD_ERR );
         Mockito.when( response.getExitCode() ).thenReturn( EXIT_CODE );
-        Mockito.when( response.getConfigPoints() ).thenReturn( Sets.newHashSet( CONFIG_POINT ) );
 
         responseImpl = new ResponseImpl( response );
     }
@@ -70,6 +68,5 @@ public class ResponseImplTest
 
         assertEquals( EXIT_CODE, responseImpl.getExitCode() );
 
-        assertEquals( Sets.newHashSet( CONFIG_POINT ), responseImpl.getConfigPoints() );
     }
 }
