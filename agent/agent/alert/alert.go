@@ -182,10 +182,10 @@ func CurrentAlerts(list []container.Container) []Load {
 	for _, v := range list {
 		var item Load
 
-		if stats[v.Name].CPU.Current > 80 {
+		if stats[v.Name].CPU != nil && stats[v.Name].CPU.Current > 80 {
 			item.CPU = &Values{Current: stats[v.Name].CPU.Current, Quota: stats[v.Name].CPU.Quota}
 		}
-		if stats[v.Name].RAM.Current > 80 {
+		if stats[v.Name].RAM != nil && stats[v.Name].RAM.Current > 80 {
 			item.RAM = &Values{Current: stats[v.Name].RAM.Current, Quota: stats[v.Name].RAM.Quota}
 		}
 
