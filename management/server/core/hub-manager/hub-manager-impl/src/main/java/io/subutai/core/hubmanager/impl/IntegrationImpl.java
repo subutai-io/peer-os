@@ -149,11 +149,6 @@ public class IntegrationImpl implements Integration
             //
             //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
 
-			/*LOG.info ("Registering peer key");
-			this.configManager.addHubConfig ("hub.subut.ai");
-			RegistrationManager registrationManager = new RegistrationManager (this, configManager, "hub.subut.ai");
-			registrationManager.registerPeerPubKey ();*/
-
 
 			this.sumChecker.scheduleWithFixedDelay (new Runnable ()
 			{
@@ -240,12 +235,8 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-			configManager.addHubConfig( "hub.subut.ai" );
-
-			RegistrationManager registrationManager = new RegistrationManager( this, configManager, "hub.subut.ai" );
-			registrationManager.registerPeerPubKey ();
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", "hub.subut.ai" );
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products", "hub.subut.ai" );
 
             Response r = client.get();
 
