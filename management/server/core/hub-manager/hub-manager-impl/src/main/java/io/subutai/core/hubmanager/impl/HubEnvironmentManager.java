@@ -23,8 +23,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
@@ -622,14 +620,5 @@ public class HubEnvironmentManager
     protected CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
-    }
-
-
-    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String p2pHash,
-                                                        String secretKey, long secretKeyTtlSec )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ),
-                        Strings.isNullOrEmpty( localIp ) ? "" : localIp ) ).withTimeout( 90 );
     }
 }
