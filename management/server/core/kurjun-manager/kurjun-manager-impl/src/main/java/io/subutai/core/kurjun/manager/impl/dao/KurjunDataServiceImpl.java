@@ -174,6 +174,7 @@ public class KurjunDataServiceImpl implements KurjunDataService
 
             entity.setOwnerFingerprint( fingerprint );
             entity.setAuthID( authId );
+            entity.setState( true );
 
             em.merge( entity );
             daoManager.commitTransaction( em );
