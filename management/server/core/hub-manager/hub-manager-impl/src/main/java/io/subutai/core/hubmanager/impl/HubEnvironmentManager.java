@@ -463,7 +463,7 @@ public class HubEnvironmentManager
                 {
                     try
                     {
-                        hosts.add( localPeer.getContainerHostById( nodeDto.getHostId() ) );
+                        hosts.add( localPeer.getContainerHostById( nodeDto.getHostName() ) );
                     }
                     catch ( HostNotFoundException e )
                     {
