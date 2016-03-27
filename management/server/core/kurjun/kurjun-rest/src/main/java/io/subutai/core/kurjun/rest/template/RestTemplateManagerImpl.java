@@ -56,6 +56,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         {
             repository = "public";
         }
+
         byte[] buffer = new byte[8192];
         try
         {

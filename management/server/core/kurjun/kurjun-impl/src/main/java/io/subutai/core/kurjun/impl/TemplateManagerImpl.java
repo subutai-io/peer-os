@@ -160,6 +160,7 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultMetadata m = new DefaultMetadata();
         m.setName( name );
         m.setVersion( version );
+        m.setFingerprint( repository );
 
         SubutaiTemplateMetadata meta = ( SubutaiTemplateMetadata ) unifiedRepository.getPackageInfo( m );
         if ( meta != null )
@@ -528,9 +529,11 @@ public class TemplateManagerImpl implements TemplateManager
                 new TemplateKurjun( String.valueOf( meta.getId() ), Hex.encodeHexString( meta.getMd5Sum() ),
                         meta.getName(), meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
                         meta.getPackage(), meta.getOwnerFprint() );
+
         template.setConfigContents( meta.getConfigContents() );
         template.setPackagesContents( meta.getPackagesContents() );
         template.setSize( meta.getSize() );
+
         return template;
     }
 }

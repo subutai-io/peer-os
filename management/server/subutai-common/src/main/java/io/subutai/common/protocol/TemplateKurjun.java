@@ -19,9 +19,8 @@ public class TemplateKurjun
     private String architecture;
     @Expose
     private String parent;
-
+    @Expose
     private String packageName;
-
     @Expose
     private String ownerFprint;
     @Expose
