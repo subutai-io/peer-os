@@ -48,26 +48,33 @@ public class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     @Override
     public CommandResult execute( RequestBuilder requestBuilder ) throws CommandException
     {
-        log.debug( "proxyContainer: {}", proxyContainer );
-
         Host host = this;
 
+        // If this is a remote host a command is sent via a proxyContainer b/c the remote host is not directly accessible from current peer.
         if ( proxyContainer != null )
         {
-            String ip = getHostInterfaces().getAll().iterator().next().getIp();
-
-            Request r = requestBuilder.build( "id" );
-
-            String command = String.format( "ssh root@%s %s", ip, r.getCommand() );
-
-            requestBuilder = new RequestBuilder( command );
+            requestBuilder = wrapForProxy( requestBuilder );
 
             host = proxyContainer;
         }
 
-        log.debug( "command: {}", requestBuilder.build( "id" ).getCommand() );
-
         return getPeer().execute( requestBuilder, host );
+    }
+
+
+    private RequestBuilder wrapForProxy( RequestBuilder requestBuilder )
+    {
+        String proxyIp = proxyContainer.getHostInterfaces().getAll().iterator().next().getIp();
+
+        String targetHostIp = getHostInterfaces().getAll().iterator().next().getIp();
+
+        Request req = requestBuilder.build( "id" );
+
+        String command = String.format( "ssh root@%s %s", targetHostIp, req.getCommand() );
+
+        log.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
+
+        return new RequestBuilder( command );
     }
 
 }
