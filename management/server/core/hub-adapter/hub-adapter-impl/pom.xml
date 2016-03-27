@@ -2,17 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <parent>
-    <artifactId>environment-manager</artifactId>
+    <artifactId>mgmt-server-core-parent</artifactId>
     <groupId>io.subutai</groupId>
     <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>environment-manager-impl</artifactId>
+  <artifactId>hub-adapter-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>Subutai Environment Manager Impl</name>
-  <description>Subutai Environment Manager Impl</description>
+  <name>Subutai Hub Adapter Impl</name>
+  <description>Subutai Hub Adapter Impl</description>
+
   <dependencies>
 
     <dependency>
@@ -22,35 +24,7 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>environment-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.servicemix</groupId>
-      <artifactId>servicemix-beanflow</artifactId>
-      <version>3.2.3</version>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>tracker-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>kurjun-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>network-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-net</groupId>
-      <artifactId>commons-net</artifactId>
     </dependency>
 
     <dependency>
@@ -60,31 +34,22 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>identity-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>object-relation-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>hub-adapter-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
-    <!-- Testing -->
-
+    <!-- Include subutai-hub-common and it dependencies until getting that in the internal maven repo -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+      <version>0.1</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/../lib/subutai-hub-share-0.1.jar</systemPath>
     </dependency>
-
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <scope>test</scope>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+      <version>0.1</version>
     </dependency>
 
   </dependencies>
@@ -101,14 +66,15 @@
         <configuration>
           <instructions>
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
-            <Bundle-SymbolicName>${project.groupId}.core.environment.impl</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.hubadapter.impl</Bundle-SymbolicName>
             <Export-Package>
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-            <Import-Package>*</Import-Package>
+            <Embed-Dependency>subutai-hub-share</Embed-Dependency>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
+
 </project>
