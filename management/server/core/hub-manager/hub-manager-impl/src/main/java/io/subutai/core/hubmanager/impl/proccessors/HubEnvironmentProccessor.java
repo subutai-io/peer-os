@@ -48,8 +48,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
 
-    private static final Pattern ENVIRONMENT_DATA_PATTERN =
-            Pattern.compile( "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
+    private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
+            "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
+                    + "[a-zA-z0-9]{1,100}" );
     private ConfigManager configManager;
     private PeerManager peerManager;
     private HubEnvironmentManager hubEnvironmentManager;
@@ -57,8 +58,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
 
     public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
-                                     final ConfigManager hConfigManager, final PeerManager peerManager,
-                                     final CommandExecutor commandExecutor )
+                                     final ConfigManager hConfigManager, final PeerManager peerManager,CommandExecutor commandExecutor )
     {
         this.configManager = hConfigManager;
         this.peerManager = peerManager;
@@ -72,8 +72,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     {
         for ( String link : stateLinks )
         {
-            // Environment Data     GET /rest/v1/environments/{environment-id}
-            Matcher environmentDataMatcher = ENVIRONMENT_DATA_PATTERN.matcher( link );
+            // Environment Data     GET /rest/v1/environments/{environment-id}/peers/{peer-id}
+            Matcher environmentDataMatcher = ENVIRONMENT_PEER_DATA_PATTERN.matcher( link );
             if ( environmentDataMatcher.matches() )
             {
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
