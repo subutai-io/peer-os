@@ -58,6 +58,13 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	getAPTs();
 
 
+	function getRawFiles() {
+		kurjunSrv.getRawFiles().success (function (data) {
+			vm.files = data;
+		});
+	}
+	getRawFiles();
+
 	function openTab(tab) {
 		vm.dtOptions = DTOptionsBuilder
 			.newOptions()
@@ -85,7 +92,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(4).notSortable()
 				];
 				break;
-			case 'apt':
+			case 'raw':
 			vm.dtColumnDefs = [
 				DTColumnDefBuilder.newColumnDef(0),
 				DTColumnDefBuilder.newColumnDef(1),
@@ -337,7 +344,13 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	}
 
 	function uploadFile() {
-		ngDialog.closeAll();
+		kurjunSrv.uploadFile (fileUploader).success (function (data) {
+			SweetAlert.swal("Success!", "You have successfully uploaded file", "success");
+			getRawFiles();
+			ngDialog.closeAll();
+		}).error (function (error) {
+			SweetAlert.swal("ERROR!", error, "error");
+		});
 	}
 
 	cfpLoadingBar.start();
