@@ -196,8 +196,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         String envDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
         try
         {
-            WebClient client =
-                    configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
+            WebClient client = configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
@@ -267,15 +266,14 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
         try
         {
-            WebClient client =
-                    configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
+            WebClient client = configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
 
             hubEnvironmentManager.configureSsh( peerDto, environmentDto );
-            hubEnvironmentManager.configureHash( peerDto, environmentDto );
+            hubEnvironmentManager.configureHash( environmentDto );
 
             WebClient clientUpdate =
                     configManager.getTrustedWebClientWithAuth( configContainer, configManager.getHubIp() );

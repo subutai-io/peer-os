@@ -378,32 +378,12 @@ public class HubEnvironmentManager
     public void configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws EnvironmentManagerException
     {
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-        LocalPeer localPeer = peerManager.getLocalPeer();
         Set<String> sshKeys = new HashSet<>();
         for ( SSHKeyDto sshKeyDto : env.getSshKeys() )
         {
             sshKeys.add( sshKeyDto.getSshKey() );
         }
-
-        Set<Host> hosts = Sets.newHashSet();
-
-        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
-        {
-            if ( nodesDto.getPeerId().equals( localPeer.getId() ) )
-            {
-                for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
-                {
-                    try
-                    {
-                        hosts.add( localPeer.getContainerHostById( nodeDto.getHostId() ) );
-                    }
-                    catch ( HostNotFoundException e )
-                    {
-                        LOG.error( "Could not get Host: " + nodeDto.getHostId() );
-                    }
-                }
-            }
-        }
+        Set<Host> hosts = getLocalPeerHosts( envDto );
         addSshKeys( hosts, sshKeys );
 
         Set<Host> succeededHosts = Sets.newHashSet();
@@ -436,9 +416,65 @@ public class HubEnvironmentManager
     }
 
 
-    public void configureHash( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
+    public void configureHash( EnvironmentDto envDto ) throws EnvironmentManagerException
     {
-        //TODO
+        Set<Host> hosts = getLocalPeerHosts( envDto );
+        Map<Host, CommandResult> results = commandUtil
+                .executeParallelSilent( getAddIpHostToEtcHostsCommand( Common.DEFAULT_DOMAIN_NAME, hosts ), hosts );
+
+        Set<Host> succeededHosts = Sets.newHashSet();
+        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        {
+            CommandResult result = resultEntry.getValue();
+            Host host = resultEntry.getKey();
+
+            if ( result.hasSucceeded() )
+            {
+                succeededHosts.add( host );
+            }
+            else
+            {
+                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
+            }
+        }
+
+        hosts.removeAll( succeededHosts );
+
+        for ( Host failedHost : hosts )
+        {
+            LOG.error( String.format( "Host registration failed on host %s", failedHost.getHostname() ) );
+        }
+
+        if ( !hosts.isEmpty() )
+        {
+            throw new EnvironmentManagerException( "Failed to register all hosts" );
+        }
+    }
+
+
+    private Set<Host> getLocalPeerHosts( EnvironmentDto envDto )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        Set<Host> hosts = Sets.newHashSet();
+
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        {
+            if ( nodesDto.getPeerId().equals( localPeer.getId() ) )
+            {
+                for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+                {
+                    try
+                    {
+                        hosts.add( localPeer.getContainerHostById( nodeDto.getHostId() ) );
+                    }
+                    catch ( HostNotFoundException e )
+                    {
+                        LOG.error( "Could not get Host: " + nodeDto.getHostId() );
+                    }
+                }
+            }
+        }
+        return hosts;
     }
 
 
@@ -503,6 +539,38 @@ public class HubEnvironmentManager
         return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
                 "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
                 "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
+    }
+
+
+    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<Host> containerHosts )
+    {
+        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
+        StringBuilder appendHosts = new StringBuilder();
+
+        for ( Host host : containerHosts )
+        {
+            String ip = host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
+            String hostname = host.getHostname();
+            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
+            appendHosts.append( "/bin/echo '" ).
+                    append( ip ).append( " " ).
+                               append( hostname ).append( "." ).append( domainName ).
+                               append( " " ).append( hostname ).
+                               append( "' >> '/etc/hosts'; " );
+        }
+
+        if ( cleanHosts.length() > 0 )
+        {
+            //drop pipe | symbol
+            cleanHosts.setLength( cleanHosts.length() - 1 );
+            cleanHosts.insert( 0, "egrep -v '" );
+            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
+            appendHosts.insert( 0, cleanHosts );
+        }
+
+        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
+
+        return new RequestBuilder( appendHosts.toString() );
     }
 
 
