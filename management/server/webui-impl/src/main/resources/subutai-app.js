@@ -231,7 +231,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 		});
 		return "";
 	}
-
 }
 
 

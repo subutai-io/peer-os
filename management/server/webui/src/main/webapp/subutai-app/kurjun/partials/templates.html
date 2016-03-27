@@ -19,7 +19,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="template in kurjunCtrl.templates">
+            <tr ng-repeat="template in kurjunCtrl.templates track by $index">
                 <td>{{ template.name }}</td>
                 <td>{{ template.repository }}</td>
                 <td>{{ template.architecture }}</td>
@@ -27,6 +27,7 @@
                 <td>{{ template.version }}</td>
 				<td>{{ template.size }}</td>
                 <td>
+
                     <a href
                        class="b-icon b-icon_share"
                        tooltips

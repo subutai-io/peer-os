@@ -8,11 +8,8 @@ kurjunService.$inject = ['$http', 'Upload', 'SettingsKurjunSrv'];
 
 function kurjunService($http, Upload, SettingsKurjunSrv) {
 
-	/*var KURJUN_URL = SERVER_URL + 'rest/kurjun/';
-	var REPOSITORIES_URL = KURJUN_URL + 'templates/repositories';*/
-
-	var GLOBAL_KURJUN_URL = "https://peer.noip.me:8339/kurjun/";
-	var BASE_URL = GLOBAL_KURJUN_URL + "rest/";
+	var GLOBAL_KURJUN_URL = "https://peer.noip.me:8339/kurjun";
+	var BASE_URL = GLOBAL_KURJUN_URL + "/rest/";
 	var TEMPLATE_URL = BASE_URL + "template/";
 	var REPOSITORY_URL = BASE_URL + "repository/";
 	var DEB_URL = BASE_URL + "deb/";
@@ -35,15 +32,16 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	return kurjunService;
 
-	SettingsKurjunSrv.getConfig().success (function (data) {
+	/*SettingsKurjunSrv.getConfig().success (function (data) {
 		GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
-	});
+	});*/
 
 	function getRepositories() {
 		return $http.get(REPOSITORY_URL + "list", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
+		console.log (TEMPLATE_URL);
 		return $http.get(TEMPLATE_URL + 'list', {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
