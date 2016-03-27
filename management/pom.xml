@@ -515,6 +515,19 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+      <!-- hub-adapter -->
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hub-adapter-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>hub-adapter-impl</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--Karaf-manager -->

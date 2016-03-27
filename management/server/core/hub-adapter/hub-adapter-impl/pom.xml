@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <parent>
+    <artifactId>mgmt-server-core-parent</artifactId>
+    <groupId>io.subutai</groupId>
+    <version>4.0.0-RC7-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>hub-adapter-impl</artifactId>
+  <packaging>bundle</packaging>
+  <name>Subutai Hub Adapter Impl</name>
+  <description>Subutai Hub Adapter Impl</description>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>peer-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>security-manager-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hub-adapter-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Include subutai-hub-common and it dependencies until getting that in the internal maven repo -->
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+      <version>0.1</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/../lib/subutai-hub-share-0.1.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+      <version>0.1</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.core.hub.adapter.impl</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+            <Embed-Dependency>subutai-hub-share</Embed-Dependency>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

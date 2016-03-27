@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
+                               http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance">
+
+
+  <reference id="securityManager" interface="io.subutai.core.security.api.SecurityManager" />
+
+  <reference id="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
+
+  <bean id="hubAdapter" class="io.subutai.core.hubadapter.impl.HubAdapterImpl" activation="eager">
+    <argument ref="securityManager" />
+    <argument ref="peerManager" />
+  </bean>
+
+  <service ref="hubAdapter" interface="io.subutai.core.hubadapter.api.HubAdapter" />
+
+</blueprint>
