@@ -58,7 +58,7 @@ public class IntegrationImpl implements Integration
 {
     private static final long TIME_15_MINUTES = 900;
 
-    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class );
 
     private SecurityManager securityManager;
     private EnvironmentManager environmentManager;
@@ -148,6 +148,13 @@ public class IntegrationImpl implements Integration
             //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
             //
             //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
+
+			/*LOG.info ("Registering peer key");
+			this.configManager.addHubConfig ("hub.subut.ai");
+			RegistrationManager registrationManager = new RegistrationManager (this, configManager, "hub.subut.ai");
+			registrationManager.registerPeerPubKey ();*/
+
+
 			this.sumChecker.scheduleWithFixedDelay (new Runnable ()
 			{
 				@Override
@@ -157,9 +164,6 @@ public class IntegrationImpl implements Integration
 					generateChecksum();
 				}
 			}, 1, 3600000, TimeUnit.MILLISECONDS);
-			this.configManager.addHubConfig ("hub.subut.ai");
-			RegistrationManager registrationManager = new RegistrationManager (this, configManager, "hub.subut.ai");
-			registrationManager.registerPeerPubKey ();
         }
         catch ( Exception e )
         {
@@ -237,7 +241,7 @@ public class IntegrationImpl implements Integration
         try
         {
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", "hub.subut.ai" );
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -456,8 +460,8 @@ public class IntegrationImpl implements Integration
 
     private void generateChecksum()
 	{
-		if (getRegistrationState ())
-		{
+/*		if (getRegistrationState ())
+		{*/
 			try
 			{
 				LOG.info ("Generating plugins list md5 checksum");
@@ -484,11 +488,11 @@ public class IntegrationImpl implements Integration
 				LOG.error (e.getMessage ());
 				e.printStackTrace ();
 			}
-		}
+/*		}
 		else
 		{
 			LOG.info ("Peer not registered. Trying again in 1 hour.");
-		}
+		}*/
 	}
 
 	@Override

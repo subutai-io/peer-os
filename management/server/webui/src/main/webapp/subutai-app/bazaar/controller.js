@@ -97,11 +97,13 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				vm.notRegistered = false;*/
 				BazaarSrv.getHubPlugins().success (function (data) {
 					vm.plugins = data.productsDto;
+					console.log (data);
 					if (vm.plugins === undefined || vm.plugins === "") {
 						vm.plugins = [];
 					}
-					console.log (vm.plugins);
-					localStorage.setItem ("bazaarProducts", JSON.stringify (vm.plugins));
+					if (vm.plugins.length !== 0) {
+						localStorage.setItem ("bazaarProducts", JSON.stringify (vm.plugins));
+					}
 					BazaarSrv.getInstalledHubPlugins().success (function (data) {
 						vm.installedHubPlugins = data;
 						console.log (vm.installedHubPlugins);
@@ -183,8 +185,10 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 			}
 		});*/
 	}
-	getHubPlugins();
-/*	vm.plugins = JSON.parse (localStorage.getItem ("bazaarProducts"));
+//	getHubPlugins();
+	vm.plugins = JSON.parse (localStorage.getItem ("bazaarProducts"));
+	console.log (bazaarUpdate);
+	console.log (vm.plugins);
 	if (bazaarUpdate === true || vm.plugins === null) {
 		getHubPlugins();
 	}
@@ -259,7 +263,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				LOADING_SCREEN ("none");
 			});
 		});
-	}*/
+	}
 
 /*	vm.buttonCheck = buttonCheck;
 	function buttonCheck (s) {
