@@ -11,6 +11,11 @@ function kurjunService($http, Upload) {
 	var KURJUN_URL = SERVER_URL + 'rest/kurjun/';
 	var REPOSITORIES_URL = KURJUN_URL + 'templates/repositories';
 
+	var GLOBAL_KURJUN = "https://peer.noip.me:8339/kurjun"
+	var baseUrl = GLOBAL_KURJUN + "/rest/";
+	var baseTemplateUrl = baseUrl + "template/";
+
+
 	var kurjunService = {
 		getRepositories: getRepositories,
 		getTemplates: getTemplates,
@@ -31,8 +36,8 @@ function kurjunService($http, Upload) {
 	}
 
 	function getTemplates(repository) {
-		return $http.get(KURJUN_URL + 'templates/' + repository + '/template-list', {
-			withCredentials: true,
+		return $http.get(baseTemplateUrl +'list', {
+			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}

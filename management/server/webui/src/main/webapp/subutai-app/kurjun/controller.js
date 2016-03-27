@@ -16,10 +16,13 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	vm.repositories = [];
 	vm.templates = [];
 	vm.apts = [];
+	vm.files = [];
 	vm.isUploadAllowed = false;
 	vm.listOfUsers = [];
 	vm.users2Add = [];
 
+	vm.uploadFileWindow = uploadFileWindow;
+	vm.uploadFile = uploadFile;
 	vm.openTab = openTab;
 	vm.addTemplate = addTemplate;
 	vm.proceedTemplate = proceedTemplate;
@@ -40,23 +43,8 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 
 	/*** Get templates according to repositories ***/
 	function getTemplates() {
-		kurjunSrv.getRepositories().success(function (repositories) {
-			vm.repositories = repositories;
-			vm.templates = [];
-			var getTemplatesRecursively = function (index, repositories) {
-				kurjunSrv.getTemplates(repositories[index]).then(function (templates) {
-					for (var template in templates.data) {
-						templates.data[template].repository = repositories[index];
-						vm.templates.push(templates.data[template]);
-					}
-					if (( index + 1 ) < repositories.length) {
-						getTemplatesRecursively(index + 1, repositories);
-					} else {
-						return;
-					}
-				});
-			};
-			getTemplatesRecursively(0, repositories);
+		kurjunSrv.getTemplates().success(function (data) {
+			vm.templates = data;
 		});
 	}
 	getTemplates();
@@ -97,6 +85,14 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(4).notSortable()
 				];
 				break;
+			case 'apt':
+			vm.dtColumnDefs = [
+				DTColumnDefBuilder.newColumnDef(0),
+				DTColumnDefBuilder.newColumnDef(1),
+				DTColumnDefBuilder.newColumnDef(2).notSortable(),
+				DTColumnDefBuilder.newColumnDef(3).notSortable()
+			];
+			break;
 			default:
 				break;
 		}
@@ -332,6 +328,18 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 		vm.checkRepositoryStatus(vm.currentTemplate.repository)
 	}
 
+
+	function uploadFileWindow() {
+		ngDialog.open ({
+			template: "subutai-app/kurjun/partials/uploadFile.html",
+			scope: $scope
+		});
+	}
+
+	function uploadFile() {
+		ngDialog.closeAll();
+	}
+
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
 		$timeout(function () {
@@ -348,7 +356,7 @@ function fileModel($parse) {
 			var modelSetter = model.assign;
 
 			element.bind('change', function () {
-				document.getElementById("js-uploadFile").value = element[0].files[0].name;
+				document.getElementById("filename").value = element[0].files[0].name;
 				scope.$apply(function () {
 					modelSetter(scope, element[0].files[0]);
 					fileUploader = element[0].files[0];

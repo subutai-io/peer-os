@@ -11,15 +11,15 @@ public interface KurjunManager
 {
 
     //****************************************
-    String registerUser( int kurjunType, String fingerprint );
+    String registerUser( String url, int kurjunType );
 
 
     //****************************************
-    String authorizeUser( int kurjunType, String fingerprint );
+    String authorizeUser( String url, int kurjunType, String signedMessage );
 
 
     //****************************************
-    boolean setSystemOwner( int kurjunType, String fingerprint );
+    boolean setSystemOwner( String url, int kurjunType );
 
 
     //****************************************
@@ -27,7 +27,7 @@ public interface KurjunManager
 
 
     //****************************************
-    String getUser( int kurjunType, String fingerprint );
+    String getUser( String url, int kurjunType );
 
     public KurjunDataService getDataService();
 }

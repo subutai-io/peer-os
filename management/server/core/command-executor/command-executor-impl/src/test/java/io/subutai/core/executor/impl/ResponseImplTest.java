@@ -48,7 +48,6 @@ public class ResponseImplTest
         assertEquals( "output", response.getStdOut() );
         assertEquals( "err", response.getStdErr() );
         assertEquals( 0, ( int ) response.getExitCode() );
-        assertNull( response.getConfigPoints() );
     }
 
 

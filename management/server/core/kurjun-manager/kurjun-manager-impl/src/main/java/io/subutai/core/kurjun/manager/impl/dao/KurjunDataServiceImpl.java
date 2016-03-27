@@ -38,18 +38,16 @@ public class KurjunDataServiceImpl implements KurjunDataService
      *
      */
     @Override
-    public Kurjun getKurjunData( final String id )
+    public Kurjun getKurjunData( final String url )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
         Kurjun result = null;
         try
         {
-            Query query = em.createQuery( "SELECT c FROM KurjunEntity c" ).setParameter( "owner_fprint", id );
-            //            daoManager.startTransaction( em );
+            Query query = em.createQuery( "SELECT c FROM KurjunEntity c where c.url = :url" );
+            query.setParameter( "url", url );
             result = ( Kurjun ) query.getSingleResult();
-            //                    result = em.find( KurjunEntity.class, id );
-            //            daoManager.commitTransaction( em );
         }
         catch ( Exception e )
         {
@@ -165,6 +163,59 @@ public class KurjunDataServiceImpl implements KurjunDataService
 
 
     @Override
+    public void updateKurjunData( final String fingerprint, final String authId, final String url )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Kurjun entity = getKurjunData( url );
+
+            entity.setOwnerFingerprint( fingerprint );
+            entity.setAuthID( authId );
+
+            em.merge( entity );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    @Override
+    public void updateKurjunData( final String signedMessage, final String url )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Kurjun entity = getKurjunData( url );
+
+            entity.setSignedMessage( signedMessage );
+
+            em.merge( entity );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    @Override
     public void persistKurjunConfig( final KurjunConfig item )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
@@ -184,6 +235,5 @@ public class KurjunDataServiceImpl implements KurjunDataService
         {
             daoManager.closeEntityManager( em );
         }
-
     }
 }

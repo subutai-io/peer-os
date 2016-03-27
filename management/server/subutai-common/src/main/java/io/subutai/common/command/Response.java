@@ -1,7 +1,6 @@
 package io.subutai.common.command;
 
 
-import java.util.Set;
 import java.util.UUID;
 
 
@@ -67,6 +66,4 @@ public interface Response
      * @return - exit code for a command
      */
     public Integer getExitCode();
-
-    public Set<String> getConfigPoints();
 }

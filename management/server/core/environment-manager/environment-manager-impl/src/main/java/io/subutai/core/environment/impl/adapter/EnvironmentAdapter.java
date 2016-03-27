@@ -21,43 +21,59 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class EnvironmentAdapter
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    static String envId = "e3c47046-75ae-46b5-adf3-4b2b7012f6c6";
+    private final EnvironmentManagerImpl environmentManager;
 
-    static String peerId = "AFAE43FE560D309809EE238D6B598523E31B8AAA";
+    private final ProxyContainerHelper proxyContainerHelper;
 
-    static String subnetCidr = "192.168.2.1/24";
 
-    static long vni = 15444522;
+    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager )
+    {
+        this.environmentManager = environmentManager;
 
-    static String p2pSubnet = "10.11.1.0";
+        proxyContainerHelper = new ProxyContainerHelper( peerManager );
+    }
 
-    static String peerP2p = "10.11.1.1";
 
-    static String chIp = "192.168.2.2";
+    //
+    // Env
+    //
 
-    static String chId = "F428C7754FC7AE90188EC42E43BFBDF54D99936E";
+    static String envId = "90e7ad5d-1497-45ab-a301-8d1cbad7944d";
 
-    static String lxcName = "4f268646-0faf-45e7-8f21-0056668169b8";
+    static String peerId = "0D091F8269B5B608F2E065601DD655B5A7C3DA37";
+
+    static String subnetCidr = "192.168.3.1/24";
+
+    static long vni = 674804;
+
+    static String p2pSubnet = "10.11.2.0";
+
+    static String peerP2p = "10.11.2.1";
+
+    //
+    // Containers
+    //
+
+    static String rhId = "5B7E40F52DD51F07FB098BABFCD5D347679AD897";
 
     static String templateName = "elasticsearch";
 
-    static String rhId = "F6E3A586B7B74F704DC40EE2698A25F71EF711F3";
 
-
-    private ProxyEnvironmentContainer getContainer( EnvironmentManagerImpl environmentManager )
+    private ProxyEnvironmentContainer getContainer( String ip, String id, String lxcName )
     {
-        HostInterfaceModel him = new HostInterfaceModel( "eth0", chIp );
+        HostInterfaceModel him = new HostInterfaceModel( "eth0", ip );
 
         Set<HostInterfaceModel> set = Sets.newHashSet();
         set.add( him );
 
-        HostInterfaces hi = new HostInterfaces( chId, set );
+        HostInterfaces hi = new HostInterfaces( id, set );
 
         ProxyEnvironmentContainer ec = new ProxyEnvironmentContainer(
                 peerId,
@@ -65,7 +81,7 @@ public class EnvironmentAdapter
                 lxcName,
 
                 new ContainerHostInfoModel(
-                        chId,
+                        id,
                         lxcName, hi,
                         HostArchitecture.AMD64,
                         ContainerHostState.RUNNING
@@ -84,7 +100,21 @@ public class EnvironmentAdapter
     }
 
 
-    public ProxyEnvironment get( final String id, EnvironmentManagerImpl environmentManager )
+    private Set<ProxyEnvironmentContainer> getContainers()
+    {
+        HashSet<ProxyEnvironmentContainer> envContainers = new HashSet<>();
+
+        envContainers.add( getContainer( "192.168.3.2", "AF70232E4BCDC2436D21F1F31A248B945E6233B8", "1e221fd8-9c8c-43b3-9806-d84a41c30f50" ) );
+
+        envContainers.add( getContainer( "192.168.3.3", "DC10DA1433EF35D905A0F9D434FDD7C3821BEC17", "6b8d4cb4-2e80-421f-b26b-4b9a1249cf82" ) );
+
+        proxyContainerHelper.setProxyToRemoteContainers( envContainers );
+
+        return envContainers;
+    }
+
+
+    public ProxyEnvironment get( final String id )
     {
         ProxyEnvironment e = new ProxyEnvironment(
                 "Mock Env",
@@ -101,10 +131,6 @@ public class EnvironmentAdapter
         e.setStatus( EnvironmentStatus.HEALTHY );
         e.getEnvironmentId();
 
-        HashSet<EnvironmentContainerImpl> set3 = new HashSet<>();
-        set3.add( getContainer( environmentManager ) );
-        e.addContainers( set3 );
-
 
         P2PConfig p2PConfig = new P2PConfig( peerId, null, null, peerP2p, null, 0 );
 
@@ -115,22 +141,22 @@ public class EnvironmentAdapter
 
         e.setEnvironmentManager( environmentManager );
 
-        log.debug( "env: {}", e );
+        Set<EnvironmentContainerImpl> containers = new HashSet<>();
+
+        containers.addAll( getContainers() );
+
+        e.addContainers( containers );
 
         return e;
     }
 
 
-    public Set<Environment> getEnvironments( EnvironmentManagerImpl environmentManager )
+    public Set<Environment> getEnvironments()
     {
-        log.debug( "=== Giving mock environments ===" );
-
         HashSet<Environment> set = new HashSet<>();
 
-        Environment env = get( envId, environmentManager );
+        Environment env = get( envId );
         set.add( env );
-
-        log.debug( "env: {}", env );
 
         return set;
     }

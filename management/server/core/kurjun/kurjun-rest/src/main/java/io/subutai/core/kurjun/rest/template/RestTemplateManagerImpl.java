@@ -1,17 +1,18 @@
 package io.subutai.core.kurjun.rest.template;
 
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,31 +49,15 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
 
 
     @Override
-    public Response getRepositories()
+    public Response getTemplate( String repository, String id, String name, String version, String type,
+                                 boolean isKurjunClient )
     {
-        Set<String> list = templateManager.getRepositories();
-        return Response.ok( GSON.toJson( list ) ).build();
-    }
-
-
-    @Override
-    public Response checkUploadAllowed( String repository )
-    {
-        try
+        if ( repository == null )
         {
-            return Response.ok( templateManager.isUploadAllowed( repository ) ).build();
+            repository = "public";
         }
-        catch ( IllegalArgumentException ex )
-        {
-            return badRequest( ex.getMessage() );
-        }
-    }
 
-
-    @Override
-    public Response getTemplate( String repository, String id, String name, String version,
-            String type, boolean isKurjunClient )
-    {
+        byte[] buffer = new byte[8192];
         try
         {
             if ( id != null )
@@ -81,16 +66,32 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 byte[] md5bytes = decodeMd5( tid.getMd5() );
                 if ( md5bytes != null )
                 {
-                    TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                    TemplateKurjun template =
+                            templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                     if ( template != null )
                     {
-                        InputStream is = templateManager.getTemplateData( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                        InputStream is = templateManager
+                                .getTemplateData( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                         if ( is != null )
                         {
-                            return Response.ok( is )
-                                    .header( "Content-Disposition", "attachment; filename=" + makeFilename( template ) )
-                                    .header( "Content-Type", "application/octet-stream" )
-                                    .build();
+                            StreamingOutput stream = output -> {
+
+                                OutputStream outputStream = new BufferedOutputStream( output );
+
+                                int bytesRead;
+
+                                while ( ( bytesRead = is.read( buffer ) ) > 0 )
+                                {
+                                    outputStream.write( buffer, 0, bytesRead );
+                                }
+
+                                outputStream.flush();
+                            };
+
+                            return Response.ok( stream ).header( "Content-Disposition",
+                                    "attachment; filename=" + makeFilename( template ) )
+                                           .header( "Content-Type", "application/octet-stream" )
+                                           .header( "Content-Length", template.getSize() ).build();
                         }
                     }
                 }
@@ -123,6 +124,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     @Override
     public Response getTemplateInfo( String repository, String id, String name, String version, boolean isKurjunClient )
     {
+        if ( repository == null )
+        {
+            repository = "public";
+        }
+
         try
         {
             if ( id != null )
@@ -131,7 +137,8 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 byte[] md5bytes = decodeMd5( tid.getMd5() );
                 if ( md5bytes != null )
                 {
-                    TemplateKurjun template = templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                    TemplateKurjun template =
+                            templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                     if ( template != null )
                     {
                         return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
@@ -164,68 +171,19 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     @Override
     public Response getTemplateList( String repository, boolean isKurjunClient )
     {
+        if ( repository == null )
+        {
+            repository = "public";
+        }
+
         try
         {
             List<TemplateKurjun> list = templateManager.list( repository, isKurjunClient );
             if ( list != null )
             {
-                List<DefaultTemplate> deflist = list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
+                List<DefaultTemplate> deflist =
+                        list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
                 return Response.ok( GSON.toJson( deflist ) ).build();
-            }
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            LOGGER.error( "", ex );
-            return badRequest( ex.getMessage() );
-        }
-        catch ( IOException ex )
-        {
-            String msg = "Failed to get template list info";
-            LOGGER.error( msg, ex );
-            return Response.serverError().entity( msg ).build();
-        }
-        return Response.ok( "No templates" ).build();
-    }
-    
-    
-    @Override
-    public Response getSharedTemplateInfos( String id )
-    {
-        try
-        {
-            TemplateId tid = IdValidators.Template.validate( id );
-            byte[] md5bytes = decodeMd5( tid.getMd5() );
-            if ( md5bytes != null )
-            {
-                List<Map<String, Object>> list = templateManager.getSharedTemplateInfos( md5bytes, tid.getOwnerFprint() );
-                return Response.ok( GSON.toJson( list ) ).build();
-            }
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            LOGGER.error( "", ex );
-            return badRequest( ex.getMessage() );
-        }
-        catch ( IOException ex )
-        {
-            String msg = "Failed to get shared info";
-            LOGGER.error( msg, ex );
-            return Response.serverError().entity( msg ).build();
-        }
-        return packageNotFoundResponse();
-    }
-    
-    
-
-    @Override
-    public Response getTemplateListSimple( String repository )
-    {
-        try
-        {
-            List<Map<String, Object>> simpleList = templateManager.listAsSimple( repository );
-            if ( simpleList != null )
-            {
-                return Response.ok( GSON.toJson( simpleList ) ).build();
             }
         }
         catch ( IllegalArgumentException ex )
@@ -246,6 +204,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     @Override
     public Response uploadTemplate( String repository, Attachment attachment )
     {
+        if ( repository == null )
+        {
+            repository = "public";
+        }
+
         File temp = null;
         try
         {
@@ -321,40 +284,6 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     }
 
 
-    @Override
-    public Response shareTemplate( String targetUserName, String id )
-    {
-        try
-        {
-            TemplateId tid = IdValidators.Template.validate( id );
-            templateManager.shareTemplate( tid.get(), targetUserName );
-            return Response.ok( "Template shared" ).build();
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            LOGGER.error( "", ex );
-            return badRequest( ex.getMessage() );
-        }
-    }
-
-
-    @Override
-    public Response unshareTemplate( String targetUserName, String id )
-    {
-        try
-        {
-            TemplateId tid = IdValidators.Template.validate( id );
-            templateManager.unshareTemplate( tid.get(), targetUserName );
-            return Response.ok( "Template unshared" ).build();
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            LOGGER.error( "", ex );
-            return badRequest( ex.getMessage() );
-        }
-    }
-
-
     private DefaultTemplate convertToDefaultTemplate( TemplateKurjun template )
     {
         return convertToDefaultTemplate( template, true );
@@ -391,5 +320,4 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
     {
         return LOGGER;
     }
-
 }
