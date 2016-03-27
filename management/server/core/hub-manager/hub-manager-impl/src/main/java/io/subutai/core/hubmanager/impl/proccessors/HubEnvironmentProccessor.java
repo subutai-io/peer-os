@@ -6,6 +6,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.core.hubmanager.api.HubPluginException;
@@ -27,6 +29,8 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.environment.EnvironmentDto;
+import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -36,8 +40,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
 
-    private static final Pattern ENVIRONMENT_DATA_PATTERN =
-            Pattern.compile( "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
+    private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
+            "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
+                    + "[a-zA-z0-9]{1,100}" );
     private ConfigManager configManager;
     private PeerManager peerManager;
     private HubEnvironmentManager hubEnvironmentManager;
@@ -57,8 +62,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     {
         for ( String link : stateLinks )
         {
-            // Environment Data     GET /rest/v1/environments/{environment-id}
-            Matcher environmentDataMatcher = ENVIRONMENT_DATA_PATTERN.matcher( link );
+            // Environment Data     GET /rest/v1/environments/{environment-id}/peers/{peer-id}
+            Matcher environmentDataMatcher = ENVIRONMENT_PEER_DATA_PATTERN.matcher( link );
             if ( environmentDataMatcher.matches() )
             {
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
@@ -101,8 +106,17 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 case EXCHANGE_INFO:
                     infoExchange( peerDto );
                     break;
+                case SETUP_P2P:
+                    setupP2P( peerDto );
+                    break;
+                case SETUP_TUNNEL:
+                    setupTunnel( peerDto );
+                    break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
+                    break;
+                case DESTROY_CONTAINER:
+                    destroyContainers( peerDto );
                     break;
             }
         }
@@ -162,20 +176,57 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
+    private void setupP2P( EnvironmentPeerDto peerDto )
+    {
+        LOG.debug( "env_via_hub: Setup VNI..." );
+        hubEnvironmentManager.setupVNI( peerDto );
+
+        LOG.debug( "env_via_hub: Setup P2P..." );
+        peerDto = hubEnvironmentManager.setupP2P( peerDto );
+
+        updateEnvironmentPeerData( peerDto );
+    }
+
+
+    private void setupTunnel( EnvironmentPeerDto peerDto )
+    {
+        String setupTunnelDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+        try
+        {
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( setupTunnelDataURL, configManager.getHubIp() );
+            Response r = client.get();
+            byte[] encryptedContent = configManager.readContent( r );
+            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
+
+            LOG.debug( "env_via_hub: Setup tunnel..." );
+            try
+            {
+                hubEnvironmentManager.setupTunnel( environmentDto );
+                peerDto.setSetupTunnel( true );
+            }
+            catch ( ExecutionException | InterruptedException e )
+            {
+                LOG.error( "Problems setting up tunnel", e );
+                peerDto.setSetupTunnel( false );
+            }
+            updateEnvironmentPeerData( peerDto );
+        }
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+                e )
+        {
+            LOG.error( "Could not get environment data from Hub.", e.getMessage() );
+        }
+    }
+
+
     private void buildContainers( EnvironmentPeerDto peerDto )
     {
         String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow",
                 peerDto.getEnvironmentInfo().getId() );
         try
         {
-            LOG.debug( "env_via_hub: Setup VNI..." );
-            hubEnvironmentManager.setupVNI( peerDto );
-
-            LOG.debug( "env_via_hub: Setup P2P..." );
-            peerDto = hubEnvironmentManager.setupP2P( peerDto );
-
-            updateEnvironmentPeerData( peerDto );
-
             WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
@@ -205,16 +256,47 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
+    private void destroyContainers( EnvironmentPeerDto peerDto )
+    {
+        String containerDestroyStateURL =
+                String.format( "/rest/v1/environments/%s/destroy", peerDto.getEnvironmentInfo().getId() );
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        try
+        {
+            localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
+            localPeer.removeP2PConnection( env.getP2pHash() );
+            localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
+
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
+            Response response = client.put( null );
+            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Container destroyed successfully" );
+            }
+        }
+        catch ( Exception e )
+        {
+
+            LOG.error( "Could not destroy container", e );
+        }
+    }
+
+
     private void updateEnvironmentPeerData( EnvironmentPeerDto peerDto )
     {
         try
         {
-            String envPeerDataUrl = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+            String envPeerDataUrl =
+                    String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
+                            peerManager.getLocalPeer().getId() );
             WebClient client = configManager.getTrustedWebClientWithAuth( envPeerDataUrl, configManager.getHubIp() );
 
             byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response r = client.post( encryptedData );
+            Response r = client.put( encryptedData );
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
                 LOG.debug( "Environment peer data successfully sent to hub" );
