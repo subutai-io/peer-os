@@ -20,6 +20,7 @@ public interface RestAptManager
 {
 
     String MD5_PARAM = "md5";
+    String ID = "id";
     String NAME_PARAM = "name";
     String VERSION_PARAM = "version";
     String TYPE_PARAM = "type";
@@ -56,7 +57,7 @@ public interface RestAptManager
 
     @GET
     @Path( "get" )
-    Response getPackage( @QueryParam( MD5_PARAM ) String md5 );
+    Response getPackage( @QueryParam( ID ) String md5 );
 
 
     @GET
