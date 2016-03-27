@@ -38,8 +38,8 @@ public class RegisterSshStep
 
 
     /**
-     * IMPORTANT: Containers always need access to each other via SSH. For example: ssh root@192.168.1.1 date.
-     * This is a workaround for: https://github.com/optdyn/hub/issues/413.
+     * IMPORTANT: Containers always need access to each other via SSH. For example: ssh root@192.168.1.1 date. This is a
+     * workaround for: https://github.com/optdyn/hub/issues/413.
      */
     public void execute( Set<String> userKeys ) throws EnvironmentManagerException
     {
@@ -50,6 +50,10 @@ public class RegisterSshStep
         if ( hosts.size() > 1 )
         {
             exchangeSshKeys( hosts, userKeys );
+        }
+        else if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
+        {
+            appendSshKeys( hosts, userKeys );
         }
     }
 
