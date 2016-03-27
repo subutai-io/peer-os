@@ -193,11 +193,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private void setupTunnel( EnvironmentPeerDto peerDto )
     {
-        String setupTunnelDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+        String envDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
         try
         {
             WebClient client =
-                    configManager.getTrustedWebClientWithAuth( setupTunnelDataURL, configManager.getHubIp() );
+                    configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
@@ -261,16 +261,25 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private void configureContainer( EnvironmentPeerDto peerDto )
     {
-        String containerDestroyStateURL = String.format( "/rest/v1/environments/%s/container-configuration",
+        String configContainer = String.format( "/rest/v1/environments/%s/container-configuration",
                 peerDto.getEnvironmentInfo().getId() );
+        String envDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+
         try
         {
-            hubEnvironmentManager.configureSsh( peerDto );
-            hubEnvironmentManager.configureHash( peerDto );
-
             WebClient client =
-                    configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
-            Response response = client.put( null );
+                    configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
+            Response r = client.get();
+            byte[] encryptedContent = configManager.readContent( r );
+            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
+
+            hubEnvironmentManager.configureSsh( peerDto, environmentDto );
+            hubEnvironmentManager.configureHash( peerDto, environmentDto );
+
+            WebClient clientUpdate =
+                    configManager.getTrustedWebClientWithAuth( configContainer, configManager.getHubIp() );
+            Response response = clientUpdate.put( null );
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "SSH configuration successfully done" );
