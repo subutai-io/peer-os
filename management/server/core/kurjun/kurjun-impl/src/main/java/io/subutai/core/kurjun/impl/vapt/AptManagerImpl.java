@@ -79,12 +79,16 @@ public class AptManagerImpl implements AptManager
     private static final String VAPT_PATH = "/deb";
 
     private static final KurjunContext APT_CONTEXT = new KurjunContext( "vapt" );
-
+    private static final String DEFAULT_APT_REPO = "vapt";
     private Injector injector;
 
     private final LocalPeer localPeer;
 
     private Set<RepoUrl> remoteRepoUrls;
+
+    private RepositoryFactory repositoryFactory;
+    private UnifiedRepository unifiedRepository;
+    private LocalRepository localAptRepository;
 
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
@@ -103,6 +107,17 @@ public class AptManagerImpl implements AptManager
         setContexts( properties );
 
         initRepoUrls();
+
+        _local();
+
+        try
+        {
+            _remote();
+        }
+        catch ( MalformedURLException e )
+        {
+            e.printStackTrace();
+        }
     }
 
 
@@ -133,18 +148,39 @@ public class AptManagerImpl implements AptManager
     }
 
 
+    private void _local()
+    {
+        this.repositoryFactory = injector.getInstance( RepositoryFactory.class );
+
+        this.localAptRepository = this.repositoryFactory.createLocalApt( new KurjunContext( DEFAULT_APT_REPO ) );
+    }
+
+
+    private void _remote() throws MalformedURLException
+    {
+        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+        this.unifiedRepository = repositoryFactory.createUnifiedRepo();
+
+        for ( String s : SystemSettings.getGlobalKurjunUrls() )
+        {
+            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalApt( new URL( s ) ) );
+        }
+    }
+
+
     @Override
     public String getRelease( String release, String component, String arch )
     {
-        UnifiedRepository repo = getRepository();
+
         Optional<ReleaseFile> rel =
-                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
+                unifiedRepository.getDistributions().stream().filter( r -> r.getCodename().equals( release ) )
+                                 .findFirst();
 
         if ( rel.isPresent() )
         {
             AptIndexBuilderFactory indexBuilderFactory = injector.getInstance( AptIndexBuilderFactory.class );
-            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( repo, APT_CONTEXT );
-            return rib.build( rel.get(), repo.isKurjun() );
+            ReleaseIndexBuilder rib = indexBuilderFactory.createReleaseIndexBuilder( unifiedRepository, APT_CONTEXT );
+            return rib.build( rel.get(), unifiedRepository.isKurjun() );
         }
         return null;
     }
@@ -154,9 +190,9 @@ public class AptManagerImpl implements AptManager
     public InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex )
             throws IllegalArgumentException
     {
-        UnifiedRepository repo = getRepository();
+
         Optional<ReleaseFile> distr =
-                repo.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
+                unifiedRepository.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
         if ( !distr.isPresent() )
         {
             throw new IllegalArgumentException( "Release not found." );
@@ -182,7 +218,7 @@ public class AptManagerImpl implements AptManager
         try ( ByteArrayOutputStream os = new ByteArrayOutputStream() )
         {
             packagesIndexBuilder
-                    .buildIndex( packagesProviderFactory.create( repo, component, architecture ), os, compressionType );
+                    .buildIndex( packagesProviderFactory.create( unifiedRepository, component, architecture ), os, compressionType );
             return new ByteArrayInputStream( os.toByteArray() );
         }
         catch ( IOException ex )
@@ -205,7 +241,7 @@ public class AptManagerImpl implements AptManager
     public InputStream getPackageByFilename( String filename ) throws IllegalArgumentException
     {
         SerializableMetadata meta = getPackageInfoByFilename( filename );
-        return ( meta != null ) ? getRepository().getPackageStream( meta ) : null;
+        return ( meta != null ) ? unifiedRepository.getPackageStream( meta ) : null;
     }
 
 
@@ -222,7 +258,7 @@ public class AptManagerImpl implements AptManager
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
-        SerializableMetadata meta = getRepository().getPackageInfo( m );
+        SerializableMetadata meta = unifiedRepository.getPackageInfo( m );
         return ( meta != null ) ? meta.serialize() : null;
     }
 
@@ -242,7 +278,7 @@ public class AptManagerImpl implements AptManager
         m.setName( packageName );
         m.setVersion( version );
 
-        return getRepository().getPackageInfo( m );
+        return unifiedRepository.getPackageInfo( m );
     }
 
 
@@ -266,7 +302,7 @@ public class AptManagerImpl implements AptManager
     @Override
     public List<AptPackage> list()
     {
-        List<SerializableMetadata> list = getRepository().listPackages();
+        List<SerializableMetadata> list = unifiedRepository.listPackages();
         List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) )
                                        .collect( Collectors.toList() );
         return deflist;
@@ -310,7 +346,7 @@ public class AptManagerImpl implements AptManager
         m.setName( name );
         m.setVersion( version );
 
-        SerializableMetadata meta = getRepository().getPackageInfo( m );
+        SerializableMetadata meta = unifiedRepository.getPackageInfo( m );
         if ( meta != null )
         {
             return meta.serialize();
@@ -330,11 +366,11 @@ public class AptManagerImpl implements AptManager
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
 
-        UnifiedRepository repo = getRepository();
-        SerializableMetadata meta = repo.getPackageInfo( m );
+
+        SerializableMetadata meta = unifiedRepository.getPackageInfo( m );
         if ( meta != null )
         {
-            return repo.getPackageStream( meta );
+            return unifiedRepository.getPackageStream( meta );
         }
         return null;
     }
@@ -483,30 +519,6 @@ public class AptManagerImpl implements AptManager
         }
     }
 
-
-    private UnifiedRepository getRepository()
-    {
-        RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
-
-        UnifiedRepository unifiedRepo = repositoryFactory.createUnifiedRepo();
-        unifiedRepo.getRepositories().add( getLocalRepository() );
-
-        for ( RepoUrl remote : remoteRepoUrls )
-        {
-            unifiedRepo.getRepositories().add( repositoryFactory.createNonLocalApt( remote.getUrl() ) );
-        }
-
-        // shuffle the global repo list to randomize and normalize usage of them
-        List<RepoUrl> list = new ArrayList<>( getGlobalKurjunUrls() );
-        Collections.shuffle( list );
-
-        for ( RepoUrl repoUrl : list )
-        {
-            unifiedRepo.getSecondaryRepositories().add( repositoryFactory.createNonLocalApt( repoUrl.getUrl() ) );
-        }
-
-        return unifiedRepo;
-    }
 
 
     private LocalRepository getLocalRepository()

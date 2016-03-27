@@ -51,8 +51,9 @@ public class RawManagerImpl implements RawManager
     private static final String RAW_PATH = "/file";
 
     private RepositoryFactory repositoryFactory;
-    private LocalRawRepository localPublicRawRepository;
     private UnifiedRepository unifiedRepository;
+    private LocalRawRepository localPublicRawRepository;
+
 
     private Set<RepoUrl> remoteRepoUrls = new HashSet<>();
 
