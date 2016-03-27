@@ -42,7 +42,7 @@ import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 public class RegistrationManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class );
 
     private ConfigManager configManager;
     private IntegrationImpl manager;
