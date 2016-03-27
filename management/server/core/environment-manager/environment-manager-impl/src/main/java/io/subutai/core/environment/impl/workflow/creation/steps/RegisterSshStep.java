@@ -4,6 +4,9 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
@@ -20,6 +23,7 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 public class RegisterSshStep
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RegisterSshStep.class );
 
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
@@ -33,13 +37,19 @@ public class RegisterSshStep
     }
 
 
+    /**
+     * IMPORTANT: Containers always need access to each other via SSH. For example: ssh root@192.168.1.1 date.
+     * This is a workaround for: https://github.com/optdyn/hub/issues/413.
+     */
     public void execute( Set<String> userKeys ) throws EnvironmentManagerException
     {
-        Set<Host> ch = Sets.newHashSet();
-        ch.addAll( environment.getContainerHosts() );
-        if ( ch.size() > 1 )
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( environment.getContainerHosts() );
+
+        if ( hosts.size() > 1 )
         {
-            exchangeSshKeys( ch, userKeys );
+            exchangeSshKeys( hosts, userKeys );
         }
     }
 
@@ -88,7 +98,12 @@ public class RegisterSshStep
 
                 succeededHosts.add( host );
             }
+            else
+            {
+                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
+            }
         }
+
 
         failedHosts.removeAll( succeededHosts );
 
@@ -189,9 +204,9 @@ public class RegisterSshStep
     public RequestBuilder getCreateNReadSSHCommand()
     {
         return new RequestBuilder( String.format( "rm -rf %1$s && " +
-                "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                        "mkdir -p %1$s && " +
+                        "chmod 700 %1$s && " +
+                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
                 Common.CONTAINER_SSH_FOLDER ) );
     }
 

@@ -57,7 +57,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.PingDistances;
@@ -881,20 +880,6 @@ public class RemotePeerImpl implements RemotePeer
     public PeerResources getResourceLimits( final String peerId ) throws PeerException
     {
         return new PeerWebClient( peerInfo, provider ).getResourceLimits( peerId );
-    }
-
-
-    @Override
-    public ControlNetworkConfig getControlNetworkConfig( final String localPeerId ) throws PeerException
-    {
-        return new PeerWebClient( peerInfo, provider ).getControlNetworkConfig( localPeerId );
-    }
-
-
-    @Override
-    public boolean updateControlNetworkConfig( final ControlNetworkConfig config ) throws PeerException
-    {
-        return new PeerWebClient( peerInfo, provider ).updateControlNetworkConfig( config );
     }
 
 

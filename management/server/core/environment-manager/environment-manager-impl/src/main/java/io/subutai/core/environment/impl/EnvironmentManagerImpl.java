@@ -72,6 +72,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
+import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.dao.TopologyDataService;
@@ -129,6 +130,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
+    private EnvironmentAdapter environmentAdapter;
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final DaoManager daoManager,
@@ -160,6 +162,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.topologyDataService = new TopologyDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
+
+        // Not NULL makes mocking
+//        environmentAdapter = new EnvironmentAdapter( this, peerManager );
     }
 
 
@@ -167,12 +172,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         executor.shutdown();
         backgroundTasksExecutorService.shutdown();
-    }
-
-
-    public SecurityManager getSecurityManager()
-    {
-        return securityManager;
     }
 
 
@@ -258,21 +257,35 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
+        // === START ===
+
+        if ( environmentAdapter != null )
+        {
+            return environmentAdapter.getEnvironments();
+        }
+
+        // === END ===
+
         User activeUser = identityManager.getActiveUser();
 
-
         Set<Environment> environments = new HashSet<>();
+
         for ( Environment environment : environmentDataService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
+
             final boolean b = environment.getUserId().equals( activeUser.getId() );
+
             if ( b || trustedRelation )
             {
                 environments.add( environment );
 
                 setEnvironmentTransientFields( environment );
+
                 setContainersTransientFields( environment );
             }
+
+            LOG.debug( "environment: {}", environment );
         }
 
         return environments;
@@ -1114,6 +1127,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        // === START ===
+
+        if ( environmentAdapter != null )
+        {
+            return environmentAdapter.get( environmentId );
+        }
+
+        // === END ===
 
         EnvironmentImpl environment = environmentDataService.find( environmentId );
 

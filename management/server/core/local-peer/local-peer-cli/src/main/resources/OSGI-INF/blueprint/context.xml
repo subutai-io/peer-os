@@ -1,22 +1,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="localpeer/control-network-config">
-      <action class="io.subutai.core.localpeer.cli.GetControlNetworkCommand">
-        <argument ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="localpeer/control-network-update">
-      <action class="io.subutai.core.localpeer.cli.UpdateControlNetworkCommand">
-        <argument ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="task/list">
       <action class="io.subutai.core.localpeer.cli.TaskListCommand">
         <argument ref="localPeer" />
@@ -43,6 +27,13 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="localpeer/management-key-exchange">
       <action class="io.subutai.core.localpeer.cli.ManagementKeyExchangeCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/list-gw">
+      <action class="io.subutai.core.localpeer.cli.ListGatewaysCommand">
         <argument ref="localPeer" />
       </action>
     </command>
