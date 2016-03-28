@@ -1,6 +1,9 @@
 package io.subutai.core.hubadapter.impl;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
@@ -11,6 +14,8 @@ import static java.lang.String.format;
 public class HubAdapterImpl implements HubAdapter
 {
     private static final String USER_ENVIRONMENTS = "/rest/v1/adapter/users/%s/environments";
+
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final DaoHelper daoHelper;
 
@@ -29,15 +34,6 @@ public class HubAdapterImpl implements HubAdapter
     }
 
 
-    @Override
-    public String sayHello()
-    {
-        return isRegistered()
-               ? httpClient.doGet( format( USER_ENVIRONMENTS, getOwnerId() ) )
-               : null;
-    }
-
-
     private boolean isRegistered()
     {
         return daoHelper.isPeerRegisteredToHub( peerId );
@@ -47,5 +43,21 @@ public class HubAdapterImpl implements HubAdapter
     private String getOwnerId()
     {
         return daoHelper.getPeerOwnerId( peerId );
+    }
+
+
+    @Override
+    public String getUserEnvironmentsForPeer()
+    {
+        if ( !isRegistered() )
+        {
+            log.debug( "Peer not registered to Hub." );
+
+            return null;
+        }
+
+        log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", getOwnerId(), peerId );
+
+        return httpClient.doGet( format( USER_ENVIRONMENTS, getOwnerId() ) );
     }
 }

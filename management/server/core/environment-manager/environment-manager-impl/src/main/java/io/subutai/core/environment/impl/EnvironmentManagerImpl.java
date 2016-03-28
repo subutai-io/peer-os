@@ -157,8 +157,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
-        // Not NULL makes mocking
-//        environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
+        environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
     }
 
 
@@ -283,11 +282,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         // === START ===
 
-        if ( environmentAdapter != null )
-        {
-//            return environmentAdapter.getEnvironments();
-            environmentAdapter.getEnvironments();
-        }
+        environments.addAll( environmentAdapter.getEnvironments() );
 
         // === END ===
 
@@ -1133,14 +1128,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         // === START ===
 
-        if ( environmentAdapter != null )
+        EnvironmentImpl environment = environmentAdapter.get( environmentId );
+
+        if ( environment != null )
         {
-            return environmentAdapter.get( environmentId );
+            return environment;
         }
 
         // === END ===
 
-        EnvironmentImpl environment = environmentDataService.find( environmentId );
+        environment = environmentDataService.find( environmentId );
 
         if ( environment == null )
         {

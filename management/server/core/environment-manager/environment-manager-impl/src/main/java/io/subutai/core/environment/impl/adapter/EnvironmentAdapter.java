@@ -154,7 +154,8 @@ public class EnvironmentAdapter
 
         e.addContainers( containers );
 
-        return e;
+//        return e;
+        return null;
     }
 
 
@@ -166,7 +167,7 @@ public class EnvironmentAdapter
 //        set.add( env );
 //        printLocalContainers();
 
-        log.debug( "hubAdapter: {}", hubAdapter.sayHello() );
+        log.debug( "environments: {}", hubAdapter.getUserEnvironmentsForPeer() );
 
         //        ArrayNode arr = null;
         //        try
@@ -180,7 +181,7 @@ public class EnvironmentAdapter
         //
         //        log.debug( "envId: {}", arr.get( 0 ).get( "id" ).asText() );
 
-        return null;
+        return new HashSet<>();
     }
 
 
