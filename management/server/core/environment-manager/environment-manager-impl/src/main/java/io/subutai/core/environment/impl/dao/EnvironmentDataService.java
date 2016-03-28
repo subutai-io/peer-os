@@ -194,6 +194,28 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
+    public synchronized EnvironmentImpl merge( EnvironmentImpl item )
+    {
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+            item = em.merge( item );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.toString(), e );
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            //            daoManager.closeEntityManager( em );
+        }
+        return item;
+    }
+
+
     public synchronized EnvironmentImpl save( Environment item )
     {
 

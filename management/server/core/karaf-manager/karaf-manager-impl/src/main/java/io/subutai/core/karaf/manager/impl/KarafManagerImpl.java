@@ -14,9 +14,12 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
+
 import io.subutai.common.mdc.SubutaiExecutors;
+import io.subutai.common.settings.Common;
 import io.subutai.core.karaf.manager.api.KarafManager;
 
 
@@ -64,43 +67,39 @@ public class KarafManagerImpl implements KarafManager
 
             do
             {
-                response += commandFuture.get(2,TimeUnit.SECONDS);
+                response += commandFuture.get( Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC, TimeUnit.SECONDS );
             }
-            while(!commandFuture.isDone());
+            while ( !commandFuture.isDone() );
         }
         catch ( Exception e )
         {
-            response += "Command Timout: ";
+            response += "Command Timeout: ";
 
-            if(byteArrayOutputStream != null)
-            {
-                response += byteArrayOutputStream.toString();
-            }
+            response += byteArrayOutputStream.toString();
         }
 
         return response;
     }
 
 
-
     /* *************
     */
-    public String executeJMXCommand( final String commandStr)
+    public String executeJMXCommand( final String commandStr )
     {
-        String result= "No Result";
+        String result = "No Result";
 
         try
         {
-            HashMap   environment = new HashMap();
-            String[]  credentials = new String[] {"admin", "secret"};
-            environment.put (JMXConnector.CREDENTIALS, credentials);
+            HashMap environment = new HashMap();
+            String[] credentials = new String[] { "admin", "secret" };
+            environment.put( JMXConnector.CREDENTIALS, credentials );
 
-            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:1099/karaf-root");
+            JMXServiceURL url = new JMXServiceURL( "service:jmx:rmi:///jndi/rmi://localhost:1099/karaf-root" );
             JMXConnector connector = null;
             connector = JMXConnectorFactory.connect( url, environment );
             MBeanServerConnection mbeanServer = connector.getMBeanServerConnection();
-            ObjectName systemMBean = new ObjectName("org.apache.karaf:type=bundle,name=root");
-            mbeanServer.invoke(systemMBean,commandStr, null, null);
+            ObjectName systemMBean = new ObjectName( "org.apache.karaf:type=bundle,name=root" );
+            mbeanServer.invoke( systemMBean, commandStr, null, null );
             connector.close();
         }
         catch ( Exception e )
