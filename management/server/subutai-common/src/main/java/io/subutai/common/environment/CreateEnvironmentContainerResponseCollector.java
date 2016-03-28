@@ -4,11 +4,8 @@ package io.subutai.common.environment;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.util.StringUtil;
 
 
