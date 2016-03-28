@@ -77,7 +77,7 @@ public class PrepareTemplatesStep
                 Future<PrepareTemplatesResponseCollector> futures = taskCompletionService.take();
                 final PrepareTemplatesResponseCollector prepareTemplatesResponse = futures.get();
 
-                succeeded = succeeded && prepareTemplatesResponse.hasSucceeded();
+                succeeded &= prepareTemplatesResponse.hasSucceeded();
                 addLogs( prepareTemplatesResponse );
                 processResponse( prepareTemplatesResponse );
             }
