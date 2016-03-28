@@ -17,49 +17,45 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 public interface RestRawManager
 {
-    static final String MD5_PARAM = "md5";
-    static final String NAME_PARAM = "name";
-    static final String FILE_PART_NAME = "file";
-    static final String IS_KURJUN_CLIENT_PARAM = "kc";
-
+    String MD5_PARAM = "md5";
+    String NAME_PARAM = "name";
+    String FILE_PART_NAME = "file";
+    String IS_KURJUN_CLIENT_PARAM = "kc";
+    String REPOSITORY = "repository";
 
     @GET
     @Path( "get" )
-    @Produces( MediaType.TEXT_PLAIN )
-    Response getFile(
-            @QueryParam( MD5_PARAM ) String md5,
-            @QueryParam( NAME_PARAM ) String name,
-            @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient
-    );
-
+    @Produces( MediaType.APPLICATION_OCTET_STREAM )
+    Response download( @QueryParam( REPOSITORY ) String repository, @QueryParam( MD5_PARAM ) String md5,
+                      @QueryParam( NAME_PARAM ) String name,
+                      @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient );
 
     @GET
     @Path( "info" )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getFileInfo(
-            @QueryParam( MD5_PARAM ) String md5,
-            @QueryParam( NAME_PARAM ) String name,
-            @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient
-    );
-
+    Response info( @QueryParam( REPOSITORY ) String repository, @QueryParam( MD5_PARAM ) String md5,
+                          @QueryParam( NAME_PARAM ) String name,
+                          @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient );
 
     @GET
     @Path( "list" )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getFileList( @QueryParam( IS_KURJUN_CLIENT_PARAM ) boolean isKurjunClient );
-
+    Response list( @QueryParam( REPOSITORY ) String repository );
 
     @POST
     @Path( "upload" )
     @Produces( MediaType.TEXT_PLAIN )
     @Consumes( MediaType.MULTIPART_FORM_DATA )
-    Response uploadFile( @Multipart( FILE_PART_NAME ) Attachment attachment );
-
+    Response upload( @QueryParam( REPOSITORY ) String repository,
+                         @Multipart( FILE_PART_NAME ) Attachment attachment );
 
     @DELETE
     @Path( "delete" )
     @Produces( MediaType.TEXT_PLAIN )
-    Response deleteFile( @QueryParam( MD5_PARAM ) String md5
-    );
+    Response delete( @QueryParam( REPOSITORY ) String repository, @QueryParam( MD5_PARAM ) String md5 );
 
+    @GET
+    @Path( "md5" )
+    @Produces( MediaType.TEXT_PLAIN )
+    Response md5( @QueryParam( REPOSITORY ) String repository );
 }

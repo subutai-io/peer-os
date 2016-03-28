@@ -10,8 +10,8 @@ public class ChannelSettings
 
     public static int SECURE_PORT_X1 = 8443;
     public static int SECURE_PORT_X2 = 8444;
-    public static int SECURE_PORT_X3 = 8445;
-    public static int SPECIAL_PORT_X1 = 8551;
+    public static int SECURE_PORT_X3 = 8338;
+    public static int SPECIAL_PORT_X1 = 8333;
     public static int AGENT_PORT = 7777
             ;
     public static final String SPECIAL_REST_BUS = "cxfBusAptManager";
@@ -22,6 +22,9 @@ public class ChannelSettings
             "/rest/v1/security/keyman/getpublickeyring", "/rest/v1/security/keyman/getpublickey",
             "/rest/v1/handshake/info", "/rest/v1/handshake/register", "/rest/v1/handshake/approve",
             "/rest/v1/handshake/cancel", "/rest/v1/handshake/reject", "/rest/v1/handshake/unregister"
+
+
+
     };
 
 
