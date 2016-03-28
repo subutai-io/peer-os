@@ -40,7 +40,8 @@ function peerRegistrationService($http) {
 		);
 	}
 
-	function rejectPeerRequest(postData) {
+	function rejectPeerRequest(peerId) {
+		var postData = 'peerId=' + peerId;
 		return $http.put(
 			PEERS_URL + 'reject/',
 			postData, 
@@ -48,7 +49,8 @@ function peerRegistrationService($http) {
 		);		
 	}
 
-	function unregisterPeerRequest(postData) {
+	function unregisterPeerRequest(peerId) {
+		var postData = 'peerId=' + peerId;
 		return $http.put(
 			PEERS_URL + 'unregister/',
 			postData, 
@@ -56,7 +58,8 @@ function peerRegistrationService($http) {
 		);		
 	}
 
-	function cancelPeerRequest(postData) {
+	function cancelPeerRequest(peerId) {
+		var postData = 'peerId=' + peerId;
 		return $http.put(
 			PEERS_URL + 'cancel/',
 			postData, 
@@ -64,8 +67,8 @@ function peerRegistrationService($http) {
 		);		
 	}
 
-	function approvePeerRequest(peerId, keyPhrase, challenge) {
-		var postData = 'peerId=' + peerId + '&key_phrase=' + keyPhrase + '&challenge=' + encodeURIComponent(challenge);
+	function approvePeerRequest(peerId, keyPhrase) {
+		var postData = 'peerId=' + peerId + '&key_phrase=' + keyPhrase;
 		return $http.put(
 			PEERS_URL + 'approve/',
 			postData, 

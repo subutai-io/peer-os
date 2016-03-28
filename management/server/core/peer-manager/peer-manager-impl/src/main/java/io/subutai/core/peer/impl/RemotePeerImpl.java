@@ -26,7 +26,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.ContainersDestructionResultImpl;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.DestroyEnvironmentContainerGroupRequest;
@@ -310,14 +309,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            peerWebClient.startContainer( containerId );
-        }
-        else
-        {
-            environmentWebClient.startContainer( peerInfo, containerId );
-        }
+        environmentWebClient.startContainer( peerInfo, containerId );
     }
 
 
@@ -328,14 +320,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            peerWebClient.stopContainer( containerId );
-        }
-        else
-        {
-            environmentWebClient.stopContainer( peerInfo, containerId );
-        }
+        environmentWebClient.stopContainer( peerInfo, containerId );
     }
 
 
@@ -343,15 +328,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
-
-        if ( containerId.getEnvironmentId() == null )
-        {
-            peerWebClient.destroyContainer( containerId );
-        }
-        else
-        {
-            environmentWebClient.destroyContainer( peerInfo, containerId );
-        }
+        environmentWebClient.destroyContainer( peerInfo, containerId );
     }
 
 
@@ -432,14 +409,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            return peerWebClient.getState( containerId );
-        }
-        else
-        {
-            return environmentWebClient.getState( peerInfo, containerId );
-        }
+        return environmentWebClient.getState( peerInfo, containerId );
     }
 
 
@@ -852,12 +822,13 @@ public class RemotePeerImpl implements RemotePeer
         }
         catch ( IOException | PGPException e )
         {
+            throw new PeerException( e.getMessage() );
         }
     }
 
 
     @Override
-    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek )
+    public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pek ) throws PeerException
     {
         Preconditions.checkNotNull( keyId, "Invalid key ID" );
         Preconditions.checkNotNull( pek, "Public key ring is null" );
@@ -868,8 +839,9 @@ public class RemotePeerImpl implements RemotePeer
             String exportedPubKeyRing = securityManager.getEncryptionTool().armorByteArrayToString( pek.getEncoded() );
             peerWebClient.addPeerEnvironmentPubKey( keyId, exportedPubKeyRing );
         }
-        catch ( IOException | PGPException | PeerException e )
+        catch ( IOException | PGPException e )
         {
+            throw new PeerException( e.getMessage() );
         }
     }
 
@@ -892,11 +864,30 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setupP2PConnection( final P2PConfig config ) throws PeerException
+    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
+
+        return peerWebClient.getP2PIP( resourceHostId, swarmHash );
+    }
+
+
+    @Override
+    public String setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
         peerWebClient.setupP2PConnection( config );
+    }
+
+
+    @Override
+    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    {
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
+
+        peerWebClient.setupInitialP2PConnection( config );
     }
 
 

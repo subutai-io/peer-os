@@ -117,11 +117,11 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response processRegisterRequest( final String ip, final String keyPhrase, final String challenge )
+    public Response processRegisterRequest( final String ip, final String keyPhrase )
     {
         try
         {
-            peerManager.doRegistrationRequest( ip, keyPhrase, challenge );
+            peerManager.doRegistrationRequest( ip, keyPhrase );
         }
         catch ( Exception e )
         {
@@ -133,28 +133,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response rejectForRegistrationRequest( final String peerId, final String challenge )
-    {
-        List<RegistrationData> dataList = peerManager.getRegistrationRequests();
-
-        RegistrationData data =
-                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
-
-        try
-        {
-            peerManager.doRejectRequest( data, challenge );
-        }
-        catch ( Exception e )
-        {
-            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
-        }
-
-        return Response.ok().build();
-    }
-
-
-    @Override
-    public Response approveForRegistrationRequest( final String peerId, final String keyPhrase, final String challenge )
+    public Response rejectForRegistrationRequest( final String peerId )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -163,7 +142,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doApproveRequest( keyPhrase, data, challenge );
+            peerManager.doRejectRequest( data );
         }
         catch ( Exception e )
         {
@@ -175,7 +154,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response cancelForRegistrationRequest( final String peerId, final String challenge )
+    public Response approveForRegistrationRequest( final String peerId, final String keyPhrase )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -184,7 +163,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doCancelRequest( data, challenge );
+            peerManager.doApproveRequest( keyPhrase, data );
         }
         catch ( Exception e )
         {
@@ -196,7 +175,28 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response unregisterForRegistrationRequest( final String peerId, final String challenge )
+    public Response cancelForRegistrationRequest( final String peerId )
+    {
+        List<RegistrationData> dataList = peerManager.getRegistrationRequests();
+
+        RegistrationData data =
+                dataList.stream().filter( p -> p.getPeerInfo().getId().equals( peerId ) ).findAny().get();
+
+        try
+        {
+            peerManager.doCancelRequest( data );
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
+    public Response unregisterForRegistrationRequest( final String peerId )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 

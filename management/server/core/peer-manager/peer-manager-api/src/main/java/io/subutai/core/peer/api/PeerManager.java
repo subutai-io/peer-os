@@ -24,8 +24,6 @@ public interface PeerManager
 
     void doUnregisterRequest( RegistrationData request ) throws PeerException;
 
-    void doUnregisterRequest( RegistrationData request, String challenge ) throws PeerException;
-
     List<RegistrationData> getRegistrationRequests();
 
 
@@ -47,19 +45,11 @@ public interface PeerManager
 
     void doRegistrationRequest( String destinationHost, String keyPhrase ) throws PeerException;
 
-    void doRegistrationRequest( String destinationHost, String keyPhrase, String challenge ) throws PeerException;
-
     void doApproveRequest( String keyPhrase, RegistrationData request ) throws PeerException;
-
-    void doApproveRequest( String keyPhrase, RegistrationData request, String challenge ) throws PeerException;
 
     void doRejectRequest( RegistrationData request ) throws PeerException;
 
-    void doRejectRequest( RegistrationData request, String challenge ) throws PeerException;
-
     void doCancelRequest( RegistrationData request ) throws PeerException;
-
-    void doCancelRequest( RegistrationData request, String challenge ) throws PeerException;
 
     void processCancelRequest( RegistrationData registrationData ) throws PeerException;
 
@@ -84,8 +74,6 @@ public interface PeerManager
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
 
     PingDistances getP2PSwarmDistances();
-
-    void updateControlNetwork();
 
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
 }

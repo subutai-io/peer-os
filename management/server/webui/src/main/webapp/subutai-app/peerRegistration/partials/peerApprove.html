@@ -18,24 +18,11 @@
 			</div>
 
 		</div>
-
-		<div ng-show="peerRegistrationPopupCtrl.operationChallenge">
-
-			<div style="display: none">
-				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-sign-input bp-sign-challenge"
-									data-challenge="approve-register"
-									ng-model="peerRegistrationPopupCtrl.operationChallenge"
-									ng-change="peerRegistrationPopupCtrl.allowSubmit()"
-									style="width: 420px; height: 160px; font-family: monospace;">
-				</textarea>
-			</div>
-
-			<div class="b-popup__footer" ng-show="peerRegistrationPopupCtrl.challengeSigned">
-				<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__peer-approve-popup">
-					Approve
-				</button>
-				<div class="clear"></div>
-			</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__peer-approve-popup">
+				Approve
+			</button>
+			<div class="clear"></div>
 		</div>
 	</form>
 </div>
