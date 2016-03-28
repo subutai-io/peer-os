@@ -77,13 +77,6 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     }
 
 
-    @Override
-    public ContainerHostState getState()
-    {
-        return ContainerHostState.RUNNING;
-    }
-
-
     void setProxyContainer( Host proxyContainer )
     {
         this.proxyContainer = proxyContainer;

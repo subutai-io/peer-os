@@ -18,7 +18,8 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
-class ProxyEnvironment extends EnvironmentImpl
+// NOTE: Using environmentManager from EnvironmentImpl gives side effects. For example, empty container list.
+public class ProxyEnvironment extends EnvironmentImpl
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -35,15 +36,13 @@ class ProxyEnvironment extends EnvironmentImpl
 
         init( json );
 
-        addContainers( parseContainers( json, localContainersByHostname ) );
+        addContainers( parseContainers( json, environmentManager, localContainersByHostname ) );
     }
 
 
     private void init( JsonNode json )
     {
         environmentId = json.get( "id" ).asText();
-
-        log.debug( "environmentId: {}", environmentId );
 
         envId = new EnvironmentId( environmentId );
 
@@ -54,7 +53,8 @@ class ProxyEnvironment extends EnvironmentImpl
     }
 
 
-    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, Map<String, ContainerHost> localContainersByHostname )
+    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager,
+                                                           Map<String, ContainerHost> localContainersByHostname )
     {
         Set<ProxyEnvironmentContainer> containers = new HashSet<>();
 
@@ -64,12 +64,7 @@ class ProxyEnvironment extends EnvironmentImpl
         {
             try
             {
-                ProxyEnvironmentContainer con = parseContainer( node, localContainersByHostname );
-
-                if ( con != null )
-                {
-                    containers.add( con );
-                }
+                parseAndAdd( containers, node, localContainersByHostname, environmentManager );
             }
             catch ( Exception e )
             {
@@ -84,6 +79,20 @@ class ProxyEnvironment extends EnvironmentImpl
         resultSet.addAll( containers );
 
         return resultSet;
+    }
+
+
+    private void parseAndAdd( Set<ProxyEnvironmentContainer> containers, JsonNode node, Map<String, ContainerHost> localContainersByHostname,
+                              EnvironmentManagerImpl environmentManager)
+    {
+        ProxyEnvironmentContainer con = parseContainer( node, localContainersByHostname );
+
+        if ( con != null )
+        {
+            containers.add( con );
+
+            con.setEnvironmentManager( environmentManager );
+        }
     }
 
 
@@ -106,14 +115,4 @@ class ProxyEnvironment extends EnvironmentImpl
     {
         return "ProxyEnvironment:" + super.toString();
     }
-
-
-    // TODO. setEnvironmentTransientFields( environment );
-    // NOTE: Using environmentManager from EnvironmentImpl gives side effects. For example, empty container list.
-//    private EnvironmentManagerImpl environmentManager;
-//    @Override
-//    public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
-//    {
-//        this.environmentManager = environmentManager;
-//    }
 }

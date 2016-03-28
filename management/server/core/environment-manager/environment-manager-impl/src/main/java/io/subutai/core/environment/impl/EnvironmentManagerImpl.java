@@ -73,6 +73,7 @@ import io.subutai.core.environment.api.exception.EnvironmentDestructionException
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
+import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.dao.TopologyDataService;
@@ -1036,8 +1037,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ), "Invalid container id" );
 
-
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        if ( environment instanceof ProxyEnvironment )
+        {
+            environmentAdapter.destroyContainer( (ProxyEnvironment) environment, containerId );
+
+            return;
+        }
 
         User activeUser = identityManager.getActiveUser();
 

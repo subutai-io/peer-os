@@ -12,10 +12,13 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.json.JsonUtil;
@@ -46,13 +49,21 @@ public class EnvironmentAdapter
     }
 
 
-    public ProxyEnvironment get( final String id )
+    public ProxyEnvironment get( String id )
     {
+        for ( ProxyEnvironment e : getEnvironments() )
+        {
+            if ( e.getId().equals( id ) )
+            {
+                return e;
+            }
+        }
+
         return null;
     }
 
 
-    public Set<Environment> getEnvironments()
+    public Set<ProxyEnvironment> getEnvironments()
     {
         String json = hubAdapter.getUserEnvironmentsForPeer();
 
@@ -65,7 +76,7 @@ public class EnvironmentAdapter
 
         Map<String, ContainerHost> localContainersByHostname = getLocalContainersByHostname();
 
-        HashSet<Environment> envs = new HashSet<>();
+        HashSet<ProxyEnvironment> envs = new HashSet<>();
 
         try
         {
@@ -103,5 +114,20 @@ public class EnvironmentAdapter
         }
 
         return map;
+    }
+
+
+    public void destroyContainer( ProxyEnvironment env, String containerId )
+    {
+        try
+        {
+            EnvironmentContainerHost ch = env.getContainerHostById( containerId );
+
+            ( ( EnvironmentContainerImpl ) ch ).destroy();
+        }
+        catch ( ContainerHostNotFoundException | PeerException e )
+        {
+            log.error( "Error to destroy container: ", e );
+        }
     }
 }
