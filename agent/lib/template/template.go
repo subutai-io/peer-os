@@ -74,6 +74,6 @@ func Install(parent, child string) {
 	}
 
 	for _, file := range []string{"config", "fstab", "packages"} {
-		copy(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+child+"/"+file, config.Agent.LxcPrefix+child+"/"+file)
+		copy(config.Agent.LxcPrefix+"tmpdir/"+child+"/"+file, config.Agent.LxcPrefix+child+"/"+file)
 	}
 }

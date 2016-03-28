@@ -16,7 +16,7 @@ import (
 func LxcRegister(name string) {
 	config.CheckKurjun()
 
-	tarFullPath := config.Agent.LxcPrefix + "lxc-data/tmpdir/" + name + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
+	tarFullPath := config.Agent.LxcPrefix + "tmpdir/" + name + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
 
 	_, err := os.Stat(tarFullPath)
 	if log.Check(log.WarnLevel, "Looking for archive", err) {
