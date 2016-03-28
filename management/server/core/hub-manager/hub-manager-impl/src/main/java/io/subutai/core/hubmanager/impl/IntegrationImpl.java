@@ -64,7 +64,7 @@ public class IntegrationImpl implements Integration
 {
     private static final long TIME_15_MINUTES = 900;
 
-    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class );
 
     private SecurityManager securityManager;
     private EnvironmentManager environmentManager;
@@ -244,8 +244,8 @@ public class IntegrationImpl implements Integration
         ProductsDto result;
         try
         {
-            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", hubIp );
+            //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -482,16 +482,16 @@ public class IntegrationImpl implements Integration
 
 
     private void generateChecksum()
-    {
-        if ( getRegistrationState() )
-        {
-            try
-            {
-                LOG.info( "Generating plugins list md5 checksum" );
-                String productList = getProducts();
-                MessageDigest md = MessageDigest.getInstance( "MD5" );
-                byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
-                StringBuilder hexString = new StringBuilder();
+	{
+/*		if (getRegistrationState ())
+		{*/
+			try
+			{
+				LOG.info ("Generating plugins list md5 checksum");
+				String productList = getProducts ();
+				MessageDigest md = MessageDigest.getInstance ("MD5");
+				byte[] bytes = md.digest (productList.getBytes ("UTF-8"));
+				StringBuilder hexString = new StringBuilder ();
 
                 for ( int i = 0; i < bytes.length; i++ )
                 {
@@ -503,20 +503,20 @@ public class IntegrationImpl implements Integration
                     hexString.append( hex );
                 }
 
-                checksum = hexString.toString();
-                LOG.info( "Checksum generated: " + checksum );
-            }
-            catch ( NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e )
-            {
-                LOG.error( e.getMessage() );
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            LOG.info( "Peer not registered. Trying again in 1 hour." );
-        }
-    }
+				checksum = hexString.toString ();
+				LOG.info ("Checksum generated: " + checksum);
+			}
+			catch (NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e)
+			{
+				LOG.error (e.getMessage ());
+				e.printStackTrace ();
+			}
+/*		}
+		else
+		{
+			LOG.info ("Peer not registered. Trying again in 1 hour.");
+		}*/
+	}
 
 
     @Override

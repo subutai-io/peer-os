@@ -417,7 +417,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         try
         {
             localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
-            localPeer.removeP2PConnection( env.getP2pHash() );
             localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
 
             WebClient client =
