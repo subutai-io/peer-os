@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.ws.rs.core.Response;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
+
+import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -351,6 +354,29 @@ public class KurjunManagerImpl implements KurjunManager
         kurjun.setType( type );
 
         dataService.persistKurjunData( kurjun );
+
+        ArrayList<String> globalUrls = Lists.newArrayList();
+        ArrayList<String> localUrls = Lists.newArrayList();
+        for ( final Kurjun entity : dataService.getAllKurjunData() )
+        {
+            if ( entity.getType() == 1 )
+            {
+                localUrls.add( entity.getUrl() );
+            }
+            else if ( entity.getType() == 2 )
+            {
+                globalUrls.add( entity.getUrl() );
+            }
+        }
+
+        String[] localArr = new String[localUrls.size()];
+        localArr = localUrls.toArray(localArr);
+
+        String[] globalArr = new String[globalUrls.size()];
+        globalArr = globalUrls.toArray(globalArr);
+
+        SystemSettings.setLocalKurjunUrls( localArr );
+        SystemSettings.setGlobalKurjunUrls( globalArr );
     }
 
 
