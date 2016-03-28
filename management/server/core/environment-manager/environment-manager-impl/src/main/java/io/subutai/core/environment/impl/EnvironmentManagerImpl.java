@@ -280,11 +280,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             LOG.debug( "environment: {}", environment );
         }
 
-        // === START ===
-
         environments.addAll( environmentAdapter.getEnvironments() );
-
-        // === END ===
 
         return environments;
     }
@@ -1126,16 +1122,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        // === START ===
-
+        // First get environment from Hub
         EnvironmentImpl environment = environmentAdapter.get( environmentId );
 
         if ( environment != null )
         {
             return environment;
         }
-
-        // === END ===
 
         environment = environmentDataService.find( environmentId );
 
