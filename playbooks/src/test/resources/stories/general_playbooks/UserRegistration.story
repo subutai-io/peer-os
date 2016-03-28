@@ -2,8 +2,8 @@ Meta:
 
 Narrative:
 As a user
-I want to perform an action
-So that I can achieve a business goal
+I want to register a new user and delete it
+For that I can run this test scenario
 
 Scenario: The User should register a new user
 Given the first user is on the Home page of Subutai
