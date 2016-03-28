@@ -9,11 +9,6 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar, $http) {
 
 	var vm = this;
 
-	$http.get(
-		"https://peer.noip.me:8339/kurjun/rest/template/list",
-		{withCredentials: true, headers: {'Content-Type': 'application/json'}}
-	);
-
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
 		cfpLoadingBar.complete();
