@@ -140,7 +140,8 @@ public class ContainerCloneStep
                 Future<CreateEnvironmentContainerResponseCollector> futures = taskCompletionService.take();
                 CreateEnvironmentContainerResponseCollector response = futures.get();
                 addLogs( response );
-                succeeded &= processResponse( placement.get( response.getPeerId() ), response );
+                final boolean b = processResponse( placement.get( response.getPeerId() ), response );
+                succeeded = succeeded && b;
             }
             catch ( Exception e )
             {
