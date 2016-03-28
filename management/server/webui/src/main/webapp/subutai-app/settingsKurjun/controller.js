@@ -173,25 +173,25 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 
 
     function urlFrom() {
-		ngDialog.open({
-			template: 'subutai-app/settingsKurjun/partials/urlForm.html',
-			scope: $scope
-		});
+        ngDialog.open({
+            template: 'subutai-app/settingsKurjun/partials/urlForm.html',
+            scope: $scope
+        });
     }
 
     function addUrl(newUrl) {
-		var postData = 'url=' + newUrl.name + '&type=' + newUrl.type;;
-		LOADING_SCREEN();
-		ngDialog.closeAll();
-		SettingsKurjunSrv.addUrl(postData).success(function (data) {
-			LOADING_SCREEN('none');
-			if (Object.keys(vm.dtInstance).length !== 0) {
-				vm.dtInstance.reloadData(null, false);
-			}
-		}).error(function (error) {
-			LOADING_SCREEN('none');
-			SweetAlert.swal("ERROR!", "Peer request error: " + error, "error");
-		});
+        var postData = 'url=' + newUrl.name + '&type=' + newUrl.type;
+        LOADING_SCREEN();
+        ngDialog.closeAll();
+        SettingsKurjunSrv.addUrl(postData).success(function (data) {
+            LOADING_SCREEN('none');
+            if (Object.keys(vm.dtInstance).length !== 0) {
+                vm.dtInstance.reloadData(null, false);
+            }
+        }).error(function (error) {
+            LOADING_SCREEN('none');
+            SweetAlert.swal("ERROR!", "Error in saving URL: " + error, "error");
+        });
     }
 }
 
