@@ -410,7 +410,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             try
             {
 
-                CloneTask task = new CloneTask( request, environmentVni.getVlan() );
+                int rhCoresNumber = getResourceHostById( request.getResourceHostId() ).getNumberOfCpuCores();
+
+                CloneTask task = new CloneTask( request, environmentVni.getVlan(), rhCoresNumber );
 
                 task.onSuccess( successResultHandler );
 

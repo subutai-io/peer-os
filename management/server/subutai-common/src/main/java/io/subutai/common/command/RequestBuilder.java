@@ -40,7 +40,7 @@ public class RequestBuilder
     private OutputRedirection errRedirection = OutputRedirection.RETURN;
 
     //command timeout interval
-    private Integer timeout = 30;
+    private Integer timeout = Common.DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC;
 
     //user under which to run the command
     private String runAs = "root";

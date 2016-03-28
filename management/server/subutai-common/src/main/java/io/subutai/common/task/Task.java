@@ -6,8 +6,6 @@ import java.util.List;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.ResourceHost;
 
 
 /**
@@ -21,6 +19,7 @@ public interface Task<R extends TaskRequest, T extends TaskResponse>
         PENDING, RUNNING, SUCCESS, FAILURE;
 
     }
+
     long getElapsedTime();
 
     long getFinished();
@@ -43,7 +42,12 @@ public interface Task<R extends TaskRequest, T extends TaskResponse>
 
     T waitAndGetResponse();
 
-    boolean isSequential();
+    /**
+     * Number of instances of this task that can be launched simultaneously.
+     *
+     * value <= 0 for unlimited
+     */
+    int getNumberOfParallelTasks();
 
     String getExceptionsAsString();
 
@@ -59,5 +63,4 @@ public interface Task<R extends TaskRequest, T extends TaskResponse>
     String getStdOut();
 
     String getStdErr();
-
 }
