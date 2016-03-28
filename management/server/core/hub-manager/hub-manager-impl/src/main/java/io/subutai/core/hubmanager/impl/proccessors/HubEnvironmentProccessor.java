@@ -291,7 +291,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                         + "proxy_pass http://%s-upstream/;\n" + "proxy_set_header X-Real-IP $remote_addr;\n"
                         + "proxy_set_header Host $http_host;\n"
                         + "proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n" + "}\n" + "}\n'"
-                        + " > /var/lib/apps/subutai/current/nginx-includes/101.conf";
+                        + " > /var/lib/apps/subutai/current/nginx-includes/1000.conf";
 
 
         List<EnvironmentNodeDto> nodes = updatedNodes.getNodes();
