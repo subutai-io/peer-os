@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"time"
+
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -11,9 +13,13 @@ func LxcStart(name string) {
 		container.Start(name)
 	}
 	state := container.State(name)
-	if state == "RUNNING" || state == "STARTING" {
-		log.Info(name + " started")
-	} else {
-		log.Error(name + " start failed. State: " + state)
+	for i := 0; i < 5; i++ {
+		if state == "RUNNING" || state == "STARTING" {
+			log.Info(name + " started")
+			return
+		}
+		time.Sleep(time.Second)
+		state = container.State(name)
 	}
+	log.Error(name + " start failed.")
 }
