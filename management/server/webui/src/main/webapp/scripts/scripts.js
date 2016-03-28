@@ -53,3 +53,7 @@ $('body').on('click', '.js-hide-resources', function(){
 
 var UPDATE_NIGHTLY_BUILD_STATUS;
 
+$(document).ready(function() {
+	$('.sweet-container').remove();
+});
+

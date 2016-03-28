@@ -48,9 +48,9 @@
 			<ul class="list">
 				<li ng-repeat="notification in currentUserCtrl.notifications"
 				ng-class="{'b-notification__error' : notification.type == 'error' }">
-					<a href="#">
+					<span>
 						{{ notification.message }}
-					</a>
+					</span>
 
 					<div class="date">
 						{{ notification.date }}
@@ -62,7 +62,7 @@
 					</div>
 				</li>
 				<li ng-if="currentUserCtrl.notifications.length <= 0" style="text-align: center;">
-					<a href>No logs</a>
+					<span>No logs</span>
 				</li>
 					<!--<li><a href="#">Your SS version is obsolete, please update
 					it to X version</a>

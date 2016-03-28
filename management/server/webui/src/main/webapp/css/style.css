@@ -3302,6 +3302,7 @@ td.b-main-table__status-col {
 	border-left: 3px solid transparent;
     font-size: 13px;
 	line-height: 15px;
+	color: #04346E;
 }
 
 .b-hub-status__dropdown .list .b-notification__error {
