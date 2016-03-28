@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.EnvironmentId;
@@ -58,7 +59,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
 
     public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
-                                     final ConfigManager hConfigManager, final PeerManager peerManager,CommandExecutor commandExecutor )
+                                     final ConfigManager hConfigManager, final PeerManager peerManager,
+                                     CommandExecutor commandExecutor )
     {
         this.configManager = hConfigManager;
         this.peerManager = peerManager;
@@ -267,9 +269,12 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         }
     }
 
+
     private EnvironmentNodesDto setupVEHS( final EnvironmentNodesDto updatedNodes, EnvironmentPeerDto peerDto )
     {
-        String pull = "bash pullMySite.sh %s %s %s \"%s\"";
+        String pull = "bash /pullMySite.sh %s %s %s \"%s\" &";
+
+        String cloneCmd = "echo %s %s %s %s > /tmp/params";
 
         JSONObject jsonpObject = null;
         String githubProjectUrl = "";
@@ -302,6 +307,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 githubProjectOwner = jsonpObject.getString( "githubProjectOwner" );
                 state = jsonpObject.getString( "state" );
                 dns = jsonpObject.getString( "dns" );
+
+                pull = String.format( pull, githubProjectUrl, githubProjectOwner, githubUserName, githubPassword );
             }
             catch ( JSONException e )
             {
@@ -317,30 +324,43 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             {
                 if ( state.equals( "DEPLOY" ) )
                 {
+                    String cmd = String.format( cloneCmd, githubProjectUrl, githubProjectOwner, githubUserName,
+                            githubPassword );
+                    execute( environmentNodeDto.getContainerId(), cmd );
+
+                    execute( environmentNodeDto.getHostId(), "mkdir -p /var/lib/apps/subutai/current/nginx-includes/" );
+
+                    execute( environmentNodeDto.getHostId(),
+                            String.format( conf, dns, environmentNodeDto.getIp(), dns, dns ) );
+
+                    execute( environmentNodeDto.getHostId(), "systemctl restart *nginx*" );
+
+                    JSONObject jsonObject = new JSONObject();
                     try
                     {
-                        CommandResult result = commandExecutor
-                                .execute( environmentNodeDto.getContainerId(), new RequestBuilder( "ifconfig" ) );
-                        LOG.info( result.getStdOut().toString() );
-
-
-                        result = commandExecutor.execute( environmentNodeDto.getHostId(),
-                                new RequestBuilder( "mkdir -p /var/lib/apps/subutai/current/nginx-includes/" ) );
-                        LOG.info( result.getStdOut().toString() );
-
-                        result = commandExecutor.execute( environmentNodeDto.getHostId(), new RequestBuilder(
-                                String.format( conf, dns, environmentNodeDto.getIp(), dns, dns ) ) );
-
-                        LOG.info( result.getStdOut().toString() );
-
-                        result = commandExecutor.execute( environmentNodeDto.getHostId(),
-                                new RequestBuilder( "systemctl restart *nginx*" ) );
-
-                        LOG.info( result.getStdOut().toString() );
-
-                        updatedNodes.setVEHS( "READY" );
+                        jsonObject.put( "param", "status" );
+                        jsonObject.put( "status", "READY" );
                     }
-                    catch ( Exception e1 )
+                    catch ( JSONException e1 )
+                    {
+                        e1.printStackTrace();
+                    }
+                    updatedNodes.setVEHS( jsonObject.toString() );
+                }
+                else if ( state.equals( "VERIFY_CHECKSUM" ) )
+                {
+                    JSONObject jsonObject = new JSONObject();
+                    try
+                    {
+                        jsonObject.put( "param", "checksum" );
+                        CommandResult result =
+                                execute( environmentNodeDto.getContainerId(), "bash /checksum.sh  /var/www/" );
+
+                        jsonObject.put( "checksum", result.getStdOut().toString() );
+
+                        updatedNodes.setVEHS( jsonObject.toString() );
+                    }
+                    catch ( JSONException e1 )
                     {
                         e1.printStackTrace();
                     }
@@ -351,6 +371,40 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         return updatedNodes;
     }
 
+
+    private CommandResult execute( String hostId, String cmd )
+    {
+        boolean exec = true;
+        int tryCount = 0;
+        CommandResult result = null;
+
+        while ( exec )
+        {
+            tryCount++;
+            exec = tryCount > 3 ? false : true;
+            try
+            {
+                result = commandExecutor.execute( hostId, new RequestBuilder( cmd ) );
+                exec = false;
+                return result;
+            }
+            catch ( CommandException e )
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                Thread.sleep( 1000 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
 
 
     private void destroyContainers( EnvironmentPeerDto peerDto )
