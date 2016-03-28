@@ -658,7 +658,18 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Could not send registration request to ourselves." );
         }
 
+
+        if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( "Peer not ready to send registration request." );
+        }
+
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
+
+        if ( "127.0.0.1".equals( peerInfo.getIp() ) )
+        {
+            throw new PeerException( "Remote peer not ready to accept registration request." );
+        }
 
         if ( getRequest( peerInfo.getId() ) != null )
         {
