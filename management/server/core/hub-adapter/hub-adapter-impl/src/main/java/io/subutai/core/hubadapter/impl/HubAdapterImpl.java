@@ -1,88 +1,51 @@
 package io.subutai.core.hubadapter.impl;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.hubadapter.api.HubAdapter;
-import io.subutai.core.hubadapter.impl.dao.DaoHelper;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
+import static java.lang.String.format;
 
 public class HubAdapterImpl implements HubAdapter
 {
-    private final Logger log = LoggerFactory.getLogger( getClass() );
-
-    private final DaoManager daoManager;
-
-    private final SecurityManager securityManager;
-
-    private final PeerManager peerManager;
-
-    private ConfigManager configManager;
+    private static final String USER_ENVIRONMENTS = "/rest/v1/adapter/users/%s/environments";
 
     private final DaoHelper daoHelper;
 
+    private final HttpClient httpClient;
 
-    public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager )
+    private final String peerId;
+
+
+    public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager ) throws Exception
     {
-        this.daoManager = daoManager;
-        this.securityManager = securityManager;
-        this.peerManager = peerManager;
-
         daoHelper = new DaoHelper( daoManager );
 
-        try
-        {
-            configManager = new ConfigManager( securityManager, peerManager );
-        }
-        catch ( Exception e )
-        {
-            log.error( "Error to init: ", e );
-        }
+        httpClient = new HttpClient( securityManager );
+
+        peerId = peerManager.getLocalPeer().getId();
     }
 
 
     @Override
     public String sayHello()
     {
-        String peerId = peerManager.getLocalPeer().getId();
-
-        boolean registered = daoHelper.isPeerRegisteredToHub( peerId );
-
-        if ( registered )
-        {
-            String ownerId = daoHelper.getPeerOwnerId( peerId );
-
-            log.debug( "Registered to Hub. Owner id: {}", ownerId );
-        }
-        else
-        {
-            log.debug( "Not registered to Hub" );
-        }
-
-        return "Hello";
+        return isRegistered()
+               ? httpClient.doGet( format( USER_ENVIRONMENTS, getOwnerId() ) )
+               : null;
     }
 
 
-//    @Override
-//    public String sayHello()
-//    {
-//        try
-//        {
-//            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", "hub.subut.ai" );
-//
-//            Response r = client.get();
-//
-//            log.debug( "status: {}", r.getStatus() );
-//        }
-//        catch ( Exception e )
-//        {
-//            log.error( "Error to test: ", e );
-//        }
-//
-//        return "done";
-//    }
+    private boolean isRegistered()
+    {
+        return daoHelper.isPeerRegisteredToHub( peerId );
+    }
+
+
+    private String getOwnerId()
+    {
+        return daoHelper.getPeerOwnerId( peerId );
+    }
 }

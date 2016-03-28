@@ -21,6 +21,7 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -32,12 +33,18 @@ public class EnvironmentAdapter
 
     private final ProxyContainerHelper proxyContainerHelper;
 
+//    private final PeerManager peerManager;
+    private final HubAdapter hubAdapter;
 
-    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager )
+
+    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager, HubAdapter hubAdapter )
     {
         this.environmentManager = environmentManager;
 
         proxyContainerHelper = new ProxyContainerHelper( peerManager );
+
+        this.hubAdapter = hubAdapter;
+//        this.peerManager = peerManager;
     }
 
 
@@ -153,11 +160,42 @@ public class EnvironmentAdapter
 
     public Set<Environment> getEnvironments()
     {
-        HashSet<Environment> set = new HashSet<>();
 
-        Environment env = get( envId );
-        set.add( env );
+//        HashSet<Environment> set = new HashSet<>();
+//        Environment env = get( envId );
+//        set.add( env );
+//        printLocalContainers();
 
-        return set;
+        log.debug( "hubAdapter: {}", hubAdapter.sayHello() );
+
+        //        ArrayNode arr = null;
+        //        try
+        //        {
+        //            arr = JsonUtil.fromJson( s, ArrayNode.class );
+        //        }
+        //        catch ( IOException e )
+        //        {
+        //            e.printStackTrace();
+        //        }
+        //
+        //        log.debug( "envId: {}", arr.get( 0 ).get( "id" ).asText() );
+
+        return null;
     }
+
+
+//    private void printLocalContainers()
+//    {
+//        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+//        {
+//            for ( ContainerHost ch : rh.getContainerHosts() )
+//            {
+//                if ( !"management".equals( ch.getHostname() ) )
+//                {
+//                    log.debug( "\nch: id={}, hostname={}, envId={}, initPeerId={}, ownerId={}, ",
+//                        ch.getId(), ch.getHostname(), ch.getEnvironmentId(), ch.getInitiatorPeerId(), ch.getOwnerId() );
+//                }
+//            }
+//        }
+//    }
 }
