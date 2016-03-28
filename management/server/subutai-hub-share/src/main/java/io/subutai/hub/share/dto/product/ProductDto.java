@@ -1,8 +1,16 @@
 package io.subutai.hub.share.dto.product;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 //Version 1.1
 public class ProductDto
@@ -11,6 +19,8 @@ public class ProductDto
     {
         PLUGIN
     }
+
+
     private String id;
 
     private String name;
@@ -25,13 +35,41 @@ public class ProductDto
 
     private String version;
 
-    private Set<String> metadata;
+    private Set<String> metadata = new HashSet<>();
 
-    private Set<String> dependencies;
+    private Set<String> dependencies = new HashSet<>();
+
 
     public ProductDto()
     {
     }
+
+
+    //JSONObject to ProductDto
+    public ProductDto( JSONObject objProduct ) throws ParseException
+    {
+        this.id = objProduct.getString( "id" );
+        this.name = objProduct.getString( "name" );
+        this.type = Type.valueOf( objProduct.getString( "type" ) );
+        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
+        sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+        this.createDate = sdf.parse( "2013-09-29T18:46:19Z" );
+        this.ownerId = objProduct.getString( "ownerId" );
+        this.version = objProduct.getString( "version" );
+
+        JSONArray metadataJson = objProduct.getJSONArray( "metadata" );
+        for ( int i = 0; i < metadataJson.length(); i++ )
+        {
+            this.metadata.add( metadataJson.getString( i ) );
+        }
+
+        JSONArray dependenciesJson = objProduct.getJSONArray( "dependencies" );
+        for ( int i = 0; i < dependenciesJson.length(); i++ )
+        {
+            this.dependencies.add( dependenciesJson.getString( i ) );
+        }
+    }
+
 
     public String getId()
     {
@@ -128,10 +166,12 @@ public class ProductDto
         this.metadata = metadata;
     }
 
+
     public void addDependency( final String dependencyId )
     {
         this.dependencies.add( dependencyId );
     }
+
 
     public Set<String> getDependencies()
     {
