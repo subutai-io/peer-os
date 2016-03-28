@@ -87,6 +87,7 @@ import io.subutai.core.environment.impl.workflow.modification.EnvironmentModifyW
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -132,10 +133,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private EnvironmentAdapter environmentAdapter;
 
+    private HubAdapter hubAdapter;
+
+
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final DaoManager daoManager,
                                    final IdentityManager identityManager, final Tracker tracker,
-                                   final RelationManager relationManager )
+                                   final RelationManager relationManager, HubAdapter hubAdapter )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -154,6 +158,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.tracker = tracker;
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
+
+        // Not NULL makes mocking
+        //        environmentAdapter = new EnvironmentAdapter( this, peerManager );
+
+        this.hubAdapter = hubAdapter;
     }
 
 
@@ -162,9 +171,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.topologyDataService = new TopologyDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
         this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
-
-        // Not NULL makes mocking
-//        environmentAdapter = new EnvironmentAdapter( this, peerManager );
     }
 
 
@@ -257,6 +263,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
+        // === START ===
+
+        LOG.debug( ">> hubAdapter: {}", hubAdapter.sayHello() );
+
+        if ( environmentAdapter != null )
+        {
+            return environmentAdapter.getEnvironments();
+        }
+
+        // === END ===
+
         User activeUser = identityManager.getActiveUser();
 
         Set<Environment> environments = new HashSet<>();
@@ -278,15 +295,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             LOG.debug( "environment: {}", environment );
         }
-
-        // ===
-
-        if ( environmentAdapter != null )
-        {
-            environments = environmentAdapter.getEnvironments();
-        }
-
-        // ===
 
         return environments;
     }
@@ -1128,6 +1136,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
+        // === START ===
+
+        if ( environmentAdapter != null )
+        {
+            return environmentAdapter.get( environmentId );
+        }
+
+        // === END ===
+
         EnvironmentImpl environment = environmentDataService.find( environmentId );
 
         if ( environment == null )
@@ -1147,15 +1164,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //set container's transient fields
         setContainersTransientFields( environment );
-
-        // ===
-
-        if ( environmentAdapter != null )
-        {
-            environment = environmentAdapter.get( environmentId );
-        }
-
-        // ===
 
         return environment;
     }
@@ -1507,8 +1515,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             throw new AccessControlException( "You don't have enough permissions to create environment" );
         }
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, peerManager,
-                securityManager, environment, topology, sshKey, operationTracker );
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, peerManager, securityManager,
+                environment, topology, sshKey, operationTracker );
     }
 
 
@@ -1845,7 +1853,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public EnvironmentImpl update( final EnvironmentImpl environment )
     {
-        environmentDataService.update( ( EnvironmentImpl ) environment );
+        environmentDataService.update( environment );
         setEnvironmentTransientFields( environment );
         setContainersTransientFields( environment );
         return environment;

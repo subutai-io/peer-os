@@ -14,7 +14,7 @@ import (
 // cfg declared in promote.go
 // LxcExport exports the given name if it suits the needs.
 func LxcExport(name string) {
-	tmpDIR := config.Agent.LxcPrefix + "lxc-data/tmpdir/"
+	tmpDIR := config.Agent.LxcPrefix + "tmpdir/"
 	packageName := tmpDIR + name + "-subutai-template"
 	packageVersion := config.Template.Version
 	packageArch := runtime.GOARCH

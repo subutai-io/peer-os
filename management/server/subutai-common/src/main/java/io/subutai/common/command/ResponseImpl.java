@@ -1,7 +1,6 @@
 package io.subutai.common.command;
 
 
-import java.util.Set;
 import java.util.UUID;
 
 import com.google.common.base.MoreObjects;
@@ -21,7 +20,6 @@ public class ResponseImpl implements Response
     private String stdOut;
     private String stdErr;
     private Integer exitCode;
-    private Set<String> configPoints;
 
 
     public ResponseImpl( final Response response )
@@ -36,7 +34,6 @@ public class ResponseImpl implements Response
         this.stdOut = response.getStdOut();
         this.stdErr = response.getStdErr();
         this.exitCode = response.getExitCode();
-        this.configPoints = response.getConfigPoints();
     }
 
 
@@ -97,18 +94,10 @@ public class ResponseImpl implements Response
 
 
     @Override
-    public Set<String> getConfigPoints()
-    {
-        return configPoints;
-    }
-
-
-    @Override
     public String toString()
     {
         return MoreObjects.toStringHelper( this ).add( "type", type ).add( "id", id ).add( "commandId", commandId )
                           .add( "pid", pid ).add( "responseNumber", responseNumber ).add( "stdOut", stdOut )
-                          .add( "stdErr", stdErr ).add( "exitCode", exitCode ).add( "configPoints", configPoints )
-                          .toString();
+                          .add( "stdErr", stdErr ).add( "exitCode", exitCode ).toString();
     }
 }

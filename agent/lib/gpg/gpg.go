@@ -108,7 +108,7 @@ func EncryptWrapper(user string, recipient string, message string) string {
 	stdin.Close()
 
 	output, err := command.Output()
-	if log.Check(log.WarnLevel, "Encrypting message ", err) {
+	if log.Check(log.WarnLevel, "Encrypting message", err) {
 		return ""
 	}
 
@@ -122,7 +122,7 @@ func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) s
 	stdin.Close()
 
 	output, err := command.Output()
-	log.Check(log.WarnLevel, "Encrypting message ", err)
+	log.Check(log.WarnLevel, "Encrypting message", err)
 	return string(output)
 }
 
