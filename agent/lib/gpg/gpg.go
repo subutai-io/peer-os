@@ -47,17 +47,16 @@ func publicKey(gpg_c string) string {
 
 	stdout, err := command.StdoutPipe()
 	log.Check(log.WarnLevel, "Openning Stdout pipe", err)
-	log.Check(log.WarnLevel, "Executing command"+gpg_c, command.Start())
+	log.Check(log.WarnLevel, "Executing command", command.Start())
 
 	size, err := buf.ReadFrom(stdout)
 	log.Check(log.WarnLevel, "Reading from Stdout pipe", err)
-	log.Check(log.WarnLevel, "Waiting for command"+gpg_c, command.Wait())
+	log.Check(log.WarnLevel, "Waiting for command", command.Wait())
 
 	defer stdout.Close()
 
 	if size == 0 {
-		log.Warn("No key found")
-		return "KEY_NOT_FOUND"
+		return ""
 	}
 	return buf.String()
 }
@@ -65,9 +64,8 @@ func publicKey(gpg_c string) string {
 func GetPk(name string) string {
 	gpg_C := "gpg --export -a " + name
 	key := publicKey(gpg_C)
-	for key == "KEY_NOT_FOUND" {
+	if key == "" {
 		GenerateGPGKeys(name)
-		key = publicKey(gpg_C)
 	}
 	return key
 }

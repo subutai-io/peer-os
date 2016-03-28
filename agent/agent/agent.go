@@ -62,6 +62,7 @@ func initAgent() {
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()
+	connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
 }
 
 func Start(c *cli.Context) {
@@ -76,7 +77,6 @@ func Start(c *cli.Context) {
 	go alert.AlertProcessing()
 
 	for {
-		Instance()
 		if heartbeat() {
 			time.Sleep(30 * time.Second)
 		} else {
@@ -177,7 +177,6 @@ func execute(rsp executer.EncRequest) {
 		log.Info("Getting public keyring", "keyring", keyring)
 		md = gpg.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
 	}
-
 	i := strings.Index(md, "{")
 	j := strings.LastIndex(md, "}") + 1
 	if i > j && i > 0 {
