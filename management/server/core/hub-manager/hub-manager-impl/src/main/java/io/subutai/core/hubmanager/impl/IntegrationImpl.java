@@ -30,7 +30,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -262,15 +261,13 @@ public class IntegrationImpl implements Integration
             }
 
             byte[] encryptedContent = configManager.readContent( r );
-            ObjectMapper mapper = createMapper( new CBORFactory() );
-
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            result = mapper.readValue( plainContent, ProductsDto.class );
+//            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            result = JsonUtil.fromCbor( encryptedContent, ProductsDto.class );
             String output = JsonUtil.toJson( result );
             LOG.debug( "ProductsDataDTO: " + result.toString() );
             return output;
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException
                 e )
         {
             e.printStackTrace();
