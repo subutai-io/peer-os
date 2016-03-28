@@ -2,13 +2,15 @@ package lib
 
 import (
 	"fmt"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/net/p2p"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/net/p2p"
+	"github.com/subutai-io/base/agent/log"
 )
 
 func P2P(c, d, u, l, p bool, args []string) {
@@ -86,38 +88,32 @@ func createFile() {
 
 func listVNI() {
 	createFile()
-	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve")
-	log.Check(log.ErrorLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err)
-
-	for _, v := range strings.Split(string(f), "\n") {
-		s := strings.Fields(v)
-		if len(s) > 2 {
-			fmt.Printf("%s,%s,%s\n", s[0], s[1], s[2])
+	var f []byte
+	var err error
+	for i := 0; i < 5; i++ {
+		f, err = ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve")
+		log.Check(log.ErrorLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err)
+		if len(f) > 5 {
+			break
 		}
+		time.Sleep(time.Millisecond * 100)
 	}
+	fmt.Println(strings.Replace(string(f), " ", ",", -1))
 }
 
 func checkVNI(vni, vlan, envid string) {
 	f, _ := ioutil.ReadFile(config.Agent.DataPrefix + "var/subutai-network/vni_reserve")
-	lines := strings.Split(string(f), "\n")
-	for _, v := range lines {
-		if v == vni+" "+vlan+" "+envid {
-			log.Error("Reservation already exist")
-		}
+	if strings.Contains(string(f), vni+" "+vlan+" "+envid) {
+		log.Error("Reservation already exist")
 	}
 }
 
 func reserveVNI(vni, vlan, envid string) {
 	createFile()
 	checkVNI(vni, vlan, envid)
-	f, err := os.OpenFile(config.Agent.DataPrefix+"var/subutai-network/vni_reserve", os.O_APPEND|os.O_WRONLY, 0600)
-	log.Check(log.ErrorLevel, "Appending line", err)
-
-	defer f.Close()
-
-	if _, err = f.WriteString(vni + " " + vlan + " " + envid + "\n"); err != nil {
-		log.Error("Writing reserver")
-	}
+	f, _ := ioutil.ReadFile(config.Agent.DataPrefix + "var/subutai-network/vni_reserve")
+	err := ioutil.WriteFile(config.Agent.DataPrefix+"var/subutai-network/vni_reserve", []byte(string(f)+vni+" "+vlan+" "+envid+"\n"), 0600)
+	log.Check(log.FatalLevel, "Reserving VNI", err)
 }
 
 func listTunnel() {
@@ -219,5 +215,5 @@ func ClearVlan(vlan string) {
 		}
 	}
 	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", []byte(strings.Join(lines, "\n")), 0744)
-	log.Check(log.WarnLevel, "config.Agent.DataPrefix + /var/subutai-network/vni_reserve delete vni", err)
+	log.Check(log.WarnLevel, config.Agent.DataPrefix+"/var/subutai-network/vni_reserve delete vni", err)
 }

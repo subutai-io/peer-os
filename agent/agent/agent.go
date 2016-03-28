@@ -73,6 +73,7 @@ func Start(c *cli.Context) {
 	initAgent()
 	go lib.Collect()
 	go connectionMonitor()
+	go alert.AlertProcessing()
 
 	for {
 		Instance()
@@ -96,7 +97,9 @@ func connectionMonitor() {
 		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
 		if err == nil && resp.StatusCode == http.StatusOK {
 			resp.Body.Close()
+			log.Debug("Connection monitor check - success")
 		} else {
+			log.Debug("Connection monitor check - failed")
 			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
 			lastHeartbeat = []byte{}
 			go heartbeat()
@@ -108,7 +111,7 @@ func connectionMonitor() {
 
 func heartbeat() bool {
 	if time.Since(lastHeartbeatTime) < time.Second*3 {
-		return true
+		return false
 	}
 	lastHeartbeatTime = time.Now()
 	mutex.Lock()
@@ -123,7 +126,7 @@ func heartbeat() bool {
 		Instance:   instanceType,
 		Containers: pool,
 		Interfaces: utils.GetInterfaces(),
-		Alert:      alert.Alert(pool),
+		Alert:      alert.CurrentAlerts(pool),
 	}
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
@@ -141,8 +144,11 @@ func heartbeat() bool {
 
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/heartbeat", url.Values{"heartbeat": {string(message)}})
 	if !log.Check(log.WarnLevel, "Sending heartbeat: "+string(jbeat), err) {
+		log.Debug(resp.Status)
 		resp.Body.Close()
-		return true
+		if resp.StatusCode == http.StatusAccepted {
+			return true
+		}
 	}
 	lastHeartbeat = []byte{}
 	return false
@@ -236,10 +242,13 @@ func response(msg []byte) {
 	resp, err := client.PostForm("https://"+config.Management.Host+":8444/rest/v1/agent/response", url.Values{"response": {string(msg)}})
 	if !log.Check(log.WarnLevel, "Sending response "+string(msg), err) {
 		resp.Body.Close()
-	} else {
-		time.Sleep(time.Second * 5)
-		go response(msg)
+		if resp.StatusCode == http.StatusAccepted {
+			return
+		}
 	}
+	time.Sleep(time.Second * 5)
+	go response(msg)
+
 }
 
 func command() {
@@ -258,7 +267,7 @@ func command() {
 	if !log.Check(log.WarnLevel, "Reading body", err) {
 		log.Check(log.WarnLevel, "Unmarshal payload", json.Unmarshal(data, &rsp))
 		for _, request := range rsp {
-			execute(request)
+			go execute(request)
 		}
 	}
 }
