@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.api;
 
 import java.util.Map;
 
-import io.subutai.common.metric.StringAlert;
 import io.subutai.core.hubmanager.api.model.Config;
 
 

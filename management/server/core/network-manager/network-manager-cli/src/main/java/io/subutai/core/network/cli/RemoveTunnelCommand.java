@@ -1,9 +1,6 @@
 package io.subutai.core.network.cli;
 
 
-import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +8,10 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
+
+import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 
 
 @Command( scope = "net", name = "tunnel-remove", description = "Removes tunnel" )

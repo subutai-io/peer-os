@@ -844,7 +844,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        peerWebClient.setupP2PConnection( config );
+        return peerWebClient.setupP2PConnection( config );
     }
 
 

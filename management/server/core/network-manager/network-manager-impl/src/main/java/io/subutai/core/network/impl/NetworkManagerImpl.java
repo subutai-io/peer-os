@@ -25,7 +25,6 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;

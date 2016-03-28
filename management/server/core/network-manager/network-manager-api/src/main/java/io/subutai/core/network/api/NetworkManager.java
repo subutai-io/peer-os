@@ -8,7 +8,6 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.Host;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
