@@ -33,6 +33,7 @@ public class EnvironmentInfoDto
 
     private Set<SSHKeyDto> sshKeys = new HashSet<>();
 
+    private String VEHS;
 
     public EnvironmentInfoDto()
     {
@@ -198,5 +199,16 @@ public class EnvironmentInfoDto
     public void addSshKey( final SSHKeyDto sshKey )
     {
         this.sshKeys.add( sshKey );
+    }
+
+    public String getVEHS()
+    {
+        return VEHS;
+    }
+
+
+    public void setVEHS( final String VEHS )
+    {
+        this.VEHS = VEHS;
     }
 }

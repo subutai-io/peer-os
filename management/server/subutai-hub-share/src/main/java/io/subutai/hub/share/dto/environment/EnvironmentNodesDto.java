@@ -15,6 +15,9 @@ public class EnvironmentNodesDto
 
     private List<EnvironmentNodeDto> nodes = new ArrayList<>();
 
+    private String VEHS;
+
+
     public EnvironmentNodesDto()
     {
     }
@@ -55,6 +58,7 @@ public class EnvironmentNodesDto
         this.environmentId = environmentId;
     }
 
+
     public List<EnvironmentNodeDto> getNodes()
     {
         return nodes;
@@ -67,13 +71,26 @@ public class EnvironmentNodesDto
     }
 
 
-    public void addNode( final EnvironmentNodeDto nodeDto)
+    public void addNode( final EnvironmentNodeDto nodeDto )
     {
         this.nodes.add( nodeDto );
     }
 
-    public void removeNode( final EnvironmentNodeDto nodeDto)
+
+    public void removeNode( final EnvironmentNodeDto nodeDto )
     {
         this.nodes.remove( nodeDto );
+    }
+
+
+    public String getVEHS()
+    {
+        return VEHS;
+    }
+
+
+    public void setVEHS( final String VEHS )
+    {
+        this.VEHS = VEHS;
     }
 }

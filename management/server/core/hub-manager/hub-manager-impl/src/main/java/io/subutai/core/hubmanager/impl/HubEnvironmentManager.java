@@ -616,6 +616,11 @@ public class HubEnvironmentManager
         }
     }
 
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
+    }
+
 
     protected CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
     {
