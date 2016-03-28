@@ -135,6 +135,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private HubAdapter hubAdapter;
 
+
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final DaoManager daoManager,
                                    final IdentityManager identityManager, final Tracker tracker,
@@ -159,7 +160,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
         // Not NULL makes mocking
-//        environmentAdapter = new EnvironmentAdapter( this, peerManager );
+        //        environmentAdapter = new EnvironmentAdapter( this, peerManager );
 
         this.hubAdapter = hubAdapter;
     }
@@ -1514,8 +1515,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             throw new AccessControlException( "You don't have enough permissions to create environment" );
         }
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, this, peerManager,
-                securityManager, environment, topology, sshKey, operationTracker );
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, peerManager, securityManager,
+                environment, topology, sshKey, operationTracker );
     }
 
 
@@ -1850,9 +1851,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public EnvironmentImpl update( final EnvironmentImpl environment )
+    public EnvironmentImpl update( EnvironmentImpl environment )
     {
-        environmentDataService.update( ( EnvironmentImpl ) environment );
+        environment = environmentDataService.merge( environment );
         setEnvironmentTransientFields( environment );
         setContainersTransientFields( environment );
         return environment;

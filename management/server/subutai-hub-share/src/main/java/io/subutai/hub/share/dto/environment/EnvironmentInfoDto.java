@@ -27,6 +27,9 @@ public class EnvironmentInfoDto
 
     private Long vni;
 
+    private String VEHS;
+
+
     public EnvironmentInfoDto()
     {
     }
@@ -173,5 +176,17 @@ public class EnvironmentInfoDto
     public void setTunnelNetwork( final String tunnelNetwork )
     {
         this.tunnelNetwork = tunnelNetwork;
+    }
+
+
+    public String getVEHS()
+    {
+        return VEHS;
+    }
+
+
+    public void setVEHS( final String VEHS )
+    {
+        this.VEHS = VEHS;
     }
 }

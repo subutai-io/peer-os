@@ -105,7 +105,7 @@ public class MessageContentUtil
         }
         else if ( inPort == SystemSettings.getSecurePortX3() )
         {
-            if ( basePath.contains( "rest/kurjun" )  || basePath.contains( "kurjun/rest" ) )
+            if ( basePath.startsWith( "/rest/kurjun" )  || basePath.startsWith( "/kurjun/rest" ) )
             {
                 status = 0;
             }

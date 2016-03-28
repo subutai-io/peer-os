@@ -971,6 +971,7 @@ public class PGPEncryptionUtil
             // each line RFC 4880 Section 7.1
             //
             ByteArrayOutputStream lineOut = new ByteArrayOutputStream();
+
             boolean isFirstLineText = aIn.isClearText();
             int lookAhead = readInputLine( lineOut, aIn );
 
@@ -983,6 +984,7 @@ public class PGPEncryptionUtil
                     bout.write( lineOut.toByteArray() );
                 }
             }
+
             return bout.toByteArray();
         }
         catch ( Exception ex )
