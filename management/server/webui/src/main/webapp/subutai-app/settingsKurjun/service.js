@@ -10,9 +10,11 @@ function SettingsKurjunSrv($http) {
 	var URLS_LIST_URL = BASE_URL + 'urls';
 	var REGISTER_URL = BASE_URL + 'register';
 	var SIGNED_MESSAGE_URL = BASE_URL + 'signed-msg';
+    var ADD_URL = BASE_URL +'url/add';
 
     var SettingsKurjunSrv = {
         getConfig: getConfig,
+        addUrl: addUrl,
         registerUrl: registerUrl,
         signedMsg: signedMsg,
         updateConfigUrls: updateConfigUrls,
@@ -26,6 +28,16 @@ function SettingsKurjunSrv($http) {
             headers: {'Content-Type': 'application/json'}
         });
     }
+
+    function addUrl(postData) {
+        // var postData
+        return $http.post(
+            ADD_URL,
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
+    }
+
 
     function registerUrl(url, type) {
         var postData = "url=" + url + "&type=" + type;

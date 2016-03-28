@@ -82,6 +82,13 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response addUrl( @FormParam( "url" ) final String url )
+    {
+        return null;
+    }
+
+
     public void setKurjunManager( final KurjunManager kurjunManager )
     {
         this.kurjunManager = kurjunManager;
