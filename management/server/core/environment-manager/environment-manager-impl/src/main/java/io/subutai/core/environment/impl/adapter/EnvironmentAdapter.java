@@ -12,10 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -124,8 +122,11 @@ public class EnvironmentAdapter
             EnvironmentContainerHost ch = env.getContainerHostById( containerId );
 
             ( ( EnvironmentContainerImpl ) ch ).destroy();
+
+            // SS container hostname is Hub container id
+            hubAdapter.destroyContainer( env.getId(), ch.getHostname() );
         }
-        catch ( ContainerHostNotFoundException | PeerException e )
+        catch ( Exception e )
         {
             log.error( "Error to destroy container: ", e );
         }
