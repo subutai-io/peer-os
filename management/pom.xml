@@ -76,6 +76,7 @@
   </repositories>
 
   <properties>
+    <management.version>${project.version}</management.version>
     <!-- turn off javadoc lint tool which breaks release -->
     <additionalparam>-Xdoclint:none</additionalparam>
     <!-- global properties -->

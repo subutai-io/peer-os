@@ -45,6 +45,14 @@ func main() {
 			lib.LxcAttach(c.Args().Get(0), c.Bool("c"), c.Bool("x"), c.Bool("r"))
 		}}, {
 
+		Name: "backup", Usage: "backup Subutai container",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "full", Usage: "make full backup"},
+			cli.BoolFlag{Name: "stop", Usage: "stop container at the time of backup"}},
+		Action: func(c *cli.Context) {
+			lib.BackupContainer(c.Args().Get(0), c.Bool("full"), c.Bool("stop"))
+		}}, {
+
 		Name: "batch", Usage: "batch commands execution",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "json", Usage: "JSON string with commands"}},
@@ -224,14 +232,22 @@ func main() {
 			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"))
 		}}, {
 
+		Name: "register", Usage: "register Subutai container",
+		Action: func(c *cli.Context) {
+			lib.LxcRegister(c.Args().Get(0))
+		}}, {
+
 		Name: "rename", Usage: "rename Subutai container",
 		Action: func(c *cli.Context) {
 			lib.LxcRename(c.Args().Get(0), c.Args().Get(1))
 		}}, {
 
-		Name: "register", Usage: "register Subutai container",
+		Name: "restore", Usage: "restore Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "d", Usage: "date of backup snapshot"},
+			cli.StringFlag{Name: "c", Usage: "name of new container"}},
 		Action: func(c *cli.Context) {
-			lib.LxcRegister(c.Args().Get(0))
+			lib.RestoreContainer(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
 		}}, {
 
 		Name: "stats", Usage: "statistics from host",
@@ -261,20 +277,11 @@ func main() {
 			lib.LxcUnregister(c.Args().Get(0))
 		}}, {
 
-		Name: "backup", Usage: "backup Subutai container",
+		Name: "update", Usage: "update Subutai management, container or Resource host",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "full", Usage: "make full backup"},
-			cli.BoolFlag{Name: "stop", Usage: "stop container at the time of backup"}},
+			cli.BoolFlag{Name: "c", Usage: "check for updates without installation"}},
 		Action: func(c *cli.Context) {
-			lib.BackupContainer(c.Args().Get(0), c.Bool("full"), c.Bool("stop"))
-		}}, {
-
-		Name: "restore", Usage: "restore Subutai container",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "d", Usage: "date of backup snapshot"},
-			cli.StringFlag{Name: "c", Usage: "name of new container"}},
-		Action: func(c *cli.Context) {
-			lib.RestoreContainer(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
+			lib.Update(c.Args().Get(0), c.Bool("c"))
 		}},
 	}
 

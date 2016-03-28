@@ -50,13 +50,6 @@ public class QuotaTask extends AbstractTask<QuotaRequest, QuotaResponse>
 
 
     @Override
-    public boolean isSequential()
-    {
-        return false;
-    }
-
-
-    @Override
     public TaskResponseBuilder<QuotaRequest, QuotaResponse> getResponseBuilder()
     {
         return this;

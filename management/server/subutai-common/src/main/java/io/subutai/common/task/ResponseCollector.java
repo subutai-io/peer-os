@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Response collector interface to collect task responses.
  */
-public interface ResponseCollector<R, T>
+public interface ResponseCollector<R extends TaskRequest, T extends TaskResponse>
 {
 
     void onSuccess( R request, T response );

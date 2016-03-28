@@ -1,6 +1,7 @@
 package io.subutai.common.environment;
 
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -31,9 +32,24 @@ public class CreateEnvironmentContainerResponseCollector extends AbstractRespons
     @Override
     public void onFailure( final CloneRequest request, final List<Throwable> exceptions )
     {
-        addFailure( String.format( "Cloning %s failed on %s.", request.getContainerName(),
-                            request.getResourceHostId() ), exceptions );
+        addFailure(
+                String.format( "Cloning %s failed on %s.", request.getContainerName(), request.getResourceHostId() ),
+                exceptions );
     }
 
 
+    public CloneResponse findByHostname( final String hostname )
+    {
+        CloneResponse result = null;
+        Iterator<CloneResponse> iterator = getResponses().iterator();
+        while ( result == null && iterator.hasNext() )
+        {
+            CloneResponse response = iterator.next();
+            if ( hostname.equalsIgnoreCase( response.getHostname() ) )
+            {
+                result = response;
+            }
+        }
+        return result;
+    }
 }

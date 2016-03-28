@@ -37,7 +37,8 @@
 								</tr>
 								<tr>
 									<th>Public Key:</th>
-									<td>
+									<td class="e2e-plugin_action_set-pub-key">
+										<div ng-show="!accountCtrl.hasPGPplugin">
 										<textarea class="b-form-input b-form-input_textarea bp-set-pub-key"
 											ng-model="accountCtrl.publicKeyInfo.key"
 											style="width: 420px; height: 160px; font-family: monospace;">
@@ -47,6 +48,7 @@
 												Set public key
 											</button>
 											<div class="clear"></div>
+										</div>
 										</div>
 									</td>
 								</tr>

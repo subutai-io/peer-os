@@ -33,12 +33,14 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
     private static Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
 
     private final int vlan;
+    private final int executorSize;
 
 
-    public CloneTask( CloneRequest request, int vlan )
+    public CloneTask( CloneRequest request, int vlan, int executorSize )
     {
         super( request );
         this.vlan = vlan;
+        this.executorSize = executorSize;
     }
 
 
@@ -72,9 +74,9 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
 
     @Override
-    public boolean isSequential()
+    public int getNumberOfParallelTasks()
     {
-        return false;
+        return executorSize;
     }
 
 
