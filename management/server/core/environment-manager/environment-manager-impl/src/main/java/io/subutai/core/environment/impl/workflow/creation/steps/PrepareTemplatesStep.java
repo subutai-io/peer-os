@@ -4,7 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -82,7 +81,7 @@ public class PrepareTemplatesStep
                 addLogs( prepareTemplatesResponse );
                 processResponse( prepareTemplatesResponse );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOGGER.error( e.getMessage(), e );
                 succeeded = false;

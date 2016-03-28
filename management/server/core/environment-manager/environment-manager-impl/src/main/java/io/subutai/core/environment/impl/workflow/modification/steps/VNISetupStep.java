@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,7 +88,7 @@ public class VNISetupStep
                 Future<Peer> f = completionService.take();
                 succeededPeers.add( f.get() );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems obtaining reserved gateways", e );
             }
@@ -172,7 +171,7 @@ public class VNISetupStep
                 Future<Peer> f = completionService.take();
                 succeededPeers.add( f.get() );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems reserving VNI", e );
             }

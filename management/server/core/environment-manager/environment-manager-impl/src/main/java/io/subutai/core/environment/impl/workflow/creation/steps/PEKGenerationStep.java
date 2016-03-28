@@ -3,13 +3,11 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
@@ -82,7 +80,7 @@ public class PEKGenerationStep
 
             trackerOperation.addLog( "PEK generation succeeded on Local Peer" );
         }
-        catch ( PGPException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Could not create PEK for: " + peerManager.getLocalPeer().getId() );
         }
@@ -112,7 +110,7 @@ public class PEKGenerationStep
                 Future<Peer> f = completionService.take();
                 succeededPeers.add( f.get() );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems generating PEK", e );
             }

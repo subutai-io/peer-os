@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,7 +85,7 @@ public class SetupP2PStep
                 result.add( config );
                 succeededPeers.add( peer );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems setting up p2p connection", e );
             }
@@ -141,7 +140,7 @@ public class SetupP2PStep
                 f.get();
                 succeededPeers.add( peer );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems setting up tunnels", e );
             }
