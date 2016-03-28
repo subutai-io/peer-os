@@ -82,7 +82,7 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    cdn = kurjun.cdn.subutai.io
+    cdn = cdn.subut.ai
 
 	[broker]
 	port = 8883
@@ -154,10 +154,10 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() {
-	_, err := net.DialTimeout("tcp", Management.Host+":8551", time.Duration(3)*time.Second)
-	if !log.Check(log.InfoLevel, "Connecting to local Kurjun", err) {
-		Management.Kurjun = "http://" + Management.Host + ":8551/rest/kurjun/templates"
+	_, err := net.DialTimeout("tcp", Management.Host+":8338", time.Duration(3)*time.Second)
+	if !log.Check(log.InfoLevel, "Trying local Kurjun", err) {
+		Management.Kurjun = "https://" + Management.Host + ":8338/rest/kurjun"
 	} else {
-		Management.Kurjun = "http://" + Management.Cdn + ":8081/rest/kurjun/templates"
+		Management.Kurjun = "https://" + Management.Cdn + ":8338/kurjun/rest"
 	}
 }

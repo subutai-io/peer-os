@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -24,18 +23,14 @@ type update struct {
 }
 
 func getBody(url string) (response *http.Response) {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
+	client := &http.Client{}
 	response, err := client.Get(url)
 	log.Check(log.FatalLevel, "Getting response from "+url, err)
 	return
 }
 
 func getList() (list []map[string]interface{}) {
-	//replace peer.noip.me with cdn after kurjun update
-	resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/list")
+	resp := getBody(config.Management.Kurjun + "/file/list")
 	defer resp.Body.Close()
 	jsonlist, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
@@ -44,9 +39,10 @@ func getList() (list []map[string]interface{}) {
 }
 
 func Update(name string, check bool) {
+	config.CheckKurjun()
 	switch name {
 	case "rh":
-		for !lockSubutai("rh.update") {
+		if !lockSubutai("rh.update") {
 			log.Error("Another update process is already running")
 		}
 		defer unlockSubutai()
@@ -85,7 +81,7 @@ func Update(name string, check bool) {
 			}
 		}
 
-		if lcl > rmt.timestamp {
+		if lcl >= rmt.timestamp {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
@@ -97,8 +93,7 @@ func Update(name string, check bool) {
 		file, err := os.Create("/tmp/" + rmt.name)
 		log.Check(log.FatalLevel, "Creating update file", err)
 		defer file.Close()
-		//replace peer.noip.me with cdn after kurjun update
-		resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/get?id=" + rmt.id)
+		resp := getBody(config.Management.Kurjun + "/file/get?id=" + rmt.id)
 		defer resp.Body.Close()
 		_, err = io.Copy(file, resp.Body)
 		log.Check(log.FatalLevel, "Writing response to file", err)
