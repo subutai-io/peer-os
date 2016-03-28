@@ -157,11 +157,15 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
+							var logsTextString = logTextTime[3];
+							if(logTextTime[4] !== undefined) {
+								logsTextString += logTextTime[4] + logTextTime[5];
+							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logTextTime[3]
+								"text": logsTextString
 							};
 							result.push(currentLog);
 
