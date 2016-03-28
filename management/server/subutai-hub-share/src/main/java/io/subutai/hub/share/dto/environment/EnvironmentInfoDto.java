@@ -1,10 +1,6 @@
 package io.subutai.hub.share.dto.environment;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
-
 public class EnvironmentInfoDto
 {
     private String id;
@@ -31,7 +27,7 @@ public class EnvironmentInfoDto
 
     private Long vni;
 
-    private Set<SSHKeyDto> sshKeys = new HashSet<>();
+    private String VEHS;
 
 
     public EnvironmentInfoDto()
@@ -183,20 +179,14 @@ public class EnvironmentInfoDto
     }
 
 
-    public Set<SSHKeyDto> getSshKeys()
+    public String getVEHS()
     {
-        return sshKeys;
+        return VEHS;
     }
 
 
-    public void setSshKeys( final Set<SSHKeyDto> sshKeys )
+    public void setVEHS( final String VEHS )
     {
-        this.sshKeys = sshKeys;
-    }
-
-
-    public void addSshKey( final SSHKeyDto sshKey )
-    {
-        this.sshKeys.add( sshKey );
+        this.VEHS = VEHS;
     }
 }
