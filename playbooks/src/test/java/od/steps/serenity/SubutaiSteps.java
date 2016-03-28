@@ -76,6 +76,30 @@ public class SubutaiSteps extends ScenarioSteps {
         environmentsPage.inputEnvironmentName.type(env_name);
     }
 
+    @Step
+    public void inputNewUserUsername(String username) {
+        userManagementPage.fieldUsername.type(username);
+    }
+
+    @Step
+    public void inputNewUserFullName(String fullname) {
+        userManagementPage.fieldFullName.type(fullname);
+    }
+
+    @Step
+    public void inputNewUserEmail(String email) {
+        userManagementPage.fieldEmail.type(email);
+    }
+
+    @Step
+    public void inputNewUserPassword(String password) {
+        userManagementPage.fieldPassword.type(password);
+    }
+
+    @Step
+    public void inputNewUserConfirmPassword(String confirmpassword) {
+        userManagementPage.fieldConfirmPassword.type(confirmpassword);
+    }
     //endregion
 
     //region ACTION: Click
@@ -206,7 +230,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnIconTemplateMongo() throws FindFailed {
-        environmentsPage.waitFor(environmentsPage.templateMongo);
+        environmentsPage.waitFor(environmentsPage.sikuliTemplateMongo);
         screen.click(environmentsPage.sikuliTemplateMongo);
     }
 
@@ -219,11 +243,13 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonBuild() throws FindFailed {
         screen.click(environmentsPage.sikuliButtonBuild);
+        waitABit(30000);
     }
 
     @Step
     public void clickOnButtonCloseBuildPopup() throws FindFailed {
-        commonPage.waitFor(environmentsPage.buttonClose);
+//        commonPage.waitFor(environmentsPage.buttonClose);
+        environmentsPage.waitForCloseButton();
         screen.click(environmentsPage.sikuliButtonClosePopupBuild);
     }
 
@@ -235,6 +261,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonDelete() throws FindFailed {
         screen.click(environmentsPage.sikuliButtonDelete);
+//        waitABit(1000000);
     }
 
     @Step
@@ -311,7 +338,8 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnAdvancedMode() throws FindFailed {
-        screen.click(environmentsPage.sikuliButtonAdvanced);
+        //screen.click(environmentsPage.sikuliButtonAdvanced);
+        environmentsPage.checkboxEnviromentMode.click();
     }
 
     @Step
@@ -388,6 +416,68 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnTitleLogs() throws FindFailed {
         screen.click(advancedPage.sikuliTitleLogs);
     }
+
+    @Step
+    public void clickOnTemplateWebdemo() throws FindFailed {
+       screen.click(environmentsPage.sikuliTemplateWebdemo);
+    }
+
+    @Step
+    public void clickOnIconDeleteEnvironmentNotSikuli() {
+        environmentsPage.iconDeleteEnvironment.click();
+    }
+
+    @Step
+    public void clickOnButtonAddUser() throws FindFailed {
+        screen.click(userManagementPage.sikuliButtonAddUser);
+    }
+
+    @Step
+    public void clickOnTrustedLevel() {
+        userManagementPage.selectorTrustedLevel.click();
+    }
+
+    @Step
+    public void clickOnUltimateTrust() {
+        userManagementPage.pickerUltimateTrust.click();
+    }
+
+    @Step
+    public void clickOnButtonChooseAll() {
+        userManagementPage.buttonChooseAll.click();
+    }
+
+    @Step
+    public void clickOnButtonSave() throws FindFailed {
+        screen.click(userManagementPage.sikuliButtonSaveUser);
+    }
+
+    @Step
+    public void clickOnIconDeleteRoleInternalSystem() {
+        userManagementPage.roleInternalSystem.click();
+    }
+
+    @Step
+    public void clickOnRemoveRoleButton() throws FindFailed {
+        screen.click(userManagementPage.sikuliButtonRemove);
+    }
+
+    @Step
+    public void clickOnButtonOkRoleRemoved() throws FindFailed {
+        screen.click(userManagementPage.sikuliButtonOk);
+//        waitABit(5000);
+    }
+
+    @Step
+    public void clickOnButtonRemoveUser() {
+        userManagementPage.buttonRemoveUser.click();
+    }
+
+    @Step
+    public void clickOnButtonOkDeleteUser() throws FindFailed {
+        screen.click(userManagementPage.sikuliButtonOk);
+    }
+
 
     //endregion
 
@@ -576,6 +666,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void userShouldObserveButtonApply() {
         assertThat(environmentsPage.buttonApply.isVisible(), is(true));
+        waitABit(20000);
     }
 
     @Step
@@ -656,6 +747,16 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void userShouldObserveButtonSaveOnKurjunSettingsQuotasPage() {
         assertThat(kurjunSettingsPage.buttonSaveQuotas.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveANewUsersEmail() {
+        assertThat(userManagementPage.usersEmail.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldNotObserveRoleInternalSystem() {
+        assertThat(userManagementPage.roleInternalSystem.isVisible(), is(false));
     }
     //endregion
 

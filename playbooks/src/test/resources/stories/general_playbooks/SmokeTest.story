@@ -20,6 +20,7 @@ And the user should observe user name: admin
 When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Environments
 Then the user should observe web elements on: Environments page
+And the user should create the local environment
 When the user clicks on the Environment's mode: Advanced
 Then the user should observe web elements on: Advanced mode page
 When the user clicks on the menu item: Containers

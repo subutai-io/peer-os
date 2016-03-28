@@ -47,6 +47,9 @@ public class EnvironmentsPage extends PageObject {
 
     //region WEB ELEMENTS: Checkboxes
 
+    @FindBy(xpath = "*//div[@class=\"b-toggle b-toggle_cloud\"]")
+    public WebElementFacade checkboxEnviromentMode;
+
     //endregion
 
     //region WEB ELEMENTS: Links
@@ -65,7 +68,10 @@ public class EnvironmentsPage extends PageObject {
 
     //endregion
 
-    //region WEB ELEMENTS: Images
+    //region WEB ELEMENTS: Icons
+
+    @FindBy(xpath = ".//*[@id='DataTables_Table_0']/tbody/tr/td[6]/a[2]")
+    public WebElementFacade iconDeleteEnvironment;
 
     //endregion
 
@@ -86,6 +92,9 @@ public class EnvironmentsPage extends PageObject {
     @FindBy(xpath = "*//span[contains(text(),\"mongo\")]")
     public WebElementFacade templateMongo;
 
+    @FindBy(xpath = "*//span[@class=\"b-cloud-item-text ng-binding\" and contains(text(),\"webdemo\")]")
+    public WebElementFacade templateWebdemo;
+
     //endregion
 
     //region SIKULI IMAGES: Templates
@@ -93,6 +102,8 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliTemplateMongo = "src/test/resources/imgs/templates/templateMongo.png";
 
     public String sikuliTemplateMySite = "src/test/resources/imgs/templates/templateMySite.png";
+
+    public String sikuliTemplateWebdemo = "src/test/resources/imgs/templates/templateWebdemo.png";
 
     //endregion
 
@@ -112,6 +123,9 @@ public class EnvironmentsPage extends PageObject {
         waitFor(templateMongo);
     }
 
+    public void waitForCloseButton(){
+        waitFor(buttonClose);
+    }
 
     //endregion
 }

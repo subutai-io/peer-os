@@ -43,6 +43,20 @@ public class DefSubutaiStepsThen {
         subutaiSteps.userShouldObservePluginMongo();
     }
 
+    @Then("the user should create the local environment")
+    public void user_should_create_local_environment() throws FindFailed {
+        subutaiSteps.clickOnTemplateWebdemo();
+        subutaiSteps.clickOnButtonApply();
+        subutaiSteps.inputEnvironmentName("Test Environment Webdemo");
+        subutaiSteps.clickOnButtonBuild();
+        subutaiSteps.clickOnButtonCloseBuildPopup();
+        subutaiSteps.waitFor(5000);
+        subutaiSteps.clickOnIconDeleteEnvironmentNotSikuli();
+        subutaiSteps.clickOnButtonDelete();
+        subutaiSteps.clickOnButtonOkPopupEnvironmentHasBeenDestroyed();
+        subutaiSteps.waitFor(5000);
+    }
+
     @Then("the user should observe web elements on: Containers page")
     public void user_observe_containers(){
         subutaiSteps.userShouldObserveHeaderContainers();
@@ -58,7 +72,7 @@ public class DefSubutaiStepsThen {
     }
 
     @Then("the user should observe web elements on: User management page")
-    public void user_observe_user_management(){
+    public void user_observe_user_management() throws FindFailed {
         subutaiSteps.userShouldObserveHeaderUserManagement();
         subutaiSteps.userShouldObserveButtonAddUser();
     }
@@ -176,6 +190,40 @@ public class DefSubutaiStepsThen {
 //        subutaiSteps.userShouldObserveHeaderAdvanced();
         subutaiSteps.clickOnTitleLogs();
         subutaiSteps.userShouldObserveButtonExport();
+    }
+
+    @Then("the user should register a new user: '$username', '$fullname', '$email', '$password', '$confirmpassword'")
+    public void user_register_new_user(String username, String fullname, String email,
+                                       String password, String confirmpassword) throws FindFailed {
+        subutaiSteps.inputNewUserUsername(username);
+        subutaiSteps.inputNewUserFullName(fullname);
+        subutaiSteps.clickOnTrustedLevel();
+        subutaiSteps.clickOnUltimateTrust();
+        subutaiSteps.inputNewUserEmail(email);
+        subutaiSteps.inputNewUserPassword(password);
+        subutaiSteps.inputNewUserConfirmPassword(confirmpassword);
+        subutaiSteps.clickOnButtonChooseAll();
+        subutaiSteps.clickOnButtonSave();
+    }
+
+    @Then("the user should observe a new user")
+    public void user_observe_a_new_user(){
+        subutaiSteps.userShouldObserveANewUsersEmail();
+    }
+
+    @Then("the user should delete the role: Internal-System")
+    public void user_delete_the_role_internal_system() throws FindFailed {
+        subutaiSteps.clickOnIconDeleteRoleInternalSystem();
+        subutaiSteps.clickOnRemoveRoleButton();
+        subutaiSteps.clickOnButtonOkRoleRemoved();
+        subutaiSteps.userShouldNotObserveRoleInternalSystem();
+    }
+
+    @Then("the user should delete a new user")
+    public void user_delete_a_new_user() throws FindFailed {
+        subutaiSteps.clickOnButtonRemoveUser();
+        subutaiSteps.clickOnButtonDelete();
+        subutaiSteps.clickOnButtonOkDeleteUser();
     }
 
     @Then("the user stop record video and save the file")
