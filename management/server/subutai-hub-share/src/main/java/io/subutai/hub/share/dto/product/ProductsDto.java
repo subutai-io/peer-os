@@ -1,8 +1,13 @@
 package io.subutai.hub.share.dto.product;
 
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 //Version 1.1
 public class ProductsDto
@@ -12,6 +17,27 @@ public class ProductsDto
 
     public ProductsDto()
     {
+    }
+
+
+    //JSON String to ProductsDto
+    public ProductsDto( String prodString )
+    {
+        JSONObject object= new JSONObject( prodString );
+        JSONArray products = object.getJSONArray( "productDtos" );
+        for ( int i = 0; i < products.length(); i++ )
+        {
+            JSONObject product = products.getJSONObject( i );
+            try
+            {
+                ProductDto productDto = new ProductDto( product );
+                this.productsDto.add( productDto );
+            }
+            catch ( ParseException e )
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
 
