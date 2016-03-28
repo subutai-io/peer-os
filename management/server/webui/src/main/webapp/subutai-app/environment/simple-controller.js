@@ -260,7 +260,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 
@@ -319,7 +322,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-status.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 
 		vm.currentEnvironment.modifyStatus = 'modifying';
@@ -652,7 +658,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 

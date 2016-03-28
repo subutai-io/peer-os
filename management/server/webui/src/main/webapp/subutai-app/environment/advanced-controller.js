@@ -748,7 +748,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info-advanced.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 
