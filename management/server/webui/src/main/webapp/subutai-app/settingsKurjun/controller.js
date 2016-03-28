@@ -110,7 +110,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
                 vm.dtInstance.reloadData(null, false);
             }
             LOADING_SCREEN('none');
-            SweetAlert.swal("Success!", "URL was successfully authorized.", "success");
+            SweetAlert.swal("Success!", "URL was successfully registered.", "success");
         }).error(function (error) {
             SweetAlert.swal("ERROR!", "Register URL error: " + error.replace(/\\n/g, " "), "error");
             LOADING_SCREEN('none');
