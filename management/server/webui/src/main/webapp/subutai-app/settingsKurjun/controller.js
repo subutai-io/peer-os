@@ -1,11 +1,9 @@
 "use strict";
 
 angular.module("subutai.settings-kurjun.controller", [])
-    .controller("SettingsKurjunCtrl", SettingsKurjunCtrl)
-    .controller('SettingsKurjunPopupCtrl', SettingsKurjunPopupCtrl);
+    .controller("SettingsKurjunCtrl", SettingsKurjunCtrl);
 
 SettingsKurjunCtrl.$inject = ['$scope', 'SettingsKurjunSrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog'];
-SettingsKurjunPopupCtrl.$inject = ['$scope', 'SettingsKurjunSrv', 'ngDialog', 'SweetAlert'];
 
 
 function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog) {
@@ -31,6 +29,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.removeGlobalUrl = removeGlobalUrl;
     vm.removeLocalUrl = removeLocalUrl;
     vm.autoSign = autoSign;
+    vm.addUrl = addUrl;
 
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
@@ -174,47 +173,25 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 
 
     function urlFrom() {
-        ngDialog.open({
-            template: 'subutai-app/settingsKurjun/partials/urlForm.html',
-            controller: 'SettingsKurjunPopupCtrl',
-            controllerAs: 'settingsKurjunPopupCtrl',
-            preCloseCallback: function (value) {
-                if (Object.keys(vm.dtInstance).length !== 0) {
-                    vm.dtInstance.reloadData(null, false);
-                }
-            }
-        });
+		ngDialog.open({
+			template: 'subutai-app/settingsKurjun/partials/urlForm.html',
+			scope: $scope
+		});
     }
-}
-
-function SettingsKurjunPopupCtrl($scope, SettingsKurjunSrv, ngDialog, SweetAlert) {
-
-    var vm = this;
-    vm.peerId = null;
-
-    if ($scope.ngDialogData !== undefined) {
-        vm.peerId = $scope.ngDialogData.peerId;
-    }
-
-    vm.addUrl = addUrl;
-    // vm.approvePeerRequest = approvePeerRequest;
 
     function addUrl(newUrl) {
-        var postData = 'url=' + newUrl.name; /*+ '&key_phrase=' + newUrl.keyphrase;*/
-        SettingsKurjunSrv.addUrl(postData).success(function (data) {
-            ngDialog.closeAll();
-        }).error(function (error) {
-            SweetAlert.swal("ERROR!", "Peer request error: " + error, "error");
-        });
+		var postData = 'url=' + newUrl.name + '&type=' + newUrl.type;;
+		LOADING_SCREEN();
+		ngDialog.closeAll();
+		SettingsKurjunSrv.addUrl(postData).success(function (data) {
+			LOADING_SCREEN('none');
+			if (Object.keys(vm.dtInstance).length !== 0) {
+				vm.dtInstance.reloadData(null, false);
+			}
+		}).error(function (error) {
+			LOADING_SCREEN('none');
+			SweetAlert.swal("ERROR!", "Peer request error: " + error, "error");
+		});
     }
-
-    // function approvePeerRequest(keyPhrase) {
-    //     peerRegistrationService.approvePeerRequest(vm.peerId, keyPhrase).success(function (data) {
-    //         ngDialog.closeAll();
-    //     }).error(function (error) {
-    //         SweetAlert.swal("ERROR!", "Peer approve error: " + error, "error");
-    //     });
-    // }
-
 }
 

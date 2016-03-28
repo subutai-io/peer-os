@@ -1,37 +1,36 @@
-<div class="b-popup b-popup_wide">
-  <div class="b-popup__header">
-    Add Url
-    <a href ng-click="closeThisDialog()">
-      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-    </a>
-  </div>
-  <form ng-submit="settingsKurjunPopupCtrl.addUrl(newUrl)">
-    <div class="b-popup__body">
+<div class="b-popup">
+	<div class="b-popup__header">
+		Add Url
+		<a href ng-click="closeThisDialog()">
+			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+		</a>
+	</div>
+	<form ng-submit="settingsKurjunCtrl.addUrl(newUrl)">
+		<div class="b-popup__body">
 
-      <div class="popup-body-box">
-        <label class="b-popup-body-label">Enter URL</label>
-        <input type="text"
-               id="subt_input__url-name"
-               class="b-popup-body-input b-popup-body-input_box"
-               ng-model="newUrl.name" required>
-        <div class="clear"></div>
-      </div>
+			<label class="b-popup-body-label b-popup-body-label_block">Enter URL:</label>
+			<input type="text"
+				class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+				ng-model="newUrl.name">
 
-      <div class="popup-body-box">
-        <label class="b-popup-body-label">Key phrase</label>
-        <input type="text"
-               id="subt_input__peer-url-type"
-               class="b-popup-body-input b-popup-body-input_box"
-               ng-model="newUrl.keyphrase" required>
-        <div class="clear"></div>
-      </div>
+			<label class="b-popup-body-label b-popup-body-label_block">Type:</label>
+			<select class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+				ng-init="newUrl.type = 1" 
+				ng-model="newUrl.type">
+				<option value="1">
+					Local
+				</option>
+				<option value="2">
+					Global
+				</option>
+			</select>			
 
-    </div>
-    <div class="b-popup__footer">
-      <button class="b-btn b-btn_green g-right" type="submit" id="subt_button__add-url">
-        Add
-      </button>
-      <div class="clear"></div>
-    </div>
-  </form>
+		</div>
+		<div class="b-popup__footer">
+			<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__add-url">
+				Add
+			</button>
+			<div class="clear"></div>
+		</div>
+	</form>
 </div>
