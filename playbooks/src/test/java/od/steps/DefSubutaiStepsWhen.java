@@ -179,4 +179,51 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnMenuItemAdvanced();
     }
 
+    @When("the user enters login for Peer Registration on the Hub: '$login'")
+    public void enters_login_peer_registration_on_the_hub(String login){
+        subutaiSteps.inputLoginPeerRegistrationOnHub(login);
+    }
+
+    @When("the user enters password for Peer Registration on the Hub: '$password'")
+    public void enters_password_peer_registration_on_the_hub(String password){
+        subutaiSteps.inputPasswordPeerRegistrationOnHub(password);
+    }
+
+    @When("the user clicks on the button: Register")
+    public void click_on_button_register() throws FindFailed {
+        subutaiSteps.clickOnButtonRegister();
+    }
+
+    @When("the user clicks on the button: Go to HUB")
+    public void click_on_button_go_to_hub() throws FindFailed {
+        subutaiSteps.clickOnButtonGoToHUBGreen();
+        subutaiSteps.waitABit(5000);
+    }
+
+    @When("user user clicks on the button: Close")
+    public void click_button_close() throws FindFailed {
+        subutaiSteps.clickButtonClose();
+    }
+
+    @When("the user clicks on the button: Peer Registration Online")
+    public void click_button_peer_registration_online() throws FindFailed {
+        subutaiSteps.clickOnButtonPeerRegistrationOnline();
+    }
+
+    @When("the user clicks on the button: Send Heartbeat")
+    public void click_button_send_heartbeat() throws FindFailed {
+        subutaiSteps.clickOnButtonSendHeartbeat();
+    }
+
+    @When("the user clicks on the button: OK")
+    public void click_button_ok() throws FindFailed {
+        subutaiSteps.clickOnButtonOkHeartbeat();
+    }
+
+    @When("the user click on the buton: Go to HUB White")
+    public void click_on_the_button_go_to_hub_white() throws FindFailed {
+        subutaiSteps.clickOnButtonGoToHUBWhite();
+        subutaiSteps.waitABit(5000);
+    }
+
 }

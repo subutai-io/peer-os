@@ -227,7 +227,22 @@ public class DefSubutaiStepsThen {
     }
 
     @Then("the user stop record video and save the file")
-    public void stopRecordVideo() throws FileNotFoundException {
+    public void stop_record_video() throws FileNotFoundException {
         subutaiSteps.run_bash_script("src/test/resources/files/recordScreenStop.sh");
+    }
+
+    @Then("the user should observe button: Go To HUB Green")
+    public void should_see_button_go_to_hub(){
+        subutaiSteps.assertButtonGoToHUB();
+    }
+
+    @Then("the user should observe message: Heartbeat sent successfully")
+    public void should_observe_message_heartbeat_sent(){
+        subutaiSteps.assertMessageHeartbeatSentSuccessfully();
+    }
+
+    @Then("the user should observe button: Send Heartbeat")
+    public void should_observe_button_send_heartbeat(){
+        subutaiSteps.assertButtonSendHeartbeat();
     }
 }
