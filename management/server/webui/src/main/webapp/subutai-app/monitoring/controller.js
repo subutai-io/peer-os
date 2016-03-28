@@ -3,11 +3,16 @@
 angular.module('subutai.monitoring.controller', [])
 	.controller('MonitoringCtrl', MonitoringCtrl);
 
-MonitoringCtrl.$inject = ['$scope', '$timeout', 'monitoringSrv', 'cfpLoadingBar'];
+MonitoringCtrl.$inject = ['$scope', '$timeout', 'monitoringSrv', 'cfpLoadingBar', '$http'];
 
-function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
+function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar, $http) {
 
 	var vm = this;
+
+	$http.get(
+		"https://peer.noip.me:8339/kurjun/rest/template/list",
+		{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+	);
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
@@ -93,7 +98,6 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	};
 
 	function getChartData(obj) {
-		console.log(obj);
 		var series = obj.Series;
 		var seriesName = obj.Series[0].name;
 
@@ -253,15 +257,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		}
 
 		/** Calculate amount of incomplete data received form rest **/
-		start = moment.unix((series[0].values[0][0]));
-		end = moment.unix((getEndDate(series)));
+		start = moment.unix(series[0].values[0][0]);
+		end = moment.unix(getEndDate(series));
 		duration = moment.duration(end.diff(start)).asMinutes();
 		diff = vm.period * 60 - duration;
-		leftLimit = moment.unix((series[0].values[0][0])).subtract(diff, 'minutes');
+		leftLimit = moment.unix(series[0].values[0][0]).subtract(diff, 'minutes');
 
 		/** Generate stub values if data is incomplete at the begining **/
 		if (diff > 0) {
-			var startPoint = moment.unix((series[0].values[0][0]));
+			var startPoint = moment.unix(series[0].values[0][0]);
 			while (startPoint.subtract(1, "minutes") >= leftLimit) {
 				stubValues.unshift({
 					x: startPoint.valueOf(),
@@ -274,13 +278,14 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		for(var item in series) {
 
 			if(moment.unix((series[item].values[series[item].values.length - 1][0])).valueOf() < moment.unix((getEndDate(series))).valueOf()) {
-				var from = moment.unix((series[item].values[series[item].values.length - 1][0])).valueOf();
-				var to = moment.unix((getEndDate(series)).valueOf());
+				var from = moment.unix(series[item].values[series[item].values.length - 1][0]);
+				var to = moment.unix(getEndDate(series));
 
 
 				from.add(1, "minutes");
-				while(from.valueOf() <= to) {
-					series[item].values.push([from.valueOf(), 0]);
+
+				while(from.valueOf() <= to.valueOf()) {
+					series[item].values.push([from.valueOf() / 1000, 0]);
 					from.add(1, "minutes");
 				}
 			}
