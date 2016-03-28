@@ -31,9 +31,10 @@ public class EnvironmentInfoDto
 
     private Long vni;
 
+    private String VEHS;
+
     private Set<SSHKeyDto> sshKeys = new HashSet<>();
 
-    private String VEHS;
 
     public EnvironmentInfoDto()
     {

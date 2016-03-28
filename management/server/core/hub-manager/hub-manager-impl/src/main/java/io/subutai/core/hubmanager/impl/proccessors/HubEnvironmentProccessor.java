@@ -205,10 +205,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private void setupTunnel( EnvironmentPeerDto peerDto )
     {
-        String envDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+        String setupTunnelDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( setupTunnelDataURL, configManager.getHubIp() );
             Response r = client.get();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );

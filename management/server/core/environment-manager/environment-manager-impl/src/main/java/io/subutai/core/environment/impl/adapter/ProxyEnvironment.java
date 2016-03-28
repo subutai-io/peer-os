@@ -1,30 +1,87 @@
 package io.subutai.core.environment.impl.adapter;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
 class ProxyEnvironment extends EnvironmentImpl
 {
-    // NOTE: Using environmentManager from EnvironmentImpl gives side effects. For example, empty container list.
-    private EnvironmentManagerImpl environmentManager;
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    ProxyEnvironment( String name, String subnetCidr, String sshKey, Long userId, String peerId )
+
+    ProxyEnvironment( JsonNode json, EnvironmentManagerImpl environmentManager )
     {
-        super( name, subnetCidr, sshKey, userId, peerId );
+        super(
+                json.get( "name" ).asText(),
+                json.get( "subnetCidr" ).asText(),
+                null,
+                3L,
+                "hub" // peerId
+        );
+
+        init( json );
+
+        addContainers( parseContainers( json ) );
     }
 
 
-    public void setId( String id )
+    private void init( JsonNode json )
     {
-        environmentId = id;
+        environmentId = json.get( "id" ).asText();
+        envId = new EnvironmentId( environmentId );
+
+        setP2PSubnet( json.get( "tunnelNetwork" ).asText() );
+        setVni( json.get( "vni" ).asLong() );
+        setVersion( 1L );
+        setStatus( EnvironmentStatus.HEALTHY );
+    }
+
+
+    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json )
+    {
+        Set<ProxyEnvironmentContainer> containers = new HashSet<>();
+
+        JsonNode arr = json.get( "containerList" );
+
+        for ( JsonNode node : arr )
+        {
+            containers.add( new ProxyEnvironmentContainer( node ) );
+        }
+
+//        proxyContainerHelper.setProxyToRemoteContainers( envContainers );
+
+        Set<EnvironmentContainerImpl> resultSet = new HashSet<>();
+
+        resultSet.addAll( containers );
+
+        return resultSet;
     }
 
 
     @Override
-    public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
+    public String toString()
     {
-        this.environmentManager = environmentManager;
+        return "ProxyEnvironment:" + super.toString();
     }
+
+
+    // NOTE: Using environmentManager from EnvironmentImpl gives side effects. For example, empty container list.
+//    private EnvironmentManagerImpl environmentManager;
+//    @Override
+//    public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
+//    {
+//        this.environmentManager = environmentManager;
+//    }
 }
