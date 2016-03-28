@@ -2,7 +2,18 @@
 
 angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
-	.directive('fileModel', fileModel);
+	.directive('fileModel', fileModel)
+	.filter( 'sshEmail', function () {
+		return function( input, modify )
+		{
+			if( !modify )
+				return input;
+
+			var newVal = input.split(' ');
+
+			return newVal[newVal.length - 1];
+		}
+	});
 
 EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];

@@ -252,6 +252,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function notifyChanges() {
+		vm.buildCompleted = false;
+
 		vm.currentEnvironment.excludedContainersByQuota =
 			getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
 		vm.currentEnvironment.includedContainersByQuota =
@@ -617,6 +619,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
+
+		vm.buildCompleted = false;
 
 		vm.newEnvID = [];		
 

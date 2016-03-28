@@ -725,7 +725,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
-
+		
+		vm.buildCompleted = false;
 		vm.newEnvID = [];		
 		vm.buildStep = 'confirm';
 
