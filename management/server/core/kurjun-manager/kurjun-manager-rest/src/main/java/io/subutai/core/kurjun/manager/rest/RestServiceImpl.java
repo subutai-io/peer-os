@@ -83,7 +83,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response addUrl( @FormParam( "url" ) final String url )
+    public Response addUrl( final String url )
     {
         return null;
     }
