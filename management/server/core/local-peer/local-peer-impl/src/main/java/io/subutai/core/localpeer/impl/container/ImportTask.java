@@ -50,13 +50,6 @@ public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTempla
 
 
     @Override
-    public boolean isSequential()
-    {
-        return false;
-    }
-
-
-    @Override
     public TaskResponseBuilder<ImportTemplateRequest, ImportTemplateResponse> getResponseBuilder()
     {
         return this;

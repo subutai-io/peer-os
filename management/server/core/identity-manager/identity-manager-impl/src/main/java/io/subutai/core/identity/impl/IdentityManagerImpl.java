@@ -920,7 +920,7 @@ public class IdentityManagerImpl implements IdentityManager
 
             // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
-                    new RelationMeta( activeUser, delegatedUser, delegatedUser, delegatedUser.getId() );
+                    new RelationMeta( activeUser, delegatedUser, delegatedUser, activeUser.getSecurityKeyId() );
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
 
             String relationJson = JsonUtil.toJson( relation );

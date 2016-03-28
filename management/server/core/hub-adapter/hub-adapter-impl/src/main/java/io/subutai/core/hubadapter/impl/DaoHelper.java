@@ -1,4 +1,4 @@
-package io.subutai.core.hubadapter.impl.dao;
+package io.subutai.core.hubadapter.impl;
 
 
 import javax.persistence.EntityManager;
@@ -10,26 +10,26 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.dao.DaoManager;
 
 
-public class DaoHelper
+class DaoHelper
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final DaoManager daoManager;
 
 
-    public DaoHelper( DaoManager daoManager )
+    DaoHelper( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
 
 
-    public String getPeerOwnerId( String peerId )
+    String getPeerOwnerId( String peerId )
     {
         return executeQuery( " select user_id from h_config where peer_id = ? ", peerId );
     }
 
 
-    public boolean isPeerRegisteredToHub( String peerId )
+    boolean isPeerRegisteredToHub( String peerId )
     {
         Integer count = executeQuery( " select count(*) from h_config where peer_id = ? ", peerId );
 
