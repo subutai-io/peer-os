@@ -380,7 +380,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        prepareTemplatesResponse.waitResponses();
+        prepareTemplatesResponse.waitResponsesWhileSucceeded();
         return prepareTemplatesResponse;
     }
 
@@ -422,7 +422,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        response.waitResponses();
+        response.waitAllResponses();
         return response;
     }
 

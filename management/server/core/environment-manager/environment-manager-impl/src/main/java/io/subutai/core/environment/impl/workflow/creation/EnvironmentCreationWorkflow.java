@@ -1,6 +1,9 @@
 package io.subutai.core.environment.impl.workflow.creation;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -22,7 +25,8 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    private final TemplateManager templateRegistry;
+    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
+
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
     private EnvironmentImpl environment;
@@ -49,15 +53,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
-    public EnvironmentCreationWorkflow( String defaultDomain, TemplateManager templateRegistry,
-                                        EnvironmentManagerImpl environmentManager, PeerManager peerManager,
-                                        SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
-                                        String sshKey, TrackerOperation operationTracker )
+    public EnvironmentCreationWorkflow( String defaultDomain, EnvironmentManagerImpl environmentManager,
+                                        PeerManager peerManager, SecurityManager securityManager,
+                                        EnvironmentImpl environment, Topology topology, String sshKey,
+                                        TrackerOperation operationTracker )
     {
         super( EnvironmentCreationPhase.INIT );
 
         this.environmentManager = environmentManager;
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.environment = environment;
@@ -76,7 +79,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         operationTracker.addLog( "Initializing environment creation" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
-        environment = environmentManager.update( environment );
+        environment = saveEnvironment();
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
 
@@ -89,7 +92,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            environment = saveEnvironment();
 
             return EnvironmentCreationPhase.SETUP_VNI;
         }
@@ -109,7 +112,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new VNISetupStep( topology, environment, peerManager, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            environment = saveEnvironment();
 
             return EnvironmentCreationPhase.SETUP_P2P;
         }
@@ -129,7 +132,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            environment = saveEnvironment();
 
             return EnvironmentCreationPhase.PREPARE_TEMPLATES;
         }
@@ -149,7 +152,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            environment = saveEnvironment();
 
             return EnvironmentCreationPhase.CLONE_CONTAINERS;
         }
@@ -170,7 +173,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
             new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
                     operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            environment = saveEnvironment();
 
             return EnvironmentCreationPhase.CONFIGURE_HOSTS;
         }
@@ -190,7 +193,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new RegisterHostsStep( environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            environment = saveEnvironment();
 
             return EnvironmentCreationPhase.CONFIGURE_SSH;
         }
@@ -212,7 +215,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
             new RegisterSshStep( environment, operationTracker ).execute( environment.getSshKeys() );
 
-            environment = environmentManager.update( environment );
+            environment = saveEnvironment();
 
             return EnvironmentCreationPhase.FINALIZE;
         }
@@ -230,7 +233,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.update( environment );
+        environment = saveEnvironment();
 
         operationTracker.addLogDone( "Environment is created" );
 
@@ -242,15 +245,24 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     @Override
     public void fail( final String message, final Throwable e )
     {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+        operationTracker.addLogFailed( getFailedReason() );
+        saveEnvironment();
         super.fail( message, e );
-        saveFailState();
     }
 
 
-    private void saveFailState()
+    protected EnvironmentImpl saveEnvironment()
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        environment = environmentManager.update( environment );
-        operationTracker.addLogFailed( getFailedReason() );
+        LOGGER.debug( "Saving environment..." );
+        try
+        {
+            environment = environmentManager.update( environment );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+        }
+        return environment;
     }
 }

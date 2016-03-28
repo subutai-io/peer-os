@@ -179,7 +179,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         try
         {
             daoManager.startTransaction( em );
-            em.merge( item );
+            item = em.merge( item );
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
