@@ -5,7 +5,7 @@ As a user
 I want to register a new user and delete it
 For that I can run this test scenario
 
-Scenario: The User should register a new user
+Scenario: The User should register a new user and delete it
 Given the first user is on the Home page of Subutai
 Then the user should observe web elements on: Login page
 Given the user enters login and password: 'admin', 'secret'
