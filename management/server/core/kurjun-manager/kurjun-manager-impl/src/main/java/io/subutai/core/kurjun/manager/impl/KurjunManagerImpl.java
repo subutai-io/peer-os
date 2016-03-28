@@ -3,6 +3,8 @@ package io.subutai.core.kurjun.manager.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.ws.rs.core.Response;
@@ -337,5 +339,30 @@ public class KurjunManagerImpl implements KurjunManager
     public KurjunDataService getDataService()
     {
         return dataService;
+    }
+
+
+    @Override
+    public void saveUrl( final String url, final int type ) throws ConfigurationException
+    {
+        validateUrl( url );
+        Kurjun kurjun = new KurjunEntity();
+        kurjun.setUrl( url );
+        kurjun.setType( type );
+
+        dataService.persistKurjunData( kurjun );
+    }
+
+
+    private void validateUrl( final String url ) throws ConfigurationException
+    {
+        try
+        {
+            new URL( url );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new ConfigurationException( "Invalid URL: " + url );
+        }
     }
 }

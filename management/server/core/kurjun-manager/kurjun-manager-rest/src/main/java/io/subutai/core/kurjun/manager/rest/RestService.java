@@ -40,5 +40,6 @@ public interface RestService
     @POST
     @Path( "url/add" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response addUrl(@FormParam( "url" ) String url);
+    public Response addUrl(@FormParam( "url" ) String url,
+                           @FormParam( "type" ) String type);
 }

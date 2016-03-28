@@ -1,6 +1,8 @@
 package io.subutai.core.kurjun.manager.api;
 
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import io.subutai.core.kurjun.manager.api.dao.KurjunDataService;
 
 
@@ -29,5 +31,12 @@ public interface KurjunManager
     //****************************************
     String getUser( String url, int kurjunType );
 
-    public KurjunDataService getDataService();
+
+    //****************************************
+    KurjunDataService getDataService();
+
+
+    //****************************************
+    void saveUrl(String url, int type) throws ConfigurationException;
+
 }

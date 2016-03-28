@@ -6,6 +6,10 @@ import java.util.List;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -19,6 +23,8 @@ import io.subutai.core.kurjun.manager.api.model.Kurjun;
 
 public class RestServiceImpl implements RestService
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
+
     private KurjunManager kurjunManager;
 
 
@@ -83,9 +89,20 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response addUrl( final String url )
+    public Response addUrl( final String url, final String type )
     {
-        return null;
+        try
+        {
+            kurjunManager.saveUrl( url, Integer.parseInt( type ) );
+
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving URL:" + e.getMessage() );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity(e.getMessage()).build();
+        }
+
     }
 
 
