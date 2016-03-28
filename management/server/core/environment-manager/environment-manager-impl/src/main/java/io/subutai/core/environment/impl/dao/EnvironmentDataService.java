@@ -179,7 +179,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         try
         {
             daoManager.startTransaction( em );
-            em.merge( item );
+            item = em.merge( item );
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
@@ -191,6 +191,28 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         {
             //            daoManager.closeEntityManager( em );
         }
+    }
+
+
+    public synchronized EnvironmentImpl merge( EnvironmentImpl item )
+    {
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
+        try
+        {
+            daoManager.startTransaction( em );
+            item = em.merge( item );
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.toString(), e );
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            //            daoManager.closeEntityManager( em );
+        }
+        return item;
     }
 
 

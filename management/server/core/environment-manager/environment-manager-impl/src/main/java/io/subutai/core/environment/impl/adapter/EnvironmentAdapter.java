@@ -1,27 +1,27 @@
 package io.subutai.core.environment.impl.adapter;
 
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.protocol.P2PConfig;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.json.JsonUtil;
 
 
 public class EnvironmentAdapter
@@ -32,12 +32,20 @@ public class EnvironmentAdapter
 
     private final ProxyContainerHelper proxyContainerHelper;
 
+    private final PeerManager peerManager;
 
-    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager )
+    private final HubAdapter hubAdapter;
+
+
+    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager, HubAdapter hubAdapter )
     {
         this.environmentManager = environmentManager;
 
         proxyContainerHelper = new ProxyContainerHelper( peerManager );
+
+        this.peerManager = peerManager;
+
+        this.hubAdapter = hubAdapter;
     }
 
 
@@ -116,48 +124,85 @@ public class EnvironmentAdapter
 
     public ProxyEnvironment get( final String id )
     {
-        ProxyEnvironment e = new ProxyEnvironment(
-                "Mock Env",
-                subnetCidr,
-                null,
-                3L,
-                peerId
-        );
+//        ProxyEnvironment e = new ProxyEnvironment(
+//                "Mock Env",
+//                subnetCidr,
+//                null,
+//                3L,
+//                peerId
+//        );
+//
+//        e.setId( id );
+//        e.setP2PSubnet( p2pSubnet );
+//        e.setVni( vni );
+//        e.setVersion( 1L );
+//        e.setStatus( EnvironmentStatus.HEALTHY );
+//        e.getEnvironmentId();
+//
+//
+//        P2PConfig p2PConfig = new P2PConfig( peerId, null, null, peerP2p, null, 0 );
+//
+//        PeerConfImpl peerConf = new PeerConfImpl( p2PConfig );
+//        peerConf.setId( 51L );
+//
+//        e.addEnvironmentPeer( peerConf );
+//
+//        e.setEnvironmentManager( environmentManager );
+//
+//        Set<EnvironmentContainerImpl> containers = new HashSet<>();
+//
+//        containers.addAll( getContainers() );
+//
+//        e.addContainers( containers );
+//        return e;
 
-        e.setId( id );
-        e.setP2PSubnet( p2pSubnet );
-        e.setVni( vni );
-        e.setVersion( 1L );
-        e.setStatus( EnvironmentStatus.HEALTHY );
-        e.getEnvironmentId();
-
-
-        P2PConfig p2PConfig = new P2PConfig( peerId, null, null, peerP2p, null, 0 );
-
-        PeerConfImpl peerConf = new PeerConfImpl( p2PConfig );
-        peerConf.setId( 51L );
-
-        e.addEnvironmentPeer( peerConf );
-
-        e.setEnvironmentManager( environmentManager );
-
-        Set<EnvironmentContainerImpl> containers = new HashSet<>();
-
-        containers.addAll( getContainers() );
-
-        e.addContainers( containers );
-
-        return e;
+        return null;
     }
 
 
     public Set<Environment> getEnvironments()
     {
-        HashSet<Environment> set = new HashSet<>();
+        String json = hubAdapter.getUserEnvironmentsForPeer();
 
-        Environment env = get( envId );
-        set.add( env );
+        if ( json == null )
+        {
+            return Collections.emptySet();
+        }
 
-        return set;
+        log.debug( "Json with environments: {}", json );
+
+        HashSet<Environment> envs = new HashSet<>();
+
+        try
+        {
+            ArrayNode arr = JsonUtil.fromJson( json, ArrayNode.class );
+
+            for ( int i = 0; i < arr.size(); i++ )
+            {
+                envs.add( new ProxyEnvironment( arr.get( 0 ), environmentManager ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to parse json: ", e );
+        }
+
+        return envs;
     }
+
+
+//    private void printLocalContainers()
+//    {
+//        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+//        {
+//            for ( ContainerHost ch : rh.getContainerHosts() )
+//            {
+//                if ( !"management".equals( ch.getHostname() ) )
+//                {
+//                    log.debug( "\nch: id={}, hostname={}, envId={}, initPeerId={}, ownerId={}, ",
+//                        ch.getId(), ch.getHostname(), ch.getEnvironmentId(), ch.getInitiatorPeerId(), ch.getOwnerId() );
+//                }
+//            }
+//        }
+//    }
 }

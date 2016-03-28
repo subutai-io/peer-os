@@ -3,7 +3,6 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,7 +81,7 @@ public class PEKGenerationStep
                 Future<Peer> f = completionService.take();
                 succeededPeers.add( f.get() );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems generating PEK", e );
             }

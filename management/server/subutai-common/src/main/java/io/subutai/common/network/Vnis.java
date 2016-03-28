@@ -2,13 +2,9 @@ package io.subutai.common.network;
 
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.codehaus.jackson.annotate.JsonProperty;
-
-import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
@@ -66,7 +62,7 @@ public class Vnis
         //check if vni is already reserved
         for ( Vni aVni : this.vnis )
         {
-            if ( aVni.getEnvironmentId().equals( environmentId ) )
+            if ( aVni.getEnvironmentId().equalsIgnoreCase( environmentId ) )
             {
                 return aVni;
             }
