@@ -11,6 +11,8 @@ import org.apache.commons.net.util.SubnetUtils;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.protocol.ControlNetworkConfig;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
 
 
 /**
@@ -171,5 +173,22 @@ public class ControlNetworkUtil
         }
 
         return new SubnetUtils( ip, NETWORK_MASK ).getInfo().getNetworkAddress();
+    }
+
+
+    public static List<String> getUsedNetworks( final P2PConnections connections )
+    {
+        Preconditions.checkNotNull( connections );
+
+        final List<String> usedNetworks = new ArrayList<>();
+        for ( P2PConnection connection : connections.getConnections() )
+        {
+            if ( connection.getIp().startsWith( ControlNetworkUtil.NETWORK_PREFIX ) )
+            {
+                String usedNetwork = ControlNetworkUtil.extractNetwork( connection.getIp() );
+                usedNetworks.add( usedNetwork );
+            }
+        }
+        return usedNetworks;
     }
 }

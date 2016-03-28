@@ -4,8 +4,10 @@ package io.subutai.core.hubmanager.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
@@ -15,8 +17,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
-
-import io.subutai.core.hubmanager.impl.proccessors.*;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
@@ -34,6 +34,7 @@ import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
@@ -42,8 +43,16 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
+import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
+import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
+import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PeerDto;
@@ -61,6 +70,7 @@ public class IntegrationImpl implements Integration
     private EnvironmentManager environmentManager;
     private PeerManager peerManager;
     private ConfigManager configManager;
+    private CommandExecutor commandExecutor;
 
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -84,12 +94,15 @@ public class IntegrationImpl implements Integration
     private Monitor monitor;
     private IdentityManager identityManager;
     private HubEnvironmentManager hubEnvironmentManager;
+    private NetworkManager networkManager;
 
     private ContainerEventProcessor containerEventProcessor;
 
     private EnvironmentBuilder envBuilder;
 
     private EnvironmentDestroyer envDestroyer;
+    private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+    private String checksum = "";
 
 
     public IntegrationImpl( DaoManager daoManager )
@@ -107,7 +120,8 @@ public class IntegrationImpl implements Integration
             configManager = new ConfigManager( securityManager, peerManager, configDataService );
 
             hubEnvironmentManager =
-                    new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager );
+                    new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager,
+                            networkManager );
 
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
 
@@ -121,7 +135,7 @@ public class IntegrationImpl implements Integration
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager );
+                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
@@ -145,6 +159,15 @@ public class IntegrationImpl implements Integration
             //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
             //
             //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
+            this.sumChecker.scheduleWithFixedDelay( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    LOG.info( "Starting sumchecker" );
+                    generateChecksum();
+                }
+            }, 1, 3600000, TimeUnit.MILLISECONDS );
         }
         catch ( Exception e )
         {
@@ -194,6 +217,8 @@ public class IntegrationImpl implements Integration
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
+
+        generateChecksum();
     }
 
 
@@ -353,7 +378,7 @@ public class IntegrationImpl implements Integration
     @Override
     public Map<String, String> getPeerInfo() throws HubPluginException
     {
-        Map<String, String> result = new HashMap<>(  );
+        Map<String, String> result = new HashMap<>();
         try
         {
             String path = "/rest/v1/peers/" + configManager.getPeerId();
@@ -367,7 +392,7 @@ public class IntegrationImpl implements Integration
                 byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 PeerDto dto = JsonUtil.fromCbor( plainContent, PeerDto.class );
-                result.put( "OwnerId",dto.getOwnerId() );
+                result.put( "OwnerId", dto.getOwnerId() );
 
                 LOG.debug( "PeerDto: " + result.toString() );
             }
@@ -378,6 +403,18 @@ public class IntegrationImpl implements Integration
             throw new HubPluginException( "Could not retrieve Peer info", e );
         }
         return result;
+    }
+
+
+    public CommandExecutor getCommandExecutor()
+    {
+        return commandExecutor;
+    }
+
+
+    public void setCommandExecutor( final CommandExecutor commandExecutor )
+    {
+        this.commandExecutor = commandExecutor;
     }
 
 
@@ -435,5 +472,56 @@ public class IntegrationImpl implements Integration
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public void setNetworkManager( final NetworkManager networkManager )
+    {
+        this.networkManager = networkManager;
+    }
+
+
+    private void generateChecksum()
+    {
+        if ( getRegistrationState() )
+        {
+            try
+            {
+                LOG.info( "Generating plugins list md5 checksum" );
+                String productList = getProducts();
+                MessageDigest md = MessageDigest.getInstance( "MD5" );
+                byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
+                StringBuilder hexString = new StringBuilder();
+
+                for ( int i = 0; i < bytes.length; i++ )
+                {
+                    String hex = Integer.toHexString( 0xFF & bytes[i] );
+                    if ( hex.length() == 1 )
+                    {
+                        hexString.append( '0' );
+                    }
+                    hexString.append( hex );
+                }
+
+                checksum = hexString.toString();
+                LOG.info( "Checksum generated: " + checksum );
+            }
+            catch ( NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e )
+            {
+                LOG.error( e.getMessage() );
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            LOG.info( "Peer not registered. Trying again in 1 hour." );
+        }
+    }
+
+
+    @Override
+    public String getChecksum()
+    {
+        return this.checksum;
     }
 }

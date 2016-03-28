@@ -69,8 +69,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param environmentId - id of environment to which the container will belong
      */
     @Deprecated
-    public ContainerHostInfo createContainer( String templateName, String hostname, ContainerQuota quota, String ip, int vlan, int timeout,
-                                     String environmentId ) throws ResourceHostException;
+    public ContainerHostInfo createContainer( String templateName, String hostname, ContainerQuota quota, String ip,
+                                              int vlan, int timeout, String environmentId )
+            throws ResourceHostException;
 
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
@@ -82,4 +83,5 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void cleanup( EnvironmentId environmentId, int vlan ) throws ResourceHostException;
 
+    int getNumberOfCpuCores() throws ResourceHostException;
 }

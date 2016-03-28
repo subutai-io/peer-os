@@ -104,6 +104,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Transient
     protected HostRegistry hostRegistry;
 
+    @Transient
+    protected int numberOfCpuCores = -1;
+
 
     protected ResourceHostEntity()
     {
@@ -560,6 +563,27 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 removeContainerHost( containerHost );
             }
         }
+    }
+
+
+    @Override
+    public int getNumberOfCpuCores() throws ResourceHostException
+    {
+        if ( numberOfCpuCores == -1 )
+        {
+            try
+            {
+                CommandResult commandResult = commandUtil.execute( new RequestBuilder( "nproc" ), this );
+
+                numberOfCpuCores = Integer.parseInt( commandResult.getStdOut().trim() );
+            }
+            catch ( Exception e )
+            {
+                throw new ResourceHostException( "Error fetching # of cpu cores", e );
+            }
+        }
+
+        return numberOfCpuCores;
     }
 
 

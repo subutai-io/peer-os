@@ -21,7 +21,7 @@ public enum CommandStatus
      */
     RUNNING,
     /**
-     * command had timed out before container sent response
+     * command had timed out before agent sent response
      */
     TIMEOUT,
     /**

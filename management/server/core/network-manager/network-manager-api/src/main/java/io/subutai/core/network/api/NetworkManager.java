@@ -7,9 +7,9 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 
@@ -69,33 +69,18 @@ public interface NetworkManager
     PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     /**
-     * Returns p2p connections in the p2p swarm running on MH
-     *
-     * @param p2pHash - hash of p2p swarm
-     */
-    public Set<P2PConnection> getP2PConnectionsInSwarm( String p2pHash ) throws NetworkManagerException;
-
-    /**
-     * Returns p2p connections in the p2p swarm running on the specified host
-     *
-     * @param host - host
-     * @param p2pHash - hash of p2p swarm
-     */
-    public Set<P2PConnection> getP2PConnectionsInSwarm( Host host, String p2pHash ) throws NetworkManagerException;
-
-    /**
      * Returns all p2p connections running on the specified host
      *
      * @param host - host
      */
 
-    public Set<P2PConnection> getP2PConnections( Host host ) throws NetworkManagerException;
+    public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
 
     /**
      * Returns all p2p connections running on MH
      */
 
-    public Set<P2PConnection> getP2PConnections() throws NetworkManagerException;
+    public P2PConnections getP2PConnections() throws NetworkManagerException;
 
 
     /**
@@ -143,58 +128,6 @@ public interface NetworkManager
      */
     public Vnis getReservedVnis() throws NetworkManagerException;
 
-    /**
-     * Enables passwordless ssh access between containers
-     *
-     * @param containers - set of {@code ContainerHost}
-     * @param additionalSshKeys - set of additional ssh keys to add to each container
-     */
-    public void exchangeSshKeys( Set<ContainerHost> containers, Set<String> additionalSshKeys )
-            throws NetworkManagerException;
-
-    /**
-     * Appends ssh keys to each container
-     *
-     * @param containers - containers
-     * @param sshKeys - ssh keys
-     */
-    public void appendSshKeys( Set<ContainerHost> containers, Set<String> sshKeys ) throws NetworkManagerException;
-
-    /**
-     * Adds supplied ssh key to authorized_keys file of given containers
-     *
-     * @param containers- set of {@code ContainerHost}
-     * @param sshKey - ssh key to add
-     */
-    public void addSshKeyToAuthorizedKeys( Set<ContainerHost> containers, String sshKey )
-            throws NetworkManagerException;
-
-    /**
-     * Replaces supplied old ssh key with new ssh key in authorized_keys file of given containers
-     *
-     * @param containers set of {@code ContainerHost}
-     * @param oldSshKey - old ssh key
-     * @param newSshKey - new ssh key
-     */
-    public void replaceSshKeyInAuthorizedKeys( final Set<ContainerHost> containers, final String oldSshKey,
-                                               final String newSshKey ) throws NetworkManagerException;
-
-    /**
-     * Removes supplied ssh key from authorized_keys file of given containers
-     *
-     * @param containers set of {@code ContainerHost}
-     * @param sshKey - ssh key to remove
-     */
-    public void removeSshKeyFromAuthorizedKeys( final Set<ContainerHost> containers, final String sshKey )
-            throws NetworkManagerException;
-
-    /**
-     * Registers containers in /etc/hosts of each other
-     *
-     * @param containers - set of {@code ContainerHost}
-     * @param domainName - domain name e.g. "intra.lan"
-     */
-    public void registerHosts( Set<ContainerHost> containers, String domainName ) throws NetworkManagerException;
 
     /**
      * Returns reverse proxy domain assigned to vlan

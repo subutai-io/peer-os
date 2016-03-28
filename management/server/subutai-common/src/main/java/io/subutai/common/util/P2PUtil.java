@@ -39,9 +39,9 @@ public abstract class P2PUtil
     }
 
 
-    public static String generateHash( final String ip )
+    public static String generateHash( final String envId )
     {
-        return String.format( "swarm-%s", ip.replace( ".", "_" ) );
+        return String.format( "swarm-%s", envId );
     }
 
 

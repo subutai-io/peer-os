@@ -13,6 +13,7 @@ import (
 	"os/user"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 	"unsafe"
@@ -89,8 +90,10 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	end := time.Now().Add(time.Duration(req.Timeout) * time.Second).Unix()
 	var response = genericResponse(&req)
 	response.ResponseNumber = 1
-	flagOut := true
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		r := bufio.NewReader(rop)
 		for line, isPrefix, err := r.ReadLine(); err == nil; line, isPrefix, err = r.ReadLine() {
 			response.StdOut = response.StdOut + string(line)
@@ -103,15 +106,12 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 				response.StdErr, response.StdOut = "", ""
 				response.ResponseNumber++
 			}
-			if end-now() < 0 {
-				break
-			}
 		}
-		flagOut = false
 	}()
 
-	flagErr := true
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		scanErr := bufio.NewScanner(rep)
 		for scanErr.Scan() {
 			response.StdErr = response.StdErr + scanErr.Text() + "\n"
@@ -121,22 +121,20 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 				response.StdErr, response.StdOut = "", ""
 				response.ResponseNumber++
 			}
-			if end-now() < 0 {
-				break
-			}
 		}
-		flagErr = false
 	}()
 
+	wg.Add(1)
 	go func() {
-		for end-now() > 0 && (flagOut || flagErr) {
+		defer wg.Done()
+		for end-now() > 0 {
 			if now()-start > 10 {
 				out_c <- response
 				start = now()
 				response.StdErr, response.StdOut = "", ""
 				response.ResponseNumber++
 			}
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}()
 
@@ -144,9 +142,8 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	go func() { done <- cmd.Wait() }()
 	select {
 	case <-done:
-		for flagOut || flagErr {
-			time.Sleep(time.Second)
-		}
+		end = -1
+		wg.Wait()
 		response.ExitCode = "0"
 		if req.IsDaemon != 1 {
 			response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
@@ -168,9 +165,7 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 			}
 			out_c <- response
 		}
-	}
-	for flagOut || flagErr {
-		time.Sleep(time.Second)
+		wg.Wait()
 	}
 	close(out_c)
 }
@@ -223,10 +218,8 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 
 	var res ResponseOptions = genericResponse(&r)
 
-	o_read, o_write, err := os.Pipe()
-	log.Check(log.WarnLevel, "Creating pipe for container attach", err)
-	e_read, e_write, err := os.Pipe()
-	log.Check(log.WarnLevel, "Creating pipe for container attach", err)
+	o_read, o_write, _ := os.Pipe()
+	e_read, e_write, _ := os.Pipe()
 
 	var chunk bytes.Buffer
 	defer o_read.Close()
@@ -249,12 +242,7 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 
 	log.Debug("Executing command in container " + name + ":" + cmd.String())
 	go func() {
-		if lxc_c.Running() {
-			log.Debug("Container " + name + " is running")
-		}
-
-		exitCode, err = lxc_c.RunCommandStatus([]string{"timeout", strconv.Itoa(r.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
-		log.Check(log.WarnLevel, "Execution command", err)
+		exitCode, _ = lxc_c.RunCommandStatus([]string{"timeout", strconv.Itoa(r.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
 
 		o_write.Close()
 		e_write.Close()
@@ -264,9 +252,7 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 	var e bytes.Buffer
 	start_time := time.Now().Unix()
 
-	//response counter
-	var resN int = 1
-
+	res.ResponseNumber = 1
 	for out.Scan() {
 		//we have more stdout coming in
 		//collect 1000 bytes and send the chunk
@@ -274,31 +260,23 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 		//send chunk every 1000 bytes or 10 seconds
 		if chunk.Len() >= 1000 || now()-start_time >= 10 {
 			res.StdOut = chunk.String()
-			res.ResponseNumber = resN
-			log.Info("Command intermediate result " + chunk.String())
 			out_c <- res
 			chunk.Truncate(0)
-			resN++
+			res.ResponseNumber++
 			start_time = now()
 		}
 	}
 
-	log.Info("Command intermediate result " + chunk.String())
 	io.Copy(&e, e_read)
 	if exitCode == 0 {
 		res.Type = config.Broker.ExecuteResponce
 		res.ExitCode = strconv.Itoa(exitCode)
 		if chunk.Len() > 0 {
-			if resN > 1 {
-				res.ResponseNumber = resN
-			}
-			log.Info("Command intermediate result " + chunk.String())
 			res.StdOut = chunk.String()
 		}
 		res.StdErr = e.String()
 		out_c <- res
 	} else {
-		log.Debug("Exited with exit code", strconv.Itoa(exitCode))
 		if exitCode/256 == 124 {
 			res.Type = config.Broker.ExecuteTimeout
 		}

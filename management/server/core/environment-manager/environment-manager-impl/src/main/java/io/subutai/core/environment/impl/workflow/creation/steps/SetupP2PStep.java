@@ -22,19 +22,22 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.network.Vni;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.settings.Common;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.P2PUtil;
-import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
-import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -43,115 +46,158 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class SetupP2PStep
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( SetupP2PStep.class );
+    private static final Logger LOG = LoggerFactory.getLogger( SetupP2PStep.class );
 
     private final Topology topology;
-    private final EnvironmentImpl env;
+    private final EnvironmentImpl environment;
     private final PeerManager peerManager;
-    private final NetworkManager networkManager;
+    private final TrackerOperation trackerOperation;
 
 
     public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
-                         final NetworkManager networkManager )
+                         final TrackerOperation trackerOperation )
     {
         this.topology = topology;
-        this.env = environment;
+        this.environment = environment;
         this.peerManager = peerManager;
-        this.networkManager = networkManager;
+        this.trackerOperation = trackerOperation;
     }
 
 
-    public void execute() throws EnvironmentManagerException
+    public void execute() throws EnvironmentCreationException, PeerException, NetworkManagerException
     {
-        try
+
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+        //obtain participating peers
+        Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
+
+        //add local peer
+        peers.add( localPeer );
+
+        // figure out free p2p subnet
+        Set<String> usedSubnets = getUsedP2PSubnets( peers );
+        String freeP2pSubnet = P2PUtil.findFreeSubnet( usedSubnets );
+
+        if ( freeP2pSubnet == null )
         {
-            //obtain already participating peers
-            Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
+            throw new EnvironmentCreationException( "Free p2p subnet not found" );
+        }
 
-            peers.add( peerManager.getLocalPeer() );
-            // creating new p2p tunnels
-            Set<String> usedSubnets = getUsedP2PSubnets( peers );
+        environment.setP2PSubnet( freeP2pSubnet );
 
-            String freeP2pSubnet = P2PUtil.findFreeSubnet( usedSubnets );
+        SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeP2pSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
+        String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
+        final String[] addresses = subnetInfo.getAllAddresses();
 
-            LOGGER.debug( String.format( "Free p2p subnet: %s", freeP2pSubnet ) );
+        //setup initial p2p participant on local peer MH with explicit IP
+        localPeer.setupInitialP2PConnection(
+                new P2PConfig( localPeer.getId(), environment.getId(), environment.getP2PHash(), addresses[0],
+                        sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
 
-            if ( freeP2pSubnet == null )
-            {
-                throw new EnvironmentManagerException( "Free p2p subnet not found" );
-            }
+        ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
+        ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-            env.setP2PSubnet( freeP2pSubnet );
+        int counter = 1;
+        for ( Peer peer : peers )
+        {
+            P2PConfig config =
+                    new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), addresses[counter],
+                            sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+            p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
+            counter++;
+        }
 
-            SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeP2pSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
-
-            ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
-
-            ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
-
-
-            String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
-            final String[] addresses = subnetInfo.getAllAddresses();
-
-            Vni reservedVni = networkManager.getReservedVnis().findVniByEnvironmentId( env.getEnvironmentId().getId() );
-
-            //setup initial p2p participant local peer MH
-            networkManager.setupP2PConnection( peerManager.getLocalPeer().getManagementHost(),
-                    P2PUtil.generateInterfaceName( reservedVni.getVlan() ), addresses[0], env.getP2PHash(),
-                    sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
-
-            int counter = 1;
-            for ( Peer peer : peers )
-            {
-                P2PConfig config =
-                        new P2PConfig( peer.getId(), env.getId(), env.getP2PHash(), addresses[counter],
-                                sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
-                p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
-                counter++;
-            }
-
-            // p2p setup
-            List<P2PConfig> result = new ArrayList<>( peers.size() );
-            for ( Peer peer : peers )
+        // p2p setup
+        List<P2PConfig> result = new ArrayList<>( peers.size() );
+        Set<Peer> succeededPeers = Sets.newHashSet();
+        for ( Peer peer : peers )
+        {
+            try
             {
                 final Future<P2PConfig> f = p2pCompletionService.take();
                 P2PConfig config = f.get();
                 result.add( config );
+                succeededPeers.add( peer );
             }
-
-            p2pExecutor.shutdown();
-
-            for ( P2PConfig config : result )
+            catch ( Exception e )
             {
-                env.addEnvironmentPeer( new PeerConfImpl( config ) );
+                LOG.error( "Problems setting up p2p connection", e );
             }
-
-
-            int peersCount = env.getPeerConfs().size();
-            ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
-
-            ExecutorCompletionService<Integer> tunnelCompletionService =
-                    new ExecutorCompletionService<Integer>( tunnelExecutor );
-
-            // tunnel setup
-            Map<String, String> tunnels = env.getTunnels();
-            for ( Peer peer : env.getPeers() )
-            {
-                tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnels ) );
-            }
-
-            for ( int i = 0; i < peersCount; i++ )
-            {
-                final Future<Integer> f = tunnelCompletionService.take();
-                f.get();
-            }
-
-            tunnelExecutor.shutdown();
         }
-        catch ( Exception e )
+
+        p2pExecutor.shutdown();
+
+        for ( Peer succeededPeer : succeededPeers )
         {
-            LOGGER.error( e.getMessage(), e );
-            throw new EnvironmentManagerException( "Error setting up p2p connection", e );
+            trackerOperation.addLog( String.format( "P2P setup succeeded on peer %s", succeededPeer.getName() ) );
+        }
+
+        peers.removeAll( succeededPeers );
+
+        for ( Peer failedPeer : peers )
+        {
+            trackerOperation.addLog( String.format( "P2P setup failed on peer %s", failedPeer.getName() ) );
+        }
+
+        for ( P2PConfig config : result )
+        {
+            environment.addEnvironmentPeer( new PeerConfImpl( config ) );
+        }
+
+        if ( !peers.isEmpty() )
+        {
+            throw new EnvironmentCreationException( "Failed to setup P2P connection across all peers" );
+        }
+
+        //tunnel setup
+
+        Map<String, String> tunnels = environment.getTunnels();
+        int peersCount = environment.getPeerConfs().size();
+        ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
+        ExecutorCompletionService<Integer> tunnelCompletionService =
+                new ExecutorCompletionService<Integer>( tunnelExecutor );
+
+        for ( Peer peer : environment.getPeers() )
+        {
+            tunnelCompletionService.submit( new SetupTunnelTask( peer, environment.getId(), tunnels ) );
+        }
+
+        succeededPeers = Sets.newHashSet();
+        peers = environment.getPeers();
+
+        for ( Peer peer : peers )
+        {
+            final Future<Integer> f;
+            try
+            {
+                f = tunnelCompletionService.take();
+                f.get();
+                succeededPeers.add( peer );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Problems setting up tunnels", e );
+            }
+        }
+
+        tunnelExecutor.shutdown();
+
+        for ( Peer succeededPeer : succeededPeers )
+        {
+            trackerOperation.addLog( String.format( "Tunnel setup succeeded on peer %s", succeededPeer.getName() ) );
+        }
+
+        peers.removeAll( succeededPeers );
+
+        for ( Peer failedPeer : peers )
+        {
+            trackerOperation.addLog( String.format( "Tunnel setup failed on peer %s", failedPeer.getName() ) );
+        }
+
+        if ( !peers.isEmpty() )
+        {
+            throw new EnvironmentCreationException( "Failed to setup tunnel across all peers" );
         }
     }
 
@@ -198,7 +244,7 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            peer.setupP2PConnection( p2PConfig );
+            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
             return p2PConfig;
         }
     }

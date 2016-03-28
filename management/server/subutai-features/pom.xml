@@ -347,6 +347,17 @@
       <artifactId>hub-manager-rest</artifactId>
     </dependency>
 
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- hub-adapter -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hub-adapter-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>hub-adapter-impl</artifactId>
+    </dependency>
+
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <!--Karaf-manager -->
     <dependency>

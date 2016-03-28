@@ -11,10 +11,9 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
-import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupP2PStep;
 import io.subutai.core.environment.impl.workflow.destruction.steps.RemoveKeysStep;
 
-
+//todo use native fail for failing the workflow
 public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
 {
 
@@ -32,7 +31,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     {
         INIT,
         CLEANUP_ENVIRONMENT,
-        CLEANUP_P2P,
         REMOVE_KEYS,
         FINALIZE
     }
@@ -72,28 +70,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         try
         {
-            new CleanupEnvironmentStep( environment ).execute();
-
-            environment = environmentManager.update( environment );
-
-            return EnvironmentDestructionPhase.CLEANUP_P2P;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentDestructionPhase CLEANUP_P2P()
-    {
-        operationTracker.addLog( "Cleaning up P2P" );
-
-        try
-        {
-            new CleanupP2PStep( environment ).execute();
+            new CleanupEnvironmentStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -114,7 +91,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         try
         {
-            new RemoveKeysStep( environment ).execute();
+            new RemoveKeysStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
