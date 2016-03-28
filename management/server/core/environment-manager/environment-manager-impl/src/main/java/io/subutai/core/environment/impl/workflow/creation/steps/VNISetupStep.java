@@ -32,6 +32,10 @@ import io.subutai.core.peer.api.PeerManager;
 
 /**
  * VNI setup generation
+ *
+ * TODO we need to add peer to environment metadata in this step (create/VniSetupStep and modify/VniSetupStep) rather
+ * then in create/SetupP2PStep or modify/SetupP2PStep so that if env creation fails we can cleanup also reserved network
+ * resources even if not actual creation took place
  */
 public class VNISetupStep
 {
