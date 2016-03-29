@@ -185,18 +185,6 @@ public class EnvironmentInfoDto
     }
 
 
-    public String getVEHS()
-    {
-        return VEHS;
-    }
-
-
-    public void setVEHS( final String VEHS )
-    {
-        this.VEHS = VEHS;
-    }
-
-
     public Set<SSHKeyDto> getSshKeys()
     {
         return sshKeys;
@@ -212,5 +200,16 @@ public class EnvironmentInfoDto
     public void addSshKey( final SSHKeyDto sshKey )
     {
         this.sshKeys.add( sshKey );
+    }
+
+    public String getVEHS()
+    {
+        return VEHS;
+    }
+
+
+    public void setVEHS( final String VEHS )
+    {
+        this.VEHS = VEHS;
     }
 }

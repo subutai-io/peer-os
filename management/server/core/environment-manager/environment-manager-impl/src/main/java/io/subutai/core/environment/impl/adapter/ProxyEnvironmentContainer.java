@@ -25,21 +25,12 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
 class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 {
-    private final Logger log = LoggerFactory.getLogger( getClass() );
+    private static final Logger LOG = LoggerFactory.getLogger( ProxyEnvironmentContainer.class );
 
     private Host proxyContainer;
 
 
-    ProxyEnvironmentContainer( String creatorPeerId, String peerId, String nodeGroupName, ContainerHostInfoModel hostInfo, String templateName,
-                                      HostArchitecture templateArch, int sshGroupId, int hostsGroupId, String domainName, ContainerSize containerSize,
-                                      String resourceHostId, String containerName )
-    {
-        super( creatorPeerId, peerId, nodeGroupName, hostInfo, templateName, templateArch, sshGroupId, hostsGroupId, domainName, containerSize,
-             resourceHostId, containerName );
-    }
-
-
-    ProxyEnvironmentContainer( JsonNode json )
+    ProxyEnvironmentContainer( JsonNode json, String containerHostId )
     {
         super(
                 "hub",
@@ -47,8 +38,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
                 json.get( "hostName" ).asText(),
 
                 new ContainerHostInfoModel(
+                        containerHostId,
                         json.get( "id" ).asText(),
-                        json.get( "hostName" ).asText(),
                         initHostInterfaces( json ),
                         HostArchitecture.AMD64,
                         ContainerHostState.RUNNING
@@ -126,7 +117,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         String command = String.format( "ssh root@%s %s", targetHostIp, req.getCommand() );
 
-        log.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
+        LOG.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
 
         return new RequestBuilder( command );
     }

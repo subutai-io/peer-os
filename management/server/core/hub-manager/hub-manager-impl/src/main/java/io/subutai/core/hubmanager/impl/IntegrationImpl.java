@@ -30,7 +30,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -241,11 +240,11 @@ public class IntegrationImpl implements Integration
     @Override
     public String getProducts() throws HubPluginException
     {
-        ProductsDto result;
         try
         {
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -261,17 +260,11 @@ public class IntegrationImpl implements Integration
                 return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( r );
-            ObjectMapper mapper = createMapper( new CBORFactory() );
-
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            result = mapper.readValue( plainContent, ProductsDto.class );
-            String output = JsonUtil.toJson( result );
-            LOG.debug( "ProductsDataDTO: " + result.toString() );
-            return output;
+            String result = r.readEntity( String.class );
+            ProductsDto productsDto = new ProductsDto( result );
+            return JsonUtil.toJson( productsDto );
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException e )
         {
             e.printStackTrace();
             throw new HubPluginException( "Could not retrieve product data", e );
@@ -482,41 +475,41 @@ public class IntegrationImpl implements Integration
 
 
     private void generateChecksum()
-	{
+    {
 /*		if (getRegistrationState ())
-		{*/
-			try
-			{
-				LOG.info ("Generating plugins list md5 checksum");
-				String productList = getProducts ();
-				MessageDigest md = MessageDigest.getInstance ("MD5");
-				byte[] bytes = md.digest (productList.getBytes ("UTF-8"));
-				StringBuilder hexString = new StringBuilder ();
+        {*/
+        try
+        {
+            LOG.info( "Generating plugins list md5 checksum" );
+            String productList = getProducts();
+            MessageDigest md = MessageDigest.getInstance( "MD5" );
+            byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
+            StringBuilder hexString = new StringBuilder();
 
-                for ( int i = 0; i < bytes.length; i++ )
+            for ( int i = 0; i < bytes.length; i++ )
+            {
+                String hex = Integer.toHexString( 0xFF & bytes[i] );
+                if ( hex.length() == 1 )
                 {
-                    String hex = Integer.toHexString( 0xFF & bytes[i] );
-                    if ( hex.length() == 1 )
-                    {
-                        hexString.append( '0' );
-                    }
-                    hexString.append( hex );
+                    hexString.append( '0' );
                 }
+                hexString.append( hex );
+            }
 
-				checksum = hexString.toString ();
-				LOG.info ("Checksum generated: " + checksum);
-			}
-			catch (NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e)
-			{
-				LOG.error (e.getMessage ());
-				e.printStackTrace ();
-			}
+            checksum = hexString.toString();
+            LOG.info( "Checksum generated: " + checksum );
+        }
+        catch ( NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e )
+        {
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
+        }
 /*		}
 		else
 		{
 			LOG.info ("Peer not registered. Trying again in 1 hour.");
 		}*/
-	}
+    }
 
 
     @Override
