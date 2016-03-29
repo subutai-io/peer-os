@@ -19,6 +19,7 @@ public class EnvironmentPeerDto
         START_CONTAINER,
         STOP_CONTAINER,
         DESTROY_CONTAINER,
+        DELETE_PEER,
         WAIT,
         READY
     }
