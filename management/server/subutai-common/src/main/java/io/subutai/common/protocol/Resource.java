@@ -7,9 +7,14 @@ import com.google.gson.annotations.Expose;
 public class Resource
 {
     @Expose
+    private String fingerprint;
+
+    @Expose
     private String md5Sum;
+
     @Expose
     private String name;
+
     @Expose
     private long size;
 

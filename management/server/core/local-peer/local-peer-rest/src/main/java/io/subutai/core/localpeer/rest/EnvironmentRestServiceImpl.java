@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -13,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -20,7 +21,6 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -162,14 +162,32 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response configureSshInEnvironment( final EnvironmentId environmentId, final Set<String> sshKeys )
+    public SshPublicKeys generateSshKeysForEnvironment( final EnvironmentId environmentId )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( sshKeys ) );
 
-            localPeer.configureSshInEnvironment( environmentId, sshKeys );
+            return localPeer.generateSshKeyForEnvironment( environmentId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( sshPublicKeys );
+            Preconditions.checkArgument( !sshPublicKeys.isEmpty() );
+
+            localPeer.configureSshInEnvironment( environmentId, sshPublicKeys );
 
             return Response.ok().build();
         }
@@ -182,13 +200,13 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response configureHostsInEnvironment( final EnvironmentId environmentId,
-                                                 final Map<String, String> hostAddresses )
+    public Response configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty() );
+            Preconditions.checkNotNull( hostAddresses );
+            Preconditions.checkArgument( !hostAddresses.isEmpty() );
 
             localPeer.configureHostsInEnvironment( environmentId, hostAddresses );
 

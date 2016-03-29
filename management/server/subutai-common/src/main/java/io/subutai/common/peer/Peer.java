@@ -14,8 +14,10 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
@@ -334,8 +336,9 @@ public interface Peer
 
     PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
-    void configureSshInEnvironment( EnvironmentId environmentId, Set<String> sshKeys ) throws PeerException;
+    SshPublicKeys generateSshKeyForEnvironment( EnvironmentId environmentId ) throws PeerException;
 
-    void configureHostsInEnvironment( EnvironmentId environmentId, Map<String, String> hostAddresses )
-            throws PeerException;
+    void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
+
+    void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 }

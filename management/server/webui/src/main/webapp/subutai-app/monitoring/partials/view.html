@@ -15,6 +15,11 @@
 					ng-click="monitoringCtrl.setCurrentType('environments')">
 					Environment
 				</li>
+				<li class="b-tabs-menu__item"
+					ng-class="monitoringCtrl.currentType == 'management' ? 'b-tabs-menu__item_active' : ''"
+					ng-click="monitoringCtrl.setCurrentType('management')">
+					Management
+				</li>
 			</ul>
 		</div>
 	</div>
