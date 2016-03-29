@@ -20,16 +20,15 @@
 					<input type="text" class="b-search-input" ng-model="searchTemplate" id="js-search">
 				</div>
 				<div class="b-tools-menu__inpit">
-					<select class="b-search-input" ng-model="advEnvCtrl.templatesType">
+					<select class="b-search-input" ng-model="advEnvCtrl.templatesType" ng-change="advEnvCtrl.getFilteredTemplates()">
 						<option value="all">All</option>
 						<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
 							{{ templatesType }} ({{ templateList.length }})
 						</option>
 					</select>
 				</div>
-				<ul ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" 
-					ng-if="advEnvCtrl.templatesType == 'all' || advEnvCtrl.templatesType == templatesType">
-					<li ng-repeat="template in templateList  | filter:searchTemplate" 
+				<ul>
+					<li ng-repeat="template in advEnvCtrl.templatesList  | filter:searchTemplate | orderBy: identity" 
 						data-template="{{ template }}">
 						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
