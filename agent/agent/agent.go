@@ -20,7 +20,7 @@ import (
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
-	cont "github.com/subutai-io/base/agent/lib/container"
+	// cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -56,9 +56,6 @@ func initAgent() {
 	// move .gnupg dir to app home
 	os.Setenv("GNUPGHOME", config.Agent.DataPrefix+".gnupg")
 
-	if cont.State("management") == "STOPPED" {
-		cont.Start("management")
-	}
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()

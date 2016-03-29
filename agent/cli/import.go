@@ -2,12 +2,10 @@ package lib
 
 import (
 	"crypto/md5"
-	// "crypto/tls"
 	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"runtime"
 	"strings"
@@ -24,19 +22,16 @@ import (
 )
 
 var (
-	lock lockfile.Lockfile
+	lock   lockfile.Lockfile
+	kurjun = config.CheckKurjun()
 )
 
 func templId(templ, arch, version string) string {
-	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	// client := &http.Client{Transport: tr}
-	client := &http.Client{}
-	// https://peer.noip.me:8339/kurjun/rest/template/info?name=master&type=text
 	url := config.Management.Kurjun + "/template/info?name=" + templ + "&version=" + version + "&type=text"
 	if version == "stable" || len(version) == 0 {
 		url = config.Management.Kurjun + "/template/info?name=" + templ + "&type=text"
 	}
-	response, err := client.Get(url)
+	response, err := kurjun.Get(url)
 	log.Debug(config.Management.Kurjun + "/template/info?name=" + templ + "&type=text")
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
@@ -87,10 +82,7 @@ func download(file, id string) string {
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + file)
 	log.Check(log.FatalLevel, "Creating file "+file, err)
 	defer out.Close()
-	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	// client := &http.Client{Transport: tr}
-	client := &http.Client{}
-	response, err := client.Get(config.Management.Kurjun + "/template/get?id=" + id)
+	response, err := kurjun.Get(config.Management.Kurjun + "/template/get?id=" + id)
 	log.Check(log.FatalLevel, "Getting "+config.Management.Kurjun+"/template/get?id="+id, err)
 	defer response.Body.Close()
 	_, err = io.Copy(out, response.Body)
@@ -136,7 +128,6 @@ func LxcImport(templ, version, token string) {
 		return
 	}
 
-	config.CheckKurjun()
 	fullname := templ + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
 	// if len(token) == 0 {
 	// token = gpg.GetToken()

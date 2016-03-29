@@ -1,8 +1,10 @@
 package config
 
 import (
+	"crypto/tls"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 	"time"
 
@@ -10,6 +12,8 @@ import (
 
 	"gopkg.in/gcfg.v1"
 )
+
+var client *http.Client
 
 type agentConfig struct {
 	Debug       bool
@@ -153,11 +157,15 @@ func InitAgentDebug() {
 	}
 }
 
-func CheckKurjun() {
+func CheckKurjun() (client *http.Client) {
 	_, err := net.DialTimeout("tcp", Management.Host+":8338", time.Duration(3)*time.Second)
 	if !log.Check(log.InfoLevel, "Trying local Kurjun", err) {
 		Management.Kurjun = "https://" + Management.Host + ":8338/rest/kurjun"
+		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+		client = &http.Client{Transport: tr}
 	} else {
 		Management.Kurjun = "https://" + Management.Cdn + ":8338/kurjun/rest"
+		client = &http.Client{}
 	}
+	return
 }
