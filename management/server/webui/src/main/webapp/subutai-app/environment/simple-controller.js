@@ -130,11 +130,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
+							var logsTextString = logTextTime[3];
+							if(logTextTime[4] !== undefined) {
+								logsTextString += logTextTime[4] + logTextTime[5];
+							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logTextTime[3]
+								"text": logsTextString
 							};
 							result.push(currentLog);
 
@@ -248,6 +252,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function notifyChanges() {
+		vm.buildCompleted = false;
+
 		vm.currentEnvironment.excludedContainersByQuota =
 			getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
 		vm.currentEnvironment.includedContainersByQuota =
@@ -256,7 +262,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 
@@ -315,7 +324,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-status.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 
 		vm.currentEnvironment.modifyStatus = 'modifying';
@@ -608,6 +620,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
 
+		vm.buildCompleted = false;
+
 		vm.newEnvID = [];		
 
 		var allElements = graph.getCells();
@@ -648,7 +662,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 

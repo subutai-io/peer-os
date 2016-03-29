@@ -15,7 +15,6 @@ public class ContainerDto
     private String id;
     private String environmentId;
     private String hostname;
-    private ContainerHostState state;
     private String ip;
     private String templateName;
     private ContainerSize type;
@@ -27,14 +26,13 @@ public class ContainerDto
 
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
-                         final ContainerHostState state, final String ip, final String templateName,
+                         final String ip, final String templateName,
                          final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
                          final String hostId )
     {
         this.id = id;
         this.environmentId = environmentId;
         this.hostname = hostname;
-        this.state = state;
         this.ip = ip;
         this.templateName = templateName;
         this.type = type;
@@ -78,18 +76,6 @@ public class ContainerDto
     public void setHostname( final String hostname )
     {
         this.hostname = hostname;
-    }
-
-
-    public ContainerHostState getState()
-    {
-        return state;
-    }
-
-
-    public void setState( final ContainerHostState state )
-    {
-        this.state = state;
     }
 
 

@@ -67,17 +67,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 					scope: $scope
 				});
 			}
-
-			if (vm.hubStatus) {
-				if (localStorage.getItem ("bazaarMD5") === null) {
-					localStorage.setItem ("bazaarMD5", getBazaarChecksum());
-					bazaarUpdate = true;
-				} else {
-					if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
-						bazaarUpdate = true;
-					}
-				}
-			}
 		});
 	}
     checkIfRegistered();
@@ -222,6 +211,16 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         vm.notificationsCount = 0;
         localStorage.removeItem('notifications');
     }
+
+
+	if (localStorage.getItem ("bazaarMD5") === null) {
+		localStorage.setItem ("bazaarMD5", getBazaarChecksum());
+		bazaarUpdate = true;
+	} else {
+		if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
+			bazaarUpdate = true;
+		}
+	}
 
    	function getBazaarChecksum() {
    		console.log ("Getting checksum");

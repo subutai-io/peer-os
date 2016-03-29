@@ -1,16 +1,16 @@
 <div class="b-popup b-popup_log">
 	<script>
-		$(document).ready(function(){
-			$('.js-accordion').on('click', function() {
-				if($(this).hasClass('js-accordion_open')) {
-					$(this).height(34);
-					$(this).removeClass('js-accordion_open');
-				} else {
-					$(this).height('auto');
-					$(this).addClass('js-accordion_open');
-				}
-			});
-		});
+//		$(document).ready(function(){
+//			$('.js-accordion').on('click', function() {
+//				if($(this).hasClass('js-accordion_open')) {
+//					$(this).height(34);
+//					$(this).removeClass('js-accordion_open');
+//				} else {
+//					$(this).height('auto');
+//					$(this).addClass('js-accordion_open');
+//				}
+//			});
+//		});
 	</script>
 	<div class="b-popup__header">
 		SSH Keys
@@ -19,9 +19,10 @@
 		</a>
 	</div>
 	<div class="b-popup__body">
-		<div ng-repeat="sshKey in environmentViewCtrl.sshKeysList" class="b-accordion js-accordion">
+		<div ng-repeat="sshKey in environmentViewCtrl.sshKeysList"
+			 ng-init="line.id=true" ng-click="line.id=!line.id" ng-class="[ line.id ? '' : 'js-accordion_open', 'b-accordion js-accordion' ]">
 			<div class="b-accordion__sub">
-				{{ sshKey }}
+				{{ sshKey | sshEmail : line.id }}
 			</div>
 			<a href="" class="b-icon b-icon_remove" ng-click="environmentViewCtrl.deleteSSHKey(sshKey, $index)"></a>
 		</div>

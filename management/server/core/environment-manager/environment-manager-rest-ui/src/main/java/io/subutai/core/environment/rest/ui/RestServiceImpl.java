@@ -44,7 +44,6 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -844,19 +843,17 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                ContainerHostState state = containerHost.getState();
-
                 HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
+                        containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), /*rhId*/ containerHost.getResourceHostId().getId() ) );
+                        containerHost.getPeerId(), containerHost.getResourceHostId().getId() ) );
             }
             catch ( Exception e )
             {
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), ContainerHostState.UNKNOWN, "UNKNOWN",
+                        containerHost.getHostname(), "UNKNOWN",
                         containerHost.getTemplateName(), containerHost.getContainerSize(),
                         containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
                         "UNKNOWN" ) );
