@@ -19,30 +19,23 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.settings.Common;
-import io.subutai.core.network.api.ContainerInfo;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
-import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -98,10 +91,7 @@ public class NetworkManagerImplTest
     Commands commands;
     @Mock
     RequestBuilder requestBuilder;
-    @Mock
-    SshManager sshManager;
-    @Mock
-    HostManager hostManager;
+
 
     private NetworkManagerImpl spyNetworkManager;
 
@@ -125,8 +115,6 @@ public class NetworkManagerImplTest
         when( commandResult.hasSucceeded() ).thenReturn( true );
         containers = Sets.newHashSet( containerHost );
         spyNetworkManager = spy( networkManager );
-        doReturn( sshManager ).when( spyNetworkManager ).getSshManager( containers );
-        doReturn( hostManager ).when( spyNetworkManager ).getHostManager( containers, DOMAIN );
     }
 
 
@@ -184,92 +172,6 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testRemoveGateway() throws Exception
-    {
-        networkManager.removeGateway( VLAN_ID );
-
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveGatewayCommand( VLAN_ID );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveGatewayOnContainer() throws Exception
-    {
-        networkManager.removeGatewayOnContainer( CONTAINER_NAME );
-
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( commands ).getRemoveGatewayOnContainerCommand();
-        verify( containerHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testCleanupEnvironmentNetworkSettings() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
-
-        networkManager.cleanupEnvironmentNetworkSettings( new EnvironmentId( ENVIRONMENT_ID ) );
-
-        verify( commands ).getCleanupEnvironmentNetworkSettingsCommand( VLAN_ID );
-        verify( managementHost, atLeastOnce() ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testSetContainerIp() throws Exception
-    {
-        networkManager.setContainerIp( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByContainerName( anyString() );
-        verify( commands ).getSetContainerIpCommand( CONTAINER_NAME, LOCAL_IP, NET_MASK, VLAN_ID );
-        verify( resourceHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveContainerIp() throws Exception
-    {
-        networkManager.removeContainerIp( CONTAINER_NAME );
-
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByContainerName( anyString() );
-        verify( commands ).getRemoveContainerIpCommand( CONTAINER_NAME );
-        verify( resourceHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testGetContainerIp() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( CONTAINER_IP_OUTPUT );
-
-        ContainerInfo containerInfo = networkManager.getContainerIp( CONTAINER_NAME );
-
-        assertNotNull( containerInfo );
-        verify( localPeer ).getContainerHostByName( CONTAINER_NAME );
-        verify( localPeer ).getResourceHostByContainerName( anyString() );
-        verify( commands ).getShowContainerIpCommand( CONTAINER_NAME );
-
-
-        when( commandResult.getStdOut() ).thenReturn( "" );
-
-        try
-        {
-            networkManager.getContainerIp( CONTAINER_NAME );
-            fail( "Expected NetworkManagerException" );
-        }
-        catch ( NetworkManagerException e )
-        {
-        }
-    }
-
-
-    @Test
     public void testListTunnels() throws Exception
     {
         when( commandResult.getStdOut() ).thenReturn( LIST_TUNNELS_OUTPUT );
@@ -277,18 +179,6 @@ public class NetworkManagerImplTest
         Set<Tunnel> tunnels = networkManager.listTunnels();
 
         assertFalse( tunnels.isEmpty() );
-    }
-
-
-    @Test
-    public void testListP2PConnections() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( LIST_P2P_OUTPUT );
-
-
-        Set<P2PConnection> connections = networkManager.listP2PConnections();
-
-        TestCase.assertFalse( connections.isEmpty() );
     }
 
 
@@ -390,67 +280,5 @@ public class NetworkManagerImplTest
         Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings();
 
         assertTrue( mappings.contains( new VniVlanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID ) ) );
-    }
-
-
-    @Test
-    public void testExchangeSshKeys() throws Exception
-    {
-        spyNetworkManager.exchangeSshKeys( containers, Sets.<String>newHashSet() );
-
-        verify( sshManager ).execute( Sets.<String>newHashSet(), false );
-    }
-
-
-    @Test
-    public void testAddSshKeyToAuthorizedKeys() throws Exception
-    {
-
-        spyNetworkManager.addSshKeyToAuthorizedKeys( containers, SSH_KEY );
-
-        verify( sshManager ).appendSshKey( SSH_KEY );
-    }
-
-
-    @Test
-    public void testReplaceSshKeyInAuthorizedKeys() throws Exception
-    {
-        spyNetworkManager.replaceSshKeyInAuthorizedKeys( containers, SSH_KEY, SSH_KEY );
-
-        verify( sshManager ).replaceSshKey( SSH_KEY, SSH_KEY );
-    }
-
-
-    @Test
-    public void testRemoveSshKeyFromAuthorizedKeys() throws Exception
-    {
-        spyNetworkManager.removeSshKeyFromAuthorizedKeys( containers, SSH_KEY );
-
-        verify( sshManager ).removeSshKey( SSH_KEY );
-    }
-
-
-    @Test
-    public void testRegisterHosts() throws Exception
-    {
-
-        spyNetworkManager.registerHosts( containers, DOMAIN );
-
-        verify( hostManager ).execute();
-    }
-
-
-    @Test
-    public void testGetHostManager() throws Exception
-    {
-        assertNotNull( networkManager.getHostManager( containers, DOMAIN ) );
-    }
-
-
-    @Test
-    public void testGetSshManager() throws Exception
-    {
-
-        assertNotNull( networkManager.getSshManager( containers ) );
     }
 }

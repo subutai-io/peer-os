@@ -9,6 +9,12 @@ import javax.ws.rs.core.Response;
 public interface RestService
 {
 	@GET
+	@Path( "products/checksum" )
+	@Produces( { MediaType.TEXT_PLAIN } )
+	public Response getListMD5 ();
+
+
+	@GET
 	@Path( "products" )
 	@Produces( { MediaType.APPLICATION_JSON } )
 	public Response listProducts ();

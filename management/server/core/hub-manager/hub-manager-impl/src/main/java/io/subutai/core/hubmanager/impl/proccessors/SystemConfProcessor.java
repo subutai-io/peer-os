@@ -1,9 +1,7 @@
 package io.subutai.core.hubmanager.impl.proccessors;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -17,7 +15,6 @@ import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -85,7 +82,7 @@ public class SystemConfProcessor implements StateLinkProccessor
                 return result;
             }
 
-            byte[] encryptedContent = readContent( r );
+            byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
 
             result = JsonUtil.fromCbor( plainContent, SystemConfDto.class );
@@ -110,21 +107,5 @@ public class SystemConfProcessor implements StateLinkProccessor
         {
             //TODO write cases for System types
         }
-    }
-
-
-    private byte[] readContent( Response response ) throws IOException
-    {
-        if ( response.getEntity() == null )
-        {
-            return null;
-        }
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        InputStream is = ( ( InputStream ) response.getEntity() );
-
-        IOUtils.copy( is, bos );
-        return bos.toByteArray();
     }
 }

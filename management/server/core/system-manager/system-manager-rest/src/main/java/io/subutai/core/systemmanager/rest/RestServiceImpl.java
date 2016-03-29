@@ -143,12 +143,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setKurjunSettingsUrls( final String globalKurjunUrls )
+    public Response setKurjunSettingsUrls( final String globalKurjunUrls, final String localKurjunUrls )
     {
 
         try
         {
-            systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ) );
+            systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ), localKurjunUrls.split( "," ) );
         }
         catch ( ConfigurationException e )
         {

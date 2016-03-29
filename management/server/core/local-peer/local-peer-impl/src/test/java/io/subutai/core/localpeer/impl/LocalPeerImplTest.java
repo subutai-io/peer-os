@@ -80,7 +80,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -304,15 +303,6 @@ public class LocalPeerImplTest
         localPeer.serviceLocator = serviceLocator;
         when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
         when( serviceLocator.getService( NetworkManager.class ) ).thenReturn( networkManager );
-    }
-
-
-    @Test
-    public void testInit() throws Exception
-    {
-        doReturn( resourceHostDataService ).when( localPeer ).createResourceHostDataService();
-
-        localPeer.init();
     }
 
 
@@ -579,27 +569,27 @@ public class LocalPeerImplTest
 
         verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder );
 
-        when( containerHost.isConnected() ).thenReturn( false );
+//        when( containerHost.isConnected() ).thenReturn( false );
+//
+//        try
+//        {
+//            localPeer.execute( requestBuilder, containerHost );
+//            fail( "Expected CommandException" );
+//        }
+//        catch ( CommandException e )
+//        {
+//        }
 
-        try
-        {
-            localPeer.execute( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
-
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-
-        try
-        {
-            localPeer.execute( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
+//        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
+//
+//        try
+//        {
+//            localPeer.execute( requestBuilder, containerHost );
+//            fail( "Expected CommandException" );
+//        }
+//        catch ( CommandException e )
+//        {
+//        }
     }
 
 
@@ -614,27 +604,27 @@ public class LocalPeerImplTest
 
         verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder );
 
-        when( containerHost.isConnected() ).thenReturn( false );
+//        when( containerHost.isConnected() ).thenReturn( false );
+//
+//        try
+//        {
+//            localPeer.executeAsync( requestBuilder, containerHost );
+//            fail( "Expected CommandException" );
+//        }
+//        catch ( CommandException e )
+//        {
+//        }
 
-        try
-        {
-            localPeer.executeAsync( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
-
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-
-        try
-        {
-            localPeer.executeAsync( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
+//        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
+//
+//        try
+//        {
+//            localPeer.executeAsync( requestBuilder, containerHost );
+//            fail( "Expected CommandException" );
+//        }
+//        catch ( CommandException e )
+//        {
+//        }
     }
 
 
@@ -782,33 +772,6 @@ public class LocalPeerImplTest
 
 
     @Test( expected = PeerException.class )
-    public void testRemoveGateway() throws Exception
-    {
-        localPeer.removeGateway( VLAN );
-
-        verify( networkManager ).removeGateway( VLAN );
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).removeGateway( VLAN );
-
-        localPeer.removeGateway( VLAN );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testCleanupEnvironmentNetworkSettings() throws Exception
-    {
-        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-
-        verify( networkManager ).cleanupEnvironmentNetworkSettings( environmentId );
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager )
-                                                    .cleanupEnvironmentNetworkSettings( environmentId );
-
-        localPeer.cleanupEnvironmentNetworkSettings( environmentId );
-    }
-
-
-    @Test( expected = PeerException.class )
     public void testListTunnels() throws Exception
     {
         localPeer.listTunnels();
@@ -827,10 +790,6 @@ public class LocalPeerImplTest
         Tunnel tunnel = mock( Tunnel.class );
         when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
         when( tunnel.getTunnelIp() ).thenReturn( IP );
-
-        localPeer.removeTunnel( IP );
-
-        verify( networkManager ).removeTunnel( anyInt() );
     }
 
 

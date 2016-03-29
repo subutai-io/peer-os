@@ -33,12 +33,14 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
     private static Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
 
     private final int vlan;
+    private final int executorSize;
 
 
-    public CloneTask( CloneRequest request, int vlan )
+    public CloneTask( CloneRequest request, int vlan, int executorSize )
     {
         super( request );
         this.vlan = vlan;
+        this.executorSize = executorSize;
     }
 
 
@@ -72,9 +74,9 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
 
     @Override
-    public boolean isSequential()
+    public int getNumberOfParallelTasks()
     {
-        return false;
+        return executorSize;
     }
 
 
@@ -89,7 +91,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
     public CloneResponse build( final CloneRequest request, final CommandResult commandResult, final long elapsedTime )
             throws Exception
     {
-        String agentId = null;
+        String containerId = null;
 
         if ( commandResult != null && commandResult.hasSucceeded() )
         {
@@ -107,18 +109,18 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
                 LOG.debug( String.format( "Token: %s", nextToken ) );
                 if ( m.find() && m.groupCount() == 1 )
                 {
-                    agentId = m.group( 1 );
+                    containerId = m.group( 1 );
                     break;
                 }
             }
         }
 
-        if ( agentId == null )
+        if ( containerId == null )
         {
-            LOG.error( "Agent ID not found in output of subutai clone command. %s ", getStdErr() );
+            LOG.error( "Agent ID not found in output of subutai clone command." );
             throw new CommandException( "Agent ID not found in output of subutai clone command." );
         }
         return new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
-                request.getTemplateName(), request.getTemplateArch(), request.getIp(), agentId, elapsedTime );
+                request.getTemplateName(), request.getTemplateArch(), request.getIp(), containerId, elapsedTime );
     }
 }

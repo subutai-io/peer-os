@@ -5,14 +5,15 @@ public class Common
 {
     public static final String SUBUTAI_HTTP_HEADER = "sbt-hdr";
     public static final String KARAF_ETC = System.getProperty( "karaf.etc" );
-    public static final String CONTAINER_GROUP_NOT_FOUND = "Container group not found";
     public static final String SUBUTAI_APP_DATA_PATH = System.getProperty( "subutaiAppDataPath" );
     public static final String SUBUTAI_APP_KEYSTORES_PATH = System.getProperty( "subutaiKeystorePath" );
     public static final String SUBUTAI_APP_CERTS_PATH = System.getProperty( "subutaiCertsPath" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
+    public static final String LOCAL_HOST_IP = "127.0.0.1";
+    public static final String LOCAL_HOST_NAME = "localhost";
     //10 min including possible template download
-    public static final int WAIT_CONTAINER_CONNECTION_SEC = 10 * 60;   // 10 min
-    public static final int BROKER_MESSAGE_TIMEOUT_SEC = 30;
+    public static final int WAIT_CONTAINER_CONNECTION_SEC = 30;
+    public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 30;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
     public static final int DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL = 30; // 30 sec
@@ -35,9 +36,8 @@ public class Common
     //constants that can be converted into settings in the future
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_HOSTNAME = "management";
-    public static final String GIT_REPO_URL = "git@gw.intra.lan:/opt/git/project.git";
     public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
-    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 60 * 60;
+    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 90 * 60;// 1.5 hour
     public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";
@@ -47,4 +47,7 @@ public class Common
     public static final long DEFAULT_RECEIVE_TIMEOUT = 1000 * 60 * 10;
     public static final long DEFAULT_CONNECTION_TIMEOUT = 1000 * 15;
     public static final int DEFAULT_MAX_RETRANSMITS = 3;
+
+    public static final String CONTAINER_SSH_FOLDER = "/root/.ssh";
+    public static final String CONTAINER_SSH_FILE = String.format( "%s/authorized_keys", CONTAINER_SSH_FOLDER );
 }

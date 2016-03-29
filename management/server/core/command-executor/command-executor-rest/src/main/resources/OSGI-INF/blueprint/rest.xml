@@ -28,7 +28,7 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <!--temporarily make rest-impl as subscription service for heartbeat listeners-->
+  <!--temporarily make rest-rest as subscription service for heartbeat listeners-->
 
   <reference-list id="hbLstnr"
                   interface="io.subutai.common.host.HeartbeatListener"

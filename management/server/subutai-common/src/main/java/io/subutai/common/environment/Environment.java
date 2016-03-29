@@ -74,11 +74,10 @@ public interface Environment extends RelationLink
     /**
      * Grows environment according to the passed blueprint
      *
-     * @param environmentId = environment id to use when growing
      * @param topology = topology to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
             throws EnvironmentModificationException;
 
 
@@ -128,15 +127,13 @@ public interface Environment extends RelationLink
 
     Set<EnvironmentContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException;
 
-    String getTunnelNetwork();
+    String getP2pSubnet();
 
     Map<String, String> getTunnels();
 
     boolean isMember( Peer peer );
 
-    String getTunnelInterfaceName();
-
-    String getTunnelCommunityName();
+    String getP2PHash();
 
     EnvironmentId getEnvironmentId();
 

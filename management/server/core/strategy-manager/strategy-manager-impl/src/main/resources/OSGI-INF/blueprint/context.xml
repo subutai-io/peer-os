@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-
   <bean id="masterPlacementStrategy"
         class="io.subutai.core.strategy.impl.ExamplePlacementStrategy">
   </bean>
@@ -9,11 +8,10 @@
   <bean id="unlimitedStrategy"
         class="io.subutai.core.strategy.impl.UnlimitedPlacementStrategy">
   </bean>
-<!--
-  <bean id="bestServerStrategy"
-        class="io.subutai.core.strategy.impl.BestServerStrategy">
+  <bean id="roundRobinStrategy"
+        class="io.subutai.core.strategy.impl.RoundRobinPlacementStrategy">
   </bean>
--->
+
   <bean id="strategyManager" scope="singleton"
         class="io.subutai.core.strategy.impl.StrategyManagerImpl"
         destroy-method="destroy">
@@ -27,11 +25,9 @@
   </reference-list>
 
   <service ref="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
+
   <service ref="masterPlacementStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
   <service ref="unlimitedStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
-<!--
   <service ref="roundRobinStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
-  <service ref="bestServerStrategy" interface="io.subutai.core.strategy.api.ContainerPlacementStrategy" />
--->
 
 </blueprint>

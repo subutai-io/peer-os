@@ -112,5 +112,6 @@ public class EnvironmentsPage extends PageObject {
         waitFor(templateMongo);
     }
 
+
     //endregion
 }

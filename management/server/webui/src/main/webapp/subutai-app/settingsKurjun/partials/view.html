@@ -15,6 +15,11 @@
 					ng-class="settingsKurjunCtrl.activeTab == 'quotas' ? 'b-tabs-menu__item_active' : ''">
 					Quotas
 				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="settingsKurjunCtrl.activeTab = 'urlsList'"
+					ng-class="settingsKurjunCtrl.activeTab == 'urlsList' ? 'b-tabs-menu__item_active' : ''">
+					URLs List
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -28,6 +33,11 @@
 	<div
 		ng-if="settingsKurjunCtrl.activeTab == 'quotas'"
 		ng-include="'subutai-app/settingsKurjun/partials/quotas.html'">
+	</div>
+
+	<div
+		ng-if="settingsKurjunCtrl.activeTab == 'urlsList'"
+		ng-include="'subutai-app/settingsKurjun/partials/urls-list.html'">
 	</div>
   </div>
 </div>
