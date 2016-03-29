@@ -328,7 +328,11 @@ public class PeerWebClient
 
         try
         {
-            client.post( config );
+            final Response response = client.post( config );
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
         }
         catch ( Exception e )
         {
