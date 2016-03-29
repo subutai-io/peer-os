@@ -130,8 +130,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
                     break;
-                case DESTROY_CONTAINER:
-                    destroyContainers( peerDto );
+                case DELETE_PEER:
+                    deletePeer( peerDto );
                     break;
             }
         }
@@ -445,7 +445,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
-    private void destroyContainers( EnvironmentPeerDto peerDto )
+    private void deletePeer( EnvironmentPeerDto peerDto )
     {
         String containerDestroyStateURL =
                 String.format( "/rest/v1/environments/%s/destroy", peerDto.getEnvironmentInfo().getId() );
@@ -456,7 +456,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
             localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
-
             WebClient client =
                     configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
             Response response = client.put( null );
