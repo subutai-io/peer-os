@@ -97,9 +97,20 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void inputNewUserConfirmPassword(String confirmpassword) {
-        userManagementPage.fieldConfirmPassword.type(confirmpassword);
+    public void inputNewUserConfirmPassword(String confirmPassword) {
+        userManagementPage.fieldConfirmPassword.type(confirmPassword);
     }
+
+    @Step
+    public void inputLoginPeerRegistrationOnHub(String login){
+        commonPage.fieldLogin.type(login);
+    }
+
+    @Step
+    public void inputPasswordPeerRegistrationOnHub(String password){
+        commonPage.fieldPassword.type(password);
+    }
+
     //endregion
 
     //region ACTION: Click
@@ -513,6 +524,7 @@ public class SubutaiSteps extends ScenarioSteps {
         assertThat(monitoringPage.headerMonitoring.isVisible(), is(true));
     }
 
+
     @Step
     public void userShouldObserveManagementHost() {
         assertThat(monitoringPage.selectorHostsItemManagementHost.isVisible(), is(true));
@@ -790,5 +802,58 @@ public class SubutaiSteps extends ScenarioSteps {
     public void run_bash_script(String file) throws FileNotFoundException {
         ExecuteShellCommand executeShellCommand = new ExecuteShellCommand();
         System.out.println(executeShellCommand.executeCommand(file));
+    }
+
+    @Step
+    public void clickOnButtonRegister() throws FindFailed {
+        screen.click(commonPage.sikuliButtonRegister);
+    }
+
+    @Step
+    public void assertButtonGoToHUB(){
+        commonPage.waitFor(commonPage.buttonGoToHUB);
+        assertThat(commonPage.buttonGoToHUB.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonGoToHUBGreen() throws FindFailed {
+        screen.click(commonPage.sikuliButtonGoToHUBGreen);
+    }
+
+    @Step
+    public void assertMessageHeartbeatSentSuccessfully(){
+        commonPage.waitFor(commonPage.textEnvironmentHasBeenBuiltSuccessfully);
+        assertThat(commonPage.textEnvironmentHasBeenBuiltSuccessfully.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickButtonClose() throws FindFailed {
+        screen.click(commonPage.sikuliButtonClose);
+    }
+
+    @Step
+    public void clickOnButtonPeerRegistrationOnline() throws FindFailed {
+        screen.click(commonPage.sikuliButtonPeerRegistrationOnline);
+    }
+
+    @Step
+    public void assertButtonSendHeartbeat() {
+        commonPage.waitFor(commonPage.buttonSendHeartbeat);
+        assertThat(commonPage.buttonSendHeartbeat.isVisible(), is(true));
+    }
+
+    @Step
+    public void clickOnButtonSendHeartbeat() throws FindFailed {
+        screen.click(commonPage.sikuliButtonSendHearbeat);
+    }
+
+    @Step
+    public void clickOnButtonOkHeartbeat() throws FindFailed {
+        screen.click(commonPage.sikuliButtonOk);
+    }
+
+    @Step
+    public void clickOnButtonGoToHUBWhite() throws FindFailed {
+        screen.click(commonPage.sikuliButtonGoToHUBWhite);
     }
 }
