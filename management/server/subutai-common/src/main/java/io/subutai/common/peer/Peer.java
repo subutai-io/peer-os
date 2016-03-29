@@ -34,6 +34,7 @@ import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationLinkDto;
 
 
 /**
@@ -250,7 +251,7 @@ public interface Peer extends RelationLink
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto /*, String userToken*/ )
             throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )

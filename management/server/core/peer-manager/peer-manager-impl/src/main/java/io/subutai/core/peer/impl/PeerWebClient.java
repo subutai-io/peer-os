@@ -35,6 +35,7 @@ import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
 import io.subutai.core.object.relation.api.RelationVerificationException;
 
@@ -119,7 +120,7 @@ public class PeerWebClient
     }
 
 
-    public PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
+    public PublicKeyContainer createEnvironmentKeyPair( final RelationLinkDto envLink ) throws PeerException
     {
         try
         {
@@ -131,7 +132,7 @@ public class PeerWebClient
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
 
-            final Response response = client.post( environmentId );
+            final Response response = client.post( envLink );
             if ( response.getStatus() == 500 )
             {
                 throw new PeerException( response.readEntity( String.class ) );

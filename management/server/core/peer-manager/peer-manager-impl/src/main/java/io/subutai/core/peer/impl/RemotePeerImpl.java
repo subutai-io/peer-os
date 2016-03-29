@@ -67,6 +67,7 @@ import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
@@ -761,11 +762,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
-        Preconditions.checkNotNull( environmentId, "Invalid environmentId" );
+        Preconditions.checkNotNull( envLink, "Invalid environmentId" );
 
-        return peerWebClient.createEnvironmentKeyPair( environmentId );
+        return peerWebClient.createEnvironmentKeyPair( envLink );
     }
 
 

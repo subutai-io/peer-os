@@ -30,6 +30,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
 
 //todo please check all endpoints for returned media type, do we return correct type if we just return response code
@@ -83,7 +84,7 @@ public interface RestService
     @Path( "pek" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    PublicKeyContainer createEnvironmentKeyPair( EnvironmentId environmentId );
+    PublicKeyContainer createEnvironmentKeyPair( RelationLinkDto environmentId );
 
     @PUT
     @Path( "pek" )

@@ -39,11 +39,11 @@ import io.subutai.common.network.Gateways;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
@@ -160,12 +160,12 @@ public class HubEnvironmentManager
     }
 
 
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId )
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink )
     {
         try
         {
             io.subutai.common.security.PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
+                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
             PublicKeyContainer keyContainer = new PublicKeyContainer();
             keyContainer.setKey( publicKeyContainer.getKey() );

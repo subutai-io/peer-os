@@ -23,6 +23,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -67,8 +68,9 @@ public class PEKGenerationStep
         PGPPublicKeyRing localPeerSignedPEK;
         try
         {
+            RelationLinkDto envLink = new RelationLinkDto( environment );
             PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environment.getEnvironmentId() );
+                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
             PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
 
@@ -97,7 +99,7 @@ public class PEKGenerationStep
         // creating PEK on remote peers
         for ( final Peer peer : peers )
         {
-            completionService.submit(
+            completionService.submit                                (
                     new GeneratePekTask( peerManager.getLocalPeer(), envSecKeyRing, localPeerSignedPEK, environment,
                             peer, securityManager.getKeyManager() ) );
         }
@@ -161,18 +163,19 @@ public class PEKGenerationStep
         @Override
         public Peer call() throws Exception
         {
-            PublicKeyContainer publicKeyContainer = peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() );
+            RelationLinkDto relationLinkDto = new RelationLinkDto( environment );
+            PublicKeyContainer publicKeyContainer = peer.createPeerEnvironmentKeyPair( relationLinkDto );
 
             PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
 
             PGPPublicKeyRing signedPEK = keyManager.setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
             peer.updatePeerEnvironmentPubKey( environment.getEnvironmentId(), signedPEK );
-            peer.addPeerEnvironmentPubKey( localPeer.getId() + "-" + environment.getEnvironmentId().getId(),
-                    localPeerSignedPEK );
+            peer.addPeerEnvironmentPubKey( localPeer.getId() + "_" + environment.getEnvironmentId().getId(),
+                    localPeerSignedPEK   );
 
             localPeer
-                    .addPeerEnvironmentPubKey( peer.getId() + "-" + environment.getEnvironmentId().getId(), signedPEK );
+                    .addPeerEnvironmentPubKey( peer.getId() + "_" + environment.getEnvironmentId().getId(), signedPEK );
 
             return peer;
         }

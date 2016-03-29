@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.peer.api.PeerManager;
@@ -66,7 +67,8 @@ public class PEKGenerationStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() ).getKey();
+                    RelationLinkDto envLink = new RelationLinkDto( environment );
+                    peer.createPeerEnvironmentKeyPair( envLink ).getKey();
 
                     return peer;
                 }

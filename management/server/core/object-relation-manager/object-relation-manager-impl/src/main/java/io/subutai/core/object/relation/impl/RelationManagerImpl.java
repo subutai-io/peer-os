@@ -237,4 +237,11 @@ public class RelationManagerImpl implements RelationManager
     {
         relationDataService.remove( relationId );
     }
+
+
+    @Override
+    public RelationLink getRelationLink( final String uniqueId )
+    {
+        return relationDataService.getRelationLinkByUniqueId( uniqueId );
+    }
 }

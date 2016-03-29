@@ -384,6 +384,33 @@ public class RelationDataService
         return result;
     }
 
+    public RelationLink getRelationLinkByUniqueId( final String uniqueIdentifier )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        RelationLink result = null;
+        try
+        {
+            Query qr = em.createQuery( "select ss from RelationLinkImpl AS ss"
+                    + " where ss.uniqueIdentifier=:uniqueIdentifier" );
+            qr.setParameter( "uniqueIdentifier", uniqueIdentifier );
+            List<RelationLink> list = qr.getResultList();
+
+            if ( list.size() > 0 )
+            {
+                result = list.get( 0 );
+            }
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust item.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
+    }
+
 
     public RelationChallengeImpl getRelationToken( final String token )
     {

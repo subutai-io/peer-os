@@ -35,6 +35,7 @@ import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
@@ -176,7 +177,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId )
+    public PublicKeyContainer createEnvironmentKeyPair( final RelationLinkDto environmentId )
     {
         Preconditions.checkNotNull( environmentId );
 

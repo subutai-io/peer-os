@@ -99,6 +99,8 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
@@ -1108,8 +1110,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
         }
-
-
     }
 
 
@@ -1480,13 +1480,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
-        Preconditions.checkNotNull( envId );
+        Preconditions.checkNotNull( envLink );
         //TODO don't generate PEK if already exists, return the existing one!!!
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
-        String pairId = String.format( "%s-%s", getId(), envId.getId() );
+        String pairId = String.format( "%s-%s", getId(), envLink.getUniqueIdentifier() );
+        buildPeerEnvRelation( envLink );
+
         final PGPSecretKeyRing peerSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( null );
         try
         {
@@ -1513,6 +1515,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    private void buildPeerEnvRelation(final RelationLink envLink)
+    {
+
+        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment.
+
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+        if ( peerOwner != null )
+        {
+            // Simply pass key value object as map
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+            relationTraits.put( "hostEnvironment", "true" );
+            relationTraits.put( "containerLimit", "unlimited" );
+            relationTraits.put( "bandwidthLimit", "unlimited" );
+
+            RelationMeta relationMeta = new RelationMeta( peerOwner, this, envLink, this.getKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
+    }
+
+
     @Override
     public void updatePeerEnvironmentPubKey( final EnvironmentId environmentId, final PGPPublicKeyRing pubKeyRing )
             throws PeerException
@@ -1531,6 +1557,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( pubRing );
 
         securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
+
+        // Build relation between LocalPeer => RemotePeer => Environment
+        // for message encryption/decryption mechanism described in relation trais
+        String [] ids = keyId.split( "_" );
+        if ( ids.length == 2 )
+        {
+            String envId = ids[1];
+            RelationLink envLink = relationManager.getRelationLink( envId );
+            RelationLink peerLink = relationManager.getRelationLink( ids[0] );
+
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+            relationTraits.put( "encryptMessage", "true" );
+            relationTraits.put( "decryptMessage", "true" );
+
+            RelationMeta relationMeta = new RelationMeta( this, peerLink, envLink, this.getKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
     }
 
 

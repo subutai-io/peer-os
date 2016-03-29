@@ -118,8 +118,8 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            String targetId = peerManager.getPeerIdByIp( ip ) + "-" + environmentId;
-            String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
+            String targetId = peerManager.getPeerIdByIp( ip ) + "_" + environmentId;
+            String sourceId = peerManager.getLocalPeer().getId() + "_" + environmentId;
 
             MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
         }
