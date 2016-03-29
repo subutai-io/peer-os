@@ -31,8 +31,10 @@ import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
@@ -363,7 +365,7 @@ public class HubEnvironmentManager
                         nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
                         nodeDto.setHostName( cloneResponse.getHostname() );
                         nodeDto.setState( ContainerStateDto.RUNNING );
-                        
+
                         Set<Host> hosts = new HashSet<>();
                         Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
                         hosts.add( host );
@@ -405,7 +407,7 @@ public class HubEnvironmentManager
             @Override
             public Peer call() throws Exception
             {
-                localPeer.configureSshInEnvironment( environmentId, sshKeys );
+                localPeer.configureSshInEnvironment( environmentId, new SshPublicKeys( sshKeys ) );
                 return localPeer;
             }
         } );
@@ -450,7 +452,7 @@ public class HubEnvironmentManager
             @Override
             public Peer call() throws Exception
             {
-                localPeer.configureHostsInEnvironment( environmentId, hostAddresses );
+                localPeer.configureHostsInEnvironment( environmentId, new HostAddresses( hostAddresses ) );
                 return localPeer;
             }
         } );
