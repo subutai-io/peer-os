@@ -2,7 +2,6 @@ package io.subutai.core.environment.impl.adapter;
 
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -11,19 +10,19 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
-class ProxyEnvironment extends EnvironmentImpl
+// NOTE: Using environmentManager from EnvironmentImpl gives side effects. For example, empty container list.
+public class ProxyEnvironment extends EnvironmentImpl
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
 
-    ProxyEnvironment( JsonNode json, EnvironmentManagerImpl environmentManager, Map<String, ContainerHost> localContainersByHostname )
+    ProxyEnvironment( JsonNode json, EnvironmentManagerImpl environmentManager )
     {
         super(
                 json.get( "name" ).asText(),
@@ -35,15 +34,13 @@ class ProxyEnvironment extends EnvironmentImpl
 
         init( json );
 
-        addContainers( parseContainers( json, localContainersByHostname ) );
+        addContainers( parseContainers( json, environmentManager ) );
     }
 
 
     private void init( JsonNode json )
     {
         environmentId = json.get( "id" ).asText();
-
-        log.debug( "environmentId: {}", environmentId );
 
         envId = new EnvironmentId( environmentId );
 
@@ -54,7 +51,7 @@ class ProxyEnvironment extends EnvironmentImpl
     }
 
 
-    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, Map<String, ContainerHost> localContainersByHostname )
+    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager )
     {
         Set<ProxyEnvironmentContainer> containers = new HashSet<>();
 
@@ -64,12 +61,7 @@ class ProxyEnvironment extends EnvironmentImpl
         {
             try
             {
-                ProxyEnvironmentContainer con = parseContainer( node, localContainersByHostname );
-
-                if ( con != null )
-                {
-                    containers.add( con );
-                }
+                containers.add( new ProxyEnvironmentContainer( node, environmentManager ) );
             }
             catch ( Exception e )
             {
@@ -87,33 +79,9 @@ class ProxyEnvironment extends EnvironmentImpl
     }
 
 
-    // May return null b/c of bug in SS: not all containers in environment has corresponding CH registered in MH.
-    private ProxyEnvironmentContainer parseContainer( JsonNode node, Map<String, ContainerHost> localContainersByHostname )
-    {
-        // Fix for: SS container hostname is stored as id on Hub
-        String hostname = node.get( "id" ).asText();
-
-        ContainerHost ch = localContainersByHostname.get( hostname );
-
-        return ch != null
-               ? new ProxyEnvironmentContainer( node, ch.getId() )
-               : null;
-    }
-
-
     @Override
     public String toString()
     {
         return "ProxyEnvironment:" + super.toString();
     }
-
-
-    // TODO. setEnvironmentTransientFields( environment );
-    // NOTE: Using environmentManager from EnvironmentImpl gives side effects. For example, empty container list.
-//    private EnvironmentManagerImpl environmentManager;
-//    @Override
-//    public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
-//    {
-//        this.environmentManager = environmentManager;
-//    }
 }
