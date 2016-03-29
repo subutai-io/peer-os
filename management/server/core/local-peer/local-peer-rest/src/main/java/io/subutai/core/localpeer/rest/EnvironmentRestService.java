@@ -7,12 +7,14 @@ import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -97,7 +99,12 @@ public interface EnvironmentRestService
     @Path( "{environmentId}/containers/sshkeys" )
     @Consumes( MediaType.APPLICATION_JSON )
     Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
-                                        Set<String> sshKeys );
+                                        SshPublicKeys sshPublicKeys );
+
+    @PUT
+    @Path( "{environmentId}/containers/sshkeys" )
+    @Produces( MediaType.APPLICATION_JSON )
+    SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @POST
     @Path( "{environmentId}/containers/hosts" )
