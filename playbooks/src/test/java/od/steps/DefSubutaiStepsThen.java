@@ -4,6 +4,7 @@ import net.thucydides.core.annotations.Steps;
 import od.steps.serenity.SubutaiSteps;
 import org.jbehave.core.annotations.Then;
 import org.sikuli.script.FindFailed;
+import org.yecht.Data;
 
 import java.io.FileNotFoundException;
 
@@ -245,5 +246,25 @@ public class DefSubutaiStepsThen {
     @Then("the user should observe button: Send Heartbeat")
     public void should_observe_button_send_heartbeat(){
         subutaiSteps.assertButtonSendHeartbeat();
+    }
+
+    @Then("the user should create a peer request with: '$ip', '$key'")
+    public void should_create_a_peer_request(String ip, String key) throws FindFailed {
+        subutaiSteps.inputPeerIP(ip);
+        subutaiSteps.inputPeerKeyPhrase(key);
+        subutaiSteps.clickOnButtonCreate();
+    }
+
+    @Then("the user should observe button: Cancel")
+    public void should_observe_button_cancel_request(){
+        subutaiSteps.assertButtonCancelPeerRequest();
+    }
+
+    @Then("the user should approve the peer with: '$key'")
+    public void should_approve_peer(String key) throws FindFailed {
+        subutaiSteps.clickbuttonApprove();
+        subutaiSteps.inputApprovePeerKeyPhrase(key);
+        subutaiSteps.clickbuttonApprovePopUp();
+        subutaiSteps.assertButtonUnregister();
     }
 }

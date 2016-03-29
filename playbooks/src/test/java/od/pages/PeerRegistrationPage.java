@@ -8,12 +8,31 @@ public class PeerRegistrationPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
+    @FindBy(id="subt_input__peer-ip")
+    public WebElementFacade fieldPeerIp;
+
+    @FindBy(id="subt_input__peer-key-phrase")
+    public WebElementFacade fieldPeerKeyPhrase;
+
+    @FindBy(id="subt_input__peer-approve-keyphrase")
+    public WebElementFacade fieldPeerApprove;
     //endregion
 
     //region WEB ELEMENTS: Buttons
 
     @FindBy(id = "subt_link__create-peer")
     public WebElementFacade buttonCreatePeer;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_blue subt_button__peer-cancel\"]")
+    public WebElementFacade buttonCancelPeerRequest;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_red subt_button__peer-unregister\"]")
+    public WebElementFacade buttonUnregister;
+
+    public String sikuliButtonCreatePeer = "src/test/resources/imgs/buttons/buttonCreatePeer.png";
+    public String sikuliButtonCreate = "src/test/resources/imgs/buttons/buttonCreate.png";
+    public String sikuliButtonApprove = "src/test/resources/imgs/buttons/buttonApprove.png";
+    public String sikuliButtonApprovePopUp = "src/test/resources/imgs/buttons/buttonApprovePopUp.png";
 
     //endregion
 

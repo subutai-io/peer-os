@@ -111,6 +111,22 @@ public class SubutaiSteps extends ScenarioSteps {
         commonPage.fieldPassword.type(password);
     }
 
+    @Step
+    public void inputPeerIP(String ip) {
+        peerRegistrationPage.fieldPeerIp.type(ip);
+    }
+
+    @Step
+    public void inputPeerKeyPhrase(String key) {
+        peerRegistrationPage.fieldPeerKeyPhrase.type(key);
+
+    }
+
+    @Step
+    public void inputApprovePeerKeyPhrase(String key) {
+        peerRegistrationPage.fieldPeerApprove.type(key);
+    }
+
     //endregion
 
     //region ACTION: Click
@@ -139,7 +155,7 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnMenuEnvironment() throws FindFailed {
 //        commonPage.linkEnvironment.click();
         screen.click(commonPage.sikuliMenuItemEnvironment);
-        commonPage.waitFor(2000);
+//        commonPage.waitFor(2000);
     }
 
     @Step
@@ -490,6 +506,20 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(userManagementPage.sikuliButtonOk);
     }
 
+    @Step
+    public void clickOnButtonCreatePeer() throws FindFailed {
+        screen.click(peerRegistrationPage.sikuliButtonCreatePeer);
+    }
+
+    @Step
+    public void clickOnButtonCreate() throws FindFailed {
+        screen.click(peerRegistrationPage.sikuliButtonCreate);
+    }
+
+    @Step
+    public void clickbuttonApprovePopUp() throws FindFailed {
+        screen.click(peerRegistrationPage.sikuliButtonApprovePopUp);
+    }
 
     //endregion
 
@@ -500,6 +530,10 @@ public class SubutaiSteps extends ScenarioSteps {
         waitABit(30000);
     }
 
+    @Step
+    public void userShouldWaitAFewSeconds() {
+        waitABit(4000);
+    }
     //endregion
 
     //region VERIFICATION: AssertThat
@@ -771,6 +805,17 @@ public class SubutaiSteps extends ScenarioSteps {
     public void userShouldNotObserveRoleInternalSystem() {
         assertThat(userManagementPage.roleInternalSystem.isVisible(), is(false));
     }
+
+    @Step
+    public void assertButtonCancelPeerRequest() {
+        assertThat(peerRegistrationPage.buttonCancelPeerRequest.isVisible(), is(true));
+    }
+
+    @Step
+    public void assertButtonUnregister() {
+        assertThat(peerRegistrationPage.buttonUnregister.isVisible(), is(true));
+    }
+
     //endregion
 
     //region ACTION: Shell command
@@ -856,4 +901,10 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnButtonGoToHUBWhite() throws FindFailed {
         screen.click(commonPage.sikuliButtonGoToHUBWhite);
     }
+
+    @Step
+    public void clickbuttonApprove() throws FindFailed {
+        screen.click(peerRegistrationPage.sikuliButtonApprove);
+    }
+
 }

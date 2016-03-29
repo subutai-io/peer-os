@@ -226,4 +226,14 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.waitABit(5000);
     }
 
+    @When("the user clicks on the button: Сreate peer")
+    public void clicks_on_the_button_create_peer() throws FindFailed {
+        subutaiSteps.clickOnButtonCreatePeer();
+    }
+
+    @When("the user should wait a few seconds")
+    public void user_should_wait_a_few_seconds(){
+        subutaiSteps.userShouldWaitAFewSeconds();
+    }
+
 }
