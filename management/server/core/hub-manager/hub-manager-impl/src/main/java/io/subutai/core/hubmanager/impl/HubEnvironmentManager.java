@@ -23,9 +23,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
+import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.Node;
@@ -39,10 +42,12 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
@@ -357,6 +362,12 @@ public class HubEnvironmentManager
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
                         nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
                         nodeDto.setHostName( cloneResponse.getHostname() );
+
+                        Set<Host> hosts = new HashSet<>();
+                        Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
+                        hosts.add( host );
+                        String sshKey = createSshKey( hosts );
+                        nodeDto.addSshKey( sshKey );
                     }
                 }
             }
@@ -449,6 +460,36 @@ public class HubEnvironmentManager
         {
             LOG.error( "Problems registering hosts in peer: " + localPeer.getId(), e );
         }
+    }
+
+
+    public String createSshKey( Set<Host> hosts )
+    {
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
+
+        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        {
+            CommandResult result = resultEntry.getValue();
+            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+            {
+                return result.getStdOut();
+            }
+            else
+            {
+                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
+            }
+        }
+        return null;
+    }
+
+
+    public RequestBuilder getCreateNReadSSHCommand()
+    {
+        return new RequestBuilder( String.format( "rm -rf %1$s && " +
+                        "mkdir -p %1$s && " +
+                        "chmod 700 %1$s && " +
+                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                Common.CONTAINER_SSH_FOLDER ) );
     }
 
 

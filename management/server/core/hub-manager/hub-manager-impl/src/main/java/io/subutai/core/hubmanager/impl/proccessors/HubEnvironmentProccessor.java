@@ -127,7 +127,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
                     break;
-                case CONFIGURE_SSH:
+                case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
                     break;
                 case DESTROY_CONTAINER:
@@ -292,7 +292,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             WebClient clientUpdate =
                     configManager.getTrustedWebClientWithAuth( configContainer, configManager.getHubIp() );
-            Response response = clientUpdate.put( peerDto );
+
+            byte[] cborData = JsonUtil.toCbor( peerDto );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+            Response response = clientUpdate.put( encryptedData );
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "SSH configuration successfully done" );
