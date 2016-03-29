@@ -461,7 +461,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( sshPublicKeys, "SshPublicKey is null" );
         Preconditions.checkArgument( !sshPublicKeys.isEmpty(), "No ssh keys" );
 
-        environmentWebClient.configureSshInEnvironment( peerInfo, environmentId, sshKeys );
+        environmentWebClient.configureSshInEnvironment( peerInfo, environmentId, sshPublicKeys );
     }
 
 
