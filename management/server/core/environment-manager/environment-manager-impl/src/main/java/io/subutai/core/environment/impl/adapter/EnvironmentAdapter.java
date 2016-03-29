@@ -2,9 +2,7 @@ package io.subutai.core.environment.impl.adapter;
 
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -72,8 +70,6 @@ public class EnvironmentAdapter
 
         log.debug( "Json with environments: {}", json );
 
-        Map<String, ContainerHost> localContainersByHostname = getLocalContainersByHostname();
-
         HashSet<ProxyEnvironment> envs = new HashSet<>();
 
         try
@@ -82,7 +78,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, localContainersByHostname ) );
+                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager ) );
             }
         }
         catch ( Exception e )
@@ -90,15 +86,14 @@ public class EnvironmentAdapter
             log.error( "Error to parse json: ", e );
         }
 
+        printLocalContainers();
+
         return envs;
     }
 
 
-    // Fix for: SS container hostname is stored as id on Hub
-    private Map<String, ContainerHost> getLocalContainersByHostname()
+    private void printLocalContainers()
     {
-        HashMap<String, ContainerHost> map = new HashMap<>();
-
         for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
         {
             for ( ContainerHost ch : rh.getContainerHosts() )
@@ -106,12 +101,8 @@ public class EnvironmentAdapter
                 String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
                 log.debug( "Local container: hostname={}, id={}, ip={}", ch.getHostname(), ch.getId(), ip );
-
-                map.put( ch.getHostname(), ch );
             }
         }
-
-        return map;
     }
 
 
@@ -123,8 +114,7 @@ public class EnvironmentAdapter
 
             ( ( EnvironmentContainerImpl ) ch ).destroy();
 
-            // SS container hostname is Hub container id
-            hubAdapter.destroyContainer( env.getId(), ch.getHostname() );
+            hubAdapter.destroyContainer( env.getId(), containerId );
         }
         catch ( Exception e )
         {

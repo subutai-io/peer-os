@@ -2,7 +2,6 @@ package io.subutai.core.environment.impl.adapter;
 
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -24,7 +22,7 @@ public class ProxyEnvironment extends EnvironmentImpl
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
 
-    ProxyEnvironment( JsonNode json, EnvironmentManagerImpl environmentManager, Map<String, ContainerHost> localContainersByHostname )
+    ProxyEnvironment( JsonNode json, EnvironmentManagerImpl environmentManager )
     {
         super(
                 json.get( "name" ).asText(),
@@ -36,7 +34,7 @@ public class ProxyEnvironment extends EnvironmentImpl
 
         init( json );
 
-        addContainers( parseContainers( json, environmentManager, localContainersByHostname ) );
+        addContainers( parseContainers( json, environmentManager ) );
     }
 
 
@@ -53,8 +51,7 @@ public class ProxyEnvironment extends EnvironmentImpl
     }
 
 
-    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager,
-                                                           Map<String, ContainerHost> localContainersByHostname )
+    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager )
     {
         Set<ProxyEnvironmentContainer> containers = new HashSet<>();
 
@@ -64,7 +61,7 @@ public class ProxyEnvironment extends EnvironmentImpl
         {
             try
             {
-                parseAndAdd( containers, node, localContainersByHostname, environmentManager );
+                containers.add( new ProxyEnvironmentContainer( node, environmentManager ) );
             }
             catch ( Exception e )
             {
@@ -79,34 +76,6 @@ public class ProxyEnvironment extends EnvironmentImpl
         resultSet.addAll( containers );
 
         return resultSet;
-    }
-
-
-    private void parseAndAdd( Set<ProxyEnvironmentContainer> containers, JsonNode node, Map<String, ContainerHost> localContainersByHostname,
-                              EnvironmentManagerImpl environmentManager)
-    {
-        ProxyEnvironmentContainer con = parseContainer( node, localContainersByHostname );
-
-        if ( con != null )
-        {
-            containers.add( con );
-
-            con.setEnvironmentManager( environmentManager );
-        }
-    }
-
-
-    // May return null b/c of bug in SS: not all containers in environment has corresponding CH registered in MH.
-    private ProxyEnvironmentContainer parseContainer( JsonNode node, Map<String, ContainerHost> localContainersByHostname )
-    {
-        // Fix for: SS container hostname is stored as id on Hub
-        String hostname = node.get( "id" ).asText();
-
-        ContainerHost ch = localContainersByHostname.get( hostname );
-
-        return ch != null
-               ? new ProxyEnvironmentContainer( node, ch.getId() )
-               : null;
     }
 
 
