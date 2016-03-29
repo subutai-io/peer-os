@@ -361,6 +361,7 @@ public class HubEnvironmentManager
                         nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
                         nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
+                        nodeDto.setHostName( cloneResponse.getHostname() );
                     }
                 }
             }

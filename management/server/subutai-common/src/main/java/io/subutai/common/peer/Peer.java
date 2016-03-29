@@ -216,7 +216,7 @@ public interface Peer
 
 
     /**
-     * Sets up tunnels on the local peer to the specified remote peers
+     * Sets up tunnels on the local peer to the specified remote peers todo use EnvironmentId instead of string
      */
     public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
 
@@ -242,6 +242,8 @@ public interface Peer
      * Gets containerHost by Id specified
      *
      * @return - containerHost
+     *
+     * todo use ContainerId instead of string
      */
     public HostInfo getContainerHostInfoById( String containerHostId ) throws PeerException;
 
@@ -249,8 +251,7 @@ public interface Peer
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId/*, String userToken*/ )
-            throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -312,6 +313,7 @@ public interface Peer
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
+    //todo use PeerId instead of string
     PeerResources getResourceLimits( String peerId ) throws PeerException;
 
     ContainerQuota getAvailableQuota( ContainerId containerId ) throws PeerException;
@@ -331,4 +333,9 @@ public interface Peer
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 
     PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
+
+    void configureSshInEnvironment( EnvironmentId environmentId, Set<String> sshKeys ) throws PeerException;
+
+    void configureHostsInEnvironment( EnvironmentId environmentId, Map<String, String> hostAddresses )
+            throws PeerException;
 }

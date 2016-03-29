@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.rest;
 
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
@@ -16,6 +17,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.quota.ContainerQuota;
 
 //TODO make all methods consistent about parameters
@@ -90,4 +92,16 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     HostId getResourceHostIdByContainerId( @PathParam( "containerId" ) ContainerId containerId );
+
+    @POST
+    @Path( "{environmentId}/containers/sshkeys" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                        Set<String> sshKeys );
+
+    @POST
+    @Path( "{environmentId}/containers/hosts" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response configureHostsInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                          Map<String, String> hostAddresses );
 }

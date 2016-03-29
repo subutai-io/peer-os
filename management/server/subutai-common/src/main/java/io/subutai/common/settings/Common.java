@@ -9,6 +9,8 @@ public class Common
     public static final String SUBUTAI_APP_KEYSTORES_PATH = System.getProperty( "subutaiKeystorePath" );
     public static final String SUBUTAI_APP_CERTS_PATH = System.getProperty( "subutaiCertsPath" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
+    public static final String LOCAL_HOST_IP = "127.0.0.1";
+    public static final String LOCAL_HOST_NAME = "localhost";
     //10 min including possible template download
     public static final int WAIT_CONTAINER_CONNECTION_SEC = 30;
     public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 30;
