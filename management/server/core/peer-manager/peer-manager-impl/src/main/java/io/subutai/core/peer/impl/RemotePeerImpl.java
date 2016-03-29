@@ -449,7 +449,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( sshKeys ), "Invalid ssh keys" );
 
-        new EnvironmentWebClient( provider ).addSshKeysToEnvironment( peerInfo, environmentId, sshKeys );
+        environmentWebClient.addSshKeysToEnvironment( peerInfo, environmentId, sshKeys );
     }
 
 
