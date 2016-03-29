@@ -1735,7 +1735,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //TODO don't generate PEK if already exists, return the existing one!!!
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
-        String pairId = String.format( "%s-%s", getId(), envLink.getUniqueIdentifier() );
+        String pairId = String.format( "%s_%s", getId(), envLink.getUniqueIdentifier() );
         buildPeerEnvRelation( envLink );
 
         final PGPSecretKeyRing peerSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( null );

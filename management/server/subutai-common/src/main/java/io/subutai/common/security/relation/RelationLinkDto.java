@@ -1,6 +1,8 @@
 package io.subutai.common.security.relation;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.google.common.base.Preconditions;
 
 
@@ -9,15 +11,26 @@ import com.google.common.base.Preconditions;
  */
 public class RelationLinkDto implements RelationLink
 {
+    @JsonProperty( "linkId" )
     private String linkId;
+
+    @JsonProperty( "uniqueId" )
     private String uniqueIdentifier;
+
+    @JsonProperty( "simpleName" )
     private String classPath;
+
+    @JsonProperty( "context" )
     private String context = "";
+
+    @JsonProperty( "keyId" )
     private String keyId;
 
 
-    public RelationLinkDto( final String uniqueIdentifier, final String classPath, final String context,
-                            final String keyId )
+    public RelationLinkDto( @JsonProperty( "uniqueId" ) final String uniqueIdentifier,
+                            @JsonProperty( "simpleName" ) final String classPath,
+                            @JsonProperty( "context" ) final String context,
+                            @JsonProperty( "keyId" ) final String keyId )
     {
         this.uniqueIdentifier = uniqueIdentifier;
         this.classPath = classPath;
