@@ -13,9 +13,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Role;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.hub.share.dto.UserDto;
+import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -23,25 +28,66 @@ public class EnvironmentUserHelper
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private ConfigManager configManager;
+    private final ConfigManager configManager;
 
-    private IdentityManager identityManager;
+    private final IdentityManager identityManager;
 
 
-    public EnvironmentUserHelper( final ConfigManager configManager, final IdentityManager identityManager )
+    public EnvironmentUserHelper( ConfigManager configManager, IdentityManager identityManager )
     {
         this.configManager = configManager;
+
         this.identityManager = identityManager;
     }
 
 
     public void test()
     {
-        String userId = "554455fd-7fd3-47c3-b87d-cef2db75f8bc";
+//        String userId = "554455fd-7fd3-47c3-b87d-cef2db75f8bc"; // askat
+        String userId = "43163772-a8c2-459f-bfcb-4d0bcc5759f6"; // sydyk
 
         UserDto userDto = getUserDataFromHub( userId );
 
-        log.debug( "user: email={}, name={}", userDto.getEmail(), userDto.getName() );
+        createNewUser( userDto, "!qaz@wsx" );
+    }
+
+
+    private Role getEnvironmentRole()
+    {
+        for ( Role r : identityManager.getAllRoles() )
+        {
+            if ( r.getName().equals( "Environment-Manager" ) )
+            {
+                return r;
+            }
+        }
+
+        return null;
+    }
+
+    private void createNewUser( UserDto userDto, String password )
+    {
+        log.debug( "Creating new user: {}", userDto.getEmail() );
+
+        try
+        {
+            User user = identityManager.createUser( userDto.getEmail(), password, "[Hub]" + userDto.getName(), userDto.getEmail(), UserType.Regular.getId(),
+                    KeyTrustLevel.Marginal.getId(), false, false );
+
+            identityManager.assignUserRole( user, getEnvironmentRole() );
+
+            log.debug( "User created with id = {}", user.getId() );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to create user: ", e );
+        }
+    }
+
+
+    void handleEnvironmentOwner( EnvironmentPeerDto peerDto )
+    {
+        log.debug( ">> userId: {}", peerDto.getOwnerId() );
     }
 
 
