@@ -40,8 +40,6 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
-import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
@@ -97,9 +95,6 @@ public class IntegrationImpl implements Integration
 
     private ContainerEventProcessor containerEventProcessor;
 
-    private EnvironmentBuilder envBuilder;
-
-    private EnvironmentDestroyer envDestroyer;
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
     private String checksum = "";
 
@@ -154,10 +149,6 @@ public class IntegrationImpl implements Integration
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
-
-            //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
-            //
-            //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
                 @Override
@@ -191,10 +182,6 @@ public class IntegrationImpl implements Integration
         resourceHostConfProcessor.sendResourceHostConf();
 
         containerEventProcessor.process();
-
-        //        envBuilder.test();
-
-        //        envDestroyer.test();
     }
 
 
