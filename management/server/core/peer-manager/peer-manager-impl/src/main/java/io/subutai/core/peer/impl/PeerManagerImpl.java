@@ -581,10 +581,6 @@ public class PeerManagerImpl implements PeerManager
     public void processApproveRequest( final RegistrationData registrationData ) throws PeerException
     {
         final PeerInfo peerInfo = registrationData.getPeerInfo();
-        if ( "127.0.0.1".equals( peerInfo.getIp() ) )
-        {
-            throw new PeerException( "Invalid IP or DNS name. Please set proper public name." );
-        }
 
         RegistrationData initRequest = getRequest( peerInfo.getId() );
         if ( initRequest == null )
@@ -664,10 +660,10 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Could not send registration request to ourselves." );
         }
 
-
         if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
         {
-            throw new PeerException( "Peer is not ready to send registration request." );
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
         }
 
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
@@ -735,6 +731,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
+        if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
+        }
+
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
         {
