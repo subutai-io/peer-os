@@ -463,13 +463,13 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             Response response = client.delete();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Container destroyed successfully" );
+                LOG.debug( "Environment cleaned successfully" );
             }
         }
         catch ( Exception e )
         {
 
-            LOG.error( "Could not destroy container", e );
+            LOG.error( "Could not clean environment", e );
         }
     }
 
