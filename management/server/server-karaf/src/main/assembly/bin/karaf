@@ -19,7 +19,8 @@
 #Generate certificates before any configuration is applied
 
 #Function to generate self signed certificate for peer
-generate_keystore_certificate() {
+generate_keystore_certificate()
+{
     local alias=$1
     local file_path=$2
 #    echo "Generating cert for alias" $alias
@@ -35,7 +36,9 @@ generate_keystore_certificate() {
 }
 
 #Create and add self peer to truststore
-generate_truststore_certificate() {
+
+generate_truststore_certificate()
+{
     local alias=$1
     local keystore=$2
     local file_path=$3
@@ -48,7 +51,8 @@ generate_truststore_certificate() {
 	rm $client_cert
 }
 
-generate_keystore(){
+generate_keystore()
+{
     folder=$SUBUTAI_APP_DATA_PATH"/keystores"
     if [ ! -d $folder ]; then
         mkdir -p $folder

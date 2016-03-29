@@ -972,10 +972,11 @@ public class PGPEncryptionUtil
             //
             ByteArrayOutputStream lineOut = new ByteArrayOutputStream();
 
+            boolean isFirstLineText = aIn.isClearText();
+            int lookAhead = readInputLine( lineOut, aIn );
 
-            if ( aIn.isClearText() )
+            if ( lookAhead != -1 && isFirstLineText )
             {
-                int lookAhead = readInputLine( lineOut, aIn );
                 bout.write( lineOut.toByteArray() );
                 while ( lookAhead != -1 && aIn.isClearText() )
                 {
@@ -983,6 +984,7 @@ public class PGPEncryptionUtil
                     bout.write( lineOut.toByteArray() );
                 }
             }
+
             return bout.toByteArray();
         }
         catch ( Exception ex )
@@ -1068,11 +1070,12 @@ public class PGPEncryptionUtil
         // each line RFC 4880 Section 7.1
         //
         ByteArrayOutputStream lineOut = new ByteArrayOutputStream();
-        int lookAhead;
 
-        if ( aIn.isClearText() )
+        boolean isFirstLineClearText = aIn.isClearText();
+        int lookAhead = readInputLine( lineOut, aIn );
+
+        if ( lookAhead != -1 && isFirstLineClearText )
         {
-            lookAhead = readInputLine( lineOut, aIn );
             bout.write( lineOut.toByteArray() );
             while ( lookAhead != -1 && aIn.isClearText() )
             {

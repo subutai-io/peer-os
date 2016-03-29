@@ -2,9 +2,7 @@ package io.subutai.core.environment.impl.adapter;
 
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -12,10 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.json.JsonUtil;
@@ -46,13 +45,21 @@ public class EnvironmentAdapter
     }
 
 
-    public ProxyEnvironment get( final String id )
+    public ProxyEnvironment get( String id )
     {
+        for ( ProxyEnvironment e : getEnvironments() )
+        {
+            if ( e.getId().equals( id ) )
+            {
+                return e;
+            }
+        }
+
         return null;
     }
 
 
-    public Set<Environment> getEnvironments()
+    public Set<ProxyEnvironment> getEnvironments()
     {
         String json = hubAdapter.getUserEnvironmentsForPeer();
 
@@ -63,9 +70,7 @@ public class EnvironmentAdapter
 
         log.debug( "Json with environments: {}", json );
 
-        Map<String, ContainerHost> localContainersByHostname = getLocalContainersByHostname();
-
-        HashSet<Environment> envs = new HashSet<>();
+        HashSet<ProxyEnvironment> envs = new HashSet<>();
 
         try
         {
@@ -73,7 +78,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, localContainersByHostname ) );
+                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager ) );
             }
         }
         catch ( Exception e )
@@ -81,15 +86,14 @@ public class EnvironmentAdapter
             log.error( "Error to parse json: ", e );
         }
 
+        printLocalContainers();
+
         return envs;
     }
 
 
-    // Fix for: SS container hostname is stored as id on Hub
-    private Map<String, ContainerHost> getLocalContainersByHostname()
+    private void printLocalContainers()
     {
-        HashMap<String, ContainerHost> map = new HashMap<>();
-
         for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
         {
             for ( ContainerHost ch : rh.getContainerHosts() )
@@ -97,11 +101,24 @@ public class EnvironmentAdapter
                 String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
                 log.debug( "Local container: hostname={}, id={}, ip={}", ch.getHostname(), ch.getId(), ip );
-
-                map.put( ch.getHostname(), ch );
             }
         }
+    }
 
-        return map;
+
+    public void destroyContainer( ProxyEnvironment env, String containerId )
+    {
+        try
+        {
+            EnvironmentContainerHost ch = env.getContainerHostById( containerId );
+
+            ( ( EnvironmentContainerImpl ) ch ).destroy();
+
+            hubAdapter.destroyContainer( env.getId(), containerId );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to destroy container: ", e );
+        }
     }
 }

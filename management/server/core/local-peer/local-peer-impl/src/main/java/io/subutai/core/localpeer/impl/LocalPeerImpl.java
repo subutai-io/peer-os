@@ -43,8 +43,10 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -358,11 +360,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void configureHostsInEnvironment( final EnvironmentId environmentId,
-                                             final Map<String, String> hostAddresses ) throws PeerException
+    public void configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+            throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty(), "Invalid host addresses" );
+        Preconditions.checkNotNull( hostAddresses, "Invalid HostAdresses" );
+        Preconditions.checkArgument( !hostAddresses.isEmpty(), "No host addresses" );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -373,8 +376,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        Map<Host, CommandResult> results =
-                commandUtil.executeParallelSilent( getAddIpHostToEtcHostsCommand( hostAddresses ), hosts );
+        Map<Host, CommandResult> results = commandUtil
+                .executeParallelSilent( getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ), hosts );
 
 
         Set<Host> succeededHosts = Sets.newHashSet();
@@ -438,11 +441,74 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final Set<String> sshKeys )
+    public SshPublicKeys generateSshKeyForEnvironment( final EnvironmentId environmentId ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+
+        SshPublicKeys sshPublicKeys = new SshPublicKeys();
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return sshPublicKeys;
+        }
+
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
+
+
+        Set<Host> succeededHosts = Sets.newHashSet();
+        Set<Host> failedHosts = Sets.newHashSet( hosts );
+
+        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        {
+            CommandResult result = resultEntry.getValue();
+            Host host = resultEntry.getKey();
+
+            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+            {
+                sshPublicKeys.addSshPublicKey( result.getStdOut() );
+
+                succeededHosts.add( host );
+            }
+        }
+
+        failedHosts.removeAll( succeededHosts );
+
+        for ( Host failedHost : failedHosts )
+        {
+            LOG.error( "Failed to generate ssh key on host {}", failedHost.getHostname() );
+        }
+
+        if ( !failedHosts.isEmpty() )
+        {
+            throw new PeerException( "Failed to generate ssh keys on all hosts" );
+        }
+
+
+        return sshPublicKeys;
+    }
+
+
+    protected RequestBuilder getCreateNReadSSHCommand()
+    {
+        return new RequestBuilder( String.format( "rm -rf %1$s && " +
+                        "mkdir -p %1$s && " +
+                        "chmod 700 %1$s && " +
+                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                Common.CONTAINER_SSH_FOLDER ) );
+    }
+
+
+    @Override
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( sshKeys ), "Invalid ssh keys" );
+        Preconditions.checkNotNull( sshPublicKeys, "SshPublicKey is null" );
+        Preconditions.checkArgument( !sshPublicKeys.isEmpty(), "No ssh keys" );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -456,12 +522,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //add keys in portions, since all can not fit into one command, it fails
         int i = 0;
         StringBuilder keysString = new StringBuilder();
-        for ( String key : sshKeys )
+        Set<String> keys = sshPublicKeys.getSshPublicKeys();
+
+        for ( String key : keys )
         {
             keysString.append( key );
             i++;
             //send next 5 keys
-            if ( i % 5 == 0 || i == sshKeys.size() )
+            if ( i % 5 == 0 || i == keys.size() )
             {
                 Set<Host> succeededHosts = Sets.newHashSet();
                 Set<Host> failedHosts = Sets.newHashSet( hosts );
