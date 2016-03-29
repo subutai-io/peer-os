@@ -383,7 +383,87 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void addSshKeysToEnvironment( final EnvironmentId environmentId, final Set<String> sshKeys )
+    public void configureHostsInEnvironment( final EnvironmentId environmentId,
+                                             final Map<String, String> hostAddresses ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty(), "Invalid host addresses" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( getAddIpHostToEtcHostsCommand( hostAddresses ), hosts );
+
+
+        Set<Host> succeededHosts = Sets.newHashSet();
+        Set<Host> failedHosts = Sets.newHashSet( hosts );
+
+        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        {
+            CommandResult result = resultEntry.getValue();
+            Host host = resultEntry.getKey();
+
+            if ( result.hasSucceeded() )
+            {
+                succeededHosts.add( host );
+            }
+        }
+
+        failedHosts.removeAll( succeededHosts );
+
+        for ( Host failedHost : failedHosts )
+        {
+            LOG.error( "Host registration failed on host {}", failedHost.getHostname() );
+        }
+
+        if ( !failedHosts.isEmpty() )
+        {
+            throw new PeerException( "Failed to register all hosts" );
+        }
+    }
+
+
+    protected RequestBuilder getAddIpHostToEtcHostsCommand( Map<String, String> hostAddresses )
+    {
+        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
+        StringBuilder appendHosts = new StringBuilder();
+
+        for ( Map.Entry<String, String> hostEntry : hostAddresses.entrySet() )
+        {
+            String hostname = hostEntry.getKey();
+            String ip = hostEntry.getValue();
+            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
+            appendHosts.append( "/bin/echo '" ).
+                    append( ip ).append( " " ).
+                               append( hostname ).append( "." ).append( Common.DEFAULT_DOMAIN_NAME ).
+                               append( " " ).append( hostname ).
+                               append( "' >> '/etc/hosts'; " );
+        }
+
+        if ( cleanHosts.length() > 0 )
+        {
+            //drop pipe | symbol
+            cleanHosts.setLength( cleanHosts.length() - 1 );
+            cleanHosts.insert( 0, "egrep -v '" );
+            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
+            appendHosts.insert( 0, cleanHosts );
+        }
+
+        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
+
+        return new RequestBuilder( appendHosts.toString() );
+    }
+
+
+    @Override
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final Set<String> sshKeys )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );

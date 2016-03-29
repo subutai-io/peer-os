@@ -337,5 +337,8 @@ public interface Peer extends RelationLink
 
     PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
-    void addSshKeysToEnvironment( EnvironmentId environmentId, Set<String> sshKeys ) throws PeerException;
+    void configureSshInEnvironment( EnvironmentId environmentId, Set<String> sshKeys ) throws PeerException;
+
+    void configureHostsInEnvironment( EnvironmentId environmentId, Map<String, String> hostAddresses )
+            throws PeerException;
 }

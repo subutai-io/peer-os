@@ -52,8 +52,6 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		var status = data.registrationData.status;
 		var statusText = data.registrationData.status;
 
-		if( status == "" )
-
 		if( data.registrationData.status == "APPROVED" )
 		{
 			if(data.isOnline == false)

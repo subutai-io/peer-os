@@ -65,7 +65,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -89,7 +89,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -107,7 +107,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -124,7 +124,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -141,7 +141,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -156,7 +156,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -171,7 +171,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -188,7 +188,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -209,7 +209,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -224,7 +224,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -240,7 +240,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -255,7 +255,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -274,7 +274,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -289,7 +289,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -304,7 +304,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -322,7 +322,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -337,7 +337,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -353,7 +353,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -369,7 +369,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -385,7 +385,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -400,7 +400,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -415,7 +415,7 @@ public class RestServiceImpl implements RestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -432,7 +432,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -449,7 +449,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -464,7 +464,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -483,7 +483,7 @@ public class RestServiceImpl implements RestService
         catch ( PeerException e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 }
