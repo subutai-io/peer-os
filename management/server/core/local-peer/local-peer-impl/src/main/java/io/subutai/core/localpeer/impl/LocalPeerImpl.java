@@ -357,9 +357,110 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected ExecutorService getFixedPoolExecutor( int numOfThreads )
+    @Override
+    public void addSshKeysToEnvironment( final EnvironmentId environmentId, final Set<String> sshKeys )
+            throws PeerException
     {
-        return Executors.newFixedThreadPool( numOfThreads );
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( sshKeys ), "Invalid ssh keys" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        //add keys in portions, since all can not fit into one command, it fails
+        int i = 0;
+        StringBuilder keysString = new StringBuilder();
+        for ( String key : sshKeys )
+        {
+            keysString.append( key );
+            i++;
+            //send next 5 keys
+            if ( i % 5 == 0 || i == sshKeys.size() )
+            {
+                Set<Host> succeededHosts = Sets.newHashSet();
+                Set<Host> failedHosts = Sets.newHashSet( hosts );
+
+                Map<Host, CommandResult> results =
+                        commandUtil.executeParallelSilent( getAppendSshKeysCommand( keysString.toString() ), hosts );
+
+                keysString.setLength( 0 );
+
+                for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+                {
+                    CommandResult result = resultEntry.getValue();
+                    Host host = resultEntry.getKey();
+
+                    if ( result.hasSucceeded() )
+                    {
+                        succeededHosts.add( host );
+                    }
+                }
+
+                failedHosts.removeAll( succeededHosts );
+
+                for ( Host failedHost : failedHosts )
+                {
+                    LOG.error( "Failed to add ssh keys on host {}", failedHost.getHostname() );
+                }
+
+                if ( !failedHosts.isEmpty() )
+                {
+                    throw new PeerException( "Failed to add ssh keys on all hosts" );
+                }
+            }
+        }
+
+        //config ssh
+        Set<Host> succeededHosts = Sets.newHashSet();
+        Set<Host> failedHosts = Sets.newHashSet( hosts );
+
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getConfigSSHCommand(), hosts );
+
+        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        {
+            CommandResult result = resultEntry.getValue();
+            Host host = resultEntry.getKey();
+
+            if ( result.hasSucceeded() )
+            {
+                succeededHosts.add( host );
+            }
+        }
+
+        failedHosts.removeAll( succeededHosts );
+
+        for ( Host failedHost : failedHosts )
+        {
+            LOG.error( "Failed to configure ssh on host {}", failedHost.getHostname() );
+        }
+
+        if ( !failedHosts.isEmpty() )
+        {
+            throw new PeerException( "Failed to configure ssh on all hosts" );
+        }
+    }
+
+
+    protected RequestBuilder getAppendSshKeysCommand( String keys )
+    {
+        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "echo '%3$s' >> %2$s && " +
+                "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
+    }
+
+
+    protected RequestBuilder getConfigSSHCommand()
+    {
+        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
+                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
+                "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
     }
 
 

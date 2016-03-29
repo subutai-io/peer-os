@@ -3,6 +3,11 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +19,8 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -41,7 +48,7 @@ public class RegisterSshStep
      * IMPORTANT: Containers always need access to each other via SSH. For example: ssh root@192.168.1.1 date. This is a
      * workaround for: https://github.com/optdyn/hub/issues/413.
      */
-    public void execute( Set<String> userKeys ) throws EnvironmentManagerException
+    public void execute( Set<String> userKeys ) throws EnvironmentManagerException, PeerException
     {
         Set<Host> hosts = Sets.newHashSet();
 
@@ -53,14 +60,15 @@ public class RegisterSshStep
         }
         else if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
         {
-            appendSshKeys( hosts, userKeys );
+            appendSshKeys( userKeys );
         }
     }
 
 
-    protected void exchangeSshKeys( Set<Host> hosts, Set<String> userKeys ) throws EnvironmentManagerException
+    protected void exchangeSshKeys( Set<Host> hosts, Set<String> userKeys )
+            throws EnvironmentManagerException, PeerException
     {
-        Set<String> sshKeys = Sets.newHashSet();
+        final Set<String> sshKeys = Sets.newHashSet();
 
         if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
         {
@@ -69,17 +77,61 @@ public class RegisterSshStep
 
         sshKeys.addAll( createSshKeys( hosts ) );
 
-        addSshKeys( hosts, sshKeys );
-
-        configureSsh( hosts );
+        appendSshKeys( sshKeys );
     }
 
 
-    protected void appendSshKeys( Set<Host> hosts, Set<String> sshKeys ) throws EnvironmentManagerException
+    protected void appendSshKeys( final Set<String> sshKeys ) throws EnvironmentManagerException, PeerException
     {
-        addSshKeys( hosts, sshKeys );
+        Set<Peer> peers = environment.getPeers();
 
-        configureSsh( hosts );
+        ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        for ( final Peer peer : peers )
+        {
+            completionService.submit( new Callable<Peer>()
+            {
+                @Override
+                public Peer call() throws Exception
+                {
+                    peer.addSshKeysToEnvironment( environment.getEnvironmentId(), sshKeys );
+                    return peer;
+                }
+            } );
+        }
+
+        Set<Peer> succeededPeers = Sets.newHashSet();
+        for ( Peer ignored : peers )
+        {
+            try
+            {
+                Future<Peer> f = completionService.take();
+                succeededPeers.add( f.get() );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Problems registering ssh keys in environment", e );
+            }
+        }
+
+        for ( Peer succeededPeer : succeededPeers )
+        {
+            trackerOperation.addLog( String.format( "Registered ssh keys on peer %s", succeededPeer.getName() ) );
+        }
+
+        Set<Peer> failedPeers = Sets.newHashSet( peers );
+        failedPeers.removeAll( succeededPeers );
+
+        for ( Peer failedPeer : failedPeers )
+        {
+            trackerOperation.addLog( String.format( "Failed to register ssh keys on peer %s", failedPeer.getName() ) );
+        }
+
+        if ( !failedPeers.isEmpty() )
+        {
+            throw new EnvironmentManagerException( "Failed to register ssh keys on all peers" );
+        }
     }
 
 
@@ -125,86 +177,6 @@ public class RegisterSshStep
     }
 
 
-    protected void addSshKeys( Set<Host> hosts, Set<String> keys ) throws EnvironmentManagerException
-    {
-        //send key in portions, since all can not fit into one command, it fails
-        int i = 0;
-        StringBuilder keysString = new StringBuilder();
-        for ( String key : keys )
-        {
-            keysString.append( key );
-            i++;
-            //send next 5 keys
-            if ( i % 5 == 0 || i == keys.size() )
-            {
-                Set<Host> succeededHosts = Sets.newHashSet();
-                Set<Host> failedHosts = Sets.newHashSet( hosts );
-
-                Map<Host, CommandResult> results =
-                        commandUtil.executeParallelSilent( getAppendSshKeysCommand( keysString.toString() ), hosts );
-
-                keysString.setLength( 0 );
-
-                for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
-                {
-                    CommandResult result = resultEntry.getValue();
-                    Host host = resultEntry.getKey();
-
-                    if ( result.hasSucceeded() )
-                    {
-                        succeededHosts.add( host );
-                    }
-                }
-
-                failedHosts.removeAll( succeededHosts );
-
-                for ( Host failedHost : failedHosts )
-                {
-                    trackerOperation
-                            .addLog( String.format( "Failed to add ssh keys on host %s", failedHost.getHostname() ) );
-                }
-
-                if ( !failedHosts.isEmpty() )
-                {
-                    throw new EnvironmentManagerException( "Failed to add ssh keys on all hosts" );
-                }
-            }
-        }
-    }
-
-
-    protected void configureSsh( Set<Host> hosts ) throws EnvironmentManagerException
-    {
-        Set<Host> succeededHosts = Sets.newHashSet();
-        Set<Host> failedHosts = Sets.newHashSet( hosts );
-
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getConfigSSHCommand(), hosts );
-
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
-        {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() )
-            {
-                succeededHosts.add( host );
-            }
-        }
-
-        failedHosts.removeAll( succeededHosts );
-
-        for ( Host failedHost : failedHosts )
-        {
-            trackerOperation.addLog( String.format( "Failed to configure ssh on host %s", failedHost.getHostname() ) );
-        }
-
-        if ( !failedHosts.isEmpty() )
-        {
-            throw new EnvironmentManagerException( "Failed to configure ssh on all hosts" );
-        }
-    }
-
-
     public RequestBuilder getCreateNReadSSHCommand()
     {
         return new RequestBuilder( String.format( "rm -rf %1$s && " +
@@ -212,22 +184,5 @@ public class RegisterSshStep
                         "chmod 700 %1$s && " +
                         "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
                 Common.CONTAINER_SSH_FOLDER ) );
-    }
-
-
-    public RequestBuilder getAppendSshKeysCommand( String keys )
-    {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && " +
-                "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
-    }
-
-
-    public RequestBuilder getConfigSSHCommand()
-    {
-        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
-                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
-                "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
     }
 }
