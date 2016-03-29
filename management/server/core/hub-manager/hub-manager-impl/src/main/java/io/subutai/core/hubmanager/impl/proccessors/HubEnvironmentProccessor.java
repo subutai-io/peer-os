@@ -287,12 +287,12 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
 
-            hubEnvironmentManager.configureSsh( peerDto, environmentDto );
+            peerDto = hubEnvironmentManager.configureSsh( peerDto, environmentDto );
             hubEnvironmentManager.configureHash( environmentDto );
 
             WebClient clientUpdate =
                     configManager.getTrustedWebClientWithAuth( configContainer, configManager.getHubIp() );
-            Response response = clientUpdate.put( null );
+            Response response = clientUpdate.put( peerDto );
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "SSH configuration successfully done" );
