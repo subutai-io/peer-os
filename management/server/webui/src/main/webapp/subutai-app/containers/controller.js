@@ -193,10 +193,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	};
 	reloadTableData();*/
 
-	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+	/*$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		console.log('cancel');
 		$timeout.cancel(refreshTable);
-	});
+	});*/
 
 	function destroyContainer(containerId, key) {
 		var previousWindowKeyDown = window.onkeydown;

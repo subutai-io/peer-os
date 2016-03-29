@@ -44,6 +44,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	vm.currentUserRoles = [];
 	vm.editUserName = false;
 	vm.activeTab = "approved";
+	vm.addUserForm = '';
 
 	vm.userTypes = {
 		1: "Systemt",
@@ -162,23 +163,23 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	getRolesFromAPI();
 
 	function addUser() {
-		//if ($scope.addUserForm.$valid) {
-		var postData = userPostData(vm.user2Add);
-		LOADING_SCREEN();
-		ngDialog.closeAll();
-		identitySrv.addUser(postData).success(function (data) {
-			LOADING_SCREEN('none');
-			if(Object.keys(vm.dtInstance).length !== 0) {
-				vm.dtInstance.reloadData(null, false);
-			}
-		}).error(function(error){
-			LOADING_SCREEN('none');
-			SweetAlert.swal ("ERROR!", "Error: " + error, "error");
-		});
-		vm.user2Add = {"trustLevel": 2};
-		//$scope.addUserForm.$setPristine();
-		//$scope.addUserForm.$setUntouched();
-		//}
+		if (vm.addUserForm.$valid) {
+			var postData = userPostData(vm.user2Add);
+			LOADING_SCREEN();
+			ngDialog.closeAll();
+			identitySrv.addUser(postData).success(function (data) {
+				LOADING_SCREEN('none');
+				if(Object.keys(vm.dtInstance).length !== 0) {
+					vm.dtInstance.reloadData(null, false);
+				}
+			}).error(function(error){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
+			});
+			vm.user2Add = {"trustLevel": 2};
+			vm.addUserForm.$setPristine();
+			vm.addUserForm.$setUntouched();
+		}
 	}
 
 	function colSelectUserRole(id) {
