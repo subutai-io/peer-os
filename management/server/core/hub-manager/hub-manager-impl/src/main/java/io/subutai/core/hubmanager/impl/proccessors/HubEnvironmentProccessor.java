@@ -308,6 +308,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         }
     }
 
+
     private EnvironmentNodesDto setupVEHS( final EnvironmentNodesDto updatedNodes, EnvironmentPeerDto peerDto )
     {
         String pull = "bash /pullMySite.sh %s %s %s \"%s\" &";
@@ -448,7 +449,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     private void deletePeer( EnvironmentPeerDto peerDto )
     {
         String containerDestroyStateURL =
-                String.format( "/rest/v1/environments/%s/destroy", peerDto.getEnvironmentInfo().getId() );
+                String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
+                        peerDto.getPeerId() );
 
         LocalPeer localPeer = peerManager.getLocalPeer();
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
@@ -458,7 +460,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
             WebClient client =
                     configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
-            Response response = client.put( null );
+            Response response = client.delete();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "Container destroyed successfully" );
