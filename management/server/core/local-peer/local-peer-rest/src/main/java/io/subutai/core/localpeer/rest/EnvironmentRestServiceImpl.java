@@ -50,7 +50,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -66,7 +66,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -82,7 +82,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -99,7 +99,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -117,7 +117,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -137,7 +137,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -156,7 +156,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -176,7 +176,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -197,7 +197,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -215,7 +215,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -235,7 +235,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -254,7 +254,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -272,7 +272,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getCause() ).build() );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 }
