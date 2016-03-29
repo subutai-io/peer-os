@@ -212,7 +212,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             environment.addSshKey( sshKey );
 
-            new RegisterSshStep( environment, operationTracker ).execute( environment.getSshKeys() );
+            new RegisterSshStep( environment, operationTracker ).execute();
 
             environment = saveEnvironment();
 

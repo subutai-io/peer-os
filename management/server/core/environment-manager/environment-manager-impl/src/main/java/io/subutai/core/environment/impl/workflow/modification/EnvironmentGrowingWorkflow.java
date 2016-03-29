@@ -172,8 +172,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager,
-                    environmentManager, operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
+                    operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -215,7 +215,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new RegisterSshStep( environment, operationTracker ).execute( environment.getSshKeys() );
+            new RegisterSshStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
