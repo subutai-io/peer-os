@@ -287,11 +287,13 @@ public class HubEnvironmentManager
         Set<Node> nodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-            Node node =
-                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0,
-                            0, peerDto.getPeerId(), nodeDto.getHostId() );
-            nodes.add( node );
+            if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+            {
+                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+                Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(),
+                        contSize, 0, 0, peerDto.getPeerId(), nodeDto.getHostId() );
+                nodes.add( node );
+            }
         }
 
         ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
