@@ -473,7 +473,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( PeerException e )
         {
-            throw new PeerException( String.format( "Registration request rejected. Provided URL %s not accessable.",
+            throw new PeerException( String.format( "Registration request rejected. Provided URL %s not accessible.",
                     registrationData.getPeerInfo().getPublicUrl() ) );
         }
 
@@ -487,11 +487,11 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
-        // Check peer consumers. This remote peer is used?
+        // Check peer consumers. This remote peer in use?
         if ( !notifyPeerActionListeners(
                 new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer in used." );
+            throw new PeerException( "Could not unregister peer. Peer in use." );
         }
         Peer p = getPeer( registrationData.getPeerInfo().getId() );
         if ( p == null )
@@ -580,14 +580,16 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processApproveRequest( final RegistrationData registrationData ) throws PeerException
     {
-        RegistrationData initRequest = getRequest( registrationData.getPeerInfo().getId() );
+        final PeerInfo peerInfo = registrationData.getPeerInfo();
+
+        RegistrationData initRequest = getRequest( peerInfo.getId() );
         if ( initRequest == null )
         {
             throw new PeerException( "Registration request not found." );
         }
         register( initRequest.getKeyPhrase(), registrationData );
-        removeRequest( registrationData.getPeerInfo().getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo() );
+        removeRequest( peerInfo.getId() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( peerInfo );
     }
 
 
@@ -658,6 +660,12 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Could not send registration request to ourselves." );
         }
 
+        if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
+        }
+
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
         if ( getRequest( peerInfo.getId() ) != null )
@@ -689,8 +697,7 @@ public class PeerManagerImpl implements PeerManager
     {
         try
         {
-            URL url = new URL( destinationHost );
-            return url;
+            return new URL( destinationHost );
         }
         catch ( MalformedURLException e )
         {
@@ -724,6 +731,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
+        if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
+        }
+
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
         {
