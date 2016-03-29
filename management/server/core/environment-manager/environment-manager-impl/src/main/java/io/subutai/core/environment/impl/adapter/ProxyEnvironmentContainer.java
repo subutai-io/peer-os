@@ -20,6 +20,7 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
 
@@ -30,7 +31,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     private Host proxyContainer;
 
 
-    ProxyEnvironmentContainer( JsonNode json, String containerHostId )
+    ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager )
     {
         super(
                 "hub",
@@ -38,7 +39,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
                 json.get( "hostName" ).asText(),
 
                 new ContainerHostInfoModel(
-                        containerHostId,
+                        json.get( "id" ).asText(),
                         json.get( "id" ).asText(),
                         initHostInterfaces( json ),
                         HostArchitecture.AMD64,
@@ -52,6 +53,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
                 json.get( "hostId" ).asText(),
                 json.get( "name" ).asText()
         );
+
+        setEnvironmentManager( environmentManager );
     }
 
 
@@ -74,13 +77,6 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         set.add( him );
 
         return new HostInterfaces( id, set );
-    }
-
-
-    @Override
-    public ContainerHostState getState()
-    {
-        return ContainerHostState.RUNNING;
     }
 
 

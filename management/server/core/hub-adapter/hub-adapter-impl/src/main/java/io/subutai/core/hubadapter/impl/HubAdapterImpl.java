@@ -15,6 +15,8 @@ public class HubAdapterImpl implements HubAdapter
 {
     private static final String USER_ENVIRONMENTS = "/rest/v1/adapter/users/%s/environments";
 
+    private static final String CONTAINERS = "/rest/v1/adapter/environments/%s/containers/%s";
+
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final DaoHelper daoHelper;
@@ -59,5 +61,12 @@ public class HubAdapterImpl implements HubAdapter
         log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", getOwnerId(), peerId );
 
         return httpClient.doGet( format( USER_ENVIRONMENTS, getOwnerId() ) );
+    }
+
+
+    @Override
+    public void destroyContainer( String envId, String containerId )
+    {
+        httpClient.doDelete( format( CONTAINERS, envId, containerId ) );
     }
 }
