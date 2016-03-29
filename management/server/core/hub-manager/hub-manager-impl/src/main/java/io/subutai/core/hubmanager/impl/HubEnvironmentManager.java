@@ -362,7 +362,8 @@ public class HubEnvironmentManager
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
                         nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
                         nodeDto.setHostName( cloneResponse.getHostname() );
-
+                        nodeDto.setState( ContainerStateDto.RUNNING );
+                        
                         Set<Host> hosts = new HashSet<>();
                         Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
                         hosts.add( host );
@@ -391,9 +392,12 @@ public class HubEnvironmentManager
 
         final EnvironmentId environmentId = new EnvironmentId( env.getId() );
         final Set<String> sshKeys = new HashSet<>();
-        for ( SSHKeyDto sshKeyDto : env.getSshKeys() )
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
-            sshKeys.add( sshKeyDto.getSshKey() );
+            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+            {
+                sshKeys.addAll( nodeDto.getSshKeys() );
+            }
         }
 
         completionService.submit( new Callable<Peer>()
