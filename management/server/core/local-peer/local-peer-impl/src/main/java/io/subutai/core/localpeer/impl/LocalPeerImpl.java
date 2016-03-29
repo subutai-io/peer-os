@@ -43,6 +43,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
@@ -384,11 +385,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void configureHostsInEnvironment( final EnvironmentId environmentId,
-                                             final Map<String, String> hostAddresses ) throws PeerException
+    public void configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+            throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty(), "Invalid host addresses" );
+        Preconditions.checkNotNull( hostAddresses, "Invalid HostAdresses" );
+        Preconditions.checkArgument( !hostAddresses.isEmpty(), "No host addresses" );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -399,8 +401,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        Map<Host, CommandResult> results =
-                commandUtil.executeParallelSilent( getAddIpHostToEtcHostsCommand( hostAddresses ), hosts );
+        Map<Host, CommandResult> results = commandUtil
+                .executeParallelSilent( getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ), hosts );
 
 
         Set<Host> succeededHosts = Sets.newHashSet();

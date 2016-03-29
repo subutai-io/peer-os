@@ -2,7 +2,6 @@ package io.subutai.core.peer.impl;
 
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -15,6 +14,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -382,7 +382,7 @@ public class EnvironmentWebClient
 
 
     public void configureHostsInEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId,
-                                             final Map<String, String> hostAddresses ) throws PeerException
+                                             final HostAddresses hostAddresses ) throws PeerException
     {
         String path = String.format( "/%s/containers/hosts", environmentId.getId() );
 

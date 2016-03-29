@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
@@ -14,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -110,5 +110,5 @@ public interface EnvironmentRestService
     @Path( "{environmentId}/containers/hosts" )
     @Consumes( MediaType.APPLICATION_JSON )
     Response configureHostsInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
-                                          Map<String, String> hostAddresses );
+                                          HostAddresses hostAddresses );
 }

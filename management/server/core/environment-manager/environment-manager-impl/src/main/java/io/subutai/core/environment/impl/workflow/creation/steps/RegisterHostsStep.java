@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -73,7 +74,8 @@ public class RegisterHostsStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    peer.configureHostsInEnvironment( environment.getEnvironmentId(), hostAddresses );
+                    peer.configureHostsInEnvironment( environment.getEnvironmentId(),
+                            new HostAddresses( hostAddresses ) );
                     return peer;
                 }
             } );
