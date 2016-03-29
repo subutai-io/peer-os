@@ -95,7 +95,7 @@ public class RegisterSshStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    peer.addSshKeysToEnvironment( environment.getEnvironmentId(), sshKeys );
+                    peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
                     return peer;
                 }
             } );

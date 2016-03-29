@@ -2,6 +2,7 @@ package io.subutai.core.peer.impl;
 
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
@@ -197,6 +198,7 @@ public class EnvironmentWebClient
     }
 
 
+    //todo add check for http response code
     public void setCpuSet( final PeerInfo peerInfo, final ContainerId containerId, final Set<Integer> cpuSet )
             throws PeerException
     {
@@ -262,6 +264,7 @@ public class EnvironmentWebClient
     }
 
 
+    //todo add check for http response code
     public void setQuota( final PeerInfo peerInfo, final ContainerId containerId, final ContainerQuota containerQuota )
 
             throws PeerException
@@ -306,8 +309,8 @@ public class EnvironmentWebClient
     }
 
 
-    public void addSshKeysToEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId,
-                                         final Set<String> sshKeys ) throws PeerException
+    public void configureSshInEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId,
+                                           final Set<String> sshKeys ) throws PeerException
     {
         String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
 
@@ -324,7 +327,35 @@ public class EnvironmentWebClient
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error adding ssh keys to environment: " + e.getMessage() );
+            throw new PeerException( "Error configuring ssh in environment", e );
+        }
+
+        if ( response.getStatus() == 500 )
+        {
+            throw new PeerException( response.readEntity( String.class ) );
+        }
+    }
+
+
+    public void configureHostsInEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId,
+                                             final Map<String, String> hostAddresses ) throws PeerException
+    {
+        String path = String.format( "/%s/containers/hosts", environmentId.getId() );
+
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+
+        Response response;
+
+        try
+        {
+            response = client.post( hostAddresses );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error configuring hosts in environment", e );
         }
 
         if ( response.getStatus() == 500 )
