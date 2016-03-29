@@ -545,7 +545,7 @@ public class IdentityManagerImpl implements IdentityManager
             }
             else
             {
-                LOGGER.info( "******* User not found with fingerpint:" + fingerprint);
+                LOGGER.info( "******* User not found with fingerprint:" + fingerprint);
                 return null;
             }
 
