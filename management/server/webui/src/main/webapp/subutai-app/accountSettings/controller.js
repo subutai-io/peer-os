@@ -26,7 +26,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 				]
 			};
 		}
-	}, 4000);
+	}, 1000);
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {

@@ -18,7 +18,7 @@
     <argument ref="rawManager" />
   </bean>
     
-  <jaxrs:server address="/kurjun/files" id="restRawManager" bus="cxfBusRawManager">
+  <jaxrs:server address="/kurjun/file" id="restRawManager" bus="cxfBusRawManager">
     <jaxrs:serviceBeans>
       <ref component-id="restRawManagerImpl" />
     </jaxrs:serviceBeans>

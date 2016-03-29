@@ -60,7 +60,7 @@ public class RegistrationManagerImplTest
     @Before
     public void setUp() throws Exception
     {
-        registrationManager = new RegistrationManagerImpl( securityManager, daoManager, networkManager, localPeer, "" );
+        registrationManager = new RegistrationManagerImpl( securityManager, daoManager, localPeer );
         registrationManager.setRequestDataService( requestDataService );
 
         RequestedHostImpl host1 = mock( RequestedHostImpl.class );

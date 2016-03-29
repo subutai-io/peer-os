@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;

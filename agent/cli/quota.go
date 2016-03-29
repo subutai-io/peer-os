@@ -7,7 +7,7 @@ import (
 )
 
 // LxcQuota sets quotas for containers
-func LxcQuota(name, res, size, max string) {
+func LxcQuota(name, res, size string) {
 	switch res {
 	case "networkRate":
 		fmt.Println(container.QuotaNet(name, size))

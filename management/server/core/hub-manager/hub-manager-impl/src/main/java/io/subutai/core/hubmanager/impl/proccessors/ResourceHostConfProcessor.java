@@ -23,7 +23,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostMetricDto;
 import io.subutai.hub.share.json.JsonUtil;
-import jstun.DiscoveryNAT;
 
 
 public class ResourceHostConfProcessor implements Runnable
@@ -74,8 +73,6 @@ public class ResourceHostConfProcessor implements Runnable
                     resourceHostMetricDto.setPeerId( peerManager.getLocalPeer().getId() );
                     resourceHostMetricDto.setName( resourceHostMetric.getHostInfo().getHostname() );
                     resourceHostMetricDto.setHostId( resourceHostMetric.getHostInfo().getId() );
-                    resourceHostMetricDto
-                            .setHasAccessFromInternet( DiscoveryNAT.isOpenAccess( "jstun.javawi.de", 3478 ) );
 
                     try
                     {

@@ -1,15 +1,10 @@
 package io.subutai.core.registration.rest;
 
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -45,14 +40,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     }
 
 
-    protected String getClientIP()
-    {
-        Message message = PhaseInterceptorChain.getCurrentMessage();
-        HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
-        return request.getRemoteAddr();
-    }
-
-
     @Override
     public Response registerPublicKey( final String message )
     {
@@ -73,6 +60,22 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         }
 
         return Response.ok().build();
+    }
+
+
+    @Override
+    public Response approveRegistrationRequest( final String requestId )
+    {
+        try
+        {
+            registrationManager.approveRequest( requestId );
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error approving registration request", e );
+            return Response.serverError().build();
+        }
     }
 
 
@@ -111,21 +114,5 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     {
         String result = gson.toJson( registrationManager.getRequests() );
         return Response.ok( result ).build();
-    }
-
-
-    @Override
-    public Response approveRegistrationRequest( final String requestId )
-    {
-        try
-        {
-            registrationManager.approveRequest( requestId );
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( "Error approving registration request", e );
-            return Response.serverError().build();
-        }
     }
 }

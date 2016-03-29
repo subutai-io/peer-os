@@ -30,9 +30,9 @@ func templId(templ, arch, version, token string) string {
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	// client := &http.Client{Transport: tr}
 	client := &http.Client{}
-	url := config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token
-	if len(version) != 0 {
-		url = config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
+	url := config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
+	if version == "stable" || len(version) == 0 {
+		url = config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token
 	}
 	response, err := client.Get(url)
 	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token)
@@ -61,7 +61,7 @@ func md5sum(file string) string {
 
 func checkLocal(templ, md5, arch string) string {
 	var response string
-	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "lxc-data/tmpdir")
+	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
 		file := strings.Split(f.Name(), "-subutai-template_")
 		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
@@ -70,11 +70,11 @@ func checkLocal(templ, md5, arch string) string {
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
-					return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + f.Name()
+					return config.Agent.LxcPrefix + "tmpdir/" + f.Name()
 				}
 			}
-			if md5 == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+f.Name()) {
-				return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + f.Name()
+			if md5 == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
+				return config.Agent.LxcPrefix + "tmpdir/" + f.Name()
 			}
 		}
 	}
@@ -82,7 +82,7 @@ func checkLocal(templ, md5, arch string) string {
 }
 
 func download(file, id, token string) string {
-	out, err := os.Create(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file)
+	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + file)
 	log.Check(log.FatalLevel, "Creating file "+file, err)
 	defer out.Close()
 	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -93,38 +93,36 @@ func download(file, id, token string) string {
 	defer response.Body.Close()
 	_, err = io.Copy(out, response.Body)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
-	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"lxc-data/tmpdir/"+file) {
-		return config.Agent.LxcPrefix + "lxc-data/tmpdir/" + file
+	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+file) {
+		return config.Agent.LxcPrefix + "tmpdir/" + file
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return ""
 }
-func lockImport(templ string) bool {
-	var err error
-
-	lock, err = lockfile.New("/var/run/lock/subutai-" + templ + ".import")
-	if log.Check(log.DebugLevel, "Init lock file for "+templ, err) {
+func lockSubutai(file string) bool {
+	lock, err := lockfile.New("/var/run/lock/subutai." + file)
+	if log.Check(log.DebugLevel, "Init lock "+file, err) {
 		return false
 	}
 
 	err = lock.TryLock()
-	if log.Check(log.DebugLevel, "Locking file for "+templ, err) {
+	if log.Check(log.DebugLevel, "Locking file "+file, err) {
 		return false
 	}
 
 	return true
 }
 
-func unlockImport(templ string) {
+func unlockSubutai() {
 	lock.Unlock()
 }
 
 func LxcImport(templ, version, token string) {
 	log.Info("Importing " + templ)
-	for !lockImport(templ) {
+	for !lockSubutai(templ + ".import") {
 		time.Sleep(time.Second * 1)
 	}
-	defer unlockImport(templ)
+	defer unlockSubutai()
 
 	if container.IsContainer(templ) && templ == "management" && len(token) > 1 {
 		gpg.ExchageAndEncrypt("management", token)
@@ -137,10 +135,13 @@ func LxcImport(templ, version, token string) {
 	}
 
 	config.CheckKurjun()
-	fullname := templ + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
+	fullname := templ + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
 	// if len(token) == 0 {
 	token = gpg.GetToken()
 	// }
+	if len(version) == 0 && templ == "management" {
+		version = config.Management.Version
+	}
 	id := templId(templ, runtime.GOARCH, version, token)
 	md5 := ""
 	if len(strings.Split(id, ".")) > 1 {
@@ -157,12 +158,12 @@ func LxcImport(templ, version, token string) {
 
 	log.Info("Unpacking template " + templ)
 	tgz := extractor.NewTgz()
-	tgz.Extract(archive, config.Agent.LxcPrefix+"lxc-data/tmpdir/"+templ)
-	templdir := config.Agent.LxcPrefix + "lxc-data/tmpdir/" + templ
+	tgz.Extract(archive, config.Agent.LxcPrefix+"tmpdir/"+templ)
+	templdir := config.Agent.LxcPrefix + "tmpdir/" + templ
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
 		log.Info("Parent template required: " + parent)
-		LxcImport(parent, "", token)
+		LxcImport(parent, "stable", token)
 	}
 
 	log.Info("Installing template " + templ)

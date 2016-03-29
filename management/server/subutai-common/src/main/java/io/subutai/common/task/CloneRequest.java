@@ -23,7 +23,6 @@ public class CloneRequest implements TaskRequest
     private final ContainerSize containerSize;
 
 
-    // todo: add vlan at request creation time
     public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
                          final String ip, final String environmentId, final String initiatorPeerId,
                          final String ownerId, final String templateName, HostArchitecture templateArch,

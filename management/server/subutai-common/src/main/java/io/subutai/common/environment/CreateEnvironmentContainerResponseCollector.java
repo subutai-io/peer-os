@@ -3,11 +3,8 @@ package io.subutai.common.environment;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.util.StringUtil;
 
 
@@ -31,9 +28,23 @@ public class CreateEnvironmentContainerResponseCollector extends AbstractRespons
     @Override
     public void onFailure( final CloneRequest request, final List<Throwable> exceptions )
     {
-        addFailure( String.format( "Cloning %s failed on %s.", request.getContainerName(),
-                            request.getResourceHostId() ), exceptions );
+        addFailure(
+                String.format( "Cloning %s failed on %s.", request.getContainerName(), request.getResourceHostId() ),
+                exceptions );
     }
 
 
+    public CloneResponse findByHostname( final String hostname )
+    {
+
+        for ( CloneResponse response : getResponses() )
+        {
+            if ( hostname.equalsIgnoreCase( response.getHostname() ) )
+            {
+                return response;
+            }
+        }
+
+        return null;
+    }
 }

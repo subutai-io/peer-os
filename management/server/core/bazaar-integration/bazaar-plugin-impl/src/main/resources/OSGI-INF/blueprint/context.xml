@@ -29,6 +29,6 @@
 <!--	<service ref="integration" interface="io.subutai.webui.api.WebuiModule" />
 
 
-	<bean id="module" scope="singleton" class="io.subutai.plugin.bazaar.impl.BazaarWebModule">
+	<bean id="module" scope="singleton" class="io.subutai.plugin.bazaar.rest.BazaarWebModule">
 	</bean>-->
 </blueprint>

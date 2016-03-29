@@ -66,7 +66,7 @@ func parceCmd(line []string, isEntrypoint bool) string {
 	return ""
 }
 
-func Parce(name string) (out, env, cmd, image, user string) {
+func Parce(name string) (out, env, cmd, image, user, wdir string) {
 	file, _ := os.Open(name)
 	node, _ := docker.Parse(file)
 	file.Close()
@@ -89,11 +89,17 @@ func Parce(name string) (out, env, cmd, image, user string) {
 				cmd = cmd + parceCmd(str, true) + " "
 			case "user":
 				user, _ = strconv.Unquote(strings.Join(str[1:], ""))
+			case "workdir":
+				{
+					wdir, _ = strconv.Unquote(strings.Join(str[1:], ""))
+					out = out + "cd " + wdir + "\n"
+
+				}
 			}
 		}
 	}
 	if len(out) > 0 {
-		return out, env, cmd, image, user
+		return out, env, cmd, image, user, wdir
 	}
 	return
 }

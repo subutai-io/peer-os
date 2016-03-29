@@ -15,7 +15,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
-@Command( scope = "net", name = "setup-p2p", description = "Sets up P2P connection with control peer" )
+@Command( scope = "net", name = "p2p-create", description = "Creates P2P connection" )
 public class SetupP2PCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetupP2PCommand.class.getName() );
@@ -25,9 +25,9 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
     @Argument( index = 0, name = "interface name", required = true, multiValued = false,
             description = "interface name" )
     String interfaceName;
-    @Argument( index = 1, name = "community name", required = true, multiValued = false,
-            description = "community name" )
-    String communityName;
+    @Argument( index = 1, name = "p2p hash", required = true, multiValued = false,
+            description = "p2p hash" )
+    String p2pHash;
     @Argument( index = 2, name = "local peer IP", required = true, multiValued = false,
             description = "local peer IP" )
     String localIp;
@@ -35,7 +35,7 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
             description = "p2p secret key" )
     String secretKey;
     @Argument( index = 4, name = "secret key ttl", required = false, multiValued = false,
-            description = "p2p secret key tie-to-live in seconds" )
+            description = "p2p secret key time-to-live in seconds" )
     Long secretKeyTtl = Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC;
 
 
@@ -53,7 +53,7 @@ public class SetupP2PCommand extends SubutaiShellCommandSupport
 
         try
         {
-            networkManager.setupP2PConnection( interfaceName, localIp, communityName, secretKey, secretKeyTtl );
+            networkManager.setupP2PConnection( interfaceName, localIp, p2pHash, secretKey, secretKeyTtl );
             System.out.println( "OK" );
         }
         catch ( NetworkManagerException e )

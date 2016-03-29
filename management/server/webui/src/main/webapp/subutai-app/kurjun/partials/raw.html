@@ -1,0 +1,44 @@
+<div class="b-workspace-content__row">
+<<<<<<< HEAD
+	<button class="b-btn b-btn_green b-btn_search-field-level" ng-click="kurjunCtrl.uploadFileWindow()">
+=======
+	<button class="b-btn b-btn_green b-btn_search-field-level" ng-click="kurjunCtrl.uploadFile()">
+>>>>>>> d656165d97ae0b4c423cbbad5bc44ea2c08fd783
+		<i class="fa fa-plus"></i> Upload file
+	</button>
+	<div class="b-data-table">
+		<table datatable="ng"
+			   dt-options="kurjunCtrl.dtOptions"
+			   dt-column-defs="kurjunCtrl.dtColumnDefs"
+			   class="b-main-table b-main-table_with-header">
+			<thead>
+			<tr>
+				<th>Name</th>
+				<th>Size</th>
+				<th>Actions</th>
+				<th></th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr ng-repeat="file in kurjunCtrl.files">
+				<td>{{ file.name }}</td>
+				<td>{{ file.size }}</td>
+				<td>
+					<a href
+					   class="b-icon b-icon_share"
+					   tooltips
+					   tooltip-template='Download'
+					   ng-click="kurjunCtrl.downloadFile(file)">
+					</a>
+					<a href
+					   class="b-icon b-icon_remove"
+					   ng-if="template.deletable"
+					   ng-click="kurjunCtrl.deleteFile(file)">
+					</a>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+

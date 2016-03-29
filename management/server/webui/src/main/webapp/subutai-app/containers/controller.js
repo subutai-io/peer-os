@@ -1,7 +1,18 @@
 'use strict';
 
 angular.module('subutai.containers.controller', ['ngTagsInput'])
-	.controller('ContainerViewCtrl', ContainerViewCtrl);
+	.controller('ContainerViewCtrl', ContainerViewCtrl)
+	.filter('getEnvById', function() {
+		return function(input, id) {
+			for ( var i = 0; i < input.length ; i++ )
+			{
+				if (input[i].id == id) {
+					return input[i].name;
+				}
+			}
+			return null;
+		}
+	});
 
 ContainerViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$stateParams', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 
@@ -33,6 +44,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.removeTag = removeTag;
 	vm.showDomainForm = showDomainForm;
 	vm.checkDomain = checkDomain;
+	vm.getContainerStatus = getContainerStatus;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
@@ -51,6 +63,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			LOADING_SCREEN('none');
 		}).error(function(error){
 			LOADING_SCREEN('none');
+			SweetAlert.swal ("ERROR!", error.replace(/\\n/g, " "));
 			ngDialog.closeAll();
 		});
 	}
@@ -171,14 +184,14 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		DTColumnDefBuilder.newColumnDef(6).notSortable()
 	];
 
-	var refreshTable;
+	/*var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
 			getContainers();
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
-	reloadTableData();
+	reloadTableData();*/
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		console.log('cancel');
@@ -186,6 +199,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	});
 
 	function destroyContainer(containerId, key) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Your will not be able to recover this Container!",
@@ -199,6 +213,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				environmentService.destroyContainer(containerId).success(function (data) {
 					SweetAlert.swal("Destroyed!", "Your container has been destroyed.", "success");
@@ -229,6 +244,13 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 				vm.containers[key].state = 'RUNNING';
 			}
 		});		
+	}
+
+	function getContainerStatus(container) {
+		container.state = 'checking';
+		environmentService.getContainerStatus(container.id).success(function (data) {
+			container.state = data.STATE;
+		});
 	}
 
 }

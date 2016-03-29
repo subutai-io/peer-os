@@ -26,7 +26,7 @@ func RestoreContainer(container, date, newContainer string) {
 	}
 
 	currentDT := strconv.Itoa(int(time.Now().Unix()))
-	tmpUnpackDir := config.Agent.LxcPrefix + "lxc-data/tmpdir/unpacking_" + currentDT + "/"
+	tmpUnpackDir := config.Agent.LxcPrefix + "tmpdir/unpacking_" + currentDT + "/"
 
 	// tmpUnpackDir := backupDir + "tmpdir/unpacking_" + container + "_" + currentDT + "/"
 	log.Check(log.FatalLevel, "Create UnPack tmp dir: "+tmpUnpackDir,

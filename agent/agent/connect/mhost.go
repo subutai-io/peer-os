@@ -2,12 +2,13 @@ package connect
 
 import (
 	"crypto/tls"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 )
 
 type mhost struct {
@@ -33,7 +34,7 @@ func Instance() *mhost {
 
 func (m *mhost) GetToken() string {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr, Timeout: time.Second * 3}
+	client := &http.Client{Transport: tr, Timeout: time.Second * 5}
 	resp, err := client.Get("https://" + m.Ipv4 + ":" + m.Port + m.Url + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
 	if log.Check(log.WarnLevel, "Getting security token", err) {
 		return ""
@@ -46,13 +47,16 @@ func (m *mhost) GetToken() string {
 
 func (m *mhost) GetKey() *Key {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
-	resp, err := client.Get(m.URL())
-	log.Check(log.WarnLevel, "Getting Management host Public Key", err)
+	client := &http.Client{Transport: tr, Timeout: time.Second * 5}
+	url := m.URL()
+	resp, err := client.Get(url)
+	if log.Check(log.WarnLevel, "Getting Management host Public Key", err) {
+		return nil
+	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		log.Warn("Failed to fetch PK from Management Server. Status Code " + strconv.Itoa(resp.StatusCode) + " url " + m.URL())
+		log.Warn("Failed to fetch PK from Management Server. Status Code " + strconv.Itoa(resp.StatusCode) + " url " + url)
 		return nil
 	}
 
@@ -65,11 +69,10 @@ func (m *mhost) GetKey() *Key {
 }
 
 func (m *mhost) URL() string {
+	url := "https://" + m.Ipv4 + ":" + m.Port + config.Management.RestPublicKey + "?sptoken="
 	token := m.GetToken()
-	for len(token) != 168 {
-		time.Sleep(time.Second * 5)
-		token = m.GetToken()
+	if len(token) == 168 {
+		return url + token
 	}
-	url := "https://" + m.Ipv4 + ":" + m.Port + config.Management.RestPublicKey + "?sptoken=" + token
 	return url
 }
