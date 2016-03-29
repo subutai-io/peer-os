@@ -18,7 +18,7 @@
     <argument ref="aptManager" />
   </bean>
     
-  <jaxrs:server address="/kurjun/vapt" id="restAptManager" bus="cxfBusAptManager">
+  <jaxrs:server address="/kurjun/deb" id="restAptManager" bus="cxfBusAptManager">
     <jaxrs:serviceBeans>
       <ref component-id="restAptManagerImpl" />
     </jaxrs:serviceBeans>

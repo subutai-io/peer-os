@@ -65,7 +65,6 @@ import io.subutai.core.identity.impl.model.UserDelegateEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.identity.impl.utils.SecurityUtil;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.RelationVerificationException;
 import io.subutai.core.object.relation.api.model.Relation;
@@ -1000,11 +999,12 @@ public class IdentityManagerImpl implements IdentityManager
             }
             //***************************************
             
+            /*
             if ( generateKeyPair && inited )
             {
                 TemplateManager templateManager = ServiceLocator.getServiceNoCache( TemplateManager.class );
-                templateManager.createUserRepository( user.getUserName() );
-            }
+                .createUserRepository( user.getUserName() );
+            }*/
         }
         catch ( Exception e )
         {

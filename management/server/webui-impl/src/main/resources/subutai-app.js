@@ -230,7 +230,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 		});
 		return "";
 	}
-
 }
 
 
@@ -408,7 +407,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/kurjun/kurjun.js',
                                 'subutai-app/kurjun/controller.js',
                                 'subutai-app/kurjun/service.js',
-                                'subutai-app/identity/service.js'
+                                'subutai-app/identity/service.js',
+                                'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
