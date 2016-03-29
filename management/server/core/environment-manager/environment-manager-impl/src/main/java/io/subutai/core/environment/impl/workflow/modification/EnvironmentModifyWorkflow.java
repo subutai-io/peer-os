@@ -255,7 +255,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new RegisterSshStep( environment, operationTracker ).execute( environment.getSshKeys() );
+            new RegisterSshStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

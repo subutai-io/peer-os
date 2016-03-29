@@ -43,6 +43,7 @@
     <module>hub-manager</module>
     <module>common-plugin</module>
     <module>karaf-manager</module>
+    <module>kurjun-manager</module>
   </modules>
 
 </project>

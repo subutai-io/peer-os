@@ -39,7 +39,7 @@ import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
 public class SystemManagerImpl implements SystemManager
 {
-    private static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
+    private static final String DEFAULT_KURJUN_REPO = "https://peer.noip.me:8338/kurjun/rest";
 
     private TemplateManager templateManager;
     private IdentityManager identityManager;

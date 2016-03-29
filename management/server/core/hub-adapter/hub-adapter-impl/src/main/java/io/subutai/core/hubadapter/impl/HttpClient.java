@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -77,13 +78,37 @@ class HttpClient
     }
 
 
-    private String handleResponse( Response response ) throws IOException, PGPException
+    String doDelete( String path )
     {
-        if ( response.getStatus() != HttpStatus.SC_OK )
+        try
         {
-            log.error( "HTTP {}: {}", response.getStatus(), response.readEntity( String.class ) );
+            Response response = getWebClient( path ).delete();
+
+            return handleResponse( response );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to execute request: ", e );
 
             return null;
+        }
+    }
+
+
+    private String handleResponse( Response response ) throws IOException, PGPException
+    {
+        if ( response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_NO_CONTENT )
+        {
+            String content = response.readEntity( String.class );
+
+            log.error( "HTTP {}: {}", response.getStatus(), StringUtils.abbreviate( content, 250 ) );
+
+            return null;
+        }
+
+        if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+        {
+            return "";
         }
 
         byte[] encryptedContent = readContent( response );

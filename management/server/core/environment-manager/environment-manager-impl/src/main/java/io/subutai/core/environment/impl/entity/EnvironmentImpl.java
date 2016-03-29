@@ -484,7 +484,10 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void addContainers( Set<EnvironmentContainerImpl> containers )
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ) );
+        if ( CollectionUtil.isCollectionEmpty( containers ) )
+        {
+            return;
+        }
 
         for ( EnvironmentContainerImpl container : containers )
         {

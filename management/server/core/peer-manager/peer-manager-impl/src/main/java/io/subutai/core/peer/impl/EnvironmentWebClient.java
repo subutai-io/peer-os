@@ -15,6 +15,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -322,8 +323,38 @@ public class EnvironmentWebClient
     }
 
 
+    public SshPublicKeys generateSshKeysForEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId )
+            throws PeerException
+    {
+        String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
+
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
+        try
+        {
+            response = client.put( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error generating ssh keys in environment", e );
+        }
+
+        if ( response.getStatus() == 500 )
+        {
+            throw new PeerException( response.readEntity( String.class ) );
+        }
+
+        return response.readEntity( SshPublicKeys.class );
+    }
+
+
     public void configureSshInEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId,
-                                           final Set<String> sshKeys ) throws PeerException
+                                           final SshPublicKeys sshPublicKeys ) throws PeerException
     {
         String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
 
@@ -335,7 +366,7 @@ public class EnvironmentWebClient
 
         try
         {
-            response = client.post( sshKeys );
+            response = client.post( sshPublicKeys );
         }
         catch ( Exception e )
         {
