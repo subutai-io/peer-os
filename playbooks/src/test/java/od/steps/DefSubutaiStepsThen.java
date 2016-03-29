@@ -74,7 +74,7 @@ public class DefSubutaiStepsThen {
     @Then("the user should observe web elements on: User management page")
     public void user_observe_user_management() throws FindFailed {
         subutaiSteps.userShouldObserveHeaderUserManagement();
-        subutaiSteps.userShouldObserveButtonAddUser();
+//        subutaiSteps.userShouldObserveButtonAddUser();
     }
 
     @Then("the user should observe web elements on: Role management page")
@@ -195,6 +195,7 @@ public class DefSubutaiStepsThen {
     @Then("the user should register a new user: '$username', '$fullname', '$email', '$password', '$confirmpassword'")
     public void user_register_new_user(String username, String fullname, String email,
                                        String password, String confirmpassword) throws FindFailed {
+        subutaiSteps.clickOnButtonAddUser();
         subutaiSteps.inputNewUserUsername(username);
         subutaiSteps.inputNewUserFullName(fullname);
         subutaiSteps.clickOnTrustedLevel();

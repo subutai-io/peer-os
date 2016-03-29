@@ -14,7 +14,7 @@ public class UserManagementPage extends PageObject {
     @FindBy(xpath = "*//input[@class=\"b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm ng-pristine ng-untouched ng-invalid ng-invalid-required\"]")
     public WebElementFacade fieldFullName;
 
-    @FindBy(xpath = "*//input[@ng-model=\"identityUserFormCtrl.user2Add.email\"]")
+    @FindBy(xpath = "*//input[@type=\"email\"]")
     public WebElementFacade fieldEmail;
 
     @FindBy(id = "js-password")
@@ -34,11 +34,12 @@ public class UserManagementPage extends PageObject {
     public String sikuliButtonSaveUser = "src/test/resources/imgs/buttons/buttonSaveUser.png";
     public String sikuliButtonRemove = "src/test/resources/imgs/buttons/buttonRemove.png";
     public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
+    public String sikuliButtonRemoveRoles = "src/test/resources/imgs/buttons/buttonRemoveRoles.png";
 
     @FindBy(xpath = "*//tr[@class=\"even b-midletrusted-user\"]//a[@class=\"b-icon b-icon_remove\"]")
     public WebElementFacade buttonRemoveUser;
 
-    @FindBy(xpath = "*//a[@ng-click=\"identityUserFormCtrl.selectAll()\"]")
+    @FindBy(xpath = "*//i[@class=\"fa fa-angle-double-down\"]")
     public WebElementFacade buttonChooseAll;
 
     @FindBy(xpath = "*//a[@ng-click=\"identityUserFormCtrl.unselectAll()\"]")

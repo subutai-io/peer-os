@@ -440,6 +440,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnUltimateTrust() {
         userManagementPage.pickerUltimateTrust.click();
+        userManagementPage.pickerUltimateTrust.click();
     }
 
     @Step
