@@ -18,6 +18,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.quota.ContainerQuota;
@@ -66,6 +67,7 @@ public class EnvironmentWebClient
     }
 
 
+    //todo make consistent with other methods , use container id in path
     void stopContainer( PeerInfo peerInfo, ContainerId containerId ) throws PeerException
     {
         String path = String.format( "/%s/container/stop", containerId.getEnvironmentId().getId() );
@@ -89,6 +91,7 @@ public class EnvironmentWebClient
     }
 
 
+    //todo make consistent with other methods , use container id in path
     public void destroyContainer( final PeerInfo peerInfo, final ContainerId containerId ) throws PeerException
     {
         String path = String.format( "/%s/container/destroy", containerId.getEnvironmentId().getId() );
@@ -299,6 +302,34 @@ public class EnvironmentWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining resource host id by container id", e );
+        }
+    }
+
+
+    public void addSshKeysToEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId,
+                                         final Set<String> sshKeys ) throws PeerException
+    {
+        String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
+
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+
+        Response response;
+
+        try
+        {
+            response = client.post( sshKeys );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error adding ssh keys to environment: " + e.getMessage() );
+        }
+
+        if ( response.getStatus() == 500 )
+        {
+            throw new PeerException( response.readEntity( String.class ) );
         }
     }
 }

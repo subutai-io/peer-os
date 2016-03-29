@@ -333,4 +333,6 @@ public interface Peer
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 
     PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
+
+    void addSshKeysToEnvironment( EnvironmentId environmentId, Set<String> sshKeys ) throws PeerException;
 }
