@@ -19,17 +19,21 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>kurjun-api</artifactId>
     </dependency>
-    
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-common</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>object-relation-manager-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-manager-api</artifactId>
@@ -95,6 +99,11 @@
       <version>${ai.subut.kurjun.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.6.1</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -107,17 +116,18 @@
             <Bundle-SymbolicName>${project.groupId}.core.kurjun.impl</Bundle-SymbolicName>
             <Export-Package>{local-packages};version=${project.version};-noimport:=true</Export-Package>
             <Embed-Dependency>
-              commons-compress,
-              groupId=ai.subut.kurjun|com.amazonaws|com.datastax.cassandra|org.yaml
+              commons-compress,org.apache.commons.codec*,
+              groupId=ai.subut.kurjun*|com.amazonaws|com.datastax.cassandra|org.yaml
               |com.zaxxer|com.google.inject*|javax.inject|aopalliance|org.vafer|org.tukaani
-              |commons-configuration|org.mapdb|org.mybatis|org.bouncycastle
+              |commons-configuration|org.mapdb|org.mybatis|org.bouncycastle|com.fasterxml.jackson.core
+              |io.subutai.core.kurjun.api*|io.subutai.common.peer*
             </Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
-
+            <Import-Package>*;resolution:=optional</Import-Package>
             <Import-Package>
-              io.subutai.*, org.apache.commons.codec*, org.apache.commons.logging*,
+              io.subutai*, org.apache.commons.codec*, org.apache.commons.logging*,
               org.apache.commons.io, org.apache.commons.lang*, com.google.common*,
-              com.google.gson*, org.slf4j, org.apache.cxf.*, javax.ws.rs*, 
+              com.google.gson*, org.slf4j, org.apache.cxf.*, javax.ws.rs*,
               javax.annotation.*, javax.persistence*, javax.security*, !*
             </Import-Package>
 

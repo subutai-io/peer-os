@@ -18,7 +18,7 @@
     <argument ref="templateManager" />
   </bean>
     
-  <jaxrs:server address="/kurjun/templates" id="restTemplateManager" bus="cxfBusTemplateManager">
+  <jaxrs:server address="/kurjun/template" id="restTemplateManager" bus="cxfBusTemplateManager">
     <jaxrs:serviceBeans>
       <ref component-id="restTemplateManagerImpl" />
     </jaxrs:serviceBeans>

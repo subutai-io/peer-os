@@ -25,8 +25,8 @@ import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.security.api.SecurityManager;
 
 
-//todo temporarily made rest-impl as subscription service for heartbeat listeners
-//todo extract separate service/class for this purpose^, move it to command-executor-impl
+//todo temporarily made rest-rest as subscription service for heartbeat listeners
+//todo extract separate service/class for this purpose^, move it to command-executor-rest
 //todo close the URLs for 8444 port only in AccessControlInterceptor
 public class RestServiceImpl implements RestService
 {
