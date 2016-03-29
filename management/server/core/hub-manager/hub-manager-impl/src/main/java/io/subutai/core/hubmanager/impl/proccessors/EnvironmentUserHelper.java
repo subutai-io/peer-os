@@ -46,19 +46,40 @@ public class EnvironmentUserHelper
 //        String userId = "554455fd-7fd3-47c3-b87d-cef2db75f8bc"; // askat
         String userId = "43163772-a8c2-459f-bfcb-4d0bcc5759f6"; // sydyk
 
-        UserDto userDto = getUserDataFromHub( userId );
+        if ( userExists( userId ) )
+        {
+            log.debug( "User exists" );
+        }
+        else
+        {
+            UserDto userDto = getUserDataFromHub( userId );
 
-        createNewUser( userDto, "!qaz@wsx" );
+            createNewUser( userDto, "!qaz@wsx" );
+        }
+    }
+
+
+    private boolean userExists( String userId )
+    {
+        for ( User user : identityManager.getAllUsers() )
+        {
+            if ( user.getEmail().startsWith( userId ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
     private Role getEnvironmentRole()
     {
-        for ( Role r : identityManager.getAllRoles() )
+        for ( Role role : identityManager.getAllRoles() )
         {
-            if ( r.getName().equals( "Environment-Manager" ) )
+            if ( role.getName().equals( "Environment-Manager" ) )
             {
-                return r;
+                return role;
             }
         }
 
@@ -69,9 +90,12 @@ public class EnvironmentUserHelper
     {
         log.debug( "Creating new user: {}", userDto.getEmail() );
 
+        // Trick to get later the user id in Hub
+        String email = userDto.getId() + "@hub.subut.ai";
+
         try
         {
-            User user = identityManager.createUser( userDto.getEmail(), password, "[Hub]" + userDto.getName(), userDto.getEmail(), UserType.Regular.getId(),
+            User user = identityManager.createUser( userDto.getEmail(), password, "[Hub] " + userDto.getName(), email, UserType.Regular.getId(),
                     KeyTrustLevel.Marginal.getId(), false, false );
 
             identityManager.assignUserRole( user, getEnvironmentRole() );
