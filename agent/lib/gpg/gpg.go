@@ -37,37 +37,18 @@ func ImportPk(file string) string {
 
 func GetContainerPk(name string) string {
 	lxc_path := config.Agent.LxcPrefix + name + "/public.pub"
-	gpg_C := "gpg --no-default-keyring --keyring " + lxc_path + " --export -a " + name + "@subutai.io"
-	return publicKey(gpg_C)
-}
-
-func publicKey(gpg_c string) string {
-	buf := new(bytes.Buffer)
-	command := exec.Command("/bin/bash", "-c", gpg_c)
-
-	stdout, err := command.StdoutPipe()
-	log.Check(log.WarnLevel, "Openning Stdout pipe", err)
-	log.Check(log.WarnLevel, "Executing command", command.Start())
-
-	size, err := buf.ReadFrom(stdout)
-	log.Check(log.WarnLevel, "Reading from Stdout pipe", err)
-	log.Check(log.WarnLevel, "Waiting for command", command.Wait())
-
-	defer stdout.Close()
-
-	if size == 0 {
-		return ""
-	}
-	return buf.String()
+	stdout, err := exec.Command("/bin/bash", "-c", "gpg --no-default-keyring --keyring "+lxc_path+" --export -a "+name+"@subutai.io").Output()
+	log.Check(log.WarnLevel, "Getting Container public key", err)
+	return string(stdout)
 }
 
 func GetPk(name string) string {
-	gpg_C := "gpg --export -a " + name
-	key := publicKey(gpg_C)
-	if key == "" {
+	stdout, err := exec.Command("/bin/bash", "-c", "gpg --export -a "+name).Output()
+	log.Check(log.WarnLevel, "Getting public key", err)
+	if len(stdout) == 0 {
 		GenerateGPGKeys(name)
 	}
-	return key
+	return string(stdout)
 }
 
 func DecryptNoDefaultKeyring(message, keyring, pub string) string {
