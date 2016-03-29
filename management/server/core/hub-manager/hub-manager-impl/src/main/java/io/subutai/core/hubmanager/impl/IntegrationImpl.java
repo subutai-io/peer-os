@@ -41,6 +41,7 @@ import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
@@ -98,6 +99,8 @@ public class IntegrationImpl implements Integration
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
     private String checksum = "";
 
+    private EnvironmentUserHelper environmentUserHelper;
+
 
     public IntegrationImpl( DaoManager daoManager )
     {
@@ -127,6 +130,8 @@ public class IntegrationImpl implements Integration
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
+
+            environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
                     new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor );
@@ -177,11 +182,11 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendHeartbeat() throws HubPluginException
     {
-        heartbeatProcessor.sendHeartbeat();
+//        heartbeatProcessor.sendHeartbeat();
+//        resourceHostConfProcessor.sendResourceHostConf();
+//        containerEventProcessor.process();
 
-        resourceHostConfProcessor.sendResourceHostConf();
-
-        containerEventProcessor.process();
+        environmentUserHelper.test(  );
     }
 
 
