@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.rest;
 
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -16,8 +17,10 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -47,7 +50,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -63,7 +66,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -79,7 +82,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -96,7 +99,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -114,7 +117,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -134,7 +137,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -153,7 +156,48 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response configureSshInEnvironment( final EnvironmentId environmentId, final Set<String> sshKeys )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( sshKeys ) );
+
+            localPeer.configureSshInEnvironment( environmentId, sshKeys );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response configureHostsInEnvironment( final EnvironmentId environmentId,
+                                                 final Map<String, String> hostAddresses )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty() );
+
+            localPeer.configureHostsInEnvironment( environmentId, hostAddresses );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -171,7 +215,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -191,7 +235,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -210,7 +254,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -228,7 +272,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 }
