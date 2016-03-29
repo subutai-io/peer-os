@@ -2246,7 +2246,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
     }
 
-
+    //todo check reserved net resource on system level
     @Override
     public synchronized void reserveNetworkResource( final String environmentId, final long vni, final String p2pSubnet,
                                                      final String containerSubnet ) throws PeerException
