@@ -34,7 +34,7 @@ public class UserManagementPage extends PageObject {
     public String sikuliButtonSaveUser = "src/test/resources/imgs/buttons/buttonSaveUser.png";
     public String sikuliButtonRemove = "src/test/resources/imgs/buttons/buttonRemove.png";
     public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
-    public String sikuliButtonRemoveRoles = "src/test/resources/imgs/buttons/buttonRemoveRoles.png";
+    public String sikuliButtonChooseRoles = "src/test/resources/imgs/buttons/buttonRemoveRoles.png";
 
     @FindBy(xpath = "*//tr[@class=\"even b-midletrusted-user\"]//a[@class=\"b-icon b-icon_remove\"]")
     public WebElementFacade buttonRemoveUser;
