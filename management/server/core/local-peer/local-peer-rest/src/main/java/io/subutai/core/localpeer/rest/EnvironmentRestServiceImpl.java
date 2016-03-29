@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -200,13 +200,13 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response configureHostsInEnvironment( final EnvironmentId environmentId,
-                                                 final Map<String, String> hostAddresses )
+    public Response configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty() );
+            Preconditions.checkNotNull( hostAddresses );
+            Preconditions.checkArgument( !hostAddresses.isEmpty() );
 
             localPeer.configureHostsInEnvironment( environmentId, hostAddresses );
 

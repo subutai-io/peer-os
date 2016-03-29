@@ -29,6 +29,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
@@ -428,11 +429,12 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void configureHostsInEnvironment( final EnvironmentId environmentId,
-                                             final Map<String, String> hostAddresses ) throws PeerException
+    public void configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+            throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty(), "Invalid host addresses" );
+        Preconditions.checkNotNull( hostAddresses, "Invalid HostAdresses" );
+        Preconditions.checkArgument( !hostAddresses.isEmpty(), "No host addresses" );
 
         new EnvironmentWebClient( provider ).configureHostsInEnvironment( peerInfo, environmentId, hostAddresses );
     }
