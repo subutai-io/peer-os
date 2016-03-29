@@ -50,6 +50,7 @@ import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
@@ -660,7 +661,7 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Could not send registration request to ourselves." );
         }
 
-        if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
+        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
         {
             throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
                     localPeer.getPeerInfo().getPublicUrl() ) );
@@ -731,7 +732,7 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
-        if ( "127.0.0.1".equals( localPeer.getPeerInfo().getIp() ) )
+        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
         {
             throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
                     localPeer.getPeerInfo().getPublicUrl() ) );

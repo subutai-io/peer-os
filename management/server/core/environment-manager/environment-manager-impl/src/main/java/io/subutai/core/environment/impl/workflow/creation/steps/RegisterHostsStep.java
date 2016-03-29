@@ -3,16 +3,21 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -25,7 +30,6 @@ public class RegisterHostsStep
 
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
-    private CommandUtil commandUtil = new CommandUtil();
 
 
     public RegisterHostsStep( final EnvironmentImpl environment, final TrackerOperation trackerOperation )
@@ -35,81 +39,76 @@ public class RegisterHostsStep
     }
 
 
-    public void execute() throws EnvironmentManagerException
+    public void execute() throws EnvironmentManagerException, PeerException
     {
         Set<Host> hosts = Sets.newHashSet();
         hosts.addAll( environment.getContainerHosts() );
         if ( hosts.size() > 1 )
         {
-            registerHosts( Common.DEFAULT_DOMAIN_NAME, hosts );
+            registerHosts( hosts );
         }
     }
 
 
-    protected void registerHosts( String localDomain, Set<Host> hosts ) throws EnvironmentManagerException
+    protected void registerHosts( Set<Host> hosts ) throws EnvironmentManagerException, PeerException
     {
 
-        Map<Host, CommandResult> results =
-                commandUtil.executeParallelSilent( getAddIpHostToEtcHostsCommand( localDomain, hosts ), hosts );
+        Set<Peer> peers = environment.getPeers();
 
-        Set<Host> succeededHosts = Sets.newHashSet();
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        final Map<String, String> hostAddresses = Maps.newHashMap();
+
+        for ( Host host : hosts )
         {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
+            hostAddresses
+                    .put( host.getHostname(), host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() );
+        }
 
-            if ( result.hasSucceeded() )
+        for ( final Peer peer : peers )
+        {
+            completionService.submit( new Callable<Peer>()
             {
-                succeededHosts.add( host );
-            }
-            else
+                @Override
+                public Peer call() throws Exception
+                {
+                    peer.configureHostsInEnvironment( environment.getEnvironmentId(), hostAddresses );
+                    return peer;
+                }
+            } );
+        }
+
+        Set<Peer> succeededPeers = Sets.newHashSet();
+        for ( Peer ignored : peers )
+        {
+            try
             {
-                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
+                Future<Peer> f = completionService.take();
+                succeededPeers.add( f.get() );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Problems registering hosts in environment", e );
             }
         }
 
-        hosts.removeAll( succeededHosts );
-
-        for ( Host failedHost : hosts )
+        for ( Peer succeededPeer : succeededPeers )
         {
-            trackerOperation.addLog( String.format( "Host registration failed on host %s", failedHost.getHostname() ) );
+            trackerOperation.addLog( String.format( "Registered hosts on peer %s", succeededPeer.getName() ) );
         }
 
-        if ( !hosts.isEmpty() )
+        Set<Peer> failedPeers = Sets.newHashSet( peers );
+        failedPeers.removeAll( succeededPeers );
+
+        for ( Peer failedPeer : failedPeers )
         {
-            throw new EnvironmentManagerException( "Failed to register all hosts" );
-        }
-    }
-
-
-    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<Host> containerHosts )
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-
-        for ( Host host : containerHosts )
-        {
-            String ip = host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
-            String hostname = host.getHostname();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( domainName ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
+            trackerOperation.addLog( String.format( "Failed to register hosts on peer %s", failedPeer.getName() ) );
         }
 
-        if ( cleanHosts.length() > 0 )
+        if ( !failedPeers.isEmpty() )
         {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
+            throw new EnvironmentManagerException( "Failed to register hosts on all peers" );
         }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
-
-        return new RequestBuilder( appendHosts.toString() );
     }
 }

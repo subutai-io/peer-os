@@ -402,6 +402,30 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final Set<String> sshKeys )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( sshKeys ), "Invalid ssh keys" );
+
+        new EnvironmentWebClient( provider ).configureSshInEnvironment( peerInfo, environmentId, sshKeys );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void configureHostsInEnvironment( final EnvironmentId environmentId,
+                                             final Map<String, String> hostAddresses ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( hostAddresses != null && !hostAddresses.isEmpty(), "Invalid host addresses" );
+
+        new EnvironmentWebClient( provider ).configureHostsInEnvironment( peerInfo, environmentId, hostAddresses );
+    }
+
+
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
