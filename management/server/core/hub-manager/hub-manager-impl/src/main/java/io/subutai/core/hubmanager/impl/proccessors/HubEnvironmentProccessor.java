@@ -130,6 +130,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
                     break;
+                case CONFIGURE_SSH:
+                    configureContainer( peerDto );
+                    break;
                 case DESTROY_CONTAINER:
                     destroyContainers( peerDto );
                     break;
@@ -278,6 +281,37 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
+    private void configureContainer( EnvironmentPeerDto peerDto )
+    {
+        String configContainer = String.format( "/rest/v1/environments/%s/container-configuration",
+                peerDto.getEnvironmentInfo().getId() );
+        String envDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
+
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
+            Response r = client.get();
+            byte[] encryptedContent = configManager.readContent( r );
+            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
+
+            hubEnvironmentManager.configureSsh( peerDto, environmentDto );
+            hubEnvironmentManager.configureHash( environmentDto );
+
+            WebClient clientUpdate =
+                    configManager.getTrustedWebClientWithAuth( configContainer, configManager.getHubIp() );
+            Response response = clientUpdate.put( null );
+            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "SSH configuration successfully done" );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not configure SSH/Hash", e );
+        }
+    }
+
     private EnvironmentNodesDto setupVEHS( final EnvironmentNodesDto updatedNodes, EnvironmentPeerDto peerDto )
     {
         String pull = "bash /pullMySite.sh %s %s %s \"%s\" &";
@@ -425,7 +459,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         try
         {
             localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
-            localPeer.removeP2PConnection( env.getP2pHash() );
             localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
 
             WebClient client =

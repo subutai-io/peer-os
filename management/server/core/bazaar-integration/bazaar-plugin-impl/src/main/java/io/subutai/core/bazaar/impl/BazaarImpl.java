@@ -42,6 +42,7 @@ public class BazaarImpl implements Bazaar
     {
         try
         {
+
             String result = this.integration.getProducts();
             return result;
         }

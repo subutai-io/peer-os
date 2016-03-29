@@ -161,7 +161,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Transient
     @JsonIgnore
-    private EnvironmentId envId;
+    protected EnvironmentId envId;
 
 
     protected EnvironmentImpl()

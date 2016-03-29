@@ -103,7 +103,7 @@ public class ContainerCloneStep
         if ( requestedContainerCount > totalAvailableIpCount )
         {
             throw new EnvironmentCreationException(
-                    String.format( "Requested %d containers but only %d ip " + "" + "" + "" + "addresses available",
+                    String.format( "Requested %d containers but only %d IP addresses available",
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
@@ -140,7 +140,7 @@ public class ContainerCloneStep
                 Future<CreateEnvironmentContainerResponseCollector> futures = taskCompletionService.take();
                 CreateEnvironmentContainerResponseCollector response = futures.get();
                 addLogs( response );
-                succeeded = succeeded && processResponse( placement.get( response.getPeerId() ), response );
+                succeeded &= processResponse( placement.get( response.getPeerId() ), response );
             }
             catch ( Exception e )
             {

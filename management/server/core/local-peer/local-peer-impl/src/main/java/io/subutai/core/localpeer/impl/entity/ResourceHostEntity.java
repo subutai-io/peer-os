@@ -33,7 +33,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
@@ -540,24 +539,18 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void cleanup( final EnvironmentId environmentId, final int vlan ) throws ResourceHostException
     {
+        try
+        {
+            commandUtil.execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Could not cleanup resource host '%s'.", hostname ) );
+        }
+
         Set<ContainerHost> containerHosts = getContainerHostsByEnvironmentId( environmentId.getId() );
         if ( containerHosts.size() > 0 )
         {
-            try
-            {
-                final CommandResult result =
-                        execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ) );
-                if ( result.getStatus() != CommandStatus.SUCCEEDED )
-                {
-                    throw new ResourceHostException(
-                            String.format( "Could not cleanup resource host '%s'.", hostname ) );
-                }
-            }
-            catch ( CommandException e )
-            {
-                throw new ResourceHostException( String.format( "Could not cleanup resource host '%s'.", hostname ) );
-            }
-
             for ( ContainerHost containerHost : containerHosts )
             {
                 removeContainerHost( containerHost );

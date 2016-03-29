@@ -663,6 +663,10 @@ input[type=checkbox] {
     background-color: #efc94c;
 }
 
+.b-status-icon_ {
+    background-color: #ccc;
+}
+
 .b-status-icon_UNDER_MODIFICATION,
 .b-status-icon_WAIT,
 .b-status-icon_REQUESTED,
@@ -3302,6 +3306,7 @@ td.b-main-table__status-col {
 	border-left: 3px solid transparent;
     font-size: 13px;
 	line-height: 15px;
+	color: #04346E;
 }
 
 .b-hub-status__dropdown .list .b-notification__error {
@@ -3588,3 +3593,10 @@ select.b-search-input {
     outline: none;
 }
 
+.js-accordion {
+    word-break: break-all;
+}
+
+.js-accordion_open {
+    height: auto !important;
+}

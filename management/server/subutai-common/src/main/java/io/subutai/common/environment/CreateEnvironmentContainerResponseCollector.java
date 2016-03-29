@@ -1,7 +1,6 @@
 package io.subutai.common.environment;
 
 
-import java.util.Iterator;
 import java.util.List;
 
 import io.subutai.common.task.CloneRequest;
@@ -37,16 +36,15 @@ public class CreateEnvironmentContainerResponseCollector extends AbstractRespons
 
     public CloneResponse findByHostname( final String hostname )
     {
-        CloneResponse result = null;
-        Iterator<CloneResponse> iterator = getResponses().iterator();
-        while ( result == null && iterator.hasNext() )
+
+        for ( CloneResponse response : getResponses() )
         {
-            CloneResponse response = iterator.next();
             if ( hostname.equalsIgnoreCase( response.getHostname() ) )
             {
-                result = response;
+                return response;
             }
         }
-        return result;
+
+        return null;
     }
 }

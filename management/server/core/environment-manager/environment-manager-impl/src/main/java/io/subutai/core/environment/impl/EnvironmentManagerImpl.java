@@ -132,8 +132,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private EnvironmentAdapter environmentAdapter;
 
-    private HubAdapter hubAdapter;
-
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final DaoManager daoManager,
@@ -158,10 +156,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
-        // Not NULL makes mocking
-        //        environmentAdapter = new EnvironmentAdapter( this, peerManager );
-
-        this.hubAdapter = hubAdapter;
+        environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
     }
 
 
@@ -262,17 +257,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
-        // === START ===
-
-        LOG.debug( ">> hubAdapter: {}", hubAdapter.sayHello() );
-
-        if ( environmentAdapter != null )
-        {
-            return environmentAdapter.getEnvironments();
-        }
-
-        // === END ===
-
         User activeUser = identityManager.getActiveUser();
 
         Set<Environment> environments = new HashSet<>();
@@ -294,6 +278,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             LOG.debug( "environment: {}", environment );
         }
+
+        environments.addAll( environmentAdapter.getEnvironments() );
 
         return environments;
     }
@@ -1135,16 +1121,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        // === START ===
+        // First get from Hub
+        EnvironmentImpl environment = environmentAdapter.get( environmentId );
 
-        if ( environmentAdapter != null )
+        if ( environment != null )
         {
-            return environmentAdapter.get( environmentId );
+            return environment;
         }
 
-        // === END ===
-
-        EnvironmentImpl environment = environmentDataService.find( environmentId );
+        environment = environmentDataService.find( environmentId );
 
         if ( environment == null )
         {

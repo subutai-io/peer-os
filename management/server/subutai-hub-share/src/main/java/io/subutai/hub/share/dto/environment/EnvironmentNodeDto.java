@@ -23,6 +23,8 @@ public class EnvironmentNodeDto
 
     private String containerId;
 
+    private ContainerStateDto state;
+
     private long elapsedTime;
 
     private int ipAddressOffset;
@@ -174,5 +176,17 @@ public class EnvironmentNodeDto
     public void setElapsedTime( final long elapsedTime )
     {
         this.elapsedTime = elapsedTime;
+    }
+
+
+    public ContainerStateDto getState()
+    {
+        return state;
+    }
+
+
+    public void setState( final ContainerStateDto state )
+    {
+        this.state = state;
     }
 }
