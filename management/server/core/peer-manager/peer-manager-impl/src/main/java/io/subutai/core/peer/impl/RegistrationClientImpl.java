@@ -49,8 +49,7 @@ public class RegistrationClientImpl implements RegistrationClient
             String s = response.readEntity( String.class );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException( String.format( "Remote peer '%s' return %d error code.", destinationHost,
-                        response.getStatus() ) );
+                throw new PeerException( response.readEntity( String.class ) );
             }
             else
             {
@@ -78,8 +77,7 @@ public class RegistrationClientImpl implements RegistrationClient
             Response response = client.post( registrationData );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException( String.format( "Remote peer '%s' return %d error code.", destinationHost,
-                        response.getStatus() ) );
+                throw new PeerException( response.readEntity( String.class ) );
             }
             else
             {
@@ -108,8 +106,7 @@ public class RegistrationClientImpl implements RegistrationClient
             Response response = client.post( registrationData );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException(
-                        "Error on sending cancel registration request: " + response.readEntity( String.class ) );
+                throw new PeerException( response.readEntity( String.class ) );
             }
         }
         catch ( Exception e )
@@ -159,7 +156,7 @@ public class RegistrationClientImpl implements RegistrationClient
             Response response = client.post( registrationData );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+                throw new PeerException( response.readEntity( String.class ) );
             }
         }
         catch ( Exception e )
@@ -184,7 +181,7 @@ public class RegistrationClientImpl implements RegistrationClient
             Response response = client.post( registrationData );
             if ( response.getStatus() != Response.Status.OK.getStatusCode() )
             {
-                throw new PeerException( "Remote exception: " + response.readEntity( String.class ) );
+                throw new PeerException( response.readEntity( String.class ) );
             }
         }
         catch ( Exception e )
