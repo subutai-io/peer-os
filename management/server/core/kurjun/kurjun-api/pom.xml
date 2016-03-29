@@ -20,6 +20,13 @@
     </dependency>
 
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>install-repository</artifactId>
+      <version>${version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
@@ -59,7 +66,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.kurjun.api</Bundle-SymbolicName>
             <Export-Package>org.apache.commons.codec*;version=1.10;
-                            {local-packages};version=${project.version};-noimport:=true
+              {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
             <Import-Package>io.subutai.*, com.google.gson*,commons-codec*, !*
             </Import-Package>
