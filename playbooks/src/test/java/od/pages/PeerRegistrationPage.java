@@ -33,6 +33,8 @@ public class PeerRegistrationPage extends PageObject {
     public String sikuliButtonCreate = "src/test/resources/imgs/buttons/buttonCreate.png";
     public String sikuliButtonApprove = "src/test/resources/imgs/buttons/buttonApprove.png";
     public String sikuliButtonApprovePopUp = "src/test/resources/imgs/buttons/buttonApprovePopUp.png";
+    public String sikuliButtonUnregister = "src/test/resources/imgs/buttons/buttonUnregister.png";
+    public String sikuliButtonUnregisterPopup = "src/test/resources/imgs/buttons/buttonUnregisterPopup.png";
 
     //endregion
 

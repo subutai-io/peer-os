@@ -13,7 +13,7 @@ And the user clicks on the button: Login
 When the user clicks on the menu item: Peer Registration
 And the user should wait a few seconds
 And the user clicks on the button: Сreate peer
-Then the user should create a peer request with: '31.29.5.194', 'test'
+Then the user should create a peer request with: '158.181.157.6', 'test'
 And the user should observe button: Cancel
 
 Scenario: The Second User Approve Request
@@ -24,14 +24,12 @@ And the user clicks on the button: Login
 When the user clicks on the menu item: Peer Registration
 Then the user should approve the peer with: 'test'
 
-Scenario: Grow Cross Peer Environment on Remove
-Given the first user is on the Home page of Subutai
-When the user should wait a few seconds
-And the user clicks on the menu item: Environment
+Scenario: Grow Cross Peer Environment on Remove Peer and destroy it
+When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Environments
-When the user clicks on the Environment's mode: Advanced
+And the user creates environment using template: Casandra
+Then the user destroys created environment
 
-Scenario: Destroy Cross Peer Environment and Blueprint
-Given To Do!
-When To Do!
-Then To Do!
+Scenario: the user should unregister peer
+When the user clicks on the menu item: Peer Registration
+Then the user unregister peer

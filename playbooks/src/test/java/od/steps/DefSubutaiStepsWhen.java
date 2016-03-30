@@ -123,10 +123,6 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnButtonBuild();
         subutaiSteps.clickOnButtonCloseBuildPopup();
         subutaiSteps.waitFor(5000);
-        subutaiSteps.clickOnIconDeleteEnvironment();
-        subutaiSteps.clickOnButtonDelete();
-        subutaiSteps.clickOnButtonOkPopupEnvironmentHasBeenDestroyed();
-        subutaiSteps.waitFor(5000);
     }
 
     @When("the user clicks on the upper menu item: Register Peer")
@@ -234,6 +230,16 @@ public class DefSubutaiStepsWhen {
     @When("the user should wait a few seconds")
     public void user_should_wait_a_few_seconds(){
         subutaiSteps.userShouldWaitAFewSeconds();
+    }
+
+    @When("the user creates environment using template: Casandra")
+    public void user_creates_environment_using_template_casandra() throws FindFailed, FileNotFoundException {
+        subutaiSteps.clickOnIconTemplateCasandra();
+        subutaiSteps.clickOnButtonApply();
+        subutaiSteps.inputEnvironmentName("Test Environment Casandra");
+        subutaiSteps.clickOnButtonBuild();
+        subutaiSteps.clickOnButtonCloseBuildPopup();
+        subutaiSteps.waitFor(5000);
     }
 
 }

@@ -155,7 +155,7 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnMenuEnvironment() throws FindFailed {
 //        commonPage.linkEnvironment.click();
         screen.click(commonPage.sikuliMenuItemEnvironment);
-//        commonPage.waitFor(2000);
+        commonPage.waitFor(2000);
     }
 
     @Step
@@ -270,7 +270,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonBuild() throws FindFailed {
         screen.click(environmentsPage.sikuliButtonBuild);
-        waitABit(30000);
+        waitABit(20000);
     }
 
     @Step
@@ -519,6 +519,31 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickbuttonApprovePopUp() throws FindFailed {
         screen.click(peerRegistrationPage.sikuliButtonApprovePopUp);
+    }
+
+    @Step
+    public void clickOnIconTemplateCasandra() throws FindFailed {
+        screen.click(environmentsPage.sikuliTemplateCasandra);
+    }
+
+    @Step
+    public void clickbuttonApprove() throws FindFailed {
+        screen.click(peerRegistrationPage.sikuliButtonApprove);
+    }
+
+    @Step
+    public void clickOnButtonUnregister() throws FindFailed {
+        screen.click(peerRegistrationPage.sikuliButtonUnregister);
+    }
+
+    @Step
+    public void clickOnButtonUnregisterPopup() throws FindFailed {
+        screen.click(peerRegistrationPage.sikuliButtonUnregisterPopup);
+    }
+
+    @Step
+    public void clickOnButtonOkUnregisterPeer() throws FindFailed {
+        screen.click(commonPage.sikuliButtonOk);
     }
 
     //endregion
@@ -900,11 +925,6 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonGoToHUBWhite() throws FindFailed {
         screen.click(commonPage.sikuliButtonGoToHUBWhite);
-    }
-
-    @Step
-    public void clickbuttonApprove() throws FindFailed {
-        screen.click(peerRegistrationPage.sikuliButtonApprove);
     }
 
 }

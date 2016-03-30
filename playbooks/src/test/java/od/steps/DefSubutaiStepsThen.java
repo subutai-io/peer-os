@@ -267,4 +267,19 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickbuttonApprovePopUp();
         subutaiSteps.assertButtonUnregister();
     }
+
+    @Then("the user destroys created environment")
+    public void user_delete_environment() throws FindFailed {
+        subutaiSteps.clickOnIconDeleteEnvironment();
+        subutaiSteps.clickOnButtonDelete();
+        subutaiSteps.clickOnButtonOkPopupEnvironmentHasBeenDestroyed();
+        subutaiSteps.waitFor(5000);
+    }
+
+    @Then("the user unregister peer")
+    public void user_unregister_peer() throws FindFailed {
+        subutaiSteps.clickOnButtonUnregister();
+        subutaiSteps.clickOnButtonUnregisterPopup();
+        subutaiSteps.clickOnButtonOkUnregisterPeer();
+    }
 }

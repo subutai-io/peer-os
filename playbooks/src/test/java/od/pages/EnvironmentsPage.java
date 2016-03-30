@@ -100,10 +100,9 @@ public class EnvironmentsPage extends PageObject {
     //region SIKULI IMAGES: Templates
 
     public String sikuliTemplateMongo = "src/test/resources/imgs/templates/templateMongo.png";
-
     public String sikuliTemplateMySite = "src/test/resources/imgs/templates/templateMySite.png";
-
     public String sikuliTemplateWebdemo = "src/test/resources/imgs/templates/templateWebdemo.png";
+    public String sikuliTemplateCasandra = "src/test/resources/imgs/templates/templateCasandra.png";
 
     //endregion
 
