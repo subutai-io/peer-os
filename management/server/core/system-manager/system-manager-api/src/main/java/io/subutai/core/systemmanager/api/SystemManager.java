@@ -27,7 +27,7 @@ public interface SystemManager
     PeerSettings getPeerSettings();
 
     void setNetworkSettings( String securePortX1, String securePortX2, String securePortX3, final String publicUrl,
-                             final String agentPort ) throws ConfigurationException;
+                             final String agentPort, final String publicSecurePort ) throws ConfigurationException;
 
     AdvancedSettings getAdvancedSettings();
 
