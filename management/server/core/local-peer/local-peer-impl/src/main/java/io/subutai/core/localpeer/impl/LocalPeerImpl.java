@@ -32,6 +32,7 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -47,6 +48,7 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
+import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
@@ -75,6 +77,8 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.LocalPeerInfo;
+import io.subutai.common.peer.NetworkResource;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -123,9 +127,11 @@ import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupR
 import io.subutai.core.localpeer.impl.container.ImportTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
 import io.subutai.core.localpeer.impl.container.QuotaTask;
+import io.subutai.core.localpeer.impl.dao.NetworkResourceDaoImpl;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
+import io.subutai.core.localpeer.impl.entity.NetworkResourceEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 import io.subutai.core.localpeer.impl.tasks.ReserveVniTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
@@ -171,6 +177,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected boolean initialized = false;
     protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
     private TaskManagerImpl taskManager;
+    private NetworkResourceDaoImpl networkResourceDao;
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
@@ -191,22 +198,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
-
-        initPeerInfo();
-
-        //add command request listener
-        addRequestListener( new CommandRequestListener() );
-        //add command response listener
-
-        //add create container requests listener
-        addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
-
-        //add prepare templates listener
-        addRequestListener( new PrepareTemplateRequestListener( this ) );
-
-
         try
         {
+            initPeerInfo();
+
+            //add command request listener
+            addRequestListener( new CommandRequestListener() );
+            //add command response listener
+
+            //add create container requests listener
+            addRequestListener( new CreateEnvironmentContainerGroupRequestListener( this ) );
+
+            //add prepare templates listener
+            addRequestListener( new PrepareTemplateRequestListener( this ) );
+
 
             resourceHostDataService = createResourceHostDataService();
             resourceHosts.clear();
@@ -219,13 +224,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             setResourceHostTransientFields( getResourceHosts() );
+
+            taskManager = new TaskManagerImpl( this );
+
+            this.networkResourceDao = new NetworkResourceDaoImpl( daoManager.getEntityManagerFactory() );
         }
         catch ( Exception e )
         {
             throw new LocalPeerInitializationError( "Failed to init Local Peer", e );
         }
 
-        taskManager = new TaskManagerImpl( this );
         initialized = true;
     }
 
@@ -233,11 +241,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected void initPeerInfo()
     {
 
-        peerInfo = new PeerInfo();
+        peerInfo = new LocalPeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
         peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
-        peerInfo.setPort( SystemSettings.getPublicSecurePort() );
+        peerInfo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
         peerInfo.setName( String.format( "Peer %s on %s", peerInfo.getId(), SystemSettings.getPublicUrl() ) );
     }
 
@@ -245,7 +253,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void setPeerInfo( final PeerInfo peerInfo )
     {
-        this.peerInfo = peerInfo;
+        this.peerInfo.setId( peerInfo.getId() );
+        this.peerInfo.setName( peerInfo.getName() );
+        this.peerInfo.setOwnerId( peerInfo.getOwnerId() );
+        this.peerInfo.setPublicUrl( peerInfo.getPublicUrl() );
+        this.peerInfo.setPublicSecurePort( peerInfo.getPublicSecurePort() );
     }
 
 
@@ -685,10 +697,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             @Override
             public void handle( Task task, CloneRequest request, CloneResponse response ) throws Exception
             {
-                if ( response == null )
-                {
-                    throw new IllegalArgumentException( "Task response could not be null." );
-                }
+
+                Preconditions.checkNotNull( response, "Task response could not be null" );
+
 
                 try
                 {
@@ -1046,8 +1057,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
     }
 
+
     //TODO this is for basic environment via hub
-//    @RolesAllowed( "Environment-Management|Delete" )
+    //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
@@ -2237,6 +2249,52 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 return new PingDistance( sourceIp, targetIp, null, null, null, null );
             }
         }
+    }
+
+
+    //todo check reserved net resource on system level
+    @Override
+    public synchronized void reserveNetworkResource( final String environmentId, final long vni, final String p2pSubnet,
+                                                     final String containerSubnet ) throws PeerException
+    {
+        try
+        {
+            NetworkResourceEntity networkResource =
+                    new NetworkResourceEntity( environmentId, vni, p2pSubnet, containerSubnet );
+
+            NetworkResource nr = networkResourceDao.find( networkResource );
+
+            if ( nr != null )
+            {
+                throw new PeerException( String.format( "Network resource %s is already reserved", nr ) );
+            }
+            else
+            {
+                networkResourceDao.create( networkResource );
+            }
+        }
+        catch ( DaoException e )
+        {
+            throw new PeerException( "Error reserving network resources", e );
+        }
+    }
+
+
+    @Override
+    public List<NetworkResource> listReservedNetworkResources() throws PeerException
+    {
+        List<NetworkResource> networkResources = Lists.newArrayList();
+
+        try
+        {
+            networkResources.addAll( networkResourceDao.readAll() );
+        }
+        catch ( DaoException e )
+        {
+            throw new PeerException( "Error getting reserved network resources", e );
+        }
+
+        return networkResources;
     }
 
 

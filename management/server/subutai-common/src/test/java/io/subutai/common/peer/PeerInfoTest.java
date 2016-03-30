@@ -72,7 +72,7 @@ public class PeerInfoTest
         //        assertNotNull( peerInfo.getIp() );
         //        assertNotNull( peerInfo.getGatewayIp() );
         //        assertNotNull( peerInfo.getStatus() );
-        //        assertNotNull( peerInfo.getPort() );
+        //        assertNotNull( peerInfo.getPublicSecurePort() );
         //        assertNotNull( peerInfo.getLastUsedVlanId() );
         //        assertNotNull( peerInfo.getKeyId() );
         //        assertNotNull( peerInfo.getPeerPolicy() );

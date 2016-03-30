@@ -39,7 +39,7 @@ public class WebClientBuilder
     public static WebClient buildPeerWebClient( final PeerInfo peerInfo, final String path, final Object provider,
                                                 long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
-        String effectiveUrl = String.format( PEER_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPort(),
+        String effectiveUrl = String.format( PEER_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client;
         if ( provider == null )
@@ -98,7 +98,7 @@ public class WebClientBuilder
                                                        final Object provider, long connectTimeoutMs, long readTimeoutMs,
                                                        int maxAttempts )
     {
-        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPort(),
+        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
@@ -138,7 +138,7 @@ public class WebClientBuilder
     public static WebClient buildEnvironmentWebClient( final PeerInfo peerInfo, final String path,
                                                        final Object provider )
     {
-        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPort(),
+        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();

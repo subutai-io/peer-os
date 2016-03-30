@@ -7,7 +7,6 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  * DAO Manager. Manages, controls entityManagerFactory instances
- *
  */
 
 public class DaoManager
@@ -75,10 +74,12 @@ public class DaoManager
         }
     }
 
+
     /**
      * Rollback the transaction
      *
      * @param em - EntityManager
+     *
      * @return short
      */
     public short rollBackTransaction( EntityManager em )
@@ -98,6 +99,7 @@ public class DaoManager
      * Start the transaction
      *
      * @param em - EntityManager
+     *
      * @return short
      */
     public short startTransaction( EntityManager em )
@@ -115,6 +117,7 @@ public class DaoManager
      * Commit the transaction
      *
      * @param em - EntityManager
+     *
      * @return short
      */
     public short commitTransaction( EntityManager em )
@@ -132,6 +135,7 @@ public class DaoManager
      * Close EntityManager object
      *
      * @param em - EntityManager
+     *
      * @return short
      */
     public short closeEntityManager( EntityManager em )
@@ -173,6 +177,7 @@ public class DaoManager
 
         return 1;
     }
+
 
     /**
      * Save entity data (synchronized)
