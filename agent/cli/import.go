@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"runtime"
 	"strings"
@@ -22,11 +23,10 @@ import (
 )
 
 var (
-	lock   lockfile.Lockfile
-	kurjun = config.CheckKurjun()
+	lock lockfile.Lockfile
 )
 
-func templId(templ, arch, version string) string {
+func templId(templ, arch, version string, kurjun *http.Client) string {
 	url := config.Management.Kurjun + "/template/info?name=" + templ + "&version=" + version + "&type=text"
 	if version == "stable" || len(version) == 0 {
 		url = config.Management.Kurjun + "/template/info?name=" + templ + "&type=text"
@@ -78,7 +78,7 @@ func checkLocal(templ, md5, arch string) string {
 	return ""
 }
 
-func download(file, id string) string {
+func download(file, id string, kurjun *http.Client) string {
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + file)
 	log.Check(log.FatalLevel, "Creating file "+file, err)
 	defer out.Close()
@@ -135,7 +135,8 @@ func LxcImport(templ, version, token string) {
 	if len(version) == 0 && templ == "management" {
 		version = config.Management.Version
 	}
-	id := templId(templ, runtime.GOARCH, version)
+	kurjun := config.CheckKurjun()
+	id := templId(templ, runtime.GOARCH, version, kurjun)
 	md5 := ""
 	if len(strings.Split(id, ".")) > 1 {
 		md5 = strings.Split(id, ".")[1]
@@ -144,7 +145,7 @@ func LxcImport(templ, version, token string) {
 	archive := checkLocal(templ, md5, runtime.GOARCH)
 	if len(archive) == 0 && len(md5) != 0 {
 		log.Info("Downloading " + templ)
-		archive = download(fullname, id)
+		archive = download(fullname, id, kurjun)
 	} else if len(archive) == 0 && len(md5) == 0 {
 		log.Error(templ + " " + version + " template not found")
 	}

@@ -23,8 +23,7 @@ type update struct {
 }
 
 func getBody(url string) (response *http.Response) {
-	client := &http.Client{}
-	response, err := client.Get(url)
+	response, err := config.CheckKurjun().Get(url)
 	log.Check(log.FatalLevel, "Getting response from "+url, err)
 	return
 }
@@ -39,7 +38,6 @@ func getList() (list []map[string]interface{}) {
 }
 
 func Update(name string, check bool) {
-	config.CheckKurjun()
 	switch name {
 	case "rh":
 		if !lockSubutai("rh.update") {
