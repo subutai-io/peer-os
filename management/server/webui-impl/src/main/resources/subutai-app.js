@@ -67,17 +67,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 					scope: $scope
 				});
 			}
-
-			if (vm.hubStatus) {
-				if (localStorage.getItem ("bazaarMD5") === null) {
-					localStorage.setItem ("bazaarMD5", getBazaarChecksum());
-					bazaarUpdate = true;
-				} else {
-					if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
-						bazaarUpdate = true;
-					}
-				}
-			}
 		});
 	}
     checkIfRegistered();
@@ -223,6 +212,16 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         localStorage.removeItem('notifications');
     }
 
+
+	if (localStorage.getItem ("bazaarMD5") === null) {
+		localStorage.setItem ("bazaarMD5", getBazaarChecksum());
+		bazaarUpdate = true;
+	} else {
+		if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
+			bazaarUpdate = true;
+		}
+	}
+
    	function getBazaarChecksum() {
    		console.log ("Getting checksum");
 		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
@@ -231,7 +230,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 		});
 		return "";
 	}
-
 }
 
 
@@ -409,7 +407,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/kurjun/kurjun.js',
                                 'subutai-app/kurjun/controller.js',
                                 'subutai-app/kurjun/service.js',
-                                'subutai-app/identity/service.js'
+                                'subutai-app/identity/service.js',
+                                'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
@@ -1042,7 +1041,7 @@ function toggle(source, name) {
 
 function hasPGPplugin() {
     if ($('#bp-plugin-version').val().length > 0) {
-        return true;
+		return $('#bp-plugin-version').val();
     } else {
         return false;
     }

@@ -4,7 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,6 +31,10 @@ import io.subutai.core.peer.api.PeerManager;
 
 /**
  * VNI setup generation
+ *
+ * TODO we need to add peer to environment metadata in this step (create/VniSetupStep and modify/VniSetupStep) rather
+ * then in create/SetupP2PStep or modify/SetupP2PStep so that if env creation fails we can cleanup also reserved network
+ * resources even if not actual creation took place
  */
 public class VNISetupStep
 {
@@ -86,7 +89,7 @@ public class VNISetupStep
                 Future<Peer> f = completionService.take();
                 succeededPeers.add( f.get() );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems obtaining reserved gateways", e );
             }
@@ -158,7 +161,7 @@ public class VNISetupStep
                 Future<Peer> f = completionService.take();
                 succeededPeers.add( f.get() );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems reserving VNI", e );
             }
@@ -218,7 +221,7 @@ public class VNISetupStep
                 Future<Peer> f = completionService.take();
                 succeededPeers.add( f.get() );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOG.error( "Problems getting reserved vnis", e );
             }

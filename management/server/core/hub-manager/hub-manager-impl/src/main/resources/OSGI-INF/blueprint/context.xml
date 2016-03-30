@@ -42,6 +42,13 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="networkManager"
+             interface="io.subutai.core.network.api.NetworkManager" />
+
+
+  <reference id="commandExecutor" availability="mandatory"
+             interface="io.subutai.core.executor.api.CommandExecutor" />
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
@@ -55,6 +62,7 @@
     <property name="environmentManager" ref="environmentManager" />
     <property name="identityManager" ref="identityManager" />
     <property name="monitor" ref="monitor" />
+    <property name="commandExecutor" ref="commandExecutor" />
     <argument ref="daoManagerHub" />
   </bean>
   <service ref="hubImpl" interface="io.subutai.core.hubmanager.api.Integration" />

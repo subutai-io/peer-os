@@ -13,12 +13,27 @@ import com.google.common.base.Preconditions;
  */
 public class P2PConnections
 {
-    private Set<P2PConnection> connections;
+    private Set<P2PConnection> connections = new HashSet<>();
 
 
     public P2PConnections( final Set<P2PConnection> connections )
     {
         this.connections = connections;
+    }
+
+
+    public P2PConnections()
+    {
+    }
+
+
+    public void addConnection( P2PConnection p2PConnection )
+    {
+        if ( p2PConnection == null )
+        {
+            throw new IllegalArgumentException( "P2P connection could not be null." );
+        }
+        connections.add( p2PConnection );
     }
 
 

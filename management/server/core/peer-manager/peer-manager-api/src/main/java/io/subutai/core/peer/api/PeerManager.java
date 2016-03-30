@@ -61,7 +61,7 @@ public interface PeerManager
 
     void processRejectRequest( RegistrationData registrationData ) throws PeerException;
 
-    String getPeerIdByIp( String ip ) throws PeerException;
+    String getRemotePeerIdByIp( String ip ) throws PeerException;
 
     PeerGroupResources getPeerGroupResources() throws PeerException;
 
@@ -74,8 +74,6 @@ public interface PeerManager
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
 
     PingDistances getP2PSwarmDistances();
-
-    void updateControlNetwork();
 
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
 }

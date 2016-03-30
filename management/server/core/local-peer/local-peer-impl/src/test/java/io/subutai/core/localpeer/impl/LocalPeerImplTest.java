@@ -244,16 +244,16 @@ public class LocalPeerImplTest
 
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
-        localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager,/* strategyManager,*/
-                commandExecutor, hostRegistry, monitor, securityManager ) );
+        localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, commandExecutor, hostRegistry,
+                monitor, securityManager ) );
 
+        localPeer.peerInfo = peerInfo;
         localPeer.resourceHostDataService = resourceHostDataService;
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
         localPeer.commandUtil = commandUtil;
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
-        localPeer.setPeerInfo( peerInfo );
         when( containerGateway.getContainerId() ).thenReturn( containerId );
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
@@ -569,27 +569,27 @@ public class LocalPeerImplTest
 
         verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder );
 
-        when( containerHost.isConnected() ).thenReturn( false );
+        //        when( containerHost.isConnected() ).thenReturn( false );
+        //
+        //        try
+        //        {
+        //            localPeer.execute( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
 
-        try
-        {
-            localPeer.execute( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
-
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-
-        try
-        {
-            localPeer.execute( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
+        //        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
+        //
+        //        try
+        //        {
+        //            localPeer.execute( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
     }
 
 
@@ -604,27 +604,27 @@ public class LocalPeerImplTest
 
         verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder );
 
-        when( containerHost.isConnected() ).thenReturn( false );
+        //        when( containerHost.isConnected() ).thenReturn( false );
+        //
+        //        try
+        //        {
+        //            localPeer.executeAsync( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
 
-        try
-        {
-            localPeer.executeAsync( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
-
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-
-        try
-        {
-            localPeer.executeAsync( requestBuilder, containerHost );
-            fail( "Expected CommandException" );
-        }
-        catch ( CommandException e )
-        {
-        }
+        //        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
+        //
+        //        try
+        //        {
+        //            localPeer.executeAsync( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
     }
 
 

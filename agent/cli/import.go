@@ -2,7 +2,6 @@ package lib
 
 import (
 	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -47,13 +46,18 @@ func templId(templ, arch, version string, kurjun *http.Client) string {
 	return string(hash)
 }
 
-func md5sum(file string) string {
-	var hashChannel = make(chan []byte, 1)
-	a, err := ioutil.ReadFile(file)
-	log.Check(log.FatalLevel, "Reading file "+file, err)
-	s := md5.Sum(a)
-	hashChannel <- s[:]
-	return hex.EncodeToString(<-hashChannel)
+func md5sum(filePath string) string {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
 func checkLocal(templ, md5, arch string) string {

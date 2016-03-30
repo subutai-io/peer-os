@@ -109,7 +109,11 @@ function run_tests(){
     Xvfb :10 -ac &
     export DISPLAY=:10
     firefox &
-    mvn clean; mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF; mvn serenity:aggregate;
+    mvn clean
+    recordmydesktop -o ~/base/playbooks/src/test/resources/video/playbooks.ogv &
+    mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
+    pkill recordmydesktop &
+    mvn serenity:aggregate
 }
 
 function copy_results(){

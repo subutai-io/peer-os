@@ -6,16 +6,20 @@ import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.quota.ContainerQuota;
 
 //TODO make all methods consistent about parameters
@@ -90,4 +94,21 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     HostId getResourceHostIdByContainerId( @PathParam( "containerId" ) ContainerId containerId );
+
+    @POST
+    @Path( "{environmentId}/containers/sshkeys" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                        SshPublicKeys sshPublicKeys );
+
+    @PUT
+    @Path( "{environmentId}/containers/sshkeys" )
+    @Produces( MediaType.APPLICATION_JSON )
+    SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
+
+    @POST
+    @Path( "{environmentId}/containers/hosts" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response configureHostsInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                          HostAddresses hostAddresses );
 }

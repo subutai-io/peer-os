@@ -5,16 +5,9 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
-
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.settings.Common;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 
 public class CommandsTest
@@ -105,43 +98,5 @@ public class CommandsTest
     public void testGetListReservedVnisCommand() throws Exception
     {
         assertNotNull( commands.getListReservedVnisCommand() );
-    }
-
-
-    @Test
-    public void testGetAppendSshKeyCommand() throws Exception
-    {
-        assertNotNull( commands.getAppendSshKeyCommand( KEY ) );
-    }
-
-
-    @Test
-    public void testGetRemoveSshKeyCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveSshKeyCommand( KEY ) );
-    }
-
-
-    @Test
-    public void testGetConfigSSHCommand() throws Exception
-    {
-        assertNotNull( commands.getConfigSSHCommand() );
-    }
-
-
-    @Test
-    public void testGetReplaceSshKeyCommand() throws Exception
-    {
-        assertNotNull( commands.getReplaceSshKeyCommand( KEY, KEY ) );
-    }
-
-
-    @Test
-    public void testGetAddIpHostToEtcHostsCommand() throws Exception
-    {
-        ContainerHost containerHost = mock( ContainerHost.class );
-        final HostInterface hostInterface = mock( HostInterface.class );
-        when( containerHost.getInterfaceByName( anyString() ) ).thenReturn( hostInterface );
-        assertNotNull( commands.getAddIpHostToEtcHostsCommand( DOMAIN, Sets.newHashSet( containerHost ) ) );
     }
 }

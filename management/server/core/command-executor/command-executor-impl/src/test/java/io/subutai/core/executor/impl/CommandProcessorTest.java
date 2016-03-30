@@ -3,7 +3,6 @@ package io.subutai.core.executor.impl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -255,13 +254,6 @@ public class CommandProcessorTest
 
             @Override
             public Integer isDaemon()
-            {
-                return null;
-            }
-
-
-            @Override
-            public Set<String> getConfigPoints()
             {
                 return null;
             }

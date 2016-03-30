@@ -85,7 +85,7 @@ public class EnvironmentImpl implements Environment, Serializable
     @Id
     @Column( name = "environment_id" )
     @JsonProperty( "environmentId" )
-    private String environmentId;
+    protected String environmentId;
 
     @Version
     @JsonIgnore
@@ -161,7 +161,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Transient
     @JsonIgnore
-    private EnvironmentId envId;
+    protected EnvironmentId envId;
 
 
     protected EnvironmentImpl()
@@ -484,7 +484,10 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void addContainers( Set<EnvironmentContainerImpl> containers )
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ) );
+        if ( CollectionUtil.isCollectionEmpty( containers ) )
+        {
+            return;
+        }
 
         for ( EnvironmentContainerImpl container : containers )
         {

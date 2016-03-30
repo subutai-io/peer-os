@@ -4,7 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -70,6 +69,7 @@ public class PrepareTemplatesStep
         taskExecutor.shutdown();
 
         //collect results
+        boolean succeeded = true;
         for ( int i = 0; i < placement.size(); i++ )
         {
             try
@@ -77,22 +77,19 @@ public class PrepareTemplatesStep
                 Future<PrepareTemplatesResponseCollector> futures = taskCompletionService.take();
                 final PrepareTemplatesResponseCollector prepareTemplatesResponse = futures.get();
 
+                succeeded &= prepareTemplatesResponse.hasSucceeded();
                 addLogs( prepareTemplatesResponse );
                 processResponse( prepareTemplatesResponse );
-
-                if ( !prepareTemplatesResponse.hasSucceeded() )
-                {
-                    throw new EnvironmentCreationException(
-                            "There were errors during preparation of templates on peer " + prepareTemplatesResponse
-                                    .getPeerId() );
-                }
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 LOGGER.error( e.getMessage(), e );
-                throw new EnvironmentCreationException(
-                        "There were errors during preparation templates. Unexpected error." );
+                succeeded = false;
             }
+        }
+        if ( !succeeded )
+        {
+            throw new EnvironmentCreationException( "There were errors during preparation templates." );
         }
     }
 
@@ -111,7 +108,7 @@ public class PrepareTemplatesStep
         for ( OperationMessage message : result.getOperationMessages() )
         {
             operationTracker.addLog( message.getValue() );
-            if ( !result.hasSucceeded() && StringUtils.isNotBlank( message.getDescription() ))
+            if ( !result.hasSucceeded() && StringUtils.isNotBlank( message.getDescription() ) )
             {
                 LOGGER.error( message.getDescription() );
             }

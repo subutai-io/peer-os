@@ -120,7 +120,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
     @JsonIgnore
-    private Environment environment;
+    protected Environment environment;
 
     @Column( name = "arch", nullable = false )
     @Enumerated
@@ -151,7 +151,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Transient
     @JsonIgnore
-    private EnvironmentManagerImpl environmentManager;
+    protected EnvironmentManagerImpl environmentManager;
 
     @Transient
     @JsonIgnore
@@ -660,12 +660,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         ContainerHostState state = getState();
 
+        String envId = environment != null ? environment.getId() : null;
+
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
-                          .add( "templateName", templateName ).add( "environmentId", environment.getId() )
+                          .add( "templateName", templateName ).add( "environmentId", envId )
                           .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
                           .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
-                          .add( "hostArchitecture", hostArchitecture ).add( "state", state ).toString();
+                          .add( "hostArchitecture", hostArchitecture ).add( "state", state )
+                          .add( "resourceHostId", resourceHostId ).toString();
     }
 
 

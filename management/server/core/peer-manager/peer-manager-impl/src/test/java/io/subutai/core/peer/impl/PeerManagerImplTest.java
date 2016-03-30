@@ -103,7 +103,6 @@ public class PeerManagerImplTest
         //        when( localPeer.getManagementHost() ).thenReturn( managementHost );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( localPeer.getId() ).thenReturn( PEER_ID );
-        when( localPeer.getControlNetworkConfig( PEER_ID ) ).thenReturn( controlNetworkConfig );
 
         final List<String> list = Arrays.asList( new String[] { "10.200.0.0", "10.200.1.0", "10.200.3.0" } );
         when( controlNetworkConfig.getUsedNetworks() ).thenReturn( list );
@@ -118,7 +117,7 @@ public class PeerManagerImplTest
 
 
         //        when( peerManager.loadPeerData( PEER_ID ) ).thenReturn( localPeerData );
-        peerManager.addPeer( localPeer );
+        peerManager.addPeerToRegistry( localPeer );
         //        peerManager.peerDAO = peerDAO;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         //        doNothing().when( peerManager ).initPeerInfo();

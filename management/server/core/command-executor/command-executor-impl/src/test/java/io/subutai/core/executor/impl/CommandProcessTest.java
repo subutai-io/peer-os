@@ -126,6 +126,8 @@ public class CommandProcessTest
     @Test
     public void testProcessResponse() throws Exception
     {
+        when( response.getResponseNumber() ).thenReturn( 1 );
+
         commandProcess.processResponse( response );
 
         verify( executor ).execute( isA( ResponseProcessor.class ) );

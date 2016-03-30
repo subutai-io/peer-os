@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -22,10 +23,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
@@ -35,42 +44,57 @@ import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;
+import io.subutai.hub.share.dto.environment.ContainerStateDto;
+import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.hub.share.dto.environment.SSHKeyDto;
 
 
 public class HubEnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentManager.class.getName() );
+    private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
+    private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
+    private static final String SSH_FOLDER = "/root/.ssh";
+    private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
+    protected CommandUtil commandUtil = new CommandUtil();
 
     private SecurityManager securityManager;
     private PeerManager peerManager;
     private ConfigManager configManager;
     private IdentityManager identityManager;
     private EnvironmentManager environmentManager;
+    private NetworkManager networkManager;
 
 
     public HubEnvironmentManager( final EnvironmentManager environmentManager, final ConfigManager hConfigManager,
-                                  final PeerManager peerManager, final IdentityManager identityManager )
+                                  final PeerManager peerManager, final IdentityManager identityManager,
+                                  final NetworkManager networkManager )
     {
         this.environmentManager = environmentManager;
         this.configManager = hConfigManager;
         this.peerManager = peerManager;
         this.identityManager = identityManager;
+        this.networkManager = networkManager;
     }
 
 
@@ -130,6 +154,7 @@ public class HubEnvironmentManager
         Set<String> gatewayDtos = new HashSet<>();
         try
         {
+
             Gateways gateways = peerManager.getLocalPeer().getGateways();
             for ( Gateway gateway : gateways.list() )
             {
@@ -176,58 +201,84 @@ public class HubEnvironmentManager
         }
         catch ( PeerException e )
         {
-            LOG.error( "Could not setup VNI" );
+            LOG.error( "Could not setup VNI", e.getMessage() );
         }
     }
 
 
     public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto )
     {
-        LocalPeer peer = peerManager.getLocalPeer();
+        LocalPeer localPeer = peerManager.getLocalPeer();
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-        String tunComName = P2PUtil.generateHash( env.getTunnelNetwork() );
 
         SubnetUtils.SubnetInfo subnetInfo =
                 new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
-        final String addresses = subnetInfo.getAddress();
 
-        ExecutorService p2pExecutor = Executors.newFixedThreadPool( 1 );
-        ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
-
-        P2PConfig config =
-                new P2PConfig( peer.getId(), env.getId(), tunComName, addresses, env.getP2pHash(), env.getP2pTTL() );
-        p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
+        final String[] addresses = subnetInfo.getAllAddresses();
 
         try
         {
+            localPeer.setupInitialP2PConnection(
+                    new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[0], env.getP2pKey(),
+                            env.getP2pTTL() ) );
+        }
+        catch ( PeerException e )
+        {
+            LOG.error( "Could not setup initial p2p participant on local peer MH with explicit IP", e );
+        }
+
+        ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
+
+        P2PConfig config =
+                new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[1], env.getP2pKey(),
+                        env.getP2pTTL() );
+        p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
+
+        try
+        {
+
             final Future<P2PConfig> f = p2pCompletionService.take();
             P2PConfig createdConfig = f.get();
             p2pExecutor.shutdown();
-
             peerDto.setTunnelAddress( createdConfig.getAddress() );
             peerDto.setCommunityName( createdConfig.getHash() );
             peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
+        }
+        catch ( ExecutionException | InterruptedException e )
+        {
+            LOG.error( "Problems setting up p2p connection", e );
+        }
+        return peerDto;
+    }
 
-            ExecutorService tunnelExecutor = Executors.newFixedThreadPool( 1 );
 
+    public void setupTunnel( EnvironmentDto environmentDto ) throws InterruptedException, ExecutionException
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        Map<String, String> tunnels = new HashMap<>();
+
+        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
+        {
+            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
+            {
+                tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
+            }
+        }
+
+        if ( !tunnels.isEmpty() )
+        {
+            ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
             ExecutorCompletionService<Integer> tunnelCompletionService =
                     new ExecutorCompletionService<Integer>( tunnelExecutor );
 
-            Map<String, String> tunnel = new HashMap<>();
-            tunnel.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
-            tunnelCompletionService.submit( new SetupTunnelTask( peer, env.getId(), tunnel ) );
+            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), tunnels ) );
 
-            final Future<Integer> fTunnel = tunnelCompletionService.take();
-            fTunnel.get();
+            final Future<Integer> f = tunnelCompletionService.take();
+            f.get();
 
             tunnelExecutor.shutdown();
         }
-        catch ( Exception e )
-        {
-            LOG.error( "Could not create P2P tunnel.", e.getMessage() );
-        }
-
-        return peerDto;
     }
 
 
@@ -236,14 +287,16 @@ public class HubEnvironmentManager
         Set<Node> nodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-            Node node =
-                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0,
-                            0, peerDto.getPeerId(), nodeDto.getHostId() );
-            nodes.add( node );
+            if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+            {
+                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+                Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(),
+                        contSize, 0, 0, peerDto.getPeerId(), nodeDto.getHostId() );
+                nodes.add( node );
+            }
         }
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( 1 );
+        ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
         CompletionService<PrepareTemplatesResponseCollector> taskCompletionService =
                 getCompletionService( taskExecutor );
 
@@ -279,19 +332,22 @@ public class HubEnvironmentManager
 
             for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
             {
-                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-                try
+                if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
                 {
-                    CloneRequest cloneRequest =
-                            new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                                    nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
-                                    peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
+                    ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+                    try
+                    {
+                        CloneRequest cloneRequest = new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(),
+                                nodeDto.getContainerName(), nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(),
+                                peerDto.getPeerId(), peerDto.getOwnerId(), nodeDto.getTemplateName(),
+                                HostArchitecture.AMD64, contSize );
 
-                    containerGroupRequest.addRequest( cloneRequest );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Could not create container clone request", e.getMessage() );
+                        containerGroupRequest.addRequest( cloneRequest );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Could not create container clone request", e.getMessage() );
+                    }
                 }
             }
 
@@ -309,6 +365,14 @@ public class HubEnvironmentManager
                         nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
                         nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
+                        nodeDto.setHostName( cloneResponse.getHostname() );
+                        nodeDto.setState( ContainerStateDto.RUNNING );
+
+                        Set<Host> hosts = new HashSet<>();
+                        Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
+                        hosts.add( host );
+                        String sshKey = createSshKey( hosts );
+                        nodeDto.addSshKey( sshKey );
                     }
                 }
             }
@@ -318,6 +382,122 @@ public class HubEnvironmentManager
             LOG.error( "Could not clone containers" );
         }
         return envNodes;
+    }
+
+
+    public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
+            throws EnvironmentManagerException
+    {
+
+        final EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        final LocalPeer localPeer = peerManager.getLocalPeer();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        final EnvironmentId environmentId = new EnvironmentId( env.getId() );
+        final Set<String> sshKeys = new HashSet<>();
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        {
+            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+            {
+                sshKeys.addAll( nodeDto.getSshKeys() );
+            }
+        }
+
+        completionService.submit( new Callable<Peer>()
+        {
+            @Override
+            public Peer call() throws Exception
+            {
+                localPeer.configureSshInEnvironment( environmentId, new SshPublicKeys( sshKeys ) );
+                return localPeer;
+            }
+        } );
+
+        try
+        {
+            Future<Peer> f = completionService.take();
+            f.get();
+
+            for ( SSHKeyDto sshKeyDto : env.getSshKeys() )
+            {
+                sshKeyDto.addConfiguredPeer( localPeer.getId() );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Failed to register ssh keys on peer: " + localPeer.getId(), e );
+        }
+        return peerDto;
+    }
+
+
+    public void configureHash( EnvironmentDto envDto ) throws EnvironmentManagerException
+    {
+        final LocalPeer localPeer = peerManager.getLocalPeer();
+
+        final EnvironmentId environmentId = new EnvironmentId( envDto.getId() );
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        final Map<String, String> hostAddresses = Maps.newHashMap();
+
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        {
+            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+            {
+                hostAddresses.put( nodeDto.getHostName(), nodeDto.getIp() );
+            }
+        }
+        completionService.submit( new Callable<Peer>()
+        {
+            @Override
+            public Peer call() throws Exception
+            {
+                localPeer.configureHostsInEnvironment( environmentId, new HostAddresses( hostAddresses ) );
+                return localPeer;
+            }
+        } );
+
+        try
+        {
+            Future<Peer> f = completionService.take();
+            f.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Problems registering hosts in peer: " + localPeer.getId(), e );
+        }
+    }
+
+
+    public String createSshKey( Set<Host> hosts )
+    {
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
+
+        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        {
+            CommandResult result = resultEntry.getValue();
+            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+            {
+                return result.getStdOut();
+            }
+            else
+            {
+                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
+            }
+        }
+        return null;
+    }
+
+
+    public RequestBuilder getCreateNReadSSHCommand()
+    {
+        return new RequestBuilder( String.format( "rm -rf %1$s && " +
+                        "mkdir -p %1$s && " +
+                        "chmod 700 %1$s && " +
+                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
@@ -337,7 +517,7 @@ public class HubEnvironmentManager
         @Override
         public P2PConfig call() throws Exception
         {
-            peer.setupP2PConnection( p2PConfig );
+            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
             return p2PConfig;
         }
     }
@@ -363,6 +543,12 @@ public class HubEnvironmentManager
         {
             return peer.setupTunnels( tunnels, environmentId );
         }
+    }
+
+
+    public EnvironmentManager getEnvironmentManager()
+    {
+        return environmentManager;
     }
 
 

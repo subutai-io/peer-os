@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
-	"errors"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
@@ -15,21 +14,9 @@ import (
 	"time"
 )
 
-var (
-	ErrUserKeyNotFoundByEmail = errors.New("Key not found by user email")
-	ErrUserKeyRingNotFound    = errors.New("Keyring not found")
-	ErrUnreadableKeyring      = errors.New("Could not read keyring")
-	ErrUnverifiedMessage      = errors.New("Message does not contain signature")
-)
-
-const (
-	MANAGEMENT_HOST_PK = "/root/.gnupg/pubring.gpg"
-	gnupg              = "gpg"
-)
-
 //import PK gpg2 --import pubkey.key
 func ImportPk(file string) string {
-	command := exec.Command("/bin/bash", "-c", gnupg+" --import "+file)
+	command := exec.Command("/bin/bash", "-c", "gpg --import "+file)
 	out, err := command.CombinedOutput()
 	log.Check(log.WarnLevel, "Importing MH public key", err)
 	return string(out)
@@ -37,37 +24,18 @@ func ImportPk(file string) string {
 
 func GetContainerPk(name string) string {
 	lxc_path := config.Agent.LxcPrefix + name + "/public.pub"
-	gpg_C := "gpg --no-default-keyring --keyring " + lxc_path + " --export -a " + name + "@subutai.io"
-	return publicKey(gpg_C)
-}
-
-func publicKey(gpg_c string) string {
-	buf := new(bytes.Buffer)
-	command := exec.Command("/bin/bash", "-c", gpg_c)
-
-	stdout, err := command.StdoutPipe()
-	log.Check(log.WarnLevel, "Openning Stdout pipe", err)
-	log.Check(log.WarnLevel, "Executing command", command.Start())
-
-	size, err := buf.ReadFrom(stdout)
-	log.Check(log.WarnLevel, "Reading from Stdout pipe", err)
-	log.Check(log.WarnLevel, "Waiting for command", command.Wait())
-
-	defer stdout.Close()
-
-	if size == 0 {
-		return ""
-	}
-	return buf.String()
+	stdout, err := exec.Command("/bin/bash", "-c", "gpg --no-default-keyring --keyring "+lxc_path+" --export -a "+name+"@subutai.io").Output()
+	log.Check(log.WarnLevel, "Getting Container public key", err)
+	return string(stdout)
 }
 
 func GetPk(name string) string {
-	gpg_C := "gpg --export -a " + name
-	key := publicKey(gpg_C)
-	if key == "" {
+	stdout, err := exec.Command("/bin/bash", "-c", "gpg --export -a "+name).Output()
+	log.Check(log.WarnLevel, "Getting public key", err)
+	if len(stdout) == 0 {
 		GenerateGPGKeys(name)
 	}
-	return key
+	return string(stdout)
 }
 
 func DecryptNoDefaultKeyring(message, keyring, pub string) string {
@@ -99,7 +67,7 @@ func DecryptWrapper(message string) string {
 }
 
 func EncryptWrapper(user string, recipient string, message string) string {
-	gpg_C := gnupg + " --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --armor -u " + user + " -r " + recipient + " --sign --encrypt --no-tty"
+	gpg_C := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --armor -u " + user + " -r " + recipient + " --sign --encrypt --no-tty"
 	command := exec.Command("/bin/bash", "-c", gpg_C)
 	stdin, _ := command.StdinPipe()
 	stdin.Write([]byte(message))
@@ -113,7 +81,7 @@ func EncryptWrapper(user string, recipient string, message string) string {
 	return string(output)
 }
 func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) string {
-	gpg_C := gnupg + " --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --no-default-keyring --keyring " + pub + " --secret-keyring " + sec + " --armor -u " + user + "@subutai.io -r " + recipient + " --sign --encrypt --no-tty"
+	gpg_C := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --no-default-keyring --keyring " + pub + " --secret-keyring " + sec + " --armor -u " + user + "@subutai.io -r " + recipient + " --sign --encrypt --no-tty"
 	command := exec.Command("/bin/bash", "-c", gpg_C)
 	stdin, _ := command.StdinPipe()
 	stdin.Write([]byte(message))
@@ -126,7 +94,7 @@ func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) s
 
 func ImportMHKeyNoDefaultKeyring(cont string) {
 	pub := config.Agent.LxcPrefix + cont + "/public.pub"
-	gpg_C := gnupg + " --no-default-keyring --keyring " + pub + " --import epub.key"
+	gpg_C := "gpg --no-default-keyring --keyring " + pub + " --import epub.key"
 	command := exec.Command("/bin/bash", "-c", gpg_C)
 	status, err := command.CombinedOutput()
 	log.Check(log.WarnLevel, "Importing Management Host Key "+string(status), err)
@@ -177,7 +145,7 @@ func GetFingerprint(email string) (fingerprint string) {
 
 func GetToken() string {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr, Timeout: time.Duration(3 * time.Second)}
+	client := &http.Client{Transport: tr, Timeout: 3 * time.Second}
 
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
 	if log.Check(log.DebugLevel, "Getting token", err) {
@@ -228,8 +196,7 @@ func getMngKey(c string) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	mngkey := []byte(body)
-	err = ioutil.WriteFile(config.Agent.LxcPrefix+c+"/mgn.key", mngkey, 0644)
+	err = ioutil.WriteFile(config.Agent.LxcPrefix+c+"/mgn.key", body, 0644)
 	log.Check(log.FatalLevel, "Writing Management public key", err)
 }
 

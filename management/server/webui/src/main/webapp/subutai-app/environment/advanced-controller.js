@@ -25,6 +25,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.logMessages = [];
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
+	$scope.identity = angular.identity;
 
 	vm.activeCloudTab = 'peers';
 	vm.templatesType = 'all';
@@ -53,6 +54,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.editEnvironment = editEnvironment;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
+	vm.getFilteredTemplates = getFilteredTemplates;
 
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
@@ -62,10 +64,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	environmentService.getTemplates()
 		.then(function (data) {
 			vm.templates = data;
+			getFilteredTemplates();
 		});
-		//.error(function (data) {
-		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		//});
+
+	function getFilteredTemplates() {
+		vm.templatesList = [];
+		for(var i in vm.templates) {
+			if(vm.templatesType == 'all' || i == vm.templatesType) {
+				vm.templatesList = vm.templatesList.concat(vm.templates[i]);
+			}
+		}
+	}
 
 	function getPeers() {
 		$('.js-peer-load-screen').show();
@@ -157,11 +166,15 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
+							var logsTextString = logTextTime[3];
+							if(logTextTime[4] !== undefined) {
+								logsTextString += logTextTime[4] + logTextTime[5];
+							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logTextTime[3]
+								"text": logsTextString
 							};
 							result.push(currentLog);
 
@@ -721,7 +734,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
-
+		
+		vm.buildCompleted = false;
 		vm.newEnvID = [];		
 		vm.buildStep = 'confirm';
 
@@ -744,7 +758,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info-advanced.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 
