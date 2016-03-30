@@ -33,7 +33,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
-	vm.environment2BuildName = 'Environment name';
+	vm.environment2BuildName = '';
 	vm.buildCompleted = false;
 
 	// functions
@@ -259,6 +259,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function notifyChanges() {

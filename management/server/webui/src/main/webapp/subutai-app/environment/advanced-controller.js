@@ -41,7 +41,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.excludedContainers = [];
 	vm.cubeGrowth = 1;
-	vm.environment2BuildName = 'Environment name';
+	vm.environment2BuildName = '';
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
 	vm.buildCompleted = false;
@@ -282,6 +282,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function buildEditedEnvironment() {
