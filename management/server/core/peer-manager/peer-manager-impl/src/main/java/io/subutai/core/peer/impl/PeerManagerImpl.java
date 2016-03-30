@@ -148,8 +148,8 @@ public class PeerManagerImpl implements PeerManager
 
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
-                Peer peer = createPeer( peerData );
-                addPeer( peer );
+                Peer peer = constructPeerPojo( peerData );
+                addPeerToRegistry( peer );
             }
         }
         catch ( Exception e )
@@ -233,9 +233,9 @@ public class PeerManagerImpl implements PeerManager
                             keyPhrase, toJson( policy ), order );
             updatePeerData( peerData );
 
-            Peer newPeer = createPeer( peerData );
+            Peer newPeer = constructPeerPojo( peerData );
 
-            addPeer( newPeer );
+            addPeerToRegistry( newPeer );
 
             templateManager.addRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
@@ -285,7 +285,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void addPeer( final Peer peer ) throws PeerException
+    protected void addPeerToRegistry( final Peer peer ) throws PeerException
     {
         if ( peer == null )
         {
@@ -313,10 +313,8 @@ public class PeerManagerImpl implements PeerManager
 
     private void updatePeerData( final PeerData peerData ) throws PeerException
     {
-        if ( peerData == null )
-        {
-            throw new IllegalArgumentException( "Peer data could not be null." );
-        }
+        Preconditions.checkNotNull( peerData, "Peer data could not be null." );
+
         this.peerDataService.saveOrUpdate( peerData );
     }
 
@@ -334,20 +332,13 @@ public class PeerManagerImpl implements PeerManager
      *
      * @return peer instance
      */
-    private Peer createPeer( final PeerData peerData ) throws PeerException
+    private Peer constructPeerPojo( final PeerData peerData ) throws PeerException
     {
-        if ( peerData == null )
-        {
-            throw new IllegalArgumentException( "Peer info could not be null." );
-        }
+        Preconditions.checkNotNull( peerData, "Peer info could not be null." );
+
         try
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
-            if ( localPeerId.equals( peerData.getId() ) )
-            {
-                localPeer.setPeerInfo( peerInfo );
-                return localPeer;
-            }
 
             return new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
                     messageResponseListener, provider );
@@ -1076,8 +1067,8 @@ public class PeerManagerImpl implements PeerManager
             peerInfo.setPort( securePort );
             peerData.setInfo( toJson( peerInfo ) );
             peerDataService.saveOrUpdate( peerData );
-            Peer peer = createPeer( peerData );
-            addPeer( peer );
+            Peer peer = constructPeerPojo( peerData );
+            addPeerToRegistry( peer );
             //update settings
             if ( getLocalPeer().getId().equalsIgnoreCase( peerId ) )
             {
@@ -1147,11 +1138,16 @@ public class PeerManagerImpl implements PeerManager
 
                     peerData.setInfo( toJson( peerInfo ) );
 
+                    //modify local peer info
+                    localPeer.setPeerInfo( peerInfo );
+
+                    //save to db
                     updatePeerData( peerData );
 
-                    Peer newPeer = createPeer( peerData );
+                    Peer newPeer = constructPeerPojo( peerData );
 
-                    addPeer( newPeer );
+                    //add to cache
+                    addPeerToRegistry( newPeer );
 
                     localIpSetter.shutdown();
                 }
