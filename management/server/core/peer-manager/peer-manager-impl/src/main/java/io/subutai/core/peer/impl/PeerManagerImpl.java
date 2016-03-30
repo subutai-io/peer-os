@@ -52,6 +52,7 @@ import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
@@ -76,7 +77,7 @@ import io.subutai.core.security.api.SecurityManager;
  * PeerManager implementation
  */
 @PermitAll
-public class PeerManagerImpl implements PeerManager
+public class PeerManagerImpl implements PeerManager, SettingsListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
@@ -1093,6 +1094,31 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    @Override
+    public void settingsChanged()
+    {
+        try
+        {
+            if ( localPeer.getPeerInfo().getPublicSecurePort() != SystemSettings.getPublicSecurePort() || !localPeer
+                    .getPeerInfo().getPublicUrl().equalsIgnoreCase( SystemSettings.getPublicUrl() ) )
+            {
+                //modify local peer info
+                localPeer.getPeerInfo().setPublicUrl( SystemSettings.getPublicUrl() );
+                localPeer.getPeerInfo().setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+
+                //update db
+                PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
+                peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
+                updatePeerData( peerData );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error updating local peer info", e );
+        }
+    }
+
+
     private class P2PSwarmDistanceTask implements Callable<PingDistances>
     {
         private Peer peer;
@@ -1138,22 +1164,18 @@ public class PeerManagerImpl implements PeerManager
                         return;
                     }
 
-                    PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-
-                    PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
-
-                    peerInfo.setPublicUrl( externalInterface.getIp() );
-
-                    peerInfo.setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
-
-                    peerData.setInfo( toJson( peerInfo ) );
-
                     //modify local peer info
-                    localPeer.getPeerInfo().setPublicUrl( peerInfo.getPublicUrl() );
-                    localPeer.getPeerInfo().setName( peerInfo.getName() );
+                    localPeer.getPeerInfo().setPublicUrl( externalInterface.getIp() );
+                    localPeer.getPeerInfo()
+                             .setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
 
                     //update db
+                    PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
+                    peerData.setInfo( toJson(  localPeer.getPeerInfo() ) );
                     updatePeerData( peerData );
+
+                    //modify settings
+                    SystemSettings.setPublicUrl( localPeer.getPeerInfo().getPublicUrl() );
 
                     localIpSetter.shutdown();
                 }
