@@ -282,6 +282,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function buildEditedEnvironment() {

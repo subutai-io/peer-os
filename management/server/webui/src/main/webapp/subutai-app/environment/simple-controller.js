@@ -259,6 +259,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function notifyChanges() {
