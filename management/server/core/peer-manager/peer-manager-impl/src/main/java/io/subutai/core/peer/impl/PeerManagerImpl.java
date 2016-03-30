@@ -341,7 +341,7 @@ public class PeerManagerImpl implements PeerManager
 
             if ( localPeerId.equals( peerData.getId() ) )
             {
-                localPeer.setPeerInfo(peerInfo);
+                localPeer.setPeerInfo( peerInfo );
                 return localPeer;
             }
 
@@ -652,7 +652,8 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Invalid URL." );
         }
 
-        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
+                .getPeerInfo().getPublicSecurePort() )
         {
             throw new PeerException( "Could not send registration request to ourselves." );
         }
