@@ -92,10 +92,10 @@ func BackupContainer(container string, full, stop bool) {
 
 		if full {
 			fs.Send(containerSnapshotDir+"/"+subvolBase, containerSnapshotDir+"/"+subvolBase,
-				tmpBackupDir+string(subvolBase)+".delta")
+				tmpBackupDir+subvolBase+".delta")
 		} else {
 			fs.Send(lastSnapshotDir+"/"+subvolBase, containerSnapshotDir+"/"+subvolBase,
-				tmpBackupDir+string(subvolBase)+".delta")
+				tmpBackupDir+subvolBase+".delta")
 		}
 
 		if lastSnapshotDir != "" {

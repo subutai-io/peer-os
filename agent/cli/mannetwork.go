@@ -123,7 +123,7 @@ func listTunnel() {
 	ports := strings.Split(string(ret), "\n")
 
 	for k, port := range ports {
-		if strings.Contains(string(port), "remote_ip") {
+		if strings.Contains(port, "remote_ip") {
 			iface := strings.Fields(ports[k-2])
 			tunnel := strings.Trim(iface[1], "\"")
 			addr := strings.Fields(port)
@@ -135,10 +135,9 @@ func listTunnel() {
 
 func createTunnel(tunnel, addr, tunType string) {
 	ifTunExist(tunnel)
+	err := ioutil.WriteFile(config.Agent.DataPrefix+"var/subutai-network/"+tunnel, []byte(addr), 0600)
+	log.Check(log.ErrorLevel, "Creating tunnel file", err)
 
-	log.Check(log.FatalLevel, "Creating tunnel port",
-		exec.Command("ovs-vsctl", "--may-exist", "add-port", "wan", tunnel, "--", "set", "interface", tunnel, "type="+tunType,
-			"options:stp_enable=true", "options:key=flow", "options:remote_ip="+addr).Run())
 }
 
 func ifTunExist(name string) {
@@ -160,7 +159,7 @@ func displayVNIMap() {
 	ports := strings.Split(string(ret), "\n")
 
 	for k, port := range ports {
-		if strings.Contains(string(port), "env") {
+		if strings.Contains(port, "env") {
 			iface := strings.Fields(ports[k-2])
 			tunname := strings.Trim(iface[1], "\"")
 			tag := strings.Fields(ports[k-3])[1]
@@ -174,11 +173,14 @@ func displayVNIMap() {
 }
 
 func createVNIMap(tunnel, vni, vlan, envid string) {
-	log.Check(log.FatalLevel, "MakeVNIMap set interface: ",
-		exec.Command("ovs-vsctl", "--if-exists", "set", "interface", tunnel, "options:key="+vni, "options:env="+envid).Run())
-	log.Check(log.FatalLevel, "MakeVNIMap set port: ",
-		exec.Command("ovs-vsctl", "--if-exists", "set", "port", tunnel, "tag="+vlan).Run())
+	log.Check(log.WarnLevel, "Creating bridge ", exec.Command("ovs-vsctl", "add-br", "gw-"+vlan).Run())
 
+	addr, _ := ioutil.ReadFile(config.Agent.DataPrefix + "var/subutai-network/" + tunnel)
+	log.Check(log.FatalLevel, "Creating tunnel port",
+		exec.Command("ovs-vsctl", "--may-exist", "add-port", "gw-"+vlan, tunnel, "--", "set", "interface", tunnel, "type=vxlan",
+			"options:stp_enable=true", "options:key="+vni, "options:remote_ip="+string(addr), "options:env="+envid).Run())
+
+	log.Check(log.FatalLevel, "MakeVNIMap set port: ", exec.Command("ovs-vsctl", "--if-exists", "set", "port", tunnel, "tag="+vlan).Run())
 }
 
 func removeTunnel(tunnel string) {
@@ -192,7 +194,7 @@ func delTunById(envId string) {
 	ports := strings.Split(string(ret), "\n")
 
 	for k, port := range ports {
-		if strings.Contains(string(port), envId) {
+		if strings.Contains(port, envId) {
 			tunnel := strings.Split(ports[k-2], "\"")[1]
 			log.Check(log.WarnLevel, "Removing port "+tunnel,
 				exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())

@@ -12,25 +12,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/subutai-io/base/agent/agent/connect"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/log"
 )
-
-func Instance() {
-	email := config.Management.GpgUser
-	hostname, _ := os.Hostname()
-	if email == "" {
-		mgn := connect.Instance()
-		pk := mgn.GetKey()
-		if pk != nil {
-			email = pk.ExtractKeyEmail()
-		}
-	}
-
-	config.Management.GpgUser = email
-	config.Agent.GpgUser = hostname + "@subutai.io"
-}
 
 func x509generate() {
 	hostname, _ := os.Hostname()
