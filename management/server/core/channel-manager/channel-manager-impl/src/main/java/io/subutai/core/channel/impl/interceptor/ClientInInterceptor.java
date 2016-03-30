@@ -89,7 +89,7 @@ public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
     {
         try
         {
-            return peerManager.getPeerIdByIp( ip );
+            return peerManager.getRemotePeerIdByIp( ip );
         }
         catch ( PeerException e )
         {

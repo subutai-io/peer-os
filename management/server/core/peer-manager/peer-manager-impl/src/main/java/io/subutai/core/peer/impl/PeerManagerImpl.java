@@ -46,6 +46,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
@@ -834,7 +835,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public String getPeerIdByIp( final String ip ) throws PeerException
+    public String getRemotePeerIdByIp( final String ip ) throws PeerException
     {
         Preconditions.checkNotNull( ip );
 
@@ -842,10 +843,13 @@ public class PeerManagerImpl implements PeerManager
 
         for ( Peer peer : this.peers.values() )
         {
-            PeerInfo peerInfo = peer.getPeerInfo();
-            if ( ip.equals( peerInfo.getIp() ) )
+            if ( peer instanceof RemotePeer )
             {
-                result = peerInfo.getId();
+                PeerInfo peerInfo = peer.getPeerInfo();
+                if ( ip.equals( peerInfo.getIp() ) )
+                {
+                    result = peerInfo.getId();
+                }
             }
         }
 
