@@ -15,11 +15,11 @@ public class EnvironmentPeerDto
         SETUP_P2P,
         SETUP_TUNNEL,
         BUILD_CONTAINER,
-        CONFIGURE_HOSTS,
-        CONFIGURE_SSH,
+        CONFIGURE_CONTAINER,
         START_CONTAINER,
         STOP_CONTAINER,
         DESTROY_CONTAINER,
+        DELETE_PEER,
         WAIT,
         READY
     }
