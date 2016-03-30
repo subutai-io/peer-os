@@ -1,6 +1,10 @@
 package io.subutai.hub.share.dto.environment;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+
 public class EnvironmentNodeDto
 {
     private String hostId;
@@ -28,6 +32,8 @@ public class EnvironmentNodeDto
     private long elapsedTime;
 
     private int ipAddressOffset;
+
+    private Set<String> sshKeys = new HashSet<>();
 
 
     public EnvironmentNodeDto()
@@ -188,5 +194,23 @@ public class EnvironmentNodeDto
     public void setState( final ContainerStateDto state )
     {
         this.state = state;
+    }
+
+
+    public Set<String> getSshKeys()
+    {
+        return sshKeys;
+    }
+
+
+    public void setSshKeys( final Set<String> sshKeys )
+    {
+        this.sshKeys = sshKeys;
+    }
+
+
+    public void addSshKey( final String sshKey )
+    {
+        this.sshKeys.add( sshKey );
     }
 }

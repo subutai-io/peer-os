@@ -1071,8 +1071,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
     }
 
-
-    @RolesAllowed( "Environment-Management|Delete" )
+    //TODO this is for basic environment via hub
+//    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {

@@ -12,6 +12,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	var GRID_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
+	$scope.identity = angular.identity;
 
 	vm.popupLogState = 'full';
 
@@ -25,6 +26,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	vm.colors = quotaColors;
 	vm.templates = [];
+	vm.templatesList = [];
 
 	vm.activeCloudTab = 'templates';
 	vm.templatesType = 'all';
@@ -40,6 +42,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
+	vm.getFilteredTemplates = getFilteredTemplates;
 
 	vm.addContainer = addContainer;
 	vm.closePopup = closePopup;
@@ -48,10 +51,17 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	environmentService.getTemplates()
 		.then(function (data) {
 			vm.templates = data;
+			getFilteredTemplates();
 		});
-		//.error(function (data) {
-		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		//});
+
+	function getFilteredTemplates() {
+		vm.templatesList = [];
+		for(var i in vm.templates) {
+			if(vm.templatesType == 'all' || i == vm.templatesType) {
+				vm.templatesList = vm.templatesList.concat(vm.templates[i]);
+			}
+		}
+	}
 
 	function closePopup() {
 		vm.buildCompleted = false;
