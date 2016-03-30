@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
-	"errors"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
@@ -15,16 +14,8 @@ import (
 	"time"
 )
 
-var (
-	ErrUserKeyNotFoundByEmail = errors.New("Key not found by user email")
-	ErrUserKeyRingNotFound    = errors.New("Keyring not found")
-	ErrUnreadableKeyring      = errors.New("Could not read keyring")
-	ErrUnverifiedMessage      = errors.New("Message does not contain signature")
-)
-
 const (
-	MANAGEMENT_HOST_PK = "/root/.gnupg/pubring.gpg"
-	gnupg              = "gpg"
+	gnupg = "gpg"
 )
 
 //import PK gpg2 --import pubkey.key
@@ -158,7 +149,7 @@ func GetFingerprint(email string) (fingerprint string) {
 
 func GetToken() string {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr, Timeout: time.Duration(3 * time.Second)}
+	client := &http.Client{Transport: tr, Timeout: 3 * time.Second}
 
 	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
 	if log.Check(log.DebugLevel, "Getting token", err) {
@@ -209,8 +200,7 @@ func getMngKey(c string) {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 
-	mngkey := []byte(body)
-	err = ioutil.WriteFile(config.Agent.LxcPrefix+c+"/mgn.key", mngkey, 0644)
+	err = ioutil.WriteFile(config.Agent.LxcPrefix+c+"/mgn.key", body, 0644)
 	log.Check(log.FatalLevel, "Writing Management public key", err)
 }
 

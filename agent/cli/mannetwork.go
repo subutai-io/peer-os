@@ -123,7 +123,7 @@ func listTunnel() {
 	ports := strings.Split(string(ret), "\n")
 
 	for k, port := range ports {
-		if strings.Contains(string(port), "remote_ip") {
+		if strings.Contains(port, "remote_ip") {
 			iface := strings.Fields(ports[k-2])
 			tunnel := strings.Trim(iface[1], "\"")
 			addr := strings.Fields(port)
@@ -159,7 +159,7 @@ func displayVNIMap() {
 	ports := strings.Split(string(ret), "\n")
 
 	for k, port := range ports {
-		if strings.Contains(string(port), "env") {
+		if strings.Contains(port, "env") {
 			iface := strings.Fields(ports[k-2])
 			tunname := strings.Trim(iface[1], "\"")
 			tag := strings.Fields(ports[k-3])[1]
@@ -194,7 +194,7 @@ func delTunById(envId string) {
 	ports := strings.Split(string(ret), "\n")
 
 	for k, port := range ports {
-		if strings.Contains(string(port), envId) {
+		if strings.Contains(port, envId) {
 			tunnel := strings.Split(ports[k-2], "\"")[1]
 			log.Check(log.WarnLevel, "Removing port "+tunnel,
 				exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())

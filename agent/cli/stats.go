@@ -22,8 +22,7 @@ import (
 )
 
 var (
-	clnt     client.Client
-	interval string
+	clnt client.Client
 )
 
 type hostStat struct {
