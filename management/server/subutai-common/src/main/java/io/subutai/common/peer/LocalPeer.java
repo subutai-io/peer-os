@@ -15,12 +15,6 @@ import io.subutai.common.task.Task;
 public interface LocalPeer extends Peer
 {
 
-
-    /**
-     * Returns public IP of peer determined by internet service
-     */
-    String getPublicIp() throws PeerException;
-
     Task getTask( Integer id );
 
 
@@ -144,8 +138,6 @@ public interface LocalPeer extends Peer
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 
-    void setPeerInfo( PeerInfo peerInfo );
-
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
@@ -160,11 +152,17 @@ public interface LocalPeer extends Peer
 
     List<ContainerHost> getPeerContainers( String peerId );
 
-    String getCurrentControlNetwork() throws PeerException;
-
     Host findHostByName( String hostname ) throws HostNotFoundException;
 
     List<Task> getTaskList();
 
     public void exchangeMhKeysWithRH() throws Exception;
+
+    void reserveNetworkResource( String environmentId, long vni, String p2pSubnet, String containerSubnet )
+            throws PeerException;
+
+    List<NetworkResource> listReservedNetworkResources() throws PeerException;
+
+    void setPeerInfo( PeerInfo peerInfo );
 }
+

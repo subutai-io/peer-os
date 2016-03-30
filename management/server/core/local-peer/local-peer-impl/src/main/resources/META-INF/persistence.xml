@@ -10,6 +10,7 @@
     <class>io.subutai.core.localpeer.impl.entity.ResourceHostEntity</class>
     <class>io.subutai.core.localpeer.impl.entity.HostInterfaceEntity</class>
     <class>io.subutai.core.localpeer.impl.entity.ContainerHostEntity</class>
+    <class>io.subutai.core.localpeer.impl.entity.NetworkResourceEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN" />

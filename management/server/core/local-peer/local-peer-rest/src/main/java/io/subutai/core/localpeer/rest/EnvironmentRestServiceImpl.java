@@ -12,10 +12,13 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.quota.ContainerQuota;
 
@@ -46,9 +49,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error destroying container #destroyContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -63,9 +65,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error starting container #startContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -80,9 +81,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error stopping container #stopContainer", e );
-            Response response = Response.serverError().entity( e.toString() ).build();
-            throw new WebApplicationException( response );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -98,9 +98,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting container state #getContainerState", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -117,9 +116,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting processing resource usage #getProcessResourceUsage", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -138,8 +136,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting cpu set #getCpuSet", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -157,8 +155,67 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting cpu set #setCpuSet", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public SshPublicKeys generateSshKeysForEnvironment( final EnvironmentId environmentId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+
+            return localPeer.generateSshKeyForEnvironment( environmentId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( sshPublicKeys );
+            Preconditions.checkArgument( !sshPublicKeys.isEmpty() );
+
+            localPeer.configureSshInEnvironment( environmentId, sshPublicKeys );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( hostAddresses );
+            Preconditions.checkArgument( !hostAddresses.isEmpty() );
+
+            localPeer.configureHostsInEnvironment( environmentId, hostAddresses );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -175,8 +232,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -195,8 +252,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -214,8 +271,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error setting disk quota #setDiskQuota", e );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build();
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 
@@ -228,14 +285,12 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
         try
         {
-
             return localPeer.getResourceHostIdByContainerId( containerId );
         }
         catch ( Exception e )
         {
-            LOGGER.error( "Error getting resource host id by container id #getResourceHostIdByContainerId", e );
-            throw new WebApplicationException(
-                    Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.toString() ).build() );
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
 }

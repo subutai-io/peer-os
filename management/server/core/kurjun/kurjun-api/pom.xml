@@ -20,8 +20,35 @@
     </dependency>
 
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>install-repository</artifactId>
+      <version>${version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.10</version>
+    </dependency>
+    <dependency>
+      <groupId>ai.subut.kurjun</groupId>
+      <artifactId>model</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>ai.subut.kurjun</groupId>
+      <artifactId>common-utils</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>ai.subut.kurjun</groupId>
+      <artifactId>metadata-common</artifactId>
+      <version>1.0</version>
     </dependency>
 
   </dependencies>
@@ -38,12 +65,10 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.groupId}.core.kurjun.api</Bundle-SymbolicName>
-            <Export-Package>
+            <Export-Package>org.apache.commons.codec*;version=1.10;
               {local-packages};version=${project.version};-noimport:=true
             </Export-Package>
-
-            <Import-Package>
-              io.subutai.*, com.google.gson*, !*
+            <Import-Package>io.subutai.*, com.google.gson*,commons-codec*, !*
             </Import-Package>
           </instructions>
         </configuration>

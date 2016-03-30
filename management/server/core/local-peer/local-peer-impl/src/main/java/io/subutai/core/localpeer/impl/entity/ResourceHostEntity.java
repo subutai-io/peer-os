@@ -33,7 +33,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.ContainerHostInfo;
@@ -102,6 +101,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     @Transient
     protected HostRegistry hostRegistry;
+
+    @Transient
+    protected int numberOfCpuCores = -1;
 
 
     protected ResourceHostEntity()
@@ -536,29 +538,44 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void cleanup( final EnvironmentId environmentId, final int vlan ) throws ResourceHostException
     {
+        try
+        {
+            commandUtil.execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Could not cleanup resource host '%s'.", hostname ) );
+        }
+
         Set<ContainerHost> containerHosts = getContainerHostsByEnvironmentId( environmentId.getId() );
         if ( containerHosts.size() > 0 )
         {
-            try
-            {
-                final CommandResult result =
-                        execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ) );
-                if ( result.getStatus() != CommandStatus.SUCCEEDED )
-                {
-                    throw new ResourceHostException(
-                            String.format( "Could not cleanup resource host '%s'.", hostname ) );
-                }
-            }
-            catch ( CommandException e )
-            {
-                throw new ResourceHostException( String.format( "Could not cleanup resource host '%s'.", hostname ) );
-            }
-
             for ( ContainerHost containerHost : containerHosts )
             {
                 removeContainerHost( containerHost );
             }
         }
+    }
+
+
+    @Override
+    public int getNumberOfCpuCores() throws ResourceHostException
+    {
+        if ( numberOfCpuCores == -1 )
+        {
+            try
+            {
+                CommandResult commandResult = commandUtil.execute( new RequestBuilder( "nproc" ), this );
+
+                numberOfCpuCores = Integer.parseInt( commandResult.getStdOut().trim() );
+            }
+            catch ( Exception e )
+            {
+                throw new ResourceHostException( "Error fetching # of cpu cores", e );
+            }
+        }
+
+        return numberOfCpuCores;
     }
 
 

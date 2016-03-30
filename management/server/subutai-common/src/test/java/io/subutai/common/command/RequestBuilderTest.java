@@ -3,10 +3,8 @@ package io.subutai.common.command;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
@@ -111,16 +109,6 @@ public class RequestBuilderTest
 
 
     @Test
-    public void testWithConfigPoints() throws Exception
-    {
-        Set<String> mySet = new HashSet<>();
-        mySet.add( "test" );
-
-        assertNotNull( requestBuilder.withConfigPoints( mySet ) );
-    }
-
-
-    @Test
     public void testDaemon() throws Exception
     {
         assertNotNull( requestBuilder.daemon() );
@@ -170,7 +158,6 @@ public class RequestBuilderTest
         requestBuilder.build( UUID.randomUUID().toString() ).getRunAs();
         requestBuilder.build( UUID.randomUUID().toString() ).getTimeout();
         requestBuilder.build( UUID.randomUUID().toString() ).isDaemon();
-        requestBuilder.build( UUID.randomUUID().toString() ).getConfigPoints();
         requestBuilder.build( UUID.randomUUID().toString() ).getPid();
     }
 }

@@ -38,9 +38,16 @@ public class IndexFilter implements Filter
                     url.startsWith("/fav") || url.startsWith("/plugin") ||
                     url.startsWith("/assets") || url.startsWith("/css") ||
                     url.startsWith("/fonts") || url.startsWith("/scripts") ||
-                    url.startsWith("/login")) )
+                    url.startsWith("/login")) && !url.contains("#")  )
             {
-                ((HttpServletResponse)servletResponse).sendRedirect("/#" + url);
+                try
+                {
+                    ((HttpServletResponse)servletResponse).sendRedirect("/#" + url);
+                }
+                catch (Exception e)
+                {
+                    // precation to possible exceptions
+                }
             }
             else
             {

@@ -168,9 +168,10 @@ public abstract class AbstractTask<R extends TaskRequest, T extends TaskResponse
 
 
     @Override
-    public boolean isSequential()
+    public int getNumberOfParallelTasks()
     {
-        return false;
+        //by default no limit for parallel tasks
+        return -1;
     }
 
 

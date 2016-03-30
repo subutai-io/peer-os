@@ -12,6 +12,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	var GRID_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
+	$scope.identity = angular.identity;
 
 	vm.popupLogState = 'full';
 
@@ -25,6 +26,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	vm.colors = quotaColors;
 	vm.templates = [];
+	vm.templatesList = [];
 
 	vm.activeCloudTab = 'templates';
 	vm.templatesType = 'all';
@@ -40,6 +42,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.buildEnvironmentByJoint = buildEnvironmentByJoint;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
+	vm.getFilteredTemplates = getFilteredTemplates;
 
 	vm.addContainer = addContainer;
 	vm.closePopup = closePopup;
@@ -48,10 +51,17 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	environmentService.getTemplates()
 		.then(function (data) {
 			vm.templates = data;
+			getFilteredTemplates();
 		});
-		//.error(function (data) {
-		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		//});
+
+	function getFilteredTemplates() {
+		vm.templatesList = [];
+		for(var i in vm.templates) {
+			if(vm.templatesType == 'all' || i == vm.templatesType) {
+				vm.templatesList = vm.templatesList.concat(vm.templates[i]);
+			}
+		}
+	}
 
 	function closePopup() {
 		vm.buildCompleted = false;
@@ -130,11 +140,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
+							var logsTextString = logTextTime[3];
+							if(logTextTime[4] !== undefined) {
+								logsTextString += logTextTime[4] + logTextTime[5];
+							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logTextTime[3]
+								"text": logsTextString
 							};
 							result.push(currentLog);
 
@@ -248,6 +262,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function notifyChanges() {
+		vm.buildCompleted = false;
+
 		vm.currentEnvironment.excludedContainersByQuota =
 			getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
 		vm.currentEnvironment.includedContainersByQuota =
@@ -256,7 +272,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 
@@ -315,7 +334,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-status.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 
 		vm.currentEnvironment.modifyStatus = 'modifying';
@@ -608,6 +630,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
 
+		vm.buildCompleted = false;
+
 		vm.newEnvID = [];		
 
 		var allElements = graph.getCells();
@@ -648,7 +672,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 
