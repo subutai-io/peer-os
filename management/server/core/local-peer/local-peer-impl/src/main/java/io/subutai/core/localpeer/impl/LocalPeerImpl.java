@@ -240,11 +240,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected void initPeerInfo()
     {
 
-        peerInfo = new PeerInfo();
+        peerInfo = new LocalPeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
         peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
-        peerInfo.setPort( SystemSettings.getPublicSecurePort() );
+        peerInfo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
         peerInfo.setName( String.format( "Peer %s on %s", peerInfo.getId(), SystemSettings.getPublicUrl() ) );
     }
 
@@ -252,7 +252,43 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void setPeerInfo( final PeerInfo peerInfo )
     {
-        this.peerInfo = peerInfo;
+        this.peerInfo.setId( peerInfo.getId() );
+        this.peerInfo.setName( peerInfo.getName() );
+        this.peerInfo.setOwnerId( peerInfo.getOwnerId() );
+        this.peerInfo.setPublicUrl( peerInfo.getPublicUrl() );
+        this.peerInfo.setPublicSecurePort( peerInfo.getPublicSecurePort() );
+    }
+
+
+    class LocalPeerInfo extends PeerInfo
+    {
+
+        @Override
+        public String getPublicUrl()
+        {
+            if ( SystemSettings.DEFAULT_PUBLIC_URL.equalsIgnoreCase( SystemSettings.getPublicUrl() ) )
+            {
+                return super.getPublicUrl();
+            }
+            else
+            {
+                return SystemSettings.getPublicUrl();
+            }
+        }
+
+
+        @Override
+        public int getPublicSecurePort()
+        {
+            if ( SystemSettings.DEFAULT_PUBLIC_SECURE_PORT == SystemSettings.getPublicSecurePort() )
+            {
+                return super.getPublicSecurePort();
+            }
+            else
+            {
+                return SystemSettings.getPublicSecurePort();
+            }
+        }
     }
 
 
@@ -692,10 +728,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             @Override
             public void handle( Task task, CloneRequest request, CloneResponse response ) throws Exception
             {
-                if ( response == null )
-                {
-                    throw new IllegalArgumentException( "Task response could not be null." );
-                }
+
+                Preconditions.checkNotNull( response, "Task response could not be null" );
+
 
                 try
                 {
@@ -1053,8 +1088,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
     }
 
+
     //TODO this is for basic environment via hub
-//    @RolesAllowed( "Environment-Management|Delete" )
+    //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
     {
@@ -2245,6 +2281,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
     }
+
 
     //todo check reserved net resource on system level
     @Override

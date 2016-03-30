@@ -138,8 +138,6 @@ public interface LocalPeer extends Peer
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 
-    void setPeerInfo( PeerInfo peerInfo );
-
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
@@ -164,5 +162,7 @@ public interface LocalPeer extends Peer
             throws PeerException;
 
     List<NetworkResource> listReservedNetworkResources() throws PeerException;
+
+    void setPeerInfo( PeerInfo peerInfo );
 }
 

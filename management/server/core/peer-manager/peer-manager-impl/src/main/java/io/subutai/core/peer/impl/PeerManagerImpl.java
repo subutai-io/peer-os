@@ -120,7 +120,7 @@ public class PeerManagerImpl implements PeerManager
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         localIpSetter = Executors.newSingleThreadScheduledExecutor();
-        localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 5, 5, TimeUnit.SECONDS );
+        localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 1, 1, TimeUnit.SECONDS );
     }
 
 
@@ -231,6 +231,7 @@ public class PeerManagerImpl implements PeerManager
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ), order );
+
             updatePeerData( peerData );
 
             Peer newPeer = constructPeerPojo( peerData );
@@ -287,10 +288,8 @@ public class PeerManagerImpl implements PeerManager
 
     protected void addPeerToRegistry( final Peer peer ) throws PeerException
     {
-        if ( peer == null )
-        {
-            throw new IllegalArgumentException( "Peer could not be null." );
-        }
+        Preconditions.checkNotNull( peer, "Peer could not be null." );
+
         this.peers.put( peer.getId(), peer );
     }
 
@@ -339,6 +338,12 @@ public class PeerManagerImpl implements PeerManager
         try
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
+
+            if ( localPeerId.equals( peerData.getId() ) )
+            {
+                localPeer.setPeerInfo(peerInfo);
+                return localPeer;
+            }
 
             return new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
                     messageResponseListener, provider );
@@ -1064,7 +1069,7 @@ public class PeerManagerImpl implements PeerManager
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
             peerInfo.setPublicUrl( publicUrl );
-            peerInfo.setPort( securePort );
+            peerInfo.setPublicSecurePort( securePort );
             peerData.setInfo( toJson( peerInfo ) );
             peerDataService.saveOrUpdate( peerData );
             Peer peer = constructPeerPojo( peerData );
@@ -1139,16 +1144,16 @@ public class PeerManagerImpl implements PeerManager
                     peerData.setInfo( toJson( peerInfo ) );
 
                     //modify local peer info
-                    localPeer.setPeerInfo( peerInfo );
+                    localPeer.getPeerInfo().setPublicUrl( peerInfo.getPublicUrl() );
+                    localPeer.getPeerInfo().setName( peerInfo.getName() );
 
-                    //save to db
+                    //update db
                     updatePeerData( peerData );
 
-                    Peer newPeer = constructPeerPojo( peerData );
-
-                    //add to cache
-                    addPeerToRegistry( newPeer );
-
+                    localIpSetter.shutdown();
+                }
+                else
+                {
                     localIpSetter.shutdown();
                 }
             }

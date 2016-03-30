@@ -247,13 +247,13 @@ public class LocalPeerImplTest
         localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, commandExecutor, hostRegistry,
                 monitor, securityManager ) );
 
+        localPeer.peerInfo = peerInfo;
         localPeer.resourceHostDataService = resourceHostDataService;
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
         localPeer.commandUtil = commandUtil;
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
-        localPeer.setPeerInfo( peerInfo );
         when( containerGateway.getContainerId() ).thenReturn( containerId );
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
