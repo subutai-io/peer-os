@@ -23,6 +23,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 
     //functions
     vm.urlFrom = urlFrom;
+    vm.editUrl = editUrl;
     vm.approveUrl = approveUrl;
     vm.updateConfigQuotas = updateConfigQuotas;
     vm.updateConfigUrls = updateConfigUrls;
@@ -31,6 +32,10 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.removeLocalUrl = removeLocalUrl;
     vm.autoSign = autoSign;
     vm.addUrl = addUrl;
+    vm.currentUrlObject = {};
+    vm.previousName = "";
+    vm.updateUrl = updateUrl;
+    vm.urlList = [];
 
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
@@ -52,6 +57,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         .withOption('createdRow', createdRow);
 
     vm.dtColumns = [
+        DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionEdit),
         DTColumnBuilder.newColumn('id').withTitle('ID'),
         DTColumnBuilder.newColumn('url').withTitle('URL'),
         DTColumnBuilder.newColumn('type').withTitle('Type').renderWith(getUrlType),
@@ -75,6 +81,16 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         return result;
     }
 
+    function actionEdit(data, type, full, meta) {
+        var result = '<span ></span>';
+        if (data.state == false) {
+            result = '<a href class="b-icon b-icon_edit" ng-click="settingsKurjunCtrl.editUrl( ' + data + ' )"></a>';
+        }
+
+        return result;
+    }
+
+
     function actionApprove(data, type, full, meta) {
         var approveButton = '<span ></span>';
         if (data.state == false) {
@@ -82,6 +98,17 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         }
         return approveButton;
     }
+
+    function editUrl(data) {
+        vm.currentUrl = url;
+        vm.currentType = type;
+        vm.currentId = id;
+        ngDialog.open({
+            template: "subutai-app/settingsKurjun/partials/editUrl.html",
+            scope: $scope
+        });
+    }
+
 
     function approveUrl(url, type, id) {
         vm.currentUrl = url;
@@ -180,6 +207,37 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
             scope: $scope
         });
     }
+
+    function updateUrl() {
+        if (vm.previousName !== vm.currentUrlObject.name) {
+            // if (checkIfExists (vm.currentUrlObject)) {
+            //     SweetAlert.swal ("ERROR!", "Operation already exists", "error");
+            //     return;
+            // }
+        }
+        if (vm.currentUrlObject.name === "" || vm.currentUrlObject.name === undefined) {
+            SweetAlert.swal("ERROR!", "Please enter operation name", "error");
+        }
+        genericSrv.updateOperation(vm.currentOperation).success(function (data) {
+            SweetAlert.swal("Success!", "Your operation was updated.", "success");
+            vm.getOperations();
+            ngDialog.closeAll();
+        }).error(function (error) {
+            SweetAlert.swal("ERROR!", "Operation update error: " + error.replace(/\\n/g, " "), "error");
+        });
+    }
+
+    // function checkIfExists(urlObject) {
+    //     var arr = [];
+    //     for (var i = 0; i < vm.operations.length; ++i) {
+    //         arr.push (vm.operations.operationName);
+    //     }
+    //     if (arr.indexOf (operation.operationName) > -1) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
+
 
     function addUrl(newUrl) {
         var postData = 'url=' + newUrl.name + '&type=' + newUrl.type;
