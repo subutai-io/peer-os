@@ -77,7 +77,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.LocalPeerInfo;
 import io.subutai.common.peer.NetworkResource;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
@@ -241,7 +240,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected void initPeerInfo()
     {
 
-        peerInfo = new LocalPeerInfo();
+        peerInfo = new PeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
         peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
@@ -317,6 +316,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             throw new PeerException( "Peer info unavailable." );
         }
+
         return peerInfo;
     }
 
