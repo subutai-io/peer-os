@@ -30,6 +30,6 @@ And the user clicks on the menu item: Environments
 And the user creates environment using template: Casandra
 Then the user destroys created environment
 
-Scenario: the user should unregister peer
+Scenario: the user should unregister Peer
 When the user clicks on the menu item: Peer Registration
 Then the user unregister peer
