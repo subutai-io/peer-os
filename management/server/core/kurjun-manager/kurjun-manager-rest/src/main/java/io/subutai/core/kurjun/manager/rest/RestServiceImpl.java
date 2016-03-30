@@ -56,6 +56,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response update( final String id, final String url )
+    {
+        return null;
+    }
+
+
+    @Override
     public Response getSignedMessage( final String signedMsg, final String id )
     {
         //        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )

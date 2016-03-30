@@ -26,6 +26,11 @@ public interface RestService
     public Response register( @FormParam( "id" ) String id );
 
     @POST
+    @Path( "update" )
+    @Produces( { MediaType.TEXT_PLAIN } )
+    public Response update( @FormParam( "id" ) String id, @FormParam( "url" ) String url  );
+
+    @POST
     @Path( "signed-msg" )
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg, @FormParam( "id" ) String id );

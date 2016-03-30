@@ -82,9 +82,10 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     function actionEdit(data, type, full, meta) {
+        vm.urlList[data.id] = data;
         var result = '<span ></span>';
         if (data.state == false) {
-            result = '<a href class="b-icon b-icon_edit" ng-click="settingsKurjunCtrl.editUrl( ' + data + ' )"></a>';
+            result = '<a href class="b-icon b-icon_edit" ng-click="settingsKurjunCtrl.editUrl( ' + data.id + ' )"></a>';
         }
 
         return result;
@@ -99,10 +100,9 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         return approveButton;
     }
 
-    function editUrl(data) {
-        vm.currentUrl = url;
-        vm.currentType = type;
-        vm.currentId = id;
+    function editUrl(id) {
+        vm.currentUrlObject = vm.urlList[id];
+        vm.previousName = vm.currentUrlObject.url;
         ngDialog.open({
             template: "subutai-app/settingsKurjun/partials/editUrl.html",
             scope: $scope
@@ -209,30 +209,32 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     function updateUrl() {
-        if (vm.previousName !== vm.currentUrlObject.name) {
+        if (vm.previousName !== vm.currentUrlObject.url) {
             // if (checkIfExists (vm.currentUrlObject)) {
             //     SweetAlert.swal ("ERROR!", "Operation already exists", "error");
             //     return;
             // }
         }
-        if (vm.currentUrlObject.name === "" || vm.currentUrlObject.name === undefined) {
+        if (vm.currentUrlObject.url === "" || vm.currentUrlObject.url === undefined) {
             SweetAlert.swal("ERROR!", "Please enter operation name", "error");
         }
-        genericSrv.updateOperation(vm.currentOperation).success(function (data) {
-            SweetAlert.swal("Success!", "Your operation was updated.", "success");
-            vm.getOperations();
+
+        var postData = 'id=' + vm.currentUrlObject.id + '&url=' + vm.currentUrlObject.url;
+
+        SettingsKurjunSrv.updateUrl(postData).success(function (data) {
+            SweetAlert.swal("Success!", " Url was updated.", "success");
             ngDialog.closeAll();
         }).error(function (error) {
-            SweetAlert.swal("ERROR!", "Operation update error: " + error.replace(/\\n/g, " "), "error");
+            SweetAlert.swal("ERROR!", "Url update error: " + error.replace(/\\n/g, " "), "error");
         });
     }
 
     // function checkIfExists(urlObject) {
     //     var arr = [];
-    //     for (var i = 0; i < vm.operations.length; ++i) {
-    //         arr.push (vm.operations.operationName);
+    //     for (var i = 0; i < vm.urlList.length; ++i) {
+    //         arr.push (vm.urlList.url);
     //     }
-    //     if (arr.indexOf (operation.operationName) > -1) {
+    //     if (arr.indexOf (urlObject.url) > -1) {
     //         return true;
     //     }
     //     return false;
