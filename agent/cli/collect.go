@@ -18,13 +18,12 @@ import (
 )
 
 var (
-	traff       = []string{"in", "out"}
-	cgtype      = []string{"cpuacct", "memory"}
-	metrics     = []string{"total", "used", "available"}
-	btrfsmounts = []string{"rootfs", "home", "var", "opt"}
-	cpu         = []string{"user", "nice", "system", "idle", "iowait"}
-	lxcmemory   = map[string]bool{"cache": true, "rss": true, "Cached": true, "MemFree": true}
-	memory      = map[string]bool{"Active": true, "Buffers": true, "Cached": true, "MemFree": true}
+	traff     = []string{"in", "out"}
+	cgtype    = []string{"cpuacct", "memory"}
+	metrics   = []string{"total", "used", "available"}
+	cpu       = []string{"user", "nice", "system", "idle", "iowait"}
+	lxcmemory = map[string]bool{"cache": true, "rss": true, "Cached": true, "MemFree": true}
+	memory    = map[string]bool{"Active": true, "Buffers": true, "Cached": true, "MemFree": true}
 )
 
 var (
