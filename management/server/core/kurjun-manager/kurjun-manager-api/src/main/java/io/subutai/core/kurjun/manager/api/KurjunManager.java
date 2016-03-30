@@ -13,11 +13,11 @@ public interface KurjunManager
 {
 
     //****************************************
-    String registerUser( String url, int kurjunType );
+    String registerUser( int id );
 
 
     //****************************************
-    String authorizeUser( String url, int kurjunType, String signedMessage );
+    String authorizeUser( int id, String signedMessage );
 
 
     //****************************************
@@ -29,7 +29,7 @@ public interface KurjunManager
 
 
     //****************************************
-    String getUser( String url, int kurjunType );
+    String getUser( int id );
 
 
     //****************************************

@@ -40,51 +40,33 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response register( final String url, final int type )
+    public Response register( final String id )
     {
         String authId = "";
-        if ( Strings.isNullOrEmpty( kurjunManager.getUser( url, type ) ) )
+        if ( Strings.isNullOrEmpty( kurjunManager.getUser( Integer.parseInt( id ) ) ) )
         {
-            authId = kurjunManager.registerUser( url, type );
+            authId = kurjunManager.registerUser( Integer.parseInt( id ) );
         }
         else
         {
-            authId = kurjunManager.getDataService().getKurjunData( url ).getAuthID();
+            authId = kurjunManager.getDataService().getKurjunData( id ).getAuthID();
         }
         return Response.status( Response.Status.OK ).entity( authId ).build();
     }
 
 
     @Override
-    public Response getSignedMessage( final String signedMsg, final String url, final int type )
+    public Response getSignedMessage( final String signedMsg, final String id )
     {
-
-//        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )
-//        {
-////            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-//            return Response.status( Response.Status.OK ).build();
-//        }
-//        else
-//        {
-            return Response.status( Response.Status.OK ).build();
-//        }
-    }
-
-
-    @Override
-    public Response getTemplates()
-    {
-        WebClient client = RestUtil.createTrustedWebClient( "https://peer.noip.me:8339/kurjun/rest/template/list" );
-        Response response = client.get();
-
-        if ( response.getStatus() == HttpStatus.SC_OK )
-        {
-            return Response.status( Response.Status.OK ).entity( response.readEntity( String.class ) ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
+        //        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )
+        //        {
+        ////            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        //            return Response.status( Response.Status.OK ).build();
+        //        }
+        //        else
+        //        {
+        return Response.status( Response.Status.OK ).build();
+        //        }
     }
 
 
@@ -100,9 +82,8 @@ public class RestServiceImpl implements RestService
         catch ( ConfigurationException e )
         {
             LOG.error( "Error in saving URL:" + e.getMessage() );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity(e.getMessage()).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
         }
-
     }
 
 

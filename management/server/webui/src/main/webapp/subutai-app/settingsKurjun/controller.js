@@ -13,6 +13,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.uid = '';
     vm.currentUrl = '';
     vm.currentType = '';
+    vm.currentId = '';
 
     vm.urlsType = {
         1: "Local",
@@ -77,16 +78,17 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     function actionApprove(data, type, full, meta) {
         var approveButton = '<span ></span>';
         if (data.state == false) {
-            approveButton = '<a href class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.approveUrl(\'' + data.url + '\', \'' + data.type + '\')">Register</a>';
+            approveButton = '<a href class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.approveUrl(\'' + data.id + '\', \'' + data.type + '\', \'' + data.id + '\')">Register</a>';
         }
         return approveButton;
     }
 
-    function approveUrl(url, type) {
+    function approveUrl(url, type, id) {
         vm.currentUrl = url;
         vm.currentType = type;
+        vm.currentId = id;
         LOADING_SCREEN();
-        SettingsKurjunSrv.registerUrl(url, type).success(function (data) {
+        SettingsKurjunSrv.registerUrl(id).success(function (data) {
             vm.uid = data;
             if (vm.uid) {
                 //$('#js-uid-sign-area').addClass('bp-sign-target');
@@ -105,7 +107,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 
     function autoSign() {
         LOADING_SCREEN();
-        SettingsKurjunSrv.signedMsg(vm.currentUrl, vm.currentType, vm.uid).success(function (data) {
+        SettingsKurjunSrv.signedMsg(vm.currentId, vm.uid).success(function (data) {
             if (Object.keys(vm.dtInstance).length !== 0) {
                 vm.dtInstance.reloadData(null, false);
             }

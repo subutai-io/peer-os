@@ -23,23 +23,16 @@ public interface RestService
     @POST
     @Path( "register" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response register( @FormParam( "url" ) String url, @FormParam( "type" ) int type );
+    public Response register( @FormParam( "id" ) String id );
 
     @POST
     @Path( "signed-msg" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg, @FormParam( "url" ) String url,
-                                      @FormParam( "type" ) int type );
-
-    @GET
-    @Path( "template/list" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getTemplates();
+    public Response getSignedMessage( @FormParam( "signedMsg" ) String signedMsg, @FormParam( "id" ) String id );
 
 
     @POST
     @Path( "url/add" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response addUrl(@FormParam( "url" ) String url,
-                           @FormParam( "type" ) String type);
+    public Response addUrl( @FormParam( "url" ) String url, @FormParam( "type" ) String type );
 }
