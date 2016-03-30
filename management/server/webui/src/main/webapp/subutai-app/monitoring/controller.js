@@ -3,9 +3,9 @@
 angular.module('subutai.monitoring.controller', [])
 	.controller('MonitoringCtrl', MonitoringCtrl);
 
-MonitoringCtrl.$inject = ['$scope', '$timeout', 'monitoringSrv', 'cfpLoadingBar', '$http'];
+MonitoringCtrl.$inject = ['$scope', 'monitoringSrv', 'cfpLoadingBar'];
 
-function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar, $http) {
+function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar) {
 
 	var vm = this;
 
@@ -50,6 +50,11 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar, $http) {
 		vm.selectedEnvironment = '';
 		vm.currentHost = '';
 		vm.currentType = type;
+
+		if( type == 'management' )
+		{
+			getServerData();
+		}
 	}
 
 	function showContainers(environmentId) {
@@ -63,9 +68,18 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar, $http) {
 	}
 
 	function getServerData() {
-		if (vm.period > 0 && vm.currentHost) {
+		if (vm.period > 0 && ( vm.currentHost || vm.currentType == 'management' )) {
 			LOADING_SCREEN();
-			monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
+			var env = vm.selectedEnvironment;
+			var host = vm.currentHost;
+
+			if( vm.currentType == 'management' )
+			{
+				env = "";
+				host = "management";
+			}
+
+			monitoringSrv.getInfo(env, host, vm.period).success(function (data) {
 
 				vm.charts = [];
 				if(data['Metrics']) {
