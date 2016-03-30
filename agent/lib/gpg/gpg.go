@@ -14,13 +14,9 @@ import (
 	"time"
 )
 
-const (
-	gnupg = "gpg"
-)
-
 //import PK gpg2 --import pubkey.key
 func ImportPk(file string) string {
-	command := exec.Command("/bin/bash", "-c", gnupg+" --import "+file)
+	command := exec.Command("/bin/bash", "-c", "gpg --import "+file)
 	out, err := command.CombinedOutput()
 	log.Check(log.WarnLevel, "Importing MH public key", err)
 	return string(out)
@@ -71,7 +67,7 @@ func DecryptWrapper(message string) string {
 }
 
 func EncryptWrapper(user string, recipient string, message string) string {
-	gpg_C := gnupg + " --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --armor -u " + user + " -r " + recipient + " --sign --encrypt --no-tty"
+	gpg_C := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --armor -u " + user + " -r " + recipient + " --sign --encrypt --no-tty"
 	command := exec.Command("/bin/bash", "-c", gpg_C)
 	stdin, _ := command.StdinPipe()
 	stdin.Write([]byte(message))
@@ -85,7 +81,7 @@ func EncryptWrapper(user string, recipient string, message string) string {
 	return string(output)
 }
 func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) string {
-	gpg_C := gnupg + " --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --no-default-keyring --keyring " + pub + " --secret-keyring " + sec + " --armor -u " + user + "@subutai.io -r " + recipient + " --sign --encrypt --no-tty"
+	gpg_C := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --no-default-keyring --keyring " + pub + " --secret-keyring " + sec + " --armor -u " + user + "@subutai.io -r " + recipient + " --sign --encrypt --no-tty"
 	command := exec.Command("/bin/bash", "-c", gpg_C)
 	stdin, _ := command.StdinPipe()
 	stdin.Write([]byte(message))
@@ -98,7 +94,7 @@ func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) s
 
 func ImportMHKeyNoDefaultKeyring(cont string) {
 	pub := config.Agent.LxcPrefix + cont + "/public.pub"
-	gpg_C := gnupg + " --no-default-keyring --keyring " + pub + " --import epub.key"
+	gpg_C := "gpg --no-default-keyring --keyring " + pub + " --import epub.key"
 	command := exec.Command("/bin/bash", "-c", gpg_C)
 	status, err := command.CombinedOutput()
 	log.Check(log.WarnLevel, "Importing Management Host Key "+string(status), err)
