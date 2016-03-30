@@ -22,4 +22,8 @@ public interface NetworkSettings
     public int getAgentPort();
 
     public void setAgentPort( final int agentPort );
+
+    public int getPublicSecurePort();
+
+    public void setPublicSecurePort( final int publicSecurePort );
 }
