@@ -77,6 +77,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.LocalPeerInfo;
 import io.subutai.common.peer.NetworkResource;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
@@ -257,38 +258,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.peerInfo.setOwnerId( peerInfo.getOwnerId() );
         this.peerInfo.setPublicUrl( peerInfo.getPublicUrl() );
         this.peerInfo.setPublicSecurePort( peerInfo.getPublicSecurePort() );
-    }
-
-
-    class LocalPeerInfo extends PeerInfo
-    {
-
-        @Override
-        public String getPublicUrl()
-        {
-            if ( SystemSettings.DEFAULT_PUBLIC_URL.equalsIgnoreCase( SystemSettings.getPublicUrl() ) )
-            {
-                return super.getPublicUrl();
-            }
-            else
-            {
-                return SystemSettings.getPublicUrl();
-            }
-        }
-
-
-        @Override
-        public int getPublicSecurePort()
-        {
-            if ( SystemSettings.DEFAULT_PUBLIC_SECURE_PORT == SystemSettings.getPublicSecurePort() )
-            {
-                return super.getPublicSecurePort();
-            }
-            else
-            {
-                return SystemSettings.getPublicSecurePort();
-            }
-        }
     }
 
 
