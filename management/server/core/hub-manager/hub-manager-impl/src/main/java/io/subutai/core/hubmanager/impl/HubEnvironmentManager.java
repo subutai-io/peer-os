@@ -23,15 +23,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
-import com.google.common.collect.Sets;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
@@ -42,7 +45,6 @@ import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -285,11 +287,13 @@ public class HubEnvironmentManager
         Set<Node> nodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-            Node node =
-                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0,
-                            0, peerDto.getPeerId(), nodeDto.getHostId() );
-            nodes.add( node );
+            if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+            {
+                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
+                Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(),
+                        contSize, 0, 0, peerDto.getPeerId(), nodeDto.getHostId() );
+                nodes.add( node );
+            }
         }
 
         ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
@@ -362,6 +366,13 @@ public class HubEnvironmentManager
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
                         nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
                         nodeDto.setHostName( cloneResponse.getHostname() );
+                        nodeDto.setState( ContainerStateDto.RUNNING );
+
+                        Set<Host> hosts = new HashSet<>();
+                        Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
+                        hosts.add( host );
+                        String sshKey = createSshKey( hosts );
+                        nodeDto.addSshKey( sshKey );
                     }
                 }
             }
@@ -374,202 +385,119 @@ public class HubEnvironmentManager
     }
 
 
-    public void configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws EnvironmentManagerException
+    public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
+            throws EnvironmentManagerException
     {
-        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-        Set<String> sshKeys = new HashSet<>();
-        for ( SSHKeyDto sshKeyDto : env.getSshKeys() )
+
+        final EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        final LocalPeer localPeer = peerManager.getLocalPeer();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        final EnvironmentId environmentId = new EnvironmentId( env.getId() );
+        final Set<String> sshKeys = new HashSet<>();
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
-            sshKeys.add( sshKeyDto.getSshKey() );
-        }
-        Set<Host> hosts = getLocalPeerHosts( envDto );
-        addSshKeys( hosts, sshKeys );
-
-        Set<Host> succeededHosts = Sets.newHashSet();
-        Set<Host> failedHosts = Sets.newHashSet( hosts );
-
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getConfigSSHCommand(), hosts );
-
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
-        {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() )
+            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
-                succeededHosts.add( host );
+                sshKeys.addAll( nodeDto.getSshKeys() );
             }
         }
 
-        failedHosts.removeAll( succeededHosts );
-
-        for ( Host failedHost : failedHosts )
+        completionService.submit( new Callable<Peer>()
         {
-            LOG.error( String.format( "Failed to configure ssh on host %s", failedHost.getHostname() ) );
-        }
+            @Override
+            public Peer call() throws Exception
+            {
+                localPeer.configureSshInEnvironment( environmentId, new SshPublicKeys( sshKeys ) );
+                return localPeer;
+            }
+        } );
 
-        if ( !failedHosts.isEmpty() )
+        try
         {
-            throw new EnvironmentManagerException( "Failed to configure ssh on all hosts" );
+            Future<Peer> f = completionService.take();
+            f.get();
+
+            for ( SSHKeyDto sshKeyDto : env.getSshKeys() )
+            {
+                sshKeyDto.addConfiguredPeer( localPeer.getId() );
+            }
         }
+        catch ( Exception e )
+        {
+            LOG.error( "Failed to register ssh keys on peer: " + localPeer.getId(), e );
+        }
+        return peerDto;
     }
 
 
     public void configureHash( EnvironmentDto envDto ) throws EnvironmentManagerException
     {
-        Set<Host> hosts = getLocalPeerHosts( envDto );
-        Map<Host, CommandResult> results = commandUtil
-                .executeParallelSilent( getAddIpHostToEtcHostsCommand( Common.DEFAULT_DOMAIN_NAME, hosts ), hosts );
+        final LocalPeer localPeer = peerManager.getLocalPeer();
 
-        Set<Host> succeededHosts = Sets.newHashSet();
+        final EnvironmentId environmentId = new EnvironmentId( envDto.getId() );
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        final Map<String, String> hostAddresses = Maps.newHashMap();
+
+        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
+        {
+            for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+            {
+                hostAddresses.put( nodeDto.getHostName(), nodeDto.getIp() );
+            }
+        }
+        completionService.submit( new Callable<Peer>()
+        {
+            @Override
+            public Peer call() throws Exception
+            {
+                localPeer.configureHostsInEnvironment( environmentId, new HostAddresses( hostAddresses ) );
+                return localPeer;
+            }
+        } );
+
+        try
+        {
+            Future<Peer> f = completionService.take();
+            f.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Problems registering hosts in peer: " + localPeer.getId(), e );
+        }
+    }
+
+
+    public String createSshKey( Set<Host> hosts )
+    {
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
+
         for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
         {
             CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() )
+            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
             {
-                succeededHosts.add( host );
+                return result.getStdOut();
             }
             else
             {
                 LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
             }
         }
-
-        hosts.removeAll( succeededHosts );
-
-        for ( Host failedHost : hosts )
-        {
-            LOG.error( String.format( "Host registration failed on host %s", failedHost.getHostname() ) );
-        }
-
-        if ( !hosts.isEmpty() )
-        {
-            throw new EnvironmentManagerException( "Failed to register all hosts" );
-        }
+        return null;
     }
 
 
-    private Set<Host> getLocalPeerHosts( EnvironmentDto envDto )
+    public RequestBuilder getCreateNReadSSHCommand()
     {
-        LocalPeer localPeer = peerManager.getLocalPeer();
-        Set<Host> hosts = Sets.newHashSet();
-
-        for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
-        {
-            if ( nodesDto.getPeerId().equals( localPeer.getId() ) )
-            {
-                for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
-                {
-                    try
-                    {
-                        hosts.add( localPeer.getContainerHostById( nodeDto.getHostName() ) );
-                    }
-                    catch ( HostNotFoundException e )
-                    {
-                        LOG.error( "Could not get Host: " + nodeDto.getHostId() );
-                    }
-                }
-            }
-        }
-        return hosts;
-    }
-
-
-    protected void addSshKeys( Set<Host> hosts, Set<String> keys ) throws EnvironmentManagerException
-    {
-        //send key in portions, since all can not fit into one command, it fails
-        int i = 0;
-        StringBuilder keysString = new StringBuilder();
-        for ( String key : keys )
-        {
-            keysString.append( key );
-            i++;
-            //send next 5 keys
-            if ( i % 5 == 0 || i == keys.size() )
-            {
-                Set<Host> succeededHosts = Sets.newHashSet();
-                Set<Host> failedHosts = Sets.newHashSet( hosts );
-
-                Map<Host, CommandResult> results =
-                        commandUtil.executeParallelSilent( getAppendSshKeysCommand( keysString.toString() ), hosts );
-
-                keysString.setLength( 0 );
-
-                for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
-                {
-                    CommandResult result = resultEntry.getValue();
-                    Host host = resultEntry.getKey();
-
-                    if ( result.hasSucceeded() )
-                    {
-                        succeededHosts.add( host );
-                    }
-                }
-
-                failedHosts.removeAll( succeededHosts );
-
-                for ( Host failedHost : failedHosts )
-                {
-                    LOG.error( String.format( "Failed to add ssh keys on host %s", failedHost.getHostname() ) );
-                }
-
-                if ( !failedHosts.isEmpty() )
-                {
-                    throw new EnvironmentManagerException( "Failed to add ssh keys on all hosts" );
-                }
-            }
-        }
-    }
-
-
-    public RequestBuilder getAppendSshKeysCommand( String keys )
-    {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && " +
-                "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
-    }
-
-
-    public RequestBuilder getConfigSSHCommand()
-    {
-        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
-                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
-                "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
-    }
-
-
-    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<Host> containerHosts )
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-
-        for ( Host host : containerHosts )
-        {
-            String ip = host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
-            String hostname = host.getHostname();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( domainName ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
-        }
-
-        if ( cleanHosts.length() > 0 )
-        {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
-        }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
-
-        return new RequestBuilder( appendHosts.toString() );
+        return new RequestBuilder( String.format( "rm -rf %1$s && " +
+                        "mkdir -p %1$s && " +
+                        "chmod 700 %1$s && " +
+                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
@@ -616,6 +544,7 @@ public class HubEnvironmentManager
             return peer.setupTunnels( tunnels, environmentId );
         }
     }
+
 
     public EnvironmentManager getEnvironmentManager()
     {

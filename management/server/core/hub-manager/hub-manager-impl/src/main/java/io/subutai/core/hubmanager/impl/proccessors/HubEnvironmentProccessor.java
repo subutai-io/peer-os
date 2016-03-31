@@ -139,11 +139,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     buildContainers( peerDto );
                     environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
-                case CONFIGURE_SSH:
+                case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
                     break;
-                case DESTROY_CONTAINER:
-                    destroyContainers( peerDto );
+                case DELETE_PEER:
+                    deletePeer( peerDto );
                     break;
             }
         }
@@ -299,12 +299,16 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
 
-            hubEnvironmentManager.configureSsh( peerDto, environmentDto );
+            peerDto = hubEnvironmentManager.configureSsh( peerDto, environmentDto );
             hubEnvironmentManager.configureHash( environmentDto );
 
             WebClient clientUpdate =
                     configManager.getTrustedWebClientWithAuth( configContainer, configManager.getHubIp() );
-            Response response = clientUpdate.put( null );
+
+            byte[] cborData = JsonUtil.toCbor( peerDto );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+            Response response = clientUpdate.put( encryptedData );
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "SSH configuration successfully done" );
@@ -315,6 +319,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             LOG.error( "Could not configure SSH/Hash", e );
         }
     }
+
 
     private EnvironmentNodesDto setupVEHS( final EnvironmentNodesDto updatedNodes, EnvironmentPeerDto peerDto )
     {
@@ -453,10 +458,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     }
 
 
-    private void destroyContainers( EnvironmentPeerDto peerDto )
+    private void deletePeer( EnvironmentPeerDto peerDto )
     {
         String containerDestroyStateURL =
-                String.format( "/rest/v1/environments/%s/destroy", peerDto.getEnvironmentInfo().getId() );
+                String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
+                        peerDto.getPeerId() );
 
         LocalPeer localPeer = peerManager.getLocalPeer();
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
@@ -464,19 +470,18 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
             localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
-
             WebClient client =
                     configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
-            Response response = client.put( null );
+            Response response = client.delete();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Container destroyed successfully" );
+                LOG.debug( "Environment cleaned successfully" );
             }
         }
         catch ( Exception e )
         {
 
-            LOG.error( "Could not destroy container", e );
+            LOG.error( "Could not clean environment", e );
         }
     }
 

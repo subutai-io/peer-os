@@ -20,6 +20,7 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
  * {@link EnvironmentDataService} implements {@link io.subutai.common.protocol.api.DataService} interface. {@link
  * EnvironmentDataService} manages {@link io.subutai.core.environment.impl.entity.EnvironmentImpl} entity in database
  */
+//todo since env metadata is saved correctly now, return new EM in every call
 public class EnvironmentDataService implements DataService<String, EnvironmentImpl>
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDataService.class );

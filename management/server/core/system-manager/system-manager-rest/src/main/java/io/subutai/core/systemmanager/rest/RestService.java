@@ -84,7 +84,8 @@ public interface RestService
                                         @FormParam( "securePortX2" ) String securePortX2,
                                         @FormParam( "securePortX3" ) String securePortX3,
                                         @FormParam( "publicUrl" ) String publicUrl,
-                                        @FormParam( "agentPort" ) String agentPort ) throws ConfigurationException;
+                                        @FormParam( "agentPort" ) String agentPort,
+                                        @FormParam( "publicSecurePort" ) String publicSecurePort ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )

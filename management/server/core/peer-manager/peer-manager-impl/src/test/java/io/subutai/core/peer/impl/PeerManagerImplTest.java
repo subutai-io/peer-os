@@ -117,7 +117,7 @@ public class PeerManagerImplTest
 
 
         //        when( peerManager.loadPeerData( PEER_ID ) ).thenReturn( localPeerData );
-        peerManager.addPeer( localPeer );
+        peerManager.addPeerToRegistry( localPeer );
         //        peerManager.peerDAO = peerDAO;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         //        doNothing().when( peerManager ).initPeerInfo();

@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.kurjun.manager.api.dao.*;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
-import io.subutai.core.kurjun.manager.api.model.KurjunConfig;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 
 
@@ -217,24 +216,25 @@ public class KurjunDataServiceImpl implements KurjunDataService
 
 
     @Override
-    public void persistKurjunConfig( final KurjunConfig item )
+    public Kurjun getKurjunData( final int id )
     {
-        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        EntityManager em = daoManager.getEntityManagerFromFactory();
 
+        Kurjun result = null;
         try
         {
             daoManager.startTransaction( em );
-            em.merge( item );
+            result = em.find( KurjunEntity.class, id );
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            LOG.error( "ConfigDataService saveProfile:" + e.toString() );
         }
         finally
         {
             daoManager.closeEntityManager( em );
         }
+        return result;
     }
 }

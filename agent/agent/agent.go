@@ -20,7 +20,7 @@ import (
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
-	cont "github.com/subutai-io/base/agent/lib/container"
+	// cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -56,12 +56,10 @@ func initAgent() {
 	// move .gnupg dir to app home
 	os.Setenv("GNUPGHOME", config.Agent.DataPrefix+".gnupg")
 
-	if cont.State("management") == "STOPPED" {
-		cont.Start("management")
-	}
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()
+	connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
 }
 
 func Start(c *cli.Context) {
@@ -76,7 +74,6 @@ func Start(c *cli.Context) {
 	go alert.AlertProcessing()
 
 	for {
-		Instance()
 		if heartbeat() {
 			time.Sleep(30 * time.Second)
 		} else {
@@ -177,7 +174,6 @@ func execute(rsp executer.EncRequest) {
 		log.Info("Getting public keyring", "keyring", keyring)
 		md = gpg.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
 	}
-
 	i := strings.Index(md, "{")
 	j := strings.LastIndex(md, "}") + 1
 	if i > j && i > 0 {
@@ -234,8 +230,7 @@ func tlsConfig() *http.Client {
 	}
 
 	transport := &http.Transport{TLSClientConfig: tlsconfig}
-	client := &http.Client{Transport: transport, Timeout: time.Second * 30}
-	return client
+	return &http.Client{Transport: transport, Timeout: time.Second * 30}
 }
 
 func response(msg []byte) {
