@@ -322,6 +322,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 						}
 					);
 
+					var destroyEnvEvent = new CustomEvent('destroyEnvironment', {'detail': environmentId});
+					document.getElementById('js-environment-creation').dispatchEvent(destroyEnvEvent);
+
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						loadEnvironments();
@@ -546,13 +549,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			'type': 'TINY'
 		};
 		return defaultVal;
-	}
-
-	function clearWorkspace() {
-		vm.isEditing = false;
-		vm.cubeGrowth = 0;
-		vm.templateGrid = [];
-		graph.resetCells();
 	}
 
 	function getQuotaColor(quotaSize) {

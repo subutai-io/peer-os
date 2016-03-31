@@ -680,6 +680,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		});
 	}
 
+	document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+		if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
+			clearWorkspace();
+			vm.currentEnvironment = {};
+		}
+	}, false);
+
 	function editEnvironment(environment) {
 		clearWorkspace();
 		vm.isApplyingChanges = false;
@@ -714,6 +721,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.cubeGrowth = 0;
 		vm.templateGrid = [];
 		graph.resetCells();
+		vm.environment2BuildName = '';
 	}
 
 	function addSettingsToTemplate(settings) {
