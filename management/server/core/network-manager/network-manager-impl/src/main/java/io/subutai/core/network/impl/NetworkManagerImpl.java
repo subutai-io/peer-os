@@ -25,7 +25,6 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
@@ -175,11 +174,19 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void setupTunnel( final int tunnelId, final String tunnelIp ) throws NetworkManagerException
     {
+        setupTunnel( getManagementHost(), tunnelId, tunnelIp );
+    }
+
+
+    @Override
+    public void setupTunnel( final Host host, final int tunnelId, final String tunnelIp ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ), "Invalid tunnel ip" );
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
 
-        execute( getManagementHost(),
-                commands.getSetupTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp,
-                        TUNNEL_TYPE ) );
+        execute( host, commands.getSetupTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp,
+                TUNNEL_TYPE ) );
     }
 
 
@@ -196,9 +203,16 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<Tunnel> listTunnels() throws NetworkManagerException
     {
+        return listTunnels( getManagementHost() );
+    }
+
+
+    @Override
+    public Set<Tunnel> listTunnels( final Host host ) throws NetworkManagerException
+    {
         Set<Tunnel> tunnels = Sets.newHashSet();
 
-        CommandResult result = execute( getManagementHost(), commands.getListTunnelsCommand() );
+        CommandResult result = execute( host, commands.getListTunnelsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -224,11 +238,21 @@ public class NetworkManagerImpl implements NetworkManager
     public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final String environmentId )
             throws NetworkManagerException
     {
+        setupVniVLanMapping( getManagementHost(), tunnelId, vni, vLanId, environmentId );
+    }
+
+
+    @Override
+    public void setupVniVLanMapping( final Host host, final int tunnelId, final long vni, final int vLanId,
+                                     final String environmentId ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
-        execute( getManagementHost(),
+        execute( host,
                 commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
                         environmentId ) );
     }
@@ -251,9 +275,18 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException
     {
+        return getVniVlanMappings( getManagementHost() );
+    }
+
+
+    @Override
+    public Set<VniVlanMapping> getVniVlanMappings( final Host host ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+
         Set<VniVlanMapping> mappings = Sets.newHashSet();
 
-        CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
+        CommandResult result = execute( host, commands.getListVniVlanMappingsCommand() );
 
         Pattern p = Pattern.compile( String.format(
                         "\\s*(%s\\d+)\\s*(\\d+)\\s*(\\d+)\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"

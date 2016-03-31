@@ -158,11 +158,6 @@ public interface LocalPeer extends Peer
 
     public void exchangeMhKeysWithRH() throws Exception;
 
-    void reserveNetworkResource( String environmentId, long vni, String p2pSubnet, String containerSubnet )
-            throws PeerException;
-
-    List<NetworkResource> listReservedNetworkResources() throws PeerException;
-
     void setPeerInfo( PeerInfo peerInfo );
 }
 

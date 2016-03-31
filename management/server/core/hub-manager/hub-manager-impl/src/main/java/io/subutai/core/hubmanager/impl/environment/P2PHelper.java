@@ -1,7 +1,6 @@
 package io.subutai.core.hubmanager.impl.environment;
 
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
@@ -9,11 +8,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.google.common.collect.ImmutableMap;
-
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 
 
@@ -39,19 +37,22 @@ class P2PHelper extends Helper
     {
         log.debug( "P2P Tunnel Setup - START" );
 
-        Map<String, String> tunnels = ImmutableMap.of( localPeer.getId(), dto.getP2pIp() );
+        P2pIps p2pIps = new P2pIps();
+
+        if ( p2pIps.isEmpty() )
+        {
+            return;
+        }
 
         ExecutorService tunnelExecutor = Executors.newSingleThreadScheduledExecutor();
 
-        ExecutorCompletionService<Integer> tunnelCompletionService = new ExecutorCompletionService( tunnelExecutor );
+        ExecutorCompletionService<Boolean> tunnelCompletionService = new ExecutorCompletionService( tunnelExecutor );
 
-        tunnelCompletionService.submit( new SetupTunnelTask( localPeer, dto.getEnvironmentId(), tunnels ) );
+        tunnelCompletionService.submit( new SetupTunnelTask( localPeer, dto.getEnvironmentId(), p2pIps ) );
 
-        Future<Integer> f2 = tunnelCompletionService.take();
+        Future<Boolean> f2 = tunnelCompletionService.take();
 
-        Integer vlanid = f2.get();
-
-        log.debug( "vlanid: {}", vlanid );
+        f2.get();
 
         tunnelExecutor.shutdown();
 
@@ -83,25 +84,27 @@ class P2PHelper extends Helper
     }
 
 
-    private class SetupTunnelTask implements Callable<Integer>
+    private class SetupTunnelTask implements Callable<Boolean>
     {
         private final Peer peer;
         private final String environmentId;
-        private final Map<String, String> tunnels;
+        private final P2pIps p2pIps;
 
 
-        public SetupTunnelTask( final Peer peer, final String environmentId, final Map<String, String> tunnels )
+        public SetupTunnelTask( final Peer peer, final String environmentId, final P2pIps p2pIps )
         {
             this.peer = peer;
             this.environmentId = environmentId;
-            this.tunnels = tunnels;
+            this.p2pIps = p2pIps;
         }
 
 
         @Override
-        public Integer call() throws Exception
+        public Boolean call() throws Exception
         {
-            return peer.setupTunnels( tunnels, environmentId );
+            peer.setupTunnels( p2pIps, environmentId );
+
+            return true;
         }
     }
 

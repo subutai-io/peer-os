@@ -2,7 +2,6 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,9 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
@@ -256,25 +258,25 @@ public class HubEnvironmentManager
     public void setupTunnel( EnvironmentDto environmentDto ) throws InterruptedException, ExecutionException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
-        Map<String, String> tunnels = new HashMap<>();
+        P2pIps p2pIps = new P2pIps();
 
-        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
-        {
-            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
-            {
-                tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
-            }
-        }
+        //        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
+        //        {
+        //            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
+        //            {
+        //                tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
+        //            }
+        //        }
 
-        if ( !tunnels.isEmpty() )
+        if ( !p2pIps.isEmpty() )
         {
             ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
-            ExecutorCompletionService<Integer> tunnelCompletionService =
-                    new ExecutorCompletionService<Integer>( tunnelExecutor );
+            ExecutorCompletionService<Boolean> tunnelCompletionService =
+                    new ExecutorCompletionService<>( tunnelExecutor );
 
-            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), tunnels ) );
+            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), p2pIps ) );
 
-            final Future<Integer> f = tunnelCompletionService.take();
+            final Future<Boolean> f = tunnelCompletionService.take();
             f.get();
 
             tunnelExecutor.shutdown();
@@ -517,31 +519,36 @@ public class HubEnvironmentManager
         @Override
         public P2PConfig call() throws Exception
         {
-            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
+            P2PConnections p2PConnections = peer.setupP2PConnection( p2PConfig );
+            for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
+            {
+                p2PConfig.addP2pIp( p2PConnection.getIp() );
+            }
             return p2PConfig;
         }
     }
 
 
-    private class SetupTunnelTask implements Callable<Integer>
+    private class SetupTunnelTask implements Callable<Boolean>
     {
         private final Peer peer;
         private final String environmentId;
-        private final Map<String, String> tunnels;
+        private final P2pIps p2pIps;
 
 
-        public SetupTunnelTask( final Peer peer, final String environmentId, final Map<String, String> tunnels )
+        public SetupTunnelTask( final Peer peer, final String environmentId, P2pIps p2pIps )
         {
             this.peer = peer;
             this.environmentId = environmentId;
-            this.tunnels = tunnels;
+            this.p2pIps = p2pIps;
         }
 
 
         @Override
-        public Integer call() throws Exception
+        public Boolean call() throws Exception
         {
-            return peer.setupTunnels( tunnels, environmentId );
+            peer.setupTunnels( p2pIps, environmentId );
+            return true;
         }
     }
 

@@ -42,6 +42,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateways;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
@@ -60,17 +61,21 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
@@ -706,18 +711,25 @@ public class RemotePeerImpl implements RemotePeer
 
 
     //networking
+
+
+    @Override
+    public UsedNetworkResources getUsedNetworkResources() throws PeerException
+    {
+        return new PeerWebClient( peerInfo, provider ).getReservedNetResources();
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
     {
-
-        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
-        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
+        Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         try
         {
-            return new PeerWebClient( peerInfo, provider ).setupTunnels( peerIps, environmentId );
+            new PeerWebClient( peerInfo, provider ).setupTunnels( p2pIps, environmentId );
         }
         catch ( Exception e )
         {
@@ -820,6 +832,21 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void reserveNetworkResource( final String environmentId, final long vni, final String p2pSubnet,
+                                        final String containerSubnet ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid env id" );
+        Preconditions
+                .checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ), "Invalid vni" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ), "Invalid p2p subnet" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerSubnet ), "Invalid container subnet" );
+
+        new PeerWebClient( peerInfo, provider )
+                .reserveNetworkResource( environmentId, vni, p2pSubnet, containerSubnet );
+    }
+
+
+    @Override
     public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
@@ -841,7 +868,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String setupP2PConnection( final P2PConfig config ) throws PeerException
+    public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 

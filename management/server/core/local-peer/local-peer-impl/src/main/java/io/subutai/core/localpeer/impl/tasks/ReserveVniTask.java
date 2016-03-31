@@ -1,16 +1,11 @@
 package io.subutai.core.localpeer.impl.tasks;
 
 
-import java.util.SortedSet;
 import java.util.concurrent.Callable;
-
-import com.google.common.collect.Sets;
 
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.settings.Common;
 import io.subutai.core.network.api.NetworkManager;
 
 
@@ -42,6 +37,7 @@ public class ReserveVniTask implements Callable<Vni>
         }
 
         //figure out available vlan
+        //todo revise this part, take reserved vlans from p2p-interfaces
         int vlan = reservedVnis.findAvailableVlanId();
 
         //reserve vni & vlan for environment

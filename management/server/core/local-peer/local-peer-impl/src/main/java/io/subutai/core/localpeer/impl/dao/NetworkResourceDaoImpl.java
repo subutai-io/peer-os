@@ -10,6 +10,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.exception.DaoException;
+import io.subutai.common.network.NetworkResource;
+import io.subutai.common.util.IPUtil;
 import io.subutai.core.localpeer.impl.entity.NetworkResourceEntity;
 
 
@@ -240,12 +242,15 @@ public class NetworkResourceDaoImpl implements NetworkResourceDao<NetworkResourc
     }
 
 
-    @Override
-    public NetworkResourceEntity find( final NetworkResourceEntity networkResource ) throws DaoException
+    //    @Override
+    public NetworkResourceEntity find( final NetworkResource networkResource ) throws DaoException
     {
         Preconditions.checkNotNull( networkResource );
 
         List<NetworkResourceEntity> networkResources = readAll();
+
+        String containerSubnet = IPUtil.getNetworkAddress( networkResource.getContainerSubnet() );
+        String p2pSubnet = IPUtil.getNetworkAddress( networkResource.getP2pSubnet() );
 
         for ( NetworkResourceEntity netResource : networkResources )
         {
@@ -253,11 +258,11 @@ public class NetworkResourceDaoImpl implements NetworkResourceDao<NetworkResourc
             {
                 return netResource;
             }
-            if ( networkResource.getContainerSubnet().equalsIgnoreCase( netResource.getContainerSubnet() ) )
+            if ( containerSubnet.equalsIgnoreCase( netResource.getContainerSubnet() ) )
             {
                 return netResource;
             }
-            if ( networkResource.getP2pSubnet().equalsIgnoreCase( netResource.getP2pSubnet() ) )
+            if ( p2pSubnet.equalsIgnoreCase( netResource.getP2pSubnet() ) )
             {
                 return netResource;
             }

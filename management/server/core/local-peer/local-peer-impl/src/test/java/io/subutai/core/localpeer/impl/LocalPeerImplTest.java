@@ -68,7 +68,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -768,19 +767,6 @@ public class LocalPeerImplTest
         doThrow( new QuotaException() ).when( quotaManager ).setCpuSet( eq( containerId ), anySet() );
 
         localPeer.setCpuSet( containerHost, Sets.newHashSet( QUOTA ) );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testListTunnels() throws Exception
-    {
-        localPeer.listTunnels();
-
-        verify( networkManager ).listTunnels();
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).listTunnels();
-
-        localPeer.listTunnels();
     }
 
 
