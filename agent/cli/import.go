@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cheggaaa/pb"
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
 
@@ -89,7 +90,12 @@ func download(file, id string, kurjun *http.Client) string {
 	response, err := kurjun.Get(config.Management.Kurjun + "/template/get?id=" + id)
 	log.Check(log.FatalLevel, "Getting "+config.Management.Kurjun+"/template/get?id="+id, err)
 	defer response.Body.Close()
-	_, err = io.Copy(out, response.Body)
+
+	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
+	bar.Start()
+	rd := bar.NewProxyReader(response.Body)
+
+	_, err = io.Copy(out, rd)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
 	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+file) {
 		return config.Agent.LxcPrefix + "tmpdir/" + file
