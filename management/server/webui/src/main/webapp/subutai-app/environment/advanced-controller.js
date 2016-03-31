@@ -41,7 +41,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.excludedContainers = [];
 	vm.cubeGrowth = 1;
-	vm.environment2BuildName = 'Environment name';
+	vm.environment2BuildName = '';
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
 	vm.buildCompleted = false;
@@ -282,6 +282,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function buildEditedEnvironment() {
@@ -765,6 +766,13 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		});
 	}
 
+	document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+		if(vm.editingEnv && vm.editingEnv.id == e.detail) {
+			clearWorkspace();
+			vm.editingEnv = false;
+		}
+	}, false);
+
 	function editEnvironment(environment) {
 		clearWorkspace();
 		vm.editingEnv = environment;
@@ -836,6 +844,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	function clearWorkspace() {
 		vm.cubeGrowth = 0;
 		PEER_MAP = {};
+		vm.environment2BuildName = '';
 
 		vm.env2Build = {};
 		vm.containers2Build = [];
