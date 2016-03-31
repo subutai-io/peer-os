@@ -18,7 +18,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	var promise = SettingsKurjunSrv.getConfig().success (function (data) {
 		GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
-		BASE_URL = GLOBAL_KURJUN_URL + "/rest/";
+		BASE_URL = GLOBAL_KURJUN_URL + "/";
 		TEMPLATE_URL = BASE_URL + "template/";
 		REPOSITORY_URL = BASE_URL + "repository/";
 		DEB_URL = BASE_URL + "deb/";
@@ -44,26 +44,26 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	return kurjunService;
 
 	function getRepositories() {
-		return $http.get(REPOSITORY_URL + "list", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
+		return $http.get(REPOSITORY_URL + "list?repository=all", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
 		console.log (TEMPLATE_URL);
-		return $http.get(TEMPLATE_URL + 'list', {
+		return $http.get(TEMPLATE_URL + 'list?repository=all', {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
 	function getAPTList() {
-		return $http.get(DEB_URL + "list", {
+		return $http.get(DEB_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
 	function getRawFiles() {
-		return $http.get(RAW_URL + "list", {
+		return $http.get(RAW_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
