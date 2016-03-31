@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.hubadapter.api.HubAdapter;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -23,14 +25,18 @@ public class HubAdapterImpl implements HubAdapter
 
     private final HttpClient httpClient;
 
+    private final IdentityManager identityManager;
+
     private final String peerId;
 
 
-    public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager ) throws Exception
+    public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager, IdentityManager identityManager ) throws Exception
     {
         daoHelper = new DaoHelper( daoManager );
 
         httpClient = new HttpClient( securityManager );
+
+        this.identityManager = identityManager;
 
         peerId = peerManager.getLocalPeer().getId();
     }
@@ -48,9 +54,23 @@ public class HubAdapterImpl implements HubAdapter
     }
 
 
+    private void userTest()
+    {
+        User user = identityManager.getActiveUser();
+
+        log.debug( "user: username={}, id={}, email={}, fp={}", user.getUserName(), user.getId(), user.getEmail(), user.getFingerprint() );
+    }
+
+
+    //
+    // REST API
+    //
+
     @Override
     public String getUserEnvironmentsForPeer()
     {
+        userTest();
+
         if ( !isRegistered() )
         {
             log.debug( "Peer not registered to Hub." );
