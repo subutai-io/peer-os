@@ -13,7 +13,11 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.uid = '';
     vm.currentUrl = '';
     vm.currentType = '';
-
+    vm.currentId = '';
+    vm.currentUrlObject = {};
+    vm.previousName = "";
+    vm.urlList = [];
+    vm.urls = {};
     vm.urlsType = {
         1: "Local",
         2: "Global",
@@ -22,6 +26,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 
     //functions
     vm.urlFrom = urlFrom;
+    vm.editUrl = editUrl;
     vm.approveUrl = approveUrl;
     vm.updateConfigQuotas = updateConfigQuotas;
     vm.updateConfigUrls = updateConfigUrls;
@@ -30,6 +35,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.removeLocalUrl = removeLocalUrl;
     vm.autoSign = autoSign;
     vm.addUrl = addUrl;
+    vm.updateUrl = updateUrl;
 
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
@@ -38,6 +44,14 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     getConfig();
+
+    function getUrls() {
+        SettingsKurjunSrv.getUrls().success(function (data) {
+            vm.urls = data;
+        });
+    }
+
+    getUrls();
 
 
     vm.dtInstance = {};
@@ -51,6 +65,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         .withOption('createdRow', createdRow);
 
     vm.dtColumns = [
+        DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionEdit),
         DTColumnBuilder.newColumn('id').withTitle('ID'),
         DTColumnBuilder.newColumn('url').withTitle('URL'),
         DTColumnBuilder.newColumn('type').withTitle('Type').renderWith(getUrlType),
@@ -74,19 +89,41 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         return result;
     }
 
+    function actionEdit(data, type, full, meta) {
+        vm.urlList[data.id] = data;
+        var result = '<span ></span>';
+        if (data.state == false) {
+            result = '<a href class="b-icon b-icon_edit" ng-click="settingsKurjunCtrl.editUrl( ' + data.id + ' )"></a>';
+        }
+
+        return result;
+    }
+
+
     function actionApprove(data, type, full, meta) {
         var approveButton = '<span ></span>';
         if (data.state == false) {
-            approveButton = '<a href class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.approveUrl(\'' + data.url + '\', \'' + data.type + '\')">Register</a>';
+            approveButton = '<a href class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.approveUrl(\'' + data.id + '\', \'' + data.type + '\', \'' + data.id + '\')">Register</a>';
         }
         return approveButton;
     }
 
-    function approveUrl(url, type) {
+    function editUrl(id) {
+        vm.currentUrlObject = vm.urlList[id];
+        vm.previousName = vm.currentUrlObject.url;
+        ngDialog.open({
+            template: "subutai-app/settingsKurjun/partials/editUrl.html",
+            scope: $scope
+        });
+    }
+
+
+    function approveUrl(url, type, id) {
         vm.currentUrl = url;
         vm.currentType = type;
+        vm.currentId = id;
         LOADING_SCREEN();
-        SettingsKurjunSrv.registerUrl(url, type).success(function (data) {
+        SettingsKurjunSrv.registerUrl(id).success(function (data) {
             vm.uid = data;
             if (vm.uid) {
                 //$('#js-uid-sign-area').addClass('bp-sign-target');
@@ -105,7 +142,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
 
     function autoSign() {
         LOADING_SCREEN();
-        SettingsKurjunSrv.signedMsg(vm.currentUrl, vm.currentType, vm.uid).success(function (data) {
+        SettingsKurjunSrv.signedMsg(vm.currentId, vm.uid).success(function (data) {
             if (Object.keys(vm.dtInstance).length !== 0) {
                 vm.dtInstance.reloadData(null, false);
             }
@@ -178,6 +215,55 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
             scope: $scope
         });
     }
+
+    function updateUrl() {
+        console.log(vm.urls);
+        // if (checkIfExists(vm.currentUrlObject)) {
+        //     SweetAlert.swal("ERROR!", "Operation already exists", "error");
+        //     return;
+        // }
+
+        if (vm.currentUrlObject.url === "" || vm.currentUrlObject.url === undefined) {
+            SweetAlert.swal("ERROR!", "Please enter url", "error");
+        }
+
+        var postData = 'id=' + vm.currentUrlObject.id + '&url=' + vm.currentUrlObject.url;
+
+        LOADING_SCREEN();
+        ngDialog.closeAll();
+
+        SettingsKurjunSrv.updateUrl(postData).success(function (data) {
+            LOADING_SCREEN('none');
+            if (Object.keys(vm.dtInstance).length !== 0) {
+                vm.dtInstance.reloadData(null, false);
+            }
+            vm.getUrls();
+            SweetAlert.swal("Success!", " Url was updated.", "success");
+        }).error(function (error) {
+            SweetAlert.swal("ERROR!", "Url update error: " + error.replace(/\\n/g, " "), "error");
+        });
+    }
+
+    function checkIfExists(urlObject) {
+        
+        for (var i = 0; i<= vm.urls.length; ++i){
+            if (urlObject.url == vm.urls[i]){
+                return true;
+            }
+        }
+        
+        return false;
+
+        // var arr = [];
+        // for (var i = 0; i < vm.operations.length; ++i) {
+        //     arr.push(vm.operations.operationName);
+        // }
+        // if (arr.indexOf(operation.operationName) > -1) {
+        //     return true;
+        // }
+        // return false;
+    }
+
 
     function addUrl(newUrl) {
         var postData = 'url=' + newUrl.name + '&type=' + newUrl.type;
