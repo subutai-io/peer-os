@@ -52,20 +52,31 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
                     + "[a-zA-z0-9]{1,100}" );
-    private ConfigManager configManager;
-    private PeerManager peerManager;
-    private HubEnvironmentManager hubEnvironmentManager;
-    private CommandExecutor commandExecutor;
+
+    private final ConfigManager configManager;
+
+    private final PeerManager peerManager;
+
+    private final HubEnvironmentManager hubEnvironmentManager;
+
+    private final CommandExecutor commandExecutor;
+
+    private final EnvironmentUserHelper environmentUserHelper;
 
 
     public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
                                      final ConfigManager hConfigManager, final PeerManager peerManager,
-                                     CommandExecutor commandExecutor )
+                                     CommandExecutor commandExecutor, EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
+
         this.peerManager = peerManager;
+
         this.hubEnvironmentManager = hubEnvironmentManager;
+
         this.commandExecutor = commandExecutor;
+
+        this.environmentUserHelper = environmentUserHelper;
     }
 
 
@@ -126,6 +137,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
+                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
