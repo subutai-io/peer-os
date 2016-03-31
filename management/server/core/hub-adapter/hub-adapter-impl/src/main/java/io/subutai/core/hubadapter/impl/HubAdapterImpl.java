@@ -4,6 +4,8 @@ package io.subutai.core.hubadapter.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
@@ -54,13 +56,28 @@ public class HubAdapterImpl implements HubAdapter
     }
 
 
-    private void userTest()
+    private String getUserId()
     {
         User user = identityManager.getActiveUser();
 
-        log.debug( "user: username={}, id={}, email={}, fp={}", user.getUserName(), user.getId(), user.getEmail(), user.getFingerprint() );
-    }
+        log.debug( "Active user: username={}, email={}", user.getUserName(), user.getEmail() );
 
+        // For the admin, get peer owner data from Hub
+        if ( user.getUserName().equals( "admin") )
+        {
+            return getOwnerId();
+        }
+
+        // Trick to get the user id in Hub. See also: EnvironmentUserHelper.
+        if ( user.getEmail().contains( "@hub.subut.ai" ) )
+        {
+            return StringUtils.substringBefore( user.getEmail(), "@" );
+        }
+
+        log.debug( "Can't get proper user id for Hub" );
+
+        return null;
+    }
 
     //
     // REST API
@@ -69,8 +86,6 @@ public class HubAdapterImpl implements HubAdapter
     @Override
     public String getUserEnvironmentsForPeer()
     {
-        userTest();
-
         if ( !isRegistered() )
         {
             log.debug( "Peer not registered to Hub." );
@@ -78,9 +93,16 @@ public class HubAdapterImpl implements HubAdapter
             return null;
         }
 
-        log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", getOwnerId(), peerId );
+        String userId = getUserId();
 
-        return httpClient.doGet( format( USER_ENVIRONMENTS, getOwnerId() ) );
+        if ( userId == null )
+        {
+            return null;
+        }
+
+        log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", userId, peerId );
+
+        return httpClient.doGet( format( USER_ENVIRONMENTS, userId ) );
     }
 
 
