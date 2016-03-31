@@ -17,9 +17,7 @@ public class EnvironmentPeerDto
         BUILD_CONTAINER,
         CONFIGURE_CONTAINER,
         CONFIGURE_DOMAIN,
-        START_CONTAINER,
-        STOP_CONTAINER,
-        DESTROY_CONTAINER,
+        CHANGE_CONTAINER_STATE,
         DELETE_PEER,
         WAIT,
         READY

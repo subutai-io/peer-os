@@ -287,7 +287,7 @@ public class HubEnvironmentManager
         Set<Node> nodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+            if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
             {
                 ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
                 Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(),
@@ -332,11 +332,12 @@ public class HubEnvironmentManager
 
             for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
             {
-                if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+                if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
                 {
                     ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
                     try
                     {
+                        nodeDto.setState( ContainerStateDto.UNKNOWN );
                         CloneRequest cloneRequest = new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(),
                                 nodeDto.getContainerName(), nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(),
                                 peerDto.getPeerId(), peerDto.getOwnerId(), nodeDto.getTemplateName(),
