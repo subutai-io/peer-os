@@ -412,6 +412,9 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             ]
                         }
                     ]);
+                }],
+                serviceData: ['kurjunSrv', function(kurjunSrv) {
+                    return kurjunSrv.promise;
                 }]
             }
         })
