@@ -24,9 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
@@ -141,6 +144,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
                     environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
+                    break;
+                case CONFIGURE_DOMAIN:
+                    configureDomain( peerDto );
                     break;
                 case DELETE_PEER:
                     deletePeer( peerDto );
@@ -317,6 +323,45 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         catch ( Exception e )
         {
             LOG.error( "Could not configure SSH/Hash", e );
+        }
+    }
+
+
+    private void configureDomain( EnvironmentPeerDto peerDto )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        String domainUpdatePath =
+                String.format( "/rest/v1/environments/%s/peers/%s/domain", peerDto.getEnvironmentInfo().getId(),
+                        peerDto.getPeerId() );
+        try
+
+        {
+            boolean assign = !Strings.isNullOrEmpty( env.getDomainName() );
+            //TODO balanceStrategy should come from HUB
+            DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
+            if ( assign )
+            {
+                localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
+            }
+            else
+            {
+                localPeer.removeVniDomain( env.getVni() );
+            }
+
+            WebClient clientUpdate =
+                    configManager.getTrustedWebClientWithAuth( domainUpdatePath, configManager.getHubIp() );
+            byte[] cborData = JsonUtil.toCbor( peerDto );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+            Response response = clientUpdate.put( encryptedData );
+            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Domain configuration successfully done" );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not configure domain name" );
         }
     }
 
