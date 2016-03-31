@@ -37,10 +37,8 @@ import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.network.Gateway;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -105,10 +103,11 @@ public class HubEnvironmentManager
         Set<Long> vniDtos = new HashSet<>();
         try
         {
-            Vnis vnis = peerManager.getLocalPeer().getReservedVnis();
-            for ( Vni vni : vnis.list() )
+            ReservedNetworkResources reservedNetworkResources =
+                    peerManager.getLocalPeer().getReservedNetworkResources();
+            for ( NetworkResource NetworkResource : reservedNetworkResources.getNetworkResources() )
             {
-                vniDtos.add( vni.getVni() );
+                vniDtos.add( NetworkResource.getVni() );
             }
             return vniDtos;
         }
@@ -153,21 +152,22 @@ public class HubEnvironmentManager
 
     public Set<String> getReservedGateways()
     {
-        Set<String> gatewayDtos = new HashSet<>();
-        try
-        {
-
-            Gateways gateways = peerManager.getLocalPeer().getGateways();
-            for ( Gateway gateway : gateways.list() )
-            {
-                gatewayDtos.add( gateway.getIp() );
-            }
-            return gatewayDtos;
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Could not get local peer used interfaces" );
-        }
+        //todo reimplement
+        //        Set<String> gatewayDtos = new HashSet<>();
+        //        try
+        //        {
+        //
+        //            Gateways gateways = peerManager.getLocalPeer().getGateways();
+        //            for ( Gateway gateway : gateways.list() )
+        //            {
+        //                gatewayDtos.add( gateway.getIp() );
+        //            }
+        //            return gatewayDtos;
+        //        }
+        //        catch ( PeerException e )
+        //        {
+        //            LOG.error( "Could not get local peer used interfaces" );
+        //        }
         return null;
     }
 
@@ -196,15 +196,16 @@ public class HubEnvironmentManager
 
     public void setupVNI( EnvironmentPeerDto peerDto )
     {
-        try
-        {
-            Vni vni = new Vni( peerDto.getEnvironmentInfo().getVni(), peerDto.getEnvironmentInfo().getId() );
-            peerManager.getLocalPeer().reserveVni( vni );
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Could not setup VNI", e.getMessage() );
-        }
+        //todo reimplement this
+        //        try
+        //        {
+        //            Vni vni = new Vni( peerDto.getEnvironmentInfo().getVni(), peerDto.getEnvironmentInfo().getId() );
+        //            peerManager.getLocalPeer().reserveVni( vni );
+        //        }
+        //        catch ( PeerException e )
+        //        {
+        //            LOG.error( "Could not setup VNI", e.getMessage() );
+        //        }
     }
 
 

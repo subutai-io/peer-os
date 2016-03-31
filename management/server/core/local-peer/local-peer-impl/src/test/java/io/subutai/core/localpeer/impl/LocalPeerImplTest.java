@@ -34,7 +34,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.network.Gateways;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -776,15 +775,5 @@ public class LocalPeerImplTest
         Tunnel tunnel = mock( Tunnel.class );
         when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
         when( tunnel.getTunnelIp() ).thenReturn( IP );
-    }
-
-
-    @Test
-    @Ignore
-    public void testGetGateways() throws Exception
-    {
-        Gateways gateways = localPeer.getGateways();
-
-        assertEquals( 1, gateways.list().size() );
     }
 }

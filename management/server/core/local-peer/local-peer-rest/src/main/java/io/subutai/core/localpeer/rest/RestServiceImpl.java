@@ -19,11 +19,8 @@ import com.google.common.base.Strings;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -96,24 +93,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setDefaultGateway( final String containerId, final String gatewayIp )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            localPeer.getContainerHostById( containerId ).setDefaultGateway( gatewayIp );
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
     public Response getContainerHostInfoById( final String containerId )
     {
         try
@@ -138,36 +117,6 @@ public class RestServiceImpl implements RestService
             Preconditions.checkNotNull( environmentId );
 
             return Response.ok( localPeer.getEnvironmentContainers( environmentId ) ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Vnis getReservedVnis()
-    {
-        try
-        {
-            return localPeer.getReservedVnis();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Gateways getGateways()
-    {
-        try
-        {
-            return localPeer.getGateways();
         }
         catch ( Exception e )
         {
@@ -237,21 +186,6 @@ public class RestServiceImpl implements RestService
         {
             PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( pek );
             localPeer.addPeerEnvironmentPubKey( keyId, pubKeyRing );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Vni reserveVni( final Vni vni )
-    {
-        try
-        {
-            return localPeer.reserveVni( vni );
         }
         catch ( Exception e )
         {

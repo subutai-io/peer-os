@@ -52,4 +52,32 @@ public class ReservedNetworkResources
 
         return null;
     }
+
+
+    public NetworkResource findByVlan( int vlan )
+    {
+        for ( NetworkResource networkResource : networkResources )
+        {
+            if ( networkResource.getVlan() == vlan )
+            {
+                return networkResource;
+            }
+        }
+
+        return null;
+    }
+
+
+    public NetworkResource findByVni( long vni )
+    {
+        for ( NetworkResource networkResource : networkResources )
+        {
+            if ( networkResource.getVni() == vni )
+            {
+                return networkResource;
+            }
+        }
+
+        return null;
+    }
 }

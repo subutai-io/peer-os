@@ -19,11 +19,8 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -423,89 +420,6 @@ public class PeerWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error getting rh metrics", e );
-        }
-    }
-
-
-    public Gateways getGateways() throws PeerException
-    {
-        String path = "/gateways";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Gateways.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting gateways", e );
-        }
-    }
-
-
-    public Vnis getReservedVnis() throws PeerException
-    {
-        String path = "/vni";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Vnis.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", peerInfo ), e );
-        }
-    }
-
-
-    public Vni reserveVni( final Vni vni ) throws PeerException
-    {
-        String path = "/vni";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            final Response response = client.post( vni );
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Vni.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on reserving VNI", e );
         }
     }
 

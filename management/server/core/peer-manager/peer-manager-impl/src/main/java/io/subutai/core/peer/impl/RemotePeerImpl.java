@@ -41,13 +41,9 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -293,33 +289,6 @@ public class RemotePeerImpl implements RemotePeer
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
         new EnvironmentWebClient( provider ).destroyContainer( peerInfo, containerId );
-    }
-
-
-    @Override
-    public void setDefaultGateway( final ContainerGateway containerGateway ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerGateway, "Container host is null" );
-
-        String path = "peer/container/gateway";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", containerGateway.getContainerId().getId() );
-        params.put( "gatewayIp", containerGateway.getGateway() );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //*************************************************************
-
-        try
-        {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error setting container gateway ip", e );
-        }
     }
 
 
@@ -737,38 +706,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public Vni reserveVni( final Vni vni ) throws PeerException
-    {
-        Preconditions.checkNotNull( vni, "Invalid vni" );
-
-        return new PeerWebClient( peerInfo, provider ).reserveVni( vni );
-    }
-
     //************ END ENVIRONMENT SPECIFIC REST
-
-
-    @RolesAllowed( "Environment-Management|Read" )
-    @Override
-    public Gateways getGateways() throws PeerException
-    {
-        try
-        {
-            return new PeerWebClient( peerInfo, provider ).getGateways();
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error obtaining gateways from peer %s", getName() ), e );
-        }
-    }
-
-
-    @Override
-    public Vnis getReservedVnis() throws PeerException
-    {
-        return new PeerWebClient( peerInfo, provider ).getReservedVnis();
-    }
 
 
     @Override

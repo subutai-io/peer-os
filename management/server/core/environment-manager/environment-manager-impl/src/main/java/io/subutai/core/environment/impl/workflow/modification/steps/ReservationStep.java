@@ -115,7 +115,7 @@ public class ReservationStep
             throw new EnvironmentModificationException( "Failed to obtain reserved network resources from all peers" );
         }
 
-        //check availability of subnet
+        //check availability of network resources
         SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
         final String containerSubnet = subnetUtils.getInfo().getNetworkAddress();
 

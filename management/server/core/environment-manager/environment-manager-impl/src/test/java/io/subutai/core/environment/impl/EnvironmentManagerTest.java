@@ -101,8 +101,6 @@ public class EnvironmentManagerTest
         environmentManager =
                 spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, daoManager,
                         identityManager, tracker, relationManager, hubAdapter ) );
-        doReturn( environment ).when( environmentManager )
-                               .createEmptyEnvironment( anyString(), anyString(), anyString() );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
         doReturn( new HashSet<>() ).when( environmentManager ).getUsedIps( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )

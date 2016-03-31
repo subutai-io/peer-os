@@ -17,14 +17,11 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
+import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
@@ -52,28 +49,6 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
-    @GET
-    @Path( "vni" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Vnis getReservedVnis();
-
-    @POST
-    @Path( "vni" )
-    @Produces( MediaType.APPLICATION_JSON )
-    @Consumes( MediaType.APPLICATION_JSON )
-    Vni reserveVni( Vni vni );
-
-    @GET
-    @Path( "gateways" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Gateways getGateways();
-
-
-    @POST
-    @Path( "container/gateway" )
-    Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
-                                @FormParam( "gatewayIp" ) String gatewayIp );
 
     @POST
     @Path( "tunnels/{environmentId}" )
