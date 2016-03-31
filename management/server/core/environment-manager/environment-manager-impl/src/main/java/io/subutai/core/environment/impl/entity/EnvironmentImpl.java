@@ -564,6 +564,15 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public void setSubnetCidr( final String cidr )
+    {
+        SubnetUtils subnetUtils = new SubnetUtils( cidr );
+
+        this.subnetCidr = cidr;
+    }
+
+
+    @Override
     public Long getVni()
     {
         return vni;

@@ -12,8 +12,6 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.net.util.SubnetUtils;
-
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -115,31 +113,27 @@ public class ReservationStep
             throw new EnvironmentCreationException( "Failed to obtain reserved network resources from all peers" );
         }
 
-        //todo calculate free container subnet here
-        //check container subnet
-        SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
-        final String containerSubnet = subnetUtils.getInfo().getNetworkAddress();
         Set<String> allP2pSubnets = Sets.newHashSet();
+        Set<String> allContainerSubnets = Sets.newHashSet();
         Set<Long> allVnis = Sets.newHashSet();
 
-        for ( Map.Entry<Peer, UsedNetworkResources> peerReservedNetResourcesEntry : reservedNetResources.entrySet() )
+        for ( UsedNetworkResources netResources : reservedNetResources.values() )
         {
-            Peer peer = peerReservedNetResourcesEntry.getKey();
-            UsedNetworkResources netResources = peerReservedNetResourcesEntry.getValue();
-
-            if ( netResources.containerSubnetExists( containerSubnet ) )
-            {
-                throw new EnvironmentCreationException(
-                        String.format( "Container subnet %s is already used on peer %s", environment.getSubnetCidr(),
-                                peer.getName() ) );
-            }
-
+            allContainerSubnets.addAll( netResources.getContainerSubnets() );
             allP2pSubnets.addAll( netResources.getP2pSubnets() );
             allVnis.addAll( netResources.getVnis() );
         }
 
+        //calculate free container subnet
+        final String freeContainerSubnet = P2PUtil.findFreeContainerSubnet( allContainerSubnets );
+
+        if ( freeContainerSubnet == null )
+        {
+            throw new EnvironmentCreationException( "Free container subnet not found" );
+        }
+
         //calculate free p2p subnet
-        final String freeP2pSubnet = P2PUtil.findFreeSubnet( allP2pSubnets );
+        final String freeP2pSubnet = P2PUtil.findFreeP2PSubnet( allP2pSubnets );
 
         if ( freeP2pSubnet == null )
         {
@@ -148,6 +142,11 @@ public class ReservationStep
 
         //calculate free vni
         final Long freeVni = generateRandomVni( allVnis );
+
+        if ( freeVni == -1 )
+        {
+            throw new EnvironmentCreationException( "Free VNI not found" );
+        }
 
         //reserve network resources
         executorService = Executors.newFixedThreadPool( peers.size() );
@@ -160,8 +159,8 @@ public class ReservationStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    peer.reserveNetworkResource(
-                            new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet, containerSubnet ) );
+                    peer.reserveNetworkResource( new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet,
+                            freeContainerSubnet ) );
                     return peer;
                 }
             } );
@@ -208,10 +207,11 @@ public class ReservationStep
         //store network data in environment metadata
         environment.setVni( freeVni );
         environment.setP2PSubnet( freeP2pSubnet );
+        environment.setSubnetCidr( String.format( "%s/24", freeContainerSubnet ) );
     }
 
 
-    protected long generateRandomVni( Set<Long> excludedVnis ) throws EnvironmentCreationException
+    protected long generateRandomVni( Set<Long> excludedVnis )
     {
         int maxIterations = 10000;
         int currentIteration = 0;
@@ -226,7 +226,7 @@ public class ReservationStep
 
         if ( excludedVnis.contains( vni ) )
         {
-            throw new EnvironmentCreationException( "No free vni found" );
+            return -1;
         }
 
         return vni;

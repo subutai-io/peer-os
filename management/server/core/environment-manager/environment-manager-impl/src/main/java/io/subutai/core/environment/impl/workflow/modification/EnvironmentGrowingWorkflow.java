@@ -247,8 +247,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     @Override
     public void fail( final String message, final Throwable e )
     {
-        saveFailState();
         super.fail( message, e );
+        saveFailState();
     }
 
 

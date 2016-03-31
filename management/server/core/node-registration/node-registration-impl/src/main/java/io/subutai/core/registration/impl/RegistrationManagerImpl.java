@@ -255,7 +255,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
             Set<String> existingNetworks = getTunnelNetworks( peers );
 
-            String freeP2PSubnet = P2PUtil.findFreeSubnet( existingNetworks );
+            String freeP2PSubnet = P2PUtil.findFreeP2PSubnet( existingNetworks );
             args.add( "-I" );
             freeP2PSubnet = freeP2PSubnet.substring( 0, freeP2PSubnet.length() - 1 ) + (
                     Integer.valueOf( freeP2PSubnet.substring( freeP2PSubnet.length() - 1 ) ) + 1 );

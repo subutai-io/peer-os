@@ -100,6 +100,8 @@ public interface Environment extends RelationLink
     String getSubnetCidr();
 
 
+    void setSubnetCidr( String cidr );
+
     /**
      * VNI of the environment.
      */

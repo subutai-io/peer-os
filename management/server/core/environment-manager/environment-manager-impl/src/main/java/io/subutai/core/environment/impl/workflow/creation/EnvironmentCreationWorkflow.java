@@ -244,10 +244,10 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     @Override
     public void fail( final String message, final Throwable e )
     {
+        super.fail( message, e );
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
         operationTracker.addLogFailed( getFailedReason() );
         saveEnvironment();
-        super.fail( message, e );
     }
 
 

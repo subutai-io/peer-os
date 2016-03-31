@@ -288,8 +288,8 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     @Override
     public void fail( final String message, final Throwable e )
     {
-        saveFailState();
         super.fail( message, e );
+        saveFailState();
     }
 
 
