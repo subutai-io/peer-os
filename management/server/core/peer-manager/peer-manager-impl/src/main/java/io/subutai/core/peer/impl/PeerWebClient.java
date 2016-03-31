@@ -19,7 +19,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
@@ -644,7 +644,7 @@ public class PeerWebClient
     }
 
 
-    public void reserveNetworkResource( final NetworkResource networkResource ) throws PeerException
+    public void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
         String path = "/netresources";
 

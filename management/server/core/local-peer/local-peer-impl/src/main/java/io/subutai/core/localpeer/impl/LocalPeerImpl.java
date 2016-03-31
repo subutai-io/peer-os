@@ -65,6 +65,7 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.network.VniVlanMapping;
@@ -1668,7 +1669,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public synchronized void reserveNetworkResource( final NetworkResource networkResource ) throws PeerException
+    public synchronized void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
 
         Preconditions.checkNotNull( networkResource );

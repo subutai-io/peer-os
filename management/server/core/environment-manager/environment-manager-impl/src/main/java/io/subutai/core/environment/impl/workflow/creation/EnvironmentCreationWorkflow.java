@@ -105,7 +105,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public EnvironmentCreationPhase RESERVE_NET()
     {
-        operationTracker.addLog( "Setting up VNI" );
+        operationTracker.addLog( "Reserving network resources" );
 
         try
         {

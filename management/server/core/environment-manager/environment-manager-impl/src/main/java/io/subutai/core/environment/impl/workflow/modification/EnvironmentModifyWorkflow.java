@@ -146,7 +146,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public EnvironmentGrowingPhase RESERVE_NET()
     {
-        operationTracker.addLog( "Setting up VNI" );
+        operationTracker.addLog( "Reserving network resources" );
 
         try
         {

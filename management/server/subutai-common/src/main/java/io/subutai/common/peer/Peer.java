@@ -24,7 +24,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PConnections;
@@ -214,7 +214,7 @@ public interface Peer
 
     UsedNetworkResources getUsedNetworkResources() throws PeerException;
 
-    void reserveNetworkResource( NetworkResource networkResource ) throws PeerException;
+    void reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
 
 
     /**
