@@ -953,9 +953,14 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * IMPORTANT. Here we have quick and dirty workaround for https://github.com/optdyn/hub/issues/413.
+     * We have to create a new account in SS for an environment owner from Hub.
+     * Normally this method should be annotated with @RolesAllowed( "Identity-Management|Write" ) but then the hub-manager module
+     * gets error: "AccessControlException: No JAAS login present". To workaround this, we use @PermitAll which is not good.
+     * In future this should be fixed.
      */
-    @RolesAllowed( "Identity-Management|Write" )
+    @PermitAll
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
                             boolean generateKeyPair,boolean createUserDelegate) throws Exception

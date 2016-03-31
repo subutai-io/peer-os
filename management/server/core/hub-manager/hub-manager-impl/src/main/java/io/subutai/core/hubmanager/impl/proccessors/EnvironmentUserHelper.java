@@ -15,6 +15,8 @@ import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.UserType;
+import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
@@ -32,30 +34,36 @@ public class EnvironmentUserHelper
 
     private final IdentityManager identityManager;
 
+    private final ConfigDataService configDataService;
 
-    public EnvironmentUserHelper( ConfigManager configManager, IdentityManager identityManager )
+
+    public EnvironmentUserHelper( ConfigManager configManager, IdentityManager identityManager, ConfigDataService configDataService )
     {
         this.configManager = configManager;
 
         this.identityManager = identityManager;
+
+        this.configDataService = configDataService;
     }
 
 
-    public void test()
+
+    void handleEnvironmentOwnerCreation( EnvironmentPeerDto peerDto )
     {
-//        String userId = "554455fd-7fd3-47c3-b87d-cef2db75f8bc"; // askat
-        String userId = "43163772-a8c2-459f-bfcb-4d0bcc5759f6"; // sydyk
+        String envOwnerId = peerDto.getOwnerId();
 
-        if ( userExists( userId ) )
-        {
-            log.debug( "User exists" );
-        }
-        else
-        {
-            UserDto userDto = getUserDataFromHub( userId );
+        Config config = configDataService.getHubConfig( configManager.getPeerId() );
 
-            createNewUser( userDto, "!qaz@wsx" );
+        if ( envOwnerId.equals( config.getOwnerId() ) || userExists( envOwnerId ))
+        {
+            log.debug( "No need to create new user for environment" );
+
+            return;
         }
+
+        UserDto userDto = getUserDataFromHub( envOwnerId );
+
+        createNewUser( userDto );
     }
 
 
@@ -86,12 +94,14 @@ public class EnvironmentUserHelper
         return null;
     }
 
-    private void createNewUser( UserDto userDto, String password )
+    private void createNewUser( UserDto userDto )
     {
         log.debug( "Creating new user: {}", userDto.getEmail() );
 
         // Trick to get later the user id in Hub
         String email = userDto.getId() + "@hub.subut.ai";
+
+        String password = "!qaz@wsx";
 
         try
         {
@@ -100,18 +110,12 @@ public class EnvironmentUserHelper
 
             identityManager.assignUserRole( user, getEnvironmentRole() );
 
-            log.debug( "User created with id = {}", user.getId() );
+            log.debug( "User created successfully" );
         }
         catch ( Exception e )
         {
             log.error( "Error to create user: ", e );
         }
-    }
-
-
-    void handleEnvironmentOwner( EnvironmentPeerDto peerDto )
-    {
-        log.debug( ">> userId: {}", peerDto.getOwnerId() );
     }
 
 

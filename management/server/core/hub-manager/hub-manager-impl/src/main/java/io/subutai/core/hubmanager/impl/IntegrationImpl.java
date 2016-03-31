@@ -99,8 +99,6 @@ public class IntegrationImpl implements Integration
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
     private String checksum = "";
 
-    private EnvironmentUserHelper environmentUserHelper;
-
 
     public IntegrationImpl( DaoManager daoManager )
     {
@@ -131,10 +129,10 @@ public class IntegrationImpl implements Integration
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
-            environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager );
+            EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService );
 
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor );
+                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor, environmentUserHelper );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
@@ -182,11 +180,9 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendHeartbeat() throws HubPluginException
     {
-//        heartbeatProcessor.sendHeartbeat();
-//        resourceHostConfProcessor.sendResourceHostConf();
-//        containerEventProcessor.process();
-
-        environmentUserHelper.test(  );
+        heartbeatProcessor.sendHeartbeat();
+        resourceHostConfProcessor.sendResourceHostConf();
+        containerEventProcessor.process();
     }
 
 
@@ -200,9 +196,6 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
-
-        // todo revert
-
         configManager.addHubConfig( hupIp );
 
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
