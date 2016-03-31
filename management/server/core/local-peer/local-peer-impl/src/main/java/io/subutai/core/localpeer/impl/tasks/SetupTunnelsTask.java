@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ResourceHost;
@@ -45,6 +46,14 @@ public class SetupTunnelsTask implements Callable<Boolean>
         //setup tunnel to each local and remote RH
         for ( String tunnelIp : p2pIps.getP2pIps() )
         {
+            //skip if own IP
+            boolean ownIp = !( resourceHost.getHostInterfaces().findByIp( tunnelIp ) instanceof NullHostInterface );
+            if ( ownIp )
+            {
+                continue;
+            }
+
+            //see if tunnel exists
             int tunnelId = findTunnel( tunnelIp, tunnels );
             //tunnel not found, create new one
             if ( tunnelId == -1 )
@@ -60,7 +69,7 @@ public class SetupTunnelsTask implements Callable<Boolean>
                 tunnels.add( new Tunnel( String.format( "%s%d", NetworkManager.TUNNEL_PREFIX, tunnelId ), tunnelIp ) );
             }
 
-
+            //see if mapping exists
             if ( !vniVlanMappingExists( mappings, tunnelId ) )
             {
                 //create vni-vlan mapping

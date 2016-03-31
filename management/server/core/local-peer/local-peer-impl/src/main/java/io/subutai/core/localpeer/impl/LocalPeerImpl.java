@@ -1873,6 +1873,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Update" )
+    //TODO move logic to RH
     @Override
     public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
     {
