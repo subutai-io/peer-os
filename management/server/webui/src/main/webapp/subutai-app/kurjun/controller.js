@@ -61,6 +61,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	function getRawFiles() {
 		kurjunSrv.getRawFiles().success (function (data) {
 			vm.files = data;
+			console.log(vm.files);
 		});
 	}
 	getRawFiles();
@@ -97,7 +98,6 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(0),
 					DTColumnDefBuilder.newColumnDef(1),
 					DTColumnDefBuilder.newColumnDef(2).notSortable(),
-					DTColumnDefBuilder.newColumnDef(3).notSortable(),
 				];
 				default:
 				break;

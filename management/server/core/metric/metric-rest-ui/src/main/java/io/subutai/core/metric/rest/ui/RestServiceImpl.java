@@ -54,6 +54,10 @@ public class RestServiceImpl implements RestService
             {
                 host = environmentManager.loadEnvironment( environmentId ).getContainerHostById( hostId );
             }
+            else if( hostId.equals("management") )
+            {
+                host = localPeer.getContainerHostByName( hostId );
+            }
             else if( hostId != null )
             {
                 host = localPeer.getResourceHostById( hostId );
