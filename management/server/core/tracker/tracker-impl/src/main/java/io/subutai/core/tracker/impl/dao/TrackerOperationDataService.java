@@ -27,7 +27,7 @@ public class TrackerOperationDataService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( TrackerOperationDataService.class );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    EntityManagerFactory emf;
+    private EntityManagerFactory emf;
 
 
     public TrackerOperationDataService( final EntityManagerFactory emf )
@@ -231,5 +231,31 @@ public class TrackerOperationDataService
             em.close();
         }
         return result;
+    }
+
+    private List<TrackerOperationView> getRecentUserOperations() throws SQLException
+    {
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            em.getTransaction().begin();
+
+            TypedQuery<String> query =
+                    em.createQuery( "select distinct to.source from TrackerOperationEntity to", String.class );
+//            result.addAll( query.getResultList() );
+
+            em.getTransaction().commit();
+        }
+        catch ( PersistenceException e )
+        {
+            LOGGER.error( "Error getting getRecentUserOperations.", e );
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+
+        return null;
     }
 }

@@ -15,7 +15,18 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	var DEB_URL = BASE_URL + "deb/";
 	var RAW_URL = BASE_URL + "file/";
 
+
+	var promise = SettingsKurjunSrv.getConfig().success (function (data) {
+		GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
+		BASE_URL = GLOBAL_KURJUN_URL + "/rest/";
+		TEMPLATE_URL = BASE_URL + "template/";
+		REPOSITORY_URL = BASE_URL + "repository/";
+		DEB_URL = BASE_URL + "deb/";
+		RAW_URL = BASE_URL + "file/";
+	});
+
 	var kurjunService = {
+		promise:promise,
 		getRepositories: getRepositories,
 		getTemplates: getTemplates,
 		getAPTList: getAPTList,
@@ -31,10 +42,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	};
 
 	return kurjunService;
-
-	/*SettingsKurjunSrv.getConfig().success (function (data) {
-		GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
-	});*/
 
 	function getRepositories() {
 		return $http.get(REPOSITORY_URL + "list", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
