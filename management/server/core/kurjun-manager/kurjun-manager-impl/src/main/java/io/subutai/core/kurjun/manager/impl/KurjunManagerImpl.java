@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.ws.rs.core.Response;
@@ -93,16 +94,6 @@ public class KurjunManagerImpl implements KurjunManager
         }
 
         properties = loadProperties();
-
-
-        //        if ( Strings.isNullOrEmpty( getUser( KurjunType.Local.getId(), fingerprint ) ) )
-        //        {
-        //            registerUser( KurjunType.Local.getId(), fingerprint );
-        //        }
-        //        else
-        //        {
-        //            authorizeUser( KurjunType.Local.getId(), fingerprint );
-        //        }
     }
 
 
@@ -122,56 +113,10 @@ public class KurjunManagerImpl implements KurjunManager
     }
 
 
-    //****************************************
-    //    @Override
-    //    public String authorizeUser( int kurjunType, String fingerprint )
-    //    {
-    //        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.auth" ) );
-    //        WebClient client = RestUtil.createTrustedWebClient( url );
-    //
-    //        byte[] signedMsg = null;
-    //
-    //        List<Kurjun> list = dataService.getAllKurjunData();
-    //        for ( final Kurjun kurjun : list )
-    //        {
-    //            //            signedMsg = kurjun.getSignedMessage();
-    //            break;
-    //        }
-    //
-    //        try
-    //        {
-    //            client.query( "fingerprint", fingerprint );
-    //            client.query( "message", PGPEncryptionUtil.armorByteArrayToString( signedMsg ) );
-    //
-    //            Response response = client.post( null );
-    //
-    //            if ( response.getStatus() != HttpStatus.SC_OK )
-    //            {
-    //                return null;
-    //            }
-    //        }
-    //        catch ( PGPException e )
-    //        {
-    //            e.printStackTrace();
-    //        }
-    //
-    //
-    //        return "success";
-    //    }
-
-
-    //****************************************
-    //    @Override
-    //    public boolean setSystemOwner( int kurjunType, String fingerprint )
-    //    {
-    //
-    //        return true;
-    //    }
-
-
     @Override
-    public String registerUser( final String url, final int kurjunType )
+    public String registerUser( final int id )
     {
+        Kurjun kurjun = dataService.getKurjunData( id );
         PGPPublicKey key =
                 securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
                                .getPublicKey();
@@ -187,7 +132,7 @@ public class KurjunManagerImpl implements KurjunManager
 
 
         String authId = "";
-        String path = getKurjunUrl( url, "url.identity.user.add", kurjunType );
+        String path = getKurjunUrl( kurjun.getUrl(), "url.identity.user.add", kurjun.getType() );
 
         WebClient client = RestUtil.createTrustedWebClient( path );
         client.query( "key", ownerKey );
@@ -203,18 +148,22 @@ public class KurjunManagerImpl implements KurjunManager
             return null;
         }
 
-        dataService.updateKurjunData( PGPKeyUtil.getFingerprint( key.getFingerprint() ), authId, url );
+        kurjun.setAuthID( authId );
+        kurjun.setOwnerFingerprint( PGPKeyUtil.getFingerprint( key.getFingerprint() ) );
+        kurjun.setState( true );
+
+        dataService.updateKurjunData( kurjun );
 
         return authId;
     }
 
 
     @Override
-    public String authorizeUser( final String url, final int kurjunType, final String signedMessage )
+    public String authorizeUser( final int id, final String signedMessage )
     {
-        Kurjun kurjun = getDataService().getKurjunData( url );
+        Kurjun kurjun = getDataService().getKurjunData( id );
 
-        String path = getKurjunUrl( url, "url.identity.user.auth", kurjunType );
+        String path = getKurjunUrl( kurjun.getUrl(), "url.identity.user.auth", kurjun.getType() );
 
         WebClient client = RestUtil.createTrustedWebClient( path );
 
@@ -258,15 +207,16 @@ public class KurjunManagerImpl implements KurjunManager
 
 
     @Override
-    public String getUser( final String url, final int kurjunType )
+    public String getUser( final int id )
     {
+        Kurjun kurjun = dataService.getKurjunData( id );
         PGPPublicKey key =
                 securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
                                .getPublicKey();
 
         String fingerprint = PGPKeyUtil.getFingerprint( key.getFingerprint() );
 
-        String path = getKurjunUrl( url, "url.identity.user.get", kurjunType );
+        String path = getKurjunUrl( kurjun.getUrl(), "url.identity.user.get", kurjun.getType() );
         WebClient client = RestUtil.createTrustedWebClient( path );
         client.query( "fingerprint", fingerprint );
 
@@ -282,26 +232,6 @@ public class KurjunManagerImpl implements KurjunManager
             return "success";
         }
     }
-
-
-    //****************************************
-    //    @Override
-    //    public String getUser( int kurjunType, String fingerprint )
-    //    {
-    //        String url = getKurjunUrl( kurjunType, properties.getProperty( "url.identity.user.get" ) );
-    //        WebClient client = RestUtil.createTrustedWebClient( url );
-    //        client.query( "fingerprint", fingerprint );
-    //
-    //        Response response = client.get();
-    //
-    //        if ( response.getStatus() != HttpStatus.SC_OK )
-    //        {
-    //            LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
-    //            return null;
-    //        }
-    //
-    //        return null;
-    //    }
 
 
     public void setIdentityManager( final IdentityManager identityManager )
@@ -354,7 +284,25 @@ public class KurjunManagerImpl implements KurjunManager
         kurjun.setType( type );
 
         dataService.persistKurjunData( kurjun );
+        updateSystemSettings();
+    }
 
+
+    @Override
+    public void updateUrl( final int id, final String url ) throws ConfigurationException
+    {
+        validateUrl( url );
+
+        Kurjun kurjun = dataService.getKurjunData( id );
+        kurjun.setUrl( url );
+
+        dataService.updateKurjunData( kurjun );
+        updateSystemSettings();
+    }
+
+
+    private void updateSystemSettings() throws ConfigurationException
+    {
         ArrayList<String> globalUrls = Lists.newArrayList();
         ArrayList<String> localUrls = Lists.newArrayList();
         for ( final Kurjun entity : dataService.getAllKurjunData() )
@@ -370,10 +318,10 @@ public class KurjunManagerImpl implements KurjunManager
         }
 
         String[] localArr = new String[localUrls.size()];
-        localArr = localUrls.toArray(localArr);
+        localArr = localUrls.toArray( localArr );
 
         String[] globalArr = new String[globalUrls.size()];
-        globalArr = globalUrls.toArray(globalArr);
+        globalArr = globalUrls.toArray( globalArr );
 
         SystemSettings.setLocalKurjunUrls( localArr );
         SystemSettings.setGlobalKurjunUrls( globalArr );
