@@ -34,8 +34,11 @@
 						{{ notification.date }}
 					</div>
 					<div class="b-dropdown-buttons" ng-if="notification.links">
-						<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green">
-							{{ link.text }}
+						<a ng-repeat="link in notification.links" href="{{ link.href }}" class="b-btn b-btn_green" target="{{ link.newTab ? '_blank' : '_self' }}">
+							<span ng-if="!link.tooltip">{{ link.text }}</span>
+							<span ng-if="link.tooltip" tooltips tooltip-template="{{ link.tooltip }}" tooltip-side="bottom">
+								{{ link.text }}
+							</span>
 						</a>
 					</div>
 				</li>

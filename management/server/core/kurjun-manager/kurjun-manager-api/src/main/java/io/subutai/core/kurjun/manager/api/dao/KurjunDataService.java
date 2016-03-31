@@ -3,18 +3,12 @@ package io.subutai.core.kurjun.manager.api.dao;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
-import com.google.common.collect.Lists;
-
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
-import io.subutai.core.kurjun.manager.api.model.KurjunConfig;
 
 
 public interface KurjunDataService
 {
-    public Kurjun getKurjunData( final String id );
+    public Kurjun getKurjunData( final String url );
 
 
     /* *************************************************
@@ -56,5 +50,5 @@ public interface KurjunDataService
     /* *************************************************
      *
     */
-    public void persistKurjunConfig( final KurjunConfig item );
+    public Kurjun getKurjunData( final int id );
 }

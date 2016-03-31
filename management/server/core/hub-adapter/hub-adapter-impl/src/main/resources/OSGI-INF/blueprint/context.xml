@@ -16,10 +16,13 @@
 
   <reference id="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
 
+  <reference id="identityManager" interface="io.subutai.core.identity.api.IdentityManager" />
+
   <bean id="hubAdapter" class="io.subutai.core.hubadapter.impl.HubAdapterImpl" activation="eager">
     <argument ref="daoManager" />
     <argument ref="securityManager" />
     <argument ref="peerManager" />
+    <argument ref="identityManager" />
   </bean>
 
   <service ref="hubAdapter" interface="io.subutai.core.hubadapter.api.HubAdapter" />
