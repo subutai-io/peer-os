@@ -2,7 +2,7 @@ package io.subutai.common.exception;
 
 
 /**
- * Exception thrown by DispatcherDAO
+ * Exception thrown by DAO classes
  */
 public class DaoException extends Exception
 {

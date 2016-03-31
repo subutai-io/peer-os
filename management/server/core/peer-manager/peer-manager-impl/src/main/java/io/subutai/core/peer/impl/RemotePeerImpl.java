@@ -130,15 +130,15 @@ public class RemotePeerImpl implements RemotePeer
 
         String url;
 
-        int port = peerInfo.getPort();
+        int port = peerInfo.getPublicSecurePort();
 
         if ( port == SystemSettings.getSpecialPortX1() || port == SystemSettings.getOpenPort() )
         {
-            url = String.format( "http://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
+            url = String.format( "http://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPublicSecurePort() );
         }
         else
         {
-            url = String.format( "https://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPort() );
+            url = String.format( "https://%s:%s/rest/v1/peer", peerInfo, peerInfo.getPublicSecurePort() );
         }
 
         this.baseUrl = url;

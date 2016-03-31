@@ -6,6 +6,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -17,6 +22,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
@@ -44,6 +50,59 @@ public class SystemManagerImpl implements SystemManager
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
+
+    protected Set<SettingsListener> listeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
+
+    protected ExecutorService notifierPool = Executors.newCachedThreadPool();
+
+
+    public void addListener( SettingsListener listener )
+    {
+
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( SettingsListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+
+    public void dispose()
+    {
+        notifierPool.shutdown();
+        listeners.clear();
+    }
+
+
+    protected void notifyListeners()
+    {
+        for ( final SettingsListener listener : listeners )
+        {
+            notifierPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        listener.settingsChanged();
+                    }
+                    catch ( Exception ignore )
+                    {
+                    }
+                }
+            } );
+        }
+    }
 
 
     public SystemManagerImpl( final String globalKurjunUrls, final int securePortX1, final int securePortX2,
@@ -161,7 +220,8 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     public void setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                    final String publicUrl, final String agentPort, final String publicSecurePort ) throws ConfigurationException
+                                    final String publicUrl, final String agentPort, final String publicSecurePort )
+            throws ConfigurationException
     {
         SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
         SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
@@ -169,6 +229,8 @@ public class SystemManagerImpl implements SystemManager
         SystemSettings.setPublicUrl( publicUrl );
         SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
         SystemSettings.setPublicSecurePort( Integer.parseInt( publicSecurePort ) );
+
+        notifyListeners();
     }
 
 
@@ -194,7 +256,8 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setKurjunSettingsUrls( final String[] globalKurjunUrls, final String[] localKurjunUrls ) throws ConfigurationException
+    public void setKurjunSettingsUrls( final String[] globalKurjunUrls, final String[] localKurjunUrls )
+            throws ConfigurationException
     {
         SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
         SystemSettings.setLocalKurjunUrls( localKurjunUrls );

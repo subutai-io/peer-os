@@ -52,11 +52,11 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
         {
             if ( InterceptorState.SERVER_IN.isActive( message ) )
             {
+                //obtain client request
+                HttpServletRequest req = ( HttpServletRequest ) message.getExchange().getInMessage()
+                                                                       .get( AbstractHTTPDestination.HTTP_REQUEST );
 
-                HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
-
-                if ( req.getLocalPort() == /*SystemSettings.getSecurePortX2()*/ peerManager.getLocalPeer().getPeerInfo()
-                                                                                           .getPort() )
+                if ( req.getLocalPort() == SystemSettings.getSecurePortX2() )
                 {
                     HttpHeaders headers = new HttpHeadersImpl( message.getExchange().getInMessage() );
                     String subutaiHeader = headers.getHeaderString( Common.SUBUTAI_HTTP_HEADER );
@@ -66,7 +66,6 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                     if ( path.startsWith( "/rest/v1/peer" ) )
                     {
                         handlePeerMessage( subutaiHeader, message );
-                        //                        LOG.debug( "Path handled by peer crypto handler: " + path );
                     }
                     else
                     {
@@ -76,18 +75,10 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
                             String s = path.substring( prefix.length() + 1 );
                             String environmentId = s.substring( 0, s.indexOf( "/" ) );
                             handleEnvironmentMessage( subutaiHeader, environmentId, message );
-                            //                            LOG.debug( "Path handled by environment crypto handler: " +
-                            // path );
-                        }
-                        else
-                        {
-                            //                            LOG.warn( "Path is not handled by crypto handler: " + path );
                         }
                     }
                 }
             }
-
-            //-----------------------------------------------------------------------------------------------
         }
         catch ( Exception e )
         {
@@ -99,6 +90,7 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     private void handlePeerMessage( final String targetId, final Message message )
     {
         String sourceId = peerManager.getLocalPeer().getId();
+
         MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
     }
 
@@ -110,5 +102,4 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 
         MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
     }
-    //******************************************************************
 }

@@ -10,7 +10,6 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-
   <!-- ***************************************************************** -->
   <bean id="daoManagerPeer" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="localPeerPUnit" property="entityManagerFactory" />
@@ -26,10 +25,6 @@
              interface="io.subutai.core.kurjun.api.TemplateManager" />
 
   <reference id="hostRegistry" interface="io.subutai.core.hostregistry.api.HostRegistry" />
-
-  <!--
-    <reference id="strategyManager" interface="io.subutai.core.strategy.api.StrategyManager" />
-  -->
 
   <reference id="quotaManager" availability="mandatory"
              interface="io.subutai.core.lxc.quota.api.QuotaManager" />
@@ -51,16 +46,12 @@
     <argument ref="daoManagerPeer" />
     <argument ref="templateRegistry" />
     <argument ref="quotaManager" />
-    <!--    <argument ref="strategyManager" />-->
     <argument ref="commandExecutor" />
     <argument ref="hostRegistry" />
     <argument ref="monitor" />
     <argument ref="securityManager" />
     <property name="identityManager" ref="identityManager" />
     <property name="relationManager" ref="relationManager" />
-<!--
-    <property name="externalIpInterface" value="${externalIpInterface}" />
--->
   </bean>
 
   <bean id="messageRequestListener" class="io.subutai.core.localpeer.impl.request.MessageRequestListener"

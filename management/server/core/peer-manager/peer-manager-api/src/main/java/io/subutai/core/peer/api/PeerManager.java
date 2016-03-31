@@ -61,7 +61,7 @@ public interface PeerManager
 
     void processRejectRequest( RegistrationData registrationData ) throws PeerException;
 
-    String getPeerIdByIp( String ip ) throws PeerException;
+    String getRemotePeerIdByIp( String ip ) throws PeerException;
 
     PeerGroupResources getPeerGroupResources() throws PeerException;
 

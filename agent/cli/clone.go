@@ -39,8 +39,6 @@ func LxcClone(parent, child, envId, addr, token string) {
 	setDns(child)
 	LxcStart(child)
 
-	container.AptUpdate(child)
-	// container.Start(child)
 	log.Info(child + " with ID " + gpg.GetFingerprint(child) + " successfully cloned")
 
 }
