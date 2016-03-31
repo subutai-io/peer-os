@@ -209,36 +209,41 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     function updateUrl() {
-        if (vm.previousName !== vm.currentUrlObject.url) {
-            // if (checkIfExists (vm.currentUrlObject)) {
-            //     SweetAlert.swal ("ERROR!", "Operation already exists", "error");
-            //     return;
-            // }
-        }
+        // if (checkIfExists(vm.currentUrlObject)) {
+        //     ngDialog.closeAll();
+        //     SweetAlert.swal("ERROR!", "Operation already exists", "error");
+        //     return;
+        // }
         if (vm.currentUrlObject.url === "" || vm.currentUrlObject.url === undefined) {
-            SweetAlert.swal("ERROR!", "Please enter operation name", "error");
+            SweetAlert.swal("ERROR!", "Please enter url", "error");
         }
 
         var postData = 'id=' + vm.currentUrlObject.id + '&url=' + vm.currentUrlObject.url;
 
+        LOADING_SCREEN();
+        ngDialog.closeAll();
+
         SettingsKurjunSrv.updateUrl(postData).success(function (data) {
+            LOADING_SCREEN('none');
+            if (Object.keys(vm.dtInstance).length !== 0) {
+                vm.dtInstance.reloadData(null, false);
+            }
             SweetAlert.swal("Success!", " Url was updated.", "success");
-            ngDialog.closeAll();
         }).error(function (error) {
             SweetAlert.swal("ERROR!", "Url update error: " + error.replace(/\\n/g, " "), "error");
         });
     }
 
-    // function checkIfExists(urlObject) {
-    //     var arr = [];
-    //     for (var i = 0; i < vm.urlList.length; ++i) {
-    //         arr.push (vm.urlList.url);
-    //     }
-    //     if (arr.indexOf (urlObject.url) > -1) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    function checkIfExists(urlObject) {
+        var arr = [];
+        for (var i = 1; i < vm.urlList.length; ++i) {
+            arr.push(vm.urlList[i].url);
+        }
+        if (arr.indexOf(urlObject.url) > -1) {
+            return true;
+        }
+        return false;
+    }
 
 
     function addUrl(newUrl) {

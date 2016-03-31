@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.ws.rs.core.Response;
@@ -283,7 +284,25 @@ public class KurjunManagerImpl implements KurjunManager
         kurjun.setType( type );
 
         dataService.persistKurjunData( kurjun );
+        updateSystemSettings();
+    }
 
+
+    @Override
+    public void updateUrl( final int id, final String url ) throws ConfigurationException
+    {
+        validateUrl( url );
+
+        Kurjun kurjun = dataService.getKurjunData( id );
+        kurjun.setUrl( url );
+
+        dataService.updateKurjunData( kurjun );
+        updateSystemSettings();
+    }
+
+
+    private void updateSystemSettings() throws ConfigurationException
+    {
         ArrayList<String> globalUrls = Lists.newArrayList();
         ArrayList<String> localUrls = Lists.newArrayList();
         for ( final Kurjun entity : dataService.getAllKurjunData() )

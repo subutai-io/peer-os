@@ -37,6 +37,9 @@ public interface KurjunManager
 
 
     //****************************************
-    void saveUrl(String url, int type) throws ConfigurationException;
+    void saveUrl( String url, int type ) throws ConfigurationException;
 
+
+    //****************************************
+    void updateUrl( int id, String url ) throws ConfigurationException;
 }

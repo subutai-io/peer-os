@@ -58,7 +58,16 @@ public class RestServiceImpl implements RestService
     @Override
     public Response update( final String id, final String url )
     {
-        return null;
+        try
+        {
+            kurjunManager.updateUrl( Integer.parseInt( id ), url );
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in saving URL:" + e.getMessage() );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
+        }
     }
 
 
