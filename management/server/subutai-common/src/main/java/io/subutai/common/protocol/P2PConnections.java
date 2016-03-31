@@ -7,9 +7,6 @@ import java.util.Set;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
-
-import io.subutai.common.util.CollectionUtil;
 
 
 /**
@@ -23,6 +20,8 @@ public class P2PConnections
 
     public P2PConnections( @JsonProperty( "connections" ) final Set<P2PConnection> connections )
     {
+        Preconditions.checkNotNull( connections );
+
         this.connections = connections;
     }
 
@@ -34,17 +33,16 @@ public class P2PConnections
 
     public void addConnection( P2PConnection p2PConnection )
     {
-        if ( p2PConnection == null )
-        {
-            throw new IllegalArgumentException( "P2P connection can not be null." );
-        }
+
+        Preconditions.checkNotNull( p2PConnection, "P2P connection can not be null." );
+
         connections.add( p2PConnection );
     }
 
 
     public Set<P2PConnection> getConnections()
     {
-        return CollectionUtil.isCollectionEmpty( connections ) ? Sets.<P2PConnection>newHashSet() : this.connections;
+        return this.connections;
     }
 
 
