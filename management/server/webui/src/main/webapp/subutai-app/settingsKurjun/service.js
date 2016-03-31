@@ -16,6 +16,7 @@ function SettingsKurjunSrv($http) {
     var SettingsKurjunSrv = {
         getConfig: getConfig,
         addUrl: addUrl,
+        getUrls: getUrls,
         updateUrl: updateUrl,
         registerUrl: registerUrl,
         signedMsg: signedMsg,
@@ -31,6 +32,14 @@ function SettingsKurjunSrv($http) {
             withCredentials: true,
             headers: {'Content-Type': 'application/json'}
         });
+    }
+
+    function getUrls() {
+        return $http.get(
+            URLS_LIST_URL,
+            {
+                withCredentials: true, headers: {'Content-Type': 'application/json'}
+            });
     }
 
     function addUrl(postData) {

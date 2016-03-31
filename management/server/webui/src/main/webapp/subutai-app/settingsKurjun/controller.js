@@ -14,7 +14,10 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.currentUrl = '';
     vm.currentType = '';
     vm.currentId = '';
-
+    vm.currentUrlObject = {};
+    vm.previousName = "";
+    vm.urlList = [];
+    vm.urls = {};
     vm.urlsType = {
         1: "Local",
         2: "Global",
@@ -32,10 +35,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.removeLocalUrl = removeLocalUrl;
     vm.autoSign = autoSign;
     vm.addUrl = addUrl;
-    vm.currentUrlObject = {};
-    vm.previousName = "";
     vm.updateUrl = updateUrl;
-    vm.urlList = [];
 
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
@@ -44,6 +44,14 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     getConfig();
+
+    function getUrls() {
+        SettingsKurjunSrv.getUrls().success(function (data) {
+            vm.urls = data;
+        });
+    }
+
+    getUrls();
 
 
     vm.dtInstance = {};
@@ -209,11 +217,12 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     function updateUrl() {
+        console.log(vm.urls);
         // if (checkIfExists(vm.currentUrlObject)) {
-        //     ngDialog.closeAll();
         //     SweetAlert.swal("ERROR!", "Operation already exists", "error");
         //     return;
         // }
+
         if (vm.currentUrlObject.url === "" || vm.currentUrlObject.url === undefined) {
             SweetAlert.swal("ERROR!", "Please enter url", "error");
         }
@@ -228,6 +237,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
             if (Object.keys(vm.dtInstance).length !== 0) {
                 vm.dtInstance.reloadData(null, false);
             }
+            vm.getUrls();
             SweetAlert.swal("Success!", " Url was updated.", "success");
         }).error(function (error) {
             SweetAlert.swal("ERROR!", "Url update error: " + error.replace(/\\n/g, " "), "error");
@@ -235,14 +245,23 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     function checkIfExists(urlObject) {
-        var arr = [];
-        for (var i = 1; i < vm.urlList.length; ++i) {
-            arr.push(vm.urlList[i].url);
+        
+        for (var i = 0; i<= vm.urls.length; ++i){
+            if (urlObject.url == vm.urls[i]){
+                return true;
+            }
         }
-        if (arr.indexOf(urlObject.url) > -1) {
-            return true;
-        }
+        
         return false;
+
+        // var arr = [];
+        // for (var i = 0; i < vm.operations.length; ++i) {
+        //     arr.push(vm.operations.operationName);
+        // }
+        // if (arr.indexOf(operation.operationName) > -1) {
+        //     return true;
+        // }
+        // return false;
     }
 
 
