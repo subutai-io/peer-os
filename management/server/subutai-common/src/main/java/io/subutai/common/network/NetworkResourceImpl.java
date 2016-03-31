@@ -1,6 +1,7 @@
 package io.subutai.common.network;
 
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 
@@ -56,9 +57,11 @@ public class NetworkResourceImpl implements NetworkResource
     }
 
 
+    @JsonIgnore
     @Override
     public int getVlan()
     {
-        throw new UnsupportedOperationException( "VLAN is calculated on target peer" );
+        //vlan is calculated on target peer
+        return -1;
     }
 }
