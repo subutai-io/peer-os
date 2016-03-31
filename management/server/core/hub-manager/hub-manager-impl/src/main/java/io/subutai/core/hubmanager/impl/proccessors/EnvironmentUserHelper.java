@@ -101,7 +101,7 @@ public class EnvironmentUserHelper
         // Trick to get later the user id in Hub
         String email = userDto.getId() + "@hub.subut.ai";
 
-        String password = "!qaz@wsx";
+        String password = "" + Math.abs( userDto.getEmail().hashCode() );
 
         try
         {

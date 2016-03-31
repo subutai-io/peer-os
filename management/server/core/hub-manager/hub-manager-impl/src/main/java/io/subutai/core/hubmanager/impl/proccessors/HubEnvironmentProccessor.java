@@ -137,10 +137,10 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
-                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
+                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case DELETE_PEER:
                     deletePeer( peerDto );
