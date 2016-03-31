@@ -39,7 +39,7 @@ public class P2pIps
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( p2pIps ) );
 
-        p2pIps.addAll( p2pIps );
+        this.p2pIps.addAll( p2pIps );
     }
 
 

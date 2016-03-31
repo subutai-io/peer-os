@@ -18,9 +18,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -313,18 +311,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void reserveVni( final Vni vni ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( vni );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vni.getVlan(), Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-
-        execute( getManagementHost(),
-                commands.getReserveVniCommand( vni.getVni(), vni.getVlan(), vni.getEnvironmentId() ) );
-    }
-
-
-    @Override
     public String getVlanDomain( final int vLanId ) throws NetworkManagerException
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
@@ -436,35 +422,6 @@ public class NetworkManagerImpl implements NetworkManager
             throw new NetworkManagerException(
                     String.format( "Could not parse port out of response %s", result.getStdOut() ) );
         }
-    }
-
-
-    @Override
-    public Vnis getReservedVnis() throws NetworkManagerException
-    {
-        Vnis reservedVnis = new Vnis();
-
-        CommandResult result = execute( getManagementHost(), commands.getListReservedVnisCommand() );
-
-        Pattern p = Pattern.compile( "\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*"
-                        + "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*",
-                Pattern.CASE_INSENSITIVE );
-
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
-            {
-                reservedVnis.add( new Vni( Long.parseLong( m.group( 1 ) ), Integer.parseInt( m.group( 2 ) ),
-                        m.group( 3 ) ) );
-            }
-        }
-
-        return reservedVnis;
     }
 
 

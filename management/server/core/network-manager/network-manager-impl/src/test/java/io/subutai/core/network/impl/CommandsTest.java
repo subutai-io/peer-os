@@ -85,18 +85,4 @@ public class CommandsTest
     {
         assertNotNull( commands.getListVniVlanMappingsCommand() );
     }
-
-
-    @Test
-    public void testReserveVniCommand() throws Exception
-    {
-        assertNotNull( commands.getReserveVniCommand( VNI, VLAN_ID, ENVIRONMENT_ID ) );
-    }
-
-
-    @Test
-    public void testGetListReservedVnisCommand() throws Exception
-    {
-        assertNotNull( commands.getListReservedVnisCommand() );
-    }
 }

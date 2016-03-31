@@ -4,9 +4,7 @@ package io.subutai.core.network.api;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
@@ -135,20 +133,6 @@ public interface NetworkManager
      * Returns all vni-vlan mappings on specified host
      */
     public Set<VniVlanMapping> getVniVlanMappings( Host host ) throws NetworkManagerException;
-
-    /**
-     * Reserves VNI on management host
-     *
-     * @param vni - vni to reserve
-     */
-    @Deprecated
-    public void reserveVni( Vni vni ) throws NetworkManagerException;
-
-    /**
-     * Returns all reserved VNIs on management host
-     */
-    @Deprecated
-    public Vnis getReservedVnis() throws NetworkManagerException;
 
 
     /**
