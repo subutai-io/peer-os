@@ -26,7 +26,6 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateways;
 import io.subutai.common.network.NetworkResource;
-import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -223,6 +222,9 @@ public interface Peer
 
     UsedNetworkResources getUsedNetworkResources() throws PeerException;
 
+    void reserveNetworkResource( NetworkResource networkResource ) throws PeerException;
+
+
     /**
      * Sets up tunnels on the local peer to the specified remote peers todo use EnvironmentId instead of string
      */
@@ -348,8 +350,4 @@ public interface Peer
     void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
-
-    public ReservedNetworkResources getReservedNetworkResources() throws PeerException;
-
-    void reserveNetworkResource( NetworkResource networkResource ) throws PeerException;
 }

@@ -311,7 +311,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public UsedNetworkResources getReservedNetResources()
+    public UsedNetworkResources getUsedNetResources()
     {
         try
         {

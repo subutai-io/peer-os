@@ -20,13 +20,13 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateways;
+import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
@@ -704,7 +704,7 @@ public class PeerWebClient
     }
 
 
-    public UsedNetworkResources getReservedNetResources() throws PeerException
+    public UsedNetworkResources getUsedNetResources() throws PeerException
     {
         String path = "/netresources";
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
@@ -730,8 +730,7 @@ public class PeerWebClient
     }
 
 
-    public void reserveNetworkResource( final String environmentId, final long vni, final String p2pSubnet,
-                                        final String containerSubnet ) throws PeerException
+    public void reserveNetworkResource( final NetworkResource networkResource ) throws PeerException
     {
         String path = "/netresources";
 
@@ -739,8 +738,7 @@ public class PeerWebClient
 
         client.type( MediaType.APPLICATION_JSON );
 
-        final Response response =
-                client.post( new NetworkResourceImpl( environmentId, vni, p2pSubnet, containerSubnet ) );
+        final Response response = client.post( networkResource );
 
         if ( response.getStatus() == 500 )
         {

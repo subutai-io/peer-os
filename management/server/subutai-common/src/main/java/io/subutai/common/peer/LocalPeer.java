@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.task.Task;
 
@@ -159,5 +160,7 @@ public interface LocalPeer extends Peer
     public void exchangeMhKeysWithRH() throws Exception;
 
     void setPeerInfo( PeerInfo peerInfo );
+
+    public ReservedNetworkResources getReservedNetworkResources() throws PeerException;
 }
 

@@ -120,7 +120,7 @@ public interface RestService
     @GET
     @Path( "netresources" )
     @Produces( MediaType.APPLICATION_JSON )
-    UsedNetworkResources getReservedNetResources();
+    UsedNetworkResources getUsedNetResources();
 
     @POST
     @Path( "netresources" )

@@ -42,6 +42,7 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.Gateways;
+import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.network.Vni;
 import io.subutai.common.network.Vnis;
@@ -70,12 +71,10 @@ import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
@@ -716,7 +715,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
-        return new PeerWebClient( peerInfo, provider ).getReservedNetResources();
+        return new PeerWebClient( peerInfo, provider ).getUsedNetResources();
     }
 
 
@@ -832,17 +831,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void reserveNetworkResource( final String environmentId, final long vni, final String p2pSubnet,
-                                        final String containerSubnet ) throws PeerException
+    public void reserveNetworkResource( final NetworkResource networkResource ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid env id" );
-        Preconditions
-                .checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ), "Invalid vni" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ), "Invalid p2p subnet" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerSubnet ), "Invalid container subnet" );
+        Preconditions.checkNotNull( networkResource );
 
-        new PeerWebClient( peerInfo, provider )
-                .reserveNetworkResource( environmentId, vni, p2pSubnet, containerSubnet );
+        new PeerWebClient( peerInfo, provider ).reserveNetworkResource( networkResource );
     }
 
 
