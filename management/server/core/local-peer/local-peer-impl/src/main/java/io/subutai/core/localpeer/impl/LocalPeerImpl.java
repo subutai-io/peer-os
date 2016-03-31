@@ -2020,6 +2020,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 throw new PeerException( e.getMessage() );
             }
         }
+
+        //remove reservation
+        try
+        {
+            networkResourceDao.delete( ( NetworkResourceEntity ) reservedNetworkResource );
+        }
+        catch ( DaoException e )
+        {
+            LOG.warn( "Failed to delete reservation from db", e );
+        }
     }
 
 
