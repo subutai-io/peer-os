@@ -20,12 +20,13 @@ var app = angular.module('subutai-app', [
 
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
+	.factory('SettingsKurjunSrv', SettingsKurjunSrv)
 
     .run(startup);
 
 CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
+startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog', 'SettingsKurjunSrv'];
 
 function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog) {
     var vm = this;
@@ -408,13 +409,9 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/kurjun/controller.js',
                                 'subutai-app/kurjun/service.js',
                                 'subutai-app/identity/service.js',
-                                'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
-                }],
-                serviceData: ['kurjunSrv', function(kurjunSrv) {
-                    return kurjunSrv.promise;
                 }]
             }
         })
@@ -656,8 +653,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             name: 'subutai.settings-kurjun',
                             files: [
                                 'subutai-app/settingsKurjun/settingsKurjun.js',
-                                'subutai-app/settingsKurjun/controller.js',
-                                'subutai-app/settingsKurjun/service.js'
+                                'subutai-app/settingsKurjun/controller.js'
                             ]
                         }
                     ]);
@@ -785,7 +781,11 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
     });
 }
 
-function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog) {
+function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog, SettingsKurjunSrv) {
+
+	SettingsKurjunSrv.getConfig().success (function (data) {
+		GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
+	});
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         LOADING_SCREEN('none');
@@ -921,6 +921,7 @@ app.directive('focusInput', function ($timeout, $parse) {
 var bazaarUpdate = false;
 
 var SERVER_URL = '/';
+var GLOBAL_KURJUN_URL = '';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 1600;
