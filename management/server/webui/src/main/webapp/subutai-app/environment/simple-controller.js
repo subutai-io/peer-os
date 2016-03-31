@@ -549,6 +549,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function initJointJs() {
 
+		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+			if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
+				clearWorkspace();
+				vm.currentEnvironment = {};
+			}
+		}, false);
+
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
 			width: '100%',
@@ -679,13 +686,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		});
 	}
-
-	document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
-		if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
-			clearWorkspace();
-			vm.currentEnvironment = {};
-		}
-	}, false);
 
 	function editEnvironment(environment) {
 		clearWorkspace();
