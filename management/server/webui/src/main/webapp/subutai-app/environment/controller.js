@@ -596,8 +596,8 @@ function getDateFromString(string) {
 	dateString = [temp[1], temp[0], temp[2]].join('.') + ' ' + dateString[1];
 	var dateFullString = [dateString, logTextTime[1], logTextTime[2]].join(':');
 
-	var testDateUtc = moment.utc(dateFullString);
-	var localDate = moment(testDateUtc).local();
+	//var testDateUtc = moment.utc(Date.parse(dateFullString));
+	var localDate = moment(Date.parse(dateFullString + '+0000')).local();
 
 	return localDate.format('HH:mm:ss');
 }
