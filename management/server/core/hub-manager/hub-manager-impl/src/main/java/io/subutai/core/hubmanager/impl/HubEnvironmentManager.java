@@ -149,13 +149,14 @@ public class HubEnvironmentManager
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
+        final String subnetWithoutMask = env.getSubnetCidr().replace( "/24", "" );
         completionService.submit( new Callable<Peer>()
         {
             @Override
             public Peer call() throws Exception
             {
                 localPeer.reserveNetworkResource(
-                        new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), env.getSubnetCidr() ) );
+                        new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), subnetWithoutMask ) );
                 return localPeer;
             }
         } );
