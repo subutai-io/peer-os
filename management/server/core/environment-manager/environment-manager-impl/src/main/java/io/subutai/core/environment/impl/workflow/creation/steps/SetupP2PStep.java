@@ -2,10 +2,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -18,25 +15,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.entity.PeerConfImpl;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -75,18 +70,9 @@ public class SetupP2PStep
         //add local peer
         peers.add( localPeer );
 
-        // figure out free p2p subnet
-        Set<String> usedSubnets = getUsedP2PSubnets( peers );
-        String freeP2pSubnet = P2PUtil.findFreeSubnet( usedSubnets );
 
-        if ( freeP2pSubnet == null )
-        {
-            throw new EnvironmentCreationException( "Free p2p subnet not found" );
-        }
-
-        environment.setP2PSubnet( freeP2pSubnet );
-
-        SubnetUtils.SubnetInfo subnetInfo = new SubnetUtils( freeP2pSubnet, P2PUtil.P2P_SUBNET_MASK ).getInfo();
+        SubnetUtils.SubnetInfo subnetInfo =
+                new SubnetUtils( environment.getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         final String[] addresses = subnetInfo.getAllAddresses();
 
@@ -98,14 +84,12 @@ public class SetupP2PStep
         ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        int counter = 1;
         for ( Peer peer : peers )
         {
             P2PConfig config =
-                    new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), addresses[counter],
-                            sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+                    new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), null, sharedKey,
+                            Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
-            counter++;
         }
 
         // p2p setup
@@ -142,7 +126,7 @@ public class SetupP2PStep
 
         for ( P2PConfig config : result )
         {
-            environment.addEnvironmentPeer( new PeerConfImpl( config ) );
+            environment.getPeerConf( config.getPeerId() ).addP2pIps( config.getP2pIps() );
         }
 
         if ( !peers.isEmpty() )
@@ -152,15 +136,14 @@ public class SetupP2PStep
 
         //tunnel setup
 
-        Map<String, String> tunnels = environment.getTunnels();
+        P2pIps p2pIps = environment.getP2pIps();
         int peersCount = environment.getPeerConfs().size();
         ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
-        ExecutorCompletionService<Integer> tunnelCompletionService =
-                new ExecutorCompletionService<Integer>( tunnelExecutor );
+        ExecutorCompletionService<Boolean> tunnelCompletionService = new ExecutorCompletionService<>( tunnelExecutor );
 
         for ( Peer peer : environment.getPeers() )
         {
-            tunnelCompletionService.submit( new SetupTunnelTask( peer, environment.getId(), tunnels ) );
+            tunnelCompletionService.submit( new SetupTunnelTask( peer, environment.getId(), p2pIps ) );
         }
 
         succeededPeers = Sets.newHashSet();
@@ -168,7 +151,7 @@ public class SetupP2PStep
 
         for ( Peer peer : peers )
         {
-            final Future<Integer> f;
+            final Future<Boolean> f;
             try
             {
                 f = tunnelCompletionService.take();
@@ -202,32 +185,6 @@ public class SetupP2PStep
     }
 
 
-    private Set<String> getUsedP2PSubnets( final Set<Peer> peers ) throws PeerException
-    {
-        Set<String> result = new HashSet<>();
-
-        for ( Peer peer : peers )
-        {
-            Set<HostInterfaceModel> r = peer.getInterfaces().filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
-
-            Collection tunnels = CollectionUtils.collect( r, new Transformer()
-            {
-                @Override
-                public Object transform( final Object o )
-                {
-                    HostInterface i = ( HostInterface ) o;
-                    SubnetUtils u = new SubnetUtils( i.getIp(), P2PUtil.P2P_SUBNET_MASK );
-                    return u.getInfo().getNetworkAddress();
-                }
-            } );
-
-            result.addAll( tunnels );
-        }
-
-        return result;
-    }
-
-
     private class SetupP2PConnectionTask implements Callable<P2PConfig>
     {
         private Peer peer;
@@ -244,31 +201,37 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
+            P2PConnections p2PConnections = peer.setupP2PConnection( p2PConfig );
+            for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
+            {
+                p2PConfig.addP2pIp( p2PConnection.getIp() );
+            }
             return p2PConfig;
         }
     }
 
 
-    private class SetupTunnelTask implements Callable<Integer>
+    private class SetupTunnelTask implements Callable<Boolean>
     {
         private final Peer peer;
         private final String environmentId;
-        private final Map<String, String> tunnels;
+        private final P2pIps p2pIps;
 
 
-        public SetupTunnelTask( final Peer peer, final String environmentId, final Map<String, String> tunnels )
+        public SetupTunnelTask( final Peer peer, final String environmentId, final P2pIps p2pIps )
         {
             this.peer = peer;
             this.environmentId = environmentId;
-            this.tunnels = tunnels;
+            this.p2pIps = p2pIps;
         }
 
 
         @Override
-        public Integer call() throws Exception
+        public Boolean call() throws Exception
         {
-            return peer.setupTunnels( tunnels, environmentId );
+            peer.setupTunnels( p2pIps, environmentId );
+
+            return true;
         }
     }
 }

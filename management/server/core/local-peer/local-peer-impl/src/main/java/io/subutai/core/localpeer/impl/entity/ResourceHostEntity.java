@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.naming.NamingException;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
@@ -43,6 +44,7 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
@@ -50,15 +52,19 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.container.CreateContainerTask;
 import io.subutai.core.localpeer.impl.container.DestroyContainerTask;
+import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
+import io.subutai.core.network.api.NetworkManager;
 
 
 /**
@@ -196,6 +202,39 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         Preconditions.checkNotNull( hostname );
         this.hostname = hostname;
+    }
+
+
+    public void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException
+    {
+        Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
+        Preconditions.checkNotNull( networkResource, "Invalid networkResource" );
+
+        //need to execute sequentially since other parallel executions can setup the same tunnel
+        Future<Boolean> future =
+                queueSequentialTask( new SetupTunnelsTask( getNetworkManager(), this, p2pIps, networkResource ) );
+
+        try
+        {
+            future.get();
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceHostException( "Error setting up tunnels", e.getCause() );
+        }
+    }
+
+
+    protected NetworkManager getNetworkManager() throws ResourceHostException
+    {
+        try
+        {
+            return ServiceLocator.getServiceNoCache( NetworkManager.class );
+        }
+        catch ( NamingException e )
+        {
+            throw new ResourceHostException( e );
+        }
     }
 
 

@@ -4,11 +4,8 @@ package io.subutai.core.network.api;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.Host;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
@@ -18,7 +15,6 @@ public interface NetworkManager
 {
     String TUNNEL_PREFIX = "tunnel";
     String TUNNEL_TYPE = "vxlan";
-    String P2P_STRING_KEY = "string";
 
 
     /**
@@ -88,6 +84,12 @@ public interface NetworkManager
      */
     public void setupTunnel( int tunnelId, String tunnelIp ) throws NetworkManagerException;
 
+
+    /**
+     * Sets up tunnel to another peer on specified host
+     */
+    public void setupTunnel( Host host, int tunnelId, String tunnelIp ) throws NetworkManagerException;
+
     /**
      * Removes tunnel to another peer on management host
      */
@@ -99,11 +101,22 @@ public interface NetworkManager
      */
     public Set<Tunnel> listTunnels() throws NetworkManagerException;
 
+    /**
+     * Lists existing tunnels on specified host
+     */
+    public Set<Tunnel> listTunnels( Host host ) throws NetworkManagerException;
+
 
     /**
      * Sets up VNI-VLAN mapping on management host
      */
     public void setupVniVLanMapping( int tunnelId, long vni, int vLanId, String environmentId )
+            throws NetworkManagerException;
+
+    /**
+     * Sets up VNI-VLAN mapping on specified host
+     */
+    public void setupVniVLanMapping( Host host, int tunnelId, long vni, int vLanId, String environmentId )
             throws NetworkManagerException;
 
     /**
@@ -117,16 +130,9 @@ public interface NetworkManager
     public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
 
     /**
-     * Reserves VNI on management host
-     *
-     * @param vni - vni to reserve
+     * Returns all vni-vlan mappings on specified host
      */
-    public void reserveVni( Vni vni ) throws NetworkManagerException;
-
-    /**
-     * Returns all reserved VNIs on management host
-     */
-    public Vnis getReservedVnis() throws NetworkManagerException;
+    public Set<VniVlanMapping> getVniVlanMappings( Host host ) throws NetworkManagerException;
 
 
     /**

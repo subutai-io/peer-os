@@ -15,9 +15,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -31,7 +29,6 @@ import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
@@ -247,27 +244,6 @@ public class NetworkManagerImplTest
         doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getContainerHostByName( anyString() );
 
         networkManager.getContainerHost( CONTAINER_NAME );
-    }
-
-
-    @Test
-    public void testReserveVni() throws Exception
-    {
-        networkManager.reserveVni( new Vni( VNI, VLAN_ID, ENVIRONMENT_ID ) );
-
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testGetReservedVnis() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( RESERVED_VNIS_OUTPUT );
-
-        Vnis vnis = networkManager.getReservedVnis();
-
-        assertNotNull( vnis.findVlanByVni( VNI ) );
-        assertNotNull( vnis.findVniByEnvironmentId( ENVIRONMENT_ID ) );
     }
 
 

@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Map;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -19,17 +17,17 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
 
@@ -51,34 +49,12 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
-    @GET
-    @Path( "vni" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Vnis getReservedVnis();
-
-    @POST
-    @Path( "vni" )
-    @Produces( MediaType.APPLICATION_JSON )
-    @Consumes( MediaType.APPLICATION_JSON )
-    Vni reserveVni( Vni vni );
-
-    @GET
-    @Path( "gateways" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Gateways getGateways();
-
-
-    @POST
-    @Path( "container/gateway" )
-    Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
-                                @FormParam( "gatewayIp" ) String gatewayIp );
 
     @POST
     @Path( "tunnels/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.TEXT_PLAIN )
-    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, Map<String, String> peerIps );
+    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, P2pIps p2pIps );
 
     @POST
     @Path( "pek" )
@@ -117,6 +93,16 @@ public interface RestService
     ResourceHostMetrics getResources();
 
     @GET
+    @Path( "netresources" )
+    @Produces( MediaType.APPLICATION_JSON )
+    UsedNetworkResources getUsedNetResources();
+
+    @POST
+    @Path( "netresources" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void reserveNetResources( NetworkResourceImpl networkResource );
+
+    @GET
     @Path( "interfaces" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
@@ -135,9 +121,9 @@ public interface RestService
 
     @POST
     @Path( "p2ptunnel" )
-    @Produces( MediaType.TEXT_PLAIN )
+    @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response setupP2PConnection( P2PConfig config );
+    P2PConnections setupP2PConnection( P2PConfig config );
 
     @POST
     @Path( "p2pinitial" )
