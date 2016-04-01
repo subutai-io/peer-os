@@ -40,7 +40,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
                 new ContainerHostInfoModel(
                         json.get( "id" ).asText(),
-                        json.get( "id" ).asText(),
+                        json.get( "hostName" ).asText(),
                         initHostInterfaces( json ),
                         HostArchitecture.AMD64,
                         ContainerHostState.RUNNING

@@ -153,6 +153,8 @@ public class HubEnvironmentManager
 
     public Set<String> getReservedGateways()
     {
+        Set<String> gatewayDtos = new HashSet<>();
+
         //todo reimplement
         //        Set<String> gatewayDtos = new HashSet<>();
         //        try
@@ -169,7 +171,8 @@ public class HubEnvironmentManager
         //        {
         //            LOG.error( "Could not get local peer used interfaces" );
         //        }
-        return null;
+
+        return gatewayDtos;
     }
 
 
@@ -405,7 +408,10 @@ public class HubEnvironmentManager
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
-                sshKeys.addAll( nodeDto.getSshKeys() );
+                if ( nodeDto.getSshKeys() != null )
+                {
+                    sshKeys.addAll( nodeDto.getSshKeys() );
+                }
             }
         }
 

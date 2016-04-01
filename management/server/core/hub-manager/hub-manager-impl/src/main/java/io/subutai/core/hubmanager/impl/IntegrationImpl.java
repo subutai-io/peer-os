@@ -65,9 +65,13 @@ public class IntegrationImpl implements Integration
     private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class );
 
     private SecurityManager securityManager;
+
     private EnvironmentManager environmentManager;
+
     private PeerManager peerManager;
+
     private ConfigManager configManager;
+
     private CommandExecutor commandExecutor;
 
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -80,23 +84,32 @@ public class IntegrationImpl implements Integration
 
     private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
-
     private HeartbeatProcessor heartbeatProcessor;
+
     private ResourceHostConfProcessor resourceHostConfProcessor;
+
     private SystemConfProcessor systemConfProcessor;
+
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
+
     private HubLoggerProcessor hubLoggerProcessor;
 
     private DaoManager daoManager;
+
     private ConfigDataService configDataService;
+
     private Monitor monitor;
+
     private IdentityManager identityManager;
+
     private HubEnvironmentManager hubEnvironmentManager;
+
     private NetworkManager networkManager;
 
     private ContainerEventProcessor containerEventProcessor;
 
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+
     private String checksum = "";
 
 
@@ -129,7 +142,8 @@ public class IntegrationImpl implements Integration
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
-            EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService );
+            EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
+                    environmentManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
                     new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor, environmentUserHelper );

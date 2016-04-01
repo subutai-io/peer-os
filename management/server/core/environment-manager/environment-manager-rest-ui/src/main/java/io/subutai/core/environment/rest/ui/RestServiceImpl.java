@@ -18,10 +18,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.environment.rest.ui.entity.ContainerDto;
-import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
-import io.subutai.core.environment.rest.ui.entity.PeerDto;
-import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +26,6 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -59,6 +54,10 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
+import io.subutai.core.environment.rest.ui.entity.ContainerDto;
+import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
+import io.subutai.core.environment.rest.ui.entity.PeerDto;
+import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -158,6 +157,9 @@ public class RestServiceImpl implements RestService
 
             Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
 
+            // @todo workaround, subnet shouldn't be calculated in distributaion
+            topology.setSubnet("192.168.1.1/24");
+
             eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
         catch ( Exception e )
@@ -184,6 +186,8 @@ public class RestServiceImpl implements RestService
 
             Topology topology = new Topology( name );
 
+            // @todo workaround, subnet shouldn't be calculated in distributaion
+            topology.setSubnet("192.168.1.1/24");
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 

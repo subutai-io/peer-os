@@ -40,6 +40,7 @@ public interface EnvironmentManager
      */
     Set<Environment> getEnvironments();
 
+    Set<Environment> getEnvironmentsByOwnerId( long userId );
 
     /**
      * Creates environment based on a passed topology
