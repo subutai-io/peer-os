@@ -6,12 +6,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.peer.ContainerCreationException;
-import io.subutai.common.peer.ContainerGroupNotFoundException;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.ResourceHostException;
-
-import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertEquals;
 
 
@@ -29,16 +23,6 @@ public class ExceptionsTest
         ContainerCreationException exception = new ContainerCreationException( ERR_MSG );
 
         assertEquals( ERR_MSG, exception.getMessage() );
-    }
-
-
-    @Test
-    public void testContainerGroupNotFoundException() throws Exception
-    {
-        ContainerGroupNotFoundException exception = new ContainerGroupNotFoundException();
-
-        assertNull( exception.getMessage() );
-        assertNull( exception.getCause() );
     }
 
 

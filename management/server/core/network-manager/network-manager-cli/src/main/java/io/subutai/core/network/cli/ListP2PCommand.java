@@ -14,7 +14,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.network.api.NetworkManager;
 
 
 @Command( scope = "net", name = "p2p-list", description = "List P2P connections" )
@@ -22,7 +21,6 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( ListP2PCommand.class.getName() );
 
-    private final NetworkManager networkManager;
     private final LocalPeer localPeer;
 
     @Argument( index = 0, name = "host id", required = false, multiValued = false,
@@ -30,12 +28,10 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
     String hostId;
 
 
-    public ListP2PCommand( final NetworkManager networkManager, final LocalPeer localPeer )
+    public ListP2PCommand( final LocalPeer localPeer )
     {
-        Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( localPeer );
 
-        this.networkManager = networkManager;
         this.localPeer = localPeer;
     }
 
@@ -45,9 +41,9 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
     {
         try
         {
-            final P2PConnections connections = Strings.isNullOrEmpty( hostId ) ? networkManager.getP2PConnections() :
-                                               networkManager
-                                                       .getP2PConnections( localPeer.getResourceHostById( hostId ) );
+            final P2PConnections connections =
+                    Strings.isNullOrEmpty( hostId ) ? localPeer.getManagementHost().getP2PConnections() :
+                    localPeer.getResourceHostById( hostId ).getP2PConnections();
 
             System.out.format( "Found %d P2P connection(s)%n", connections.getConnections().size() );
 

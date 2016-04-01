@@ -226,37 +226,6 @@ public class PeerWebClient
     }
 
 
-    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
-
-        String path = String.format( "/p2pip/%s/%s", resourceHostId, swarmHash );
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.accept( MediaType.TEXT_PLAIN );
-
-        try
-        {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( String.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting P2P IP", e );
-        }
-    }
-
-
     public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Adding remote peer to p2p swarm: %s %s", config.getHash(), config.getAddress() ) );

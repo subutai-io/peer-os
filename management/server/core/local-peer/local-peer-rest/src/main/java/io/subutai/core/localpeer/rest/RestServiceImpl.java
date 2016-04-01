@@ -282,7 +282,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            localPeer.resetP2PSecretKey( p2PCredentials );
+            localPeer.resetSwarmSecretKey( p2PCredentials );
         }
         catch ( Exception e )
         {
@@ -293,12 +293,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getP2PIP( final String resourceHostId, final String swarmHash )
+    public P2PConnections joinP2PSwarm( final P2PConfig config )
     {
         try
         {
-            String p2pIp = localPeer.getP2PIP( resourceHostId, swarmHash );
-            return Response.ok( p2pIp ).build();
+            return localPeer.joinP2PSwarm( config );
         }
         catch ( Exception e )
         {
@@ -309,26 +308,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public P2PConnections setupP2PConnection( final P2PConfig config )
+    public Response createP2PSwarm( final P2PConfig config )
     {
         try
         {
-            return localPeer.setupP2PConnection( config );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response setupInitialP2PConnection( final P2PConfig config )
-    {
-        try
-        {
-            localPeer.setupInitialP2PConnection( config );
+            localPeer.createP2PSwarm( config );
             return Response.ok().build();
         }
         catch ( Exception e )

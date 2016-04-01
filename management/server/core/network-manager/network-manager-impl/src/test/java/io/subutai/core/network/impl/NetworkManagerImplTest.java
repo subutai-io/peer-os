@@ -20,16 +20,13 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
-import static junit.framework.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -113,29 +110,6 @@ public class NetworkManagerImplTest
     public void testConstructor() throws Exception
     {
         new NetworkManagerImpl( null );
-    }
-
-
-    @Test
-    public void testListTunnels() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( LIST_TUNNELS_OUTPUT );
-
-        Set<Tunnel> tunnels = networkManager.listTunnels();
-
-        assertFalse( tunnels.isEmpty() );
-    }
-
-
-    @Test
-    public void testSetupVniVLanMapping() throws Exception
-    {
-
-        networkManager.setupVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID );
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
 

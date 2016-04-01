@@ -15,7 +15,6 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertHandler;
-import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -31,7 +30,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
  */
 public interface EnvironmentManager
 {
-    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
+    //TODO implement startContainer, stopContainer and resetSwarmSecretKey methods
 
     /**
      * Returns all existing environments
@@ -228,11 +227,6 @@ public interface EnvironmentManager
     EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
             throws EnvironmentNotFoundException;
 
-    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
-            throws EnvironmentManagerException;
-
-    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
-            throws EnvironmentManagerException;
 
     List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
 

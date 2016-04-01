@@ -83,7 +83,7 @@ public interface LocalPeer extends Peer
     /**
      * Returns instance of management host
      */
-    public Host getManagementHost() throws HostNotFoundException;
+    public ResourceHost getManagementHost() throws HostNotFoundException;
 
     /**
      * Returns all local peer's resource hosts
