@@ -1,7 +1,6 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +17,11 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -35,10 +33,8 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.network.NetworkResource;
-import io.subutai.common.network.ReservedNetworkResources;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -54,6 +50,7 @@ import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.network.api.NetworkManager;
@@ -98,80 +95,82 @@ public class HubEnvironmentManager
     }
 
 
-    public Set<Long> getReservedVnis()
+    public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto )
+            throws EnvironmentCreationException
     {
-        Set<Long> vniDtos = new HashSet<>();
-        try
+        final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
+        final LocalPeer localPeer = peerManager.getLocalPeer();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        completionService.submit( new Callable<Peer>()
         {
-            ReservedNetworkResources reservedNetworkResources =
-                    peerManager.getLocalPeer().getReservedNetworkResources();
-            for ( NetworkResource NetworkResource : reservedNetworkResources.getNetworkResources() )
+            @Override
+            public Peer call() throws Exception
             {
-                vniDtos.add( NetworkResource.getVni() );
+                reservedNetResources.put( localPeer, localPeer.getUsedNetworkResources() );
+                return localPeer;
             }
-            return vniDtos;
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Could not get local peer reserved vnis" );
-        }
-        return null;
-    }
+        } );
 
-
-    public Set<String> getTunnelNetworks()
-    {
-        Set<String> usedInterfaces = new HashSet<>();
+        executorService.shutdown();
         try
         {
-            Set<HostInterfaceModel> r =
-                    peerManager.getLocalPeer().getInterfaces().filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
-
-
-            Collection tunnels = CollectionUtils.collect( r, new Transformer()
-            {
-                @Override
-                public Object transform( final Object o )
-                {
-                    HostInterface i = ( HostInterface ) o;
-                    SubnetUtils u = new SubnetUtils( i.getIp(), P2PUtil.P2P_SUBNET_MASK );
-                    return u.getInfo().getNetworkAddress();
-                }
-            } );
-
-            usedInterfaces.addAll( tunnels );
-            return usedInterfaces;
+            Future<Peer> f = completionService.take();
+            f.get();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
-            LOG.error( "Could not get local peer used interfaces" );
+            throw new EnvironmentCreationException( "Failed to obtain reserved network resources from local peer" );
         }
-        return null;
+
+        Set<String> allP2pSubnets = Sets.newHashSet();
+        Set<String> allContainerSubnets = Sets.newHashSet();
+        Set<Long> allVnis = Sets.newHashSet();
+
+        for ( UsedNetworkResources netResources : reservedNetResources.values() )
+        {
+            allContainerSubnets.addAll( netResources.getContainerSubnets() );
+            allP2pSubnets.addAll( netResources.getP2pSubnets() );
+            allVnis.addAll( netResources.getVnis() );
+        }
+        peerDto.setVnis( allVnis );
+        peerDto.setContainerSubnets( allContainerSubnets );
+        peerDto.setP2pSubnets( allP2pSubnets );
+        return peerDto;
     }
 
 
-    public Set<String> getReservedGateways()
+    public void reserveNetworkResource( EnvironmentPeerDto peerDto ) throws EnvironmentCreationException
     {
-        Set<String> gatewayDtos = new HashSet<>();
+        final LocalPeer localPeer = peerManager.getLocalPeer();
+        final EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
-        //todo reimplement
-        //        Set<String> gatewayDtos = new HashSet<>();
-        //        try
-        //        {
-        //
-        //            Gateways gateways = peerManager.getLocalPeer().getGateways();
-        //            for ( Gateway gateway : gateways.list() )
-        //            {
-        //                gatewayDtos.add( gateway.getIp() );
-        //            }
-        //            return gatewayDtos;
-        //        }
-        //        catch ( PeerException e )
-        //        {
-        //            LOG.error( "Could not get local peer used interfaces" );
-        //        }
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
-        return gatewayDtos;
+        final String subnetWithoutMask = env.getSubnetCidr().replace( "/24", "" );
+        completionService.submit( new Callable<Peer>()
+        {
+            @Override
+            public Peer call() throws Exception
+            {
+                localPeer.reserveNetworkResource(
+                        new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), subnetWithoutMask ) );
+                return localPeer;
+            }
+        } );
+
+        executorService.shutdown();
+        try
+        {
+            Future<Peer> f = completionService.take();
+            f.get();
+        }
+        catch ( Exception e )
+        {
+            throw new EnvironmentCreationException( "Failed to reserve network resources on all peers" );
+        }
     }
 
 
@@ -197,28 +196,13 @@ public class HubEnvironmentManager
     }
 
 
-    public void setupVNI( EnvironmentPeerDto peerDto )
-    {
-        //todo reimplement this
-        //        try
-        //        {
-        //            Vni vni = new Vni( peerDto.getEnvironmentInfo().getVni(), peerDto.getEnvironmentInfo().getId() );
-        //            peerManager.getLocalPeer().reserveVni( vni );
-        //        }
-        //        catch ( PeerException e )
-        //        {
-        //            LOG.error( "Could not setup VNI", e.getMessage() );
-        //        }
-    }
-
-
     public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto )
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
         SubnetUtils.SubnetInfo subnetInfo =
-                new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
+                new SubnetUtils( peerDto.getEnvironmentInfo().getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
         final String[] addresses = subnetInfo.getAllAddresses();
 

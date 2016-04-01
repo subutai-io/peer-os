@@ -15,8 +15,6 @@ public class EnvironmentInfoDto
 
     private String p2pSubnet;
 
-    private String tunnelNetwork;
-
     private EnvironmentDto.State state;
 
     private String publicKey;
@@ -176,18 +174,6 @@ public class EnvironmentInfoDto
     public void setP2pSubnet( final String p2pSubnet )
     {
         this.p2pSubnet = p2pSubnet;
-    }
-
-
-    public String getTunnelNetwork()
-    {
-        return tunnelNetwork;
-    }
-
-
-    public void setTunnelNetwork( final String tunnelNetwork )
-    {
-        this.tunnelNetwork = tunnelNetwork;
     }
 
 
