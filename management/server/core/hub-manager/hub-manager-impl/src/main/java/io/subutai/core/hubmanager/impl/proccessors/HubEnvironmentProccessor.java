@@ -587,7 +587,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             localPeer.cleanupEnvironment( envId );
 
-            localPeer.removePeerEnvironmentKeyPair( envId );
+//            localPeer.removePeerEnvironmentKeyPair( envId );
 
             environmentUserHelper.handleEnvironmentOwnerDeletion( peerDto );
 
