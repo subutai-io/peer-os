@@ -168,33 +168,6 @@ public class PeerWebClient
     }
 
 
-    public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId );
-
-        String path = String.format( "/pek/%s", environmentId.getId() );
-
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            final Response response = client.delete();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on removing peer environment key", e );
-        }
-    }
-
-
     public HostInterfaces getInterfaces() throws PeerException
     {
         String path = "/interfaces";
@@ -338,33 +311,6 @@ public class PeerWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error setting up initial P2P connection", e );
-        }
-    }
-
-
-    public void removeP2PConnection( final String p2pHash ) throws PeerException
-    {
-        LOG.debug( String.format( "Removing remote peer from p2p swarm: %s", p2pHash ) );
-
-        String path = String.format( "/p2ptunnel/%s", p2pHash );
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        try
-        {
-            final Response response = client.delete();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error removing p2p connection", e );
         }
     }
 

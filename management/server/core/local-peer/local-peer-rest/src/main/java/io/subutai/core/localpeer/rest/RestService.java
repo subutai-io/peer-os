@@ -68,10 +68,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void updateEnvironmentKey( PublicKeyContainer publicKeyContainer );
 
-    @DELETE
-    @Path( "pek/{environmentId}" )
-    void removeEnvironmentKeyPair( @PathParam( "environmentId" ) EnvironmentId environmentId );
-
     @POST
     @Path( "pek/add/{keyId}" )
     @Produces( MediaType.APPLICATION_JSON )
@@ -130,11 +126,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     Response setupInitialP2PConnection( P2PConfig config );
 
-    @DELETE
-    @Path( "p2ptunnel/{p2pHash}" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    void removeP2PConnection( @PathParam( "p2pHash" ) String p2pHash );
 
     @DELETE
     @Path( "cleanup/{environmentId}" )

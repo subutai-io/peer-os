@@ -165,21 +165,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void removeEnvironmentKeyPair( final EnvironmentId environmentId )
-    {
-        try
-        {
-            localPeer.removePeerEnvironmentKeyPair( environmentId );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
     public void addInitiatorPeerEnvironmentPubKey( final String keyId, final String pek )
     {
         try
@@ -345,21 +330,6 @@ public class RestServiceImpl implements RestService
         {
             localPeer.setupInitialP2PConnection( config );
             return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public void removeP2PConnection( final String p2pHash )
-    {
-        try
-        {
-            localPeer.removeP2PConnection( p2pHash );
         }
         catch ( Exception e )
         {
