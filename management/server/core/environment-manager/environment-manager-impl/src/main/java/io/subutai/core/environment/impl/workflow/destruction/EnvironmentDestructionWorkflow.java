@@ -11,7 +11,6 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
-import io.subutai.core.environment.impl.workflow.destruction.steps.RemoveKeysStep;
 import io.subutai.core.object.relation.api.RelationManager;
 
 
@@ -33,7 +32,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     {
         INIT,
         CLEANUP_ENVIRONMENT,
-        REMOVE_KEYS,
         FINALIZE
     }
 
@@ -73,27 +71,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         try
         {
             new CleanupEnvironmentStep( environment, operationTracker ).execute();
-
-            environment = environmentManager.update( environment );
-
-            return EnvironmentDestructionPhase.REMOVE_KEYS;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentDestructionPhase REMOVE_KEYS()
-    {
-        operationTracker.addLog( "Removing keys" );
-
-        try
-        {
-            new RemoveKeysStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

@@ -331,13 +331,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @Override
-    public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
-    {
-        peerWebClient.removePeerEnvironmentKeyPair( environmentId );
-    }
-
-
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public boolean isConnected( final HostId hostId )
@@ -851,15 +844,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
         peerWebClient.setupInitialP2PConnection( config );
-    }
-
-
-    @Override
-    public void removeP2PConnection( final String p2pHash ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
-
-        peerWebClient.removeP2PConnection( p2pHash );
     }
 
 

@@ -533,7 +533,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         "mkdir -p %1$s && " +
                         "chmod 700 %1$s && " +
                         "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
-                Common.CONTAINER_SSH_FOLDER     ) );
+                Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
@@ -734,7 +734,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     taskManager.schedule( quotaTask, null );
 
                     final HostInterfaces interfaces = new HostInterfaces();
-                    interfaces.addHostInterface                                                            (
+                    interfaces.addHostInterface(
                             new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp() ) );
                     final String hostId = response.getContainerId();
                     final String localPeerId = localPeer.getId();
@@ -802,7 +802,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             PGPPublicKeyRing containerPub = securityManager.getKeyManager().getPublicKeyRing( containerId );
 
             PGPPublicKeyRing signedKey = securityManager.getKeyManager().setKeyTrust( pekSecKeyRing, containerPub,
-                    KeyTrustLevel.Full.getId()                                      );
+                    KeyTrustLevel.Full.getId() );
 
             securityManager.getKeyManager().updatePublicKeyRing( signedKey );
         }
@@ -1079,23 +1079,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
-    }
-
-
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public void removePeerEnvironmentKeyPair( final EnvironmentId environmentId ) throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId );
-
-        KeyManager keyManager = securityManager.getKeyManager();
-
-        keyManager.removeKeyData( environmentId.getId() );
-        keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
-
-        RelationLink envLink = relationManager.getRelationLink( environmentId.getId() );
-        relationManager.removeRelation( envLink );
     }
 
 
@@ -1492,7 +1475,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             try
             {
                 getNetworkManager().setVlanDomain( reservedNetworkResource.getVlan(), domain, domainLoadBalanceStrategy,
-                        sslCertPath              );
+                        sslCertPath );
             }
             catch ( NetworkManagerException e )
             {
@@ -1523,7 +1506,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format    ( "Error checking domain by ip %s and vlan %d", hostIp,
+                throw new PeerException( String.format( "Error checking domain by ip %s and vlan %d", hostIp,
                         reservedNetworkResource.getVlan() ), e );
             }
         }
@@ -1551,7 +1534,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format    ( "Error adding ip %s to domain by vlan %d", hostIp,
+                throw new PeerException( String.format( "Error adding ip %s to domain by vlan %d", hostIp,
                         reservedNetworkResource.getVlan() ), e );
             }
         }
@@ -1579,7 +1562,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format    ( "Error removing ip %s from domain by vlan %d", hostIp,
+                throw new PeerException( String.format( "Error removing ip %s from domain by vlan %d", hostIp,
                         reservedNetworkResource.getVlan() ), e );
             }
         }
@@ -1795,7 +1778,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 if ( usedNetworkResources.containerSubnetExists( networkResource.getContainerSubnet() ) )
                 {
-                    throw new PeerException( String.format       ( "Container subnet %s is already reserved",
+                    throw new PeerException( String.format( "Container subnet %s is already reserved",
                             networkResource.getContainerSubnet() ) );
                 }
                 if ( usedNetworkResources.p2pSubnetExists( networkResource.getP2pSubnet() ) )
@@ -1950,8 +1933,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
                 getNetworkManager()
-                        .resetP2PSecretKey                        ( resourceHost, p2PCredentials.getP2pHash(),
-                                p2PCredentials.getP2pSecretKey(),
+                        .resetP2PSecretKey( resourceHost, p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
                                 p2PCredentials.getP2pTtlSeconds() );
             }
         }
@@ -2019,20 +2001,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 if ( connections.findConnectionByHash( p2pHash ) != null )
                 {
                     getNetworkManager().resetP2PSecretKey( resourceHost, config.getHash(), config.getSecretKey(),
-                            config.getSecretKeyTtlSec()  );
+                            config.getSecretKeyTtlSec() );
                 }
                 else
                 {
                     //we don't supply p2p IP since it should get assigned dynamically
-                    getNetworkManager().setupP2PConnection                     ( resourceHost, p2pInterface, null,
-                            config.getHash(),
+                    getNetworkManager().setupP2PConnection( resourceHost, p2pInterface, null, config.getHash(),
                             config.getSecretKey(), config.getSecretKeyTtlSec() );
                 }
             }
 
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                p2PConnections.addConnection                                                                  (
+                p2PConnections.addConnection(
                         getNetworkManager().getP2PConnections( resourceHost ).findConnectionByHash( p2pHash ) );
             }
 
@@ -2075,11 +2056,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             else
             {
-                getNetworkManager()
-                        .setupP2PConnection                 ( P2PUtil.generateInterfaceName( reservedNetworkResource
-                                .getVlan() ),
-                                config.getAddress(), config.getHash(), config.getSecretKey(),
-                                config.getSecretKeyTtlSec() );
+                getNetworkManager().setupP2PConnection( getManagementHost(),
+                        P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() ), config.getAddress(),
+                        config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
             }
         }
         catch ( NetworkManagerException e )
@@ -2089,25 +2068,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public void removeP2PConnection( final String p2pHash ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
-
-        try
-        {
-            for ( ResourceHost resourceHost : getResourceHosts() )
-            {
-                getNetworkManager().removeP2PConnection( resourceHost, p2pHash );
-            }
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException( "Failed to remove P2P connection", e );
-        }
-    }
     //----------- P2P SECTION END --------------------
 
 
@@ -2123,8 +2083,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( reservedNetworkResource == null )
         {
-            LOG.warn                                                                                                 (
-                    "Environment VNI not found to cleanup resources hosts. Environment ID: " + environmentId.getId() );
+            LOG.warn( "Network reservation for environment {} not found", environmentId.getId() );
             return;
         }
 
@@ -2136,7 +2095,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( ResourceHostException e )
             {
-                throw new PeerException( e.getMessage() );
+                LOG.error( "Failed to cleanup environment {} on RH {}", environmentId.getId(), resourceHost.getId(),
+                        e );
             }
         }
 
@@ -2147,7 +2107,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( DaoException e )
         {
-            LOG.warn( "Failed to delete reservation from db", e );
+            LOG.error( "Failed to delete network reservation for environment {}", environmentId.getId(), e );
+        }
+
+        //remove PEK
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+
+            keyManager.removeKeyData( environmentId.getId() );
+            keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Failed to delete PEK for environment {}", environmentId.getId(), e );
         }
     }
 

@@ -590,7 +590,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         try
         {
             localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
-            localPeer.removePeerEnvironmentKeyPair( new EnvironmentId( env.getId() ) );
             WebClient client =
                     configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
             Response response = client.delete();

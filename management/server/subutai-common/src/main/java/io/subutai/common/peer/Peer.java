@@ -288,16 +288,9 @@ public interface Peer extends RelationLink
      */
     public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException;
 
-    /**
-     * Removes p2p connection by hash from all RHs
-     *
-     * @param p2pHash - hash of p2p swarm
-     */
-    void removeP2PConnection( String p2pHash ) throws PeerException;
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
 
-    void removePeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
