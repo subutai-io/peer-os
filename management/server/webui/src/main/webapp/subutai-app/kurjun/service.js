@@ -8,12 +8,13 @@ kurjunService.$inject = ['$http', 'Upload', 'SettingsKurjunSrv'];
 
 function kurjunService($http, Upload, SettingsKurjunSrv) {
 
-	var GLOBAL_KURJUN_URL = "https://peer.noip.me:8339/kurjun";
+	console.log(GLOBAL_KURJUN_URL);
 	var BASE_URL = GLOBAL_KURJUN_URL + "/rest/";
 	var TEMPLATE_URL = BASE_URL + "template/";
 	var REPOSITORY_URL = BASE_URL + "repository/";
 	var DEB_URL = BASE_URL + "deb/";
 	var RAW_URL = BASE_URL + "file/";
+
 
 	var kurjunService = {
 		getRepositories: getRepositories,
@@ -32,31 +33,26 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	return kurjunService;
 
-	/*SettingsKurjunSrv.getConfig().success (function (data) {
-		GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
-	});*/
-
 	function getRepositories() {
-		return $http.get(REPOSITORY_URL + "list", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
+		return $http.get(REPOSITORY_URL + "list?repository=all", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
-		console.log (TEMPLATE_URL);
-		return $http.get(TEMPLATE_URL + 'list', {
+		return $http.get(TEMPLATE_URL + 'list?repository=all', {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
 	function getAPTList() {
-		return $http.get(DEB_URL + "list", {
+		return $http.get(DEB_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
 	function getRawFiles() {
-		return $http.get(RAW_URL + "list", {
+		return $http.get(RAW_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
@@ -85,7 +81,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 		// TODO: doesn't work properly
 		var postData = "users=" + users + "&templateId=" + templateId;
 		return $http.post(
-			KURJUN_URL + "share",
+			BASE_URL + "share",
 			postData,
 			{withCredentials: false, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
@@ -99,8 +95,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function isUploadAllowed(repository) {
-		// TODO: no alternative for global kurjun
-		return $http.get(KURJUN_URL + 'templates/' + repository + '/can-upload', {
+		return $http.get(TEMPLATE_URL + repository + '/can-upload', {
 			withCredentials: false,
 			headers: {withCredentials: false, 'Content-Type': 'application/json'}
 		});
@@ -108,7 +103,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	function getShared(templateId) {
 		// TODO: doesn't work properly
-		return $http.get (KURJUN_URL + "shared/users/" + templateId);
+		return $http.get (BASE_URL + "shared/users/" + templateId);
 	}
 
 	function uploadTemplate(file, url, repository) {

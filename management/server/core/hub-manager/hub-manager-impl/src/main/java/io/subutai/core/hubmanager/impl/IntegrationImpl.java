@@ -40,9 +40,8 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
-import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
@@ -97,9 +96,6 @@ public class IntegrationImpl implements Integration
 
     private ContainerEventProcessor containerEventProcessor;
 
-    private EnvironmentBuilder envBuilder;
-
-    private EnvironmentDestroyer envDestroyer;
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
     private String checksum = "";
 
@@ -133,8 +129,10 @@ public class IntegrationImpl implements Integration
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
+            EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService );
+
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor );
+                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor, environmentUserHelper );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
@@ -154,10 +152,6 @@ public class IntegrationImpl implements Integration
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
-
-            //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
-            //
-            //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
                 @Override
@@ -187,14 +181,8 @@ public class IntegrationImpl implements Integration
     public void sendHeartbeat() throws HubPluginException
     {
         heartbeatProcessor.sendHeartbeat();
-
         resourceHostConfProcessor.sendResourceHostConf();
-
         containerEventProcessor.process();
-
-        //        envBuilder.test();
-
-        //        envDestroyer.test();
     }
 
 
@@ -208,9 +196,6 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
-
-        // todo revert
-
         configManager.addHubConfig( hupIp );
 
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );

@@ -24,5 +24,5 @@ public interface NetworkResourceDao<NetworkResource, String>
 
     NetworkResource findByContainerSubnet( String containerSubnet ) throws DaoException;
 
-    NetworkResource find( NetworkResource networkResource ) throws DaoException;
+//    NetworkResource find( NetworkResource networkResource ) throws DaoException;
 }

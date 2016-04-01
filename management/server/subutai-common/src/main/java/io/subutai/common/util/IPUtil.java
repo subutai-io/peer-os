@@ -11,6 +11,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.net.util.SubnetUtils;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
@@ -101,6 +103,13 @@ public class IPUtil
         }
 
         return localIps;
+    }
+
+
+    public static String getNetworkAddress( String ip )
+    {
+        SubnetUtils subnetUtils = new SubnetUtils( ip, "255.255.255.0" );
+        return subnetUtils.getInfo().getNetworkAddress();
     }
 }
 

@@ -7,6 +7,8 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.network.NetworkResource;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.quota.ContainerQuota;
 
 
@@ -56,6 +58,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * Returns state of hosted container
      */
     public ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
+
+    public void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
 
     /**

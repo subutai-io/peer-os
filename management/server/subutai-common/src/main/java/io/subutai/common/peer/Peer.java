@@ -24,11 +24,12 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
@@ -86,11 +87,6 @@ public interface Peer
      * Destroys container on the peer
      */
     public void destroyContainer( ContainerId containerId ) throws PeerException;
-
-    /**
-     * Sets default gateway for the container
-     */
-    public void setDefaultGateway( ContainerGateway containerGateway ) throws PeerException;
 
 
     /**
@@ -216,29 +212,16 @@ public interface Peer
 
     //networking
 
+    UsedNetworkResources getUsedNetworkResources() throws PeerException;
+
+    void reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
+
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers todo use EnvironmentId instead of string
      */
-    public int setupTunnels( Map<String, String> peerIps, String environmentId ) throws PeerException;
+    public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
 
-
-    /* ************************************************
-     * Returns all existing gateways of the peer
-     */
-    public Gateways getGateways() throws PeerException;
-
-
-    /* ************************************************
-     * Reserves VNI on the peer
-     */
-    public Vni reserveVni( Vni vni ) throws PeerException;
-
-
-    /* ************************************************
-     * Returns all reserved vnis on the peer
-     */
-    public Vnis getReservedVnis() throws PeerException;
 
     /**
      * Gets containerHost by Id specified
@@ -292,7 +275,7 @@ public interface Peer
      *
      * @return - P2P IP of RH with MH
      */
-    String setupP2PConnection( P2PConfig config ) throws PeerException;
+    P2PConnections setupP2PConnection( P2PConfig config ) throws PeerException;
 
 
     /**

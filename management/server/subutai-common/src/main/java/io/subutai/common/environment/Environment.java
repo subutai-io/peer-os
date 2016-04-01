@@ -1,7 +1,6 @@
 package io.subutai.common.environment;
 
 
-import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.EnvironmentAlertHandler;
@@ -9,6 +8,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.relation.RelationLink;
 
 
@@ -100,6 +100,8 @@ public interface Environment extends RelationLink
     String getSubnetCidr();
 
 
+    void setSubnetCidr( String cidr );
+
     /**
      * VNI of the environment.
      */
@@ -129,7 +131,7 @@ public interface Environment extends RelationLink
 
     String getP2pSubnet();
 
-    Map<String, String> getTunnels();
+    P2pIps getP2pIps();
 
     boolean isMember( Peer peer );
 
