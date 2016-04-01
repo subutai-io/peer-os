@@ -1772,6 +1772,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         usedNetworkResources.addP2pSubnet( iface.getIp() );
                         usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
                     }
+
+                    //add LAN subnet to prevent collisions
+                    if ( iface.getName().equalsIgnoreCase( SystemSettings.getExternalIpInterface() ) )
+                    {
+                        usedNetworkResources.addContainerSubnet( iface.getIp() );
+                        usedNetworkResources.addP2pSubnet( iface.getIp() );
+                    }
                 }
             }
 
