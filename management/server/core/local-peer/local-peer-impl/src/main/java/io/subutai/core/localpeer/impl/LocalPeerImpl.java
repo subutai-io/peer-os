@@ -157,7 +157,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
-    protected Host managementHost;
+    protected ResourceHost managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
     private QuotaManager quotaManager;
@@ -1078,7 +1078,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Host getManagementHost() throws HostNotFoundException
+    public ResourceHost getManagementHost() throws HostNotFoundException
     {
         if ( managementHost == null )
         {
@@ -1739,8 +1739,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
                 //tunnels
-                //todo move logic to RH
-                Tunnels tunnels = getNetworkManager().getTunnels( resourceHost );
+                Tunnels tunnels = resourceHost.getTunnels();
                 for ( Tunnel tunnel : tunnels.getTunnels() )
                 {
                     usedNetworkResources.addVni( tunnel.getVni() );
@@ -1784,7 +1783,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 usedNetworkResources.addP2pSubnet( networkResource.getP2pSubnet() );
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( ResourceHostException e )
         {
             throw new PeerException( "Error gathering reserved net resources", e );
         }
@@ -1834,14 +1833,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             //todo parallelize this using completionservice
-            //todo move logic to RH
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                getNetworkManager().resetSwarmSecretKey( resourceHost, p2PCredentials.getP2pHash(),
-                        p2PCredentials.getP2pSecretKey(), p2PCredentials.getP2pTtlSeconds() );
+                resourceHost.resetSwarmSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
+                        p2PCredentials.getP2pTtlSeconds() );
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( ResourceHostException e )
         {
             throw new PeerException( "Error resetting P2P secret key", e );
         }
@@ -1870,35 +1868,28 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
-            String p2pHash = P2PUtil.generateHash( reservedNetworkResource.getEnvironmentId() );
             String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
 
             //todo parallelize this using completion service
-            //todo move logic to RH
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                P2PConnections connections = getNetworkManager().getP2PConnections( resourceHost );
+                P2PConnections connections = resourceHost.getP2PConnections();
 
-                if ( connections.findConnectionByHash( p2pHash ) != null )
+                P2PConnection rhConnection = connections.findByHash( config.getHash() );
+
+                if ( rhConnection != null )
                 {
-                    getNetworkManager().resetSwarmSecretKey( resourceHost, config.getHash(), config.getSecretKey(),
+                    resourceHost.resetSwarmSecretKey( config.getHash(), config.getSecretKey(),
                             config.getSecretKeyTtlSec() );
+
+                    p2PConnections.addConnection( rhConnection );
                 }
                 else
                 {
-                    //we don't supply p2p IP since it should get assigned dynamically
-                    getNetworkManager()
-                            .joinP2PSwarm( resourceHost, p2pInterface, config.getHash(), config.getSecretKey(),
-                                    config.getSecretKeyTtlSec() );
+                    p2PConnections.addConnection( resourceHost
+                            .joinP2PSwarm( p2pInterface, config.getHash(), config.getSecretKey(),
+                                    config.getSecretKeyTtlSec() ) );
                 }
-            }
-
-            //todo parallelize this using completion service
-            //todo move logic to RH
-            for ( ResourceHost resourceHost : getResourceHosts() )
-            {
-                p2PConnections.addConnection(
-                        getNetworkManager().getP2PConnections( resourceHost ).findConnectionByHash( p2pHash ) );
             }
 
             return p2PConnections;
@@ -1906,7 +1897,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Failed to setup P2P connection", e );
+            throw new PeerException( "Failed to join P2P swarm", e );
         }
     }
 
@@ -1915,7 +1906,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        LOG.debug( String.format( "Creating P2P swarm: %s, first IP: %s", config.getHash(), config.getAddress() ) );
+        LOG.debug(
+                String.format( "Creating P2P swarm on MH: %s, first IP: %s", config.getHash(), config.getAddress() ) );
 
         try
         {
@@ -1930,24 +1922,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
 
-            P2PConnections p2PConnections = getNetworkManager().getP2PConnections( getManagementHost() );
+            P2PConnections p2PConnections = getManagementHost().getP2PConnections();
 
-            if ( p2PConnections
-                    .findConnectionByHash( P2PUtil.generateHash( reservedNetworkResource.getEnvironmentId() ) )
+            if ( p2PConnections.findByHash( P2PUtil.generateHash( reservedNetworkResource.getEnvironmentId() ) )
                     != null )
             {
-                throw new PeerException( "P2P with this hash already exists" );
+                throw new PeerException( "P2P swarm with this hash already exists" );
             }
             else
             {
-                getNetworkManager().createP2PSwarm( getManagementHost(),
-                        P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() ), config.getAddress(),
-                        config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                getManagementHost().createP2PSwarm( P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() ),
+                        config.getAddress(), config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( ResourceHostException e )
         {
-            throw new PeerException( "Failed to setup P2P connection on MH", e );
+            throw new PeerException( "Failed to create P2P swarm on MH", e );
         }
     }
 
@@ -2209,7 +2199,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             final P2PConnections p2PConnections = getNetworkManager().getP2PConnections( getManagementHost() );
 
-            final P2PConnection p2PConnection = p2PConnections.findConnectionByHash( p2pHash );
+            final P2PConnection p2PConnection = p2PConnections.findByHash( p2pHash );
 
             if ( p2PConnection == null )
             {

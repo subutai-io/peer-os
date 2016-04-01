@@ -8,24 +8,21 @@ import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.core.network.api.NetworkManager;
 
 
 public class SetupTunnelsTask implements Callable<Boolean>
 {
-    private final NetworkManager networkManager;
     private final ResourceHost resourceHost;
     private final P2pIps p2pIps;
     private final NetworkResource networkResource;
 
 
-    public SetupTunnelsTask( final NetworkManager networkManager, final ResourceHost resourceHost, final P2pIps p2pIps,
-                             NetworkResource networkResource )
+    public SetupTunnelsTask( final ResourceHost resourceHost, final P2pIps p2pIps, NetworkResource networkResource )
     {
-        this.networkManager = networkManager;
         this.resourceHost = resourceHost;
         this.p2pIps = p2pIps;
         this.networkResource = networkResource;
@@ -36,7 +33,7 @@ public class SetupTunnelsTask implements Callable<Boolean>
     public Boolean call() throws Exception
     {
 
-        Tunnels tunnels = networkManager.getTunnels( resourceHost );
+        Tunnels tunnels = resourceHost.getTunnels();
 
 
         //setup tunnel to each local and remote RH
@@ -45,6 +42,14 @@ public class SetupTunnelsTask implements Callable<Boolean>
             //skip if own IP
             boolean ownIp = !( resourceHost.getHostInterfaces().findByIp( tunnelIp ) instanceof NullHostInterface );
             if ( ownIp )
+            {
+                continue;
+            }
+
+            //check p2p connections in case heartbeat hasn't arrived yet with new p2p interface
+            P2PConnections p2PConnections = resourceHost.getP2PConnections();
+            //skip if exists
+            if ( p2PConnections.findByIp( tunnelIp ) != null )
             {
                 continue;
             }
@@ -65,8 +70,7 @@ public class SetupTunnelsTask implements Callable<Boolean>
                 Tunnel newTunnel =
                         new Tunnel( tunnelName, tunnelIp, networkResource.getVlan(), networkResource.getVni() );
 
-                networkManager.createTunnel( resourceHost, newTunnel.getTunnelName(), newTunnel.getTunnelIp(),
-                        newTunnel.getVlan(), newTunnel.getVni() );
+                resourceHost.createTunnel( newTunnel );
 
                 //add to avoid duplication in the next iteration
                 tunnels.addTunnel( newTunnel );

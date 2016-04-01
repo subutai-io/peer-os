@@ -134,7 +134,7 @@ public class LocalPeerImplTest
     @Mock
     TemplateManager templateRegistry;
     @Mock
-    Host managementHost;
+    ResourceHost managementHost;
     @Mock
     CommandExecutor commandExecutor;
     @Mock
