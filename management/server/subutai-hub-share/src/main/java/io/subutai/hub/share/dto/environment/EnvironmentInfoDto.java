@@ -29,6 +29,12 @@ public class EnvironmentInfoDto
 
     private String description;
 
+    private String domainName;
+
+    private String domainLoadBalanceStrategy;
+
+    private String sslCertPath;
+
     private Long vni;
 
     private String VEHS;
@@ -202,6 +208,7 @@ public class EnvironmentInfoDto
         this.sshKeys.add( sshKey );
     }
 
+
     public String getVEHS()
     {
         return VEHS;
@@ -211,5 +218,41 @@ public class EnvironmentInfoDto
     public void setVEHS( final String VEHS )
     {
         this.VEHS = VEHS;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
+    }
+
+
+    public void setDomainName( final String domainName )
+    {
+        this.domainName = domainName;
+    }
+
+
+    public String getDomainLoadBalanceStrategy()
+    {
+        return domainLoadBalanceStrategy;
+    }
+
+
+    public void setDomainLoadBalanceStrategy( final String domainLoadBalanceStrategy )
+    {
+        this.domainLoadBalanceStrategy = domainLoadBalanceStrategy;
+    }
+
+
+    public String getSslCertPath()
+    {
+        return sslCertPath;
+    }
+
+
+    public void setSslCertPath( final String sslCertPath )
+    {
+        this.sslCertPath = sslCertPath;
     }
 }
