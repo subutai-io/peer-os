@@ -2,7 +2,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +16,6 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.PublicKeyContainer;
@@ -28,7 +26,6 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.workflow.task.PeerEnvironmentKeyTask;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.KeyManager;
 
 
 /**

@@ -17,7 +17,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.task.PeerEnvironmentKeyTask;
