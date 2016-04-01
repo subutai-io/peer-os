@@ -4,9 +4,9 @@ angular.module('subutai.kurjun.service', [])
 	.factory('kurjunSrv', kurjunService);
 
 
-kurjunService.$inject = ['$http', 'Upload', 'SettingsKurjunSrv'];
+kurjunService.$inject = ['$http', 'Upload', 'SettingsKurjunSrv', '$timeout'];
 
-function kurjunService($http, Upload, SettingsKurjunSrv) {
+function kurjunService($http, Upload, SettingsKurjunSrv, $timeout) {
 
 	console.log(GLOBAL_KURJUN_URL);
 	var BASE_URL = GLOBAL_KURJUN_URL + "/rest/";
@@ -33,11 +33,30 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	return kurjunService;
 
+	function setUrlsValues() {
+		BASE_URL = GLOBAL_KURJUN_URL + "/rest/";
+		TEMPLATE_URL = BASE_URL + "template/";
+		REPOSITORY_URL = BASE_URL + "repository/";
+		DEB_URL = BASE_URL + "deb/";
+		RAW_URL = BASE_URL + "file/";
+	}
+
+	function checkKurjunUrl(callback) {
+		console.log('lololol');
+		if(GLOBAL_KURJUN_URL.length > 0) {
+			setUrlsValues();
+			return true;
+		} else {
+			$timeout(callback, 2000);
+		}
+	}
+
 	function getRepositories() {
 		return $http.get(REPOSITORY_URL + "list?repository=all", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
+		checkKurjunUrl(getTemplates);
 		return $http.get(TEMPLATE_URL + 'list?repository=all', {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
@@ -45,6 +64,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function getAPTList() {
+		checkKurjunUrl(getAPTList);
 		return $http.get(DEB_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
@@ -52,6 +72,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function getRawFiles() {
+		checkKurjunUrl(getRawFiles);
 		return $http.get(RAW_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
