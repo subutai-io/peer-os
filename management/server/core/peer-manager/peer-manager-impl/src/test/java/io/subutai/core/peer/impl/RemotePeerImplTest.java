@@ -24,7 +24,6 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.exception.HTTPException;
-import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -49,7 +48,6 @@ import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
@@ -560,48 +558,5 @@ public class RemotePeerImplTest
         catch ( PeerException e )
         {
         }
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testReserveVni() throws Exception
-    {
-        Vni vni = mock( Vni.class );
-        when( vni.getEnvironmentId() ).thenReturn( ENV_ID );
-
-
-        assertEquals( VLAN, remotePeer.reserveVni( vni ) );
-
-        throwException();
-
-        remotePeer.reserveVni( vni );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetGateways() throws Exception
-    {
-        remotePeer.getGateways();
-
-        verify( restUtil )
-                .request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap(), any() );
-
-        throwException();
-
-        remotePeer.getGateways();
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetReservedVnis() throws Exception
-    {
-        remotePeer.getReservedVnis();
-
-        verify( restUtil )
-                .request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap(), any() );
-
-        throwException();
-
-        remotePeer.getReservedVnis();
     }
 }

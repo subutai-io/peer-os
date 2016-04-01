@@ -23,8 +23,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.ByteValueResource;
 import io.subutai.core.hostregistry.api.HostRegistry;
 
 import static junit.framework.TestCase.assertEquals;
@@ -94,17 +92,17 @@ public class ContainerHostEntityTest
         when( containerHostInfo.getState() ).thenReturn( CONTAINER_HOST_STATE );
         when( anHostInterface.getName() ).thenReturn( INTERFACE_NAME );
         when( anHostInterface.getIp() ).thenReturn( IP );
-//        when( anHostInterface.getMac() ).thenReturn( MAC );
+        //        when( anHostInterface.getMac() ).thenReturn( MAC );
         when( hostRegistry.getHostInfoById( anyString() ) ).thenReturn( containerHostInfo );
 
-//        containerHostEntity =
-//                new ContainerHostEntity( PEER_ID.toString(), containerHostInfo, TEMPLATE_NAME, TEMP_ARCH );
+        //        containerHostEntity =
+        //                new ContainerHostEntity( PEER_ID.toString(), containerHostInfo, TEMPLATE_NAME, TEMP_ARCH );
         //        containerHostEntity.setLocalPeer( localPeer );
         //        containerHostEntity.setDataService( dataService );
-//        containerHostEntity.setParent( resourceHost );
+        //        containerHostEntity.setParent( resourceHost );
         //        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
         //        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-//        when( resourceHost.getPeer() ).thenReturn( peer );
+        //        when( resourceHost.getPeer() ).thenReturn( peer );
     }
 
 
@@ -167,18 +165,6 @@ public class ContainerHostEntityTest
         containerHostEntity.addTag( TAG );
 
         assertTrue( containerHostEntity.getTags().contains( TAG ) );
-    }
-
-
-    @Test
-    @Ignore
-    public void testSetDefaultGateway() throws Exception
-    {
-        when( containerHostEntity.getPeer() ).thenReturn( localPeer );
-        containerHostEntity.setDefaultGateway( GATEWAY_IP );
-
-
-        //verify( localPeer ).setDefaultGateway( containerGateway );
     }
 
 

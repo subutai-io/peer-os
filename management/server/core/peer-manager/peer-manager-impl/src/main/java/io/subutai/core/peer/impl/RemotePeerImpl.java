@@ -41,11 +41,9 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -61,7 +59,9 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
@@ -328,33 +328,6 @@ public class RemotePeerImpl implements RemotePeer
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
         environmentWebClient.destroyContainer( peerInfo, containerId );
-    }
-
-
-    @Override
-    public void setDefaultGateway( final ContainerGateway containerGateway ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerGateway, "Container host is null" );
-
-        String path = "peer/container/gateway";
-
-        Map<String, String> params = Maps.newHashMap();
-        params.put( "containerId", containerGateway.getContainerId().getId() );
-        params.put( "gatewayIp", containerGateway.getGateway() );
-
-        //*********construct Secure Header ****************************
-        Map<String, String> headers = Maps.newHashMap();
-        //*************************************************************
-
-        try
-        {
-            String alias = SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS;
-            post( path, alias, params, headers );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error setting container gateway ip", e );
-        }
     }
 
 
@@ -745,18 +718,25 @@ public class RemotePeerImpl implements RemotePeer
 
 
     //networking
+
+
+    @Override
+    public UsedNetworkResources getUsedNetworkResources() throws PeerException
+    {
+        return new PeerWebClient( peerInfo, provider ).getUsedNetResources();
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
     {
-
-        Preconditions.checkNotNull( peerIps, "Invalid peer ips set" );
-        Preconditions.checkArgument( !peerIps.isEmpty(), "Invalid peer ips set" );
+        Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         try
         {
-            return peerWebClient.setupTunnels( peerIps, environmentId );
+            peerWebClient.setupTunnels( p2pIps, environmentId );
         }
         catch ( Exception e )
         {
@@ -765,38 +745,7 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public Vni reserveVni( final Vni vni ) throws PeerException
-    {
-        Preconditions.checkNotNull( vni, "Invalid vni" );
-
-        return peerWebClient.reserveVni( vni );
-    }
-
     //************ END ENVIRONMENT SPECIFIC REST
-
-
-    @RolesAllowed( "Environment-Management|Read" )
-    @Override
-    public Gateways getGateways() throws PeerException
-    {
-        try
-        {
-            return peerWebClient.getGateways();
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error obtaining gateways from peer %s", getName() ), e );
-        }
-    }
-
-
-    @Override
-    public Vnis getReservedVnis() throws PeerException
-    {
-        return peerWebClient.getReservedVnis();
-    }
 
 
     @Override
@@ -859,6 +808,15 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    {
+        Preconditions.checkNotNull( networkResource );
+
+        new PeerWebClient( peerInfo, provider ).reserveNetworkResource( networkResource );
+    }
+
+
+    @Override
     public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
@@ -879,7 +837,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String setupP2PConnection( final P2PConfig config ) throws PeerException
+    public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 

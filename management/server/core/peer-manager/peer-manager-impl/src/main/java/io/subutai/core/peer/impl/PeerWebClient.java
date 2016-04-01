@@ -2,7 +2,6 @@ package io.subutai.core.peer.impl;
 
 
 import java.util.Date;
-import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,16 +19,17 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
@@ -291,7 +291,7 @@ public class PeerWebClient
     }
 
 
-    public String setupP2PConnection( final P2PConfig config ) throws PeerException
+    public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
     {
         LOG.debug( String.format( "Adding remote peer to p2p swarm: %s %s", config.getHash(), config.getAddress() ) );
         try
@@ -302,8 +302,8 @@ public class PeerWebClient
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.TEXT_PLAIN );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
 
             final Response response = client.post( config );
             if ( response.getStatus() == 500 )
@@ -312,7 +312,7 @@ public class PeerWebClient
             }
             else
             {
-                return response.readEntity( String.class );
+                return response.readEntity( P2PConnections.class );
             }
         }
         catch ( Exception e )
@@ -431,89 +431,6 @@ public class PeerWebClient
     }
 
 
-    public Gateways getGateways() throws PeerException
-    {
-        try
-        {
-            remotePeer.checkRelation();
-            String path = "/gateways";
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Gateways.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting gateways", e );
-        }
-    }
-
-
-    public Vnis getReservedVnis() throws PeerException
-    {
-        try
-        {
-            remotePeer.checkRelation();
-            String path = "/vni";
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Vnis.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error obtaining reserved VNIs from peer %s", peerInfo ), e );
-        }
-    }
-
-
-    public Vni reserveVni( final Vni vni ) throws PeerException
-    {
-        try
-        {
-            remotePeer.checkRelation();
-            String path = "/vni";
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.post( vni );
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Vni.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on reserving VNI", e );
-        }
-    }
-
-
     public void alert( final AlertEvent alert ) throws PeerException
     {
         try
@@ -625,9 +542,9 @@ public class PeerWebClient
     }
 
 
-    public int setupTunnels( final Map<String, String> peerIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( peerIps );
+        Preconditions.checkNotNull( p2pIps );
         Preconditions.checkNotNull( environmentId );
 
         try
@@ -637,14 +554,10 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 7000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.TEXT_PLAIN );
-            final Response response = client.post( peerIps );
+            final Response response = client.post( p2pIps );
             if ( response.getStatus() == 500 )
             {
                 throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Integer.class );
             }
         }
         catch ( Exception e )
@@ -673,7 +586,7 @@ public class PeerWebClient
                 throw new PeerException( response.readEntity( String.class ) );
             }
         }
-        catch ( RelationVerificationException e )
+        catch ( Exception e )
         {
             throw new PeerException( e );
         }
@@ -730,6 +643,58 @@ public class PeerWebClient
         catch ( Exception e )
         {
             throw new PeerException( "Error on obtaining environment containers.", e );
+        }
+    }
+
+
+    public UsedNetworkResources getUsedNetResources() throws PeerException
+    {
+        try
+        {
+            remotePeer.checkRelation();
+            String path = "/netresources";
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+            client.accept( MediaType.APPLICATION_JSON );
+
+            final Response response = client.get();
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+            else
+            {
+                return response.readEntity( UsedNetworkResources.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error obtaining reserved network resources", e );
+        }
+    }
+
+
+    public void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    {
+        try
+        {
+            remotePeer.checkRelation();
+            String path = "/netresources";
+
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
+            final Response response = client.post( networkResource );
+
+            if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+        }
+        catch ( Exception ex )
+        {
+            throw new PeerException( ex );
         }
     }
 }

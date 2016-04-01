@@ -45,7 +45,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     Set<String> getTags();
 
-    void setDefaultGateway( String gatewayIp ) throws PeerException;
 
     boolean isLocal();
 
@@ -94,5 +93,4 @@ public interface ContainerHost extends Host, ContainerHostInfo
     public HostId getResourceHostId() throws PeerException;
 
     public String getContainerName();
-
 }

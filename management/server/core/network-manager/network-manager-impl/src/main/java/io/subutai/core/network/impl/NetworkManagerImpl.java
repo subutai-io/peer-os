@@ -18,9 +18,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Vni;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -132,7 +130,7 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 3 )
             {
-                connections.addConnection( new P2PConnectionImpl( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
+                connections.addConnection( new P2PConnection( m.group( 1 ), m.group( 2 ), m.group( 3 ) ) );
             }
         }
 
@@ -174,11 +172,19 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void setupTunnel( final int tunnelId, final String tunnelIp ) throws NetworkManagerException
     {
+        setupTunnel( getManagementHost(), tunnelId, tunnelIp );
+    }
+
+
+    @Override
+    public void setupTunnel( final Host host, final int tunnelId, final String tunnelIp ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ), "Invalid tunnel ip" );
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
 
-        execute( getManagementHost(),
-                commands.getSetupTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp,
-                        TUNNEL_TYPE ) );
+        execute( host, commands.getSetupTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp,
+                TUNNEL_TYPE ) );
     }
 
 
@@ -195,9 +201,16 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<Tunnel> listTunnels() throws NetworkManagerException
     {
+        return listTunnels( getManagementHost() );
+    }
+
+
+    @Override
+    public Set<Tunnel> listTunnels( final Host host ) throws NetworkManagerException
+    {
         Set<Tunnel> tunnels = Sets.newHashSet();
 
-        CommandResult result = execute( getManagementHost(), commands.getListTunnelsCommand() );
+        CommandResult result = execute( host, commands.getListTunnelsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
@@ -223,11 +236,21 @@ public class NetworkManagerImpl implements NetworkManager
     public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final String environmentId )
             throws NetworkManagerException
     {
+        setupVniVLanMapping( getManagementHost(), tunnelId, vni, vLanId, environmentId );
+    }
+
+
+    @Override
+    public void setupVniVLanMapping( final Host host, final int tunnelId, final long vni, final int vLanId,
+                                     final String environmentId ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
-        execute( getManagementHost(),
+        execute( host,
                 commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
                         environmentId ) );
     }
@@ -250,9 +273,18 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException
     {
+        return getVniVlanMappings( getManagementHost() );
+    }
+
+
+    @Override
+    public Set<VniVlanMapping> getVniVlanMappings( final Host host ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host );
+
         Set<VniVlanMapping> mappings = Sets.newHashSet();
 
-        CommandResult result = execute( getManagementHost(), commands.getListVniVlanMappingsCommand() );
+        CommandResult result = execute( host, commands.getListVniVlanMappingsCommand() );
 
         Pattern p = Pattern.compile( String.format(
                         "\\s*(%s\\d+)\\s*(\\d+)\\s*(\\d+)\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
@@ -274,18 +306,6 @@ public class NetworkManagerImpl implements NetworkManager
         }
 
         return mappings;
-    }
-
-
-    @Override
-    public void reserveVni( final Vni vni ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( vni );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vni.getVlan(), Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-
-        execute( getManagementHost(),
-                commands.getReserveVniCommand( vni.getVni(), vni.getVlan(), vni.getEnvironmentId() ) );
     }
 
 
@@ -401,35 +421,6 @@ public class NetworkManagerImpl implements NetworkManager
             throw new NetworkManagerException(
                     String.format( "Could not parse port out of response %s", result.getStdOut() ) );
         }
-    }
-
-
-    @Override
-    public Vnis getReservedVnis() throws NetworkManagerException
-    {
-        Vnis reservedVnis = new Vnis();
-
-        CommandResult result = execute( getManagementHost(), commands.getListReservedVnisCommand() );
-
-        Pattern p = Pattern.compile( "\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*"
-                        + "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*",
-                Pattern.CASE_INSENSITIVE );
-
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 3 )
-            {
-                reservedVnis.add( new Vni( Long.parseLong( m.group( 1 ) ), Integer.parseInt( m.group( 2 ) ),
-                        m.group( 3 ) ) );
-            }
-        }
-
-        return reservedVnis;
     }
 
 

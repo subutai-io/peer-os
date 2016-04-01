@@ -24,13 +24,18 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
@@ -40,6 +45,7 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
@@ -55,20 +61,31 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
                     + "[a-zA-z0-9]{1,100}" );
-    private ConfigManager configManager;
-    private PeerManager peerManager;
-    private HubEnvironmentManager hubEnvironmentManager;
-    private CommandExecutor commandExecutor;
+
+    private final ConfigManager configManager;
+
+    private final PeerManager peerManager;
+
+    private final HubEnvironmentManager hubEnvironmentManager;
+
+    private final CommandExecutor commandExecutor;
+
+    private final EnvironmentUserHelper environmentUserHelper;
 
 
     public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
                                      final ConfigManager hConfigManager, final PeerManager peerManager,
-                                     CommandExecutor commandExecutor )
+                                     CommandExecutor commandExecutor, EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
+
         this.peerManager = peerManager;
+
         this.hubEnvironmentManager = hubEnvironmentManager;
+
         this.commandExecutor = commandExecutor;
+
+        this.environmentUserHelper = environmentUserHelper;
     }
 
 
@@ -129,9 +146,16 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
+                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
+                    break;
+                case CHANGE_CONTAINER_STATE:
+                    controlContainer( peerDto );
+                    break;
+                case CONFIGURE_DOMAIN:
+                    configureDomain( peerDto );
                     break;
                 case DELETE_PEER:
                     deletePeer( peerDto );
@@ -285,15 +309,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     {
         String configContainer = String.format( "/rest/v1/environments/%s/container-configuration",
                 peerDto.getEnvironmentInfo().getId() );
-        String envDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
-
         try
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( envDataURL, configManager.getHubIp() );
-            Response r = client.get();
-            byte[] encryptedContent = configManager.readContent( r );
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
+            EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
 
             peerDto = hubEnvironmentManager.configureSsh( peerDto, environmentDto );
             hubEnvironmentManager.configureHash( environmentDto );
@@ -313,6 +331,113 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         catch ( Exception e )
         {
             LOG.error( "Could not configure SSH/Hash", e );
+        }
+    }
+
+
+    private void controlContainer( EnvironmentPeerDto peerDto )
+    {
+        String controlContainerPath =
+                String.format( "/rest/v1/environments/%s/peers/%s/container", peerDto.getEnvironmentInfo().getId(),
+                        peerDto.getPeerId() );
+        LocalPeer localPeer = peerManager.getLocalPeer();
+
+        EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
+        if ( environmentDto != null )
+        {
+            for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
+            {
+                PeerId peerId = new PeerId( nodesDto.getPeerId() );
+                EnvironmentId envId = new EnvironmentId( nodesDto.getEnvironmentId() );
+                if ( nodesDto.getPeerId().equals( localPeer.getId() ) )
+                {
+                    for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+                    {
+                        ContainerId containerId =
+                                new ContainerId( nodeDto.getContainerId(), nodeDto.getHostName(), peerId, envId );
+                        try
+                        {
+                            if ( nodeDto.getState().equals( ContainerStateDto.STOPPING ) )
+                            {
+                                localPeer.stopContainer( containerId );
+                                nodeDto.setState( ContainerStateDto.STOPPED );
+                            }
+                            if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+                            {
+                                localPeer.startContainer( containerId );
+                                nodeDto.setState( ContainerStateDto.RUNNING );
+                            }
+                            if ( nodeDto.getState().equals( ContainerStateDto.ABORTING ) )
+                            {
+                                localPeer.destroyContainer( containerId );
+                                nodeDto.setState( ContainerStateDto.FROZEN );
+                            }
+                        }
+                        catch ( PeerException e )
+                        {
+                            LOG.error( "Could not change container state", e.getMessage() );
+                        }
+                    }
+
+                    try
+                    {
+                        WebClient clientUpdate = configManager
+                                .getTrustedWebClientWithAuth( controlContainerPath, configManager.getHubIp() );
+
+                        byte[] cborData = JsonUtil.toCbor( nodesDto );
+                        byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+                        Response response = clientUpdate.put( encryptedData );
+                        if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+                        {
+                            LOG.debug( "Container successfully updated" );
+                        }
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Could not update containers state", e.getMessage() );
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void configureDomain( EnvironmentPeerDto peerDto )
+    {
+        LocalPeer localPeer = peerManager.getLocalPeer();
+        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        String domainUpdatePath =
+                String.format( "/rest/v1/environments/%s/peers/%s/domain", peerDto.getEnvironmentInfo().getId(),
+                        peerDto.getPeerId() );
+        try
+
+        {
+            boolean assign = !Strings.isNullOrEmpty( env.getDomainName() );
+            //TODO balanceStrategy should come from HUB
+            DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
+            if ( assign )
+            {
+                localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
+            }
+            else
+            {
+                localPeer.removeVniDomain( env.getVni() );
+            }
+
+            WebClient clientUpdate =
+                    configManager.getTrustedWebClientWithAuth( domainUpdatePath, configManager.getHubIp() );
+            byte[] cborData = JsonUtil.toCbor( peerDto );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+            Response response = clientUpdate.put( encryptedData );
+            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            {
+                LOG.debug( "Domain configuration successfully done" );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not configure domain name" );
         }
     }
 
@@ -479,6 +604,25 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             LOG.error( "Could not clean environment", e );
         }
+    }
+
+
+    private EnvironmentDto getEnvironmentDto( String envId )
+    {
+        String envDataPath = String.format( "/rest/v1/environments/%s", envId );
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( envDataPath, configManager.getHubIp() );
+            Response r = client.get();
+            byte[] encryptedContent = configManager.readContent( r );
+            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+            return JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not configure SSH/Hash", e );
+        }
+        return null;
     }
 
 

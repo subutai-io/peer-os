@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -21,9 +19,8 @@ import com.google.common.base.Strings;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -31,7 +28,9 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -95,24 +94,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setDefaultGateway( final String containerId, final String gatewayIp )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            localPeer.getContainerHostById( containerId ).setDefaultGateway( gatewayIp );
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
     public Response getContainerHostInfoById( final String containerId )
     {
         try
@@ -137,36 +118,6 @@ public class RestServiceImpl implements RestService
             Preconditions.checkNotNull( environmentId );
 
             return Response.ok( localPeer.getEnvironmentContainers( environmentId ) ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Vnis getReservedVnis()
-    {
-        try
-        {
-            return localPeer.getReservedVnis();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Gateways getGateways()
-    {
-        try
-        {
-            return localPeer.getGateways();
         }
         catch ( Exception e )
         {
@@ -246,30 +197,15 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Vni reserveVni( final Vni vni )
-    {
-        try
-        {
-            return localPeer.reserveVni( vni );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response setupTunnels( final String environmentId, final Map<String, String> peerIps )
+    public Response setupTunnels( final String environmentId, final P2pIps p2pIps )
     {
         Preconditions.checkNotNull( environmentId );
-        Preconditions.checkNotNull( peerIps );
+        Preconditions.checkNotNull( p2pIps );
         try
         {
-            int vlan = localPeer.setupTunnels( peerIps, environmentId );
+            localPeer.setupTunnels( p2pIps, environmentId );
 
-            return Response.ok( vlan ).build();
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
@@ -300,6 +236,36 @@ public class RestServiceImpl implements RestService
         try
         {
             return localPeer.getResourceHostMetrics();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public UsedNetworkResources getUsedNetResources()
+    {
+        try
+        {
+            return localPeer.getUsedNetworkResources();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void reserveNetResources( final NetworkResourceImpl networkResource )
+    {
+        try
+        {
+            localPeer.reserveNetworkResource( networkResource );
         }
         catch ( Exception e )
         {
@@ -359,12 +325,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupP2PConnection( final P2PConfig config )
+    public P2PConnections setupP2PConnection( final P2PConfig config )
     {
         try
         {
-            String mhP2pIP = localPeer.setupP2PConnection( config );
-            return Response.ok( mhP2pIP ).build();
+            return localPeer.setupP2PConnection( config );
         }
         catch ( Exception e )
         {

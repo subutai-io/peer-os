@@ -33,7 +33,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
-	vm.environment2BuildName = 'Environment name';
+	vm.environment2BuildName = '';
 	vm.buildCompleted = false;
 
 	// functions
@@ -259,6 +259,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function notifyChanges() {
@@ -548,6 +549,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function initJointJs() {
 
+		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+			if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
+				clearWorkspace();
+				vm.currentEnvironment = {};
+			}
+		}, false);
+
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
 			width: '100%',
@@ -713,6 +721,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.cubeGrowth = 0;
 		vm.templateGrid = [];
 		graph.resetCells();
+		vm.environment2BuildName = '';
 	}
 
 	function addSettingsToTemplate(settings) {
