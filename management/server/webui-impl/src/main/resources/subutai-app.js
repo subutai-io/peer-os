@@ -20,13 +20,12 @@ var app = angular.module('subutai-app', [
 
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
-	.factory('SettingsKurjunSrv', SettingsKurjunSrv)
 
     .run(startup);
 
 CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
-startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog', 'SettingsKurjunSrv'];
+startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
 function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog) {
     var vm = this;
@@ -409,6 +408,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/kurjun/controller.js',
                                 'subutai-app/kurjun/service.js',
                                 'subutai-app/identity/service.js',
+								'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
@@ -781,11 +781,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
     });
 }
 
-function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog, SettingsKurjunSrv) {
-
-	SettingsKurjunSrv.getConfig().success (function (data) {
-		GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
-	});
+function startup($rootScope, $state, $location, $http, SweetAlert, ngDialog) {
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         LOADING_SCREEN('none');
