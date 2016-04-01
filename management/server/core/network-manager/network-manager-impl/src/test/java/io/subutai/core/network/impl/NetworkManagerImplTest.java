@@ -15,24 +15,18 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Tunnel;
-import io.subutai.common.settings.Common;
-import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -123,52 +117,6 @@ public class NetworkManagerImplTest
 
 
     @Test
-    public void testSetupP2PConnection() throws Exception
-    {
-        networkManager.setupP2PConnection( INTERFACE_NAME, LOCAL_IP, COMMUNITY_NAME, SECRET_KEY,
-                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupP2PConnectionCommand( eq( INTERFACE_NAME ), eq( LOCAL_IP ), eq( COMMUNITY_NAME ),
-                eq( SECRET_KEY ), anyLong() );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveP2PConnection() throws Exception
-    {
-        networkManager.removeP2PConnection( COMMUNITY_NAME );
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveP2PConnectionCommand( COMMUNITY_NAME );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testSetupTunnel() throws Exception
-    {
-        networkManager.setupTunnel( TUNNEL_ID, TUNNEL_IP );
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, NetworkManager.TUNNEL_TYPE );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveTunnel() throws Exception
-    {
-        networkManager.removeTunnel( TUNNEL_ID );
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveTunnelCommand( TUNNEL_NAME );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
     public void testListTunnels() throws Exception
     {
         when( commandResult.getStdOut() ).thenReturn( LIST_TUNNELS_OUTPUT );
@@ -187,18 +135,6 @@ public class NetworkManagerImplTest
 
         verify( localPeer ).getManagementHost();
         verify( commands ).getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID );
-        verify( managementHost ).execute( any( RequestBuilder.class ) );
-    }
-
-
-    @Test
-    public void testRemoveVniVLanMapping() throws Exception
-    {
-
-        networkManager.removeVniVLanMapping( TUNNEL_ID, VNI, VLAN_ID );
-
-        verify( localPeer ).getManagementHost();
-        verify( commands ).getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID );
         verify( managementHost ).execute( any( RequestBuilder.class ) );
     }
 
@@ -244,17 +180,5 @@ public class NetworkManagerImplTest
         doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getContainerHostByName( anyString() );
 
         networkManager.getContainerHost( CONTAINER_NAME );
-    }
-
-
-    @Test
-    public void testGetVniVlanMappings() throws Exception
-    {
-        when( commandResult.getStdOut() ).thenReturn( VNI_VLAN_MAPPING_OUTPUT );
-
-
-        Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings();
-
-        assertTrue( mappings.contains( new VniVlanMapping( TUNNEL_ID, VNI, VLAN_ID, ENVIRONMENT_ID ) ) );
     }
 }

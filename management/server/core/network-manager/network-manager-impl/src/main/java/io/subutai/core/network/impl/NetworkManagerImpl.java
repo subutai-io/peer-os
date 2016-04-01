@@ -54,12 +54,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     //---------------- P2P SECTION BEGIN ------------------------
-    @Override
-    public void setupP2PConnection( final String interfaceName, final String localIp, final String p2pHash,
-                                    final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
-    {
-        setupP2PConnection( getManagementHost(), interfaceName, localIp, p2pHash, secretKey, secretKeyTtlSec );
-    }
 
 
     @Override
@@ -69,28 +63,6 @@ public class NetworkManagerImpl implements NetworkManager
     {
         execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ) ) );
-    }
-
-
-    @Override
-    public void removeP2PConnection( final String p2pHash ) throws NetworkManagerException
-    {
-        removeP2PConnection( getManagementHost(), p2pHash );
-    }
-
-
-    @Override
-    public void removeP2PConnection( final Host host, final String p2pHash ) throws NetworkManagerException
-    {
-        execute( host, commands.getRemoveP2PConnectionCommand( p2pHash ) );
-    }
-
-
-    @Override
-    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
-            throws NetworkManagerException
-    {
-        resetP2PSecretKey( getManagementHost(), p2pHash, newSecretKey, ttlSeconds );
     }
 
 
@@ -171,13 +143,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupTunnel( final int tunnelId, final String tunnelIp ) throws NetworkManagerException
-    {
-        setupTunnel( getManagementHost(), tunnelId, tunnelIp );
-    }
-
-
-    @Override
     public void setupTunnel( final Host host, final int tunnelId, final String tunnelIp ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
@@ -190,12 +155,18 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void removeTunnel( final int tunnelId ) throws NetworkManagerException
+    public void createTunnel( final Host host, final int tunnelId, final String tunnelIp, final int vlan,
+                              final long vni ) throws NetworkManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ), "Invalid tunnel ip" );
         Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
+        Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
-        execute( getManagementHost(),
-                commands.getRemoveTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ) ) );
+        execute( host,
+                commands.getCreateTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp, vlan,
+                        vni ) );
     }
 
 
@@ -254,27 +225,6 @@ public class NetworkManagerImpl implements NetworkManager
         execute( host,
                 commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
                         environmentId ) );
-    }
-
-
-    @Override
-    public void removeVniVLanMapping( final int tunnelId, final long vni, final int vLanId )
-            throws NetworkManagerException
-    {
-        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
-        Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-
-        execute( getManagementHost(),
-                commands.getRemoveVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni,
-                        vLanId ) );
-    }
-
-
-    @Override
-    public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException
-    {
-        return getVniVlanMappings( getManagementHost() );
     }
 
 
