@@ -1156,9 +1156,11 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Delete" ).
+     * See createUser() for details.
      */
-    @RolesAllowed( "Identity-Management|Delete" )
+    @PermitAll
     @Override
     public void removeUser( long userId )
     {

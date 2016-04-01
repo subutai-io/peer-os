@@ -278,10 +278,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 setContainersTransientFields( environment );
             }
 
-            LOG.debug( "environment: {}", environment );
+                LOG.debug( "environment: {}", environment );
         }
 
         environments.addAll( environmentAdapter.getEnvironments() );
+
+        return environments;
+    }
+
+
+    @PermitAll
+    @Override
+    public Set<Environment> getEnvironmentsByOwnerId( long userId )
+    {
+        Set<Environment> environments = new HashSet<>();
+
+        for ( Environment environment : environmentDataService.getAll() )
+        {
+            if ( environment.getUserId().equals( userId ) )
+            {
+                environments.add( environment );
+
+                setEnvironmentTransientFields( environment );
+
+                setContainersTransientFields( environment );
+            }
+        }
 
         return environments;
     }

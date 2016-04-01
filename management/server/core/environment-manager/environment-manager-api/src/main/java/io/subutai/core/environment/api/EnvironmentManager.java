@@ -41,6 +41,9 @@ public interface EnvironmentManager
     Set<Environment> getEnvironments();
 
 
+    Set<Environment> getEnvironmentsByOwnerId( long userId );
+
+
     Environment setupRequisites( Topology topology ) throws EnvironmentCreationException;
 
 
