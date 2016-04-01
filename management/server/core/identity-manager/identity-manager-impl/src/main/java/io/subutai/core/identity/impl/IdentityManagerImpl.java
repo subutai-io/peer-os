@@ -639,9 +639,11 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /* *************************************************
+    /**
+     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Write" ).
+     * See createUser() for details.
      */
-    @RolesAllowed( "Identity-Management|Write" )
+    @PermitAll
     @Override
     public void assignUserRole( User user, Role role )
     {

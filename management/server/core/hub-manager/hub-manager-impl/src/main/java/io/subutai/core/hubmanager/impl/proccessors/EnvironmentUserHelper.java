@@ -147,11 +147,11 @@ public class EnvironmentUserHelper
     }
 
 
-    private Role getEnvironmentRole()
+    private Role getRole( String roleName )
     {
         for ( Role role : identityManager.getAllRoles() )
         {
-            if ( role.getName().equals( "Environment-Manager" ) )
+            if ( role.getName().equals( roleName ) )
             {
                 return role;
             }
@@ -159,6 +159,14 @@ public class EnvironmentUserHelper
 
         return null;
     }
+
+
+//    public void test()
+//    {
+//        UserDto dto = getUserDataFromHub( "43163772-a8c2-459f-bfcb-4d0bcc5759f6" );
+//
+//        createNewUser( dto );
+//    }
 
 
     private void createNewUser( UserDto userDto )
@@ -173,9 +181,11 @@ public class EnvironmentUserHelper
         try
         {
             User user = identityManager.createUser( userDto.getEmail(), password, "[Hub] " + userDto.getName(), email, UserType.Regular.getId(),
-                    KeyTrustLevel.Marginal.getId(), true, false );
+                    KeyTrustLevel.Marginal.getId(), true, true );
 
-            identityManager.assignUserRole( user, getEnvironmentRole() );
+            identityManager.assignUserRole( user, getRole( "Environment-Manager" ) );
+
+            identityManager.assignUserRole( user, getRole( "Template-Management" ) );
 
             log.debug( "User created successfully" );
         }

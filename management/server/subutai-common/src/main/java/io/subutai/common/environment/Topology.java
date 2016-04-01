@@ -22,12 +22,16 @@ public class Topology
 {
     @JsonProperty( "id" )
     private UUID id = UUID.randomUUID();
+
     @JsonProperty( "name" )
     private String environmentName;
+
     @JsonProperty( "placement" )
     private Map<String, Set<Node>> nodeGroupPlacement = Maps.newHashMap();
+
     @JsonProperty( "subnet" )
     private String subnet;
+
     @JsonProperty( "sshKey" )
     private String sshKey;
 
@@ -133,5 +137,18 @@ public class Topology
     public void setId( final UUID id )
     {
         this.id = id;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "Topology{" +
+                "id=" + id +
+                ", environmentName='" + environmentName + '\'' +
+                ", nodeGroupPlacement=" + nodeGroupPlacement +
+                ", subnet='" + subnet + '\'' +
+                ", sshKey='" + sshKey + '\'' +
+                '}';
     }
 }
