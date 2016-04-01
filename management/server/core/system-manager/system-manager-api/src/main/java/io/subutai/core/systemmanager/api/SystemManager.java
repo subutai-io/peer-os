@@ -2,6 +2,7 @@ package io.subutai.core.systemmanager.api;
 
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.SystemConfiguration;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.HostNotFoundException;
@@ -10,6 +11,7 @@ import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
+import io.subutai.hub.share.dto.SystemConfigurationDto;
 
 
 public interface SystemManager
@@ -35,4 +37,8 @@ public interface SystemManager
 
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
+
+    SystemConfigurationDto prepareConfigDto();
+
+    void sendSystemConfigToHub(SystemConfigurationDto dto);
 }

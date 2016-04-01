@@ -55,6 +55,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PeerDto;
+import io.subutai.hub.share.dto.SystemConfigurationDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -516,5 +517,12 @@ public class IntegrationImpl implements Integration
     public String getChecksum()
     {
         return this.checksum;
+    }
+
+
+    @Override
+    public void sendSystemConfiguration( final SystemConfigurationDto dto )
+    {
+        String test = "test";
     }
 }

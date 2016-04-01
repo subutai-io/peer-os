@@ -13,6 +13,8 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="integration"
+             interface="io.subutai.core.hubmanager.api.Integration" />
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl" destroy-method="dispose">
@@ -20,6 +22,7 @@
     <property name="identityManager" ref="identityManager" />
     <property name="peerManager" ref="peerManager" />
 
+    <argument ref="integration" />
     <argument value="${globalKurjunUrls}" />
     <argument value="${securePortX1}" />
     <argument value="${securePortX2}" />

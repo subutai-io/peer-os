@@ -25,6 +25,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -41,6 +42,7 @@ import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
+import io.subutai.hub.share.dto.SystemConfigurationDto;
 
 
 public class SystemManagerImpl implements SystemManager
@@ -50,6 +52,7 @@ public class SystemManagerImpl implements SystemManager
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
+    private Integration integration;
 
     protected Set<SettingsListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
@@ -105,7 +108,7 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final String globalKurjunUrls, final int securePortX1, final int securePortX2,
+    public SystemManagerImpl( final Integration integration, final String globalKurjunUrls, final int securePortX1, final int securePortX2,
                               final int securePortX3, final String publicUrl ) throws ConfigurationException
 
     {
@@ -125,6 +128,8 @@ public class SystemManagerImpl implements SystemManager
         SystemSettings.setSecurePortX2( securePortX2 );
         SystemSettings.setSecurePortX3( securePortX3 );
         SystemSettings.setPublicUrl( publicUrl );
+
+        this.integration = integration;
     }
 
 
@@ -281,6 +286,40 @@ public class SystemManagerImpl implements SystemManager
         boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
 
         return isPublicQuotaSaved && isTrustQuotaSaved;
+    }
+
+
+    @Override
+    public SystemConfigurationDto prepareConfigDto()
+    {
+        SystemConfigurationDto dto = new SystemConfigurationDto();
+
+        try
+        {
+            dto.setGlobalKurjunUrls( SystemSettings.getGlobalKurjunUrls() );
+            dto.setLocalKurjunUrls( SystemSettings.getLocalKurjunUrls() );
+
+            dto.setSecurePortX1( SystemSettings.getSecurePortX1() );
+            dto.setSecurePortX2( SystemSettings.getSecurePortX2() );
+            dto.setSecurePortX3( SystemSettings.getSecurePortX3() );
+            dto.setPublicUrl( SystemSettings.getPublicUrl() );
+            dto.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+
+        }
+        catch ( ConfigurationException e )
+        {
+            e.printStackTrace();
+        }
+
+        return dto;
+
+    }
+
+
+    @Override
+    public void sendSystemConfigToHub( final SystemConfigurationDto dto )
+    {
+        integration.sendSystemConfiguration( prepareConfigDto() );
     }
 
 

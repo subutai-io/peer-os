@@ -157,6 +157,7 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
 
+        systemManager.sendSystemConfigToHub( systemManager.prepareConfigDto());
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -196,6 +197,9 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( e.getMessage() ).build();
         }
+
+
+        systemManager.sendSystemConfigToHub( systemManager.prepareConfigDto());
         return Response.status( Response.Status.OK ).build();
     }
 
