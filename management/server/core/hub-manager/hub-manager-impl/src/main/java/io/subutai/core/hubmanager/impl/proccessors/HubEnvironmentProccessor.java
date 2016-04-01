@@ -143,10 +143,10 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
-                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
+                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case CHANGE_CONTAINER_STATE:
                     controlContainer( peerDto );
@@ -573,27 +573,37 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private void deletePeer( EnvironmentPeerDto peerDto )
     {
-        String containerDestroyStateURL =
-                String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
-                        peerDto.getPeerId() );
+        String urlFormat = "/rest/v1/environments/%s/peers/%s";
+
+        String containerDestroyStateURL = String.format( urlFormat, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
 
         LocalPeer localPeer = peerManager.getLocalPeer();
+
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+
         try
         {
-            localPeer.cleanupEnvironment( new EnvironmentId( env.getId() ) );
-            WebClient client =
-                    configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
+            EnvironmentId envId = new EnvironmentId( env.getId() );
+
+            localPeer.cleanupEnvironment( envId );
+
+//            localPeer.removePeerEnvironmentKeyPair( envId );
+
+            environmentUserHelper.handleEnvironmentOwnerDeletion( peerDto );
+
+            WebClient client = configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
+
             Response response = client.delete();
+
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Environment cleaned successfully" );
+                LOG.debug( "Environment destroyed successfully" );
             }
         }
         catch ( Exception e )
         {
 
-            LOG.error( "Could not clean environment", e );
+            LOG.error( "Error to destroy environment: ", e );
         }
     }
 

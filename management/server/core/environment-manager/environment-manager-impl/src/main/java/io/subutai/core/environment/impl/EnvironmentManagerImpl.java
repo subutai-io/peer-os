@@ -275,10 +275,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 setContainersTransientFields( environment );
             }
 
-            LOG.debug( "environment: {}", environment );
+                LOG.debug( "environment: {}", environment );
         }
 
         environments.addAll( environmentAdapter.getEnvironments() );
+
+        return environments;
+    }
+
+
+    @PermitAll
+    @Override
+    public Set<Environment> getEnvironmentsByOwnerId( long userId )
+    {
+        Set<Environment> environments = new HashSet<>();
+
+        for ( Environment environment : environmentDataService.getAll() )
+        {
+            if ( environment.getUserId().equals( userId ) )
+            {
+                environments.add( environment );
+
+                setEnvironmentTransientFields( environment );
+
+                setContainersTransientFields( environment );
+            }
+        }
 
         return environments;
     }
@@ -417,8 +439,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             //create empty environment
             final EnvironmentImpl environment = createEmptyEnvironment( topology );
-            // TODO add additional step for receiving trust message
 
+            // TODO add additional step for receiving trust message
 
             //launch environment creation workflow
             final EnvironmentCreationWorkflow environmentCreationWorkflow =
@@ -1315,12 +1337,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
-        EnvironmentImpl environment =
-                new EnvironmentImpl( topology.getEnvironmentName(), topology.getSubnet(), topology.getSshKey(),
+        EnvironmentImpl environment = new EnvironmentImpl( topology.getEnvironmentName(), topology.getSubnet(), topology.getSshKey(),
                         getUserId(), peerManager.getLocalPeer().getId() );
+
         environment.setStatus( EnvironmentStatus.PENDING );
 
         User activeUser = identityManager.getActiveUser();
+
         UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
 
         // User - Delegated user - Environment
@@ -1329,11 +1352,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         // TODO create relation between activeUser and delegatedUser
         environment.setRawTopology( JsonUtil.toJson( topology ) );
+
         environment.setUserId( delegatedUser.getUserId() );
+
         createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
+
         try
         {
-
             // TODO user should send signed trust message between delegatedUser and himself
             RelationInfoMeta relationInfoMeta =
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );

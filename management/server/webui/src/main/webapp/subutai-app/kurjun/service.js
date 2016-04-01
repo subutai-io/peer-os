@@ -9,7 +9,7 @@ kurjunService.$inject = ['$http', 'Upload', 'SettingsKurjunSrv'];
 function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	console.log(GLOBAL_KURJUN_URL);
-	var BASE_URL = GLOBAL_KURJUN_URL + "/rest/";
+	var BASE_URL = GLOBAL_KURJUN_URL + "/";
 	var TEMPLATE_URL = BASE_URL + "template/";
 	var REPOSITORY_URL = BASE_URL + "repository/";
 	var DEB_URL = BASE_URL + "deb/";
@@ -33,11 +33,21 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	return kurjunService;
 
+	function setUrlsValues() {
+		BASE_URL = GLOBAL_KURJUN_URL + "/";
+		TEMPLATE_URL = BASE_URL + "template/";
+		REPOSITORY_URL = BASE_URL + "repository/";
+		DEB_URL = BASE_URL + "deb/";
+		RAW_URL = BASE_URL + "file/";
+	}
+
 	function getRepositories() {
+		setUrlsValues();
 		return $http.get(REPOSITORY_URL + "list?repository=all", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
+		setUrlsValues();
 		return $http.get(TEMPLATE_URL + 'list?repository=all', {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
@@ -45,6 +55,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function getAPTList() {
+		setUrlsValues();
 		return $http.get(DEB_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
@@ -52,6 +63,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function getRawFiles() {
+		setUrlsValues();
 		return $http.get(RAW_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
@@ -59,18 +71,22 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function uploadFile(file) {
+		setUrlsValues();
 		return uploadFile(file, RAW_URL + 'upload');
 	}
 
 	function addTemplate(repository, file) {
+		setUrlsValues();
 		return uploadTemplate(file, TEMPLATE_URL + 'upload', repository);
 	}
 
 	function addApt(file) {
+		setUrlsValues();
 		return uploadApt(file, DEB_URL + 'upload');
 	}
 
 	function deleteTemplate(id) {
+		setUrlsValues();
 		return $http.delete(TEMPLATE_URL + 'delete', {params: {id: id}}, {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
@@ -78,6 +94,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function shareTemplate(users, templateId) {
+		setUrlsValues();
 		// TODO: doesn't work properly
 		var postData = "users=" + users + "&templateId=" + templateId;
 		return $http.post(
@@ -88,6 +105,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function deleteAPT(md5) {
+		setUrlsValues();
 		return $http.delete(DEB_URL + 'delete', {params: {md5: md5}}, {
 			withCredentials: false,
 			headers: {withCredentials: false, 'Content-Type': 'application/json'}
@@ -95,6 +113,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function isUploadAllowed(repository) {
+		setUrlsValues();
 		return $http.get(TEMPLATE_URL + repository + '/can-upload', {
 			withCredentials: false,
 			headers: {withCredentials: false, 'Content-Type': 'application/json'}
@@ -103,10 +122,12 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 
 	function getShared(templateId) {
 		// TODO: doesn't work properly
+		setUrlsValues();
 		return $http.get (BASE_URL + "shared/users/" + templateId);
 	}
 
 	function uploadTemplate(file, url, repository) {
+		setUrlsValues();
 		return Upload.upload({
 			url: url,
 			data: {file: file, repository: repository},
@@ -116,6 +137,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function uploadApt(file, url) {
+		setUrlsValues();
 		return Upload.upload({
 			url: url,
 			data: {file: file},
@@ -125,6 +147,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv) {
 	}
 
 	function uploadFile(file, url) {
+		setUrlsValues();
 		return Upload.upload({
 			url: url,
 			data: {file: file},
