@@ -96,7 +96,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
         if ( commandResult != null && commandResult.hasSucceeded() )
         {
             // why stdErr()?
-            StringTokenizer st = new StringTokenizer( getStdErr(), LINE_DELIMITER );
+            StringTokenizer st = new StringTokenizer( getStdOut(), LINE_DELIMITER );
 
 
             while ( st.hasMoreTokens() )
