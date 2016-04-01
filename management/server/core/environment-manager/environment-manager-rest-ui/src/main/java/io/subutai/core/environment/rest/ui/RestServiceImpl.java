@@ -158,6 +158,9 @@ public class RestServiceImpl implements RestService
 
             Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
 
+            // @todo workaround, subnet shouldn't be calculated in distributaion
+            topology.setSubnet("192.168.1.1/24");
+
             eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
         catch ( Exception e )
@@ -184,6 +187,8 @@ public class RestServiceImpl implements RestService
 
             Topology topology = new Topology( name );
 
+            // @todo workaround, subnet shouldn't be calculated in distributaion
+            topology.setSubnet("192.168.1.1/24");
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 

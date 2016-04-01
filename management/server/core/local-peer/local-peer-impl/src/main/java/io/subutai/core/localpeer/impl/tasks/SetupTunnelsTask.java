@@ -1,68 +1,59 @@
 package io.subutai.core.localpeer.impl.tasks;
 
 
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.common.network.Vni;
+import io.subutai.common.host.NullHostInterface;
+import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 
 
-public class SetupTunnelsTask implements Callable<Integer>
+public class SetupTunnelsTask implements Callable<Boolean>
 {
     private static final Logger LOG = LoggerFactory.getLogger( SetupTunnelsTask.class );
     private final NetworkManager networkManager;
-    private final LocalPeer localPeer;
-    private final String environmentId;
-    private final Map<String, String> peerIps;
+    private final ResourceHost resourceHost;
+    private final P2pIps p2pIps;
+    private final NetworkResource networkResource;
 
 
-    public SetupTunnelsTask( final NetworkManager networkManager, final LocalPeer localPeer, final String environmentId,
-                             final Map<String, String> peerIps )
+    public SetupTunnelsTask( final NetworkManager networkManager, final ResourceHost resourceHost, final P2pIps p2pIps,
+                             NetworkResource networkResource )
     {
         this.networkManager = networkManager;
-        this.localPeer = localPeer;
-        this.environmentId = environmentId;
-        this.peerIps = peerIps;
+        this.resourceHost = resourceHost;
+        this.p2pIps = p2pIps;
+        this.networkResource = networkResource;
     }
 
 
     @Override
-    public Integer call() throws Exception
+    public Boolean call() throws Exception
     {
-        //fail if vni is not reserved
-        Vni environmentVni = localPeer.getReservedVnis().findVniByEnvironmentId( environmentId );
 
-        if ( environmentVni == null )
-        {
-            throw new PeerException(
-                    String.format( "Error setting up tunnels: No reserved vni found for environment %s",
-                            environmentId ) );
-        }
+        Set<Tunnel> tunnels = networkManager.listTunnels( resourceHost );
 
-        for ( String peerId : peerIps.keySet() )
+        Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings( resourceHost );
+
+        //setup tunnel to each local and remote RH
+        for ( String tunnelIp : p2pIps.getP2pIps() )
         {
-            if ( peerId.equals( localPeer.getId() ) )
+            //skip if own IP
+            boolean ownIp = !( resourceHost.getHostInterfaces().findByIp( tunnelIp ) instanceof NullHostInterface );
+            if ( ownIp )
             {
-                LOG.debug( "Skipping local peer." );
                 continue;
             }
 
-            LOG.debug( String.format( "Setting up tunnel on : %s", peerId ) );
-
-            //setup tunnels to each remote peer
-            Set<Tunnel> tunnels = networkManager.listTunnels();
-
-            String tunnelIp = peerIps.get( peerId );
+            //see if tunnel exists
             int tunnelId = findTunnel( tunnelIp, tunnels );
             //tunnel not found, create new one
             if ( tunnelId == -1 )
@@ -70,27 +61,37 @@ public class SetupTunnelsTask implements Callable<Integer>
                 //calculate tunnel id
                 tunnelId = calculateNextTunnelId( tunnels );
 
-
                 LOG.debug( String.format( "Setting up tunnel: %s %s", tunnelId, tunnelIp ) );
+
                 //create tunnel
-                networkManager.setupTunnel( tunnelId, tunnelIp );
+                networkManager.setupTunnel( resourceHost, tunnelId, tunnelIp );
+
+                tunnels.add( new Tunnel( String.format( "%s%d", NetworkManager.TUNNEL_PREFIX, tunnelId ), tunnelIp ) );
             }
 
-            //create vni-vlan mapping
-            LOG.debug( String.format( "Setting up tunnel for %s: %s", peerId, environmentVni ) );
-            setupVniVlanMapping( tunnelId, environmentVni.getVni(), environmentVni.getVlan(),
-                    environmentVni.getEnvironmentId() );
-        }
+            //see if mapping exists
+            if ( !vniVlanMappingExists( mappings, tunnelId ) )
+            {
+                //create vni-vlan mapping
+                LOG.debug(
+                        String.format( "Setting up tunnel %s for %s", tunnelIp, networkResource.getEnvironmentId() ) );
 
-        return environmentVni.getVlan();
+                networkManager.setupVniVLanMapping( resourceHost, tunnelId, networkResource.getVni(),
+                        networkResource.getVlan(), networkResource.getEnvironmentId() );
+
+                mappings.add( new VniVlanMapping( tunnelId, networkResource.getVni(), networkResource.getVlan(),
+                        networkResource.getEnvironmentId() ) );
+            }
+        }
+        return true;
     }
 
 
-    public int findTunnel( String peerIp, Set<Tunnel> tunnels )
+    public int findTunnel( String tunnelIp, Set<Tunnel> tunnels )
     {
         for ( Tunnel tunnel : tunnels )
         {
-            if ( tunnel.getTunnelIp().equals( peerIp ) )
+            if ( tunnel.getTunnelIp().equals( tunnelIp ) )
             {
                 return tunnel.getTunnelId();
             }
@@ -115,26 +116,17 @@ public class SetupTunnelsTask implements Callable<Integer>
     }
 
 
-    protected void setupVniVlanMapping( final int tunnelId, final long vni, final int vlanId,
-                                        final String environmentId ) throws PeerException
+    private boolean vniVlanMappingExists( Set<VniVlanMapping> mappings, int tunnelId )
     {
-        try
+        for ( VniVlanMapping mapping : mappings )
         {
-            Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings();
-
-            for ( VniVlanMapping mapping : mappings )
+            if ( mapping.getTunnelId() == tunnelId && mapping.getEnvironmentId()
+                                                             .equals( networkResource.getEnvironmentId() ) )
             {
-                if ( mapping.getTunnelId() == tunnelId && mapping.getEnvironmentId().equals( environmentId ) )
-                {
-                    return;
-                }
+                return true;
             }
+        }
 
-            networkManager.setupVniVLanMapping( tunnelId, vni, vlanId, environmentId );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException( e );
-        }
+        return false;
     }
 }

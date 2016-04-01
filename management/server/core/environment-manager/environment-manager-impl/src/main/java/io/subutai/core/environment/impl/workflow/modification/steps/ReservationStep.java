@@ -2,7 +2,6 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
@@ -20,8 +19,8 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
@@ -29,9 +28,9 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.peer.api.PeerManager;
 
 
-public class VNISetupStep
+public class ReservationStep
 {
-    private static final Logger LOG = LoggerFactory.getLogger( VNISetupStep.class );
+    private static final Logger LOG = LoggerFactory.getLogger( ReservationStep.class );
 
     private final Topology topology;
     private final EnvironmentImpl environment;
@@ -39,8 +38,8 @@ public class VNISetupStep
     private final TrackerOperation trackerOperation;
 
 
-    public VNISetupStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
-                         final TrackerOperation trackerOperation )
+    public ReservationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
+                            final TrackerOperation trackerOperation )
     {
         this.topology = topology;
         this.environment = environment;
@@ -65,8 +64,8 @@ public class VNISetupStep
         ExecutorService executorService = Executors.newFixedThreadPool( newPeers.size() );
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
-        //obtain reserved gateways
-        final Map<Peer, Gateways> reservedGateways = Maps.newConcurrentMap();
+        //obtain reserved net resources
+        final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
         for ( final Peer peer : newPeers )
         {
             completionService.submit( new Callable<Peer>()
@@ -74,11 +73,13 @@ public class VNISetupStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    reservedGateways.put( peer, peer.getGateways() );
+                    reservedNetResources.put( peer, peer.getUsedNetworkResources() );
                     return peer;
                 }
             } );
         }
+
+        executorService.shutdown();
 
         Set<Peer> succeededPeers = Sets.newHashSet();
         for ( Peer ignored : newPeers )
@@ -90,14 +91,14 @@ public class VNISetupStep
             }
             catch ( Exception e )
             {
-                LOG.error( "Problems obtaining reserved gateways", e );
+                LOG.error( "Problems obtaining reserved network resources", e );
             }
         }
 
         for ( Peer succeededPeer : succeededPeers )
         {
-            trackerOperation
-                    .addLog( String.format( "Obtained reserved gateways from peer %s", succeededPeer.getName() ) );
+            trackerOperation.addLog(
+                    String.format( "Obtained reserved network resources from peer %s", succeededPeer.getName() ) );
         }
 
         Set<Peer> failedPeers = Sets.newHashSet( newPeers );
@@ -105,50 +106,46 @@ public class VNISetupStep
 
         for ( Peer failedPeer : failedPeers )
         {
-            trackerOperation
-                    .addLog( String.format( "Failed to obtain reserved gateways from peer %s", failedPeer.getName() ) );
+            trackerOperation.addLog(
+                    String.format( "Failed to obtain reserved network resources from peer %s", failedPeer.getName() ) );
         }
 
         if ( !failedPeers.isEmpty() )
         {
-            throw new EnvironmentModificationException( "Failed to obtain reserved gateways from all peers" );
+            throw new EnvironmentModificationException( "Failed to obtain reserved network resources from all peers" );
         }
 
-        //check availability of subnet
+        //check availability of network resources
         SubnetUtils subnetUtils = new SubnetUtils( environment.getSubnetCidr() );
-        String environmentGatewayIp = subnetUtils.getInfo().getLowAddress();
+        final String containerSubnet = subnetUtils.getInfo().getNetworkAddress();
 
-        for ( Map.Entry<Peer, Gateways> peerGateways : reservedGateways.entrySet() )
+        for ( Map.Entry<Peer, UsedNetworkResources> peerReservedNetResourcesEntry : reservedNetResources.entrySet() )
         {
-            Peer peer = peerGateways.getKey();
-            Gateways gateways = peerGateways.getValue();
+            Peer peer = peerReservedNetResourcesEntry.getKey();
+            UsedNetworkResources netResources = peerReservedNetResourcesEntry.getValue();
 
-            if ( gateways.findGatewayByIp( environmentGatewayIp ) != null )
+            if ( netResources.containerSubnetExists( containerSubnet ) )
             {
                 throw new EnvironmentModificationException(
-                        String.format( "Subnet %s is already used on peer %s", environment.getSubnetCidr(),
+                        String.format( "Container subnet %s is already used on peer %s", environment.getSubnetCidr(),
                                 peer.getName() ) );
             }
-        }
-
-        //TODO: add gateway & p2p IP to reserve vni
-        final Vni environmentVni = new Vni( environment.getVni(), environment.getId() );
-
-        //check reserved vnis
-        for ( final Peer peer : newPeers )
-        {
-            for ( final Vni vni : peer.getReservedVnis().list() )
+            if ( netResources.p2pSubnetExists( environment.getP2pSubnet() ) )
             {
-                if ( vni.getVni() == environmentVni.getVni() && !Objects
-                        .equals( vni.getEnvironmentId(), environmentVni.getEnvironmentId() ) )
-                {
-                    throw new EnvironmentModificationException(
-                            String.format( "Vni %d is already used on peer %s", environment.getVni(),
-                                    peer.getName() ) );
-                }
+                throw new EnvironmentModificationException(
+                        String.format( "P2P subnet %s is already used on peer %s", environment.getP2pSubnet(),
+                                peer.getName() ) );
+            }
+            if ( netResources.vniExists( environment.getVni() ) )
+            {
+                throw new EnvironmentModificationException(
+                        String.format( "Vni %d is already used on peer %s", environment.getVni(), peer.getName() ) );
             }
         }
 
+        //reserve network resources
+        executorService = Executors.newFixedThreadPool( newPeers.size() );
+        completionService = new ExecutorCompletionService<>( executorService );
 
         for ( final Peer peer : newPeers )
         {
@@ -157,11 +154,14 @@ public class VNISetupStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    peer.reserveVni( environmentVni );
+                    peer.reserveNetworkResource( new NetworkResourceImpl( environment.getId(), environment.getVni(),
+                            environment.getP2pSubnet(), containerSubnet ) );
                     return peer;
                 }
             } );
         }
+
+        executorService.shutdown();
 
         succeededPeers.clear();
         for ( Peer ignored : newPeers )
@@ -173,13 +173,14 @@ public class VNISetupStep
             }
             catch ( Exception e )
             {
-                LOG.error( "Problems reserving VNI", e );
+                LOG.error( "Problems reserving network resources", e );
             }
         }
 
         for ( Peer succeededPeer : succeededPeers )
         {
-            trackerOperation.addLog( String.format( "Reserved VNI on peer %s", succeededPeer.getName() ) );
+            trackerOperation
+                    .addLog( String.format( "Reserved network resources on peer %s", succeededPeer.getName() ) );
         }
 
         failedPeers = Sets.newHashSet( newPeers );
@@ -187,12 +188,13 @@ public class VNISetupStep
 
         for ( Peer failedPeer : failedPeers )
         {
-            trackerOperation.addLog( String.format( "Failed to reserve VNI on peer %s", failedPeer.getName() ) );
+            trackerOperation
+                    .addLog( String.format( "Failed to reserve network resources on peer %s", failedPeer.getName() ) );
         }
 
         if ( !failedPeers.isEmpty() )
         {
-            throw new EnvironmentModificationException( "Failed to reserve VNI on all peers" );
+            throw new EnvironmentModificationException( "Failed to reserve network resources on all peers" );
         }
     }
 }

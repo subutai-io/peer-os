@@ -34,7 +34,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.network.Gateways;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -68,7 +67,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -771,34 +769,11 @@ public class LocalPeerImplTest
     }
 
 
-    @Test( expected = PeerException.class )
-    public void testListTunnels() throws Exception
-    {
-        localPeer.listTunnels();
-
-        verify( networkManager ).listTunnels();
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).listTunnels();
-
-        localPeer.listTunnels();
-    }
-
-
     @Test
     public void testRemoveTunnel() throws Exception
     {
         Tunnel tunnel = mock( Tunnel.class );
         when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
         when( tunnel.getTunnelIp() ).thenReturn( IP );
-    }
-
-
-    @Test
-    @Ignore
-    public void testGetGateways() throws Exception
-    {
-        Gateways gateways = localPeer.getGateways();
-
-        assertEquals( 1, gateways.list().size() );
     }
 }
