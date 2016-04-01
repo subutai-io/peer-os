@@ -152,7 +152,7 @@ func main() {
 				cli.StringFlag{Name: "vni", Usage: "vni"},
 			},
 			Action: func(c *cli.Context) {
-				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("list"), c.String("name"), c.String("remoteip"), c.String("vlan"), c.String("vni"))
+				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("list"), c.String("remoteip"), c.String("vlan"), c.String("vni"))
 			}}, {
 
 			Name:  "p2p",

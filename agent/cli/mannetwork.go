@@ -11,9 +11,9 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
-func VxlanTunnel(create, del, list, name, remoteip, vlan, vni string) {
+func VxlanTunnel(create, del, list, remoteip, vlan, vni string) {
 	if len(create) > 0 {
-		tunnelCreate(name, remoteip, vlan, vni)
+		tunnelCreate(create, remoteip, vlan, vni)
 	} else if len(del) > 0 {
 		// TODO
 		return
