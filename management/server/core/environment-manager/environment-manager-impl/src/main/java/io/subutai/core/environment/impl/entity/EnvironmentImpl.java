@@ -2,10 +2,8 @@ package io.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,6 +49,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
@@ -374,13 +373,25 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void addEnvironmentPeer( final PeerConf peerConf )
     {
-        if ( peerConf == null )
-        {
-            throw new IllegalArgumentException( "Environment peer could not be null." );
-        }
+
+        Preconditions.checkNotNull( peerConf, "Environment peer could not be null." );
 
         peerConf.setEnvironment( this );
         peerConfs.add( peerConf );
+    }
+
+
+    public PeerConf getPeerConf( String peerId )
+    {
+        for ( PeerConf peerConf : peerConfs )
+        {
+            if ( peerConf.getPeerId().equalsIgnoreCase( peerId ) )
+            {
+                return peerConf;
+            }
+        }
+
+        return null;
     }
 
 
@@ -553,6 +564,15 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public void setSubnetCidr( final String cidr )
+    {
+        SubnetUtils subnetUtils = new SubnetUtils( cidr );
+
+        this.subnetCidr = cidr;
+    }
+
+
+    @Override
     public Long getVni()
     {
         return vni;
@@ -584,19 +604,19 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void setP2PSubnet( final String tunnelNetwork )
+    public void setP2PSubnet( final String p2pSubnet )
     {
-        this.p2pSubnet = tunnelNetwork;
+        this.p2pSubnet = p2pSubnet;
     }
 
 
     @Override
-    public Map<String, String> getTunnels()
+    public P2pIps getP2pIps()
     {
-        Map<String, String> result = new HashMap<>();
+        P2pIps result = new P2pIps();
         for ( PeerConf peerConf : getPeerConfs() )
         {
-            result.put( peerConf.getPeerId(), peerConf.getTunnelAddress() );
+            result.addP2pIps( peerConf.getP2pIps() );
         }
         return result;
     }
@@ -652,10 +672,8 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
     {
-        if ( environmentAlertHandler == null )
-        {
-            throw new IllegalArgumentException( "Invalid alert handler id." );
-        }
+        Preconditions.checkNotNull( environmentAlertHandler, "Invalid alert handler id." );
+
         EnvironmentAlertHandlerImpl handlerId =
                 new EnvironmentAlertHandlerImpl( environmentAlertHandler.getAlertHandlerId(),
                         environmentAlertHandler.getAlertHandlerPriority() );

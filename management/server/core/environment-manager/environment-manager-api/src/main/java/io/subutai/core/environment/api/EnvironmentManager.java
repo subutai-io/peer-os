@@ -40,15 +40,7 @@ public interface EnvironmentManager
      */
     Set<Environment> getEnvironments();
 
-
     Set<Environment> getEnvironmentsByOwnerId( long userId );
-
-
-    Environment setupRequisites( Topology topology ) throws EnvironmentCreationException;
-
-
-    Environment startEnvironmentBuild( String environmentId, String signedMessage, boolean async )
-            throws EnvironmentCreationException;
 
     /**
      * Creates environment based on a passed topology
@@ -168,57 +160,6 @@ public interface EnvironmentManager
      */
     String getDefaultDomainName();
 
-    /**
-     * Removes environment from database only. Used to cleanup environment records.
-     *
-     * @param environmentId - environment id
-     *
-     * @throws EnvironmentNotFoundException - thrown if environment not found
-     */
-    void removeEnvironment( String environmentId ) throws EnvironmentNotFoundException;
-
-
-    /**
-     * Save environment topology
-     *
-     * @param topology - topology to save
-     */
-    void saveTopology( Topology topology ) throws EnvironmentManagerException;
-
-    /**
-     * Loads environment blueprint from DB
-     *
-     * @param id blueprint primary key
-     *
-     * @return environment blueprint
-     */
-    Topology getTopology( UUID id ) throws EnvironmentManagerException;
-
-    ;
-
-
-    /**
-     * Remove blueprint from database
-     *
-     * @param topologyId - blueprint id to remove
-     */
-    void removeTopology( UUID topologyId ) throws EnvironmentManagerException;
-
-
-    /**
-     * Get All blueprints
-     *
-     * @return - set of blueprints
-     */
-    Set<Topology> getBlueprints() throws EnvironmentManagerException;
-
-
-    /**
-     * Updates environment container hosts metadata (hostname, network interface)
-     *
-     * @param environmentId - target environment Id
-     */
-    void updateEnvironmentContainersMetadata( String environmentId ) throws EnvironmentManagerException;
 
     /**
      * Removes an assigned domain if any from the environment

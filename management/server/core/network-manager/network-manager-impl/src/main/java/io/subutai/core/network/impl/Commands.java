@@ -90,19 +90,6 @@ public class Commands
     }
 
 
-    public RequestBuilder getReserveVniCommand( long vni, int vlan, String environmentId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-E", String.valueOf( vni ), String.valueOf( vlan ), environmentId ) );
-    }
-
-
-    public RequestBuilder getListReservedVnisCommand()
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-Z", "list" ) );
-    }
-
-
     public RequestBuilder getGetVlanDomainCommand( int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_PROXY_BINDING )

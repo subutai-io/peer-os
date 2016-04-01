@@ -40,7 +40,6 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
@@ -306,98 +305,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         return environments;
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public Environment setupRequisites( final Topology topology ) throws EnvironmentCreationException
-    {
-        Preconditions.checkNotNull( topology, "Invalid topology" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
-
-        try
-        {
-            topology.setSubnet( calculateCidr( getPeers( topology ) ) );
-        }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentCreationException( e.getMessage() );
-        }
-
-        //create empty environment
-        return createEmptyEnvironment( topology );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Write" )
-    public Environment startEnvironmentBuild( String environmentId, final String signedMessage, boolean async )
-            throws EnvironmentCreationException
-    {
-        //create empty environment
-        final EnvironmentImpl environment = environmentDataService.find( environmentId );
-
-        // TODO should be handled on server side when user sends signed message
-
-        Topology topology = JsonUtil.fromJson( environment.getRawTopology(), Topology.class );
-
-        try
-        {
-            topology.setSubnet( calculateCidr( getPeers( topology ) ) );
-        }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentCreationException( e );
-        }
-
-        // TODO add additional step for receiving trust message
-
-
-        //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Creating environment %s ", environment.getId() ) );
-
-        //launch environment creation workflow
-        final EnvironmentCreationWorkflow environmentCreationWorkflow =
-                getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
-
-        //start environment creation workflow
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                environmentCreationWorkflow.start();
-            }
-        } );
-
-        //notify environment event listeners
-        environmentCreationWorkflow.onStop( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                notifyOnEnvironmentCreated( environment );
-            }
-        } );
-
-        //wait
-        if ( !async )
-        {
-            environmentCreationWorkflow.join();
-
-            if ( environmentCreationWorkflow.isFailed() )
-            {
-                throw new EnvironmentCreationException(
-                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
-            }
-        }
-
-        //return created environment
-        return environment;
     }
 
 
@@ -1063,7 +970,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         if ( environment instanceof ProxyEnvironment )
         {
-            environmentAdapter.destroyContainer( (ProxyEnvironment) environment, containerId );
+            environmentAdapter.destroyContainer( ( ProxyEnvironment ) environment, containerId );
 
             return;
         }
@@ -1187,111 +1094,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public String getDefaultDomainName()
     {
         return Common.DEFAULT_DOMAIN_NAME;
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public void removeEnvironment( final String environmentId ) throws EnvironmentNotFoundException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        Environment environment = loadEnvironment( environmentId );
-
-        User activeUser = identityManager.getActiveUser();
-        boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( environment );
-
-        //final boolean deleteAll = identityManager
-        //.isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-        // PermissionScope.ALL_SCOPE,
-        //PermissionOperation.Delete );
-
-        if ( environment.getUserId().equals( activeUser.getId() ) || canDelete )
-        {
-            environmentDataService.remove( ( EnvironmentImpl ) environment );
-            notifyOnEnvironmentDestroyed( environmentId );
-        }
-        else
-        {
-            throw new AccessControlException( "You have not enough permissions." );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public void saveTopology( final Topology topology ) throws EnvironmentManagerException
-    {
-        Preconditions.checkNotNull( topology, "Invalid topology" );
-
-        topologyDataService.persist( topology );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    @Override
-    public Topology getTopology( final UUID id ) throws EnvironmentManagerException
-    {
-        Preconditions.checkNotNull( id, "Blueprint ID could not be null" );
-        return topologyDataService.find( id );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Delete" )
-    @Override
-    public void removeTopology( final UUID topologyId ) throws EnvironmentManagerException
-    {
-        Preconditions.checkNotNull( topologyId, "Invalid blueprint id" );
-
-        topologyDataService.remove( topologyId );
-    }
-
-
-    @PermitAll
-    @Override
-    public Set<Topology> getBlueprints() throws EnvironmentManagerException
-    {
-        return topologyDataService.getAll();
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void updateEnvironmentContainersMetadata( final String environmentId ) throws EnvironmentManagerException
-    {
-        try
-        {
-            Environment environment = loadEnvironment( environmentId );
-            Set<EnvironmentContainerHost> containerHosts = environment.getContainerHosts();
-
-            for ( final ContainerHost containerHost : containerHosts )
-            {
-                try
-                {
-                    HostInfo hostInfo = containerHost.getPeer().getContainerHostInfoById( containerHost.getId() );
-
-                    EnvironmentContainerImpl environmentContainer =
-                            environmentContainerDataService.find( containerHost.getId() );
-                    if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( environmentContainer ) )
-                    {
-                        continue;
-                    }
-                    environmentContainer.setHostname( hostInfo.getHostname() );
-                    environmentContainer.setHostInterfaces( hostInfo.getHostInterfaces() );
-
-                    environmentContainerDataService.update( environmentContainer );
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Couldn't get container host info from hosting peer", e );
-                }
-            }
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            throw new EnvironmentManagerException(
-                    String.format( "Couldn't find environment by id: %s", environmentId ), e );
-        }
     }
 
 
@@ -1823,24 +1625,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
             } );
         }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    protected EnvironmentImpl createEmptyEnvironment( final String name, final String subnetCidr, final String sshKey )
-    {
-
-        EnvironmentImpl environment =
-                new EnvironmentImpl( name, subnetCidr, sshKey, getUserId(), peerManager.getLocalPeer().getId() );
-
-        environment.setUserId( identityManager.getActiveUser().getId() );
-        environment = save( environment );
-
-        setEnvironmentTransientFields( environment );
-
-        notifyOnEnvironmentCreated( environment );
-
-        return environment;
     }
 
 

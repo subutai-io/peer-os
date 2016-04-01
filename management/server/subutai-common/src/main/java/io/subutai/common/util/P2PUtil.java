@@ -13,7 +13,7 @@ public abstract class P2PUtil
     public static final String P2P_INTERFACE_IP_PATTERN = "^10\\..*";
 
 
-    public static String findFreeSubnet( final Set<String> excludedNetworks )
+    public static String findFreeP2PSubnet( final Set<String> excludedNetworks )
     {
         String result = null;
         int i = 11;
@@ -22,6 +22,32 @@ public abstract class P2PUtil
         while ( result == null && i < 200 )
         {
             String s = String.format( "10.%d.%d.0", i, j );
+            if ( !excludedNetworks.contains( s ) )
+            {
+                result = s;
+            }
+
+            j++;
+            if ( j > 254 )
+            {
+                i++;
+                j = 0;
+            }
+        }
+
+        return result;
+    }
+
+
+    public static String findFreeContainerSubnet( final Set<String> excludedNetworks )
+    {
+        String result = null;
+        int i = 168;
+        int j = 1;
+
+        while ( result == null && i < 255 )
+        {
+            String s = String.format( "192.%d.%d.0", i, j );
             if ( !excludedNetworks.contains( s ) )
             {
                 result = s;

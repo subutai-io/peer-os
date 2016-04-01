@@ -92,9 +92,7 @@ public class HostInterfaces
     public Set<HostInterfaceModel> filterByIp( final String pattern )
     {
         Preconditions.checkNotNull( pattern );
-        Set<HostInterfaceModel> result = new HashSet<>();
-
-        result = Sets.filter( interfaces, new Predicate<HostInterface>()
+        Set<HostInterfaceModel> result = Sets.filter( interfaces, new Predicate<HostInterface>()
         {
             @Override
             public boolean apply( final HostInterface intf )
@@ -150,9 +148,6 @@ public class HostInterfaces
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "HostInterfaces{" );
-        sb.append( "interfaces=" ).append( interfaces );
-        sb.append( '}' );
-        return sb.toString();
+        return "HostInterfaces{" + "interfaces=" + interfaces + '}';
     }
 }
