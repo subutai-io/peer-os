@@ -134,16 +134,10 @@ func main() {
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
 			cli.StringFlag{Name: "createtunnel, c", Usage: "-c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE"},
-			cli.StringFlag{Name: "removetunnel, r", Usage: "-r tunnerPortName"},
 
 			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
 			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
-			cli.StringFlag{Name: "reservvni, E", Usage: "-E vni, vlanid, envid"},
-			cli.StringFlag{Name: "removevni, M", Usage: "-M TUNNELPORTNAME VNI VLANID"},
-
-			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
-			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
-			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [deleteall] | [list]"}},
+		},
 
 		Subcommands: []cli.Command{{
 			Name:  "p2p",

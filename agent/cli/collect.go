@@ -3,6 +3,7 @@ package lib
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -73,7 +74,7 @@ func parsefile(hostname, lxc, cgtype, filename string) {
 		if cgtype == "memory" && lxcmemory[line[0]] {
 			point, _ := client.NewPoint("lxc_"+cgtype,
 				map[string]string{"hostname": lxc, "type": line[0]},
-				map[string]interface{}{"value": value / int64(runtime.NumCPU())},
+				map[string]interface{}{"value": value},
 				time.Now())
 			bp.AddPoint(point)
 		} else if cgtype == "cpuacct" {
@@ -112,14 +113,15 @@ func netStat() {
 		return
 	}
 	scanner := bufio.NewScanner(bytes.NewReader(out))
-	traffic := make([]int, 2)
+	traffic := make([]int64, 2)
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), ":") {
 			line := strings.Fields(scanner.Text())
-			traffic[0], _ = strconv.Atoi(line[1])
-			traffic[1], _ = strconv.Atoi(line[9])
-			nicname := strings.Split(line[0], ":")[0]
+			traffic[0], _ = strconv.ParseInt(line[1], 10, 64)
+			traffic[1], _ = strconv.ParseInt(line[9], 10, 64)
 
+			nicname := strings.Split(line[0], ":")[0]
+			fmt.Println(traffic)
 			metric := "host_net"
 			hostname, _ := os.Hostname()
 			if lxcnic[nicname] != "" {
@@ -130,7 +132,7 @@ func netStat() {
 			for i := range traffic {
 				point, _ := client.NewPoint(metric,
 					map[string]string{"hostname": hostname, "iface": nicname, "type": traff[i]},
-					map[string]interface{}{"value": traffic[i]},
+					map[string]interface{}{"value": traffic[i] * 8},
 					time.Now())
 				bp.AddPoint(point)
 			}
