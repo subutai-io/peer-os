@@ -533,7 +533,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         "mkdir -p %1$s && " +
                         "chmod 700 %1$s && " +
                         "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
-                Common.CONTAINER_SSH_FOLDER ) );
+                Common.CONTAINER_SSH_FOLDER     ) );
     }
 
 
@@ -734,7 +734,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     taskManager.schedule( quotaTask, null );
 
                     final HostInterfaces interfaces = new HostInterfaces();
-                    interfaces.addHostInterface(
+                    interfaces.addHostInterface                                                            (
                             new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp() ) );
                     final String hostId = response.getContainerId();
                     final String localPeerId = localPeer.getId();
@@ -802,7 +802,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             PGPPublicKeyRing containerPub = securityManager.getKeyManager().getPublicKeyRing( containerId );
 
             PGPPublicKeyRing signedKey = securityManager.getKeyManager().setKeyTrust( pekSecKeyRing, containerPub,
-                    KeyTrustLevel.Full.getId() );
+                    KeyTrustLevel.Full.getId()                                      );
 
             securityManager.getKeyManager().updatePublicKeyRing( signedKey );
         }
@@ -1092,7 +1092,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         KeyManager keyManager = securityManager.getKeyManager();
 
         keyManager.removeKeyData( environmentId.getId() );
-        keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
+        keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
+
+        RelationLink envLink = relationManager.getRelationLink( environmentId.getId() );
+        relationManager.removeRelation( envLink );
     }
 
 
@@ -1322,7 +1325,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void buildAdminHostRelation(Host host)
+    private void buildAdminHostRelation( Host host )
     {
         // Build relation between Admin and management/resource host.
 
@@ -1345,8 +1348,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 relationTraits.put( "containerManagement", "true" );
             }
 
-            RelationMeta relationMeta =
-                    new RelationMeta( peerOwner, peerOwner, host, peerOwner.getSecurityKeyId() );
+            RelationMeta relationMeta = new RelationMeta( peerOwner, peerOwner, host, peerOwner.getSecurityKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
@@ -1490,7 +1492,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             try
             {
                 getNetworkManager().setVlanDomain( reservedNetworkResource.getVlan(), domain, domainLoadBalanceStrategy,
-                        sslCertPath );
+                        sslCertPath              );
             }
             catch ( NetworkManagerException e )
             {
@@ -1521,7 +1523,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format( "Error checking domain by ip %s and vlan %d", hostIp,
+                throw new PeerException( String.format    ( "Error checking domain by ip %s and vlan %d", hostIp,
                         reservedNetworkResource.getVlan() ), e );
             }
         }
@@ -1549,7 +1551,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format( "Error adding ip %s to domain by vlan %d", hostIp,
+                throw new PeerException( String.format    ( "Error adding ip %s to domain by vlan %d", hostIp,
                         reservedNetworkResource.getVlan() ), e );
             }
         }
@@ -1577,7 +1579,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format( "Error removing ip %s from domain by vlan %d", hostIp,
+                throw new PeerException( String.format    ( "Error removing ip %s from domain by vlan %d", hostIp,
                         reservedNetworkResource.getVlan() ), e );
             }
         }
@@ -1700,7 +1702,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void buildPeerEnvRelation(final RelationLink envLink)
+    private void buildPeerEnvRelation( final RelationLink envLink )
     {
 
         // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment.
@@ -1745,7 +1747,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         // Build relation between LocalPeer => RemotePeer => Environment
         // for message encryption/decryption mechanism described in relation trais
-        String [] ids = keyId.split( "_" );
+        String[] ids = keyId.split( "_" );
         if ( ids.length == 2 )
         {
             String envId = ids[1];
@@ -1793,7 +1795,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 if ( usedNetworkResources.containerSubnetExists( networkResource.getContainerSubnet() ) )
                 {
-                    throw new PeerException( String.format( "Container subnet %s is already reserved",
+                    throw new PeerException( String.format       ( "Container subnet %s is already reserved",
                             networkResource.getContainerSubnet() ) );
                 }
                 if ( usedNetworkResources.p2pSubnetExists( networkResource.getP2pSubnet() ) )
@@ -1948,7 +1950,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
                 getNetworkManager()
-                        .resetP2PSecretKey( resourceHost, p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
+                        .resetP2PSecretKey                        ( resourceHost, p2PCredentials.getP2pHash(),
+                                p2PCredentials.getP2pSecretKey(),
                                 p2PCredentials.getP2pTtlSeconds() );
             }
         }
@@ -2016,19 +2019,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 if ( connections.findConnectionByHash( p2pHash ) != null )
                 {
                     getNetworkManager().resetP2PSecretKey( resourceHost, config.getHash(), config.getSecretKey(),
-                            config.getSecretKeyTtlSec() );
+                            config.getSecretKeyTtlSec()  );
                 }
                 else
                 {
                     //we don't supply p2p IP since it should get assigned dynamically
-                    getNetworkManager().setupP2PConnection( resourceHost, p2pInterface, null, config.getHash(),
+                    getNetworkManager().setupP2PConnection                     ( resourceHost, p2pInterface, null,
+                            config.getHash(),
                             config.getSecretKey(), config.getSecretKeyTtlSec() );
                 }
             }
 
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                p2PConnections.addConnection(
+                p2PConnections.addConnection                                                                  (
                         getNetworkManager().getP2PConnections( resourceHost ).findConnectionByHash( p2pHash ) );
             }
 
@@ -2072,7 +2076,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             else
             {
                 getNetworkManager()
-                        .setupP2PConnection( P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() ),
+                        .setupP2PConnection                 ( P2PUtil.generateInterfaceName( reservedNetworkResource
+                                .getVlan() ),
                                 config.getAddress(), config.getHash(), config.getSecretKey(),
                                 config.getSecretKeyTtlSec() );
             }
@@ -2118,7 +2123,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( reservedNetworkResource == null )
         {
-            LOG.warn(
+            LOG.warn                                                                                                 (
                     "Environment VNI not found to cleanup resources hosts. Environment ID: " + environmentId.getId() );
             return;
         }
@@ -2442,6 +2447,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         return getId().hashCode();
     }
+
 
     @Override
     public String getLinkId()

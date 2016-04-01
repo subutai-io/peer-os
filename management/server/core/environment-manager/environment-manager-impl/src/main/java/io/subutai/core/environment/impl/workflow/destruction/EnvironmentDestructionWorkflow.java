@@ -12,6 +12,8 @@ import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
 import io.subutai.core.environment.impl.workflow.destruction.steps.RemoveKeysStep;
+import io.subutai.core.object.relation.api.RelationManager;
+
 
 //todo use native fail for failing the workflow
 public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
@@ -111,6 +113,9 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         LOG.info( "Finalizing environment destruction" );
 
         environmentManager.remove( environment );
+
+        RelationManager relationManager = environmentManager.getRelationManager();
+        relationManager.removeRelation( environment );
 
         operationTracker.addLogDone( "Environment is destroyed" );
 

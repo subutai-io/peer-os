@@ -364,17 +364,18 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 return localPeer;
             }
 
-            RemotePeerImpl remotePeer = new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
-                messageResponseListener, provider, this );
+            RemotePeerImpl remotePeer =
+                    new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
+                            messageResponseListener, provider, this );
 
             RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-            relationInfoMeta.getRelationTraits().put("receiveHeartbeats", "allow");
-            relationInfoMeta.getRelationTraits().put("sendHeartbeats", "allow");
-            relationInfoMeta.getRelationTraits().put("hostTemplates", "allow");
+            relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
+            relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
+            relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
 
             User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
-            RelationMeta relationMeta = new RelationMeta(peerOwner,localPeer, remotePeer, localPeer.getKeyId());
-            Relation relation = relationManager.buildRelation(relationInfoMeta, relationMeta );
+            RelationMeta relationMeta = new RelationMeta( peerOwner, localPeer, remotePeer, localPeer.getKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
 
@@ -411,6 +412,12 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         {
             throw new PeerException( "Could not unregister peer.", e );
         }
+
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+        Peer remotePeer = getPeer( registrationData.getPeerInfo().getId() );
+        RelationMeta relationMeta = new RelationMeta( peerOwner, localPeer, remotePeer, localPeer.getKeyId() );
+        relationManager.removeRelation( relationMeta );
+
         removePeerData( registrationData.getPeerInfo().getId() );
         removePeer( registrationData.getPeerInfo().getId() );
     }

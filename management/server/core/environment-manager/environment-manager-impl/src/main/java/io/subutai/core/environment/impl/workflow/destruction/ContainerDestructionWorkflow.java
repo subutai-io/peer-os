@@ -12,6 +12,8 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
+import io.subutai.core.object.relation.api.RelationManager;
+
 
 //todo use native fail for failing the workflow
 public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
@@ -92,6 +94,8 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
             new DestroyContainerStep( environmentManager, environment, containerHost, forceMetadataRemoval,
                     operationTracker ).execute();
 
+            RelationManager relationManager = environmentManager.getRelationManager();
+            relationManager.removeRelation( containerHost );
             environment = environmentManager.update( environment );
 
             return ContainerDestructionPhase.FINALIZE;

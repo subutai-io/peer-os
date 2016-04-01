@@ -53,5 +53,9 @@ public interface RelationManager
 
     void removeRelation( long relationId );
 
+    void removeRelation( RelationMeta relationMeta );
+
+    void removeRelation( RelationLink link );
+
     RelationLink getRelationLink(String uniqueId);
 }

@@ -41,9 +41,9 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -228,20 +228,16 @@ public class ContainerCloneStep
             for ( final EnvironmentContainerImpl container : containers )
             {
                 //TODO create environment <-> container ownership
-
-                RelationMeta relationMeta = new RelationMeta();
-                relationMeta.setSource( delegatedUser );
-                relationMeta.setTarget( environment );
-                relationMeta.setObject( container );
-
                 RelationInfoMeta relationInfoMeta =
                         new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
-                RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
+                Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+                relationTraits.put( "containerLimit", "unlimited" );
+                relationTraits.put( "bandwidthLimit", "unlimited" );
 
-                Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
-
-                relationManager.saveRelation( relation );
-            }
+                RelationMeta relationMeta = new RelationMeta( delegatedUser, environment, container, "" );
+                Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+                relation.setRelationStatus( RelationStatus.VERIFIED );
+                relationManager.saveRelation( relation );            }
         }
         catch ( Exception ex )
         {

@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationStatus;
 
@@ -66,12 +67,12 @@ public class RelationImpl implements Relation
     }
 
 
-    public RelationImpl( final RelationLinkImpl source, final RelationLinkImpl target,
-                         final RelationLinkImpl trustedObject, final RelationInfoImpl relationInfo, final String keyId )
+    public RelationImpl( final RelationLink source, final RelationLink target, final RelationLink trustedObject,
+                         final RelationInfoImpl relationInfo, final String keyId )
     {
-        this.source = source;
-        this.target = target;
-        this.trustedObject = trustedObject;
+        this.source = new RelationLinkImpl( source );
+        this.target = new RelationLinkImpl( target );
+        this.trustedObject = new RelationLinkImpl( trustedObject );
         this.relationInfo = relationInfo;
         this.relationStatus = RelationStatus.STATED;
         this.keyId = keyId;

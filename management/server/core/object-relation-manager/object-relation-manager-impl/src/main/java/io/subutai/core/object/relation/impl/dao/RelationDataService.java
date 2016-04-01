@@ -102,6 +102,32 @@ public class RelationDataService
     }
 
 
+    public void removeAllRelationLinks( RelationLink link )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+
+            Query qr = em.createQuery( "DELETE FROM RelationImpl AS rln WHERE rln.source.linkId=:id OR "
+                    + "rln.target.linkId=:id OR rln.trustedObject.linkId=:id" );
+            qr.setParameter( "id", link.getLinkId() );
+            qr.executeUpdate();
+
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
     public RelationImpl find( long trustRelationId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
@@ -247,8 +273,8 @@ public class RelationDataService
     }
 
 
-    public Relation findBySourceTargetObject( final RelationLinkImpl source, final RelationLinkImpl target,
-                                              final RelationLinkImpl object )
+    public Relation findBySourceTargetObject( final RelationLink source, final RelationLink target,
+                                              final RelationLink object )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         Relation result = null;
