@@ -34,7 +34,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -198,8 +197,6 @@ public class LocalPeerImplTest
 
     @Mock
     EntityManagerFactoryImpl entityManagerFactory;
-    @Mock
-    private ContainerGateway containerGateway;
 
     @Mock
     private ByteValueResource cpuQuota;
@@ -251,7 +248,6 @@ public class LocalPeerImplTest
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
-        when( containerGateway.getContainerId() ).thenReturn( containerId );
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );

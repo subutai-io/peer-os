@@ -15,7 +15,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
@@ -89,9 +88,6 @@ public class RestServiceImplTest
     @Mock
     ContainerId containerId;
 
-    @Mock
-    private ContainerGateway containerGateway;
-
 
     @Before
     public void setUp() throws Exception
@@ -100,7 +96,6 @@ public class RestServiceImplTest
         restService.jsonUtil = jsonUtil;
         restService.restUtil = restUtil;
         when( containerId.getId() ).thenReturn( CONTAINER_ID );
-        when( containerGateway.getContainerId() ).thenReturn( containerId );
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getId() ).thenReturn( PEER_ID );
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );

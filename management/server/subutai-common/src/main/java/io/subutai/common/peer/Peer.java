@@ -250,19 +250,11 @@ public interface Peer
 
 
     /**
-     * Returns p2p IP of the specified p2p swarm on the specified RH
-     *
-     * @param resourceHostId - id of RH
-     * @param swarmHash - hash of p2p swarm
-     */
-    String getP2PIP( String resourceHostId, String swarmHash ) throws PeerException;
-
-    /**
      * Resets a secret key for a given P2P network on all RHs
      *
      * @param p2PCredentials - P2P network credentials
      */
-    void resetP2PSecretKey( P2PCredentials p2PCredentials ) throws PeerException;
+    void resetSwarmSecretKey( P2PCredentials p2PCredentials ) throws PeerException;
 
 
     /**
@@ -271,11 +263,11 @@ public interface Peer
      * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
      * dynamic IP acquisition for RHs. If P2P connection already exists on RH, its secret key gets reset with new secret
      * key and ttl from  @param config. To setup initial p2p connection with explicit IP, use
-     * Peer#setupInitialP2PConnection
+     * Peer#createP2PSwarm
      *
      * @return - P2P IP of RH with MH
      */
-    P2PConnections setupP2PConnection( P2PConfig config ) throws PeerException;
+    P2PConnections joinP2PSwarm( P2PConfig config ) throws PeerException;
 
 
     /**
@@ -283,7 +275,7 @@ public interface Peer
      *
      * This method throws PeerException if initial P2P connection with the specified hash is already setup.
      */
-    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException;
+    public void createP2PSwarm( final P2PConfig config ) throws PeerException;
 
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;

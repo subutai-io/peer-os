@@ -45,7 +45,8 @@ public class ListP2PCommand extends SubutaiShellCommandSupport
     {
         try
         {
-            final P2PConnections connections = Strings.isNullOrEmpty( hostId ) ? networkManager.getP2PConnections() :
+            final P2PConnections connections = Strings.isNullOrEmpty( hostId ) ?
+                                               networkManager.getP2PConnections( localPeer.getManagementHost() ) :
                                                networkManager
                                                        .getP2PConnections( localPeer.getResourceHostById( hostId ) );
 

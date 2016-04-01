@@ -45,6 +45,20 @@ public class Tunnels
     }
 
 
+    public Tunnel findByName( String name )
+    {
+        for ( Tunnel tunnel : tunnels )
+        {
+            if ( tunnel.getTunnelName().equalsIgnoreCase( name ) )
+            {
+                return tunnel;
+            }
+        }
+
+        return null;
+    }
+
+
     public void addTunnel( Tunnel tunnel )
     {
         Preconditions.checkNotNull( tunnel );

@@ -51,18 +51,43 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupP2PConnection( final Host host, final String interfaceName, final String localIp,
-                                    final String p2pHash, final String secretKey, final long secretKeyTtlSec )
-            throws NetworkManagerException
+    public void createP2PSwarm( final Host host, final String interfaceName, final String localIp, final String p2pHash,
+                                final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
-        execute( host, commands.getSetupP2PConnectionCommand( interfaceName, localIp, p2pHash, secretKey,
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( localIp ), "Invalid ip" );
+        Preconditions.checkArgument( localIp.matches( Common.IP_REGEX ), "Invalid ip" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
+
+
+        execute( host, commands.getCreateP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 
 
     @Override
-    public void resetP2PSecretKey( final Host host, final String p2pHash, final String newSecretKey,
-                                   final long ttlSeconds ) throws NetworkManagerException
+    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
+                              final long secretKeyTtlSec )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret key" );
+        Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
+
+
+        execute( host, commands.getJoinP2PSwarmCommand( interfaceName, p2pHash, secretKey,
+                getUnixTimestampOffset( secretKeyTtlSec ) ) );
+    }
+
+
+    @Override
+    public void resetSwarmSecretKey( final Host host, final String p2pHash, final String newSecretKey,
+                                     final long ttlSeconds ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
@@ -74,15 +99,10 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public P2PConnections getP2PConnections() throws NetworkManagerException
-    {
-        return getP2PConnections( getManagementHost() );
-    }
-
-
-    @Override
     public P2PConnections getP2PConnections( final Host host ) throws NetworkManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
+
         P2PConnections connections = new P2PConnections();
 
         CommandResult result = execute( host, commands.getP2PConnectionsCommand() );
@@ -112,6 +132,8 @@ public class NetworkManagerImpl implements NetworkManager
     public PingDistance getPingDistance( final Host host, final String sourceHostIp, final String targetHostIp )
             throws NetworkManagerException
     {
+        Preconditions.checkNotNull( host, "Invalid host" );
+
 
         CommandResult result = execute( host, commands.getPingDistanceCommand( targetHostIp ) );
 
@@ -137,14 +159,20 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void createTunnel( final Host host, final Tunnel tunnel ) throws NetworkManagerException
+    public void createTunnel( final Host host, final String tunnelName, final String tunnelIp, final int vlan,
+                              final long vni ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkNotNull( tunnel, "Invalid tunnel" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelName ), "Invalid tunnel name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ), "Invalid tunnel ip" );
+        Preconditions.checkArgument( tunnelIp.matches( Common.IP_REGEX ), "Invalid tunnel ip" );
+        Preconditions
+                .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan" );
+        Preconditions
+                .checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ), "Invalid vni" );
 
 
-        execute( host, commands.getCreateTunnelCommand( tunnel.getTunnelName(), tunnel.getTunnelIp(), tunnel.getVlan(),
-                tunnel.getVni() ) );
+        execute( host, commands.getCreateTunnelCommand( tunnelName, tunnelIp, vlan, vni ) );
     }
 
 
@@ -180,7 +208,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public String getVlanDomain( final int vLanId ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
 
         try
         {
@@ -202,7 +231,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void removeVlanDomain( final int vLanId ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
 
         execute( getManagementHost(), commands.getRemoveVlanDomainCommand( vLanId ) );
     }
@@ -213,10 +243,11 @@ public class NetworkManagerImpl implements NetworkManager
                                final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
             throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
-        Preconditions.checkNotNull( domainLoadBalanceStrategy );
+        Preconditions.checkNotNull( domainLoadBalanceStrategy, "Invalid strategy" );
 
         execute( getManagementHost(),
                 commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
@@ -226,7 +257,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public boolean isIpInVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
         Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
 
@@ -251,7 +283,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void addIpToVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
         Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
 
@@ -262,7 +295,8 @@ public class NetworkManagerImpl implements NetworkManager
     @Override
     public void removeIpFromVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
     {
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostIp ), "Invalid host IP" );
         Preconditions.checkArgument( hostIp.matches( Common.HOSTNAME_REGEX ), "Invalid host IP" );
 

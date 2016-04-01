@@ -1,11 +1,13 @@
 package io.subutai.core.localpeer.impl.tasks;
 
 
+import java.util.Random;
 import java.util.concurrent.Callable;
 
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
@@ -53,10 +55,18 @@ public class SetupTunnelsTask implements Callable<Boolean>
             //create new tunnel
             if ( tunnel == null )
             {
-                Tunnel newTunnel = new Tunnel( String.format( "tunnel-%d", networkResource.getVlan() ), tunnelIp,
-                        networkResource.getVlan(), networkResource.getVni() );
+                String tunnelName = generateTunnelName( tunnels );
 
-                networkManager.createTunnel( resourceHost, newTunnel );
+                if ( tunnelName == null )
+                {
+                    throw new ResourceHostException( "Free tunnel name not found" );
+                }
+
+                Tunnel newTunnel =
+                        new Tunnel( tunnelName, tunnelIp, networkResource.getVlan(), networkResource.getVni() );
+
+                networkManager.createTunnel( resourceHost, newTunnel.getTunnelName(), newTunnel.getTunnelIp(),
+                        newTunnel.getVlan(), newTunnel.getVni() );
 
                 //add to avoid duplication in the next iteration
                 tunnels.addTunnel( newTunnel );
@@ -64,5 +74,30 @@ public class SetupTunnelsTask implements Callable<Boolean>
         }
 
         return true;
+    }
+
+
+    protected String generateTunnelName( Tunnels tunnels )
+    {
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        String name;
+
+        Random rnd = new Random();
+
+        do
+        {
+            int n = 10000 + rnd.nextInt( 90000 );
+            name = String.format( "tunnel-%d", n );
+            currentIteration++;
+        }
+        while ( tunnels.findByName( name ) != null && currentIteration < maxIterations );
+
+        if ( tunnels.findByName( name ) != null )
+        {
+            return null;
+        }
+
+        return name;
     }
 }

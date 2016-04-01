@@ -5,7 +5,6 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
-import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 
 
@@ -13,11 +12,19 @@ public interface NetworkManager
 {
 
     /**
-     * Sets up an P2P connection on specified host
+     * Sets up an P2P connection on specified host with explicit IP. Usually used to setup new swarm with this peer as
+     * the first member
      */
-    public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
-                                    long secretKeyTtlSec ) throws NetworkManagerException;
+    public void createP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                                long secretKeyTtlSec ) throws NetworkManagerException;
 
+    /**
+     * Sets up an P2P connection on specified host with dynamically acquired IP. Usually used to connect peer to
+     * existing swarm
+     */
+    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
+                              final long secretKeyTtlSec )
+            throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network
@@ -27,7 +34,7 @@ public interface NetworkManager
      * @param newSecretKey - new secret key to set
      * @param ttlSeconds - time-to-live for the new secret key
      */
-    public void resetP2PSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
+    public void resetSwarmSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
 
@@ -41,14 +48,9 @@ public interface NetworkManager
 
     public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
 
-    /**
-     * Returns all p2p connections running on MH
-     */
 
-    public P2PConnections getP2PConnections() throws NetworkManagerException;
-
-
-    public void createTunnel( Host host, Tunnel tunnel ) throws NetworkManagerException;
+    public void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
+            throws NetworkManagerException;
 
     public Tunnels getTunnels( final Host host ) throws NetworkManagerException;
 

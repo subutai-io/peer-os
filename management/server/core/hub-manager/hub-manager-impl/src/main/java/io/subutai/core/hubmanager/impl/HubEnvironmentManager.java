@@ -221,7 +221,7 @@ public class HubEnvironmentManager
 
         try
         {
-            localPeer.setupInitialP2PConnection(
+            localPeer.createP2PSwarm(
                     new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[0], env.getP2pKey(),
                             env.getP2pTTL() ) );
         }
@@ -521,7 +521,7 @@ public class HubEnvironmentManager
         @Override
         public P2PConfig call() throws Exception
         {
-            P2PConnections p2PConnections = peer.setupP2PConnection( p2PConfig );
+            P2PConnections p2PConnections = peer.joinP2PSwarm( p2PConfig );
             for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
             {
                 p2PConfig.addP2pIp( p2PConnection.getIp() );

@@ -26,12 +26,21 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String p2pHash,
-                                                        String secretKey, long secretKeyTtlSec )
+    public RequestBuilder getCreateP2PSwarmCommand( String interfaceName, String localIp, String p2pHash,
+                                                    String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ),
-                        Strings.isNullOrEmpty( localIp ) ? "" : localIp ) ).withTimeout( 90 );
+                        localIp ) ).withTimeout( 90 );
+    }
+
+
+    public RequestBuilder getJoinP2PSwarmCommand( String interfaceName, String p2pHash, String secretKey,
+                                                  long secretKeyTtlSec )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey,
+                        String.valueOf( secretKeyTtlSec ) ) ).withTimeout( 90 );
     }
 
 
