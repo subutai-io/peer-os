@@ -11,6 +11,28 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
+func VxlanTunnel(create, del, list, name, remoteip, vlan, vni string) {
+	if len(create) > 0 {
+		tunnelCreate(name, remoteip, vlan, vni)
+	} else if len(del) > 0 {
+		// TODO
+		return
+	} else if len(list) > 0 {
+		// TODO
+		return
+	}
+}
+
+func tunnelCreate(tunnel, addr, vlan, vni string) {
+	log.Check(log.WarnLevel, "Creating bridge ", exec.Command("ovs-vsctl", "add-br", "gw-"+vlan).Run())
+
+	log.Check(log.FatalLevel, "Creating tunnel port",
+		exec.Command("ovs-vsctl", "--may-exist", "add-port", "gw-"+vlan, tunnel, "--", "set", "interface", tunnel, "type=vxlan",
+			"options:stp_enable=true", "options:key="+vni, "options:remote_ip="+string(addr)).Run())
+
+	log.Check(log.FatalLevel, "MakeVNIMap set port: ", exec.Command("ovs-vsctl", "--if-exists", "set", "port", tunnel, "tag="+vlan).Run())
+}
+
 func P2P(c, d, u, l, p bool, args []string) {
 	if c {
 		if len(args) > 8 {
@@ -122,24 +144,4 @@ func createVNIMap(tunnel, vni, vlan, envid string) {
 			"options:stp_enable=true", "options:key="+vni, "options:remote_ip="+string(addr), "options:env="+envid).Run())
 
 	log.Check(log.FatalLevel, "MakeVNIMap set port: ", exec.Command("ovs-vsctl", "--if-exists", "set", "port", tunnel, "tag="+vlan).Run())
-}
-
-func removeTunnel(tunnel string) {
-	log.Check(log.WarnLevel, "Removing port "+tunnel,
-		exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
-}
-
-func delTunById(envId string) {
-	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
-	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
-	ports := strings.Split(string(ret), "\n")
-
-	for k, port := range ports {
-		if strings.Contains(port, envId) {
-			tunnel := strings.Split(ports[k-2], "\"")[1]
-			log.Check(log.WarnLevel, "Removing port "+tunnel,
-				exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
-		}
-	}
-
 }

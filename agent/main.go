@@ -140,6 +140,21 @@ func main() {
 		},
 
 		Subcommands: []cli.Command{{
+			Name:  "tunnel",
+			Usage: "tunnels operation",
+			Flags: []cli.Flag{
+				cli.StringFlag{Name: "create", Usage: "create tunnel (tunnel -c)"},
+				cli.StringFlag{Name: "delete", Usage: "delete tunnel (tunnel -d)"},
+				cli.StringFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
+
+				cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
+				cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
+				cli.StringFlag{Name: "vni", Usage: "vni"},
+			},
+			Action: func(c *cli.Context) {
+				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("list"), c.String("name"), c.String("remoteip"), c.String("vlan"), c.String("vni"))
+			}}, {
+
 			Name:  "p2p",
 			Usage: "p2p network operation",
 			Flags: []cli.Flag{
