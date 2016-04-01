@@ -122,7 +122,7 @@ func main() {
 			cli.BoolFlag{Name: "c", Usage: "containers only"},
 			cli.BoolFlag{Name: "t", Usage: "templates only"},
 			cli.BoolFlag{Name: "r", Usage: "registered only"},
-			cli.BoolFlag{Name: "i", Usage: "info ???? only"},
+			cli.BoolFlag{Name: "i", Usage: "detailed container info"},
 			cli.BoolFlag{Name: "a", Usage: "with ancestors"},
 			cli.BoolFlag{Name: "f", Usage: "fancy mode"},
 			cli.BoolFlag{Name: "p", Usage: "with parent"}},
@@ -145,14 +145,14 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "create", Usage: "create tunnel (tunnel -c)"},
 				cli.StringFlag{Name: "delete", Usage: "delete tunnel (tunnel -d)"},
-				cli.StringFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
+				cli.BoolFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
 
 				cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
 				cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
 				cli.StringFlag{Name: "vni", Usage: "vni"},
 			},
 			Action: func(c *cli.Context) {
-				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("list"), c.String("remoteip"), c.String("vlan"), c.String("vni"))
+				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
 			}}, {
 
 			Name:  "p2p",
