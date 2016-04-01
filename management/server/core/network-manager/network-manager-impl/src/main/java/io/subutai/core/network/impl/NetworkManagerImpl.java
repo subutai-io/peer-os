@@ -2,23 +2,17 @@ package io.subutai.core.network.impl;
 
 
 import java.time.Instant;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -27,6 +21,7 @@ import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
@@ -39,8 +34,7 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class NetworkManagerImpl implements NetworkManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( NetworkManagerImpl.class );
-    private static final String LINE_DELIMITER = "\n";
+    private static final String LINE_DELIMITER = System.lineSeparator();
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
 
@@ -143,106 +137,30 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void setupTunnel( final Host host, final int tunnelId, final String tunnelIp ) throws NetworkManagerException
+    public void createTunnel( final Host host, final Tunnel tunnel ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ), "Invalid tunnel ip" );
-        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
+        Preconditions.checkNotNull( tunnel, "Invalid tunnel" );
 
-        execute( host, commands.getSetupTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp,
-                TUNNEL_TYPE ) );
+
+        execute( host, commands.getCreateTunnelCommand( tunnel.getTunnelName(), tunnel.getTunnelIp(), tunnel.getVlan(),
+                tunnel.getVni() ) );
     }
 
 
     @Override
-    public void createTunnel( final Host host, final int tunnelId, final String tunnelIp, final int vlan,
-                              final long vni ) throws NetworkManagerException
+    public Tunnels getTunnels( final Host host ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ), "Invalid tunnel ip" );
-        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
-        Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
-        execute( host,
-                commands.getCreateTunnelCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), tunnelIp, vlan,
-                        vni ) );
-    }
+        Tunnels tunnels = new Tunnels();
 
-
-    @Override
-    public Set<Tunnel> listTunnels() throws NetworkManagerException
-    {
-        return listTunnels( getManagementHost() );
-    }
-
-
-    @Override
-    public Set<Tunnel> listTunnels( final Host host ) throws NetworkManagerException
-    {
-        Set<Tunnel> tunnels = Sets.newHashSet();
-
-        CommandResult result = execute( host, commands.getListTunnelsCommand() );
+        CommandResult result = execute( host, commands.getGetTunnelsCommand() );
 
         StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
 
-        Pattern p = Pattern.compile( "(tunnel\\d+)-(.+)" );
-
-        while ( st.hasMoreTokens() )
-        {
-            Matcher m = p.matcher( st.nextToken() );
-
-            if ( m.find() && m.groupCount() == 2 )
-            {
-                LOG.debug( String.format( "Adding new tunnel: %s %s", m.group( 1 ), m.group( 2 ) ) );
-                tunnels.add( new Tunnel( m.group( 1 ), m.group( 2 ) ) );
-            }
-        }
-
-        LOG.debug( String.format( "Total count of tunnel: %d", tunnels.size() ) );
-        return tunnels;
-    }
-
-
-    @Override
-    public void setupVniVLanMapping( final int tunnelId, final long vni, final int vLanId, final String environmentId )
-            throws NetworkManagerException
-    {
-        setupVniVLanMapping( getManagementHost(), tunnelId, vni, vLanId, environmentId );
-    }
-
-
-    @Override
-    public void setupVniVLanMapping( final Host host, final int tunnelId, final long vni, final int vLanId,
-                                     final String environmentId ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host );
-        Preconditions.checkArgument( tunnelId > 0, "Tunnel id must be greater than 0" );
-        Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
-
-        execute( host,
-                commands.getSetupVniVlanMappingCommand( String.format( "%s%d", TUNNEL_PREFIX, tunnelId ), vni, vLanId,
-                        environmentId ) );
-    }
-
-
-    @Override
-    public Set<VniVlanMapping> getVniVlanMappings( final Host host ) throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host );
-
-        Set<VniVlanMapping> mappings = Sets.newHashSet();
-
-        CommandResult result = execute( host, commands.getListVniVlanMappingsCommand() );
-
-        Pattern p = Pattern.compile( String.format(
-                        "\\s*(%s\\d+)\\s*(\\d+)\\s*(\\d+)\\s*([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3"
-                                + "}-[89ab][0-9a-f]{3}-[0-9a-f]{12})\\s*", NetworkManager.TUNNEL_PREFIX ),
-                Pattern.CASE_INSENSITIVE );
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
+        Pattern p =
+                Pattern.compile( "\\s*(\\S+)\\s+(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+(\\d+)\\s+(\\d+)\\s*" );
 
         while ( st.hasMoreTokens() )
         {
@@ -250,13 +168,12 @@ public class NetworkManagerImpl implements NetworkManager
 
             if ( m.find() && m.groupCount() == 4 )
             {
-                mappings.add( new VniVlanMapping(
-                        Integer.parseInt( m.group( 1 ).replace( NetworkManager.TUNNEL_PREFIX, "" ) ),
-                        Long.parseLong( m.group( 2 ) ), Integer.parseInt( m.group( 3 ) ), m.group( 4 ) ) );
+                tunnels.addTunnel( new Tunnel( m.group( 1 ), m.group( 2 ), Integer.parseInt( m.group( 3 ) ),
+                        Long.parseLong( m.group( 4 ) ) ) );
             }
         }
 
-        return mappings;
+        return tunnels;
     }
 
 

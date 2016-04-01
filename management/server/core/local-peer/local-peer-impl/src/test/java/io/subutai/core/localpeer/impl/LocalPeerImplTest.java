@@ -48,7 +48,6 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ByteValueResource;
@@ -766,14 +765,5 @@ public class LocalPeerImplTest
         doThrow( new QuotaException() ).when( quotaManager ).setCpuSet( eq( containerId ), anySet() );
 
         localPeer.setCpuSet( containerHost, Sets.newHashSet( QUOTA ) );
-    }
-
-
-    @Test
-    public void testRemoveTunnel() throws Exception
-    {
-        Tunnel tunnel = mock( Tunnel.class );
-        when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
-        when( tunnel.getTunnelIp() ).thenReturn( IP );
     }
 }

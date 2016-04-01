@@ -50,6 +50,13 @@ public class Commands
     }
 
 
+    public RequestBuilder getGetTunnelsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "tunnel", "-list" ) );
+    }
+
+
     public RequestBuilder getSetupTunnelCommand( String tunnelName, String tunnelIp, String tunnelType )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )

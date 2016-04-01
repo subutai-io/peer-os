@@ -15,7 +15,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
-import io.subutai.common.network.Vni;
 import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -92,9 +91,6 @@ public class RestServiceImplTest
 
     @Mock
     private ContainerGateway containerGateway;
-
-    @Mock
-    Vni vni;
 
 
     @Before

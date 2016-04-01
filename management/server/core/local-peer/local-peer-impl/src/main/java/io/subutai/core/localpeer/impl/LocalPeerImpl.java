@@ -68,7 +68,6 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -91,6 +90,8 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -1734,11 +1735,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ResourceHost resourceHost : getResourceHosts() )
             {
-                //reserved vnis
-                Set<VniVlanMapping> vniVlanMappings = getNetworkManager().getVniVlanMappings( resourceHost );
-                for ( VniVlanMapping vniVlanMapping : vniVlanMappings )
+                //tunnels
+                Tunnels tunnels = getNetworkManager().getTunnels( resourceHost );
+                for ( Tunnel tunnel : tunnels.getTunnels() )
                 {
-                    usedNetworkResources.addVni( vniVlanMapping.getVni() );
+                    usedNetworkResources.addVni( tunnel.getVni() );
+                    usedNetworkResources.addVlan( tunnel.getVlan() );
+                    usedNetworkResources.addP2pSubnet( tunnel.getTunnelIp() );
                 }
 
                 for ( HostInterface iface : resourceHost.getHostInterfaces().getAll() )
