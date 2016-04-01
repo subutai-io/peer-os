@@ -4,11 +4,11 @@ package io.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.tracker.TrackerOperationView;
-
-import com.google.common.base.Preconditions;
 
 
 /**

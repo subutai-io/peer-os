@@ -723,7 +723,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
-        return new PeerWebClient( peerInfo, provider ).getUsedNetResources();
+        return peerWebClient.getUsedNetResources();
     }
 
 
@@ -812,7 +812,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( networkResource );
 
-        new PeerWebClient( peerInfo, provider ).reserveNetworkResource( networkResource );
+        peerWebClient.reserveNetworkResource( networkResource );
     }
 
 

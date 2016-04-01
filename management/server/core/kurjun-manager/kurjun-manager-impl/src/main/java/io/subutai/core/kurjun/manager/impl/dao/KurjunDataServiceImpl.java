@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.kurjun.manager.api.dao.*;
+import io.subutai.core.kurjun.manager.api.dao.KurjunDataService;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 
