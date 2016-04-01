@@ -35,13 +35,6 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveP2PConnectionCommand( String p2pHash )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-d", p2pHash ) );
-    }
-
-
     public RequestBuilder getResetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
@@ -49,17 +42,18 @@ public class Commands
     }
 
 
+    public RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "tunnel", "-create", tunnelName, "-remoteip", tunnelIp, "-vlan",
+                        String.valueOf( vlan ), "-vni", String.valueOf( vni ) ) );
+    }
+
+
     public RequestBuilder getSetupTunnelCommand( String tunnelName, String tunnelIp, String tunnelType )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-c", tunnelName, tunnelIp, tunnelType ) );
-    }
-
-
-    public RequestBuilder getRemoveTunnelCommand( String tunnelName )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-r", tunnelName ) );
     }
 
 
@@ -74,13 +68,6 @@ public class Commands
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ),
                         environmentId ) );
-    }
-
-
-    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
     }
 
 

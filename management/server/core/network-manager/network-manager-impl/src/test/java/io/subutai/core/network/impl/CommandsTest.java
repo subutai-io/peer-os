@@ -39,23 +39,9 @@ public class CommandsTest
 
 
     @Test
-    public void testGetRemoveP2PConnectionCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveP2PConnectionCommand( COMMUNITY_NAME ) );
-    }
-
-
-    @Test
     public void testGetSetupTunnelCommand() throws Exception
     {
         assertNotNull( commands.getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, TUNNEL_TYPE ) );
-    }
-
-
-    @Test
-    public void testGetRemoveTunnelCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveTunnelCommand( TUNNEL_NAME ) );
     }
 
 
@@ -70,13 +56,6 @@ public class CommandsTest
     public void testGetSetupVniVlanMappingCommand() throws Exception
     {
         assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID ) );
-    }
-
-
-    @Test
-    public void testGetRemoveVniVlanMappingCommand() throws Exception
-    {
-        assertNotNull( commands.getRemoveVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID ) );
     }
 
 

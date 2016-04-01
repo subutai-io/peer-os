@@ -18,37 +18,11 @@ public interface NetworkManager
 
 
     /**
-     * Sets up an P2P connection on management host
-     */
-    public void setupP2PConnection( String interfaceName, String localIp, String p2pHash, String secretKey,
-                                    long secretKeyTtlSec ) throws NetworkManagerException;
-
-    /**
      * Sets up an P2P connection on specified host
      */
     public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
                                     long secretKeyTtlSec ) throws NetworkManagerException;
 
-    /**
-     * Removes P2P connection
-     */
-    public void removeP2PConnection( String p2pHash ) throws NetworkManagerException;
-
-    /**
-     * Removes P2P connection on specified host
-     */
-    public void removeP2PConnection( Host host, String p2pHash ) throws NetworkManagerException;
-
-
-    /**
-     * Resets a secret key for a given P2P network
-     *
-     * @param p2pHash - P2P network hash
-     * @param newSecretKey - new secret key to set
-     * @param ttlSeconds - time-to-live for the new secret key
-     */
-    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
-            throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network
@@ -79,21 +53,14 @@ public interface NetworkManager
     public P2PConnections getP2PConnections() throws NetworkManagerException;
 
 
-    /**
-     * Sets up tunnel to another peer on management host
-     */
-    public void setupTunnel( int tunnelId, String tunnelIp ) throws NetworkManagerException;
+    public void createTunnel( Host host, int tunnelId, String tunnelIp, int vlan, long vni )
+            throws NetworkManagerException;
 
 
     /**
      * Sets up tunnel to another peer on specified host
      */
     public void setupTunnel( Host host, int tunnelId, String tunnelIp ) throws NetworkManagerException;
-
-    /**
-     * Removes tunnel to another peer on management host
-     */
-    public void removeTunnel( int tunnelId ) throws NetworkManagerException;
 
 
     /**
@@ -119,15 +86,6 @@ public interface NetworkManager
     public void setupVniVLanMapping( Host host, int tunnelId, long vni, int vLanId, String environmentId )
             throws NetworkManagerException;
 
-    /**
-     * Removes VNI-VLAN mapping on management host
-     */
-    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Returns all vni-vlan mappings on management host
-     */
-    public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
 
     /**
      * Returns all vni-vlan mappings on specified host
@@ -194,7 +152,7 @@ public interface NetworkManager
      * @param containerIp - ip fo container
      * @param sshIdleTimeout - timeout during which the ssh connectivity is active in seconds
      *
-     * @return - port to which clients should connect to access the contaier via ssh
+     * @return - port to which clients should connect to access the container via ssh
      */
     int setupContainerSsh( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
 }
