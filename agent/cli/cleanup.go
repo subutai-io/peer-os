@@ -13,7 +13,7 @@ func Cleanup(vlan string) {
 			LxcDestroy(name)
 		}
 	}
-	net.DeleteGateway(vlan)
+	net.DelIface("gw-" + vlan)
 	p2p.RemoveByIface("p2p-" + vlan)
 	ProxyDel(vlan, "", true)
 }
