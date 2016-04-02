@@ -71,6 +71,7 @@ import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
+import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.dao.TopologyDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -126,12 +127,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
     private EnvironmentAdapter environmentAdapter;
+    private EnvironmentService environmentService;
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
                                    SecurityManager securityManager, final DaoManager daoManager,
                                    final IdentityManager identityManager, final Tracker tracker,
-                                   final RelationManager relationManager, HubAdapter hubAdapter )
+                                   final RelationManager relationManager, HubAdapter hubAdapter,
+                                   final EnvironmentService environmentService )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
@@ -152,6 +155,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
         environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
+
+        this.environmentService = environmentService;
     }
 
 
@@ -215,7 +220,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private boolean isPeerInUse( String peerId )
     {
         boolean inUse = false;
-        for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext(); )
+        //        for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext
+        // (); )
+        for ( Iterator<EnvironmentImpl> i = environmentService.getAll().iterator(); !inUse && i.hasNext(); )
         {
             EnvironmentImpl e = i.next();
             if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
@@ -256,7 +263,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         Set<Environment> environments = new HashSet<>();
 
-        for ( Environment environment : environmentDataService.getAll() )
+        //        for ( Environment environment : environmentDataService.getAll() )
+        for ( Environment environment : environmentService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
 
@@ -284,7 +292,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Set<Environment> environments = new HashSet<>();
 
-        for ( Environment environment : environmentDataService.getAll() )
+        //        for ( Environment environment : environmentDataService.getAll() )
+        for ( Environment environment : environmentService.getAll() )
         {
             if ( environment.getUserId().equals( userId ) )
             {
@@ -1032,7 +1041,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return environment;
         }
 
-        environment = environmentDataService.find( environmentId );
+        //        environment = environmentDataService.find( environmentId );
+        environment = environmentService.find( environmentId );
 
         if ( environment == null )
         {
@@ -1092,7 +1102,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        EnvironmentImpl environment = environmentDataService.find( environmentId );
+        //        EnvironmentImpl environment = environmentDataService.find( environmentId );
+        EnvironmentImpl environment = environmentService.find( environmentId );
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
         {
             throw new EnvironmentNotFoundException();
@@ -1542,18 +1553,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public EnvironmentImpl save( final Environment environment )
+    public EnvironmentImpl save( final EnvironmentImpl environment )
     {
-        EnvironmentImpl env = environmentDataService.save( environment );
-        setEnvironmentTransientFields( env );
-        setContainersTransientFields( env );
-        return env;
+        environmentService.persist( environment );
+        setEnvironmentTransientFields( environment );
+        setContainersTransientFields( environment );
+        return environment;
     }
 
 
     public EnvironmentImpl update( EnvironmentImpl environment )
     {
-        environment = environmentDataService.merge( environment );
+        //        environment = environmentDataService.merge( environment );
+        environment = environmentService.merge( environment );
         setEnvironmentTransientFields( environment );
         setContainersTransientFields( environment );
         return environment;
@@ -1562,7 +1574,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void remove( final EnvironmentImpl environment )
     {
-        environmentDataService.remove( environment );
+        //        environmentDataService.remove( environment );
+        environmentService.remove( environment.getId() );
     }
 
 

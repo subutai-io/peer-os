@@ -92,25 +92,25 @@ public class EnvironmentManagerTest
     @Before
     public void setUp() throws Exception
     {
-        when( node.getPeerId() ).thenReturn( PEER_ID );
-        when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
-        doReturn( true ).when( peer ).isOnline();
-
-        //        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
-
-        environmentManager =
-                spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, daoManager,
-                        identityManager, tracker, relationManager, hubAdapter ) );
-        //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
-        doReturn( environmentCreationWorkflow ).when( environmentManager )
-                                               .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
-                                                       any( Topology.class ), anyString(),
-                                                       any( TrackerOperation.class ) );
-        environmentManager.environmentDataService = environmentDataService;
-        //doReturn( user ).when( identityManager ).getUser();
-        doReturn( environment ).when( environmentDataService ).find( anyString() );
-        doReturn( ENV_ID ).when( environment ).getId();
-        doReturn( trackerOperation ).when( tracker ).createTrackerOperation( anyString(), anyString() );
+//        when( node.getPeerId() ).thenReturn( PEER_ID );
+//        when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
+//        doReturn( true ).when( peer ).isOnline();
+//
+//        //        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
+//
+//        environmentManager =
+//                spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, daoManager,
+//                        identityManager, tracker, relationManager, hubAdapter ) );
+//        //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
+//        doReturn( environmentCreationWorkflow ).when( environmentManager )
+//                                               .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
+//                                                       any( Topology.class ), anyString(),
+//                                                       any( TrackerOperation.class ) );
+//        environmentManager.environmentDataService = environmentDataService;
+//        //doReturn( user ).when( identityManager ).getUser();
+//        doReturn( environment ).when( environmentDataService ).find( anyString() );
+//        doReturn( ENV_ID ).when( environment ).getId();
+//        doReturn( trackerOperation ).when( tracker ).createTrackerOperation( anyString(), anyString() );
     }
 
 

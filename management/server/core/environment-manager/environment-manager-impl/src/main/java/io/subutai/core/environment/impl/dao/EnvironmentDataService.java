@@ -96,23 +96,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     @Override
     public synchronized void persist( final EnvironmentImpl item )
     {
-        //        EntityManager em = daoManager.getEntityManagerFromFactory();
-        try
-        {
-            daoManager.startTransaction( em );
-            em.persist( item );
-            em.flush();
-            daoManager.commitTransaction( em );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.toString(), e );
-            daoManager.rollBackTransaction( em );
-        }
-        finally
-        {
-            //            daoManager.closeEntityManager( em );
-        }
+        // no-op
     }
 
 
