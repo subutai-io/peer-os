@@ -11,7 +11,6 @@ import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
-import io.subutai.hub.share.dto.SystemConfigurationDto;
 
 
 public interface SystemManager
@@ -33,12 +32,11 @@ public interface SystemManager
 
     AdvancedSettings getAdvancedSettings();
 
-    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls ) throws ConfigurationException;
+    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls )
+            throws ConfigurationException;
 
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 
-    SystemConfigurationDto prepareConfigDto();
-
-    void sendSystemConfigToHub(SystemConfigurationDto dto);
+    void sendSystemConfigToHub() throws ConfigurationException;
 }

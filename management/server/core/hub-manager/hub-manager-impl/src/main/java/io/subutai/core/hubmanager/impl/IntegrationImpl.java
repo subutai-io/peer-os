@@ -42,6 +42,7 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
 import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
+import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
@@ -55,6 +56,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PeerDto;
+import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.SystemConfigurationDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -506,7 +508,7 @@ public class IntegrationImpl implements Integration
             e.printStackTrace();
         }
 /*		}
-		else
+        else
 		{
 			LOG.info ("Peer not registered. Trying again in 1 hour.");
 		}*/
@@ -521,8 +523,41 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void sendSystemConfiguration( final SystemConfigurationDto dto )
+    public void sendSystemConfiguration( final SystemConfDto dto )
     {
-        String test = "test";
+        if ( getRegistrationState() )
+        {
+            try
+            {
+                String path = "/rest/v1/system-changes";
+                WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+                byte[] cborData = JsonUtil.toCbor( dto );
+
+                byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+                LOG.info( "Sending Configuration of SS to Hub..." );
+
+                Response r = client.post( encryptedData );
+
+
+                if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                {
+                    LOG.info( "SS configuration sent successfully." );
+                }
+                else
+                {
+                    LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
+//                    throw new HubPluginException(
+//                            "Could not send SS configuration to Hub: " + r.readEntity( String.class ) );
+                }
+            }
+            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
+                    NoSuchAlgorithmException e )
+            {
+                LOG.error( "Could not send SS configuration to Hub", e );
+//                throw new HubPluginException( e.toString(), e );
+            }
+        }
     }
 }

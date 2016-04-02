@@ -19,10 +19,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>subutai-hub-share</artifactId>
-    </dependency>
   </dependencies>
 
   <build>

@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://www.w3.org/201/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             0">
 
-  <cm:property-placeholder persistent-id="subutaisystem" update-strategy="reload" />
+  <!--<cm:property-placeholder persistent-id="subutaisystem" update-strategy="reload" />-->
 
   <reference id="templateManager" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
@@ -23,11 +23,11 @@
     <property name="peerManager" ref="peerManager" />
 
     <argument ref="integration" />
-    <argument value="${globalKurjunUrls}" />
-    <argument value="${securePortX1}" />
-    <argument value="${securePortX2}" />
-    <argument value="${securePortX3}" />
-    <argument value="${publicURL}" />
+    <!--<argument value="${globalKurjunUrls}" />-->
+    <!--<argument value="${securePortX1}" />-->
+    <!--<argument value="${securePortX2}" />-->
+    <!--<argument value="${securePortX3}" />-->
+    <!--<argument value="${publicURL}" />-->
 
   </bean>
 

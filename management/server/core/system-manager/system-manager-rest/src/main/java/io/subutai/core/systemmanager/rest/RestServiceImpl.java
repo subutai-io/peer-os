@@ -149,6 +149,8 @@ public class RestServiceImpl implements RestService
         try
         {
             systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ), localKurjunUrls.split( "," ) );
+
+            systemManager.sendSystemConfigToHub();
         }
         catch ( ConfigurationException e )
         {
@@ -157,7 +159,6 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
 
-        systemManager.sendSystemConfigToHub( systemManager.prepareConfigDto());
         return Response.status( Response.Status.OK ).build();
     }
 
@@ -188,7 +189,10 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl, agentPort, publicSecurePort );
+            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl, agentPort,
+                    publicSecurePort );
+
+            systemManager.sendSystemConfigToHub();
         }
         catch ( ConfigurationException e )
         {
@@ -198,8 +202,6 @@ public class RestServiceImpl implements RestService
                     entity( e.getMessage() ).build();
         }
 
-
-        systemManager.sendSystemConfigToHub( systemManager.prepareConfigDto());
         return Response.status( Response.Status.OK ).build();
     }
 

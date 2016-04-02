@@ -42,7 +42,9 @@ import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
+import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.SystemConfigurationDto;
+import io.subutai.hub.share.dto.SystemConfigurationType;
 
 
 public class SystemManagerImpl implements SystemManager
@@ -108,26 +110,26 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final Integration integration, final String globalKurjunUrls, final int securePortX1, final int securePortX2,
-                              final int securePortX3, final String publicUrl ) throws ConfigurationException
+    public SystemManagerImpl( final Integration integration/*, final String globalKurjunUrls, final int securePortX1, final int securePortX2,
+                              final int securePortX3, final String publicUrl*/ )
 
     {
-        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
+//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
 
-        String[] urls = new String[] { globalKurjunUrls };
-
-        if ( urls.length < 1 )
-        {
-            urls = new String[] { DEFAULT_KURJUN_REPO };
-        }
-        validateGlobalKurjunUrls( urls );
-        validatePublicUrl( publicUrl );
-
-        SystemSettings.setGlobalKurjunUrls( urls );
-        SystemSettings.setSecurePortX1( securePortX1 );
-        SystemSettings.setSecurePortX2( securePortX2 );
-        SystemSettings.setSecurePortX3( securePortX3 );
-        SystemSettings.setPublicUrl( publicUrl );
+//        String[] urls = new String[] { globalKurjunUrls };
+//
+//        if ( urls.length < 1 )
+//        {
+//            urls = new String[] { DEFAULT_KURJUN_REPO };
+//        }
+//        validateGlobalKurjunUrls( urls );
+//        validatePublicUrl( publicUrl );
+//
+//        SystemSettings.setGlobalKurjunUrls( urls );
+//        SystemSettings.setSecurePortX1( securePortX1 );
+//        SystemSettings.setSecurePortX2( securePortX2 );
+//        SystemSettings.setSecurePortX3( securePortX3 );
+//        SystemSettings.setPublicUrl( publicUrl );
 
         this.integration = integration;
     }
@@ -290,36 +292,24 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public SystemConfigurationDto prepareConfigDto()
+    public void sendSystemConfigToHub() throws ConfigurationException
     {
-        SystemConfigurationDto dto = new SystemConfigurationDto();
+        SystemConfDto dto = new SystemConfDto( SystemConfigurationType.SUBUTAI_SOCIAL );
 
-        try
-        {
-            dto.setGlobalKurjunUrls( SystemSettings.getGlobalKurjunUrls() );
-            dto.setLocalKurjunUrls( SystemSettings.getLocalKurjunUrls() );
+        KurjunSettings kurjunSettings = getKurjunSettings();
+        NetworkSettings networkSettings = getNetworkSettings();
 
-            dto.setSecurePortX1( SystemSettings.getSecurePortX1() );
-            dto.setSecurePortX2( SystemSettings.getSecurePortX2() );
-            dto.setSecurePortX3( SystemSettings.getSecurePortX3() );
-            dto.setPublicUrl( SystemSettings.getPublicUrl() );
-            dto.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-
-        }
-        catch ( ConfigurationException e )
-        {
-            e.printStackTrace();
-        }
-
-        return dto;
-
-    }
+        dto.setGlobalKurjunUrls( kurjunSettings.getGlobalKurjunUrls() );
+        dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
+        dto.setSecurePortX1( networkSettings.getSecurePortX1() );
+        dto.setSecurePortX2( networkSettings.getSecurePortX2() );
+        dto.setSecurePortX3( networkSettings.getSecurePortX3() );
+        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
+        dto.setPublicUrl( networkSettings.getPublicUrl() );
+        dto.setAgentPort( networkSettings.getAgentPort() );
 
 
-    @Override
-    public void sendSystemConfigToHub( final SystemConfigurationDto dto )
-    {
-        integration.sendSystemConfiguration( prepareConfigDto() );
+        integration.sendSystemConfiguration( dto );
     }
 
 
