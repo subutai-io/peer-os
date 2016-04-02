@@ -128,7 +128,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public EnvironmentGrowingPhase GENERATE_KEYS()
     {
-        operationTracker.addLog( "Generating PEKs" );
+        operationTracker.addLog( "Securing channel" );
 
         try
         {
@@ -170,7 +170,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public EnvironmentGrowingPhase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up P2P" );
+        operationTracker.addLog( "Setting up networking" );
 
         try
         {

@@ -85,7 +85,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public EnvironmentCreationPhase GENERATE_KEYS()
     {
-        operationTracker.addLog( "Generating PEKs" );
+        operationTracker.addLog( "Securing channel" );
 
         try
         {
@@ -125,7 +125,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public EnvironmentCreationPhase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up P2P" );
+        operationTracker.addLog( "Setting up networking" );
 
         try
         {

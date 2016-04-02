@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
@@ -40,6 +41,6 @@ public class DestroyContainerTaskTest
     {
         task.call();
 
-        verify( resourceHost ).execute( any( RequestBuilder.class ) );
+        verify( commandUtil ).execute( any( RequestBuilder.class ), eq(resourceHost) );
     }
 }
