@@ -51,6 +51,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.users2Add = [];
 	vm.installedContainers = [];
 	vm.currentUser = {};
+	vm.restInProgress = false;
 
 	// functions
 	vm.changeMode = changeMode;
@@ -119,18 +120,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	vm.containersTotal = [];
 	function loadEnvironments() {
-		vm.containersTotal = [];
-		environmentService.getEnvironments().success (function (data) {
-			var environmentsList = [];
-			for (var i = 0; i < data.length; ++i) {
-				data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
-				environmentsList.push(data[i]);
-			}
-			vm.environments = environmentsList;
-		}).error(function (error){
-			console.log('environment list error');
-			console.log(error);
-		});
+
+		if( !vm.restInProgress )
+		{
+			vm.restInProgress = true;
+			vm.containersTotal = [];
+			environmentService.getEnvironments().success (function (data) {
+				var environmentsList = [];
+				for (var i = 0; i < data.length; ++i) {
+					data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
+					environmentsList.push(data[i]);
+				}
+				vm.environments = environmentsList;
+				vm.restInProgress = false;
+			}).error(function (error){
+				console.log(error);
+				vm.restInProgress = false;
+			});
+		}
 	}
 	loadEnvironments();
 
