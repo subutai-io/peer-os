@@ -175,7 +175,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		];
 	}
 
-	/*var refreshTable;
+	var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
 			loadEnvironments();
@@ -186,7 +186,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		$timeout.cancel(refreshTable);
-	});*/
+	});
 
 	function addUser2Stack(user) {
 		vm.users2Add.push(angular.copy(user));
@@ -311,7 +311,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		return sortedContainers;
 	}
 
-	function destroyEnvironment(environmentId) {
+	function destroyEnvironment(environmentId, key) {
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
@@ -340,8 +340,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					var destroyEnvEvent = new CustomEvent('destroyEnvironment', {'detail': environmentId});
 					document.getElementById('js-environment-creation').dispatchEvent(destroyEnvEvent);
 
+					vm.environments[key].status = 'UNDER_MODIFICATION';
+
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
-						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
+						//SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						loadEnvironments();
 					}).error(function (data) {
 						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
