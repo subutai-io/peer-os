@@ -12,6 +12,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+import io.subutai.core.identity.api.IdentityManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,6 +55,8 @@ public class TrackerImplTest extends SystemOutRedirectTest
     EntityManagerFactory entityManagerFactory;
     @Mock
     EntityManager entityManager;
+    @Mock
+    IdentityManager identityManager;
 
     private TrackerImpl tracker;
 
@@ -93,7 +96,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
     {
         tracker.saveTrackerOperation( SOURCE, productOperation );
 
-        verify( dataService ).saveTrackerOperation( SOURCE, productOperation );
+        verify( dataService ).saveTrackerOperation( SOURCE, productOperation, identityManager.getActiveUser().getId() );
     }
 
 
@@ -101,7 +104,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
     public void testCreateTrackerOperation() throws Exception
     {
         tracker.createTrackerOperation( SOURCE, DESCRIPTION );
-        verify( dataService ).saveTrackerOperation( eq( SOURCE ), isA( TrackerOperationImpl.class ) );
+        verify( dataService ).saveTrackerOperation( eq( SOURCE ), isA( TrackerOperationImpl.class ), identityManager.getActiveUser().getId() );
     }
 
 
