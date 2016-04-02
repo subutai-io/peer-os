@@ -267,6 +267,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
 				getLogById(data, true);
+				initScrollbar();
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -678,12 +679,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function initJointJs() {
 
-		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
-			if(vm.editingEnv && vm.editingEnv.id == e.detail) {
-				clearWorkspace();
-				vm.editingEnv = false;
-			}
-		}, false);
+		setTimeout(function (){
+			document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+				if(vm.editingEnv && vm.editingEnv.id == e.detail) {
+					clearWorkspace();
+					vm.editingEnv = false;
+				}
+			}, false);
+		}, 1000);
 
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
@@ -734,10 +737,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			cellView.model.set('position', cellView.prevPos);
 		});
 
-		$('.js-scrollbar').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
+		initScrollbar();
 	}
 
 	vm.buildStep = 'confirm';
@@ -991,20 +991,27 @@ function imageExists(image_url){
 
 function startDrag( event ) {
 
+	console.log('dragStart');
 	var containerImage = $(event.target).parent().find('img');
 
 	var ghostImage = document.createElement("span");
 	ghostImage.className = 'b-cloud-item b-hidden-object';
 	ghostImage.id = 'js-ghost-image';
 	ghostImage.style.backgroundImage = "url('" + containerImage.attr('src') + "')";
+
 	document.body.appendChild(ghostImage);
-	event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+		event.dataTransfer.setDragImage(ghostImage, 0, 0);
+	} else {
+		event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+	}
 
 	event.dataTransfer.setData( "template", $(event.target).data('template') );
 	event.dataTransfer.setData( "img", containerImage.attr('src') );
 }
 
 function dragOver( event ) {
+	console.log('dragOver');
 	var ghostImage = document.getElementById('js-ghost-image');	
 	ghostImage.style.left = event.pageX + 'px';
 	ghostImage.style.top = event.pageY + 'px';
@@ -1012,13 +1019,16 @@ function dragOver( event ) {
 }
 
 function endtDrag( event ) {
+	console.log('dragEnd');
+	event.preventDefault();
 	document.getElementById('js-ghost-image').remove();
 }
 
 var containerCounter = 1;
 function drop(event) {
-	event.preventDefault();
+	//event.preventDefault();
 
+	console.log('dragEvent');
 	var template = event.dataTransfer.getData("template");
 	var img = event.dataTransfer.getData("img");
 

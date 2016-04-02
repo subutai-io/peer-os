@@ -45,7 +45,8 @@ public class ProxyEnvironment extends EnvironmentImpl
 
         setP2PSubnet( json.get( "p2pSubnet" ).asText() );
         setVni( json.get( "vni" ).asLong() );
-        setVersion( 1L );
+        //this causes org.apache.openjpa.persistence.OptimisticLockException
+//        setVersion( 1L );
         setStatus( EnvironmentStatus.HEALTHY );
     }
 
