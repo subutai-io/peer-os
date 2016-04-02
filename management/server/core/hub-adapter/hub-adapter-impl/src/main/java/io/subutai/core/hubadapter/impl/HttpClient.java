@@ -95,6 +95,27 @@ class HttpClient
     }
 
 
+    String doPost( String path, String body )
+    {
+        try
+        {
+            byte[] cborData = JsonUtil.toCbor( body );
+
+            byte[] encryptedData = messenger.produce( cborData );
+
+            Response response = getWebClient( path ).post( encryptedData );
+
+            return handleResponse( response );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to execute request: ", e );
+
+            return null;
+        }
+    }
+
+
     private String handleResponse( Response response ) throws IOException, PGPException
     {
         if ( response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_NO_CONTENT )
