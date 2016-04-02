@@ -220,9 +220,8 @@ public class HubEnvironmentManager
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        P2PConfig config =
-                new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[1], env.getP2pKey(),
-                        env.getP2pTTL() );
+        P2PConfig config = new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), null, env.getP2pKey(),
+                env.getP2pTTL() );
         p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
 
         try
@@ -246,16 +245,17 @@ public class HubEnvironmentManager
     public void setupTunnel( EnvironmentDto environmentDto ) throws InterruptedException, ExecutionException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
+        Set<String> setOfP2PIps = new HashSet<>();
         P2pIps p2pIps = new P2pIps();
 
-        //        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
-        //        {
-        //            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
-        //            {
-        //                tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
-        //            }
-        //        }
-
+        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
+        {
+            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
+            {
+                setOfP2PIps.add( peerDto.getTunnelAddress() );
+            }
+        }
+        p2pIps.addP2pIps( setOfP2PIps );
         if ( !p2pIps.isEmpty() )
         {
             ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
