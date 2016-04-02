@@ -43,7 +43,6 @@ import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 import io.subutai.hub.share.dto.SystemConfDto;
-import io.subutai.hub.share.dto.SystemConfigurationDto;
 import io.subutai.hub.share.dto.SystemConfigurationType;
 
 

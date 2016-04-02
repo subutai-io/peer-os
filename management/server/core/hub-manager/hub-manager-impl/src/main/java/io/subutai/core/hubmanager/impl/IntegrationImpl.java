@@ -55,7 +55,6 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PeerDto;
 import io.subutai.hub.share.dto.SystemConfDto;
-import io.subutai.hub.share.dto.SystemConfigurationDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
