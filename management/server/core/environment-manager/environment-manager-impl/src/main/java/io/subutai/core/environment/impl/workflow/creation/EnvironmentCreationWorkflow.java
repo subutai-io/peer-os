@@ -97,7 +97,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            fail( e.getMessage(), e );
+            setError( e );
+
             return null;
         }
     }
@@ -117,7 +118,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            fail( e.getMessage(), e );
+            setError( e );
+
             return null;
         }
     }
@@ -137,7 +139,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            fail( e.getMessage(), e );
+            setError( e );
+
             return null;
         }
     }
@@ -157,7 +160,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            fail( e.getMessage(), e );
+            setError( e );
+
             return null;
         }
     }
@@ -178,7 +182,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            fail( e.getMessage(), e );
+            setError( e );
+
             return null;
         }
     }
@@ -198,7 +203,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            fail( e.getMessage(), e );
+            setError( e );
+
             return null;
         }
     }
@@ -220,7 +226,8 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            fail( e.getMessage(), e );
+            setError( e );
+
             return null;
         }
     }
@@ -241,13 +248,24 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     }
 
 
+    //environment must be updated only within the same thread
+    //DON NOT CALL THIS FROM fail method of Workflow b/c it is called in another thread
+    protected void setError( final Throwable error )
+    {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        saveEnvironment();
+
+        fail( error.getMessage(), error );
+    }
+
+
     @Override
     public void fail( final String message, final Throwable e )
     {
         super.fail( message, e );
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
         operationTracker.addLogFailed( getFailedReason() );
-        saveEnvironment();
     }
 
 
@@ -260,7 +278,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         }
         catch ( Exception e )
         {
-            LOGGER.error( e.getMessage(), e );
+            LOGGER.error( "Error saving environment {}", environment.getId(), e );
         }
         return environment;
     }
