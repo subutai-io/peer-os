@@ -76,8 +76,8 @@ public class SetupP2PStep
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
         final String[] addresses = subnetInfo.getAllAddresses();
 
-        //setup initial p2p participant on local peer MH with explicit IP
-        localPeer.setupInitialP2PConnection(
+        //create p2p swarm on local peer MH with explicit IP
+        localPeer.createP2PSwarm(
                 new P2PConfig( localPeer.getId(), environment.getId(), environment.getP2PHash(), addresses[0],
                         sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
 
@@ -201,7 +201,7 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            P2PConnections p2PConnections = peer.setupP2PConnection( p2PConfig );
+            P2PConnections p2PConnections = peer.joinP2PSwarm( p2PConfig );
             for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
             {
                 p2PConfig.addP2pIp( p2PConnection.getIp() );

@@ -32,15 +32,6 @@ public class DestroyEnvironmentCommand extends SubutaiShellCommandSupport
      */
             boolean async = false;
 
-    @Argument( name = "force", description = "force metadata removal",
-            index = 2, multiValued = false, required = false )
-    /**
-     * {@value forceMetadataRemoval} force metadata removal despite exception handled
-     * <p> {@code required = false}, {@code default = false}</p>
-     */
-            boolean forceMetadataRemoval = false;
-
-
     private final EnvironmentManager environmentManager;
 
 
@@ -55,7 +46,7 @@ public class DestroyEnvironmentCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        environmentManager.destroyEnvironment( environmentId, async, forceMetadataRemoval );
+        environmentManager.destroyEnvironment( environmentId, async );
 
         System.out.println( "Environment destroyed" );
 

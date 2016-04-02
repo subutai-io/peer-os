@@ -58,6 +58,7 @@ public class PeerConfImpl implements PeerConf, Serializable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.peerId = peerId;
+        this.p2pIps = new HashSet<>();
     }
 
 

@@ -68,7 +68,6 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.UsedNetworkResources;
-import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
@@ -91,6 +90,8 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -156,7 +157,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
-    protected Host managementHost;
+    protected ResourceHost managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
     private CommandExecutor commandExecutor;
     private QuotaManager quotaManager;
@@ -634,6 +635,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( String templateName : request.getTemplates().get( resourceHostId ) )
             {
+                //todo move import template logic to RH
                 ImportTask task = new ImportTask( new ImportTemplateRequest( resourceHostId, templateName ) );
                 prepareTemplatesResponse.addTask( taskManager.schedule( task, prepareTemplatesResponse ) );
             }
@@ -672,6 +674,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 int rhCoresNumber = getResourceHostById( request.getResourceHostId() ).getNumberOfCpuCores();
 
+                //todo move container clone logic to RH
                 CloneTask task = new CloneTask( request, reservedNetworkResource.getVlan(), rhCoresNumber );
 
                 task.onSuccess( successResultHandler );
@@ -1075,7 +1078,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Host getManagementHost() throws HostNotFoundException
+    public ResourceHost getManagementHost() throws HostNotFoundException
     {
         if ( managementHost == null )
         {
@@ -1728,59 +1731,82 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
-        UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
+        final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
+
+        Set<ResourceHost> resourceHosts = getResourceHosts();
+        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+        ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
+
+        for ( final ResourceHost resourceHost : resourceHosts )
+        {
+            completionService.submit( new Callable<Object>()
+            {
+                @Override
+                public Object call() throws Exception
+                {
+                    //tunnels
+                    Tunnels tunnels = resourceHost.getTunnels();
+                    for ( Tunnel tunnel : tunnels.getTunnels() )
+                    {
+                        usedNetworkResources.addVni( tunnel.getVni() );
+                        usedNetworkResources.addVlan( tunnel.getVlan() );
+                        usedNetworkResources.addP2pSubnet( tunnel.getTunnelIp() );
+                    }
+
+                    for ( HostInterface iface : resourceHost.getHostInterfaces().getAll() )
+                    {
+                        //container subnet
+                        Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
+                        if ( matcher.find() )
+                        {
+                            usedNetworkResources.addContainerSubnet( iface.getIp() );
+                            usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
+                        }
+
+                        //p2p subnet
+                        matcher = P2P_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
+                        if ( matcher.find() )
+                        {
+                            usedNetworkResources.addP2pSubnet( iface.getIp() );
+                            usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
+                        }
+
+                        //add LAN subnet to prevent collisions
+                        if ( iface.getName().equalsIgnoreCase( SystemSettings.getExternalIpInterface() ) )
+                        {
+                            usedNetworkResources.addContainerSubnet( iface.getIp() );
+                            usedNetworkResources.addP2pSubnet( iface.getIp() );
+                        }
+                    }
+
+                    return null;
+                }
+            } );
+        }
+
+        executorService.shutdown();
 
         try
         {
-            for ( ResourceHost resourceHost : getResourceHosts() )
+            for ( final ResourceHost ignored : resourceHosts )
             {
-                //reserved vnis
-                Set<VniVlanMapping> vniVlanMappings = getNetworkManager().getVniVlanMappings( resourceHost );
-                for ( VniVlanMapping vniVlanMapping : vniVlanMappings )
-                {
-                    usedNetworkResources.addVni( vniVlanMapping.getVni() );
-                }
-
-                for ( HostInterface iface : resourceHost.getHostInterfaces().getAll() )
-                {
-                    //container subnet
-                    Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
-                    if ( matcher.find() )
-                    {
-                        usedNetworkResources.addContainerSubnet( iface.getIp() );
-                        usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
-                    }
-
-                    //p2p subnet
-                    matcher = P2P_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
-                    if ( matcher.find() )
-                    {
-                        usedNetworkResources.addP2pSubnet( iface.getIp() );
-                        usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
-                    }
-
-                    //add LAN subnet to prevent collisions
-                    if ( iface.getName().equalsIgnoreCase( SystemSettings.getExternalIpInterface() ) )
-                    {
-                        usedNetworkResources.addContainerSubnet( iface.getIp() );
-                        usedNetworkResources.addP2pSubnet( iface.getIp() );
-                    }
-                }
-            }
-
-            //add reserved ones too
-            for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )
-            {
-                usedNetworkResources.addVni( networkResource.getVni() );
-                usedNetworkResources.addVlan( networkResource.getVlan() );
-                usedNetworkResources.addContainerSubnet( networkResource.getContainerSubnet() );
-                usedNetworkResources.addP2pSubnet( networkResource.getP2pSubnet() );
+                completionService.take().get();
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error gathering reserved net resources", e );
         }
+
+        //add reserved ones too
+        for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )
+        {
+            usedNetworkResources.addVni( networkResource.getVni() );
+            usedNetworkResources.addVlan( networkResource.getVlan() );
+            usedNetworkResources.addContainerSubnet( networkResource.getContainerSubnet() );
+            usedNetworkResources.addP2pSubnet( networkResource.getP2pSubnet() );
+        }
+
 
         return usedNetworkResources;
     }
@@ -1793,7 +1819,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        NetworkResource networkResource = getReservedNetworkResources().findByEnvironmentId( environmentId );
+        final NetworkResource networkResource = getReservedNetworkResources().findByEnvironmentId( environmentId );
 
         if ( networkResource == null )
         {
@@ -1801,80 +1827,93 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     String.format( "No reserved network resources found for environment %s", environmentId ) );
         }
 
+        Set<ResourceHost> resourceHosts = getResourceHosts();
+        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+        ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
 
-        for ( ResourceHost resourceHost : getResourceHosts() )
+        for ( final ResourceHost resourceHost : resourceHosts )
         {
-            try
+            completionService.submit( new Callable<Object>()
             {
-                resourceHost.setupTunnels( p2pIps, networkResource );
-            }
-            catch ( ResourceHostException e )
+                @Override
+                public Object call() throws Exception
+                {
+                    resourceHost.setupTunnels( p2pIps, networkResource );
+
+                    return null;
+                }
+            } );
+        }
+
+
+        executorService.shutdown();
+
+        try
+        {
+            for ( final ResourceHost ignored : resourceHosts )
             {
-                throw new PeerException(
-                        String.format( "Error setting up tunnels on host %s", resourceHost.getHostname() ), e );
+                completionService.take().get();
             }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error setting up tunnels", e );
         }
     }
 
 
     //----------- P2P SECTION BEGIN --------------------
     @Override
-    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
+    public void resetSwarmSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
 
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
+        Set<ResourceHost> resourceHosts = getResourceHosts();
+        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+        ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
+
+        for ( final ResourceHost resourceHost : resourceHosts )
+        {
+            completionService.submit( new Callable<Object>()
+            {
+                @Override
+                public Object call() throws Exception
+                {
+                    resourceHost.resetSwarmSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
+                            p2PCredentials.getP2pTtlSeconds() );
+
+                    return null;
+                }
+            } );
+        }
+
+        executorService.shutdown();
+
         try
         {
-            for ( ResourceHost resourceHost : getResourceHosts() )
+            for ( final ResourceHost ignored : resourceHosts )
             {
-                getNetworkManager()
-                        .resetP2PSecretKey( resourceHost, p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
-                                p2PCredentials.getP2pTtlSeconds() );
+                completionService.take().get();
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( Exception e )
         {
             throw new PeerException( "Error resetting P2P secret key", e );
         }
     }
 
 
-    @Override
-    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
-
-        try
-        {
-            String p2pIp = getNetworkManager().getP2PConnections( getResourceHostById( resourceHostId ) )
-                                              .findConnectionByHash( swarmHash ).getIp();
-            if ( p2pIp == null )
-            {
-                throw new PeerException( "P2P connection not found" );
-            }
-
-            return p2pIp;
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new PeerException( "Error getting p2p connection", e );
-        }
-    }
-
-
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Update" )
-    //TODO move logic to RH
     @Override
-    public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
+    public P2PConnections joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        P2PConnections p2PConnections = new P2PConnections();
+        final P2PConnections p2PConnections = new P2PConnections();
 
-        LOG.debug( String.format( "Adding local peer to P2P swarm: %s", config.getHash() ) );
+        LOG.debug( String.format( "Joining P2P swarm: %s", config.getHash() ) );
 
         try
         {
@@ -1887,30 +1926,47 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
             }
 
-            String p2pHash = P2PUtil.generateHash( reservedNetworkResource.getEnvironmentId() );
-            String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
+            final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
 
-            for ( ResourceHost resourceHost : getResourceHosts() )
+
+            Set<ResourceHost> resourceHosts = getResourceHosts();
+            ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+            ExecutorCompletionService<P2PConnection> completionService =
+                    new ExecutorCompletionService<>( executorService );
+
+            for ( final ResourceHost resourceHost : getResourceHosts() )
             {
-                P2PConnections connections = getNetworkManager().getP2PConnections( resourceHost );
+                completionService.submit( new Callable<P2PConnection>()
+                {
+                    @Override
+                    public P2PConnection call() throws Exception
+                    {
+                        P2PConnections connections = resourceHost.getP2PConnections();
 
-                if ( connections.findConnectionByHash( p2pHash ) != null )
-                {
-                    getNetworkManager().resetP2PSecretKey( resourceHost, config.getHash(), config.getSecretKey(),
-                            config.getSecretKeyTtlSec() );
-                }
-                else
-                {
-                    //we don't supply p2p IP since it should get assigned dynamically
-                    getNetworkManager().setupP2PConnection( resourceHost, p2pInterface, null, config.getHash(),
-                            config.getSecretKey(), config.getSecretKeyTtlSec() );
-                }
+                        P2PConnection rhConnection = connections.findByHash( config.getHash() );
+
+                        if ( rhConnection != null )
+                        {
+                            resourceHost.resetSwarmSecretKey( config.getHash(), config.getSecretKey(),
+                                    config.getSecretKeyTtlSec() );
+                        }
+                        else
+                        {
+                            rhConnection = resourceHost
+                                    .joinP2PSwarm( p2pInterface, config.getHash(), config.getSecretKey(),
+                                            config.getSecretKeyTtlSec() );
+                        }
+
+                        return rhConnection;
+                    }
+                } );
             }
 
-            for ( ResourceHost resourceHost : getResourceHosts() )
+            executorService.shutdown();
+
+            for ( ResourceHost ignored : resourceHosts )
             {
-                p2PConnections.addConnection(
-                        getNetworkManager().getP2PConnections( resourceHost ).findConnectionByHash( p2pHash ) );
+                p2PConnections.addConnection( completionService.take().get() );
             }
 
             return p2PConnections;
@@ -1918,16 +1974,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Failed to setup P2P connection", e );
+            throw new PeerException( "Failed to join P2P swarm", e );
         }
     }
 
 
-    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    public void createP2PSwarm( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        LOG.debug( String.format( "Adding local peer MH to P2P swarm: %s %s", config.getHash(), config.getAddress() ) );
+        LOG.debug(
+                String.format( "Creating P2P swarm on MH: %s, first IP: %s", config.getHash(), config.getAddress() ) );
 
         try
         {
@@ -1942,24 +1999,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
 
-            P2PConnections p2PConnections = getNetworkManager().getP2PConnections();
+            P2PConnections p2PConnections = getManagementHost().getP2PConnections();
 
-            if ( p2PConnections
-                    .findConnectionByHash( P2PUtil.generateHash( reservedNetworkResource.getEnvironmentId() ) )
+            if ( p2PConnections.findByHash( P2PUtil.generateHash( reservedNetworkResource.getEnvironmentId() ) )
                     != null )
             {
-                throw new PeerException( "Initial P2P connection is already setup with this hash" );
+                throw new PeerException( "P2P swarm with this hash already exists" );
             }
             else
             {
-                getNetworkManager().setupP2PConnection( getManagementHost(),
-                        P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() ), config.getAddress(),
-                        config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
+                getManagementHost().createP2PSwarm( P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() ),
+                        config.getAddress(), config.getHash(), config.getSecretKey(), config.getSecretKeyTtlSec() );
             }
         }
-        catch ( NetworkManagerException e )
+        catch ( ResourceHostException e )
         {
-            throw new PeerException( "Failed to setup P2P connection on MH", e );
+            throw new PeerException( "Failed to create P2P swarm on MH", e );
         }
     }
 
@@ -1974,7 +2029,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( environmentId );
 
-        NetworkResource reservedNetworkResource =
+        final NetworkResource reservedNetworkResource =
                 getReservedNetworkResources().findByEnvironmentId( environmentId.getId() );
 
         if ( reservedNetworkResource == null )
@@ -1983,18 +2038,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        for ( ResourceHost resourceHost : getResourceHosts() )
+        Set<ResourceHost> resourceHosts = getResourceHosts();
+
+        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+
+        for ( final ResourceHost resourceHost : getResourceHosts() )
         {
-            try
+            executorService.submit( new Runnable()
             {
-                resourceHost.cleanup( environmentId, reservedNetworkResource.getVlan() );
-            }
-            catch ( ResourceHostException e )
-            {
-                LOG.error( "Failed to cleanup environment {} on RH {}", environmentId.getId(), resourceHost.getId(),
-                        e );
-            }
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        resourceHost.cleanup( environmentId, reservedNetworkResource.getVlan() );
+                    }
+                    catch ( ResourceHostException e )
+                    {
+                        LOG.error( "Failed to cleanup environment {} on RH {}", environmentId.getId(),
+                                resourceHost.getId(), e );
+                    }
+                }
+            } );
         }
+
+        executorService.shutdown();
 
         //remove reservation
         try
@@ -2212,14 +2280,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    @Deprecated
     public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
         PingDistances result = new PingDistances();
         try
         {
-            final P2PConnections p2PConnections = getNetworkManager().getP2PConnections();
+            final P2PConnections p2PConnections = getNetworkManager().getP2PConnections( getManagementHost() );
 
-            final P2PConnection p2PConnection = p2PConnections.findConnectionByHash( p2pHash );
+            final P2PConnection p2PConnection = p2PConnections.findByHash( p2pHash );
 
             if ( p2PConnection == null )
             {

@@ -177,7 +177,7 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            P2PConnections p2PConnections = peer.setupP2PConnection( p2PConfig );
+            P2PConnections p2PConnections = peer.joinP2PSwarm( p2PConfig );
             for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
             {
                 p2PConfig.addP2pIp( p2PConnection.getIp() );

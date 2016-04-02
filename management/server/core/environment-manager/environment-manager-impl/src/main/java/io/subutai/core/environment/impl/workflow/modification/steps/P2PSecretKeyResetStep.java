@@ -51,7 +51,7 @@ public class P2PSecretKeyResetStep
                 @Override
                 public Peer call() throws Exception
                 {
-                    peer.resetP2PSecretKey( p2PCredentials );
+                    peer.resetSwarmSecretKey( p2PCredentials );
 
                     return peer;
                 }
