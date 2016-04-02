@@ -317,12 +317,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void setVersion( final Long version )
-    {
-        this.version = version;
-    }
-
-
     @Override
     public EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
     {
