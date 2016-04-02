@@ -6,4 +6,6 @@ public interface HubAdapter
     String getUserEnvironmentsForPeer();
 
     void destroyContainer( String envId, String containerId );
+
+    void uploadEnvironment( String json );
 }

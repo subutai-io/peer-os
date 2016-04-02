@@ -17,7 +17,7 @@ import static java.lang.String.format;
 
 public class HubAdapterImpl implements HubAdapter
 {
-    private static final String USER_ENVIRONMENTS = "/rest/v1/adapter/users/%s/environments";
+    private static final String ENVIRONMENTS = "/rest/v1/adapter/users/%s/environments";
 
     private static final String CONTAINERS = "/rest/v1/adapter/environments/%s/containers/%s";
 
@@ -79,6 +79,17 @@ public class HubAdapterImpl implements HubAdapter
         return null;
     }
 
+
+    public void uploadEnvironment( String json )
+    {
+        log.debug( "json: {}", json );
+
+        String userId = getOwnerId();
+
+        httpClient.doPost( format( ENVIRONMENTS, userId ), json );
+    }
+
+
     //
     // REST API
     //
@@ -102,7 +113,7 @@ public class HubAdapterImpl implements HubAdapter
 
         log.debug( "Peer registered to Hub. Getting environments for: user={}, peer={}", userId, peerId );
 
-        return httpClient.doGet( format( USER_ENVIRONMENTS, userId ) );
+        return httpClient.doGet( format( ENVIRONMENTS, userId ) );
     }
 
 

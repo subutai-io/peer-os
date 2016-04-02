@@ -1655,8 +1655,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public EnvironmentImpl update( EnvironmentImpl environment )
     {
         environment = environmentDataService.merge( environment );
+
         setEnvironmentTransientFields( environment );
+
         setContainersTransientFields( environment );
+
+        environmentAdapter.uploadEnvironment( environment );
+
         return environment;
     }
 
