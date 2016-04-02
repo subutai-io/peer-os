@@ -141,7 +141,7 @@ public class RestServiceImpl implements RestService
     public Response build( final String name, final String topologyJson )
     {
 
-        UUID eventId = null;
+        UUID eventId;
 
         try
         {
@@ -156,9 +156,6 @@ public class RestServiceImpl implements RestService
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
             Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
-
-            // @todo workaround, subnet shouldn't be calculated in distributaion
-            topology.setSubnet("192.168.1.1/24");
 
             eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
@@ -176,7 +173,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response buildAdvanced( final String name, final String topologyJson )
     {
-        UUID eventId = null;
+        UUID eventId;
 
         try
         {
@@ -185,9 +182,6 @@ public class RestServiceImpl implements RestService
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
 
             Topology topology = new Topology( name );
-
-            // @todo workaround, subnet shouldn't be calculated in distributaion
-            topology.setSubnet("192.168.1.1/24");
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
@@ -205,7 +199,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response modify( final String environmentId, final String topologyJson, final String removedContainers )
     {
-        UUID eventId = null;
+        UUID eventId;
         try
         {
             String name = environmentManager.getEnvironments().stream()
@@ -246,7 +240,7 @@ public class RestServiceImpl implements RestService
     public Response modifyAdvanced( final String environmentId, final String topologyJson,
                                     final String removedContainers )
     {
-        UUID eventId = null;
+        UUID eventId;
 
         try
         {
@@ -281,7 +275,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            environmentManager.destroyEnvironment( environmentId, false, false );
+            environmentManager.destroyEnvironment( environmentId, false );
         }
         catch ( Exception e )
         {
@@ -397,7 +391,7 @@ public class RestServiceImpl implements RestService
         try
         {
             DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-            if ( attr == null && attr.getDataHandler().getContent() == null )
+            if ( attr == null || attr.getDataHandler().getContent() == null )
             {
                 throw new Exception( "Error, cannot read an attachment", null );
             }
@@ -439,17 +433,16 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            if( environmentManager.getEnvironmentDomain( environmentId ) == null )
+            if ( environmentManager.getEnvironmentDomain( environmentId ) == null )
             {
-                return Response.serverError().entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
+                return Response.serverError()
+                               .entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
             }
 
 
             return Response.ok( JsonUtil
                     .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
                            .build();
-
-
         }
         catch ( Exception e )
         {
@@ -521,7 +514,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                environmentManager.destroyContainer( environment.getId(), containerHost.getId(), false, false );
+                environmentManager.destroyContainer( environment.getId(), containerHost.getId(), false );
 
                 return Response.ok().build();
             }
@@ -688,18 +681,19 @@ public class RestServiceImpl implements RestService
             for ( Peer peer : peers )
             {
                 taskCompletionService.submit( () -> {
-                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(), peer.getId().equals( localId ) );
+                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(),
+                            peer.getId().equals( localId ) );
                     if ( peer.isOnline() )
                     {
                         Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
                         for ( ResourceHostMetric metric : collection
                                 .toArray( new ResourceHostMetric[collection.size()] ) )
                         {
-                            peerDto.addResourceHostDto( new ResourceHostDto( metric.getHostInfo().getId(), metric.getCpuModel(),
-                                           metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
-                                           metric.getAvailableRam().toString(),
-                                           metric.getTotalSpace().toString(),
-                                           metric.getAvailableSpace().toString() ) );
+                            peerDto.addResourceHostDto(
+                                    new ResourceHostDto( metric.getHostInfo().getId(), metric.getCpuModel(),
+                                            metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
+                                            metric.getAvailableRam().toString(), metric.getTotalSpace().toString(),
+                                            metric.getAvailableSpace().toString() ) );
                         }
                     }
 
@@ -719,6 +713,7 @@ public class RestServiceImpl implements RestService
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
+                    //ignored
                 }
             }
         }
@@ -746,7 +741,7 @@ public class RestServiceImpl implements RestService
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
             {}.getType() );
 
-            tags.stream().forEach( tag -> containerHost.addTag( tag ) );
+            tags.stream().forEach( containerHost::addTag );
 
             environmentManager.notifyOnContainerStateChanged( environment, null );
         }
@@ -840,7 +835,7 @@ public class RestServiceImpl implements RestService
 
     /** AUX **************************************************** */
 
-    private Set<ContainerDto> convertContainersToContainerJson(Set<EnvironmentContainerHost> containerHosts )
+    private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
         Set<ContainerDto> containerDtos = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
@@ -857,10 +852,9 @@ public class RestServiceImpl implements RestService
             catch ( Exception e )
             {
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), "UNKNOWN",
-                        containerHost.getTemplateName(), containerHost.getContainerSize(),
-                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
-                        "UNKNOWN" ) );
+                        containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
+                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
+                        containerHost.getPeerId(), "UNKNOWN" ) );
             }
         }
         return containerDtos;
