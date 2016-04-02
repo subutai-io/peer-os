@@ -65,7 +65,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     public EnvironmentDestructionPhase CLEANUP_ENVIRONMENT()
     {
-        operationTracker.addLog( "Cleaning up environment" );
+        operationTracker.addLog( "Destroying environment" );
 
         try
         {

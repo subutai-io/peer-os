@@ -275,7 +275,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 setContainersTransientFields( environment );
             }
 
-                LOG.debug( "environment: {}", environment );
         }
 
         environments.addAll( environmentAdapter.getEnvironments() );
