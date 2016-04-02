@@ -17,13 +17,23 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	$timeout(function() {
 		vm.hasPGPplugin = hasPGPplugin();
 		if(!vm.hasPGPplugin) {
+			var pluginUrl = 'https://github.com/subutai-io/browsers/releases/tag/2.0.0';
+			var isFirefox = typeof InstallTrigger !== 'undefined';
+			var isChrome = !!window.chrome && !!window.chrome.webstore;
+
+			if(isChrome) {
+				pluginUrl = 'https://chrome.google.com/webstore/detail/subutai-social-e2e-plugin/kpmiofpmlciacjblommkcinncmneeoaa?utm_source=chrome-ntp-icon';
+			} else if(isFirefox) {
+				pluginUrl = 'https://addons.mozilla.org/en-US/firefox/addon/subutai-social-e2e-plugin/';
+			}
+
 			$rootScope.notifications = {
 				"message": "Life is hard when you're stupid dude! Install the subutai browser plugin for added security with end to end encryption.", 
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [
 					{
 						"text": "Install",
-						"href": "https://chrome.google.com/webstore/detail/subutai-social-e2e-plugin/kpmiofpmlciacjblommkcinncmneeoaa?utm_source=chrome-ntp-icon",
+						"href": pluginUrl,
 						"newTab": true
 					},
 					{
