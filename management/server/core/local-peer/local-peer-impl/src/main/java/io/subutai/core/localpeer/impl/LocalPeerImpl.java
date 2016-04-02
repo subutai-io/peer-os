@@ -1744,6 +1744,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 @Override
                 public Object call() throws Exception
                 {
+
                     //tunnels
                     Tunnels tunnels = resourceHost.getTunnels();
                     for ( Tunnel tunnel : tunnels.getTunnels() )
@@ -1751,6 +1752,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         usedNetworkResources.addVni( tunnel.getVni() );
                         usedNetworkResources.addVlan( tunnel.getVlan() );
                         usedNetworkResources.addP2pSubnet( tunnel.getTunnelIp() );
+                    }
+
+                    //p2p connections
+                    P2PConnections p2PConnections = resourceHost.getP2PConnections();
+                    for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
+                    {
+                        usedNetworkResources.addP2pSubnet( p2PConnection.getIp() );
                     }
 
                     for ( HostInterface iface : resourceHost.getHostInterfaces().getAll() )

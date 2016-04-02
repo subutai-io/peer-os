@@ -487,7 +487,10 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Preconditions.checkNotNull( container );
 
-        containers.remove( container );
+        synchronized ( this.containers )
+        {
+            this.containers.remove( container );
+        }
     }
 
 
