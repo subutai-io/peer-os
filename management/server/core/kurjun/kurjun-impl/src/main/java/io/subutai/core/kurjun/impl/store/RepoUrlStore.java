@@ -19,7 +19,7 @@ public class RepoUrlStore
     private static final String MAP_NAME_GLOBAL = "global_repo_urls";
     private static final String MAP_NAME_TEMPLATE = "template_repo_urls";
     private static final String MAP_NAME_APT = "apt_repo_urls";
-
+    private static final String MAP_NAME_RAW = "raw_repo_url";
     private final String repoFile;
 
 
@@ -65,6 +65,24 @@ public class RepoUrlStore
     public Set<RepoUrl> getRemoteAptUrls() throws IOException
     {
         return getUrls( MAP_NAME_APT );
+    }
+
+
+    public void addRemoteRawUrl( RepoUrl repoUrl ) throws IOException
+    {
+        addUrl( repoUrl, MAP_NAME_RAW );
+    }
+
+
+    public Set<RepoUrl> getRemoteRawUrls() throws IOException
+    {
+        return getUrls( MAP_NAME_RAW );
+    }
+
+
+    public RepoUrl removeRemoteRawUrl( RepoUrl repoUrl ) throws IOException
+    {
+        return removeUrl( repoUrl, MAP_NAME_RAW );
     }
 
 

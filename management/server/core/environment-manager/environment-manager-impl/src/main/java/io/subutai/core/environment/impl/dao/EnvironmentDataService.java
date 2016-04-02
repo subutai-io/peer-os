@@ -18,8 +18,9 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 /**
  * {@link EnvironmentDataService} implements {@link io.subutai.common.protocol.api.DataService} interface. {@link
- * EnvironmentDataService} manages {@link io.subutai.core.environment.impl.entity.EnvironmentImpl} entities in database
+ * EnvironmentDataService} manages {@link io.subutai.core.environment.impl.entity.EnvironmentImpl} entity in database
  */
+//todo since env metadata is saved correctly now, return new EM in every call
 public class EnvironmentDataService implements DataService<String, EnvironmentImpl>
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDataService.class );
@@ -40,7 +41,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
      * io.subutai.core.environment.impl.entity.EnvironmentImpl} object or {@code null} value</p>
      */
     @Override
-    public EnvironmentImpl find( final String id )
+    public synchronized EnvironmentImpl find( final String id )
     {
         EnvironmentImpl result = null;
         //        EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -66,7 +67,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
      * @return - {@link java.util.Collection} of {@link io.subutai.core.environment.impl.entity.EnvironmentImpl}
      */
     @Override
-    public Collection<EnvironmentImpl> getAll()
+    public synchronized Collection<EnvironmentImpl> getAll()
     {
         Collection<EnvironmentImpl> result = Lists.newArrayList();
         //        EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -93,7 +94,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
      * @param item - entity object to save
      */
     @Override
-    public void persist( final EnvironmentImpl item )
+    public synchronized void persist( final EnvironmentImpl item )
     {
         //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -121,7 +122,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
      * @param id - entity id to remove
      */
     @Override
-    public void remove( final String id )
+    public synchronized void remove( final String id )
     {
         //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -144,7 +145,7 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     }
 
 
-    public void remove( EnvironmentImpl item )
+    public synchronized void remove( EnvironmentImpl item )
     {
         //        EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -175,11 +176,17 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
     @Override
     public synchronized void update( EnvironmentImpl item )
     {
-//        EntityManager em = daoManager.getEntityManagerFromFactory();
+        // no-op
+    }
+
+
+    public synchronized EnvironmentImpl merge( EnvironmentImpl item )
+    {
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             daoManager.startTransaction( em );
-            em.merge( item );
+            item = em.merge( item );
             daoManager.commitTransaction( em );
         }
         catch ( Exception e )
@@ -191,12 +198,13 @@ public class EnvironmentDataService implements DataService<String, EnvironmentIm
         {
             //            daoManager.closeEntityManager( em );
         }
+        return item;
     }
 
 
     public synchronized EnvironmentImpl save( Environment item )
     {
-
+        //        EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             daoManager.startTransaction( em );

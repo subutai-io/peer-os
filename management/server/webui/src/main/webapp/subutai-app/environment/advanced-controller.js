@@ -25,6 +25,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.logMessages = [];
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
+	$scope.identity = angular.identity;
 
 	vm.activeCloudTab = 'peers';
 	vm.templatesType = 'all';
@@ -40,7 +41,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.excludedContainers = [];
 	vm.cubeGrowth = 1;
-	vm.environment2BuildName = 'Environment name';
+	vm.environment2BuildName = '';
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
 	vm.buildCompleted = false;
@@ -53,6 +54,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.editEnvironment = editEnvironment;
 	vm.clearWorkspace = clearWorkspace;
 	vm.addSettingsToTemplate = addSettingsToTemplate;
+	vm.getFilteredTemplates = getFilteredTemplates;
 
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
@@ -62,10 +64,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	environmentService.getTemplates()
 		.then(function (data) {
 			vm.templates = data;
+			getFilteredTemplates();
 		});
-		//.error(function (data) {
-		//	VARS_MODAL_ERROR( SweetAlert, 'Error on getting templates ' + data );
-		//});
+
+	function getFilteredTemplates() {
+		vm.templatesList = [];
+		for(var i in vm.templates) {
+			if(vm.templatesType == 'all' || i == vm.templatesType) {
+				vm.templatesList = vm.templatesList.concat(vm.templates[i]);
+			}
+		}
+	}
 
 	function getPeers() {
 		$('.js-peer-load-screen').show();
@@ -102,9 +111,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			});		
 	}
 
-	function checkLastLog(status) {
+	function checkLastLog(status, date) {
+		if(date === undefined || date === null) date = false;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
-		lastLog.time = moment().format('HH:mm:ss');
+
+		if(date) {
+			lastLog.time = getDateFromString(date);
+		} else {
+			lastLog.time = moment().format('HH:mm:ss');
+		}
+
 		if(status === true) {
 			lastLog.status = 'success';
 			lastLog.classes = ['fa-check', 'g-text-green'];
@@ -136,22 +152,33 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					}
 					for(i; i < logs.length; i++) {
 
-						var logTime = moment().format('HH:mm:ss');
-						var logStatus = 'success';
-						var logClasses = ['fa-check', 'g-text-green'];
-						if(i+1 == logs.length) {
-							logTime = '';
-							logStatus = 'in-progress';
-							logClasses = ['fa-spinner', 'fa-pulse'];
-						}
+						var logCheck = logs[i].replace(/ /g,'');
+						if(logCheck.length > 0) {
 
-						var  currentLog = {
-							"time": logTime,
-							"status": logStatus,
-							"classes": logClasses,
-							"text": logs[i]
-						};
-						result.push(currentLog);
+							var logTextTime = logs[i].split(':');
+							var logTime = getDateFromString(logs[i]);
+
+							var logStatus = 'success';
+							var logClasses = ['fa-check', 'g-text-green'];
+							if(i+1 == logs.length) {
+								logTime = '';
+								logStatus = 'in-progress';
+								logClasses = ['fa-spinner', 'fa-pulse'];
+							}
+
+							var logsTextString = logTextTime[3];
+							if(logTextTime[4] !== undefined) {
+								logsTextString += logTextTime[4] + logTextTime[5];
+							}
+							var  currentLog = {
+								"time": logTime,
+								"status": logStatus,
+								"classes": logClasses,
+								"text": logsTextString
+							};
+							result.push(currentLog);
+
+						}
 					}
 
 					vm.logMessages = vm.logMessages.concat(result);
@@ -184,7 +211,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 							};
 						}
 
-						checkLastLog(true);
+						if(prevLogs) {
+							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+							if(logs.length > prevLogs.length) {
+								checkLastLog(true, logs[logs.length-1]);
+							}
+						} else {
+							checkLastLog(true);
+						}
 						var currentLog = {
 							"time": moment().format('HH:mm:ss'),
 							"status": 'success',
@@ -248,6 +282,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function buildEditedEnvironment() {
@@ -643,6 +678,13 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function initJointJs() {
 
+		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+			if(vm.editingEnv && vm.editingEnv.id == e.detail) {
+				clearWorkspace();
+				vm.editingEnv = false;
+			}
+		}, false);
+
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
 			width: '100%',
@@ -700,7 +742,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.buildStep = 'confirm';
 	function buildEnvironmentByJoint() {
-
+		
+		vm.buildCompleted = false;
 		vm.newEnvID = [];		
 		vm.buildStep = 'confirm';
 
@@ -723,7 +766,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-build-info-advanced.html',
 			scope: $scope,
-			className: 'b-build-environment-info'
+			className: 'b-build-environment-info',
+			preCloseCallback: function(value) {
+				vm.buildCompleted = false;
+			}
 		});
 	}
 
@@ -798,6 +844,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	function clearWorkspace() {
 		vm.cubeGrowth = 0;
 		PEER_MAP = {};
+		vm.environment2BuildName = '';
 
 		vm.env2Build = {};
 		vm.containers2Build = [];

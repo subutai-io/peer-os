@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 public @interface RelationDeclaration
 {
     /**
-     * Relationship query, that queries permissions exists between entities
+     * Relationship query, that queries permissions exists between entity
      */
     String rql() default "";
 

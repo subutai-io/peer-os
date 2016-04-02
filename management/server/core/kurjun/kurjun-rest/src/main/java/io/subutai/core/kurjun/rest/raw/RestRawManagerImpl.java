@@ -2,12 +2,10 @@ package io.subutai.core.kurjun.rest.raw;
 
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -21,7 +19,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import ai.subut.kurjun.metadata.common.raw.RawMetadata;
-import io.subutai.common.protocol.Resource;
+import ai.subut.kurjun.model.metadata.Metadata;
+import ai.subut.kurjun.model.metadata.SerializableMetadata;
+import io.subutai.core.kurjun.api.Utils;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.rest.RestManagerBase;
 
@@ -43,36 +43,36 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
 
     @Override
-    public Response getFile( String md5, String name, boolean isKurjunClient )
+    public Response download( String repository, String md5, String name, boolean isKurjunClient )
     {
+        if ( repository == null )
+        {
+            repository = "raw";
+        }
+
         try
         {
-            byte[] md5bytes = decodeMd5( md5 );
-            Resource raw;
 
-            if ( md5bytes != null )
-            {
-                raw = rawManager.getFile( md5bytes, isKurjunClient );
-            }
-            else
-            {
-                raw = rawManager.getFile( name, isKurjunClient );
-            }
+            byte[] md5bytes = decodeMd5( md5 );
+
+            RawMetadata raw = ( RawMetadata ) rawManager.getInfo( repository, md5bytes );
 
             if ( raw != null )
             {
-                InputStream is = rawManager.getFileData( decodeMd5( raw.getMd5Sum() ), isKurjunClient );
+                InputStream is = rawManager.getFile( repository, md5bytes );
+
                 if ( is != null )
                 {
-                    return Response.ok( is ).header( "Content-Disposition",
-                            "attachment; filename=" + raw.getName() )
-                            .header( "Content-Type", "application/octet-stream" ).build();
+                    return Response.ok( is ).header( "Content-Disposition", "attachment; filename=" + raw.getName() )
+                                   .header( "Content-Type", "application/octet-stream" )
+                                   .header( "Content-Length", raw.getSize() ).build();
                 }
             }
         }
         catch ( IllegalArgumentException ex )
         {
             LOGGER.error( "", ex );
+
             return badRequest( ex.getMessage() );
         }
         catch ( IOException ex )
@@ -86,24 +86,25 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
 
     @Override
-    public Response getFileInfo( String md5, String name, boolean isKurjunClient )
+    public Response info( String repository, String md5, String name, boolean isKurjunClient )
     {
         try
         {
-            byte[] md5bytes = decodeMd5( md5 );
-            Resource raw;
-            if ( md5bytes != null )
-            {
-                raw = rawManager.getFile( md5bytes, isKurjunClient );
-            }
-            else
-            {
-                raw = rawManager.getFile( name, isKurjunClient );
-            }
+            RawMetadata rawMetadata = new RawMetadata();
 
-            if ( raw != null )
+            if ( repository == null && md5 != null )
             {
-                return Response.ok( GSON.toJson( convertToRawMetadata( raw ) ) ).build();
+                repository = "raw";
+            }
+            rawMetadata.setName( name );
+            rawMetadata.setMd5Sum( Utils.MD5.toByteArray( md5 ) );
+            rawMetadata.setFingerprint( repository );
+
+            Metadata metadata = ( Metadata ) rawManager.getInfo( repository, decodeMd5( md5 ) );
+
+            if ( metadata != null )
+            {
+                return Response.ok( GSON.toJson( metadata ) ).build();
             }
         }
         catch ( IllegalArgumentException ex )
@@ -111,28 +112,26 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
             LOGGER.error( "", ex );
             return badRequest( ex.getMessage() );
         }
-        catch ( IOException ex )
-        {
-            String msg = "Failed to get file info";
-            LOGGER.error( msg, ex );
-            return Response.serverError().entity( msg ).build();
-        }
+
         return packageNotFoundResponse();
     }
 
 
     @Override
-    public Response getFileList( boolean isKurjunClient )
+    public Response list( String repository )
     {
+        if ( repository == null )
+        {
+            repository = "all";
+        }
         try
         {
-            List<Resource> list = rawManager.getFileList( isKurjunClient );
+            List<SerializableMetadata> list = rawManager.list( repository );
 
             if ( list != null )
             {
-                List<RawMetadata> deflist
-                        = list.stream().map( t -> convertToRawMetadata( t ) ).collect( Collectors.toList() );
-                return Response.ok( GSON.toJson( deflist ) ).build();
+
+                return Response.ok( GSON.toJson( list ) ).build();
             }
         }
         catch ( IOException ex )
@@ -146,7 +145,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
 
     @Override
-    public Response uploadFile( Attachment attachment )
+    public Response upload( String repository, Attachment attachment )
     {
         File temp = null;
         try
@@ -161,17 +160,15 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
             temp = Files.createTempFile( null, null ).toFile();
             attachment.transferTo( temp );
 
-            try ( InputStream is = new FileInputStream( temp ) )
+            RawMetadata rawMetadata = ( RawMetadata ) rawManager.put( temp, filename, repository );
+
+            if ( rawMetadata != null )
             {
-                String md5 = rawManager.uploadFile( is, filename );
-                if ( md5 != null )
-                {
-                    return Response.ok( md5 ).build();
-                }
-                else
-                {
-                    return Response.serverError().entity( "Failed to put file" ).build();
-                }
+                return Response.ok( rawMetadata ).build();
+            }
+            else
+            {
+                return Response.serverError().entity( "Failed to put file" ).build();
             }
         }
         catch ( IllegalArgumentException ex )
@@ -194,30 +191,23 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
 
     @Override
-    public Response deleteFile( String md5 )
+    public Response delete( String repository, String md5 )
     {
+
         try
         {
             byte[] md5bytes = decodeMd5( md5 );
+
             if ( md5bytes != null )
             {
-                try
+                boolean deleted = rawManager.delete( repository, md5bytes );
+                if ( deleted )
                 {
-                    boolean deleted = rawManager.deleteFile( md5bytes );
-                    if ( deleted )
-                    {
-                        return Response.ok( "File deleted" ).build();
-                    }
-                    else
-                    {
-                        return packageNotFoundResponse();
-                    }
+                    return Response.ok( "File deleted" ).build();
                 }
-                catch ( IOException ex )
+                else
                 {
-                    String err = "Failed to delete file";
-                    LOGGER.error( err, ex );
-                    return Response.serverError().entity( err ).build();
+                    return packageNotFoundResponse();
                 }
             }
             return badRequest( "Invalid md5 checksum" );
@@ -231,16 +221,15 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
 
     @Override
+    public Response md5( final String repository )
+    {
+        return Response.ok( rawManager.md5() ).build();
+    }
+
+
+    @Override
     protected Logger getLogger()
     {
         return LOGGER;
     }
-
-
-    private RawMetadata convertToRawMetadata( Resource raw )
-    {
-        RawMetadata defaultTemplate = new RawMetadata( decodeMd5( raw.getMd5Sum() ), raw.getName(), raw.getSize() );
-        return defaultTemplate;
-    }
-
 }

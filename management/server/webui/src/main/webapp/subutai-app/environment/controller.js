@@ -2,7 +2,18 @@
 
 angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
-	.directive('fileModel', fileModel);
+	.directive('fileModel', fileModel)
+	.filter( 'sshEmail', function () {
+		return function( input, modify )
+		{
+			if( !modify )
+				return input;
+
+			var newVal = input.split(' ');
+
+			return newVal[newVal.length - 1];
+		}
+	});
 
 EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
@@ -55,6 +66,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.showSSHKeyForm = showSSHKeyForm;
 	vm.showSSHKeysPopup = showSSHKeysPopup;
 	vm.deleteSSHKey = deleteSSHKey;
+	vm.sshKeyFormat = sshKeyFormat;
 	vm.showDomainForm = showDomainForm;
 	vm.setDomain = setDomain;
 	vm.removeDomain = removeDomain;
@@ -285,6 +297,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function destroyEnvironment(environmentId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "You will not be able to recover this Environment!",
@@ -298,6 +311,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					SweetAlert.swal(
 						{
@@ -307,6 +321,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 							showConfirmButton: false
 						}
 					);
+
+					var destroyEnvEvent = new CustomEvent('destroyEnvironment', {'detail': environmentId});
+					document.getElementById('js-environment-creation').dispatchEvent(destroyEnvEvent);
 
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
@@ -338,6 +355,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function removeSshKey(environmentId){
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Delete environment SSH keys!",
@@ -351,6 +369,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				environmentService.removeSshKey(environmentId).success(function () {
 					SweetAlert.swal("Destroyed!", "Your SSH keys has been deleted.", "success");
@@ -405,6 +424,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
+	function sshKeyFormat(sshKey) {
+		var splitedSSH = sshKey.split('==');
+		return splitedSSH[0];
+	}
+
 	function showDomainForm(environmentId) {
 		vm.environmentForDomain = environmentId;
 		vm.currentDomain = {};
@@ -435,6 +459,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	function removeDomain(environmentId) {
 		ngDialog.closeAll();
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "Delete environment domain!",
@@ -449,6 +474,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		},
 		function (isConfirm) {
 			if (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				environmentService.removeDomain(environmentId).success(function (data) {
 					SweetAlert.swal("Deleted!", "Your domain has been deleted.", "success");
 				}).error(function (data) {
@@ -525,13 +551,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		return defaultVal;
 	}
 
-	function clearWorkspace() {
-		vm.isEditing = false;
-		vm.cubeGrowth = 0;
-		vm.templateGrid = [];
-		graph.resetCells();
-	}
-
 	function getQuotaColor(quotaSize) {
 		return quotaColors[quotaSize];
 	}
@@ -564,6 +583,20 @@ function imageExists(image_url){
 
     return http.status != 404;
 
+}
+
+function getDateFromString(string) {
+	var logTextTime = string.split(':');
+	var dateString = logTextTime[0].split(' ');
+	var temp = dateString[0].split('.');
+	dateString = [temp[2], temp[1], temp[0]].join('-') + 'T' + dateString[1];
+	var dateFullString = [dateString, logTextTime[1], logTextTime[2]].join(':');
+
+	//var testDateUtc = moment.utc(Date.parse(dateFullString));
+	console.log(dateFullString);
+	var localDate = moment(Date.parse(dateFullString + '+0000')).local();
+
+	return localDate.format('HH:mm:ss');
 }
 
 function fileModel($parse) {

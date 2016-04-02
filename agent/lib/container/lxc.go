@@ -86,10 +86,22 @@ func State(name string) (state string) {
 }
 
 func SetApt(name string) {
-	repo := []byte("deb [arch=amd64,all] http://" + config.Management.Host + ":8551/rest/kurjun/vapt trusty main contrib\n" +
-		"deb [arch=amd64,all] http://" + config.Management.Cdn + ":8081/rest/kurjun/vapt trusty main contrib\n")
-	log.Check(log.DebugLevel, "Writing source repo list",
-		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/apt/sources.list.d/subutai-repo.list", repo, 0644))
+	gateway := GetConfigItem(config.Agent.LxcPrefix+name+"/config", "lxc.network.ipv4.gateway")
+	if len(gateway) == 0 {
+		gateway = "10.10.0.254"
+	}
+
+	repo := []byte("deb http://" + gateway + "/apt/main trusty main restricted universe multiverse\n" +
+		"deb http://" + gateway + "/apt/main trusty-updates main restricted universe multiverse\n" +
+		"deb http://" + gateway + "/apt/security trusty-security main restricted universe multiverse\n")
+	log.Check(log.DebugLevel, "Writing apt source repo list",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/apt/sources.list", repo, 0644))
+
+	// kurjun := []byte("deb [arch=amd64,all] http://" + config.Management.Host + ":8330/rest/kurjun/vapt trusty main contrib\n" +
+	// 	"deb [arch=amd64,all] http://" + config.Management.Cdn + ":8330/kurjun/rest/deb trusty main contrib\n")
+	kurjun := []byte("deb [arch=amd64,all] http://" + config.Management.Cdn + ":8330/kurjun/rest/deb trusty main contrib\n")
+	log.Check(log.DebugLevel, "Writing apt source kurjun list",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/apt/sources.list.d/subutai-repo.list", kurjun, 0644))
 }
 
 func AptUpdate(name string) {
@@ -105,7 +117,7 @@ func Start(name string) {
 	c.Start()
 
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.stop"); err == nil {
-		log.Check(log.WarnLevel, "Creating .start file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.stop"))
+		log.Check(log.WarnLevel, "Deleting .stop file to "+name, os.Remove(config.Agent.LxcPrefix+name+"/.stop"))
 	}
 	if _, err := os.Stat(config.Agent.LxcPrefix + name + "/.start"); os.IsNotExist(err) {
 		f, err := os.Create(config.Agent.LxcPrefix + name + "/.start")
@@ -174,9 +186,7 @@ func GetParent(name string) string {
 	if !IsContainer(name) {
 		return "Container does not exists"
 	}
-	// c, _ := lxc.NewContainer(name)
 	configFileName := config.Agent.LxcPrefix + name + "/config"
-	// return GetConfigItem(c.ConfigFileName(), "subutai.parent")
 	return GetConfigItem(configFileName, "subutai.parent")
 }
 

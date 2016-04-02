@@ -1,9 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Collection;
-import java.util.Map;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -20,18 +17,17 @@ import javax.ws.rs.core.Response;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.Gateway;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
 
@@ -41,11 +37,6 @@ import io.subutai.common.util.DateTimeParam;
 
 public interface RestService
 {
-    @Deprecated
-    @GET
-    @Path( "me" )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getLocalPeerInfo();
 
     @GET
     @Path( "/info" )
@@ -58,34 +49,12 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getTemplate( @FormParam( "templateName" ) String templateName );
 
-    @GET
-    @Path( "vni" )
-    @Produces( MediaType.APPLICATION_JSON )
-    Vnis getReservedVnis();
-
-    @POST
-    @Path( "vni" )
-    @Produces( MediaType.APPLICATION_JSON )
-    @Consumes( MediaType.APPLICATION_JSON )
-    Vni reserveVni( Vni vni );
-
-    @GET
-    @Path( "gateways" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Gateways getGateways();
-
-
-    @POST
-    @Path( "container/gateway" )
-    Response setDefaultGateway( @FormParam( "containerId" ) String containerId,
-                                @FormParam( "gatewayIp" ) String gatewayIp );
 
     @POST
     @Path( "tunnels/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.TEXT_PLAIN )
-    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, Map<String, String> peerIps );
+    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, P2pIps p2pIps );
 
     @POST
     @Path( "pek" )
@@ -99,19 +68,11 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void updateEnvironmentKey( PublicKeyContainer publicKeyContainer );
 
-    @DELETE
-    @Path( "pek/{environmentId}" )
-    void removeEnvironmentKeyPair( @PathParam( "environmentId" ) EnvironmentId environmentId );
-
     @POST
     @Path( "pek/add/{keyId}" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
     void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
-
-    @DELETE
-    @Path( "network/{environmentId}" )
-    void cleanupNetwork( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @GET
     @Path( "container/info" )
@@ -126,6 +87,16 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     ResourceHostMetrics getResources();
+
+    @GET
+    @Path( "netresources" )
+    @Produces( MediaType.APPLICATION_JSON )
+    UsedNetworkResources getUsedNetResources();
+
+    @POST
+    @Path( "netresources" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void reserveNetResources( NetworkResourceImpl networkResource );
 
     @GET
     @Path( "interfaces" )
@@ -143,13 +114,13 @@ public interface RestService
     @Path( "p2ptunnel" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    void setupP2PConnection( P2PConfig config );
+    P2PConnections joinP2PSwarm( P2PConfig config );
 
-    @DELETE
-    @Path( "p2ptunnel/{environmentId}" )
+    @POST
+    @Path( "p2pinitial" )
     @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    void removeP2PConnection( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    Response createP2PSwarm( P2PConfig config );
+
 
     @DELETE
     @Path( "cleanup/{environmentId}" )
@@ -177,24 +148,13 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
 
-    @GET
-    @Path( "control/config/{peerId}" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getControlNetworkConfig( @PathParam( "peerId" ) final String peerId );
-
-    @PUT
-    @Path( "control/update" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response updateControlNetworkConfig( ControlNetworkConfig config );
 
     @GET
-    @Path( "control/{communityName}/{count}/distance/" )
+    @Path( "control/{p2pHash}/{count}/distance/" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getCommunityDistances( @PathParam( "communityName" ) final String communityName,
-                                    @PathParam( "count" ) final Integer count );
+    Response getP2PSwarmDistances( @PathParam( "p2pHash" ) final String p2pHash,
+                                   @PathParam( "count" ) final Integer count );
 
 
     @GET

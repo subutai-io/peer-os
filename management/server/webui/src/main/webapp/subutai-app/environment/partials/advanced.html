@@ -20,16 +20,15 @@
 					<input type="text" class="b-search-input" ng-model="searchTemplate" id="js-search">
 				</div>
 				<div class="b-tools-menu__inpit">
-					<select class="b-search-input" ng-model="advEnvCtrl.templatesType">
+					<select class="b-search-input" ng-model="advEnvCtrl.templatesType" ng-change="advEnvCtrl.getFilteredTemplates()">
 						<option value="all">All</option>
 						<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
 							{{ templatesType }} ({{ templateList.length }})
 						</option>
 					</select>
 				</div>
-				<ul ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" 
-					ng-if="advEnvCtrl.templatesType == 'all' || advEnvCtrl.templatesType == templatesType">
-					<li ng-repeat="template in templateList  | filter:searchTemplate" 
+				<ul>
+					<li ng-repeat="template in advEnvCtrl.templatesList  | filter:searchTemplate | orderBy: identity" 
 						data-template="{{ template }}">
 						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
@@ -52,20 +51,17 @@
 			ng-show="advEnvCtrl.activeCloudTab == 'peers'">
 				<ul>
 					<li ng-repeat="(peerId, peersResources) in advEnvCtrl.peerIds"
-					tooltips 
-					tooltip-template="{{ peerId }}" 
-					tooltip-side="left" 
-					ng-click="advEnvCtrl.showResources(peerId, peersResources, $index)">
+					ng-click="advEnvCtrl.showResources(peerId, peersResources.resourceHosts, $index)">
 						<span class="b-tools-menu__item" class="b-cloud-item-text g-margin-bottom-half">
 							Peer {{$index + 1}}
 						</span>
 
 						<div class="b-progress__cloud">
-							<div class="b-progress-cloud g-margin-bottom-half">
+							<!--<div class="b-progress-cloud g-margin-bottom-half">
 								<div class="b-progress-cloud-fill" style="width: 0%"></div>
-							</div>
+							</div>-->
 							<div class="b-progress-text">
-								<span class="g-text-blue">0%</span> resources used
+								<span class="g-text-blue">{{ peersResources.name }}</span>
 							</div>
 						</div>
 					</li>
@@ -83,7 +79,7 @@
 						</a>
 					</div>
 				</div>
-				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar-cloud">
+				<div class="b-tools-menu b-tools-menu_advanced js-scrollbar">
 					<ul ng-show="advEnvCtrl.currentResourceHosts.length > 0">
 						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
 						ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
@@ -130,6 +126,7 @@
 							</div>
 						</li>
 					</ul>
+					<div style="height: 46px;"></div>
 				</div>
 			</div>
 		</div>

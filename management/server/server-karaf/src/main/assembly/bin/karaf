@@ -19,7 +19,8 @@
 #Generate certificates before any configuration is applied
 
 #Function to generate self signed certificate for peer
-generate_keystore_certificate() {
+generate_keystore_certificate()
+{
     local alias=$1
     local file_path=$2
 #    echo "Generating cert for alias" $alias
@@ -35,7 +36,9 @@ generate_keystore_certificate() {
 }
 
 #Create and add self peer to truststore
-generate_truststore_certificate() {
+
+generate_truststore_certificate()
+{
     local alias=$1
     local keystore=$2
     local file_path=$3
@@ -48,7 +51,8 @@ generate_truststore_certificate() {
 	rm $client_cert
 }
 
-generate_keystore(){
+generate_keystore()
+{
     folder=$SUBUTAI_APP_DATA_PATH"/keystores"
     if [ ! -d $folder ]; then
         mkdir -p $folder
@@ -332,7 +336,11 @@ setupDefaults() {
         if [ "x$JAVA_MAX_PERM_MEM" != "x" ]; then
             DEFAULT_JAVA_OPTS="$DEFAULT_JAVA_OPTS -XX:MaxPermSize=$JAVA_MAX_PERM_MEM"
         fi
-        DEFAULT_JAVA_OPTS="-server $DEFAULT_JAVA_OPTS -Dcom.sun.management.jmxremote"
+        DEFAULT_JAVA_OPTS="-server $DEFAULT_JAVA_OPTS"
+
+        if [ "x$JMX_ENABLED" != "x" ]; then
+            DEFAULT_JAVA_OPTS="$DEFAULT_JAVA_OPTS -Dcom.sun.management.jmxremote.rmi.port=$JMX_PORT -Dcom.sun.management.jmxremote.port=$JMX_PORT -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=$JMX_HOST -Dcom.sun.management.jmxremote.local.only=false"
+        fi
     elif [ "$JVM_VENDOR" = "IBM" ]; then
         if $os400; then
             DEFAULT_JAVA_OPTS="$DEFAULT_JAVA_OPTS"

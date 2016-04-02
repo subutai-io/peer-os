@@ -2,74 +2,57 @@ package p2p
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
-	"io/ioutil"
-	"os"
+	"net"
 	"os/exec"
 	"strings"
+
+	"github.com/subutai-io/base/agent/log"
 )
 
-func p2pFile(line string) {
-	path := config.Agent.DataPrefix + "/var/subutai-network/"
-	file := path + "p2p.txt"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		log.Check(log.FatalLevel, "create "+path+" folder", os.MkdirAll(path, 0755))
-	}
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		_, err = os.Create(file)
-		log.Check(log.FatalLevel, "Creating "+file, err)
-	}
-
-	f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
-	log.Check(log.FatalLevel, "Opening file for append "+file, err)
-	defer f.Close()
-	_, err = f.WriteString(line + "\n")
-	log.Check(log.FatalLevel, "Opening file for append "+file, err)
-}
-
 func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
-	p2pFile(interfaceName + " " + localPeepIPAddr + " " + key + " " + ttl + " " + hash)
-	log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-ttl", ttl, "-hash", hash).Run())
-}
-
-func Print() {
-	fmt.Println("Interface\tLocalPeerIP\tHash")
-
-	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
-	if log.Check(log.DebugLevel, "Opening p2p.txt", err) {
-		return
+	if localPeepIPAddr == "dhcp" {
+		log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "start", "-key", key, "-dev", interfaceName, "-ttl", ttl, "-hash", hash).Run())
+	} else {
+		log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-ttl", ttl, "-hash", hash).Run())
 	}
-	scanner := bufio.NewScanner(bufio.NewReader(file))
-	for scanner.Scan() {
-		line := strings.Fields(scanner.Text())
-		if len(line) > 4 {
-			fmt.Println(line[0] + "\t" + line[1] + "\t" + line[4])
-		}
-	}
-	file.Close()
 }
 
 func Remove(hash string) {
-	if log.Check(log.WarnLevel, "Removing p2p interface", exec.Command("p2p", "stop", "-hash", hash).Run()) {
-		return
-	}
+	log.Check(log.WarnLevel, "Removing p2p interface", exec.Command("p2p", "stop", "-hash", hash).Run())
+}
 
-	file, err := os.Open(config.Agent.DataPrefix + "/var/subutai-network/p2p.txt")
-	if log.Check(log.WarnLevel, "Opening p2p.txt", err) {
-		return
-	}
-	scanner := bufio.NewScanner(bufio.NewReader(file))
-	newconf := ""
-	for scanner.Scan() {
-		line := scanner.Text()
-		if !strings.HasSuffix(line, hash) {
-			newconf = newconf + line + "\n"
+func RemoveByIface(name string) {
+	mac := ""
+	interfaces, _ := net.Interfaces()
+	for _, iface := range interfaces {
+		if iface.Name == name {
+			mac = iface.HardwareAddr.String()
 		}
 	}
-	file.Close()
-	log.Check(log.FatalLevel, "Removing p2p tunnel", ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/p2p.txt", []byte(newconf), 0644))
+	out, _ := exec.Command("p2p", "show").Output()
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	for scanner.Scan() {
+		line := strings.Fields(scanner.Text())
+		if len(line) > 1 && line[0] == mac {
+			Remove(line[2])
+		}
+	}
+	IptablesCleanUp(name)
+}
+
+func IptablesCleanUp(name string) {
+	out, _ := exec.Command("iptables-save").Output()
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, name) {
+			args := strings.Fields(line)
+			args[0] = "-D"
+			exec.Command("iptables", append([]string{"-t", "nat"}, args...)...).Run()
+		}
+	}
 }
 
 func UpdateKey(hash, newkey, ttl string) {
@@ -78,7 +61,11 @@ func UpdateKey(hash, newkey, ttl string) {
 }
 
 func Peers(hash string) {
-	out, err := exec.Command("p2p", "show", hash).Output()
+	args := []string{"show", "-hash", hash}
+	if hash == "" {
+		args = []string{"show"}
+	}
+	out, err := exec.Command("p2p", args...).Output()
 	log.Check(log.FatalLevel, "Getting list of p2p participants", err)
 	fmt.Println(string(out))
 }

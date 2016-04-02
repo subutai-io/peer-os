@@ -19,16 +19,16 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.object.relation.api.RelationManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
@@ -52,14 +52,18 @@ public class EnvironmentManagerTest
     PeerManager peerManager;
     @Mock
     SecurityManager securityManager;
-    @Mock
-    NetworkManager networkManager;
+
     @Mock
     DaoManager daoManager;
     @Mock
     IdentityManager identityManager;
+
     @Mock
     RelationManager relationManager;
+
+    @Mock
+    private HubAdapter hubAdapter;
+
     @Mock
     Tracker tracker;
     @Mock
@@ -95,12 +99,9 @@ public class EnvironmentManagerTest
         //        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
 
         environmentManager =
-                spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
-                        daoManager, identityManager, tracker, relationManager/*, strategyManager, quotaManager*/ ) );
-        doReturn( environment ).when( environmentManager )
-                               .createEmptyEnvironment( anyString(), anyString(), anyString() );
+                spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, daoManager,
+                        identityManager, tracker, relationManager, hubAdapter ) );
         //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
-        doReturn( new HashSet<>() ).when( environmentManager ).getUsedIps( ( Peer ) any() );
         doReturn( environmentCreationWorkflow ).when( environmentManager )
                                                .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
                                                        any( Topology.class ), anyString(),

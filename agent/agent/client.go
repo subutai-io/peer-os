@@ -7,33 +7,14 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"github.com/subutai-io/base/agent/agent/connect"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"math/big"
 	"os"
 	"time"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 )
-
-func Instance() {
-	email := config.Management.GpgUser
-	hostname, _ := os.Hostname()
-	if email == "" {
-		mgn := connect.Instance()
-
-		pk := mgn.GetKey()
-		for pk == nil {
-			log.Info("Failed to get management key, sleeping 5 secs")
-			time.Sleep(time.Second * 5)
-			pk = mgn.GetKey()
-		}
-		email = pk.ExtractKeyEmail()
-	}
-
-	config.Management.GpgUser = email
-	config.Agent.GpgUser = hostname + "@subutai.io"
-}
 
 func x509generate() {
 	hostname, _ := os.Hostname()

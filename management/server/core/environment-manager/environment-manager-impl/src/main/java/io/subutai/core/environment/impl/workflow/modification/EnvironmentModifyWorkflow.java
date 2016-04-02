@@ -20,12 +20,11 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsSte
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDestroyStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
-import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 
 
 public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
@@ -34,7 +33,6 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentModifyWorkflow.class );
 
     private final TemplateManager templateRegistry;
-    private final NetworkManager networkManager;
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
@@ -43,6 +41,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
     private boolean forceMetadataRemoval;
+    private final SecurityManager securityManager;
 
 
     //environment creation phases
@@ -51,7 +50,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         INIT,
         DESTROY_CONTAINERS,
         GENERATE_KEYS,
-        SETUP_VNI,
+        RESERVE_NET,
         SETUP_P2P,
         PREPARE_TEMPLATES,
         CLONE_CONTAINERS,
@@ -62,18 +61,17 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public EnvironmentModifyWorkflow( String defaultDomain, TemplateManager templateRegistry,
-                                      NetworkManager networkManager, PeerManager peerManager,
-                                      EnvironmentImpl environment, Topology topology, List<String> removedContainers,
-                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
-                                      boolean forceMetadataRemoval )
+    public EnvironmentModifyWorkflow( String defaultDomain, TemplateManager templateRegistry, PeerManager peerManager,
+                                      SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
+                                      List<String> removedContainers, TrackerOperation operationTracker,
+                                      EnvironmentManagerImpl environmentManager, boolean forceMetadataRemoval )
     {
 
         super( EnvironmentGrowingPhase.INIT );
 
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
-        this.networkManager = networkManager;
+        this.securityManager = securityManager;
         this.environment = environment;
         this.topology = topology;
         this.operationTracker = operationTracker;
@@ -130,15 +128,15 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public EnvironmentGrowingPhase GENERATE_KEYS()
     {
-        operationTracker.addLog( "Generating PEKs" );
+        operationTracker.addLog( "Securing channel" );
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
-            return EnvironmentGrowingPhase.SETUP_VNI;
+            return EnvironmentGrowingPhase.RESERVE_NET;
         }
         catch ( Exception e )
         {
@@ -149,13 +147,13 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public EnvironmentGrowingPhase SETUP_VNI()
+    public EnvironmentGrowingPhase RESERVE_NET()
     {
-        operationTracker.addLog( "Setting up VNI" );
+        operationTracker.addLog( "Reserving network resources" );
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager ).execute();
+            new ReservationStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -172,11 +170,11 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public EnvironmentGrowingPhase SETUP_P2P()
     {
-        operationTracker.addLog( "Setting up P2P" );
+        operationTracker.addLog( "Setting up networking" );
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager ).execute();
+            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -217,8 +215,8 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new ContainerCloneStep( templateRegistry, defaultDomain, topology, environment, peerManager,
-                    environmentManager, operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
+                    operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -239,7 +237,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new RegisterHostsStep( environment, networkManager ).execute();
+            new RegisterHostsStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -260,7 +258,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new RegisterSshStep( environment, networkManager ).execute( environment.getSshKeys() );
+            new RegisterSshStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

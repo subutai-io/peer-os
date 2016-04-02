@@ -46,9 +46,7 @@ public class ListEnvironmentsCommand extends SubutaiShellCommandSupport
 
             for ( PeerConf peerConf : environment.getPeerConfs() )
             {
-                System.out.println(
-                        String.format( "\t%s\t%s\t%s\t%s", peerConf.getPeerId(), peerConf.getTunnelAddress(),
-                                environment.getTunnelInterfaceName(), environment.getTunnelCommunityName() ) );
+                System.out.println( String.format( "\t%s\t%s", peerConf.getPeerId(), environment.getP2PHash() ) );
             }
 
             System.out.println( "-----------------------------------------------------------------" );

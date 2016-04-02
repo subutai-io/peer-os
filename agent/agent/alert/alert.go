@@ -3,15 +3,15 @@ package alert
 import (
 	"bufio"
 	"bytes"
-	"github.com/subutai-io/base/agent/agent/container"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
-	"gopkg.in/lxc/go-lxc.v2"
 	"io/ioutil"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/subutai-io/base/agent/agent/container"
+	"github.com/subutai-io/base/agent/config"
 )
 
 type Values struct {
@@ -26,14 +26,15 @@ type HDD struct {
 }
 
 type Load struct {
-	Container string `json:"id,omitempty"`
-	CPU       Values `json:"cpu,omitempty"`
-	RAM       Values `json:"ram,omitempty"`
-	Disk      []HDD  `json:"hdd,omitempty"`
+	Container string  `json:"id,omitempty"`
+	CPU       *Values `json:"cpu,omitempty"`
+	RAM       *Values `json:"ram,omitempty"`
+	Disk      []HDD   `json:"hdd,omitempty"`
 }
 
 var (
-	cpu = make(map[string][]int)
+	cpu   = make(map[string][]int)
+	stats = make(map[string]Load)
 )
 
 func read(path string) (i int) {
@@ -56,9 +57,7 @@ func id() (list map[string]string) {
 }
 
 func stat() string {
-	out, err := exec.Command("btrfs", "qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix).Output()
-	log.Check(log.DebugLevel, "Geting btrfs stats", err)
-
+	out, _ := exec.Command("btrfs", "qgroup", "show", "-r", "--raw", config.Agent.LxcPrefix).Output()
 	return string(out)
 }
 
@@ -75,9 +74,12 @@ func ramQuota(cont string) []int {
 }
 
 func quotaCPU(name string) int {
-	c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	cfsPeriod := 100000
-	quota, _ := strconv.Atoi(c.CgroupItem("cpu.cfs_quota_us")[0])
+	cfs_quota_us, err := ioutil.ReadFile("/sys/fs/cgroup/cpu,cpuacct/lxc/" + name + "/cpu.cfs_quota_us")
+	if err != nil {
+		return -1
+	}
+	quota, _ := strconv.Atoi(strings.TrimSpace(string(cfs_quota_us)))
 	return quota * 100 / cfsPeriod / runtime.NumCPU()
 }
 
@@ -139,59 +141,64 @@ func diskQuota(mountid, diskMap string) []int {
 	return diskUsage
 }
 
-func Alert(list []container.Container) []Load {
-	var load []Load
-	var item Load
-	var hdd HDD
-	var tmp []int
+func AlertProcessing() {
+	for {
+		stats = Alert()
+		time.Sleep(time.Second * 5)
+	}
+}
+
+func Alert() (load map[string]Load) {
+	load = make(map[string]Load)
 	diskMap := stat()
 	diskIDs := id()
 
-	for _, cont := range list {
-		trigger := false
-		if cont.Status != "RUNNING" {
+	files, _ := ioutil.ReadDir("/sys/fs/cgroup/cpu/lxc/")
+	for _, cont := range files {
+		if !cont.IsDir() {
 			continue
 		}
 
-		if tmp = cpuLoad(cont.Name); tmp[0] > 80 {
-			item.CPU.Current = tmp[0]
-			item.CPU.Quota = tmp[1]
-			trigger = true
+		cpuValues := cpuLoad(cont.Name())
+		ramValues := ramQuota(cont.Name())
+
+		disk := []HDD{}
+		for _, v := range []string{"rootfs", "opt", "var", "home"} {
+			diskValues := diskQuota(diskIDs["lib/lxc/"+cont.Name()+"/"+v], diskMap)
+			disk = append(disk, HDD{Current: diskValues[0], Quota: diskValues[1], Partition: v})
 		}
 
-		if tmp = ramQuota(cont.Name); tmp[0] > 80 {
-			item.RAM.Current = tmp[0]
-			item.RAM.Quota = tmp[1]
-			trigger = true
+		load[cont.Name()] = Load{
+			CPU:  &Values{Current: cpuValues[0], Quota: cpuValues[1]},
+			RAM:  &Values{Current: ramValues[0], Quota: ramValues[1]},
+			Disk: disk,
 		}
-		hdd.Current = tmp[0]
-		hdd.Quota = tmp[1]
-		if diskQuota(diskIDs[cont.Name+"/rootfs"], diskMap)[0] > 80 {
-			hdd.Partition = "Rootfs"
-			trigger = true
-			item.Disk = append(item.Disk, hdd)
+	}
+	return load
+}
+
+func CurrentAlerts(list []container.Container) []Load {
+	var load []Load
+	for _, v := range list {
+		var item Load
+
+		if stats[v.Name].CPU != nil && stats[v.Name].CPU.Current > 80 {
+			item.CPU = &Values{Current: stats[v.Name].CPU.Current, Quota: stats[v.Name].CPU.Quota}
 		}
-		if diskQuota(diskIDs[cont.Name+"/opt"], diskMap)[0] > 80 {
-			hdd.Partition = "Opt"
-			trigger = true
-			item.Disk = append(item.Disk, hdd)
-		}
-		if diskQuota(diskIDs[cont.Name+"/var"], diskMap)[0] > 80 {
-			hdd.Partition = "Var"
-			trigger = true
-			item.Disk = append(item.Disk, hdd)
-		}
-		if diskQuota(diskIDs[cont.Name+"/home"], diskMap)[0] > 80 {
-			hdd.Partition = "Home"
-			trigger = true
-			item.Disk = append(item.Disk, hdd)
+		if stats[v.Name].RAM != nil && stats[v.Name].RAM.Current > 80 {
+			item.RAM = &Values{Current: stats[v.Name].RAM.Current, Quota: stats[v.Name].RAM.Quota}
 		}
 
-		if trigger {
-			item.Container = cont.Id
+		for _, v := range stats[v.Name].Disk {
+			if v.Current > 80 {
+				item.Disk = append(item.Disk, HDD{Current: v.Current, Quota: v.Quota, Partition: v.Partition})
+			}
+		}
+
+		if item.CPU != nil || item.RAM != nil || len(item.Disk) > 0 {
+			item.Container = v.Id
 			load = append(load, item)
 		}
 	}
-
 	return load
 }

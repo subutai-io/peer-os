@@ -31,10 +31,7 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.DaoException;
-import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInfoModel;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
@@ -55,7 +52,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
@@ -109,7 +105,7 @@ public class MonitorImpl implements Monitor, HostListener
             throw new MonitorException( e );
         }
 
-        backgroundTasksExecutorService = Executors.newScheduledThreadPool( 1 );
+        backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 10, 30, TimeUnit.SECONDS );
     }
 
@@ -250,7 +246,7 @@ public class MonitorImpl implements Monitor, HostListener
         {
             CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
 
-            if ( null != commandResult && commandResult.hasSucceeded() )
+            if ( commandResult.hasSucceeded() )
             {
                 result = commandResult.getStdOut();
             }
@@ -273,7 +269,9 @@ public class MonitorImpl implements Monitor, HostListener
         return result;
     }
 
-    private CommandResult getHistoricalMetricsResp( final Host host, final Date startTime, final Date endTime ) throws CommandException, HostNotFoundException
+
+    private CommandResult getHistoricalMetricsResp( final Host host, final Date startTime, final Date endTime )
+            throws CommandException, HostNotFoundException
     {
         Preconditions.checkNotNull( host );
 
@@ -282,8 +280,8 @@ public class MonitorImpl implements Monitor, HostListener
         CommandResult commandResult;
         if ( host instanceof ResourceHost )
         {
-            commandResult = peerManager.getLocalPeer().getResourceHostById( host.getId() )
-                    .execute( historicalMetricCommand );
+            commandResult =
+                    peerManager.getLocalPeer().getResourceHostById( host.getId() ).execute( historicalMetricCommand );
         }
         else
         {
@@ -292,6 +290,7 @@ public class MonitorImpl implements Monitor, HostListener
 
         return commandResult;
     }
+
 
     @Override
     public void addAlert( final AlertEvent alert )
@@ -494,5 +493,12 @@ public class MonitorImpl implements Monitor, HostListener
                 queueAlertResource( new QuotaAlert( quotaAlertValue, System.currentTimeMillis() ) );
             }
         }
+    }
+
+
+    @Override
+    public void putAlert( final Alert alert )
+    {
+        queueAlertResource( alert );
     }
 }

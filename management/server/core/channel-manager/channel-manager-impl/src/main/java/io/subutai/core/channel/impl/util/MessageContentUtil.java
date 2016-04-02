@@ -103,6 +103,17 @@ public class MessageContentUtil
                 status = 1;
             }
         }
+        else if ( inPort == SystemSettings.getSecurePortX3() )
+        {
+            if ( basePath.startsWith( "/rest/kurjun" )  || basePath.startsWith( "/kurjun/rest" ) )
+            {
+                status = 0;
+            }
+            else
+            {
+                status = 1;
+            }
+        }
         else if ( inPort ==  SystemSettings.getSpecialPortX1() ) //file server
         {
             if ( basePath.startsWith( "/rest/kurjun" ) )

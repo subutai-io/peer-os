@@ -2,15 +2,12 @@ package io.subutai.core.network.impl;
 
 
 import java.util.List;
-import java.util.Set;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.settings.Common;
 
 
 /**
@@ -20,60 +17,30 @@ import io.subutai.common.settings.Common;
 public class Commands
 {
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
-    private static final String RESOURCE_HOST_NETWORK_BINDING = "subutai network";
     private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
-    private static final String SSH_FOLDER = "/root/.ssh";
-    private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
 
 
-    //container commands
-
-
-    public RequestBuilder getSetContainerIpCommand( String containerName, String ip, int netMask, int vLanId )
+    public RequestBuilder getP2PConnectionsCommand()
     {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( containerName, "-s", String.format( "%s/%s", ip, netMask ),
-                        String.valueOf( vLanId ) ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "p2p", "-p" ) );
     }
 
 
-    public RequestBuilder getShowContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-l" ) );
-    }
-
-
-    public RequestBuilder getRemoveContainerIpCommand( String containerName )
-    {
-        return new RequestBuilder( RESOURCE_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, "-r" ) );
-    }
-
-
-    //management host commands
-
-
-    public RequestBuilder getListPeersInEnvironmentCommand( String communityName )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-p", communityName ) );
-    }
-
-
-    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String communityName,
-                                                        String secretKey, long secretKeyTtlSec )
+    public RequestBuilder getCreateP2PSwarmCommand( String interfaceName, String localIp, String p2pHash,
+                                                    String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "p2p", "-c", interfaceName, localIp, communityName, secretKey,
-                        String.valueOf( secretKeyTtlSec ) ) );
+                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ),
+                        localIp ) ).withTimeout( 90 );
     }
 
 
-    public RequestBuilder getRemoveP2PConnectionCommand( String communityName )
+    public RequestBuilder getJoinP2PSwarmCommand( String interfaceName, String p2pHash, String secretKey,
+                                                  long secretKeyTtlSec )
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-d", communityName ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey,
+                        String.valueOf( secretKeyTtlSec ) ) ).withTimeout( 90 );
     }
 
 
@@ -84,9 +51,18 @@ public class Commands
     }
 
 
-    public RequestBuilder getListP2PConnectionsCommand()
+    public RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
     {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "p2p", "-l" ) );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "tunnel", "-create", tunnelName, "-remoteip", tunnelIp, "-vlan",
+                        String.valueOf( vlan ), "-vni", String.valueOf( vni ) ) );
+    }
+
+
+    public RequestBuilder getGetTunnelsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "tunnel", "-list" ) );
     }
 
 
@@ -97,43 +73,9 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveTunnelCommand( String tunnelName )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-r", tunnelName ) );
-    }
-
-
     public RequestBuilder getListTunnelsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
-    }
-
-
-    public RequestBuilder getSetupGatewayOnContainerCommand( String gatewayIp, String interfaceName )
-    {
-        return new RequestBuilder( "route add default gw" )
-                .withCmdArgs( Lists.newArrayList( gatewayIp, interfaceName ) );
-    }
-
-
-    public RequestBuilder getRemoveGatewayCommand( int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-D", String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getCleanupEnvironmentNetworkSettingsCommand( int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-Z", "deleteall", String.valueOf( vLanId ) ) );
-    }
-
-
-    public RequestBuilder getRemoveGatewayOnContainerCommand()
-    {
-        return new RequestBuilder( "route del default gw" );
     }
 
 
@@ -145,29 +87,9 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
-    }
-
-
     public RequestBuilder getListVniVlanMappingsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-v" ) );
-    }
-
-
-    public RequestBuilder getReserveVniCommand( long vni, int vlan, String environmentId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-E", String.valueOf( vni ), String.valueOf( vlan ), environmentId ) );
-    }
-
-
-    public RequestBuilder getListReservedVnisCommand()
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-Z", "list" ) );
     }
 
 
@@ -221,96 +143,9 @@ public class Commands
     }
 
 
-    // ssh and hosts
-
-
-    public RequestBuilder getCreateNReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "rm -rf %1$s && " +
-                "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa && " + "cat %1$s/id_dsa.pub", SSH_FOLDER ) );
-    }
-
-
-    public RequestBuilder getCreateNewAuthKeysFileCommand( String keys )
-    {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && " +
-                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, keys ) );
-    }
-
-
-    public RequestBuilder getAppendSshKeyCommand( String key )
-    {
-        return new RequestBuilder( String.format(
-                "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
-                        + "sort -u '%2$s' -o '%2$s'", SSH_FOLDER, SSH_FILE, key ) );
-    }
-
-
-    public RequestBuilder getReplaceSshKeyCommand( String oldKey, String newKey )
-    {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "sed -i \"\\,%3$s,d\" %2$s ; " +
-                "echo '%4$s' >> %2$s && " +
-                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, oldKey, newKey ) );
-    }
-
-
-    public RequestBuilder getConfigSSHCommand()
-    {
-        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
-                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
-                "chmod 644 %1$s/config", SSH_FOLDER ) );
-    }
-
-
-    public RequestBuilder getRemoveSshKeyCommand( final String key )
-    {
-        return new RequestBuilder( String.format( "chmod 700 %1$s && " +
-                "sed -i \"\\,%3$s,d\" %2$s && " +
-                "chmod 644 %2$s", SSH_FOLDER, SSH_FILE, key ) );
-    }
-
-
     public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
     {
         return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
-    }
-
-
-    public RequestBuilder getAddIpHostToEtcHostsCommand( String domainName, Set<ContainerHost> containerHosts )
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-
-        for ( ContainerHost host : containerHosts )
-        {
-            String ip = host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
-            String hostname = host.getHostname();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( domainName ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
-        }
-
-        if ( cleanHosts.length() > 0 )
-        {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
-        }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
-
-        return new RequestBuilder( appendHosts.toString() );
     }
 
 

@@ -3,6 +3,7 @@ package od.steps;
 import net.thucydides.core.annotations.Steps;
 import od.steps.serenity.SubutaiSteps;
 import org.jbehave.core.annotations.Given;
+import org.junit.Before;
 import org.sikuli.script.FindFailed;
 
 import java.io.FileNotFoundException;
@@ -23,7 +24,8 @@ public class DefSubutaiStepsGiven {
     }
 
     @Given("the user enters login and password: '$login', '$password'")
-    public void enter_login_and_password(String login, String password){
+    public void enter_login_and_password(String login, String password) throws FileNotFoundException {
+
         subutaiSteps.inputLogin(login);
         subutaiSteps.inputPassword(password);
     }
@@ -34,15 +36,21 @@ public class DefSubutaiStepsGiven {
     }
 
     @Given("the user configure pgp plugin")
-    public void configurePgpPlugin() throws FindFailed {
+    public void configurePgpPlugin() throws FindFailed, InterruptedException {
         subutaiSteps.clickOnIconPgp();
         subutaiSteps.clickOnButtonOptions();
-        subutaiSteps.clickOnButtonGenerate();
         subutaiSteps.typeInFieldsPgp();
         subutaiSteps.clickOnButtonSubmit();
-        subutaiSteps.clickOnButtonOk();
+        subutaiSteps.waitGeneratedE2EKey();
         subutaiSteps.clickOnSubutaiSocialTab();
     }
+
+    @Before
+    @Given("the user start record a video")
+    public void recordStartVideo() throws FileNotFoundException {
+        subutaiSteps.run_bash_script("src/test/resources/files/recordScreenStart.sh");
+    }
+
 
 
 }

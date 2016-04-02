@@ -7,15 +7,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
+import io.subutai.core.peer.api.PeerManager;
 
 
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
     private Integration integration;
+    private CommandExecutor commandExecutor;
+    private PeerManager peerManager;
 
 
     public void setIntegration( final Integration integration )
@@ -35,7 +39,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
+                    entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
         }
     }
 
@@ -51,7 +55,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
+                    entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
         }
     }
 
@@ -67,7 +71,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
+                    entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
         }
     }
 
@@ -98,7 +102,7 @@ public class RestServiceImpl implements RestService
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( JsonUtil.GSON.toJson (e.getMessage()) ).build();
+                    entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
         }
         return Response.ok().build();
     }
@@ -108,9 +112,81 @@ public class RestServiceImpl implements RestService
     public Response getRegistrationState()
     {
         RegistrationPojo pojo = new RegistrationPojo();
+        if ( integration.getRegistrationState() )
+        {
+            pojo.setOwnerId( integration.getHubConfiguration().getOwnerId() );
+        }
         pojo.setRegisteredToHub( integration.getRegistrationState() );
+
         String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
 
         return Response.status( Response.Status.OK ).entity( hubRegistrationInfo ).build();
+    }
+
+
+    @Override
+    public Response upSite()
+    {
+
+        Thread thread = new Thread()
+        {
+            public void run()
+            {
+                VEHServiceImpl.upSite( peerManager );
+            }
+        };
+
+        thread.start();
+
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response downSite()
+    {
+
+        Thread thread = new Thread()
+        {
+            public void run()
+            {
+                VEHServiceImpl.downSite( peerManager );
+            }
+        };
+
+        thread.start();
+
+        return Response.status( Response.Status.OK ).build();
+    }
+
+
+    @Override
+    public Response checksum()
+    {
+        return VEHServiceImpl.getChecksum( peerManager );
+    }
+
+
+    public CommandExecutor getCommandExecutor()
+    {
+        return commandExecutor;
+    }
+
+
+    public void setCommandExecutor( final CommandExecutor commandExecutor )
+    {
+        this.commandExecutor = commandExecutor;
+    }
+
+
+    public PeerManager getPeerManager()
+    {
+        return peerManager;
+    }
+
+
+    public void setPeerManager( final PeerManager peerManager )
+    {
+        this.peerManager = peerManager;
     }
 }

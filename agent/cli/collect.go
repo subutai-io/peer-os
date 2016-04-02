@@ -3,11 +3,9 @@ package lib
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -16,58 +14,53 @@ import (
 	"github.com/influxdata/influxdb/client/v2"
 
 	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
 )
 
 var (
-	lxcnic      map[string]string
-	traff       = []string{"in", "out"}
-	cgtype      = []string{"cpuacct", "memory"}
-	metrics     = []string{"total", "used", "available"}
-	btrfsmounts = []string{"rootfs", "home", "var", "opt"}
-	cpu         = []string{"user", "nice", "system", "idle", "iowait"}
-	lxcmemory   = map[string]bool{"cache": true, "rss": true, "Cached": true, "MemFree": true}
-	memory      = map[string]bool{"Active": true, "Buffers": true, "Cached": true, "MemFree": true}
+	traff     = []string{"in", "out"}
+	cgtype    = []string{"cpuacct", "memory"}
+	metrics   = []string{"total", "used", "available"}
+	cpu       = []string{"user", "nice", "system", "idle", "iowait"}
+	lxcmemory = map[string]bool{"cache": true, "rss": true, "Cached": true, "MemFree": true}
+	memory    = map[string]bool{"Active": true, "Buffers": true, "Cached": true, "MemFree": true}
+)
+
+var (
+	dbclient client.Client
+	bp       client.BatchPoints
 )
 
 func Collect() {
+	initInfluxdb()
 	for {
-		CollectStats()
+		_, _, err := dbclient.Ping(time.Second)
+		if err == nil {
+			bp, _ = client.NewBatchPoints(client.BatchPointsConfig{Database: config.Influxdb.Db, RetentionPolicy: "hour"})
+			netStat()
+			cgroupStat()
+			btrfsStat()
+			diskFree()
+			cpuStat()
+			memStat()
+		}
+		if err != nil || dbclient.Write(bp) != nil {
+			initInfluxdb()
+		}
 		time.Sleep(time.Second * 30)
 	}
 }
 
-func CollectStats() {
-	clnt, bp, err := initInfluxdb()
-	if err == nil {
-		netStat(clnt, bp)
-		cgroupStat(clnt, bp)
-		btrfsStat(clnt, bp)
-		diskFree(clnt, bp)
-		cpuStat(clnt, bp)
-		memStat(clnt, bp)
-	} else {
-		fmt.Println(err)
-	}
-}
-
-func initInfluxdb() (clnt client.Client, bp client.BatchPoints, err error) {
-	clnt, err = client.NewHTTPClient(client.HTTPConfig{
+func initInfluxdb() {
+	dbclient, _ = client.NewHTTPClient(client.HTTPConfig{
 		Addr:               "https://" + config.Influxdb.Server + ":8086",
 		Username:           config.Influxdb.User,
 		Password:           config.Influxdb.Pass,
 		InsecureSkipVerify: true,
 	})
-	if err != nil {
-		return
-	}
-	bp, _ = client.NewBatchPoints(client.BatchPointsConfig{
-		Database:        config.Influxdb.Db,
-		RetentionPolicy: "hour",
-	})
-	return
 }
 
-func parsefile(hostname, lxc, cgtype, filename string, clnt client.Client, bp client.BatchPoints) {
+func parsefile(hostname, lxc, cgtype, filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return
@@ -91,83 +84,49 @@ func parsefile(hostname, lxc, cgtype, filename string, clnt client.Client, bp cl
 			bp.AddPoint(point)
 		}
 	}
-	clnt.Write(bp)
+
 }
 
-func cgroupStat(clnt client.Client, bp client.BatchPoints) {
+func cgroupStat() {
 	hostname, _ := os.Hostname()
 	for _, item := range cgtype {
 		path := "/sys/fs/cgroup/" + item + "/lxc/"
 		files, _ := ioutil.ReadDir(path)
 		for _, f := range files {
 			if f.IsDir() {
-				parsefile(hostname, f.Name(), item, path+f.Name()+"/"+item+".stat", clnt, bp)
+				parsefile(hostname, f.Name(), item, path+f.Name()+"/"+item+".stat")
 			}
 		}
 	}
 }
 
-func grepnic(filename string) string {
-	regex, err := regexp.Compile("lxc.network.veth.pair")
-	if err != nil {
-		return ""
-	}
-	fh, err := os.Open(filename)
-	f := bufio.NewReader(fh)
-	if err != nil {
-		return ""
-	}
-	defer fh.Close()
-	buf := make([]byte, 64)
-	for {
-		buf, _, err = f.ReadLine()
-		if err != nil {
-			return ""
-		}
-		if regex.MatchString(string(buf)) {
-			return string(buf)
-		}
-	}
-}
-
-func lxclist() map[string]string {
+func netStat() {
+	lxcnic := make(map[string]string)
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix)
-	list := make(map[string]string)
 	for _, f := range files {
-		line := grepnic(config.Agent.LxcPrefix + f.Name() + "/config")
-		if line != "" {
-			nic := strings.Split(line, "=")
-			if len(nic) >= 2 {
-				list[strings.Fields(nic[1])[0]] = f.Name()
-			}
-		}
+		lxcnic[container.GetConfigItem(config.Agent.LxcPrefix+f.Name()+"/config", "lxc.network.veth.pair")] = f.Name()
 	}
-	return list
-}
 
-func netStat(clnt client.Client, bp client.BatchPoints) {
-	hostname, _ := os.Hostname()
-	lxcnic = lxclist()
-	file, err := os.Open("/proc/net/dev")
+	out, err := ioutil.ReadFile("/proc/net/dev")
 	if err != nil {
 		return
 	}
-	defer file.Close()
-	scanner := bufio.NewScanner(bufio.NewReader(file))
-	lc := 0
+	scanner := bufio.NewScanner(bytes.NewReader(out))
 	traffic := make([]int, 2)
 	for scanner.Scan() {
-		lc++
-		line := strings.Fields(scanner.Text())
-		if lc > 2 {
+		if strings.Contains(scanner.Text(), ":") {
+			line := strings.Fields(scanner.Text())
 			traffic[0], _ = strconv.Atoi(line[1])
-			traffic[1], _ = strconv.Atoi(line[10])
+			traffic[1], _ = strconv.Atoi(line[9])
 			nicname := strings.Split(line[0], ":")[0]
+
 			metric := "host_net"
+			hostname, _ := os.Hostname()
 			if lxcnic[nicname] != "" {
 				metric = "lxc_net"
 				hostname = lxcnic[nicname]
 			}
+
 			for i := range traffic {
 				point, _ := client.NewPoint(metric,
 					map[string]string{"hostname": hostname, "iface": nicname, "type": traff[i]},
@@ -177,10 +136,9 @@ func netStat(clnt client.Client, bp client.BatchPoints) {
 			}
 		}
 	}
-	clnt.Write(bp)
 }
 
-func btrfsStat(clnt client.Client, bp client.BatchPoints) {
+func btrfsStat() {
 	list := make(map[string]string)
 	out, _ := exec.Command("btrfs", "subvolume", "list", config.Agent.LxcPrefix).Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
@@ -202,10 +160,9 @@ func btrfsStat(clnt client.Client, bp client.BatchPoints) {
 			bp.AddPoint(point)
 		}
 	}
-	clnt.Write(bp)
 }
 
-func diskFree(clnt client.Client, bp client.BatchPoints) {
+func diskFree() {
 	hostname, _ := os.Hostname()
 	out, _ := exec.Command("df", "-B1").Output()
 	scanner := bufio.NewScanner(bytes.NewReader(out))
@@ -222,10 +179,9 @@ func diskFree(clnt client.Client, bp client.BatchPoints) {
 			}
 		}
 	}
-	clnt.Write(bp)
 }
 
-func memStat(clnt client.Client, bp client.BatchPoints) {
+func memStat() {
 	hostname, _ := os.Hostname()
 	file, err := os.Open("/proc/meminfo")
 	if err != nil {
@@ -244,10 +200,9 @@ func memStat(clnt client.Client, bp client.BatchPoints) {
 			bp.AddPoint(point)
 		}
 	}
-	clnt.Write(bp)
 }
 
-func cpuStat(clnt client.Client, bp client.BatchPoints) {
+func cpuStat() {
 	hostname, _ := os.Hostname()
 	file, err := os.Open("/proc/stat")
 	if err != nil {
@@ -268,5 +223,4 @@ func cpuStat(clnt client.Client, bp client.BatchPoints) {
 			}
 		}
 	}
-	clnt.Write(bp)
 }

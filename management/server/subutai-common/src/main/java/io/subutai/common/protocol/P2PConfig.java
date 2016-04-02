@@ -1,7 +1,13 @@
 package io.subutai.common.protocol;
 
 
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 
 /**
@@ -11,10 +17,8 @@ public class P2PConfig
 {
     @JsonProperty( "peerId" )
     private String peerId;
-    @JsonProperty( "interfaceName" )
-    private String interfaceName;
-    @JsonProperty( "communityName" )
-    private String communityName;
+    @JsonProperty( "hash" )
+    private String hash;
     @JsonProperty( "address" )
     private String address;
     @JsonProperty( "secretKey" )
@@ -23,23 +27,36 @@ public class P2PConfig
     private String environmentId;
     @JsonProperty( "secretKeyTtlSec" )
     private long secretKeyTtlSec;
+    @JsonProperty( "p2pIps" )
+    private Set<String> p2pIps = Sets.newHashSet();
 
 
     public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
                       @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "interfaceName" ) final String interfaceName,
-                      @JsonProperty( "communityName" ) final String communityName,
-                      @JsonProperty( "address" ) final String address,
+                      @JsonProperty( "hash" ) final String hash, @JsonProperty( "address" ) final String address,
                       @JsonProperty( "secretKey" ) final String secretKey,
                       @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
-        this.interfaceName = interfaceName;
-        this.communityName = communityName;
+        this.hash = hash;
         this.address = address;
         this.secretKey = secretKey;
         this.secretKeyTtlSec = secretKeyTtlSec;
+    }
+
+
+    public void addP2pIp( String p2pIp )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pIp ) );
+
+        this.p2pIps.add( p2pIp );
+    }
+
+
+    public Set<String> getP2pIps()
+    {
+        return p2pIps;
     }
 
 
@@ -61,21 +78,9 @@ public class P2PConfig
     }
 
 
-    public String getInterfaceName()
+    public String getHash()
     {
-        return interfaceName;
-    }
-
-
-    public void setInterfaceName( final String interfaceName )
-    {
-        this.interfaceName = interfaceName;
-    }
-
-
-    public String getCommunityName()
-    {
-        return communityName;
+        return hash;
     }
 
 
@@ -97,6 +102,12 @@ public class P2PConfig
     }
 
 
+    public String getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
     @Override
     public boolean equals( final Object o )
     {
@@ -104,26 +115,56 @@ public class P2PConfig
         {
             return true;
         }
-        if ( !( o instanceof P2PConfig ) )
+        if ( o == null || getClass() != o.getClass() )
         {
             return false;
         }
 
-        final P2PConfig config = ( P2PConfig ) o;
+        final P2PConfig p2PConfig = ( P2PConfig ) o;
 
-        return address.equals( config.address );
+        if ( hash != null ? !hash.equals( p2PConfig.hash ) : p2PConfig.hash != null )
+        {
+            return false;
+        }
+        if ( peerId != null ? !peerId.equals( p2PConfig.peerId ) : p2PConfig.peerId != null )
+        {
+            return false;
+        }
+
+        return true;
     }
 
 
     @Override
     public int hashCode()
     {
-        return address.hashCode();
+        int result = peerId != null ? peerId.hashCode() : 0;
+        result = 31 * result + ( hash != null ? hash.hashCode() : 0 );
+        return result;
     }
 
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
-    }
+    //
+    //    @Override
+    //    public boolean equals( final Object o )
+    //    {
+    //        if ( this == o )
+    //        {
+    //            return true;
+    //        }
+    //        if ( !( o instanceof P2PConfig ) )
+    //        {
+    //            return false;
+    //        }
+    //
+    //        final P2PConfig config = ( P2PConfig ) o;
+    //
+    //        return address.equals( config.address );
+    //    }
+    //
+    //
+    //    @Override
+    //    public int hashCode()
+    //    {
+    //        return address.hashCode();
+    //    }
 }

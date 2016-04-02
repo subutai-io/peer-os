@@ -1,54 +1,20 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="networkManager" availability="mandatory"
-             interface="io.subutai.core.network.api.NetworkManager" />
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/setup-p2p">
-      <action class="io.subutai.core.network.cli.SetupP2PCommand">
-        <argument ref="networkManager" />
+    <command name="net/tunnel-list">
+      <action class="io.subutai.core.network.cli.ListTunnelCommand">
+        <argument ref="localPeer" />
       </action>
     </command>
   </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/setup-tunnel">
-      <action class="io.subutai.core.network.cli.SetupTunnelCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/remove-tunnel">
-      <action class="io.subutai.core.network.cli.RemoveTunnelCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/set-container-ip">
-      <action class="io.subutai.core.network.cli.SetContainerIpCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/remove-container-ip">
-      <action class="io.subutai.core.network.cli.RemoveContainerIpCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="p2p/list">
+    <command name="net/p2p-list">
       <action class="io.subutai.core.network.cli.ListP2PCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="p2p/remove">
-      <action class="io.subutai.core.network.cli.RemoveP2PCommand">
-        <argument ref="networkManager" />
+        <argument ref="localPeer" />
       </action>
     </command>
   </command-bundle>

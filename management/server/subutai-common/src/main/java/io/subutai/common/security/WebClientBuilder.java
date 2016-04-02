@@ -39,7 +39,7 @@ public class WebClientBuilder
     public static WebClient buildPeerWebClient( final PeerInfo peerInfo, final String path, final Object provider,
                                                 long connectTimeoutMs, long readTimeoutMs, int maxAttempts )
     {
-        String effectiveUrl = String.format( PEER_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPort(),
+        String effectiveUrl = String.format( PEER_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client;
         if ( provider == null )
@@ -95,9 +95,50 @@ public class WebClientBuilder
 
 
     public static WebClient buildEnvironmentWebClient( final PeerInfo peerInfo, final String path,
+                                                       final Object provider, long connectTimeoutMs, long readTimeoutMs,
+                                                       int maxAttempts )
+    {
+        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
+                ( path.startsWith( "/" ) ? path : "/" + path ) );
+        WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
+        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
+
+        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+        httpClientPolicy.setConnectionTimeout( connectTimeoutMs );
+        httpClientPolicy.setReceiveTimeout( readTimeoutMs );
+        httpClientPolicy.setMaxRetransmits( maxAttempts );
+
+        httpConduit.setClient( httpClientPolicy );
+
+        KeyStoreTool keyStoreManager = new KeyStoreTool();
+        KeyStoreData keyStoreData = new KeyStoreData();
+        keyStoreData.setupKeyStorePx2();
+        keyStoreData.setAlias( SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );
+        KeyStore keyStore = keyStoreManager.load( keyStoreData );
+
+        LOG.debug( String.format( "Getting key with alias: %s for url: %s", SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS,
+                effectiveUrl ) );
+
+        KeyStoreData trustStoreData = new KeyStoreData();
+        trustStoreData.setupTrustStorePx2();
+        KeyStore trustStore = keyStoreManager.load( trustStoreData );
+
+        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
+
+        TLSClientParameters tlsClientParameters = new TLSClientParameters();
+        tlsClientParameters.setDisableCNCheck( true );
+        tlsClientParameters.setTrustManagers( sslManager.getClientTrustManagers() );
+        tlsClientParameters.setKeyManagers( sslManager.getClientKeyManagers() );
+        tlsClientParameters.setCertAlias( SecuritySettings.KEYSTORE_PX2_ROOT_ALIAS );
+        httpConduit.setTlsClientParameters( tlsClientParameters );
+        return client;
+    }
+
+
+    public static WebClient buildEnvironmentWebClient( final PeerInfo peerInfo, final String path,
                                                        final Object provider )
     {
-        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPort(),
+        String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
