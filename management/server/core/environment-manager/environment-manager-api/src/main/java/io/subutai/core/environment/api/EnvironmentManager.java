@@ -114,13 +114,12 @@ public interface EnvironmentManager
      *
      * @param environmentId - environment id
      * @param async - indicates whether environment is destroyed synchronously or asynchronously to the calling party
-     * @param forceMetadataRemoval - if true, the call will remove environment metadata from database even if not all
      * containers were destroyed, otherwise an exception is thrown when first error occurs
      *
      * @throws EnvironmentDestructionException - thrown if error occurs during environment destruction
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    void destroyEnvironment( String environmentId, boolean async, boolean forceMetadataRemoval )
+    void destroyEnvironment( String environmentId, boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException;
 
 
@@ -129,14 +128,13 @@ public interface EnvironmentManager
      *
      * @param environmentId - id of container environment
      * @param containerId - id of container to destroy
-     * @param async - indicates whether container is destroyed synchronously or asynchronously to the calling party
-     * @param forceMetadataRemoval - if true, the call will remove container metadata from database even if container
-     * was not destroyed due to some error, otherwise an exception is thrown
+     * @param async - indicates whether container is destroyed synchronously or asynchronously to the calling party was
+     * not destroyed due to some error, otherwise an exception is thrown
      *
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    void destroyContainer( String environmentId, String containerId, boolean async, boolean forceMetadataRemoval )
+    void destroyContainer( String environmentId, String containerId, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 

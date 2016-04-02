@@ -298,7 +298,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         try
         {
-            environmentManager.destroyContainer( environment.getId(), this.getId(), false, false );
+            environmentManager.destroyContainer( environment.getId(), this.getId(), false );
         }
         catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
         {

@@ -275,7 +275,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            environmentManager.destroyEnvironment( environmentId, false, false );
+            environmentManager.destroyEnvironment( environmentId, false );
         }
         catch ( Exception e )
         {
@@ -514,7 +514,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                environmentManager.destroyContainer( environment.getId(), containerHost.getId(), false, false );
+                environmentManager.destroyContainer( environment.getId(), containerHost.getId(), false );
 
                 return Response.ok().build();
             }
