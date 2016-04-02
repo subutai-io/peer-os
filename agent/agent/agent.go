@@ -20,7 +20,6 @@ import (
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
-	// cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -36,8 +35,8 @@ type Heartbeat struct {
 	Arch       string                `json:"arch"`
 	Instance   string                `json:"instance"`
 	Interfaces []utils.Iface         `json:"interfaces,omitempty"`
-	Containers []container.Container `json:"containers"`
-	Alert      []alert.Load          `json:"alert, omitempty"`
+	Containers []container.Container `json:"containers,omitempty"`
+	Alert      []alert.Load          `json:"alert,omitempty"`
 }
 
 var (

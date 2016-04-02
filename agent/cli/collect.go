@@ -3,7 +3,6 @@ package lib
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -121,7 +120,6 @@ func netStat() {
 			traffic[1], _ = strconv.ParseInt(line[9], 10, 64)
 
 			nicname := strings.Split(line[0], ":")[0]
-			fmt.Println(traffic)
 			metric := "host_net"
 			hostname, _ := os.Hostname()
 			if lxcnic[nicname] != "" {
