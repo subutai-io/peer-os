@@ -611,7 +611,7 @@ public class EnvironmentImpl implements Environment, Serializable
         P2pIps result = new P2pIps();
         for ( PeerConf peerConf : getPeerConfs() )
         {
-            result.addP2pIps( peerConf.getP2pIps() );
+            result.addP2pIps( peerConf.getRhP2pIps() );
         }
         return result;
     }

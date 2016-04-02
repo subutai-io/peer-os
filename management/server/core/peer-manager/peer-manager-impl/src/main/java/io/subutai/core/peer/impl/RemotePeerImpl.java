@@ -58,7 +58,6 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
@@ -782,20 +781,18 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public P2PConnections joinP2PSwarm( final P2PConfig config ) throws PeerException
+    public void joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        return new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
+        new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
     }
 
 
     @Override
     public void createP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        Preconditions.checkNotNull( config, "Invalid p2p config" );
-
-        new PeerWebClient( peerInfo, provider ).setupInitialP2PConnection( config );
+        //no-op
     }
 
 

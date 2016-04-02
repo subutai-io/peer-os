@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -19,13 +20,11 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
@@ -33,7 +32,6 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -45,16 +43,14 @@ public class SetupP2PStep
 
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
 
 
-    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
+    public SetupP2PStep( final Topology topology, final EnvironmentImpl environment,
                          final TrackerOperation trackerOperation )
     {
         this.topology = topology;
         this.environment = environment;
-        this.peerManager = peerManager;
         this.trackerOperation = trackerOperation;
     }
 
@@ -62,33 +58,40 @@ public class SetupP2PStep
     public void execute() throws EnvironmentCreationException, PeerException, NetworkManagerException
     {
 
-        LocalPeer localPeer = peerManager.getLocalPeer();
-
         //obtain participating peers
-        Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
+        Set<Peer> peers = environment.getPeers();
 
-        //add local peer
-        peers.add( localPeer );
-
-
-        SubnetUtils.SubnetInfo subnetInfo =
+        SubnetUtils.SubnetInfo p2pSubnetInfo =
                 new SubnetUtils( environment.getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
-        String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
-        final String[] addresses = subnetInfo.getAllAddresses();
 
-        //create p2p swarm on local peer MH with explicit IP
-        localPeer.createP2PSwarm(
-                new P2PConfig( localPeer.getId(), environment.getId(), environment.getP2PHash(), addresses[0],
-                        sharedKey, Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
+        String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
+
+        final String[] p2pAddresses = p2pSubnetInfo.getAllAddresses();
+
+        Map<String, Set<String>> peerRhIds = topology.getPeerRhIds();
 
         ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
+        int addressCounter = 0;
+
         for ( Peer peer : peers )
         {
-            P2PConfig config =
-                    new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), null, sharedKey,
-                            Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+            if ( addressCounter == 255 )
+            {
+                throw new EnvironmentCreationException( "No available P2P addresses left" );
+            }
+
+            P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), sharedKey,
+                    Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+
+            Set<String> rhIds = peerRhIds.get( peer.getId() );
+
+            for ( String rhId : rhIds )
+            {
+                config.addRhP2pIp( new RhP2pIp( rhId, p2pAddresses[addressCounter++] ) );
+            }
+
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
         }
 
@@ -126,7 +129,7 @@ public class SetupP2PStep
 
         for ( P2PConfig config : result )
         {
-            environment.getPeerConf( config.getPeerId() ).addP2pIps( config.getP2pIps() );
+            environment.getPeerConf( config.getPeerId() ).addRhP2pIps( config.getRhP2pIps() );
         }
 
         if ( !peers.isEmpty() )
@@ -201,11 +204,8 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            P2PConnections p2PConnections = peer.joinP2PSwarm( p2PConfig );
-            for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
-            {
-                p2PConfig.addP2pIp( p2PConnection.getIp() );
-            }
+            peer.joinP2PSwarm( p2PConfig );
+
             return p2PConfig;
         }
     }
