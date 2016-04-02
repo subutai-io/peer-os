@@ -30,7 +30,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -69,10 +68,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
-import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
-import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
-import io.subutai.core.environment.impl.dao.TopologyDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
@@ -115,12 +111,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private final PeerManager peerManager;
     private final Tracker tracker;
     private final TemplateManager templateRegistry;
-    private final DaoManager daoManager;
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
-    protected EnvironmentDataService environmentDataService;
-    protected EnvironmentContainerDataService environmentContainerDataService;
-    protected TopologyDataService topologyDataService;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
     private SecurityManager securityManager;
@@ -131,14 +123,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
-                                   SecurityManager securityManager, final DaoManager daoManager,
-                                   final IdentityManager identityManager, final Tracker tracker,
-                                   final RelationManager relationManager, HubAdapter hubAdapter,
+                                   SecurityManager securityManager, final IdentityManager identityManager,
+                                   final Tracker tracker, final RelationManager relationManager, HubAdapter hubAdapter,
                                    final EnvironmentService environmentService )
     {
         Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
@@ -147,7 +137,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
-        this.daoManager = daoManager;
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
@@ -162,9 +151,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void init()
     {
-        this.topologyDataService = new TopologyDataService( daoManager );
-        this.environmentDataService = new EnvironmentDataService( daoManager );
-        this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
     }
 
 
@@ -1205,7 +1191,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        EnvironmentContainerImpl environmentContainer = environmentContainerDataService.find( containerHostId );
+        EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
+
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environmentContainer ) )
         {
             throw new ContainerHostNotFoundException( "Container host not found." );

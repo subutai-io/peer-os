@@ -30,12 +30,6 @@
 
   <reference id="hubAdapter" interface="io.subutai.core.hubadapter.api.HubAdapter" />
 
-  <!-- ************************************************************************************************* -->
-  <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
-    <jpa:unit unitname="envExtManagerPUnit2" property="entityManagerFactory" />
-  </bean>
-  <!-- ************************************************************************************************** -->
-
   <!-- JTA -->
 
   <!-- JTA Transaction Manager setup. -->
@@ -61,7 +55,6 @@
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
     <argument ref="securityManager" />
-    <argument ref="daoManagerEnv" />
     <argument ref="identityManager" />
     <argument ref="tracker" />
     <argument ref="relationManager" />
