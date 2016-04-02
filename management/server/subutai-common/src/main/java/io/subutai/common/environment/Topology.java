@@ -29,30 +29,25 @@ public class Topology
     @JsonProperty( "placement" )
     private Map<String, Set<Node>> nodeGroupPlacement = Maps.newHashMap();
 
-    @JsonProperty( "subnet" )
-    private String subnet;
-
     @JsonProperty( "sshKey" )
     private String sshKey;
 
 
     public Topology( @JsonProperty( "id" ) final UUID id, @JsonProperty( "name" ) final String environmentName,
                      @JsonProperty( "placement" ) final Map<String, Set<Node>> nodeGroupPlacement,
-                     @JsonProperty( "subnet" ) final String subnet, @JsonProperty( "sshKey" ) final String sshKey )
+                     @JsonProperty( "sshKey" ) final String sshKey )
     {
         this.id = id;
         this.environmentName = environmentName;
         this.nodeGroupPlacement = nodeGroupPlacement;
-        this.subnet = subnet;
         this.sshKey = sshKey;
     }
 
 
-    public Topology( final UUID id, final String environmentName, final String subnet, final String sshKey )
+    public Topology( final UUID id, final String environmentName, final String sshKey )
     {
         this.id = id;
         this.environmentName = environmentName;
-        this.subnet = subnet;
         this.sshKey = sshKey;
     }
 
@@ -122,18 +117,6 @@ public class Topology
     }
 
 
-    public String getSubnet()
-    {
-        return subnet;
-    }
-
-
-    public void setSubnet( final String subnet )
-    {
-        this.subnet = subnet;
-    }
-
-
     public void setId( final UUID id )
     {
         this.id = id;
@@ -147,7 +130,6 @@ public class Topology
                 "id=" + id +
                 ", environmentName='" + environmentName + '\'' +
                 ", nodeGroupPlacement=" + nodeGroupPlacement +
-                ", subnet='" + subnet + '\'' +
                 ", sshKey='" + sshKey + '\'' +
                 '}';
     }

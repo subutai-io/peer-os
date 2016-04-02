@@ -25,8 +25,6 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.net.util.SubnetUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -40,7 +38,6 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -111,7 +108,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
     private static final String MODULE_NAME = "Environment Manager";
-    private static final String DEFAULT_GATEWAY_TEMPLATE = "192.168.%s.1/24";
 
     private final IdentityManager identityManager;
     private final RelationManager relationManager;
@@ -125,7 +121,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected EnvironmentContainerDataService environmentContainerDataService;
     protected TopologyDataService topologyDataService;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
-    protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<String, AlertHandler>();
+    protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
@@ -274,8 +270,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
                 setContainersTransientFields( environment );
             }
-
-                LOG.debug( "environment: {}", environment );
         }
 
         environments.addAll( environmentAdapter.getEnvironments() );
@@ -341,7 +335,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        topology.setSubnet( calculateCidr( allPeers ) );
 
         try
         {
@@ -432,8 +425,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getId() ) );
             }
         }
-
-        topology.setSubnet( calculateCidr( allPeers ) );
 
         try
         {
@@ -534,7 +525,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        topology.setSubnet( environment.getSubnetCidr() );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -656,12 +646,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
 
-        if ( topology != null )
-        {
-            topology.setSubnet( environment.getSubnetCidr() );
-        }
-
-
         //launch environment growing workflow
 
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
@@ -708,12 +692,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
             else
             {
-                if ( topology != null )
-                {
-                    Set<EnvironmentContainerHost> newContainers =
-                            Sets.newHashSet( loadEnvironment( environment.getId() ).getContainerHosts() );
-                    newContainers.removeAll( oldContainers );
-                }
+                Set<EnvironmentContainerHost> newContainers =
+                        Sets.newHashSet( loadEnvironment( environment.getId() ).getContainerHosts() );
+                newContainers.removeAll( oldContainers );
             }
         }
 
@@ -872,23 +853,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
-
                                                               final TrackerOperation operationTracker )
     {
         return new SshKeyRemovalWorkflow( environment, sshKey, operationTracker, this );
     }
 
 
-    protected boolean isUserAdmin()
-    {
-        return true;//getUser().isAdmin();
-    }
-
-
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void destroyEnvironment( final String environmentId, final boolean async,
-                                    final boolean forceMetadataRemoval )
+    public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
 
@@ -912,8 +885,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
-                getEnvironmentDestructionWorkflow( peerManager, this, environment, forceMetadataRemoval,
-                        operationTracker );
+                getEnvironmentDestructionWorkflow( this, environment, operationTracker );
 
         executor.execute( new Runnable()
         {
@@ -956,8 +928,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
-    public void destroyContainer( final String environmentId, final String containerId, final boolean async,
-                                  final boolean forceMetadataRemoval )
+    public void destroyContainer( final String environmentId, final String containerId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
 
@@ -1014,8 +985,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
         final ContainerDestructionWorkflow containerDestructionWorkflow =
-                getContainerDestructionWorkflow( this, environment, environmentContainer, forceMetadataRemoval,
-                        operationTracker );
+                getContainerDestructionWorkflow( this, environment, environmentContainer, operationTracker );
 
         executor.execute( new Runnable()
         {
@@ -1042,11 +1012,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected ContainerDestructionWorkflow getContainerDestructionWorkflow(
             final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-            final ContainerHost containerHost, final boolean forceMetadataRemoval,
-            final TrackerOperation operationTracker )
+            final ContainerHost containerHost, final TrackerOperation operationTracker )
     {
-        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, forceMetadataRemoval,
-                operationTracker );
+        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, operationTracker );
     }
 
 
@@ -1337,8 +1305,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
-        EnvironmentImpl environment = new EnvironmentImpl( topology.getEnvironmentName(), topology.getSubnet(), topology.getSshKey(),
-                        getUserId(), peerManager.getLocalPeer().getId() );
+        EnvironmentImpl environment =
+                new EnvironmentImpl( topology.getEnvironmentName(), topology.getSshKey(), getUserId(),
+                        peerManager.getLocalPeer().getId() );
 
         environment.setStatus( EnvironmentStatus.PENDING );
 
@@ -1415,69 +1384,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    private String calculateCidr( final Set<Peer> peers ) throws EnvironmentCreationException
-    {
-        try
-        {
-            Set<String> usedIps = new HashSet<>();
-            usedIps.addAll( getUsedIps( peerManager.getLocalPeer() ) );
-            for ( Peer peer : peers )
-            {
-                usedIps.addAll( getUsedIps( peer ) );
-            }
-
-            String theCidr = null;
-
-            for ( int i = 1; i < 255; i++ )
-            {
-                SubnetUtils.SubnetInfo info = new SubnetUtils( String.format( DEFAULT_GATEWAY_TEMPLATE, i ) ).getInfo();
-
-                boolean isUsed = false;
-
-                for ( String usedIp : usedIps )
-                {
-                    if ( info.isInRange( usedIp ) )
-                    {
-                        isUsed = true;
-                        break;
-                    }
-                }
-
-                if ( !isUsed )
-                {
-                    theCidr = info.getCidrSignature();
-                    break;
-                }
-            }
-
-            if ( theCidr == null )
-            {
-                throw new EnvironmentCreationException( "Could not determine subnet cidr." );
-            }
-
-            return theCidr;
-        }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentCreationException( String.format( "Error on validating subnet: %s", e.getMessage() ) );
-        }
-    }
-
-
-    protected Set<String> getUsedIps( Peer peer ) throws PeerException
-    {
-
-        Set<String> usedIps = Sets.newHashSet();
-
-        for ( HostInterface hostInterface : peer.getInterfaces().getAll() )
-        {
-            usedIps.add( hostInterface.getIp() );
-        }
-
-        return usedIps;
-    }
-
-
     public void setEnvironmentTransientFields( final Environment environment )
     {
         ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
@@ -1521,16 +1427,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final PeerManager peerManager,
-                                                                                final EnvironmentManagerImpl
-                                                                                        environmentManager,
-                                                                                final EnvironmentImpl environment,
-                                                                                final boolean forceMetadataRemoval,
-                                                                                final TrackerOperation
-                                                                                        operationTracker )
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow(
+            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+            final TrackerOperation operationTracker )
     {
-        return new EnvironmentDestructionWorkflow( environmentManager, environment, forceMetadataRemoval,
-                operationTracker );
+        return new EnvironmentDestructionWorkflow( environmentManager, environment, operationTracker );
     }
 
 
@@ -1653,8 +1554,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public EnvironmentImpl update( EnvironmentImpl environment )
     {
         environment = environmentDataService.merge( environment );
+
         setEnvironmentTransientFields( environment );
+
         setContainersTransientFields( environment );
+
+        environmentAdapter.uploadEnvironment( environment );
+
         return environment;
     }
 
@@ -1662,6 +1568,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void remove( final EnvironmentImpl environment )
     {
         environmentDataService.remove( environment );
+
+        environmentAdapter.removeEnvironment( environment );
     }
 
 
