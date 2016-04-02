@@ -82,9 +82,21 @@ public class HubAdapterImpl implements HubAdapter
 
     public void uploadEnvironment( String json )
     {
-        log.debug( "json: {}", json );
+        if ( !isRegistered() )
+        {
+            log.debug( "Peer not registered to Hub." );
 
-        String userId = getOwnerId();
+            return;
+        }
+
+        String userId = getUserId();
+
+        if ( userId == null )
+        {
+            return;
+        }
+
+        log.debug( "json: {}", json );
 
         httpClient.doPost( format( ENVIRONMENTS, userId ), json );
     }
@@ -93,9 +105,14 @@ public class HubAdapterImpl implements HubAdapter
     @Override
     public void removeEnvironment( String envId )
     {
-        String userId = getOwnerId();
+        if ( !isRegistered() )
+        {
+            log.debug( "Peer not registered to Hub." );
 
-        String path = format( ENVIRONMENTS, userId ) + "/" + envId;
+            return;
+        }
+
+        String path = format( ENVIRONMENTS, getUserId() ) + "/" + envId;
 
         httpClient.doDelete( path );
     }
@@ -104,6 +121,7 @@ public class HubAdapterImpl implements HubAdapter
     //
     // REST API
     //
+
 
     @Override
     public String getUserEnvironmentsForPeer()
