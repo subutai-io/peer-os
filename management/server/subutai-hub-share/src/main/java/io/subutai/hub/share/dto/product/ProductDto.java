@@ -56,6 +56,7 @@ public class ProductDto
         this.createDate = sdf.parse( "2013-09-29T18:46:19Z" );
         this.ownerId = objProduct.getString( "ownerId" );
         this.version = objProduct.getString( "version" );
+        this.description = objProduct.getString( "description" );
 
         JSONArray metadataJson = objProduct.getJSONArray( "metadata" );
         for ( int i = 0; i < metadataJson.length(); i++ )
