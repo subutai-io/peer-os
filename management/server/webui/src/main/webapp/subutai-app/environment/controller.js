@@ -23,8 +23,6 @@ var fileUploader = {};
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
-	var GRID_CELL_SIZE = 100;
-	var GRID_SIZE = 100;
 
 	vm.activeMode = 'simple';
 
@@ -591,15 +589,14 @@ function imageExists(image_url){
 }
 
 function getDateFromString(string) {
-	var logTextTime = string.split(':');
-	var dateString = logTextTime[0].split(' ');
+	// var logTextTime = string.split(':');
+	var dateString = string.split(' ');
 	var temp = dateString[0].split('.');
-	dateString = [temp[2], temp[1], temp[0]].join('-') + 'T' + dateString[1];
-	var dateFullString = [dateString, logTextTime[1], logTextTime[2]].join(':');
+	var result = [temp[2], temp[1], temp[0]].join('-') + " " + dateString[1];
 
-	//var testDateUtc = moment.utc(Date.parse(dateFullString));
-	console.log(dateFullString);
-	var localDate = moment(Date.parse(dateFullString + '+0000')).local();
+	var a = result.split(/[^0-9]/);
+
+	var localDate = moment(Date.parse(new Date(a[0],a[1]-1,a[2],a[3],a[4],a[5] ))).local();
 
 	return localDate.format('HH:mm:ss');
 }

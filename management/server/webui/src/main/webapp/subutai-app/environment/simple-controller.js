@@ -9,7 +9,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
-	var GRID_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 	$scope.identity = angular.identity;
