@@ -2,7 +2,9 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -15,10 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -26,6 +30,8 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
@@ -48,20 +54,66 @@ public class SetupP2PStep
 
     public void execute() throws EnvironmentModificationException, PeerException
     {
+
+        //create p2p subnet util
+        SubnetUtils.SubnetInfo p2pSubnetInfo =
+                new SubnetUtils( environment.getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
+
+        //get all subnet ips
+        final Set<String> p2pAddresses = Sets.newHashSet( p2pSubnetInfo.getAllAddresses() );
+
+        //subtract already used ips
+        for ( RhP2pIp rhP2pIp : environment.getP2pIps().getP2pIps() )
+        {
+            p2pAddresses.remove( rhP2pIp.getP2pIp() );
+        }
+
+        //obtain target RHs
+        Map<String, Set<String>> peerRhIds = topology.getPeerRhIds();
+
+        //count total requested
+        int totalIps = 0;
+
+        for ( Set<String> peerRhs : peerRhIds.values() )
+        {
+            totalIps += peerRhs.size();
+        }
+
+        if ( totalIps > p2pAddresses.size() )
+        {
+            throw new EnvironmentModificationException(
+                    String.format( "Requested IP count %d is more than available %d", totalIps, p2pAddresses.size() ) );
+        }
+
+        //obtain participating peers
         Set<Peer> peers = environment.getPeers();
 
+        //generate p2p secret key
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
 
         ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        //todo!!!
+        Iterator<String> p2pAddressIterator = p2pAddresses.iterator();
+
+        //p2p setup
         for ( Peer peer : peers )
         {
-            P2PConfig config =
-                    new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), null, sharedKey,
-                            Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+            P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), sharedKey,
+                    Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
+            //obtain target RHs
+            Set<String> rhIds = peerRhIds.get( peer.getId() );
+
+            if ( !CollectionUtil.isCollectionEmpty( rhIds ) )
+            {
+                for ( String rhId : rhIds )
+                {
+                    config.addRhP2pIp( new RhP2pIp( rhId, p2pAddressIterator.next() ) );
+                }
+            }
+
+            //todo call new method Peer.joinOrUpdateSwarm(...)
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
         }
 

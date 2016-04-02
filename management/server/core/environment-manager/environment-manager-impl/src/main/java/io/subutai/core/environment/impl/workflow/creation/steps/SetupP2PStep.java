@@ -58,30 +58,44 @@ public class SetupP2PStep
     public void execute() throws EnvironmentCreationException, PeerException, NetworkManagerException
     {
 
-        //obtain participating peers
-        Set<Peer> peers = environment.getPeers();
-
+        //create p2p subnet util
         SubnetUtils.SubnetInfo p2pSubnetInfo =
                 new SubnetUtils( environment.getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
-        String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
-
+        //get all subnet ips
         final String[] p2pAddresses = p2pSubnetInfo.getAllAddresses();
 
+        //obtain target RHs
         Map<String, Set<String>> peerRhIds = topology.getPeerRhIds();
+
+        //count total requested
+        int totalIps = 0;
+
+        for ( Set<String> peerRhs : peerRhIds.values() )
+        {
+            totalIps += peerRhs.size();
+        }
+
+        if ( totalIps > 255 )
+        {
+            throw new EnvironmentCreationException(
+                    String.format( "Requested IP count %d is more than available 255", totalIps ) );
+        }
+
+        //obtain participating peers
+        Set<Peer> peers = environment.getPeers();
+
+        //generate p2p secret key
+        String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
 
         ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
+        //p2p setup
         int addressCounter = 0;
 
         for ( Peer peer : peers )
         {
-            if ( addressCounter == 255 )
-            {
-                throw new EnvironmentCreationException( "No available P2P addresses left" );
-            }
-
             P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), sharedKey,
                     Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
 
@@ -95,7 +109,6 @@ public class SetupP2PStep
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
         }
 
-        // p2p setup
         List<P2PConfig> result = new ArrayList<>( peers.size() );
         Set<Peer> succeededPeers = Sets.newHashSet();
         for ( Peer peer : peers )
@@ -138,7 +151,6 @@ public class SetupP2PStep
         }
 
         //tunnel setup
-
         P2pIps p2pIps = environment.getP2pIps();
         int peersCount = environment.getPeerConfs().size();
         ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
