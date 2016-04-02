@@ -74,7 +74,7 @@ import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
- * Resource host implementation.
+ * Resource host implementation. TODO review all methods to see which ones must be run sequentially like setupTunnels
  */
 @Entity
 @Table( name = "r_host" )
@@ -142,20 +142,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         this.instanceType = resourceHostInfo.getInstanceType();
 
-        setNetInterfaces( resourceHostInfo.getHostInterfaces() );
+        setSavedHostInterfaces( resourceHostInfo.getHostInterfaces() );
 
         init();
     }
 
 
     @Override
-    public Set<HostInterface> getNetInterfaces()
+    public Set<HostInterface> getSavedHostInterfaces()
     {
         return netInterfaces;
     }
 
 
-    public void setNetInterfaces( HostInterfaces hostInterfaces )
+    public void setSavedHostInterfaces( HostInterfaces hostInterfaces )
     {
         Preconditions.checkNotNull( hostInterfaces );
 
@@ -323,12 +323,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException( "Error on starting container", e );
         }
 
-        poolContainerAvailability( containerHost );
+        waitContainerStart( containerHost );
     }
 
 
-    private void poolContainerAvailability( final ContainerHost containerHost ) throws ResourceHostException
+    private void waitContainerStart( final ContainerHost containerHost ) throws ResourceHostException
     {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+
         //wait container connection
         long ts = System.currentTimeMillis();
         while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !containerHost.isConnected() )
@@ -718,7 +720,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         super.updateHostInfo( hostInfo );
 
-        setNetInterfaces( hostInfo.getHostInterfaces() );
+        setSavedHostInterfaces( hostInfo.getHostInterfaces() );
 
         ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
 

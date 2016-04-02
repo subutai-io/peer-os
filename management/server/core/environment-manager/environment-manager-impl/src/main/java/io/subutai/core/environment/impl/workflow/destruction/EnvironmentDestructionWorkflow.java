@@ -22,7 +22,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     private final EnvironmentManagerImpl environmentManager;
     private EnvironmentImpl environment;
-    private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
 
     private Throwable error;
@@ -37,14 +36,12 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
 
     public EnvironmentDestructionWorkflow( final EnvironmentManagerImpl environmentManager,
-                                           final EnvironmentImpl environment, final boolean forceMetadataRemoval,
-                                           final TrackerOperation operationTracker )
+                                           final EnvironmentImpl environment, final TrackerOperation operationTracker )
     {
         super( EnvironmentDestructionPhase.INIT );
 
         this.environmentManager = environmentManager;
         this.environment = environment;
-        this.forceMetadataRemoval = forceMetadataRemoval;
         this.operationTracker = operationTracker;
     }
 
@@ -66,7 +63,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     public EnvironmentDestructionPhase CLEANUP_ENVIRONMENT()
     {
-        operationTracker.addLog( "Cleaning up environment" );
+        operationTracker.addLog( "Destroying environment" );
 
         try
         {

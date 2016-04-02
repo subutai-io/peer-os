@@ -15,6 +15,7 @@ import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContai
 import io.subutai.core.object.relation.api.RelationManager;
 
 
+
 //todo use native fail for failing the workflow
 public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
 {
@@ -23,7 +24,6 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     private final EnvironmentManagerImpl environmentManager;
     private EnvironmentImpl environment;
     private final ContainerHost containerHost;
-    private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
 
     private Throwable error;
@@ -39,14 +39,13 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
     public ContainerDestructionWorkflow( final EnvironmentManagerImpl environmentManager,
                                          final EnvironmentImpl environment, final ContainerHost containerHost,
-                                         final boolean forceMetadataRemoval, final TrackerOperation operationTracker )
+                                         final TrackerOperation operationTracker )
     {
         super( ContainerDestructionPhase.INIT );
 
         this.environmentManager = environmentManager;
         this.environment = environment;
         this.containerHost = containerHost;
-        this.forceMetadataRemoval = forceMetadataRemoval;
         this.operationTracker = operationTracker;
     }
 
@@ -60,7 +59,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment =  environmentManager.update( environment );
+        environment = environmentManager.update( environment );
 
         return ContainerDestructionPhase.VALIDATE;
     }
@@ -91,8 +90,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         try
         {
-            new DestroyContainerStep( environmentManager, environment, containerHost, forceMetadataRemoval,
-                    operationTracker ).execute();
+            new DestroyContainerStep( environmentManager, environment, containerHost ).execute();
 
             RelationManager relationManager = environmentManager.getRelationManager();
             relationManager.removeRelation( containerHost );
