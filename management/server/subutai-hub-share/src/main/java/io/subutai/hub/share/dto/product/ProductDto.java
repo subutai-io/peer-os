@@ -53,9 +53,10 @@ public class ProductDto
         this.type = Type.valueOf( objProduct.getString( "type" ) );
         SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
         sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-        this.createDate = sdf.parse( "2013-09-29T18:46:19Z" );
+        this.createDate = sdf.parse( objProduct.getString( "createDate" ) );
         this.ownerId = objProduct.getString( "ownerId" );
         this.version = objProduct.getString( "version" );
+        this.description = objProduct.getString( "description" );
 
         JSONArray metadataJson = objProduct.getJSONArray( "metadata" );
         for ( int i = 0; i < metadataJson.length(); i++ )

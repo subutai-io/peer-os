@@ -26,8 +26,7 @@ public class ProxyEnvironment extends EnvironmentImpl
     {
         super(
                 json.get( "name" ).asText(),
-//                json.get( "subnetCidr" ).asText(),
-                null,
+                json.get( "subnetCidr" ).asText(),
                 0L,
                 "hub" // peerId
         );
@@ -44,7 +43,7 @@ public class ProxyEnvironment extends EnvironmentImpl
 
         envId = new EnvironmentId( environmentId );
 
-        setP2PSubnet( json.get( "tunnelNetwork" ).asText() );
+        setP2PSubnet( json.get( "p2pSubnet" ).asText() );
         setVni( json.get( "vni" ).asLong() );
 //        setVersion( 1L );
         setStatus( EnvironmentStatus.HEALTHY );
