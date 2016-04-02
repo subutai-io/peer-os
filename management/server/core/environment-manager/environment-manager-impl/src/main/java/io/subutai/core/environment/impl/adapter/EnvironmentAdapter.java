@@ -128,6 +128,12 @@ public class EnvironmentAdapter
     }
 
 
+    public void removeEnvironment( EnvironmentImpl env )
+    {
+        hubAdapter.removeEnvironment( env.getEnvironmentId().getId() );
+    }
+
+
     public void uploadEnvironment( EnvironmentImpl env )
     {
         if ( env.getStatus() != EnvironmentStatus.HEALTHY )

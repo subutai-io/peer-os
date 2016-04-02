@@ -90,6 +90,17 @@ public class HubAdapterImpl implements HubAdapter
     }
 
 
+    @Override
+    public void removeEnvironment( String envId )
+    {
+        String userId = getOwnerId();
+
+        String path = format( ENVIRONMENTS, userId ) + "/" + envId;
+
+        httpClient.doDelete( path );
+    }
+
+
     //
     // REST API
     //

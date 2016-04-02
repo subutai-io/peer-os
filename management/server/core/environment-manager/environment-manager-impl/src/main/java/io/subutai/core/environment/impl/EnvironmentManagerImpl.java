@@ -1568,6 +1568,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void remove( final EnvironmentImpl environment )
     {
         environmentDataService.remove( environment );
+
+        environmentAdapter.removeEnvironment( environment );
     }
 
 

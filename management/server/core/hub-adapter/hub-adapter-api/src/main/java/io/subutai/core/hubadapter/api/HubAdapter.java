@@ -8,4 +8,6 @@ public interface HubAdapter
     void destroyContainer( String envId, String containerId );
 
     void uploadEnvironment( String json );
+
+    void removeEnvironment( String envId );
 }
