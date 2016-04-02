@@ -25,8 +25,6 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.net.util.SubnetUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -274,7 +272,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
                 setContainersTransientFields( environment );
             }
-
         }
 
         environments.addAll( environmentAdapter.getEnvironments() );
@@ -340,7 +337,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        topology.setSubnet( calculateCidr( allPeers ) );
 
         try
         {
@@ -431,8 +427,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 throw new EnvironmentCreationException( String.format( "Peer %s is offline", peer.getId() ) );
             }
         }
-
-        topology.setSubnet( calculateCidr( allPeers ) );
 
         try
         {
@@ -533,7 +527,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        topology.setSubnet( environment.getSubnetCidr() );
 
         if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
         {
@@ -652,12 +645,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             throw new EnvironmentModificationException(
                     String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-
-
-        if ( topology != null )
-        {
-            topology.setSubnet( environment.getSubnetCidr() );
         }
 
 
@@ -1336,8 +1323,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
-        EnvironmentImpl environment = new EnvironmentImpl( topology.getEnvironmentName(), topology.getSubnet(), topology.getSshKey(),
-                        getUserId(), peerManager.getLocalPeer().getId() );
+        EnvironmentImpl environment =
+                new EnvironmentImpl( topology.getEnvironmentName(), topology.getSshKey(), getUserId(),
+                        peerManager.getLocalPeer().getId() );
 
         environment.setStatus( EnvironmentStatus.PENDING );
 
@@ -1410,55 +1398,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         catch ( PGPException ex )
         {
             throw new EnvironmentCreationException( ex );
-        }
-    }
-
-
-    private String calculateCidr( final Set<Peer> peers ) throws EnvironmentCreationException
-    {
-        try
-        {
-            Set<String> usedIps = new HashSet<>();
-            usedIps.addAll( getUsedIps( peerManager.getLocalPeer() ) );
-            for ( Peer peer : peers )
-            {
-                usedIps.addAll( getUsedIps( peer ) );
-            }
-
-            String theCidr = null;
-
-            for ( int i = 1; i < 255; i++ )
-            {
-                SubnetUtils.SubnetInfo info = new SubnetUtils( String.format( DEFAULT_GATEWAY_TEMPLATE, i ) ).getInfo();
-
-                boolean isUsed = false;
-
-                for ( String usedIp : usedIps )
-                {
-                    if ( info.isInRange( usedIp ) )
-                    {
-                        isUsed = true;
-                        break;
-                    }
-                }
-
-                if ( !isUsed )
-                {
-                    theCidr = info.getCidrSignature();
-                    break;
-                }
-            }
-
-            if ( theCidr == null )
-            {
-                throw new EnvironmentCreationException( "Could not determine subnet cidr." );
-            }
-
-            return theCidr;
-        }
-        catch ( PeerException e )
-        {
-            throw new EnvironmentCreationException( String.format( "Error on validating subnet: %s", e.getMessage() ) );
         }
     }
 

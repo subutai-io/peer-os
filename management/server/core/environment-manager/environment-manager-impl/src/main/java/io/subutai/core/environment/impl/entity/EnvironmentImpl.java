@@ -168,14 +168,12 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId, String peerId )
+    public EnvironmentImpl( String name, String sshKey, Long userId, String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
-        SubnetUtils cidr = new SubnetUtils( subnetCidr );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.name = name;
-        this.subnetCidr = cidr.getInfo().getCidrSignature();
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
             sshKeys.add( sshKey.trim() );
