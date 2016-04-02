@@ -23,8 +23,6 @@ var fileUploader = {};
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
-	var GRID_CELL_SIZE = 100;
-	var GRID_SIZE = 100;
 
 	vm.activeMode = 'simple';
 
@@ -129,6 +127,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					vm.environments.push(data[i]);
 				}
 			}
+			console.log('environment list success');
+			console.log(vm.environments);
+		}).error(function (error){
+			console.log('environment list error');
+			console.log(error);
 		});
 	}
 	loadEnvironments();
@@ -160,7 +163,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		DTColumnDefBuilder.newColumnDef(5).notSortable()
 	];
 
-	var refreshTable;
+	/*var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
 			loadEnvironments();
@@ -171,7 +174,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		$timeout.cancel(refreshTable);
-	});
+	});*/
 
 	function addUser2Stack(user) {
 		vm.users2Add.push(angular.copy(user));
@@ -586,15 +589,14 @@ function imageExists(image_url){
 }
 
 function getDateFromString(string) {
-	var logTextTime = string.split(':');
-	var dateString = logTextTime[0].split(' ');
+	// var logTextTime = string.split(':');
+	var dateString = string.split(' ');
 	var temp = dateString[0].split('.');
-	dateString = [temp[2], temp[1], temp[0]].join('-') + 'T' + dateString[1];
-	var dateFullString = [dateString, logTextTime[1], logTextTime[2]].join(':');
+	var result = [temp[2], temp[1], temp[0]].join('-') + " " + dateString[1];
 
-	//var testDateUtc = moment.utc(Date.parse(dateFullString));
-	console.log(dateFullString);
-	var localDate = moment(Date.parse(dateFullString + '+0000')).local();
+	var a = result.split(/[^0-9]/);
+
+	var localDate = moment(Date.parse(new Date(a[0],a[1]-1,a[2],a[3],a[4],a[5] ))).local();
 
 	return localDate.format('HH:mm:ss');
 }
