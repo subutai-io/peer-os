@@ -814,20 +814,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkNotNull( containerId.getId(), "Invalid container id" );
 
-        ContainerHost result = null;
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             try
             {
-                result = resourceHost.getContainerHostById( containerId.getId() );
-                break;
+                return resourceHost.getContainerHostById( containerId.getId() );
             }
             catch ( HostNotFoundException ignore )
             {
                 // ignore
             }
         }
-        return result;
+        return null;
     }
 
 
@@ -843,6 +841,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             result.addAll( resourceHost.getContainerHostsByOwnerId( ownerId ) );
         }
+
         return result;
     }
 
@@ -1925,7 +1924,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-
         LOG.debug( String.format( "Joining P2P swarm: %s", config.getHash() ) );
 
         try
@@ -1941,8 +1939,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
 
-
-            ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+            ExecutorService executorService = Executors.newFixedThreadPool( config.getRhP2pIps().size() );
             ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
 
             for ( final RhP2pIp rhP2pIp : config.getRhP2pIps() )
@@ -1966,7 +1963,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             executorService.shutdown();
 
-            for ( ResourceHost ignored : resourceHosts )
+            for ( RhP2pIp ignored : config.getRhP2pIps() )
             {
                 completionService.take().get();
             }
@@ -1983,6 +1980,76 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
         //for existing rhp2pip call joinswarm, for missing call resetswarmkey
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
+
+        LOG.debug( String.format( "Joining/updating P2P swarm: %s", config.getHash() ) );
+
+        try
+        {
+            NetworkResource reservedNetworkResource =
+                    getReservedNetworkResources().findByEnvironmentId( config.getEnvironmentId() );
+
+            if ( reservedNetworkResource == null )
+            {
+                throw new PeerException(
+                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
+            }
+
+            final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
+
+            Set<ResourceHost> resourceHosts = getResourceHosts();
+            ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+            ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
+
+            for ( final ResourceHost resourceHost : resourceHosts )
+            {
+                final RhP2pIp rhP2pIp = config.findByRhId( resourceHost.getId() );
+
+                if ( rhP2pIp != null )
+                {
+                    //try to join RH (updates if already participating)
+                    completionService.submit( new Callable<Object>()
+                    {
+                        @Override
+                        public P2PConnection call() throws Exception
+                        {
+
+                            resourceHost.joinP2PSwarm( rhP2pIp.getP2pIp(), p2pInterface, config.getHash(),
+                                    config.getSecretKey(), config.getSecretKeyTtlSec() );
+
+
+                            return null;
+                        }
+                    } );
+                }
+                else
+                {
+                    //try to update missing RH in case it participates in the swarm
+                    completionService.submit( new Callable<Object>()
+                    {
+                        @Override
+                        public Object call() throws Exception
+                        {
+                            resourceHost.resetSwarmSecretKey( config.getHash(), config.getSecretKey(),
+                                    config.getSecretKeyTtlSec() );
+                            return null;
+                        }
+                    } );
+                }
+            }
+
+            executorService.shutdown();
+
+            for ( ResourceHost ignored : resourceHosts )
+            {
+                completionService.take().get();
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Failed to join/update P2P swarm", e );
+        }
     }
 
 

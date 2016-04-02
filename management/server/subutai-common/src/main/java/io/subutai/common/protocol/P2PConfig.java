@@ -6,6 +6,7 @@ import java.util.Set;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.RhP2pIp;
@@ -72,6 +73,22 @@ public class P2PConfig
     public Set<RhP2pIp> getRhP2pIps()
     {
         return rhP2pIps;
+    }
+
+
+    public RhP2pIp findByRhId( String rhId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+
+        for ( RhP2pIp rhP2pIp : rhP2pIps )
+        {
+            if ( rhP2pIp.getRhId().equalsIgnoreCase( rhId ) )
+            {
+                return rhP2pIp;
+            }
+        }
+
+        return null;
     }
 
 
