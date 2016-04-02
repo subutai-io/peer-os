@@ -864,10 +864,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-
-
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        // If environment from Hub, send destroy request to Hub
+        if ( environment instanceof ProxyEnvironment )
+        {
+            environmentAdapter.removeEnvironment( environment );
+
+            return;
+        }
+
         if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( environment ) )
         {
             throw new EnvironmentNotFoundException();
