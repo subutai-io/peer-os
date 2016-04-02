@@ -114,6 +114,11 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void joinP2PSwarm( P2PConfig config );
 
+    @PUT
+    @Path( "p2ptunnel" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    void joinOrUpdateP2PSwarm( P2PConfig config );
+
     @DELETE
     @Path( "cleanup/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )

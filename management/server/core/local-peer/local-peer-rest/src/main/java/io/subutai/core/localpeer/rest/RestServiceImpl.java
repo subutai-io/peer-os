@@ -307,6 +307,21 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public void joinOrUpdateP2PSwarm( final P2PConfig config )
+    {
+        try
+        {
+            localPeer.joinOrUpdateP2PSwarm( config );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public void cleanupEnvironment( final EnvironmentId environmentId )
     {
         try

@@ -99,6 +99,7 @@ public class P2PConfig
     }
 
 
+    @Deprecated
     public String getAddress()
     {
         return address;

@@ -1979,6 +1979,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
+    {
+        //for existing rhp2pip call joinswarm, for missing call resetswarmkey
+    }
+
+
     @Deprecated
     public void createP2PSwarm( final P2PConfig config ) throws PeerException
     {

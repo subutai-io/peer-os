@@ -113,7 +113,6 @@ public class SetupP2PStep
                 }
             }
 
-            //todo call new method Peer.joinOrUpdateSwarm(...)
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
         }
 
@@ -225,7 +224,7 @@ public class SetupP2PStep
         @Override
         public P2PConfig call() throws Exception
         {
-            peer.joinP2PSwarm( p2PConfig );
+            peer.joinOrUpdateP2PSwarm( p2PConfig );
 
             return p2PConfig;
         }

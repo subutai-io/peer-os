@@ -785,7 +785,16 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
+        new PeerWebClient( peerInfo, provider ).joinP2PSwarm( config );
+    }
+
+
+    @Override
+    public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
+    {
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
+
+        new PeerWebClient( peerInfo, provider ).joinOrUpdateP2PSwarm( config );
     }
 
 
