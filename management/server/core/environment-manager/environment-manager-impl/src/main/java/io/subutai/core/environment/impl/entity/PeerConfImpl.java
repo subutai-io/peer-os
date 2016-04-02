@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -18,6 +19,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -38,14 +41,17 @@ public class PeerConfImpl implements PeerConf, Serializable
     private Long id;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @Column( name = "peer_id", nullable = false )
     private String peerId;
 
 
-    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
-    @Column( name = "p2p_ips", nullable = false )
+    @ElementCollection( fetch = FetchType.EAGER )
+    @CollectionTable(
+            name = "p2p_ips",
+            joinColumns = @JoinColumn( name = "id" ) )
     private Set<String> p2pIps = new HashSet<>();
 
     @ManyToOne( targetEntity = EnvironmentImpl.class )
@@ -53,12 +59,16 @@ public class PeerConfImpl implements PeerConf, Serializable
     private Environment environment;
 
 
+    public PeerConfImpl()
+    {
+    }
+
+
     public PeerConfImpl( final String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.peerId = peerId;
-        this.p2pIps = new HashSet<>();
     }
 
 
@@ -91,12 +101,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     public Long getVersion()
     {
         return version;
-    }
-
-
-    public void setVersion( final Long version )
-    {
-        this.version = version;
     }
 
 

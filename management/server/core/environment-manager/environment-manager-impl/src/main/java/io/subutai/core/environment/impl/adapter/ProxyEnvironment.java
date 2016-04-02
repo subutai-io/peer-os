@@ -45,7 +45,7 @@ public class ProxyEnvironment extends EnvironmentImpl
 
         setP2PSubnet( json.get( "p2pSubnet" ).asText() );
         setVni( json.get( "vni" ).asLong() );
-        setVersion( 1L );
+//        setVersion( 1L );
         setStatus( EnvironmentStatus.HEALTHY );
     }
 

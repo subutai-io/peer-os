@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+    >
 
-  <persistence-unit name="envExtManagerPUnit2" transaction-type="RESOURCE_LOCAL">
+  <persistence-unit name="envMgrUnit" transaction-type="JTA">
 
+    <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+
+    <jta-data-source>osgi:service/javax.sql.XADataSource/(osgi.jndi.service.name=openjpa/xaSubutaiDS)</jta-data-source>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
     </non-jta-data-source>
+
     <class>io.subutai.core.environment.impl.entity.HostInterfaceImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentImpl</class>
     <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>
-    <class>io.subutai.core.environment.impl.entity.EnvironmentTopologyEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
     <properties>
-      <property name="openjpa.Log" value="DefaultLevel=WARN" />
-      <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
-      <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
+      <!-- OpenJPA Properties -->
+      <property name="openjpa.ConnectionDriverName" value="org.apache.derby.jdbc.EmbeddedDriver.class" />
+      <property name="openjpa.ConnectionURL" value="jdbc:derby:${subutaiAppDataPath}/db/subutaiDb2;create=true" />
+      <property name="openjpa.Multithreaded" value="true" />
+      <property name="openjpa.TransactionMode" value="managed" />
+      <property name="openjpa.ConnectionFactoryMode" value="managed" />
+      <property name="openjpa.LockManager"
+                value="pessimistic(VersionCheckOnReadLock=true,VersionUpdateOnWriteLock=true)" />
+      <property name="openjpa.LockTimeout" value="30000" />
+      <property name="openjpa.jdbc.MappingDefaults"
+                value="ForeignKeyDeleteAction=restrict, JoinForeignKeyDeleteAction=restrict" />
+      <property name="openjpa.LockManager"
+                value="pessimistic(VersionCheckOnReadLock=true,VersionUpdateOnWriteLock=true)" />
+      <property name="openjpa.Log" value="DefaultLevel=INFO, Runtime=INFO, Tool=INFO, SQL=INFO" />
+      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema" />
       <property name="openjpa.jdbc.DBDictionary" value="derby" />
-      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)" />
     </properties>
   </persistence-unit>
-
 </persistence>
