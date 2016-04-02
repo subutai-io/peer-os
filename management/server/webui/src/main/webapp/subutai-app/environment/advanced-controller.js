@@ -678,12 +678,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function initJointJs() {
 
-		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
-			if(vm.editingEnv && vm.editingEnv.id == e.detail) {
-				clearWorkspace();
-				vm.editingEnv = false;
-			}
-		}, false);
+		setTimeout(function (){
+			document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+				if(vm.editingEnv && vm.editingEnv.id == e.detail) {
+					clearWorkspace();
+					vm.editingEnv = false;
+				}
+			}, false);
+		}, 1000);
 
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),

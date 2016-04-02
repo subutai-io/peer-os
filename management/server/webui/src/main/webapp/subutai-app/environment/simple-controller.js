@@ -548,12 +548,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function initJointJs() {
 
-		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
-			if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
-				clearWorkspace();
-				vm.currentEnvironment = {};
-			}
-		}, false);
+		setTimeout(function (){
+			document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+				if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
+					clearWorkspace();
+					vm.currentEnvironment = {};
+				}
+			}, false);
+		}, 1000);
 
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
