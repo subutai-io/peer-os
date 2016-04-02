@@ -685,13 +685,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}
 		}, false);
 
-		var dragItems = document.querySelectorAll('[draggable=true]');
-		for (var i = 0; i < dragItems.length; i++) {
-			addEvent(dragItems[i], 'dragstart', function (event) {
-				event.dataTransfer.setData('Text', this.id);
-			});
-		}
-
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
 			width: '100%',
