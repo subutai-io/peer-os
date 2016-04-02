@@ -73,7 +73,7 @@ import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
- * Resource host implementation.
+ * Resource host implementation. TODO review all methods to see which ones must be run sequentially like setupTunnels
  */
 @Entity
 @Table( name = "r_host" )

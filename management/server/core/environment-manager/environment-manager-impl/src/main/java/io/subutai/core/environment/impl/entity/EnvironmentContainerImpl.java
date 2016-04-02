@@ -651,8 +651,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public String toString()
     {
-        ContainerHostState state = getState();
-
         String envId = environment != null ? environment.getId() : null;
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
@@ -660,8 +658,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                           .add( "templateName", templateName ).add( "environmentId", envId )
                           .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
                           .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
-                          .add( "hostArchitecture", hostArchitecture ).add( "state", state )
-                          .add( "resourceHostId", resourceHostId ).toString();
+                          .add( "hostArchitecture", hostArchitecture ).add( "resourceHostId", resourceHostId )
+                          .toString();
     }
 
 
