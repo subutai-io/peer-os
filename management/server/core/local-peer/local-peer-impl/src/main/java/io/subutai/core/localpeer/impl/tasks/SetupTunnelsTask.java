@@ -1,34 +1,28 @@
 package io.subutai.core.localpeer.impl.tasks;
 
 
-import java.util.Set;
+import java.util.Random;
 import java.util.concurrent.Callable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.network.NetworkResource;
-import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
-import io.subutai.core.network.api.NetworkManager;
+import io.subutai.common.protocol.Tunnels;
 
 
 public class SetupTunnelsTask implements Callable<Boolean>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SetupTunnelsTask.class );
-    private final NetworkManager networkManager;
     private final ResourceHost resourceHost;
     private final P2pIps p2pIps;
     private final NetworkResource networkResource;
 
 
-    public SetupTunnelsTask( final NetworkManager networkManager, final ResourceHost resourceHost, final P2pIps p2pIps,
-                             NetworkResource networkResource )
+    public SetupTunnelsTask( final ResourceHost resourceHost, final P2pIps p2pIps, NetworkResource networkResource )
     {
-        this.networkManager = networkManager;
         this.resourceHost = resourceHost;
         this.p2pIps = p2pIps;
         this.networkResource = networkResource;
@@ -39,9 +33,8 @@ public class SetupTunnelsTask implements Callable<Boolean>
     public Boolean call() throws Exception
     {
 
-        Set<Tunnel> tunnels = networkManager.listTunnels( resourceHost );
+        Tunnels tunnels = resourceHost.getTunnels();
 
-        Set<VniVlanMapping> mappings = networkManager.getVniVlanMappings( resourceHost );
 
         //setup tunnel to each local and remote RH
         for ( String tunnelIp : p2pIps.getP2pIps() )
@@ -53,80 +46,62 @@ public class SetupTunnelsTask implements Callable<Boolean>
                 continue;
             }
 
-            //see if tunnel exists
-            int tunnelId = findTunnel( tunnelIp, tunnels );
-            //tunnel not found, create new one
-            if ( tunnelId == -1 )
+            //check p2p connections in case heartbeat hasn't arrived yet with new p2p interface
+            P2PConnections p2PConnections = resourceHost.getP2PConnections();
+            //skip if exists
+            if ( p2PConnections.findByIp( tunnelIp ) != null )
             {
-                //calculate tunnel id
-                tunnelId = calculateNextTunnelId( tunnels );
-
-                LOG.debug( String.format( "Setting up tunnel: %s %s", tunnelId, tunnelIp ) );
-
-                //create tunnel
-                networkManager.setupTunnel( resourceHost, tunnelId, tunnelIp );
-
-                tunnels.add( new Tunnel( String.format( "%s%d", NetworkManager.TUNNEL_PREFIX, tunnelId ), tunnelIp ) );
+                continue;
             }
 
-            //see if mapping exists
-            if ( !vniVlanMappingExists( mappings, tunnelId ) )
+            //see if tunnel exists
+            Tunnel tunnel = tunnels.findByIp( tunnelIp );
+
+            //create new tunnel
+            if ( tunnel == null )
             {
-                //create vni-vlan mapping
-                LOG.debug(
-                        String.format( "Setting up tunnel %s for %s", tunnelIp, networkResource.getEnvironmentId() ) );
+                String tunnelName = generateTunnelName( tunnels );
 
-                networkManager.setupVniVLanMapping( resourceHost, tunnelId, networkResource.getVni(),
-                        networkResource.getVlan(), networkResource.getEnvironmentId() );
+                if ( tunnelName == null )
+                {
+                    throw new ResourceHostException( "Free tunnel name not found" );
+                }
 
-                mappings.add( new VniVlanMapping( tunnelId, networkResource.getVni(), networkResource.getVlan(),
-                        networkResource.getEnvironmentId() ) );
+                Tunnel newTunnel =
+                        new Tunnel( tunnelName, tunnelIp, networkResource.getVlan(), networkResource.getVni() );
+
+                resourceHost.createTunnel( newTunnel );
+
+                //add to avoid duplication in the next iteration
+                tunnels.addTunnel( newTunnel );
             }
         }
+
         return true;
     }
 
 
-    public int findTunnel( String tunnelIp, Set<Tunnel> tunnels )
+    protected String generateTunnelName( Tunnels tunnels )
     {
-        for ( Tunnel tunnel : tunnels )
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        String name;
+
+        Random rnd = new Random();
+
+        do
         {
-            if ( tunnel.getTunnelIp().equals( tunnelIp ) )
-            {
-                return tunnel.getTunnelId();
-            }
+            int n = 10000 + rnd.nextInt( 90000 );
+            name = String.format( "tunnel-%d", n );
+            currentIteration++;
+        }
+        while ( tunnels.findByName( name ) != null && currentIteration < maxIterations );
+
+        if ( tunnels.findByName( name ) != null )
+        {
+            return null;
         }
 
-        return -1;
-    }
-
-
-    private int calculateNextTunnelId( Set<Tunnel> tunnels )
-    {
-        int maxTunnelId = 0;
-        for ( Tunnel tunnel : tunnels )
-        {
-            if ( tunnel.getTunnelId() > maxTunnelId )
-            {
-                maxTunnelId = tunnel.getTunnelId();
-            }
-        }
-
-        return maxTunnelId + 1;
-    }
-
-
-    private boolean vniVlanMappingExists( Set<VniVlanMapping> mappings, int tunnelId )
-    {
-        for ( VniVlanMapping mapping : mappings )
-        {
-            if ( mapping.getTunnelId() == tunnelId && mapping.getEnvironmentId()
-                                                             .equals( networkResource.getEnvironmentId() ) )
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return name;
     }
 }

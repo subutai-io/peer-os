@@ -18,7 +18,6 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
@@ -71,8 +70,6 @@ public class ContainerHostEntityTest
     ResourceHost resourceHost;
 
     ContainerHostEntity containerHostEntity;
-    @Mock
-    private ContainerGateway containerGateway;
     @Mock
     private HostInterfaces hostInterfaces;
 

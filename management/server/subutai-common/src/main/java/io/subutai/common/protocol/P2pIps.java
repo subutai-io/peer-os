@@ -20,6 +20,8 @@ public class P2pIps
 
     public P2pIps( @JsonProperty( "p2pIps" ) Set<String> p2pIps )
     {
+        Preconditions.checkNotNull( p2pIps );
+
         this.p2pIps = p2pIps;
     }
 
@@ -37,7 +39,7 @@ public class P2pIps
 
     public void addP2pIps( Set<String> p2pIps )
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( p2pIps ) );
+        Preconditions.checkNotNull( p2pIps );
 
         this.p2pIps.addAll( p2pIps );
     }

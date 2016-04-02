@@ -810,7 +810,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
+    public void resetSwarmSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
@@ -820,17 +820,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
-
-        return peerWebClient.getP2PIP( resourceHostId, swarmHash );
-    }
-
-
-    @Override
-    public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
+    public P2PConnections joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
@@ -839,7 +829,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    public void createP2PSwarm( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 

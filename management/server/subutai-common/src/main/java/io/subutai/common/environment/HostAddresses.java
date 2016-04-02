@@ -7,7 +7,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.gson.annotations.Expose;
 
@@ -21,21 +20,9 @@ public class HostAddresses
 
     public HostAddresses( @JsonProperty( "hostAddresses" ) final Map<String, String> hostAddresses )
     {
+        Preconditions.checkNotNull( hostAddresses );
+
         this.hostAddresses = hostAddresses;
-    }
-
-
-    public HostAddresses()
-    {
-    }
-
-
-    public void addHostAddress( String hostname, String ip )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
-
-        hostAddresses.put( hostname, ip );
     }
 
 

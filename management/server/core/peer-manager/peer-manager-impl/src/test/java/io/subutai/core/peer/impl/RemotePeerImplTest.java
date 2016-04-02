@@ -24,7 +24,6 @@ import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.exception.HTTPException;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -133,8 +132,6 @@ public class RemotePeerImplTest
 
     @Mock
     private EnvironmentId environmentId;
-    @Mock
-    private ContainerGateway containerGateway;
 
     @Mock
     private SecurityManager securityManager;

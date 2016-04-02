@@ -1,28 +1,30 @@
 package io.subutai.core.network.api;
 
 
-import java.util.Set;
-
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.VniVlanMapping;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
-import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 
 
 public interface NetworkManager
 {
-    String TUNNEL_PREFIX = "tunnel";
-    String TUNNEL_TYPE = "vxlan";
-
 
     /**
-     * Sets up an P2P connection on specified host
+     * Sets up an P2P connection on specified host with explicit IP. Usually used to setup new swarm with this peer as
+     * the first member
      */
-    public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
-                                    long secretKeyTtlSec ) throws NetworkManagerException;
+    public void createP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                                long secretKeyTtlSec ) throws NetworkManagerException;
 
+    /**
+     * Sets up an P2P connection on specified host with dynamically acquired IP. Usually used to connect peer to
+     * existing swarm
+     */
+    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
+                              final long secretKeyTtlSec )
+            throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network
@@ -32,7 +34,7 @@ public interface NetworkManager
      * @param newSecretKey - new secret key to set
      * @param ttlSeconds - time-to-live for the new secret key
      */
-    public void resetP2PSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
+    public void resetSwarmSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
 
@@ -46,51 +48,11 @@ public interface NetworkManager
 
     public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
 
-    /**
-     * Returns all p2p connections running on MH
-     */
 
-    public P2PConnections getP2PConnections() throws NetworkManagerException;
-
-
-    public void createTunnel( Host host, int tunnelId, String tunnelIp, int vlan, long vni )
+    public void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
             throws NetworkManagerException;
 
-
-    /**
-     * Sets up tunnel to another peer on specified host
-     */
-    public void setupTunnel( Host host, int tunnelId, String tunnelIp ) throws NetworkManagerException;
-
-
-    /**
-     * Lists existing tunnels on management host
-     */
-    public Set<Tunnel> listTunnels() throws NetworkManagerException;
-
-    /**
-     * Lists existing tunnels on specified host
-     */
-    public Set<Tunnel> listTunnels( Host host ) throws NetworkManagerException;
-
-
-    /**
-     * Sets up VNI-VLAN mapping on management host
-     */
-    public void setupVniVLanMapping( int tunnelId, long vni, int vLanId, String environmentId )
-            throws NetworkManagerException;
-
-    /**
-     * Sets up VNI-VLAN mapping on specified host
-     */
-    public void setupVniVLanMapping( Host host, int tunnelId, long vni, int vLanId, String environmentId )
-            throws NetworkManagerException;
-
-
-    /**
-     * Returns all vni-vlan mappings on specified host
-     */
-    public Set<VniVlanMapping> getVniVlanMappings( Host host ) throws NetworkManagerException;
+    public Tunnels getTunnels( final Host host ) throws NetworkManagerException;
 
 
     /**

@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.host.ContainerHostInfo;
 
 
@@ -20,6 +22,8 @@ public class Containers
 
     public Containers( @JsonProperty( "containers" ) final Set<ContainerHostInfo> containers )
     {
+        Preconditions.checkNotNull( containers );
+
         this.containers = containers;
     }
 
@@ -31,10 +35,9 @@ public class Containers
 
     public void addContainer( final ContainerHostInfo containerHostInfo )
     {
-        if ( containerHostInfo == null )
-        {
-            throw new IllegalArgumentException( "Container host info could not be null." );
-        }
+
+        Preconditions.checkNotNull( containerHostInfo, "Container host info could not be null." );
+
 
         containers.add( containerHostInfo );
     }

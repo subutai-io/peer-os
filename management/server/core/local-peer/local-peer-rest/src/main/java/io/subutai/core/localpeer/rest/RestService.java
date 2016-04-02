@@ -111,21 +111,16 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void resetP2PSecretKey( P2PCredentials p2PCredentials );
 
-    @GET
-    @Path( "p2pip/{rhId}/{hash}" )
-    @Produces( MediaType.TEXT_PLAIN )
-    Response getP2PIP( @PathParam( "rhId" ) String resourceHostId, @PathParam( "hash" ) String swarmHash );
-
     @POST
     @Path( "p2ptunnel" )
     @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    P2PConnections setupP2PConnection( P2PConfig config );
+    P2PConnections joinP2PSwarm( P2PConfig config );
 
     @POST
     @Path( "p2pinitial" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response setupInitialP2PConnection( P2PConfig config );
+    Response createP2PSwarm( P2PConfig config );
 
 
     @DELETE
