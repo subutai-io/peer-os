@@ -209,8 +209,10 @@
 			</div>
 			<div class="b-cloud-space__table">
 				<table datatable="ng"
+				ng-init="environmentViewCtrl.initDataTable()" 
 				dt-options="environmentViewCtrl.dtOptionsInstallTable"
 				dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
+				dt-instance="environmentViewCtrl.dtInstance" 
 				class="row-border hover subt_table-containers-table">
 					<thead>
 						<tr>

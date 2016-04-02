@@ -70,6 +70,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.removeDomain = removeDomain;
 	vm.minimizeLogs = minimizeLogs;
 	vm.getQuotaColor = getQuotaColor;
+	vm.initDataTable = initDataTable;
 
 	//share environment functions
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
@@ -120,15 +121,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	function loadEnvironments() {
 		vm.containersTotal = [];
 		environmentService.getEnvironments().success (function (data) {
-			vm.environments = [];
+			var environmentsList = [];
 			for (var i = 0; i < data.length; ++i) {
-				if (data[i].status !== "PENDING") {
-					data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
-					vm.environments.push(data[i]);
-				}
+				data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
+				environmentsList.push(data[i]);
 			}
-			console.log('environment list success');
-			console.log(vm.environments);
+			vm.environments = environmentsList;
 		}).error(function (error){
 			console.log('environment list error');
 			console.log(error);
@@ -149,19 +147,26 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	});
 
 	//installed environment table options
-	vm.dtOptionsInstallTable = DTOptionsBuilder
-		.newOptions()
-		.withOption('order', [[ 1, "asc" ]])
-		.withOption('stateSave', true)
-		.withPaginationType('full_numbers');
-	vm.dtColumnDefsInstallTable = [
-		DTColumnDefBuilder.newColumnDef(0).notSortable(),
-		DTColumnDefBuilder.newColumnDef(1),
-		DTColumnDefBuilder.newColumnDef(2).notSortable(),
-		DTColumnDefBuilder.newColumnDef(3).notSortable(),
-		DTColumnDefBuilder.newColumnDef(4).notSortable(),
-		DTColumnDefBuilder.newColumnDef(5).notSortable()
-	];
+	function initDataTable() {
+		console.log('checker');
+		vm.dtInstance = {};
+		vm.dtOptionsInstallTable = DTOptionsBuilder
+			.newOptions()
+			.withOption('order', [[ 1, "asc" ]])
+			.withOption('stateSave', true)
+			//.withOption('paging', false)
+			.withOption('searching', false)
+			.withOption('retrieve', true)
+			.withPaginationType('full_numbers');
+		vm.dtColumnDefsInstallTable = [
+			DTColumnDefBuilder.newColumnDef(0).notSortable(),
+			DTColumnDefBuilder.newColumnDef(1),
+			DTColumnDefBuilder.newColumnDef(2).notSortable(),
+			DTColumnDefBuilder.newColumnDef(3).notSortable(),
+			DTColumnDefBuilder.newColumnDef(4).notSortable(),
+			DTColumnDefBuilder.newColumnDef(5).notSortable()
+		];
+	}
 
 	/*var refreshTable;
 	var reloadTableData = function() {
@@ -578,14 +583,19 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 }
 
 function imageExists(image_url){
-
     var http = new XMLHttpRequest();
 
     http.open('HEAD', image_url, false);
     http.send();
 
     return http.status != 404;
+}
 
+function initScrollbar() {
+	$('.js-scrollbar').perfectScrollbar({
+		"wheelPropagation": true,
+		"swipePropagation": false
+	});
 }
 
 function getDateFromString(string) {

@@ -267,6 +267,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
 				getLogById(data, true);
+				initScrollbar();
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -736,10 +737,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			cellView.model.set('position', cellView.prevPos);
 		});
 
-		$('.js-scrollbar').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
+		initScrollbar();
 	}
 
 	vm.buildStep = 'confirm';
