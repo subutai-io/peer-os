@@ -228,8 +228,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-        //        LOG.info( "Finalizing environment creation" );
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
         environment = saveEnvironment();
