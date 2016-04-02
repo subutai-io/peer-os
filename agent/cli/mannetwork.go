@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/net"
 	"github.com/subutai-io/base/agent/lib/net/p2p"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -15,7 +16,7 @@ func VxlanTunnel(create, del, remoteip, vlan, vni string, list bool) {
 	if len(create) > 0 {
 		tunnelCreate(create, remoteip, vlan, vni)
 	} else if len(del) > 0 {
-		// TODO
+		net.DelIface(del)
 		return
 	} else if list {
 		tunnelList()

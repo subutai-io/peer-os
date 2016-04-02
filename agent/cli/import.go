@@ -180,6 +180,7 @@ func LxcImport(templ, version, token string) {
 
 	if templ == "management" {
 		template.MngInit()
+		return
 	}
 
 	container.SetContainerConf(templ, [][]string{
