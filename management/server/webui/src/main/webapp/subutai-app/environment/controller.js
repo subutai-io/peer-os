@@ -156,7 +156,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			.withOption('stateSave', true)
 			//.withOption('paging', false)
 			.withOption('searching', false)
-			.withOption('retrieve', true)
+			//.withOption('retrieve', true)
 			.withPaginationType('full_numbers');
 		vm.dtColumnDefsInstallTable = [
 			DTColumnDefBuilder.newColumnDef(0).notSortable(),
