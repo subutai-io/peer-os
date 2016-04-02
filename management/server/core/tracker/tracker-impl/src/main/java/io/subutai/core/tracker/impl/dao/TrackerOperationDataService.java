@@ -113,6 +113,52 @@ public class TrackerOperationDataService
     }
 
 
+    public TrackerOperationView getTrackerUserOperation( String source, final UUID operationTrackId, long userId )
+    {
+        TrackerOperationEntity result = null;
+        source = source.toUpperCase();
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            em.getTransaction().begin();
+
+            TypedQuery<TrackerOperationEntity> query =
+                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_OPERATION, TrackerOperationEntity.class );
+            query.setParameter( "source", source );
+            query.setParameter( "operationTrackId", operationTrackId.toString() );
+            query.setParameter( "userId", userId );
+
+            List<TrackerOperationEntity> operations = query.getResultList();
+
+            if ( operations != null && operations.size() > 0 )
+            {
+                result = operations.get( 0 );
+            }
+
+            em.getTransaction().commit();
+        }
+        catch ( PersistenceException e )
+        {
+            LOGGER.error( "Error .", e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+        }
+        finally
+        {
+            em.close();
+        }
+        if ( result != null )
+        {
+            return createTrackerOperation( result.getInfo() );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     private TrackerOperationViewImpl createTrackerOperation( String infoClob )
     {
         if ( infoClob != null && infoClob.length() > 0 )
@@ -124,7 +170,7 @@ public class TrackerOperationDataService
     }
 
 
-    public void saveTrackerOperation( String source, final TrackerOperationImpl po ) throws SQLException
+    public void saveTrackerOperation( String source, final TrackerOperationImpl po, long userId ) throws SQLException
     {
         source = source.toUpperCase();
         EntityManager em = emf.createEntityManager();
@@ -132,7 +178,7 @@ public class TrackerOperationDataService
         {
             em.getTransaction().begin();
 
-            TrackerOperationEntity entity = extractFromTrackerOperationImpl( source, po );
+            TrackerOperationEntity entity = extractFromTrackerOperationImpl( source, po, userId );
             em.merge( entity );
 
             em.getTransaction().commit();
@@ -153,11 +199,11 @@ public class TrackerOperationDataService
     }
 
 
-    private TrackerOperationEntity extractFromTrackerOperationImpl( String source, TrackerOperationImpl po )
+    private TrackerOperationEntity extractFromTrackerOperationImpl( String source, TrackerOperationImpl po, long userId )
     {
         source = source.toUpperCase();
         return new TrackerOperationEntity( source, po.getId().toString(), po.createDate().getTime(),
-                GSON.toJson( po ) );
+                GSON.toJson( po ), userId );
     }
 
 

@@ -121,13 +121,13 @@ public class TrackerOperationDataServiceTest
     @Test( expected = SQLException.class )
     public void testSaveTrackerOperation() throws Exception
     {
-        trackerOperationDataService.saveTrackerOperation( SOURCE, trackerOperation );
+        trackerOperationDataService.saveTrackerOperation( SOURCE, trackerOperation, 0 );
 
         verify( entityTransaction ).commit();
 
         doThrow( new PersistenceException( "" ) ).when( entityTransaction ).begin();
 
-        trackerOperationDataService.saveTrackerOperation( SOURCE, trackerOperation );
+        trackerOperationDataService.saveTrackerOperation( SOURCE, trackerOperation, 0 );
     }
 
 

@@ -3,7 +3,7 @@
 		Applying changes
 		<a href ng-click="closeThisDialog()"><i class="fa fa-times g-right"></i></a>
 	</div>
-	<div class="b-popup__body">
+	<div class="b-popup__body js-scrollbar b-popup-logs">
 		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
 			<tr ng-repeat="(key, log) in environmentSimpleViewCtrl.logMessages">
 				<td>{{ log.time }}</td>

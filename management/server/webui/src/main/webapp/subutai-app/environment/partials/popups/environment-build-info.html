@@ -45,7 +45,7 @@
 			</div>
 		</div>
 
-		<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'showLogs'">
+		<div class="b-popup__body js-scrollbar b-popup-logs" ng-if="environmentSimpleViewCtrl.buildStep == 'showLogs'">
 			<table class="b-main-table b-main-table_none-border b-main-table_logs g-margin-bottom-half">
 				<tr ng-repeat="(key, log) in environmentSimpleViewCtrl.logMessages">
 					<td>{{ log.time }}</td>
