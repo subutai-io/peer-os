@@ -1,4 +1,4 @@
-<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="dragOver(event)">
+<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="return dragOver(event)">
 	<div class="b-cloud__tools">
 		<div class="b-cloud-tools">
 			<div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -33,14 +33,14 @@
 						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
 								<img
-									src="assets/templates/{{ template }}.jpg"
+									ng-src="assets/templates/{{ template }}.jpg"
 									alt="{{ template }}"
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</span>
 							<span class="b-cloud-item-text">{{ template }}</span>
 						</span>
 						<div class="b-dragAndDrop-item"
-							ondragstart="startDrag(event)" ondrop="drop(event)" ondragend="endtDrag(event)" draggable="true" 
+							ondragstart="startDrag(event)" ondragend="endtDrag(event)" draggable="true" 
 							data-template="{{ template }}">
 						</div>
 					</li>
@@ -138,7 +138,7 @@
 				class="b-cloud-space-work"
 				id="js-environment-creation"
 				ng-init="advEnvCtrl.initJointJs()" 
-				ondrop="drop(event)" ondragover="return false;">
+				ondrop="return drop(event);" ondragenter="return false;" ondragover="return false;">
 
 					<div class="b-template-settings js-dropen-menu">
 						<div class="header"></div>

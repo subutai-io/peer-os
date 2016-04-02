@@ -129,6 +129,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					vm.environments.push(data[i]);
 				}
 			}
+			console.log('environment list success');
+			console.log(vm.environments);
+		}).error(function (error){
+			console.log('environment list error');
+			console.log(error);
 		});
 	}
 	loadEnvironments();
@@ -160,7 +165,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		DTColumnDefBuilder.newColumnDef(5).notSortable()
 	];
 
-	var refreshTable;
+	/*var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
 			loadEnvironments();
@@ -171,7 +176,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		$timeout.cancel(refreshTable);
-	});
+	});*/
 
 	function addUser2Stack(user) {
 		vm.users2Add.push(angular.copy(user));
