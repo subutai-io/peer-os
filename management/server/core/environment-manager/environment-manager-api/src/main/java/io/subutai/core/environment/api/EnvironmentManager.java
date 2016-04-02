@@ -15,7 +15,6 @@ import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertHandler;
-import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -31,7 +30,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
  */
 public interface EnvironmentManager
 {
-    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
+    //TODO implement startContainer, stopContainer and resetSwarmSecretKey methods
 
     /**
      * Returns all existing environments
@@ -40,12 +39,7 @@ public interface EnvironmentManager
      */
     Set<Environment> getEnvironments();
 
-
-    Environment setupRequisites( Topology topology ) throws EnvironmentCreationException;
-
-
-    Environment startEnvironmentBuild( String environmentId, String signedMessage, boolean async )
-            throws EnvironmentCreationException;
+    Set<Environment> getEnvironmentsByOwnerId( long userId );
 
     /**
      * Creates environment based on a passed topology
@@ -165,57 +159,6 @@ public interface EnvironmentManager
      */
     String getDefaultDomainName();
 
-    /**
-     * Removes environment from database only. Used to cleanup environment records.
-     *
-     * @param environmentId - environment id
-     *
-     * @throws EnvironmentNotFoundException - thrown if environment not found
-     */
-    void removeEnvironment( String environmentId ) throws EnvironmentNotFoundException;
-
-
-    /**
-     * Save environment topology
-     *
-     * @param topology - topology to save
-     */
-    void saveTopology( Topology topology ) throws EnvironmentManagerException;
-
-    /**
-     * Loads environment blueprint from DB
-     *
-     * @param id blueprint primary key
-     *
-     * @return environment blueprint
-     */
-    Topology getTopology( UUID id ) throws EnvironmentManagerException;
-
-    ;
-
-
-    /**
-     * Remove blueprint from database
-     *
-     * @param topologyId - blueprint id to remove
-     */
-    void removeTopology( UUID topologyId ) throws EnvironmentManagerException;
-
-
-    /**
-     * Get All blueprints
-     *
-     * @return - set of blueprints
-     */
-    Set<Topology> getBlueprints() throws EnvironmentManagerException;
-
-
-    /**
-     * Updates environment container hosts metadata (hostname, network interface)
-     *
-     * @param environmentId - target environment Id
-     */
-    void updateEnvironmentContainersMetadata( String environmentId ) throws EnvironmentManagerException;
 
     /**
      * Removes an assigned domain if any from the environment
@@ -284,11 +227,6 @@ public interface EnvironmentManager
     EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
             throws EnvironmentNotFoundException;
 
-    void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
-            throws EnvironmentManagerException;
-
-    void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
-            throws EnvironmentManagerException;
 
     List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
 

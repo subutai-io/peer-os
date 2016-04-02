@@ -4,12 +4,12 @@ angular.module('subutai.kurjun.controller', [])
 	.controller('KurjunCtrl', KurjunCtrl)
 	.directive('fileModel', fileModel);
 
-KurjunCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'identitySrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
+KurjunCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'SettingsKurjunSrv', 'identitySrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 fileModel.$inject = ['$parse'];
 
 var fileUploader = {};
 
-function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
+function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
 	vm.activeTab = 'templates';
@@ -36,34 +36,62 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
 
+	//get Lists functions
+	vm.getTemplates = getTemplates;
+	vm.getAPTs = getAPTs;
+	vm.getRawFiles = getRawFiles;
+
 	identitySrv.getCurrentUser().success (function (data) {
 		vm.currentUser = data;
 	});
 
 
 	/*** Get templates according to repositories ***/
-	function getTemplates() {
-		kurjunSrv.getTemplates().success(function (data) {
-			vm.templates = data;
+	function sturtup() {
+		LOADING_SCREEN();
+		SettingsKurjunSrv.getConfig().success (function (data) {
+			GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
+			getTemplates();
+			getAPTs();
+			getRawFiles();
+		}).error(function (error){
+			SweetAlert.swal("ERROR!", error, "error");
+			LOADING_SCREEN('none');
 		});
 	}
-	getTemplates();
+	sturtup();
+
+	function getTemplates() {
+		LOADING_SCREEN();
+		kurjunSrv.getTemplates().success(function (data) {
+			vm.templates = data;
+			LOADING_SCREEN('none');
+		}).error(function (error){
+			LOADING_SCREEN('none');
+		});
+	}
 
 	/*** Get all APTs ***/
 	function getAPTs() {
+		LOADING_SCREEN();
 		kurjunSrv.getAPTList().success(function (aptList) {
 			vm.aptList = aptList;
+			LOADING_SCREEN('none');
+		}).error(function (error){
+			LOADING_SCREEN('none');
 		});
 	}
-	getAPTs();
 
 
 	function getRawFiles() {
+		LOADING_SCREEN();
 		kurjunSrv.getRawFiles().success (function (data) {
 			vm.files = data;
+			LOADING_SCREEN('none');
+		}).error(function (error){
+			LOADING_SCREEN('none');
 		});
 	}
-	getRawFiles();
 
 	function openTab(tab) {
 		vm.dtOptions = DTOptionsBuilder
@@ -80,7 +108,8 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(2),
 					DTColumnDefBuilder.newColumnDef(3),
 					DTColumnDefBuilder.newColumnDef(4),
-					DTColumnDefBuilder.newColumnDef(5).notSortable()
+					DTColumnDefBuilder.newColumnDef(5),
+					DTColumnDefBuilder.newColumnDef(6).notSortable()
 				];
 				break;
 			case 'apt':
@@ -97,7 +126,6 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(0),
 					DTColumnDefBuilder.newColumnDef(1),
 					DTColumnDefBuilder.newColumnDef(2).notSortable(),
-					DTColumnDefBuilder.newColumnDef(3).notSortable(),
 				];
 				default:
 				break;
@@ -324,6 +352,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 
 
 	function checkRepositoryStatus(repository) {
+		console.log(repository);
 		kurjunSrv.isUploadAllowed(repository).success(function (data) {
 			vm.isUploadAllowed = (data === 'false' ? false : true);
 		});

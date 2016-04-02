@@ -1,8 +1,6 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,12 +17,11 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
@@ -36,12 +33,8 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.network.Gateway;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.Vnis;
+import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -49,11 +42,15 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.network.api.NetworkManager;
@@ -98,75 +95,82 @@ public class HubEnvironmentManager
     }
 
 
-    public Set<Long> getReservedVnis()
+    public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto )
+            throws EnvironmentCreationException
     {
-        Set<Long> vniDtos = new HashSet<>();
+        final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
+        final LocalPeer localPeer = peerManager.getLocalPeer();
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        completionService.submit( new Callable<Peer>()
+        {
+            @Override
+            public Peer call() throws Exception
+            {
+                reservedNetResources.put( localPeer, localPeer.getUsedNetworkResources() );
+                return localPeer;
+            }
+        } );
+
+        executorService.shutdown();
         try
         {
-            Vnis vnis = peerManager.getLocalPeer().getReservedVnis();
-            for ( Vni vni : vnis.list() )
-            {
-                vniDtos.add( vni.getVni() );
-            }
-            return vniDtos;
+            Future<Peer> f = completionService.take();
+            f.get();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
-            LOG.error( "Could not get local peer reserved vnis" );
+            throw new EnvironmentCreationException( "Failed to obtain reserved network resources from local peer" );
         }
-        return null;
+
+        Set<String> allP2pSubnets = Sets.newHashSet();
+        Set<String> allContainerSubnets = Sets.newHashSet();
+        Set<Long> allVnis = Sets.newHashSet();
+
+        for ( UsedNetworkResources netResources : reservedNetResources.values() )
+        {
+            allContainerSubnets.addAll( netResources.getContainerSubnets() );
+            allP2pSubnets.addAll( netResources.getP2pSubnets() );
+            allVnis.addAll( netResources.getVnis() );
+        }
+        peerDto.setVnis( allVnis );
+        peerDto.setContainerSubnets( allContainerSubnets );
+        peerDto.setP2pSubnets( allP2pSubnets );
+        return peerDto;
     }
 
 
-    public Set<String> getTunnelNetworks()
+    public void reserveNetworkResource( EnvironmentPeerDto peerDto ) throws EnvironmentCreationException
     {
-        Set<String> usedInterfaces = new HashSet<>();
-        try
+        final LocalPeer localPeer = peerManager.getLocalPeer();
+        final EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+
+        final String subnetWithoutMask = env.getSubnetCidr().replace( "/24", "" );
+        completionService.submit( new Callable<Peer>()
         {
-            Set<HostInterfaceModel> r =
-                    peerManager.getLocalPeer().getInterfaces().filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
-
-
-            Collection tunnels = CollectionUtils.collect( r, new Transformer()
+            @Override
+            public Peer call() throws Exception
             {
-                @Override
-                public Object transform( final Object o )
-                {
-                    HostInterface i = ( HostInterface ) o;
-                    SubnetUtils u = new SubnetUtils( i.getIp(), P2PUtil.P2P_SUBNET_MASK );
-                    return u.getInfo().getNetworkAddress();
-                }
-            } );
-
-            usedInterfaces.addAll( tunnels );
-            return usedInterfaces;
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Could not get local peer used interfaces" );
-        }
-        return null;
-    }
-
-
-    public Set<String> getReservedGateways()
-    {
-        Set<String> gatewayDtos = new HashSet<>();
-        try
-        {
-
-            Gateways gateways = peerManager.getLocalPeer().getGateways();
-            for ( Gateway gateway : gateways.list() )
-            {
-                gatewayDtos.add( gateway.getIp() );
+                localPeer.reserveNetworkResource(
+                        new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), subnetWithoutMask ) );
+                return localPeer;
             }
-            return gatewayDtos;
-        }
-        catch ( PeerException e )
+        } );
+
+        executorService.shutdown();
+        try
         {
-            LOG.error( "Could not get local peer used interfaces" );
+            Future<Peer> f = completionService.take();
+            f.get();
         }
-        return null;
+        catch ( Exception e )
+        {
+            throw new EnvironmentCreationException( "Failed to reserve network resources on all peers" );
+        }
     }
 
 
@@ -192,33 +196,19 @@ public class HubEnvironmentManager
     }
 
 
-    public void setupVNI( EnvironmentPeerDto peerDto )
-    {
-        try
-        {
-            Vni vni = new Vni( peerDto.getEnvironmentInfo().getVni(), peerDto.getEnvironmentInfo().getId() );
-            peerManager.getLocalPeer().reserveVni( vni );
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Could not setup VNI", e.getMessage() );
-        }
-    }
-
-
     public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto )
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
         SubnetUtils.SubnetInfo subnetInfo =
-                new SubnetUtils( peerDto.getEnvironmentInfo().getTunnelNetwork(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
+                new SubnetUtils( peerDto.getEnvironmentInfo().getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
         final String[] addresses = subnetInfo.getAllAddresses();
 
         try
         {
-            localPeer.setupInitialP2PConnection(
+            localPeer.createP2PSwarm(
                     new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[0], env.getP2pKey(),
                             env.getP2pTTL() ) );
         }
@@ -256,25 +246,25 @@ public class HubEnvironmentManager
     public void setupTunnel( EnvironmentDto environmentDto ) throws InterruptedException, ExecutionException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
-        Map<String, String> tunnels = new HashMap<>();
+        P2pIps p2pIps = new P2pIps();
 
-        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
-        {
-            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
-            {
-                tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
-            }
-        }
+        //        for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
+        //        {
+        //            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
+        //            {
+        //                tunnels.put( peerDto.getPeerId(), peerDto.getTunnelAddress() );
+        //            }
+        //        }
 
-        if ( !tunnels.isEmpty() )
+        if ( !p2pIps.isEmpty() )
         {
             ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
-            ExecutorCompletionService<Integer> tunnelCompletionService =
-                    new ExecutorCompletionService<Integer>( tunnelExecutor );
+            ExecutorCompletionService<Boolean> tunnelCompletionService =
+                    new ExecutorCompletionService<>( tunnelExecutor );
 
-            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), tunnels ) );
+            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), p2pIps ) );
 
-            final Future<Integer> f = tunnelCompletionService.take();
+            final Future<Boolean> f = tunnelCompletionService.take();
             f.get();
 
             tunnelExecutor.shutdown();
@@ -287,7 +277,7 @@ public class HubEnvironmentManager
         Set<Node> nodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
-            if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+            if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
             {
                 ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
                 Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(),
@@ -332,11 +322,12 @@ public class HubEnvironmentManager
 
             for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
             {
-                if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
+                if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
                 {
                     ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
                     try
                     {
+                        nodeDto.setState( ContainerStateDto.UNKNOWN );
                         CloneRequest cloneRequest = new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(),
                                 nodeDto.getContainerName(), nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(),
                                 peerDto.getPeerId(), peerDto.getOwnerId(), nodeDto.getTemplateName(),
@@ -400,7 +391,10 @@ public class HubEnvironmentManager
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
-                sshKeys.addAll( nodeDto.getSshKeys() );
+                if ( nodeDto.getSshKeys() != null )
+                {
+                    sshKeys.addAll( nodeDto.getSshKeys() );
+                }
             }
         }
 
@@ -517,31 +511,36 @@ public class HubEnvironmentManager
         @Override
         public P2PConfig call() throws Exception
         {
-            p2PConfig.setAddress( peer.setupP2PConnection( p2PConfig ) );
+            P2PConnections p2PConnections = peer.joinP2PSwarm( p2PConfig );
+            for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
+            {
+                p2PConfig.addP2pIp( p2PConnection.getIp() );
+            }
             return p2PConfig;
         }
     }
 
 
-    private class SetupTunnelTask implements Callable<Integer>
+    private class SetupTunnelTask implements Callable<Boolean>
     {
         private final Peer peer;
         private final String environmentId;
-        private final Map<String, String> tunnels;
+        private final P2pIps p2pIps;
 
 
-        public SetupTunnelTask( final Peer peer, final String environmentId, final Map<String, String> tunnels )
+        public SetupTunnelTask( final Peer peer, final String environmentId, P2pIps p2pIps )
         {
             this.peer = peer;
             this.environmentId = environmentId;
-            this.tunnels = tunnels;
+            this.p2pIps = p2pIps;
         }
 
 
         @Override
-        public Integer call() throws Exception
+        public Boolean call() throws Exception
         {
-            return peer.setupTunnels( tunnels, environmentId );
+            peer.setupTunnels( p2pIps, environmentId );
+            return true;
         }
     }
 

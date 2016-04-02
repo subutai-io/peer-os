@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.cli;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
+import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -40,7 +41,7 @@ public class ReserveNetworkResourceCommand extends SubutaiShellCommandSupport
     {
         try
         {
-            localPeer.reserveNetworkResource( envId, vni, p2pSubnet, containerSubnet );
+            localPeer.reserveNetworkResource( new NetworkResourceImpl( envId, vni, p2pSubnet, containerSubnet ) );
 
             System.out.println( "Network resource reserved" );
         }

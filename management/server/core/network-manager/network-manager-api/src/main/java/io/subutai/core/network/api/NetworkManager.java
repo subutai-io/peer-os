@@ -1,57 +1,29 @@
 package io.subutai.core.network.api;
 
 
-import java.util.Set;
-
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.network.Vni;
-import io.subutai.common.network.VniVlanMapping;
-import io.subutai.common.network.Vnis;
 import io.subutai.common.peer.Host;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.PingDistance;
-import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 
 
 public interface NetworkManager
 {
-    String TUNNEL_PREFIX = "tunnel";
-    String TUNNEL_TYPE = "vxlan";
-    String P2P_STRING_KEY = "string";
-
 
     /**
-     * Sets up an P2P connection on management host
+     * Sets up an P2P connection on specified host with explicit IP. Usually used to setup new swarm with this peer as
+     * the first member
      */
-    public void setupP2PConnection( String interfaceName, String localIp, String p2pHash, String secretKey,
-                                    long secretKeyTtlSec ) throws NetworkManagerException;
+    public void createP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                                long secretKeyTtlSec ) throws NetworkManagerException;
 
     /**
-     * Sets up an P2P connection on specified host
+     * Sets up an P2P connection on specified host with dynamically acquired IP. Usually used to connect peer to
+     * existing swarm
      */
-    public void setupP2PConnection( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
-                                    long secretKeyTtlSec ) throws NetworkManagerException;
-
-    /**
-     * Removes P2P connection
-     */
-    public void removeP2PConnection( String p2pHash ) throws NetworkManagerException;
-
-    /**
-     * Removes P2P connection on specified host
-     */
-    public void removeP2PConnection( Host host, String p2pHash ) throws NetworkManagerException;
-
-
-    /**
-     * Resets a secret key for a given P2P network
-     *
-     * @param p2pHash - P2P network hash
-     * @param newSecretKey - new secret key to set
-     * @param ttlSeconds - time-to-live for the new secret key
-     */
-    public void resetP2PSecretKey( String p2pHash, String newSecretKey, long ttlSeconds )
+    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
+                              final long secretKeyTtlSec )
             throws NetworkManagerException;
 
     /**
@@ -62,7 +34,7 @@ public interface NetworkManager
      * @param newSecretKey - new secret key to set
      * @param ttlSeconds - time-to-live for the new secret key
      */
-    public void resetP2PSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
+    public void resetSwarmSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
 
@@ -76,57 +48,11 @@ public interface NetworkManager
 
     public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
 
-    /**
-     * Returns all p2p connections running on MH
-     */
 
-    public P2PConnections getP2PConnections() throws NetworkManagerException;
-
-
-    /**
-     * Sets up tunnel to another peer on management host
-     */
-    public void setupTunnel( int tunnelId, String tunnelIp ) throws NetworkManagerException;
-
-    /**
-     * Removes tunnel to another peer on management host
-     */
-    public void removeTunnel( int tunnelId ) throws NetworkManagerException;
-
-
-    /**
-     * Lists existing tunnels on management host
-     */
-    public Set<Tunnel> listTunnels() throws NetworkManagerException;
-
-
-    /**
-     * Sets up VNI-VLAN mapping on management host
-     */
-    public void setupVniVLanMapping( int tunnelId, long vni, int vLanId, String environmentId )
+    public void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
             throws NetworkManagerException;
 
-    /**
-     * Removes VNI-VLAN mapping on management host
-     */
-    public void removeVniVLanMapping( int tunnelId, long vni, int vLanId ) throws NetworkManagerException;
-
-    /**
-     * Returns all vni-vlan mappings on management host
-     */
-    public Set<VniVlanMapping> getVniVlanMappings() throws NetworkManagerException;
-
-    /**
-     * Reserves VNI on management host
-     *
-     * @param vni - vni to reserve
-     */
-    public void reserveVni( Vni vni ) throws NetworkManagerException;
-
-    /**
-     * Returns all reserved VNIs on management host
-     */
-    public Vnis getReservedVnis() throws NetworkManagerException;
+    public Tunnels getTunnels( final Host host ) throws NetworkManagerException;
 
 
     /**
@@ -188,7 +114,7 @@ public interface NetworkManager
      * @param containerIp - ip fo container
      * @param sshIdleTimeout - timeout during which the ssh connectivity is active in seconds
      *
-     * @return - port to which clients should connect to access the contaier via ssh
+     * @return - port to which clients should connect to access the container via ssh
      */
     int setupContainerSsh( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
 }

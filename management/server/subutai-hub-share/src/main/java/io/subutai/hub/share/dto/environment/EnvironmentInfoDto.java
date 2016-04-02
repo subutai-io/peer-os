@@ -15,8 +15,6 @@ public class EnvironmentInfoDto
 
     private String p2pSubnet;
 
-    private String tunnelNetwork;
-
     private EnvironmentDto.State state;
 
     private String publicKey;
@@ -28,6 +26,12 @@ public class EnvironmentInfoDto
     private String p2pKey;
 
     private String description;
+
+    private String domainName;
+
+    private String domainLoadBalanceStrategy;
+
+    private String sslCertPath;
 
     private Long vni;
 
@@ -173,18 +177,6 @@ public class EnvironmentInfoDto
     }
 
 
-    public String getTunnelNetwork()
-    {
-        return tunnelNetwork;
-    }
-
-
-    public void setTunnelNetwork( final String tunnelNetwork )
-    {
-        this.tunnelNetwork = tunnelNetwork;
-    }
-
-
     public Set<SSHKeyDto> getSshKeys()
     {
         return sshKeys;
@@ -202,6 +194,7 @@ public class EnvironmentInfoDto
         this.sshKeys.add( sshKey );
     }
 
+
     public String getVEHS()
     {
         return VEHS;
@@ -211,5 +204,41 @@ public class EnvironmentInfoDto
     public void setVEHS( final String VEHS )
     {
         this.VEHS = VEHS;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
+    }
+
+
+    public void setDomainName( final String domainName )
+    {
+        this.domainName = domainName;
+    }
+
+
+    public String getDomainLoadBalanceStrategy()
+    {
+        return domainLoadBalanceStrategy;
+    }
+
+
+    public void setDomainLoadBalanceStrategy( final String domainLoadBalanceStrategy )
+    {
+        this.domainLoadBalanceStrategy = domainLoadBalanceStrategy;
+    }
+
+
+    public String getSslCertPath()
+    {
+        return sslCertPath;
+    }
+
+
+    public void setSslCertPath( final String sslCertPath )
+    {
+        this.sslCertPath = sslCertPath;
     }
 }

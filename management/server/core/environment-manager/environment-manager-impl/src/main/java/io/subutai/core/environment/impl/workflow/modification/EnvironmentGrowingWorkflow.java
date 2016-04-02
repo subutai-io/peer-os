@@ -16,10 +16,11 @@ import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplates
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
-import io.subutai.core.environment.impl.workflow.modification.steps.VNISetupStep;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 
 
 public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkflow.EnvironmentGrowingPhase>
@@ -33,6 +34,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
+    private SecurityManager securityManager;
 
 
     //environment creation phases
@@ -40,7 +42,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     {
         INIT,
         GENERATE_KEYS,
-        SETUP_VNI,
+        RESERVE_NET,
         SETUP_P2P,
         PREPARE_TEMPLATES,
         CLONE_CONTAINERS,
@@ -52,13 +54,14 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
 
     public EnvironmentGrowingWorkflow( String defaultDomain, TemplateManager templateRegistry, PeerManager peerManager,
-                                       EnvironmentImpl environment, Topology topology,
+                                       SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
                                        TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
         super( EnvironmentGrowingPhase.INIT );
 
         this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
+        this.securityManager = securityManager;
         this.environment = environment;
         this.topology = topology;
         this.operationTracker = operationTracker;
@@ -88,11 +91,11 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new PEKGenerationStep( topology, environment, peerManager, operationTracker ).execute();
+            new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
-            return EnvironmentGrowingPhase.SETUP_VNI;
+            return EnvironmentGrowingPhase.RESERVE_NET;
         }
         catch ( Exception e )
         {
@@ -103,13 +106,13 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     }
 
 
-    public EnvironmentGrowingPhase SETUP_VNI()
+    public EnvironmentGrowingPhase RESERVE_NET()
     {
-        operationTracker.addLog( "Setting up VNI" );
+        operationTracker.addLog( "Reserving network resources" );
 
         try
         {
-            new VNISetupStep( topology, environment, peerManager, operationTracker ).execute();
+            new ReservationStep( topology, environment, peerManager, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
@@ -247,8 +250,8 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     @Override
     public void fail( final String message, final Throwable e )
     {
-        saveFailState();
         super.fail( message, e );
+        saveFailState();
     }
 
 

@@ -408,7 +408,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/kurjun/controller.js',
                                 'subutai-app/kurjun/service.js',
                                 'subutai-app/identity/service.js',
-                                'subutai-app/settingsKurjun/service.js'
+								'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
@@ -653,8 +653,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             name: 'subutai.settings-kurjun',
                             files: [
                                 'subutai-app/settingsKurjun/settingsKurjun.js',
-                                'subutai-app/settingsKurjun/controller.js',
-                                'subutai-app/settingsKurjun/service.js'
+                                'subutai-app/settingsKurjun/controller.js'
                             ]
                         }
                     ]);
@@ -918,6 +917,7 @@ app.directive('focusInput', function ($timeout, $parse) {
 var bazaarUpdate = false;
 
 var SERVER_URL = '/';
+var GLOBAL_KURJUN_URL = '';
 
 var STATUS_UNDER_MODIFICATION = 'UNDER_MODIFICATION';
 var VARS_TOOLTIP_TIMEOUT = 1600;

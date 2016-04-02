@@ -1,4 +1,4 @@
-package io.subutai.common.peer;
+package io.subutai.common.network;
 
 
 public interface NetworkResource
@@ -13,4 +13,6 @@ public interface NetworkResource
 
 
     public String getContainerSubnet();
+
+    public int getVlan();
 }

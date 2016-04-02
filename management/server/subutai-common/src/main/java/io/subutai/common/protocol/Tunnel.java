@@ -1,8 +1,13 @@
 package io.subutai.common.protocol;
 
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.NumUtil;
 
 
 /**
@@ -10,20 +15,30 @@ import com.google.common.base.Strings;
  */
 public class Tunnel
 {
-    public static final String TUNNEL_PREFIX = "tunnel";
+    @JsonProperty( "tunnelName" )
     private final String tunnelName;
+    @JsonProperty( "tunnelIp" )
     private final String tunnelIp;
-    private final int tunnelId;
+    @JsonProperty( "vlan" )
+    private final int vlan;
+    @JsonProperty( "vni" )
+    private final long vni;
 
 
-    public Tunnel( final String tunnelName, final String tunnelIp )
+    public Tunnel( @JsonProperty( "tunnelName" ) final String tunnelName,
+                   @JsonProperty( "tunnelIp" ) final String tunnelIp, @JsonProperty( "vlan" ) final int vlan,
+                   @JsonProperty( "vni" ) final long vni )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelName ) );
-        Preconditions.checkArgument( tunnelName.matches( String.format( "%s\\d+", TUNNEL_PREFIX ) ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( tunnelIp ) );
+        Preconditions.checkArgument( tunnelIp.matches( Common.IP_REGEX ) );
+        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
+        Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
 
         this.tunnelName = tunnelName;
         this.tunnelIp = tunnelIp;
-        this.tunnelId = Integer.parseInt( tunnelName.replace( TUNNEL_PREFIX, "" ) );
+        this.vlan = vlan;
+        this.vni = vni;
     }
 
 
@@ -39,8 +54,14 @@ public class Tunnel
     }
 
 
-    public int getTunnelId()
+    public int getVlan()
     {
-        return tunnelId;
+        return vlan;
+    }
+
+
+    public long getVni()
+    {
+        return vni;
     }
 }

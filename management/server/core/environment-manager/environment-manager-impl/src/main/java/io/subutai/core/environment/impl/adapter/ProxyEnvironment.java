@@ -28,7 +28,7 @@ public class ProxyEnvironment extends EnvironmentImpl
                 json.get( "name" ).asText(),
                 json.get( "subnetCidr" ).asText(),
                 null,
-                3L,
+                0L,
                 "hub" // peerId
         );
 

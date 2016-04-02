@@ -2,12 +2,13 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +19,11 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.task.PeerEnvironmentKeyTask;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 
 
-//todo add trust relations
 public class PEKGenerationStep
 {
     private static final Logger LOG = LoggerFactory.getLogger( PEKGenerationStep.class );
@@ -29,14 +31,16 @@ public class PEKGenerationStep
     private final EnvironmentImpl environment;
     private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
+    private final SecurityManager securityManager;
 
 
     public PEKGenerationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
-                              final TrackerOperation trackerOperation )
+                              final SecurityManager securityManager, final TrackerOperation trackerOperation )
     {
         this.topology = topology;
         this.environment = environment;
         this.peerManager = peerManager;
+        this.securityManager = securityManager;
         this.trackerOperation = trackerOperation;
     }
 
@@ -59,18 +63,14 @@ public class PEKGenerationStep
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
 
+        final PGPSecretKeyRing envSecKeyRing = getEnvironmentKeyRing();
+        final PGPPublicKeyRing localPeerSignedPEK = getLocalPeerPek();
+        // creating PEK on remote peers
         for ( final Peer peer : peers )
         {
-            completionService.submit( new Callable<Peer>()
-            {
-                @Override
-                public Peer call() throws Exception
-                {
-                    peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() ).getKey();
-
-                    return peer;
-                }
-            } );
+            completionService.submit(
+                    new PeerEnvironmentKeyTask( peerManager.getLocalPeer(), envSecKeyRing, localPeerSignedPEK,
+                            environment, peer, securityManager.getKeyManager() ) );
         }
 
         Set<Peer> succeededPeers = Sets.newHashSet();
@@ -104,5 +104,18 @@ public class PEKGenerationStep
         {
             throw new PeerException( "Failed to generate PEK across all peers" );
         }
+    }
+
+
+    private PGPSecretKeyRing getEnvironmentKeyRing()
+    {
+        return securityManager.getKeyManager().getSecretKeyRing( environment.getEnvironmentId().getId() );
+    }
+
+
+    public PGPPublicKeyRing getLocalPeerPek()
+    {
+        return securityManager.getKeyManager().getPublicKeyRing(
+                peerManager.getLocalPeer().getId() + "-" + environment.getEnvironmentId().getId() );
     }
 }
