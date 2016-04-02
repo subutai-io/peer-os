@@ -130,7 +130,7 @@ public class EnvironmentAdapter
 
     public void removeEnvironment( EnvironmentImpl env )
     {
-        hubAdapter.removeEnvironment( env.getEnvironmentId().getId() );
+        hubAdapter.removeEnvironment( env.getId() );
     }
 
 
