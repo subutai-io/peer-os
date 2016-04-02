@@ -33,7 +33,6 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
@@ -203,13 +202,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public void setDefaultGateway( final String gatewayIp ) throws PeerException
-    {
-        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
-    }
-
-
-    @Override
     public boolean isLocal()
     {
         return true;
@@ -224,7 +216,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         }
         catch ( PeerException e )
         {
-            LOGGER.error( "Error getting container state #getState", e );
             return ContainerHostState.UNKNOWN;
         }
     }

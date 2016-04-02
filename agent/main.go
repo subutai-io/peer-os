@@ -45,6 +45,14 @@ func main() {
 			lib.LxcAttach(c.Args().Get(0), c.Bool("c"), c.Bool("x"), c.Bool("r"))
 		}}, {
 
+		Name: "backup", Usage: "backup Subutai container",
+		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "full", Usage: "make full backup"},
+			cli.BoolFlag{Name: "stop", Usage: "stop container at the time of backup"}},
+		Action: func(c *cli.Context) {
+			lib.BackupContainer(c.Args().Get(0), c.Bool("full"), c.Bool("stop"))
+		}}, {
+
 		Name: "batch", Usage: "batch commands execution",
 		Flags: []cli.Flag{
 			cli.StringFlag{Name: "json", Usage: "JSON string with commands"}},
@@ -141,7 +149,7 @@ func main() {
 			Name:  "p2p",
 			Usage: "p2p network operation",
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName localPeepIPAddr hash key ttl)"},
+				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr)"},
 				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
 				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
 				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
@@ -219,10 +227,14 @@ func main() {
 
 		Name: "quota", Usage: "set quotas for Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
-			cli.StringFlag{Name: "m", Usage: "get the maximum quota can be set to the specified container and resource_type in their default units"}},
+			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"}},
 		Action: func(c *cli.Context) {
-			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("m"))
+			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"))
+		}}, {
+
+		Name: "register", Usage: "register Subutai container",
+		Action: func(c *cli.Context) {
+			lib.LxcRegister(c.Args().Get(0))
 		}}, {
 
 		Name: "rename", Usage: "rename Subutai container",
@@ -230,9 +242,12 @@ func main() {
 			lib.LxcRename(c.Args().Get(0), c.Args().Get(1))
 		}}, {
 
-		Name: "register", Usage: "register Subutai container",
+		Name: "restore", Usage: "restore Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "d", Usage: "date of backup snapshot"},
+			cli.StringFlag{Name: "c", Usage: "name of new container"}},
 		Action: func(c *cli.Context) {
-			lib.LxcRegister(c.Args().Get(0))
+			lib.RestoreContainer(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
 		}}, {
 
 		Name: "stats", Usage: "statistics from host",
@@ -262,19 +277,11 @@ func main() {
 			lib.LxcUnregister(c.Args().Get(0))
 		}}, {
 
-		Name: "backup", Usage: "backup Subutai container",
+		Name: "update", Usage: "update Subutai management, container or Resource host",
 		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "full", Usage: "make full backup"}},
+			cli.BoolFlag{Name: "c", Usage: "check for updates without installation"}},
 		Action: func(c *cli.Context) {
-			lib.BackupContainer(c.Args().Get(0), c.Bool("full"))
-		}}, {
-
-		Name: "restore", Usage: "restore Subutai container",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "d", Usage: "date of backup snapshot"},
-			cli.StringFlag{Name: "c", Usage: "name of new container"}},
-		Action: func(c *cli.Context) {
-			lib.RestoreContainer(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
+			lib.Update(c.Args().Get(0), c.Bool("c"))
 		}},
 	}
 

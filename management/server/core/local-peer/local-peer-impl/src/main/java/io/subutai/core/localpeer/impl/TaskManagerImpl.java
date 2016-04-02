@@ -10,15 +10,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.task.ResponseCollector;
@@ -45,7 +41,7 @@ public class TaskManagerImpl implements TaskManager
     public TaskManagerImpl( LocalPeer localPeer )
     {
         this.localPeer = localPeer;
-        cleaner = Executors.newScheduledThreadPool( 1 );
+        cleaner = Executors.newSingleThreadScheduledExecutor();
         cleaner.scheduleWithFixedDelay( new TaskCleaner(), 10, 600, TimeUnit.SECONDS );
     }
 
@@ -70,17 +66,17 @@ public class TaskManagerImpl implements TaskManager
 
     private ExecutorService getExecutor( final Task task )
     {
-        String executorId = task.getRequest().getResourceHostId() + ( task.isSequential() ? "S" : "C" );
+        String executorId = String.format( "%s-%s", task.getRequest().getResourceHostId(), task.getClass().getName() );
         ExecutorService executor = executors.get( executorId );
         if ( executor == null )
         {
-            if ( task.isSequential() )
+            if ( task.getNumberOfParallelTasks() <= 0 )
             {
-                executor = Executors.newSingleThreadExecutor();
+                executor = Executors.newCachedThreadPool();
             }
             else
             {
-                executor = Executors.newCachedThreadPool();
+                executor = Executors.newFixedThreadPool( task.getNumberOfParallelTasks() );
             }
             executors.put( executorId, executor );
         }

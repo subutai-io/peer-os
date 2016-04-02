@@ -1,8 +1,6 @@
 package io.subutai.core.environment.impl;
 
 
-import java.util.HashSet;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,26 +14,20 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.impl.dao.EnvironmentDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
-import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.object.relation.api.RelationManager;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -52,14 +44,18 @@ public class EnvironmentManagerTest
     PeerManager peerManager;
     @Mock
     SecurityManager securityManager;
-    @Mock
-    NetworkManager networkManager;
+
     @Mock
     DaoManager daoManager;
     @Mock
     IdentityManager identityManager;
+
     @Mock
     RelationManager relationManager;
+
+    @Mock
+    private HubAdapter hubAdapter;
+
     @Mock
     Tracker tracker;
     @Mock
@@ -68,8 +64,7 @@ public class EnvironmentManagerTest
     Node node;
     @Mock
     User user;
-    @Mock
-    EnvironmentDataService environmentDataService;
+
     @Mock
     EnvironmentImpl environment;
     @Mock
@@ -88,28 +83,25 @@ public class EnvironmentManagerTest
     @Before
     public void setUp() throws Exception
     {
-        when( node.getPeerId() ).thenReturn( PEER_ID );
-        when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
-        doReturn( true ).when( peer ).isOnline();
-
-        //        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
-
-        environmentManager =
-                spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, networkManager,
-                        daoManager, identityManager, tracker, relationManager/*, strategyManager, quotaManager*/ ) );
-        doReturn( environment ).when( environmentManager )
-                               .createEmptyEnvironment( anyString(), anyString(), anyString() );
-        //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
-        doReturn( new HashSet<>() ).when( environmentManager ).getUsedIps( ( Peer ) any() );
-        doReturn( environmentCreationWorkflow ).when( environmentManager )
-                                               .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
-                                                       any( Topology.class ), anyString(),
-                                                       any( TrackerOperation.class ) );
-        environmentManager.environmentDataService = environmentDataService;
-        //doReturn( user ).when( identityManager ).getUser();
-        doReturn( environment ).when( environmentDataService ).find( anyString() );
-        doReturn( ENV_ID ).when( environment ).getId();
-        doReturn( trackerOperation ).when( tracker ).createTrackerOperation( anyString(), anyString() );
+        //        when( node.getPeerId() ).thenReturn( PEER_ID );
+        //        when( peerManager.getPeer( PEER_ID ) ).thenReturn( peer );
+        //        doReturn( true ).when( peer ).isOnline();
+        //
+        //        //        blueprint = new Blueprint( "env", null, Sets.newHashSet( nodeGroup ) );
+        //
+        //        environmentManager =
+        //                spy( new EnvironmentManagerImpl( templateRegistry, peerManager, securityManager, daoManager,
+        //                        identityManager, tracker, relationManager, hubAdapter ) );
+        //        //        doReturn( topology ).when( environmentManager ).buildTopology( blueprint );
+        //        doReturn( environmentCreationWorkflow ).when( environmentManager )
+        //                                               .getEnvironmentCreationWorkflow( any( EnvironmentImpl.class ),
+        //                                                       any( Topology.class ), anyString(),
+        //                                                       any( TrackerOperation.class ) );
+        //        environmentManager.environmentDataService = environmentDataService;
+        //        //doReturn( user ).when( identityManager ).getUser();
+        //        doReturn( environment ).when( environmentDataService ).find( anyString() );
+        //        doReturn( ENV_ID ).when( environment ).getId();
+        //        doReturn( trackerOperation ).when( tracker ).createTrackerOperation( anyString(), anyString() );
     }
 
 

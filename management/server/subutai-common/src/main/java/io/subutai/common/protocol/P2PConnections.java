@@ -2,10 +2,12 @@ package io.subutai.common.protocol;
 
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -13,34 +15,66 @@ import com.google.common.base.Preconditions;
  */
 public class P2PConnections
 {
-    private Set<P2PConnection> connections;
+    @JsonProperty( "connections" )
+    private Set<P2PConnection> connections = new HashSet<>();
 
 
-    public P2PConnections( final Set<P2PConnection> connections )
+    public P2PConnections( @JsonProperty( "connections" ) final Set<P2PConnection> connections )
     {
+        Preconditions.checkNotNull( connections );
+
         this.connections = connections;
+    }
+
+
+    public P2PConnections()
+    {
+    }
+
+
+    public void addConnection( P2PConnection p2PConnection )
+    {
+
+        Preconditions.checkNotNull( p2PConnection, "P2P connection can not be null." );
+
+        connections.add( p2PConnection );
     }
 
 
     public Set<P2PConnection> getConnections()
     {
-        return this.connections == null ? new HashSet<P2PConnection>() : this.connections;
+        return this.connections;
     }
 
 
-    public P2PConnection findCommunityConnection( final String communityName )
+    public P2PConnection findByHash( final String hash )
     {
-        Preconditions.checkNotNull( communityName );
+        Preconditions.checkNotNull( hash );
 
-        P2PConnection result = null;
-        for ( Iterator<P2PConnection> i = connections.iterator(); i.hasNext() && result == null; )
+        for ( P2PConnection p2PConnection : getConnections() )
         {
-            P2PConnection c = i.next();
-            if ( communityName.equalsIgnoreCase( c.getCommunityName() ) )
+            if ( p2PConnection.getHash().equalsIgnoreCase( hash ) )
             {
-                result = c;
+                return p2PConnection;
             }
         }
-        return result;
+
+        return null;
+    }
+
+
+    public P2PConnection findByIp( final String ip )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) );
+
+        for ( P2PConnection p2PConnection : getConnections() )
+        {
+            if ( p2PConnection.getIp().equalsIgnoreCase( ip ) )
+            {
+                return p2PConnection;
+            }
+        }
+
+        return null;
     }
 }

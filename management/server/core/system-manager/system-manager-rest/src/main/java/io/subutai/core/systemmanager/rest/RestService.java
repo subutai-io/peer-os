@@ -39,7 +39,8 @@ public interface RestService
     @POST
     @Path( "update_kurjun_settings_urls" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setKurjunSettingsUrls( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls )
+    public Response setKurjunSettingsUrls( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls,
+                                           @FormParam( "localKurjunUrls" ) String localKurjunUrls )
             throws ConfigurationException;
 
 
@@ -83,7 +84,8 @@ public interface RestService
                                         @FormParam( "securePortX2" ) String securePortX2,
                                         @FormParam( "securePortX3" ) String securePortX3,
                                         @FormParam( "publicUrl" ) String publicUrl,
-                                        @FormParam( "agentPort" ) String agentPort ) throws ConfigurationException;
+                                        @FormParam( "agentPort" ) String agentPort,
+                                        @FormParam( "publicSecurePort" ) String publicSecurePort ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )

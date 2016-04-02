@@ -2,13 +2,10 @@
 
 angular.module('subutai.identity-user.controller', [])
 	.controller('IdentityUserCtrl', IdentityUserCtrl)
-	.controller('IdentityUserFormCtrl', IdentityUserFormCtrl)
 	.directive('pwCheck', pwCheck)
-	.directive('colSelect', colSelect)
-	.directive('colSelect2', colSelect2);
+	.directive('colSelect', colSelect);
 
 IdentityUserCtrl.$inject = ['$scope', 'identitySrv', 'SweetAlert', 'ngDialog', 'cfpLoadingBar', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile'];
-IdentityUserFormCtrl.$inject = ['$scope', 'identitySrv', 'ngDialog', 'SweetAlert'];
 
 var trustedLevels = {
 	1: "Never Trust",
@@ -41,6 +38,19 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	var vm = this;
 
+	vm.user2Add = {"trustLevel": 2};
+	vm.users = [];
+	vm.roles = [];
+	vm.currentUserRoles = [];
+	vm.editUserName = false;
+	vm.activeTab = "approved";
+	vm.addUserForm = '';
+
+	vm.userTypes = {
+		1: "Systemt",
+		2: "Regular",
+	};
+
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
 		cfpLoadingBar.complete();
@@ -50,15 +60,12 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	vm.userForm = userForm;
 	vm.deleteUser = deleteUser;
 	vm.removeRoleFromUser = removeRoleFromUser;
-	vm.activeTab = "approved";
-	vm.users = [];
+	vm.addUser = addUser;
+	vm.colSelectUserRole = colSelectUserRole;
+	vm.selectAll = selectAll;
+	vm.unselectAll = unselectAll;
 
 	vm.trustedLevels = trustedLevels;
-
-	vm.userTypes = {
-		1: "Systemt",
-		2: "Regular",
-	};
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
@@ -129,24 +136,25 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 
 	function userForm(userId) {
 		if(userId === undefined || userId === null) userId = false;
-		var user = false;
 		if(userId) {
-			user = vm.users[userId];
-		}
+			vm.user2Add = vm.users[userId];
+			vm.editUser = true;
+			vm.currentUserRoles = angular.copy(vm.user2Add.roles);
+			vm.user2Add.password = '';
+			//vm.user2Add.confirm_password = angular.copy(vm.user2Add.password);
 
+			vm.user2Add.roles = [];
+			for(var i = 0; i < vm.currentUserRoles.length; i++) {
+				vm.user2Add.roles.push(vm.currentUserRoles[i].id);
+			}			
+		}
 
 		ngDialog.open({
 			template: 'subutai-app/identityUser/partials/userForm.html',
-			controller: 'IdentityUserFormCtrl',
-			controllerAs: 'identityUserFormCtrl',
-			data: user,
-			preCloseCallback: function(value) {
-				vm.dtInstance.reloadData(null, false);
-			}
+			scope: $scope
 		});
 	}
 
-	vm.roles = [];
 	function getRolesFromAPI() {
 		identitySrv.getRoles().success(function (data) {
 			vm.roles = data;
@@ -154,6 +162,49 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 	getRolesFromAPI();
 
+	function addUser() {
+		if (vm.addUserForm.$valid) {
+			var postData = userPostData(vm.user2Add);
+			LOADING_SCREEN();
+			ngDialog.closeAll();
+			identitySrv.addUser(postData).success(function (data) {
+				LOADING_SCREEN('none');
+				if(Object.keys(vm.dtInstance).length !== 0) {
+					vm.dtInstance.reloadData(null, false);
+				}
+			}).error(function(error){
+				LOADING_SCREEN('none');
+				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
+			});
+			vm.user2Add = {"trustLevel": 2};
+			vm.addUserForm.$setPristine();
+			vm.addUserForm.$setUntouched();
+		}
+	}
+
+	function colSelectUserRole(id) {
+
+		if(vm.user2Add.roles === undefined) {
+			vm.user2Add.roles = [];
+		}
+
+		if(vm.user2Add.roles.indexOf(id) >= 0) {
+			vm.user2Add.roles.splice(vm.user2Add.roles.indexOf(id), 1);
+		} else {
+			vm.user2Add.roles.push(id);
+		}
+	}
+
+	function selectAll() {
+		vm.user2Add.roles = [];
+		for (var i = 0; i < vm.roles.length; i++) {
+			vm.user2Add.roles.push(vm.roles[i].id);
+		}
+	}
+
+	function unselectAll() {
+		vm.user2Add.roles = [];
+	}
 
 	function removeRoleFromUser(userId, roleKey) {
 		var user = angular.copy(vm.users[userId]);
@@ -189,6 +240,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	}
 
 	function deleteUser(userId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
 				text: "You will not be able to recover this user!",
@@ -202,6 +254,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 				showLoaderOnConfirm: true
 			},
 			function (isConfirm) {
+				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					identitySrv.deleteUser(userId).success(function (data) {
 						SweetAlert.swal("Deleted!", "User has been deleted.", "success");
@@ -213,152 +266,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			});
 	}
 
-	vm.approveWindow = approveWindow;
-	vm.reject = reject;
-	vm.colSelectUserRole = colSelectUserRole;
-	vm.approve = approve;
-	vm.currentUser = {};
-
-	function approveWindow (user) {
-		vm.currentUser = user;
-		ngDialog.open({
-			template: 'subutai-app/identityUser/partials/approveWindow.html',
-			scope: $scope
-		});
-	}
-
-	function approve() {
-		identitySrv.approve (vm.currentUser.userName, JSON.stringify (vm.currentUser.roles)).success (function (data) {
-			SweetAlert.swal ("Success!", "User was approved.", "success");
-			vm.dtInstance.reloadData(null, false);
-			ngDialog.closeAll();
-		}).error (function (error) {
-			SweetAlert.swal ("ERROR!", "User approve error: " + error.replace(/\\n/g, " "), "error");
-		});
-	}
-
-	function colSelectUserRole(id) {
-
-		if(vm.currentUser.roles === undefined) {
-			vm.currentUser.roles = [];
-		}
-
-		if(vm.currentUser.roles.indexOf(id) >= 0) {
-			vm.currentUser.roles.splice(vm.currentUser.roles.indexOf(id), 1);
-		} else {
-			vm.currentUser.roles.push(id);
-		}
-	}
-
-	function reject (user) {
-		SweetAlert.swal({
-				title: "Are you sure?",
-				text: "Your will not be able to undo this!",
-				type: "warning",
-				showCancelButton: true,
-				confirmButtonColor: "#ff3f3c",
-				confirmButtonText: "Delete",
-				cancelButtonText: "Cancel",
-				closeOnConfirm: false,
-				closeOnCancel: true,
-				showLoaderOnConfirm: true
-			},
-			function (isConfirm) {
-				if (isConfirm) {
-					identitySrv.deleteUser (user.id).success (function (data) {
-						SweetAlert.swal ("Success!", "User was rejected.", "success");
-						vm.dtInstance.reloadData(null, false);
-					}).error (function (error) {
-						SweetAlert.swal ("ERROR!", "User reject error: " + error.replace(/\\n/g, " "), "error");
-					});
-				}
-			});
-	}
-
-	function getKey (id) {
-		return identitySrv.getKey (id);
-	}
-
 };
-
-function IdentityUserFormCtrl($scope, identitySrv, ngDialog, SweetAlert) {
-
-	var vm = this;
-	vm.user2Add = {"trustLevel": 2};
-	vm.roles = [];
-	vm.currentUserRoles = [];
-	vm.editUserName = false;
-
-	vm.trustedLevels = trustedLevels;	
-
-	//functions
-	vm.addUser = addUser;
-	vm.colSelectUserRole = colSelectUserRole;
-	vm.selectAll = selectAll;
-	vm.unselectAll = unselectAll;
-
-	if($scope.ngDialogData !== undefined) {
-		vm.user2Add = $scope.ngDialogData;
-		vm.editUser = true;
-		vm.currentUserRoles = angular.copy(vm.user2Add.roles);
-		vm.user2Add.password = '';
-		//vm.user2Add.confirm_password = angular.copy(vm.user2Add.password);
-
-		vm.user2Add.roles = [];
-		for(var i = 0; i < vm.currentUserRoles.length; i++) {
-			vm.user2Add.roles.push(vm.currentUserRoles[i].id);
-		}
-	}
-
-	function getRolesFromAPI() {
-		identitySrv.getRoles().success(function (data) {
-			vm.roles = data;
-		});
-	}
-	getRolesFromAPI();
-
-	function addUser() {
-		console.log($scope.addUserForm.$valid);
-		if ($scope.addUserForm.$valid) {
-			var postData = userPostData(vm.user2Add);
-			LOADING_SCREEN();
-			identitySrv.addUser(postData).success(function (data) {
-				LOADING_SCREEN('none');
-				ngDialog.closeAll();
-			}).error(function(error){
-				LOADING_SCREEN('none');
-				SweetAlert.swal ("ERROR!", "Error: " + error, "error");
-			});
-			$scope.addUserForm.$setPristine();
-			$scope.addUserForm.$setUntouched();
-		}
-	}
-
-	function colSelectUserRole(id) {
-
-		if(vm.user2Add.roles === undefined) {
-			vm.user2Add.roles = [];
-		}
-
-		if(vm.user2Add.roles.indexOf(id) >= 0) {
-			vm.user2Add.roles.splice(vm.user2Add.roles.indexOf(id), 1);
-		} else {
-			vm.user2Add.roles.push(id);
-		}
-	}
-
-	function selectAll() {
-		vm.user2Add.roles = [];
-		for (var i = 0; i < vm.roles.length; i++) {
-			vm.user2Add.roles.push(vm.roles[i].id);
-		}
-	}
-
-	function unselectAll() {
-		vm.user2Add.roles = [];
-	}
-
-}
 
 function pwCheck() {
 	return {

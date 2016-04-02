@@ -16,7 +16,7 @@ import (
 func LxcRegister(name string) {
 	config.CheckKurjun()
 
-	tarFullPath := config.Agent.LxcPrefix + "lxc-data/tmpdir/" + name + "-subutai-template_" + config.Misc.Version + "_" + config.Misc.Arch + ".tar.gz"
+	tarFullPath := config.Agent.LxcPrefix + "tmpdir/" + name + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
 
 	_, err := os.Stat(tarFullPath)
 	if log.Check(log.WarnLevel, "Looking for archive", err) {
@@ -36,7 +36,7 @@ func LxcRegister(name string) {
 	log.Check(log.FatalLevel, "Copying file to request", err)
 
 	req, err := http.NewRequest("POST", config.Management.Kurjun+"/upload/public?sptoken="+gpg.GetToken(), &data)
-	log.Debug("http://" + config.Management.Kurjun + "/upload/public?sptoken=" + gpg.GetToken())
+	log.Debug(config.Management.Kurjun + "/upload/public?sptoken=" + gpg.GetToken())
 
 	log.Check(log.FatalLevel, "Creating post request", err)
 

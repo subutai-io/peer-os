@@ -46,7 +46,6 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -82,15 +81,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     @Id
     @Column( name = "host_id", nullable = false )
-    @JsonProperty("hostId")
+    @JsonProperty( "hostId" )
     private String hostId;
 
     @Column( name = "hostname", nullable = false )
-    @JsonProperty("hostname")
+    @JsonProperty( "hostname" )
     private String hostname;
 
     @Column( name = "containerName", nullable = true )
-    @JsonProperty("containerName")
+    @JsonProperty( "containerName" )
     private String containerName;
 
     @Column( name = "node_group_name", nullable = false )
@@ -102,7 +101,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     private String creatorPeerId;
 
     @Column( name = "template_name", nullable = false )
-    @JsonProperty("template")
+    @JsonProperty( "template" )
     private String templateName;
 
     @Column( name = "template_arch", nullable = false )
@@ -110,7 +109,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     private HostArchitecture templateArch;
 
     @Column( name = "rh_id", nullable = false )
-    @JsonProperty("resourceHostId")
+    @JsonProperty( "resourceHostId" )
     private String resourceHostId;
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
@@ -120,7 +119,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @ManyToOne( targetEntity = EnvironmentImpl.class, fetch = FetchType.EAGER )
     @JoinColumn( name = "environment_id" )
     @JsonIgnore
-    private Environment environment;
+    protected Environment environment;
 
     @Column( name = "arch", nullable = false )
     @Enumerated
@@ -141,17 +140,17 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     private int hostsGroupId;
 
     @Column( name = "domain_name" )
-    @JsonProperty("domainName")
+    @JsonProperty( "domainName" )
     private String domainName;
 
     @Column( name = "type" )
     @Enumerated( EnumType.STRING )
-    @JsonProperty("size")
+    @JsonProperty( "size" )
     private ContainerSize containerSize;
 
     @Transient
     @JsonIgnore
-    private EnvironmentManagerImpl environmentManager;
+    protected EnvironmentManagerImpl environmentManager;
 
     @Transient
     @JsonIgnore
@@ -227,6 +226,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         setHostInterfaces( hostInterfaces );
     }
 
+
     public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
@@ -247,13 +247,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public HostId getResourceHostId() throws PeerException
     {
         return new HostId( resourceHostId );
-    }
-
-
-    @Override
-    public void setDefaultGateway( final String gatewayIp ) throws PeerException
-    {
-        getPeer().setDefaultGateway( new ContainerGateway( getContainerId(), gatewayIp ) );
     }
 
 
@@ -287,7 +280,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         }
         catch ( PeerException e )
         {
-            logger.error( "Error getting container state #getState", e );
+            logger.warn( "Error getting container state #getState" );
             return ContainerHostState.UNKNOWN;
         }
     }
@@ -305,7 +298,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         try
         {
-            environmentManager.destroyContainer( environment.getId(), this.getId(), false, false );
+            environmentManager.destroyContainer( environment.getId(), this.getId(), false );
         }
         catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
         {
@@ -658,14 +651,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public String toString()
     {
-        ContainerHostState state = getState();
+        String envId = environment != null ? environment.getId() : null;
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
-                          .add( "templateName", templateName ).add( "environmentId", environment.getId() )
+                          .add( "templateName", templateName ).add( "environmentId", envId )
                           .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
                           .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
-                          .add( "hostArchitecture", hostArchitecture ).add( "state", state ).toString();
+                          .add( "hostArchitecture", hostArchitecture ).add( "resourceHostId", resourceHostId )
+                          .toString();
     }
 
 

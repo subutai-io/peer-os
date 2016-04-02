@@ -3,8 +3,6 @@ package io.subutai.common.util;
 
 import java.util.Set;
 
-import com.google.common.base.Preconditions;
-
 
 /**
  * P2P utils.
@@ -15,7 +13,7 @@ public abstract class P2PUtil
     public static final String P2P_INTERFACE_IP_PATTERN = "^10\\..*";
 
 
-    public static String findFreeTunnelNetwork( final Set<String> excludedNetworks )
+    public static String findFreeP2PSubnet( final Set<String> excludedNetworks )
     {
         String result = null;
         int i = 11;
@@ -41,21 +39,25 @@ public abstract class P2PUtil
     }
 
 
-    public static String findFreeAddress( String network, Set<String> excludedAddresses )
+    public static String findFreeContainerSubnet( final Set<String> excludedNetworks )
     {
-        Preconditions.checkNotNull( network, "Network address could not be null." );
-        Preconditions.checkNotNull( excludedAddresses, "Excluded address set could not be null." );
-
-        String fmt = network.replaceAll( ".\\d$", ".%s" );
-
         String result = null;
-        for ( int i = 1; i < 255; i++ )
+        int i = 168;
+        int j = 1;
+
+        while ( result == null && i < 255 )
         {
-            String nextAddress = String.format( fmt, i );
-            if ( !excludedAddresses.contains( nextAddress ) )
+            String s = String.format( "192.%d.%d.0", i, j );
+            if ( !excludedNetworks.contains( s ) )
             {
-                result = nextAddress;
-                break;
+                result = s;
+            }
+
+            j++;
+            if ( j > 254 )
+            {
+                i++;
+                j = 0;
             }
         }
 
@@ -63,14 +65,14 @@ public abstract class P2PUtil
     }
 
 
-    public static String generateCommunityName( final String ip )
+    public static String generateHash( final String envId )
     {
-        return String.format( "com_%s", ip.replace( ".", "_" ) );
+        return String.format( "swarm-%s", envId );
     }
 
 
-    public static String generateInterfaceName( final String ip )
+    public static String generateInterfaceName( final int vlan )
     {
-        return String.format( "p2p_%s", ip.replace( ".", "_" ) );
+        return String.format( "p2p-%d", vlan );
     }
 }

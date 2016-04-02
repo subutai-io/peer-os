@@ -2,10 +2,8 @@ package io.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,8 +21,8 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.Version;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -51,6 +49,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
@@ -70,7 +69,7 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
  */
 @Entity
 @Table( name = "env",
-        uniqueConstraints=@UniqueConstraint(columnNames={"name", "user_id"}))
+        uniqueConstraints = @UniqueConstraint( columnNames = { "name", "user_id" } ) )
 @Access( AccessType.FIELD )
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
@@ -84,27 +83,27 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Id
     @Column( name = "environment_id" )
-    @JsonProperty("environmentId")
-    private String environmentId;
+    @JsonProperty( "environmentId" )
+    protected String environmentId;
 
     @Version
     @JsonIgnore
     private Long version;
 
     @Column( name = "peer_id", nullable = false )
-    @JsonProperty("peerId")
+    @JsonProperty( "peerId" )
     private String peerId;
 
     @Column( name = "name", nullable = false )
-    @JsonProperty("name")
+    @JsonProperty( "name" )
     private String name;
 
     @Column( name = "create_time", nullable = false )
-    @JsonProperty("created")
+    @JsonProperty( "created" )
     private long creationTimestamp = System.currentTimeMillis();
 
     @Column( name = "subnet_cidr" )
-    @JsonProperty("subnet")
+    @JsonProperty( "subnet" )
     private String subnetCidr;
 
     @Column( name = "last_used_ip_idx" )
@@ -116,9 +115,9 @@ public class EnvironmentImpl implements Environment, Serializable
     private Long vni;
 
 
-    @Column( name = "tunnel_network" )
+    @Column( name = "p2p_subnet" )
     @JsonIgnore
-    private String tunnelNetwork;
+    private String p2pSubnet;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
@@ -132,7 +131,7 @@ public class EnvironmentImpl implements Environment, Serializable
 
     @Enumerated( EnumType.STRING )
     @Column( name = "status", nullable = false )
-    @JsonProperty("status")
+    @JsonProperty( "status" )
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
     @Column( name = "relation_declaration", length = 3000 )
@@ -155,12 +154,13 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
+    @Column( length = 1000 )
     @JsonIgnore
     private Set<String> sshKeys = new HashSet<>();
 
     @Transient
     @JsonIgnore
-    private EnvironmentId envId;
+    protected EnvironmentId envId;
 
 
     protected EnvironmentImpl()
@@ -168,14 +168,12 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId, String peerId )
+    public EnvironmentImpl( String name, String sshKey, Long userId, String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
-        SubnetUtils cidr = new SubnetUtils( subnetCidr );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.name = name;
-        this.subnetCidr = cidr.getInfo().getCidrSignature();
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
             sshKeys.add( sshKey.trim() );
@@ -319,12 +317,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void setVersion( final Long version )
-    {
-        this.version = version;
-    }
-
-
     @Override
     public EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
     {
@@ -373,13 +365,25 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void addEnvironmentPeer( final PeerConf peerConf )
     {
-        if ( peerConf == null )
-        {
-            throw new IllegalArgumentException( "Environment peer could not be null." );
-        }
+
+        Preconditions.checkNotNull( peerConf, "Environment peer could not be null." );
 
         peerConf.setEnvironment( this );
         peerConfs.add( peerConf );
+    }
+
+
+    public PeerConf getPeerConf( String peerId )
+    {
+        for ( PeerConf peerConf : peerConfs )
+        {
+            if ( peerConf.getPeerId().equalsIgnoreCase( peerId ) )
+            {
+                return peerConf;
+            }
+        }
+
+        return null;
     }
 
 
@@ -438,14 +442,13 @@ public class EnvironmentImpl implements Environment, Serializable
     public void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        environmentManager.destroyContainer( getId(), containerHost.getId(), async, false );
+        environmentManager.destroyContainer( getId(), containerHost.getId(), async );
     }
 
 
-    //TODO: remove environmentId param
     @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
-                                                          boolean async ) throws EnvironmentModificationException
+    public Set<EnvironmentContainerHost> growEnvironment( final Topology topology, boolean async )
+            throws EnvironmentModificationException
     {
         try
         {
@@ -484,7 +487,10 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void addContainers( Set<EnvironmentContainerImpl> containers )
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( containers ) );
+        if ( CollectionUtil.isCollectionEmpty( containers ) )
+        {
+            return;
+        }
 
         for ( EnvironmentContainerImpl container : containers )
         {
@@ -550,6 +556,15 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public void setSubnetCidr( final String cidr )
+    {
+        SubnetUtils subnetUtils = new SubnetUtils( cidr );
+
+        this.subnetCidr = cidr;
+    }
+
+
+    @Override
     public Long getVni()
     {
         return vni;
@@ -575,25 +590,25 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String getTunnelNetwork()
+    public String getP2pSubnet()
     {
-        return tunnelNetwork;
+        return p2pSubnet;
     }
 
 
-    public void setTunnelNetwork( final String tunnelNetwork )
+    public void setP2PSubnet( final String p2pSubnet )
     {
-        this.tunnelNetwork = tunnelNetwork;
+        this.p2pSubnet = p2pSubnet;
     }
 
 
     @Override
-    public Map<String, String> getTunnels()
+    public P2pIps getP2pIps()
     {
-        Map<String, String> result = new HashMap<>();
+        P2pIps result = new P2pIps();
         for ( PeerConf peerConf : getPeerConfs() )
         {
-            result.put( peerConf.getPeerId(), peerConf.getTunnelAddress() );
+            result.addP2pIps( peerConf.getP2pIps() );
         }
         return result;
     }
@@ -616,20 +631,9 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
-    public String getTunnelInterfaceName()
+    public String getP2PHash()
     {
-        if ( tunnelNetwork == null )
-        {
-            throw new IllegalStateException( "Tunnel network not defined yet." );
-        }
-        return P2PUtil.generateInterfaceName( tunnelNetwork );
-    }
-
-
-    @Override
-    public String getTunnelCommunityName()
-    {
-        return P2PUtil.generateCommunityName( environmentId );
+        return P2PUtil.generateHash( environmentId );
     }
 
 
@@ -660,10 +664,8 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
     {
-        if ( environmentAlertHandler == null )
-        {
-            throw new IllegalArgumentException( "Invalid alert handler id." );
-        }
+        Preconditions.checkNotNull( environmentAlertHandler, "Invalid alert handler id." );
+
         EnvironmentAlertHandlerImpl handlerId =
                 new EnvironmentAlertHandlerImpl( environmentAlertHandler.getAlertHandlerId(),
                         environmentAlertHandler.getAlertHandlerPriority() );
@@ -685,7 +687,7 @@ public class EnvironmentImpl implements Environment, Serializable
         return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", version=" + version + ", peerId='"
                 + peerId + '\'' + ", name='" + name + '\'' + ", creationTimestamp=" + creationTimestamp
                 + ", subnetCidr='" + subnetCidr + '\'' + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni
-                + ", tunnelNetwork='" + tunnelNetwork + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
+                + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
                 + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
                 + alertHandlers + ", envId=" + envId + '}';
     }

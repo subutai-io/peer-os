@@ -38,7 +38,9 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 			controllerAs: 'identityRoleFormCtrl',
 			data: role,
 			preCloseCallback: function(value) {
-				vm.dtInstance.reloadData(null, false);
+				if(Object.keys(vm.dtInstance).length !== 0) {
+					vm.dtInstance.reloadData(null, false);
+				}
 			}
 		});
 	}
@@ -97,6 +99,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 		var perrmission = $.grep(permissionsDefault, function(element, index) {
 			return (element.object === role.permissions[permissionKey].object);
 		})[0];
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: 'Remove "' + perrmission.name + '" permission from role!',
@@ -110,6 +113,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 
 				role.permissions.splice(permissionKey, 1);
@@ -131,6 +135,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	}
 
 	function deleteRole(roleId) {
+		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
 			text: "You will not be able to recover this Role!",
@@ -144,6 +149,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 			showLoaderOnConfirm: true
 		},
 		function (isConfirm) {
+			window.onkeydown = previousWindowKeyDown;
 			if (isConfirm) {
 				identitySrv.deleteRole(roleId).success(function (data) {
 					SweetAlert.swal("Deleted!", "Role has been deleted.", "success");

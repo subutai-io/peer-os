@@ -26,7 +26,6 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -37,9 +36,9 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Node;
+import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
@@ -55,13 +54,16 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
+import io.subutai.core.environment.rest.ui.entity.ContainerDto;
+import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
+import io.subutai.core.environment.rest.ui.entity.PeerDto;
+import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
-import io.subutai.common.environment.NodeSchema;
+import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.core.strategy.api.UnlimitedStrategy;
 
 
 public class RestServiceImpl implements RestService
@@ -139,13 +141,13 @@ public class RestServiceImpl implements RestService
     public Response build( final String name, final String topologyJson )
     {
 
-        UUID eventId = null;
+        UUID eventId;
 
         try
         {
             checkName( name );
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
 
@@ -171,7 +173,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response buildAdvanced( final String name, final String topologyJson )
     {
-        UUID eventId = null;
+        UUID eventId;
 
         try
         {
@@ -180,7 +182,6 @@ public class RestServiceImpl implements RestService
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
 
             Topology topology = new Topology( name );
-
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
@@ -198,14 +199,14 @@ public class RestServiceImpl implements RestService
     @Override
     public Response modify( final String environmentId, final String topologyJson, final String removedContainers )
     {
-        UUID eventId = null;
+        UUID eventId;
         try
         {
             String name = environmentManager.getEnvironments().stream()
                                             .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
                                             .findFirst().get().getName();
 
-            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( UnlimitedStrategy.ID );
+            ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
 
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
@@ -239,7 +240,7 @@ public class RestServiceImpl implements RestService
     public Response modifyAdvanced( final String environmentId, final String topologyJson,
                                     final String removedContainers )
     {
-        UUID eventId = null;
+        UUID eventId;
 
         try
         {
@@ -274,7 +275,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            environmentManager.destroyEnvironment( environmentId, false, false );
+            environmentManager.destroyEnvironment( environmentId, false );
         }
         catch ( Exception e )
         {
@@ -390,7 +391,7 @@ public class RestServiceImpl implements RestService
         try
         {
             DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-            if ( attr == null && attr.getDataHandler().getContent() == null )
+            if ( attr == null || attr.getDataHandler().getContent() == null )
             {
                 throw new Exception( "Error, cannot read an attachment", null );
             }
@@ -432,6 +433,13 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            if ( environmentManager.getEnvironmentDomain( environmentId ) == null )
+            {
+                return Response.serverError()
+                               .entity( JsonUtil.toJson( "You must first register domain for environment" ) ).build();
+            }
+
+
             return Response.ok( JsonUtil
                     .toJson( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) ) )
                            .build();
@@ -506,7 +514,7 @@ public class RestServiceImpl implements RestService
             {
                 ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                environmentManager.destroyContainer( environment.getId(), containerHost.getId(), false, false );
+                environmentManager.destroyContainer( environment.getId(), containerHost.getId(), false );
 
                 return Response.ok().build();
             }
@@ -633,9 +641,9 @@ public class RestServiceImpl implements RestService
         {
             return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
-            return Response.serverError().entity(gson.toJson( e.getMessage() )).build();
+            return Response.serverError().entity( gson.toJson( e.getMessage() ) ).build();
         }
     }
 
@@ -660,35 +668,36 @@ public class RestServiceImpl implements RestService
     {
         List<Peer> peers = peerManager.getPeers();
 
+        String localId = peerManager.getLocalPeer().getId();
+
         ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
 
         CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
 
-        Map<String, List<PeerDto>> peerHostMap = Maps.newHashMap();
+        Map<String, PeerDto> peerHostMap = Maps.newHashMap();
 
         try
         {
             for ( Peer peer : peers )
             {
                 taskCompletionService.submit( () -> {
+                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(),
+                            peer.getId().equals( localId ) );
                     if ( peer.isOnline() )
                     {
                         Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
-                        peerHostMap.put( peer.getId(), Lists.newArrayList() );
                         for ( ResourceHostMetric metric : collection
                                 .toArray( new ResourceHostMetric[collection.size()] ) )
                         {
-                            peerHostMap.get( peer.getId() ).add(
-                                    new PeerDto(
-                                        metric.getHostInfo().getId(),
-                                        metric.getCpuModel(),
-                                        metric.getUsedCpu().toString(),
-                                        metric.getTotalRam().toString(),
-                                        metric.getAvailableRam().toString(),
-                                        metric.getTotalSpace().toString(),
-                                        metric.getAvailableSpace().toString()) );
+                            peerDto.addResourceHostDto(
+                                    new ResourceHostDto( metric.getHostInfo().getId(), metric.getCpuModel(),
+                                            metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
+                                            metric.getAvailableRam().toString(), metric.getTotalSpace().toString(),
+                                            metric.getAvailableSpace().toString() ) );
                         }
                     }
+
+                    peerHostMap.put( peer.getId(), peerDto );
                     return true;
                 } );
             }
@@ -704,6 +713,7 @@ public class RestServiceImpl implements RestService
                 }
                 catch ( ExecutionException | InterruptedException e )
                 {
+                    //ignored
                 }
             }
         }
@@ -731,7 +741,7 @@ public class RestServiceImpl implements RestService
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
             {}.getType() );
 
-            tags.stream().forEach( tag -> containerHost.addTag( tag ) );
+            tags.stream().forEach( containerHost::addTag );
 
             environmentManager.notifyOnContainerStateChanged( environment, null );
         }
@@ -830,32 +840,22 @@ public class RestServiceImpl implements RestService
         Set<ContainerDto> containerDtos = Sets.newHashSet();
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
-            ContainerHostState state = containerHost.getState();
-
-            HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-
-            String rhId = null;
-            for ( Peer peer : peerManager.getPeers() )
+            try
             {
-                if ( peer.getId().equals( containerHost.getPeerId() ) )
-                {
-                    try
-                    {
-                        rhId = peer.getResourceHostIdByContainerId( containerHost.getContainerId() ).getId();
-                    }
-                    catch ( PeerException e )
-                    {
-                        LOG.error( "cannot get resourceHostByContainerId", e );
-                    }
-                }
+                HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                        containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
+                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
+                        containerHost.getPeerId(), containerHost.getResourceHostId().getId() ) );
             }
-
-
-            containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                    containerHost.getHostname(), state, iface.getIp(), containerHost.getTemplateName(),
-                    containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                    containerHost.getPeerId(), rhId ) );
+            catch ( Exception e )
+            {
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
+                        containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
+                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
+                        containerHost.getPeerId(), "UNKNOWN" ) );
+            }
         }
         return containerDtos;
     }

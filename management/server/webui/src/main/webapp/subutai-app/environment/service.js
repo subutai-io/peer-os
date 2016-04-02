@@ -208,7 +208,7 @@ function environmentService($http, $q) {
 	}
 
 	function removeSshKey(environmentId, sshKey) {
-		return $http.delete(ENVIRONMENTS_URL + environmentId + '/keys?key=' + sshKey);
+		return $http.delete(ENVIRONMENTS_URL + environmentId + '/keys?key=' + window.btoa(sshKey));
 	}
 
 

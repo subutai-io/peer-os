@@ -1,21 +1,22 @@
 <div class="b-workspace-content__row">
-	<div class="b-main-table-border" style="width: 500px">
-		<table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
-			<tr>
-				<th>
-					<div style="display: inline-block; float: left; margin-top: 8px">Global Kurjun URLs</div>
-					&#160;&#160;
-					<div style="display: inline-block; float: left; margin-top: 9px" tooltips
-						tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Templates repository URLs from which templates are pulled</label></div>">
-						<svg xmlns="http://www.w3.org/2000/svg"  version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+  <div class="b-main-table-border" style="width: 500px">
+    <table class="b-main-table b-main-table_with-header" style="width: 500px" align="center">
+      <tr>
+        <th>
+          <div style="display: inline-block; float: left; margin-top: 8px">Global Kurjun URLs</div>
+          &#160;&#160;
+          <div style="display: inline-block; float: left; margin-top: 9px" tooltips
+               tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Templates repository URLs from which templates are pulled</label></div>">
+            <svg xmlns="http://www.w3.org/2000/svg"  version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
 							<style type="text/css">
-								.st0 {
-									fill: none;
-									stroke: #04346E;
-									stroke-linecap: round;
-									stroke-linejoin: round;
-									stroke-miterlimit: 10;
-								}
+								.st0
+                {
+                  fill: none;
+                  stroke: #04346E;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                  stroke-miterlimit: 10;
+                }
 							</style>
 							<g>
 								<circle class="st0" cx="7" cy="7" r="6.4"/>
@@ -23,30 +24,71 @@
 								<circle class="st0" cx="7" cy="10.5" r="0.6"/>
 							</g>
 						</svg>
-					</div>
-				</th>
-				<td style="padding-right: 18px; width: 300px">
-					<div ng-repeat="url in settingsKurjunCtrl.config.globalKurjunUrls track by $index">
-						<input class="b-form-input b-form-input_full" type="text"
-							ng-model="settingsKurjunCtrl.config.globalKurjunUrls[$index]" required
-							style="display: inline; width: 280px; margin-top: 5px; margin-bottom: 5px">
-						<i class="fa fa-times" 
-							ng-click="settingsKurjunCtrl.removeUrl ($index)"
-							style="width: 10px; float: right; margin-top: 13px; cursor: pointer">
-						</i>
-					</div>
-					<button class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.addUrl()"><i class="fa fa-plus"></i>&#160;&#160;Add
-					</button>
-				</td>
-			</tr>
-		</table>
-	</div>
+          </div>
+        </th>
+        <td style="padding-right: 18px; width: 300px">
+          <div ng-repeat="url in settingsKurjunCtrl.config.globalKurjunUrls track by $index">
+            <input class="b-form-input b-form-input_full" type="text"
+                   ng-model="settingsKurjunCtrl.config.globalKurjunUrls[$index]" required
+                   style="display: inline; width: 280px; margin-top: 5px; margin-bottom: 5px">
+            <i class="fa fa-times"
+               ng-click="settingsKurjunCtrl.removeGlobalUrl ($index)"
+               style="width: 10px; float: right; margin-top: 13px; cursor: pointer">
+            </i>
+          </div>
+          <button class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.addGlobalUrl()"><i class="fa fa-plus"></i>&#160;&#160;Add
+          </button>
+        </td>
+      </tr>
 
-	<button
-		class="b-btn b-btn_green"
-		ng-click="settingsKurjunCtrl.updateConfigUrls()"
-		style="margin-top: 15px">
-		<i class="fa fa-floppy-o"></i>&#160;&#160;Save
-	</button>
+
+      <tr>
+        <th>
+          <div style="display: inline-block; float: left; margin-top: 8px">Local Kurjun URLs</div>
+          &#160;&#160;
+          <div style="display: inline-block; float: left; margin-top: 9px" tooltips
+               tooltip-template="<div style = 'width: 250px'><label class = 'b-form-label'>Templates repository URLs from which templates are pulled</label></div>">
+            <svg xmlns="http://www.w3.org/2000/svg"  version="1.1" x="0px" y="0px" viewBox="0 0 14 14" style="enable-background:new 0 0 14 14; height: 15px; width: 15px" xml:space="preserve">
+							<style type="text/css">
+								.st0
+                {
+                  fill: none;
+                  stroke: #04346E;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                  stroke-miterlimit: 10;
+                }
+							</style>
+							<g>
+								<circle class="st0" cx="7" cy="7" r="6.4"/>
+								<path class="st0" d="M7,8.7V8.3c0-0.6,0.3-1.2,0.8-1.5c0.6-0.3,1-1.1,0.9-1.8C8.6,4.2,8,3.7,7.3,3.5C6.2,3.3,5.3,4.2,5.3,5.3"/>
+								<circle class="st0" cx="7" cy="10.5" r="0.6"/>
+							</g>
+						</svg>
+          </div>
+        </th>
+        <td style="padding-right: 18px; width: 300px">
+          <div ng-repeat="url in settingsKurjunCtrl.config.localKurjunUrls track by $index">
+            <input class="b-form-input b-form-input_full" type="text"
+                   ng-model="settingsKurjunCtrl.config.localKurjunUrls[$index]" required
+                   style="display: inline; width: 280px; margin-top: 5px; margin-bottom: 5px">
+            <i class="fa fa-times"
+               ng-click="settingsKurjunCtrl.removeLocalUrl ($index)"
+               style="width: 10px; float: right; margin-top: 13px; cursor: pointer">
+            </i>
+          </div>
+          <button class="b-btn b-btn_green" ng-click="settingsKurjunCtrl.addLocalUrl()"><i class="fa fa-plus"></i>&#160;&#160;Add
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <button
+      class="b-btn b-btn_green"
+      ng-click="settingsKurjunCtrl.updateConfigUrls()"
+      style="margin-top: 15px">
+    <i class="fa fa-floppy-o"></i>&#160;&#160;Save
+  </button>
 
 </div>

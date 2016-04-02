@@ -1,9 +1,7 @@
 package io.subutai.core.hubmanager.impl.proccessors;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -16,7 +14,6 @@ import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -30,9 +27,6 @@ import io.subutai.hub.share.dto.HeartbeatResponseDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Hearbeat processor
- */
 public class HeartbeatProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( HeartbeatProcessor.class );
@@ -53,16 +47,15 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            LOG.debug( "Heartbeat sending started..." );
+            LOG.debug( "Sending heartbeat..." );
 
             sendHeartbeat();
 
-            LOG.debug( "Heartbeat sending finished successfully." );
+            LOG.debug( "Heartbeat sent successfully" );
         }
         catch ( Exception e )
         {
-            LOG.debug( "Heartbeat sending failed." );
-            LOG.error( e.getMessage(), e );
+            LOG.error( "Error to send heartbeat: ", e );
         }
     }
 
@@ -87,7 +80,7 @@ public class HeartbeatProcessor implements Runnable
                     throw new HubPluginException( "Could not send heartbeat: " + r.readEntity( String.class ) );
                 }
 
-                byte[] data = readContent( r );
+                byte[] data = configManager.readContent( r );
 
                 if ( data != null )
                 {
@@ -128,21 +121,5 @@ public class HeartbeatProcessor implements Runnable
     public void addProccessor( StateLinkProccessor proccessor )
     {
         proccessors.add( proccessor );
-    }
-
-
-    private byte[] readContent( Response response ) throws IOException
-    {
-        if ( response.getEntity() == null )
-        {
-            return null;
-        }
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        InputStream is = ( ( InputStream ) response.getEntity() );
-
-        IOUtils.copy( is, bos );
-        return bos.toByteArray();
     }
 }

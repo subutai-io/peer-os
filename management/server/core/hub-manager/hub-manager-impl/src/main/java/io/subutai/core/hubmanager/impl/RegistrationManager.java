@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.model.Config;
@@ -41,7 +42,7 @@ import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 public class RegistrationManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class );
 
     private ConfigManager configManager;
     private IntegrationImpl manager;
@@ -93,7 +94,8 @@ public class RegistrationManager
 
             KeyStore keyStore = KeyStore.getInstance( "JKS" );
 
-            keyStore.load( new FileInputStream( ConfigManager.PEER_KEYSTORE ), "subutai".toCharArray() );
+            keyStore.load( new FileInputStream( ConfigManager.PEER_KEYSTORE ),
+                    SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
 
             WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
@@ -133,7 +135,7 @@ public class RegistrationManager
 
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
-            LOG.debug( "Registering Peer. Sending RegistrationDTO to Hub..." );
+            LOG.info( "Registering Peer. Sending RegistrationDTO to Hub..." );
 
             Response r = client.post( encryptedData );
 
@@ -143,14 +145,15 @@ public class RegistrationManager
                 Config config = new ConfigEntity();
                 config.setHubIp( hubIp );
                 config.setPeerId( configManager.getPeerId() );
+                config.setOwnerId( manager.getPeerInfo().get( "OwnerId" ) );
 
                 manager.getConfigDataService().saveHubConfig( config );
-                LOG.debug( "Hub configuration saved successfully." );
-                LOG.debug( "Peer registered successfully." );
+                LOG.info( "Hub configuration saved successfully." );
+                LOG.info( "Peer registered successfully." );
             }
             else
             {
-                LOG.debug( "Could not register Peer: ", r.readEntity( String.class ) );
+                LOG.error( "Could not register Peer: ", r.readEntity( String.class ) );
                 throw new HubPluginException( "Could not register Peer: " + r.readEntity( String.class ) );
             }
         }

@@ -19,13 +19,11 @@ import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 public interface RestAptManager
 {
 
-    public static final String MD5_PARAM = "md5";
-    public static final String NAME_PARAM = "name";
-    public static final String VERSION_PARAM = "version";
-    public static final String TYPE_PARAM = "type";
-
-    public static final String RESPONSE_TYPE_MD5 = "md5";
-    public static final String PACKAGE_FILE_PART_NAME = "package";
+    String MD5_PARAM = "md5";
+    String ID = "id";
+    String NAME_PARAM = "name";
+    String VERSION_PARAM = "version";
+    String PACKAGE_FILE_PART_NAME = "package";
 
 
     @GET
@@ -56,13 +54,16 @@ public interface RestAptManager
 
     @GET
     @Path( "get" )
-    Response getPackage( @QueryParam( MD5_PARAM ) String md5 );
+    Response getPackage( @QueryParam( ID ) String md5 );
 
 
     @GET
     @Path( "list" )
     Response listPackages();
 
+    @GET
+    @Path( "md5" )
+    Response md5();
 
     @POST
     @Path( "upload" )

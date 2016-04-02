@@ -28,10 +28,6 @@
       <artifactId>identity-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>kurjun-api</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>javax.annotation</groupId>

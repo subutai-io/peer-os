@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import io.subutai.common.protocol.TemplateKurjun;
 
@@ -56,13 +54,13 @@ public interface TemplateManager extends QuotaManagedRepository
     TemplateKurjun getTemplate( String name );
 
 
-    /**
-     * Gets the list of remote repo urls
-     *
-     * @return Set of urls
-     */
-    List<Map<String, Object>> getRemoteRepoUrls();
-
+//    /**
+//     * Gets the list of remote repo urls
+//     *
+//     * @return Set of urls
+//     */
+//    List<Map<String, Object>> getRemoteRepoUrls();
+//
 
     /**
      * Gets template stream.
@@ -87,12 +85,12 @@ public interface TemplateManager extends QuotaManagedRepository
      */
     List<TemplateKurjun> list( String repository, boolean isKurjunClient ) throws IOException;
 
-
-    List<Map<String, Object>> getSharedTemplateInfos( byte[] md5, String templateOwner ) throws IOException;
-
-
-    List<Map<String, Object>> listAsSimple( String repository ) throws IOException;
-
+//
+//    List<Map<String, Object>> getSharedTemplateInfos( byte[] md5, String templateOwner ) throws IOException;
+//
+//
+//    List<Map<String, Object>> listAsSimple( String repository ) throws IOException;
+//
 
     /**
      * Lists packages in public repository. The request treated as not kurjun client.
@@ -108,7 +106,7 @@ public interface TemplateManager extends QuotaManagedRepository
      * @param repository
      * @return
      */
-    boolean isUploadAllowed( String repository );
+//    boolean isUploadAllowed( String repository );
 
 
     /**
@@ -157,14 +155,14 @@ public interface TemplateManager extends QuotaManagedRepository
      *
      * @return
      */
-    Set<String> getRepositories();
+//    Set<String> getRepositories();
     
     
     /**
      * Create repository for the user with the given user name
      * @param userName 
      */
-    void createUserRepository( String userName );
+//    void createUserRepository( String userName );
 
 
     /**
@@ -173,7 +171,7 @@ public interface TemplateManager extends QuotaManagedRepository
      * @param templateId template id
      * @param targetUserName target username
      */
-    void shareTemplate( String templateId, String targetUserName );
+//    void shareTemplate( String templateId, String targetUserName );
 
 
     /**
@@ -182,6 +180,6 @@ public interface TemplateManager extends QuotaManagedRepository
      * @param templateId template id
      * @param targetUserName target username
      */
-    void unshareTemplate( String templateId, String targetUserName );
+//    void unshareTemplate( String templateId, String targetUserName );
     
 }

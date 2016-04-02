@@ -1,74 +1,75 @@
 <div class="b-popup b-popup_wide">
 	<div class="b-popup__header">
-		<span ng-show="identityUserFormCtrl.editUser">Edit</span>
-		<span ng-show="!identityUserFormCtrl.editUser">Create</span> user
+		<span ng-show="identityUserCtrl.editUser">Edit</span>
+		<span ng-show="!identityUserCtrl.editUser">Create</span> user
 		<a href ng-click="closeThisDialog()">
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
-	<form ng-submit="identityUserFormCtrl.addUser()" name="addUserForm">
+	<form ng-submit="identityUserCtrl.addUser()" name="identityUserCtrl.addUserForm">
 		<div class="b-popup__body">
 			<div class="b-popup-body b-popup-body_col-2">
 				<label class="b-popup-body-label b-popup-body-label_block">Username:</label>
 				<input type="text"
 					placeholder="Username"
 					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
-					ng-model="identityUserFormCtrl.user2Add.userName" 
+					ng-model="identityUserCtrl.user2Add.userName" 
 					pattern="(?=^.{4,}$)(^(?!(admin|sys|token)).*)" 
 					title="Min length 4. Can't start with sys, admin and token" 
 					required 
-					ng-readonly="identityUserFormCtrl.editUser">
+					tabindex=1 
+					ng-readonly="identityUserCtrl.editUser">
 
 				<label class="b-popup-body-label b-popup-body-label_block">Full name:</label>
 				<input type="text"
-					   placeholder="Full name"
-					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm"
-					   ng-model="identityUserFormCtrl.user2Add.fullName"
-					   required>
+					placeholder="Full name"
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm"
+					ng-model="identityUserCtrl.user2Add.fullName"
+					tabindex=2 
+					required>
 
 				<label class="b-popup-body-label b-popup-body-label_block">Trusted Level:</label>
 				<select class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
-					ng-model="identityUserFormCtrl.user2Add.trustLevel">
+					tabindex=3 
+					ng-model="identityUserCtrl.user2Add.trustLevel">
 					<option 
-					ng-repeat="(trystedLevelId, trustLevel) in identityUserFormCtrl.trustedLevels" 
+					ng-repeat="(trystedLevelId, trustLevel) in identityUserCtrl.trustedLevels" 
 					value="{{ trystedLevelId }}" 
-					ng-selected="trystedLevelId == identityUserFormCtrl.user2Add.trustLevel">
+					ng-selected="trystedLevelId == identityUserCtrl.user2Add.trustLevel">
 						{{ trustLevel }}
 					</option>
 				</select>
 
 				<label class="b-popup-body-label b-popup-body-label_block">E-mail:</label>
 				<input type="email"
-					   placeholder="email@mail.com"
-					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
-					   ng-model="identityUserFormCtrl.user2Add.email"
-					   required>
+					placeholder="email@mail.com"
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserCtrl.user2Add.email"
+					tabindex=4 
+					required>
 
 				<label class="b-popup-body-label b-popup-body-label_block">Password:</label>
 				<input type="password"
 					placeholder="***********"
 					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
-					ng-model="identityUserFormCtrl.user2Add.password"
+					ng-model="identityUserCtrl.user2Add.password"
 					id="js-password" 
 					pattern="(?=^.{4,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[a-z]).*$" 
 					title="Min length 4. Chars and numbers" 
-					ng-required="!identityUserFormCtrl.editUser">
+					tabindex=5 
+					ng-required="!identityUserCtrl.editUser">
 
 				<label class="b-popup-body-label b-popup-body-label_block">Confirm password:</label>
 				<input type="password"
-					   placeholder="***********"
-					   class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
-					   ng-model="identityUserFormCtrl.user2Add.confirm_password" 
-					   pw-check="js-password"
-					   name="confirm_password"
-					   ng-required="identityUserFormCtrl.user2Add.password.length > 0">
-				<span class="b-form-hint b-form-hint_red" ng-show="addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
+					placeholder="***********"
+					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
+					ng-model="identityUserCtrl.user2Add.confirm_password" 
+					pw-check="js-password"
+					name="confirm_password"
+					tabindex=6 
+					ng-required="identityUserCtrl.user2Add.password.length > 0">
+				<span class="b-form-hint b-form-hint_red" ng-show="identityUserCtrl.addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
 
-
-				<!--<label class="b-popup-body-label b-popup-body-label_block">Public key</label>
-				<textarea class="b-form-input b-form-input_full b-form-input_textarea bp-set-pub-key" ng-model = "identityUserFormCtrl.user2Add.public_key">
-				</textarea>
-				<div class="clear"></div>-->
 			</div>
 			<div class="b-popup-body b-popup-body_col-2 g-right">
 				<col-select></col-select>
@@ -76,7 +77,7 @@
 			<div class="clear"></div>
 		</div>
 		<div class="b-popup__footer">
-			<button class="b-btn b-btn_green g-right" type="submit">Save user</button>
+			<button class="b-btn b-btn_green g-right" type="submit" tabindex=7>Save user</button>
 			<div class="clear"></div>
 		</div>
 	</form>

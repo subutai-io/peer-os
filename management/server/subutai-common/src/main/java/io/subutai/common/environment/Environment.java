@@ -1,7 +1,6 @@
 package io.subutai.common.environment;
 
 
-import java.util.Map;
 import java.util.Set;
 
 import io.subutai.common.peer.EnvironmentAlertHandler;
@@ -9,6 +8,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.relation.RelationLink;
 
 
@@ -18,7 +18,7 @@ import io.subutai.common.security.relation.RelationLink;
 public interface Environment extends RelationLink
 {
 
-    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
+    //TODO implement startContainer, stopContainer and resetSwarmSecretKey methods
 
     /**
      * Return id of environment creator user
@@ -74,11 +74,10 @@ public interface Environment extends RelationLink
     /**
      * Grows environment according to the passed blueprint
      *
-     * @param environmentId = environment id to use when growing
      * @param topology = topology to use when growing
      * @param async - sync or async to the calling party
      */
-    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
+    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
             throws EnvironmentModificationException;
 
 
@@ -100,6 +99,8 @@ public interface Environment extends RelationLink
      */
     String getSubnetCidr();
 
+
+    void setSubnetCidr( String cidr );
 
     /**
      * VNI of the environment.
@@ -128,15 +129,13 @@ public interface Environment extends RelationLink
 
     Set<EnvironmentContainerHost> getContainerHostsByIds( Set<String> ids ) throws ContainerHostNotFoundException;
 
-    String getTunnelNetwork();
+    String getP2pSubnet();
 
-    Map<String, String> getTunnels();
+    P2pIps getP2pIps();
 
     boolean isMember( Peer peer );
 
-    String getTunnelInterfaceName();
-
-    String getTunnelCommunityName();
+    String getP2PHash();
 
     EnvironmentId getEnvironmentId();
 

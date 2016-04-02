@@ -4,12 +4,17 @@ angular.module('subutai.kurjun.service', [])
 	.factory('kurjunSrv', kurjunService);
 
 
-kurjunService.$inject = ['$http', 'Upload'];
+kurjunService.$inject = ['$http', 'Upload', 'SettingsKurjunSrv'];
 
-function kurjunService($http, Upload) {
+function kurjunService($http, Upload, SettingsKurjunSrv) {
 
-	var KURJUN_URL = SERVER_URL + 'rest/kurjun/';
-	var REPOSITORIES_URL = KURJUN_URL + 'templates/repositories';
+	console.log(GLOBAL_KURJUN_URL);
+	var BASE_URL = GLOBAL_KURJUN_URL + "/";
+	var TEMPLATE_URL = BASE_URL + "template/";
+	var REPOSITORY_URL = BASE_URL + "repository/";
+	var DEB_URL = BASE_URL + "deb/";
+	var RAW_URL = BASE_URL + "file/";
+
 
 	var kurjunService = {
 		getRepositories: getRepositories,
@@ -21,76 +26,132 @@ function kurjunService($http, Upload) {
 		deleteTemplate: deleteTemplate,
 		deleteAPT: deleteAPT,
 		isUploadAllowed: isUploadAllowed,
-		getShared: getShared
+		getShared: getShared,
+		getRawFiles: getRawFiles,
+		uploadFile: uploadFile
 	};
 
 	return kurjunService;
 
+	function setUrlsValues() {
+		BASE_URL = GLOBAL_KURJUN_URL + "/";
+		TEMPLATE_URL = BASE_URL + "template/";
+		REPOSITORY_URL = BASE_URL + "repository/";
+		DEB_URL = BASE_URL + "deb/";
+		RAW_URL = BASE_URL + "file/";
+	}
+
 	function getRepositories() {
-		return $http.get(REPOSITORIES_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+		setUrlsValues();
+		return $http.get(REPOSITORY_URL + "list?repository=all", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
-		return $http.get(KURJUN_URL + 'templates/' + repository + '/template-list', {
-			withCredentials: true,
+		setUrlsValues();
+		return $http.get(TEMPLATE_URL + 'list?repository=all', {
+			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
 	function getAPTList() {
-		return $http.get(KURJUN_URL + 'vapt/list', {
-			withCredentials: true,
+		setUrlsValues();
+		return $http.get(DEB_URL + "list?repository=all", {
+			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
+	function getRawFiles() {
+		setUrlsValues();
+		return $http.get(RAW_URL + "list?repository=all", {
+			withCredentials: false,
+			headers: {'Content-Type': 'application/json'}
+		});
+	}
+
+	function uploadFile(file) {
+		setUrlsValues();
+		return uploadFile(file, RAW_URL + 'upload');
+	}
+
 	function addTemplate(repository, file) {
-		return uploadFile(file, KURJUN_URL + 'templates/upload/' + repository);
+		setUrlsValues();
+		return uploadTemplate(file, TEMPLATE_URL + 'upload', repository);
 	}
 
 	function addApt(file) {
-		return uploadFile(file, KURJUN_URL + 'vapt/upload');
+		setUrlsValues();
+		return uploadApt(file, DEB_URL + 'upload');
 	}
 
-	function deleteTemplate(md5, repository) {
-		return $http.delete(KURJUN_URL + 'templates/' + repository, {params: {md5: md5}}, {
-			withCredentials: true,
+	function deleteTemplate(id) {
+		setUrlsValues();
+		return $http.delete(TEMPLATE_URL + 'delete', {params: {id: id}}, {
+			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
 	function shareTemplate(users, templateId) {
+		setUrlsValues();
+		// TODO: doesn't work properly
 		var postData = "users=" + users + "&templateId=" + templateId;
 		return $http.post(
-			KURJUN_URL + "share",
+			BASE_URL + "share",
 			postData,
-			{withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+			{withCredentials: false, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
 		);
 	}
 
 	function deleteAPT(md5) {
-		return $http.delete(KURJUN_URL + 'vapt/delete', {params: {md5: md5}}, {
-			withCredentials: true,
-			headers: {'Content-Type': 'application/json'}
+		setUrlsValues();
+		return $http.delete(DEB_URL + 'delete', {params: {md5: md5}}, {
+			withCredentials: false,
+			headers: {withCredentials: false, 'Content-Type': 'application/json'}
 		});
 	}
 
 	function isUploadAllowed(repository) {
-		return $http.get(KURJUN_URL + 'templates/' + repository + '/can-upload', {
-			withCredentials: true,
-			headers: {'Content-Type': 'application/json'}
+		setUrlsValues();
+		return $http.get(TEMPLATE_URL + repository + '/can-upload', {
+			withCredentials: false,
+			headers: {withCredentials: false, 'Content-Type': 'application/json'}
 		});
 	}
 
 	function getShared(templateId) {
-		return $http.get (KURJUN_URL + "shared/users/" + templateId);
+		// TODO: doesn't work properly
+		setUrlsValues();
+		return $http.get (BASE_URL + "shared/users/" + templateId);
+	}
+
+	function uploadTemplate(file, url, repository) {
+		setUrlsValues();
+		return Upload.upload({
+			url: url,
+			data: {file: file, repository: repository},
+			headers: {withCredentials: false, 'Content-Type': undefined},
+			transformRequest: angular.identity
+		});
+	}
+
+	function uploadApt(file, url) {
+		setUrlsValues();
+		return Upload.upload({
+			url: url,
+			data: {file: file},
+			headers: {withCredentials: false, 'Content-Type': undefined},
+			transformRequest: angular.identity
+		});
 	}
 
 	function uploadFile(file, url) {
+		setUrlsValues();
 		return Upload.upload({
 			url: url,
-			data: {'package': file},
-			headers: {'Content-Type': undefined},
+			data: {file: file},
+			headers: {withCredentials: false, 'Content-Type': undefined},
 			transformRequest: angular.identity
 		});
 	}

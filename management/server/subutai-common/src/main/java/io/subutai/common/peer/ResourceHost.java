@@ -5,10 +5,14 @@ import java.util.Set;
 
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.metric.ResourceHostMetric;
+import io.subutai.common.network.NetworkResource;
+import io.subutai.common.protocol.P2PConnection;
+import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
 
 
@@ -52,12 +56,17 @@ public interface ResourceHost extends Host, ResourceHostInfo
      */
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
-    Set<HostInterface> getNetInterfaces();
+    /**
+     * Returns network interfaces from db
+     */
+    Set<HostInterface> getSavedHostInterfaces();
 
     /**
      * Returns state of hosted container
      */
     public ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
+
+    public void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
 
     /**
@@ -71,8 +80,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
      * @param environmentId - id of environment to which the container will belong
      */
     @Deprecated
-    public ContainerHostInfo createContainer( String templateName, String hostname, ContainerQuota quota, String ip, int vlan, int timeout,
-                                     String environmentId ) throws ResourceHostException;
+    public ContainerHostInfo createContainer( String templateName, String hostname, ContainerQuota quota, String ip,
+                                              int vlan, int timeout, String environmentId )
+            throws ResourceHostException;
 
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
@@ -84,4 +94,19 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void cleanup( EnvironmentId environmentId, int vlan ) throws ResourceHostException;
 
+    int getNumberOfCpuCores() throws ResourceHostException;
+
+    P2PConnections getP2PConnections() throws ResourceHostException;
+
+    void createP2PSwarm( String interfaceName, String localIp, String p2pHash, String secretKey, long secretKeyTtlSec )
+            throws ResourceHostException;
+
+    P2PConnection joinP2PSwarm( String interfaceName, String p2pHash, String secretKey, long secretKeyTtlSec )
+            throws ResourceHostException;
+
+    void resetSwarmSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws ResourceHostException;
+
+    Tunnels getTunnels() throws ResourceHostException;
+
+    void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 }

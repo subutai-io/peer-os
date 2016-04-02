@@ -9,12 +9,12 @@
 					Available
 				</li>
 				<li class="b-tabs-menu__item"
-					ng-click="bazaarCtrl.changeTab ('plugins')"
+					ng-click="bazaarCtrl.activeTab = 'plugins'"
 					ng-class="bazaarCtrl.activeTab == 'plugins' ? 'b-tabs-menu__item_active' : ''">
 					Installed
 				</li>
 				<li class="b-tabs-menu__item"
-					ng-click="bazaarCtrl.changeTab ('other')"
+					ng-click="bazaarCtrl.activeTab = 'other'"
 					ng-class="bazaarCtrl.activeTab == 'other' ? 'b-tabs-menu__item_active' : ''">
 					Advanced
 				</li>

@@ -76,7 +76,8 @@ func Receive(src, dst, delta string, parent bool) {
 	}
 	log.Debug(strings.Join(args, " "))
 	receive := exec.Command("btrfs", args...)
-	input, err := os.Open(config.Agent.LxcPrefix + "lxc-data/tmpdir/" + delta)
+	input, err := os.Open(config.Agent.LxcPrefix + "tmpdir/" + delta)
+	defer input.Close()
 	receive.Stdin = input
 	log.Check(log.FatalLevel, "Opening delta "+delta, err)
 	out, err := receive.CombinedOutput()

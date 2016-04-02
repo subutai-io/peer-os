@@ -8,6 +8,7 @@
 
   <!--***********  Subutai Common DataSource **************** -->
 
+  <!-- standard datasource -->
   <bean id="subutaiJDBC" class="org.apache.derby.jdbc.EmbeddedDataSource">
     <property name="databaseName" value="$[subutaiAppDataPath]/db/subutaiDb2"/>
     <property name="createDatabase" value="create"/>
@@ -16,8 +17,25 @@
   <service interface="javax.sql.DataSource" ref="subutaiJDBC">
     <service-properties>
       <entry key="osgi.jndi.service.name" value="openjpa/subutaiDS" />
+      <entry key="transactional" value="false"/>
     </service-properties>
   </service>
+  <!-- standard datasource -->
+
+  <!--XA datasource -->
+  <bean id="xaSubutaiJDBC" class="org.apache.derby.jdbc.EmbeddedXADataSource">
+     <property name="databaseName" value="$[subutaiAppDataPath]/db/subutaiDb2"/>
+     <property name="createDatabase" value="create" />
+  </bean>
+
+  <service ref="xaSubutaiJDBC" interface="javax.sql.XADataSource">
+      <service-properties>
+          <entry key="osgi.jndi.service.name" value="openjpa/xaSubutaiDS"/>
+          <entry key="transactional" value="true"/>
+      </service-properties>
+  </service>
+
+  <!--XA datasource -->
 
   <!--***********  Plugins Common DataSource **************** -->
 

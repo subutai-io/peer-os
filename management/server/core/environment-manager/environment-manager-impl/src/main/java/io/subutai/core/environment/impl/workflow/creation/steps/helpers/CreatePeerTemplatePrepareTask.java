@@ -35,14 +35,19 @@ public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesR
     public PrepareTemplatesResponseCollector call() throws Exception
     {
         Map<String, Set<String>> rhTemplates = new HashMap<>();
+
         for ( Node node : nodes )
         {
+            LOG.debug( "{}", node );
+
             Set<String> templates = rhTemplates.get( node.getHostId() );
+
             if ( templates == null )
             {
                 templates = new HashSet<>();
                 rhTemplates.put( node.getHostId(), templates );
             }
+
             templates.add( node.getTemplateName() );
         }
 

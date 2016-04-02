@@ -2,11 +2,16 @@ package io.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,9 +20,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.util.CollectionUtil;
 
 
 @Entity
@@ -31,23 +41,48 @@ public class PeerConfImpl implements PeerConf, Serializable
     private Long id;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @Column( name = "peer_id", nullable = false )
     private String peerId;
 
-    @Column( name = "tunnel_address", nullable = false )
-    private String tunnelAddress;
+
+    @ElementCollection( fetch = FetchType.EAGER )
+    @CollectionTable(
+            name = "p2p_ips",
+            joinColumns = @JoinColumn( name = "id" ) )
+    private Set<String> p2pIps = new HashSet<>();
 
     @ManyToOne( targetEntity = EnvironmentImpl.class )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
 
 
-    public PeerConfImpl( final P2PConfig config )
+    public PeerConfImpl()
     {
-        this.peerId = config.getPeerId();
-        this.tunnelAddress = config.getAddress();
+    }
+
+
+    public PeerConfImpl( final String peerId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
+        this.peerId = peerId;
+    }
+
+
+    public void addP2pIps( Set<String> p2pIps )
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( p2pIps ) );
+
+        this.p2pIps.addAll( p2pIps );
+    }
+
+
+    public Set<String> getP2pIps()
+    {
+        return p2pIps;
     }
 
 
@@ -66,12 +101,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     public Long getVersion()
     {
         return version;
-    }
-
-
-    public void setVersion( final Long version )
-    {
-        this.version = version;
     }
 
 
@@ -95,32 +124,12 @@ public class PeerConfImpl implements PeerConf, Serializable
     }
 
 
-    public void setPeerId( final String peerId )
-    {
-        this.peerId = peerId;
-    }
-
-
-    @Override
-    public String getTunnelAddress()
-    {
-        return tunnelAddress;
-    }
-
-
-    public void setTunnelAddress( final String tunnelAddress )
-    {
-        this.tunnelAddress = tunnelAddress;
-    }
-
-
     @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer( "PeerConfImpl{" );
         sb.append( "id=" ).append( id );
         sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", tunnelAddress='" ).append( tunnelAddress ).append( '\'' );
         sb.append( ", environment=" ).append( environment.getId() );
         sb.append( '}' );
         return sb.toString();
@@ -145,10 +154,6 @@ public class PeerConfImpl implements PeerConf, Serializable
         {
             return false;
         }
-        if ( !tunnelAddress.equals( peerConf.tunnelAddress ) )
-        {
-            return false;
-        }
         return environment.equals( peerConf.environment );
     }
 
@@ -157,7 +162,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     public int hashCode()
     {
         int result = peerId.hashCode();
-        result = 31 * result + tunnelAddress.hashCode();
         result = 31 * result + environment.hashCode();
         return result;
     }

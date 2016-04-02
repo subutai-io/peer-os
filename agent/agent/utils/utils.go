@@ -1,14 +1,12 @@
 package utils
 
 import (
-	"bufio"
-	"bytes"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net"
 	"strings"
-	"time"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 )
 
 type Iface struct {
@@ -28,43 +26,19 @@ func GetInterfaces() []Iface {
 		inter := new(Iface)
 		inter.InterfaceName = ifac.Name
 
-		addrs, err := ifac.Addrs()
-		if err != nil {
-			log.Check(log.WarnLevel, "Getting network addresses", err)
-		}
-		var ip net.IP
-		var ipv4 string
+		addrs, _ := ifac.Addrs()
 		for _, addr := range addrs {
 			switch v := addr.(type) {
 			case *net.IPNet:
-				ip = v.IP
-				ipv4 = ip.To4().String()
+				ipv4 := v.IP.To4().String()
 				if ipv4 != "<nil>" {
 					inter.Ip = ipv4
 					l_ifaces = append(l_ifaces, *inter)
 				}
-			case *net.IPAddr:
-				ip = v.IP
 			}
 		}
-
 	}
 	return l_ifaces
-}
-
-func SendIntermediateChunks(scanner *bufio.Scanner, timeout, c_size int, ch chan<- []byte) {
-	var buffer bytes.Buffer
-	end_time := time.Now().Add(time.Duration(timeout) * time.Second)
-	for scanner.Scan() {
-		buffer.WriteString(scanner.Text() + "\n")
-		if buffer.Len() >= c_size {
-			ch <- buffer.Bytes()
-		} else if end_time.Unix()-time.Now().Unix() <= 0 {
-			ch <- buffer.Bytes()
-			close(ch)
-		}
-	}
-	close(ch)
 }
 
 func PublicCert() string {

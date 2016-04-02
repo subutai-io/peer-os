@@ -1,15 +1,13 @@
 package connect
 
 import (
-	"bufio"
-	"bytes"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/gpg"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 )
 
 type Key struct {
@@ -29,29 +27,20 @@ func (k *Key) Store() string {
 
 	status := gpg.ImportPk("epub.key")
 	os.Remove("epub.key")
-	k.Id = ExtractKeyId(status)
-	log.Debug("Found KeyID: " + k.Id)
-	config.Management.GpgUser = k.Id
 	return status
 }
 
-func (k *Key) ExtractKeyEmail() string {
+func (k *Key) ExtractKeyID() string {
 	command := exec.Command("gpg")
 	stdin, err := command.StdinPipe()
 	stdin.Write([]byte(k.String()))
 	stdin.Close()
-
 	out, err := command.Output()
-	log.Check(log.WarnLevel, "Extracting Email from Key", err)
+	log.Check(log.WarnLevel, "Extracting ID from Key", err)
 
-	scanner := bufio.NewScanner(bytes.NewReader(out))
-	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), "uid") {
-			line := strings.Fields(scanner.Text())
-			if len(line) > 1 {
-				email := line[len(line)-1]
-				return email
-			}
+	if line := strings.Fields(string(out)); len(line) > 1 {
+		if key := strings.Split(line[1], "/"); len(key) > 1 {
+			return key[1]
 		}
 	}
 	return ""
@@ -72,14 +61,4 @@ func (k *Key) Remove(file string) error {
 		return err
 	}
 	return nil
-}
-
-func ExtractKeyId(s string) string {
-	arr := strings.Split(s, " ")
-	for i, word := range arr {
-		if word == "key" {
-			return arr[i+1][0 : len(arr[i+1])-1]
-		}
-	}
-	return ""
 }

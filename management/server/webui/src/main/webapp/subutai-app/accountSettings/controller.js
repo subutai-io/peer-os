@@ -21,12 +21,20 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 				"message": "Life is hard when you're stupid dude! Install the subutai browser plugin for added security with end to end encryption.", 
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [
-					{"text": "Take it!", "href": "https://github.com/subutai-io/Tooling-pgp-plugin/releases/latest"},
-					{"text": "Set manualy", "href": "/#/account-settings"}
+					{
+						"text": "Install",
+						"href": "https://chrome.google.com/webstore/detail/subutai-social-e2e-plugin/kpmiofpmlciacjblommkcinncmneeoaa?utm_source=chrome-ntp-icon",
+						"newTab": true
+					},
+					{
+						"text": "Setup Manually",
+						"href": "/#/account-settings",
+						"tooltip": "Set PGP key manually without plugin"
+					}
 				]
 			};
 		}
-	}, 4000);
+	}, 1000);
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {

@@ -5,10 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import io.subutai.common.protocol.PlacementStrategy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,10 +19,6 @@ public class NodeTest
     private static final String TEMPLATE_NAME = "template_name";
     private static final String NODEGROUP_NAME = "test_node_group";
     private Node node;
-
-    @Mock
-    PlacementStrategy placementStrategy;
-
 
     @Before
     public void setUp() throws Exception
