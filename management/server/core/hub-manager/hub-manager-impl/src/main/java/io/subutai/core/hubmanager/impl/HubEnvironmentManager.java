@@ -208,9 +208,8 @@ public class HubEnvironmentManager
         try
         {
             //@see io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep
-            localPeer.createP2PSwarm(
-                    new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[0], env.getP2pKey(),
-                            env.getP2pTTL() ) );
+            localPeer.createP2PSwarm( new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), env.getP2pKey(),
+                    env.getP2pTTL() ) );
         }
         catch ( PeerException e )
         {
@@ -220,8 +219,8 @@ public class HubEnvironmentManager
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        P2PConfig config = new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), null, env.getP2pKey(),
-                env.getP2pTTL() );
+        P2PConfig config =
+                new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
         p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
 
         try
@@ -230,7 +229,7 @@ public class HubEnvironmentManager
             final Future<P2PConfig> f = p2pCompletionService.take();
             P2PConfig createdConfig = f.get();
             p2pExecutor.shutdown();
-            peerDto.setTunnelAddress( createdConfig.getAddress() );
+            peerDto.setTunnelAddress( null );
             peerDto.setCommunityName( createdConfig.getHash() );
             peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
         }

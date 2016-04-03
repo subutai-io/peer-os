@@ -21,8 +21,6 @@ public class P2PConfig
     private String peerId;
     @JsonProperty( "hash" )
     private String hash;
-    @JsonProperty( "address" )
-    private String address;
     @JsonProperty( "secretKey" )
     private String secretKey;
     @JsonProperty( "environmentId" )
@@ -31,22 +29,6 @@ public class P2PConfig
     private long secretKeyTtlSec;
     @JsonProperty( "rhP2pIps" )
     private Set<RhP2pIp> rhP2pIps = Sets.newHashSet();
-
-
-    @Deprecated
-    public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
-                      @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "hash" ) final String hash, @JsonProperty( "address" ) final String address,
-                      @JsonProperty( "secretKey" ) final String secretKey,
-                      @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec )
-    {
-        this.peerId = peerId;
-        this.environmentId = environmentId;
-        this.hash = hash;
-        this.address = address;
-        this.secretKey = secretKey;
-        this.secretKeyTtlSec = secretKeyTtlSec;
-    }
 
 
     public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
@@ -113,19 +95,6 @@ public class P2PConfig
     public String getHash()
     {
         return hash;
-    }
-
-
-    @Deprecated
-    public String getAddress()
-    {
-        return address;
-    }
-
-
-    public void setAddress( final String address )
-    {
-        this.address = address;
     }
 
 
