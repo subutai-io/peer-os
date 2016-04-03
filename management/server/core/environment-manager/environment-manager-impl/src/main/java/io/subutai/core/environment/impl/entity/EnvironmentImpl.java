@@ -22,7 +22,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -86,10 +85,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "environmentId" )
     protected String environmentId;
 
-    @Version
-    @JsonIgnore
-    private Long version;
-
     @Column( name = "peer_id", nullable = false )
     @JsonProperty( "peerId" )
     private String peerId;
@@ -125,7 +120,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = false )
+            cascade = CascadeType.ALL, orphanRemoval = true )
     @JsonIgnore
     private Set<PeerConf> peerConfs = Sets.newHashSet();
 
@@ -308,12 +303,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getPeerId()
     {
         return peerId;
-    }
-
-
-    public Long getVersion()
-    {
-        return version;
     }
 
 
@@ -687,12 +676,11 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String toString()
     {
-        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", version=" + version + ", peerId='"
-                + peerId + '\'' + ", name='" + name + '\'' + ", creationTimestamp=" + creationTimestamp
-                + ", subnetCidr='" + subnetCidr + '\'' + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni
-                + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
-                + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
-                + alertHandlers + ", envId=" + envId + '}';
+        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
+                + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
+                + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\''
+                + ", containers=" + containers + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='"
+                + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
     }
 
 
