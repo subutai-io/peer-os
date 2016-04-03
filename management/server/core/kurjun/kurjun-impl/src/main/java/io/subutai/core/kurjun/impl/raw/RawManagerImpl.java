@@ -98,7 +98,7 @@ public class RawManagerImpl implements RawManager
 
         for ( String s : SystemSettings.getGlobalKurjunUrls() )
         {
-            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalRaw( s, null ) );
+            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalRaw( s, null, "all" ) );
         }
     }
 
@@ -294,5 +294,4 @@ public class RawManagerImpl implements RawManager
         defaultMetadata.setMd5sum( md5 );
         return localPublicRawRepository.delete( md5 );
     }
-
 }
