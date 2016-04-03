@@ -20,7 +20,6 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -31,6 +30,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
@@ -103,7 +103,7 @@ public class SetupP2PStep
 
             for ( String rhId : rhIds )
             {
-                config.addRhP2pIp( new RhP2pIp( rhId, p2pAddresses[addressCounter++] ) );
+                config.addRhP2pIp( new RhP2PIpEntity( rhId, p2pAddresses[addressCounter++] ) );
             }
 
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );

@@ -44,7 +44,7 @@ public class PeerConfImpl implements PeerConf, Serializable
     private String peerId;
 
 
-    @ElementCollection
+    @ElementCollection( targetClass = RhP2PIpEntity.class )
     @CollectionTable(
             name = "RH_P2P_IP",
             joinColumns = @JoinColumn( name = "PEER_ID" ) )

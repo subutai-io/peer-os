@@ -253,7 +253,7 @@ public class HubEnvironmentManager
             if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
             {
                 //todo reimplement
-                setOfP2PIps.add( new RhP2pIp( "RH_ID", peerDto.getTunnelAddress() ));
+                //                setOfP2PIps.add( new ( "RH_ID", peerDto.getTunnelAddress() ));
             }
         }
         p2pIps.addP2pIps( setOfP2PIps );

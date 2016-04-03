@@ -33,6 +33,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
 
 
 public class SetupP2PStep
@@ -109,7 +110,7 @@ public class SetupP2PStep
             {
                 for ( String rhId : rhIds )
                 {
-                    config.addRhP2pIp( new RhP2pIp( rhId, p2pAddressIterator.next() ) );
+                    config.addRhP2pIp( new RhP2PIpEntity( rhId, p2pAddressIterator.next() ) );
                 }
             }
 
