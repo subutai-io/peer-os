@@ -37,12 +37,8 @@ public class PeerConfImpl implements PeerConf, Serializable
     @GeneratedValue( strategy = GenerationType.AUTO )
     private Long id;
 
-    @Version
-    private Long version;
-
     @Column( name = "peer_id", nullable = false )
     private String peerId;
-
 
     @ElementCollection( targetClass = RhP2PIpEntity.class )
     @CollectionTable(
@@ -94,12 +90,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     public void setId( final Long id )
     {
         this.id = id;
-    }
-
-
-    public Long getVersion()
-    {
-        return version;
     }
 
 
