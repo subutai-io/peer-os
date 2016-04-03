@@ -31,6 +31,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -42,8 +43,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
@@ -208,9 +207,9 @@ public class HubEnvironmentManager
 
         try
         {
-            localPeer.createP2PSwarm(
-                    new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), addresses[0], env.getP2pKey(),
-                            env.getP2pTTL() ) );
+            //@see io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep
+            localPeer.createP2PSwarm( new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), env.getP2pKey(),
+                    env.getP2pTTL() ) );
         }
         catch ( PeerException e )
         {
@@ -220,8 +219,8 @@ public class HubEnvironmentManager
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
-        P2PConfig config = new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), null, env.getP2pKey(),
-                env.getP2pTTL() );
+        P2PConfig config =
+                new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
         p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
 
         try
@@ -230,7 +229,7 @@ public class HubEnvironmentManager
             final Future<P2PConfig> f = p2pCompletionService.take();
             P2PConfig createdConfig = f.get();
             p2pExecutor.shutdown();
-            peerDto.setTunnelAddress( createdConfig.getAddress() );
+            peerDto.setTunnelAddress( null );
             peerDto.setCommunityName( createdConfig.getHash() );
             peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
         }
@@ -245,14 +244,15 @@ public class HubEnvironmentManager
     public void setupTunnel( EnvironmentDto environmentDto ) throws InterruptedException, ExecutionException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
-        Set<String> setOfP2PIps = new HashSet<>();
+        Set<RhP2pIp> setOfP2PIps = new HashSet<>();
         P2pIps p2pIps = new P2pIps();
 
         for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
         {
             if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
             {
-                setOfP2PIps.add( peerDto.getTunnelAddress() );
+                //todo reimplement
+                //                setOfP2PIps.add( new ( "RH_ID", peerDto.getTunnelAddress() ));
             }
         }
         p2pIps.addP2pIps( setOfP2PIps );
@@ -511,11 +511,8 @@ public class HubEnvironmentManager
         @Override
         public P2PConfig call() throws Exception
         {
-            P2PConnections p2PConnections = peer.joinP2PSwarm( p2PConfig );
-            for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
-            {
-                p2PConfig.addP2pIp( p2PConnection.getIp() );
-            }
+            peer.joinP2PSwarm( p2PConfig );
+
             return p2PConfig;
         }
     }

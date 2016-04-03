@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl.tasks;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
+import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ResourceHost;
@@ -37,10 +38,17 @@ public class SetupTunnelsTask implements Callable<Boolean>
 
 
         //setup tunnel to each local and remote RH
-        for ( String tunnelIp : p2pIps.getP2pIps() )
+        for ( RhP2pIp rhP2pIp : p2pIps.getP2pIps() )
         {
+            //skip self
+            if ( resourceHost.getId().equalsIgnoreCase( rhP2pIp.getRhId() ) )
+            {
+                continue;
+            }
+
             //skip if own IP
-            boolean ownIp = !( resourceHost.getHostInterfaces().findByIp( tunnelIp ) instanceof NullHostInterface );
+            boolean ownIp =
+                    !( resourceHost.getHostInterfaces().findByIp( rhP2pIp.getP2pIp() ) instanceof NullHostInterface );
             if ( ownIp )
             {
                 continue;
@@ -49,13 +57,13 @@ public class SetupTunnelsTask implements Callable<Boolean>
             //check p2p connections in case heartbeat hasn't arrived yet with new p2p interface
             P2PConnections p2PConnections = resourceHost.getP2PConnections();
             //skip if exists
-            if ( p2PConnections.findByIp( tunnelIp ) != null )
+            if ( p2PConnections.findByIp( rhP2pIp.getP2pIp() ) != null )
             {
                 continue;
             }
 
             //see if tunnel exists
-            Tunnel tunnel = tunnels.findByIp( tunnelIp );
+            Tunnel tunnel = tunnels.findByIp( rhP2pIp.getP2pIp() );
 
             //create new tunnel
             if ( tunnel == null )
@@ -67,8 +75,8 @@ public class SetupTunnelsTask implements Callable<Boolean>
                     throw new ResourceHostException( "Free tunnel name not found" );
                 }
 
-                Tunnel newTunnel =
-                        new Tunnel( tunnelName, tunnelIp, networkResource.getVlan(), networkResource.getVni() );
+                Tunnel newTunnel = new Tunnel( tunnelName, rhP2pIp.getP2pIp(), networkResource.getVlan(),
+                        networkResource.getVni() );
 
                 resourceHost.createTunnel( newTunnel );
 

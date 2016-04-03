@@ -133,7 +133,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
+            new SetupP2PStep( topology, environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
