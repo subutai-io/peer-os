@@ -75,9 +75,17 @@ public class SetupP2PStep
         //count total requested
         int totalIps = 0;
 
-        for ( Set<String> peerRhs : peerRhIds.values() )
+        P2pIps envP2pIps = environment.getP2pIps();
+
+        for ( Set<String> rhIds : peerRhIds.values() )
         {
-            totalIps += peerRhs.size();
+            for ( String rhId : rhIds )
+            {
+                if ( envP2pIps.findByRhId( rhId ) == null )
+                {
+                    totalIps++;
+                }
+            }
         }
 
         if ( totalIps > p2pAddresses.size() )
@@ -109,7 +117,7 @@ public class SetupP2PStep
             if ( !CollectionUtil.isCollectionEmpty( rhIds ) )
             {
                 //remove already participating peers
-                for ( RhP2pIp rhP2pIp : environment.getP2pIps().getP2pIps() )
+                for ( RhP2pIp rhP2pIp : envP2pIps.getP2pIps() )
                 {
                     rhIds.remove( rhP2pIp.getRhId() );
                 }
