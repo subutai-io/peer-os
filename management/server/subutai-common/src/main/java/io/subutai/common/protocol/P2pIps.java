@@ -9,6 +9,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.util.CollectionUtil;
@@ -17,10 +18,10 @@ import io.subutai.common.util.CollectionUtil;
 public class P2pIps
 {
     @JsonProperty( "p2pIps" )
-    Set<RhP2pIp> p2pIps = new HashSet<>();
+    Set<RhP2pIpImpl> p2pIps = new HashSet<>();
 
 
-    public P2pIps( @JsonProperty( "p2pIps" ) Set<RhP2pIp> p2pIps )
+    public P2pIps( @JsonProperty( "p2pIps" ) Set<RhP2pIpImpl> p2pIps )
     {
         Preconditions.checkNotNull( p2pIps );
 
@@ -35,7 +36,11 @@ public class P2pIps
 
     public Set<RhP2pIp> getP2pIps()
     {
-        return p2pIps;
+        Set<RhP2pIp> rhP2pIps = Sets.newHashSet();
+
+        rhP2pIps.addAll( this.p2pIps );
+
+        return rhP2pIps;
     }
 
 
@@ -43,7 +48,10 @@ public class P2pIps
     {
         Preconditions.checkNotNull( p2pIps );
 
-        this.p2pIps.addAll( p2pIps );
+        for ( RhP2pIp rhP2pIp : p2pIps )
+        {
+            this.p2pIps.add( new RhP2pIpImpl( rhP2pIp.getRhId(), rhP2pIp.getP2pIp() ) );
+        }
     }
 
 
