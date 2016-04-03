@@ -12,19 +12,11 @@ public interface NetworkManager
 {
 
     /**
-     * Sets up an P2P connection on specified host with explicit IP. Usually used to setup new swarm with this peer as
-     * the first member
+     * Sets up an P2P connection on specified host with explicit IP.
      */
-    public void createP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
-                                long secretKeyTtlSec ) throws NetworkManagerException;
+    public void joinP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                              long secretKeyTtlSec ) throws NetworkManagerException;
 
-    /**
-     * Sets up an P2P connection on specified host with dynamically acquired IP. Usually used to connect peer to
-     * existing swarm
-     */
-    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
-                              final long secretKeyTtlSec )
-            throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network

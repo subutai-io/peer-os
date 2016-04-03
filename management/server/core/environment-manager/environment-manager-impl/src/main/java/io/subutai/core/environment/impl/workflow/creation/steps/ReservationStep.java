@@ -57,8 +57,6 @@ public class ReservationStep
 
         Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
 
-        peers.add( peerManager.getLocalPeer() );
-
         ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 

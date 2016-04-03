@@ -27,7 +27,6 @@ import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
@@ -258,23 +257,13 @@ public interface Peer
 
 
     /**
-     * Sets up p2p connection on each RH.
-     *
-     * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
-     * dynamic IP acquisition for RHs. If P2P connection already exists on RH, its secret key gets reset with new secret
-     * key and ttl from  @param config. To setup initial p2p connection with explicit IP, use
-     * Peer#createP2PSwarm
-     *
-     * @return - P2P IP of RH with MH
+     * Sets up p2p connections on specified RHs.
      */
-    P2PConnections joinP2PSwarm( P2PConfig config ) throws PeerException;
+    void joinP2PSwarm( P2PConfig config ) throws PeerException;
 
+    void joinOrUpdateP2PSwarm( P2PConfig config ) throws PeerException;
 
-    /**
-     * Sets up initial P2P connection in swarm on MH. P2P IP must be present!
-     *
-     * This method throws PeerException if initial P2P connection with the specified hash is already setup.
-     */
+    @Deprecated
     public void createP2PSwarm( final P2PConfig config ) throws PeerException;
 
 
@@ -309,4 +298,5 @@ public interface Peer
     void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
+
 }
