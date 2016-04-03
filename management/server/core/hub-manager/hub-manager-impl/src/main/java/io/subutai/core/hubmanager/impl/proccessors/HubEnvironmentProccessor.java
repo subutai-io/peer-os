@@ -8,7 +8,6 @@ import java.security.UnrecoverableKeyException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,8 +49,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto;
-import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogEvent;
+import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -254,7 +253,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 hubEnvironmentManager.setupTunnel( environmentDto );
                 peerDto.setSetupTunnel( true );
             }
-            catch ( ExecutionException | InterruptedException e )
+            catch ( Exception e )
             {
                 String mgs = "Could not setup p2p tunnel";
                 sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.NETWORK, LogType.ERROR, null );
@@ -699,11 +698,11 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
             byte[] cborData = JsonUtil.toCbor( peerLogDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response r = client.post( encryptedData );
-            if ( r.getStatus() == HttpStatus.SC_OK )
-            {
-                LOG.debug( "Environment peer log successfully sent to hub" );
-            }
+//            Response r = client.post( encryptedData );
+//            if ( r.getStatus() == HttpStatus.SC_OK )
+//            {
+//                LOG.debug( "Environment peer log successfully sent to hub" );
+//            }
         }
         catch ( Exception e )
         {

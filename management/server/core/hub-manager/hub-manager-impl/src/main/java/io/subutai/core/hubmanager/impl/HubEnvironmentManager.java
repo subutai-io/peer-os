@@ -17,8 +17,6 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.net.util.SubnetUtils;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -47,10 +45,10 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -62,6 +60,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 import io.subutai.hub.share.dto.environment.SSHKeyDto;
 
 
@@ -195,53 +194,39 @@ public class HubEnvironmentManager
     }
 
 
-    public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto )
+    public EnvironmentPeerDto setupP2P( EnvironmentPeerDto peerDto ) throws EnvironmentCreationException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-
-        SubnetUtils.SubnetInfo subnetInfo =
-                new SubnetUtils( peerDto.getEnvironmentInfo().getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
-
-        final String[] addresses = subnetInfo.getAllAddresses();
-
-        try
-        {
-            //@see io.subutai.core.environment.impl.workflow.creation.steps.SetupP2PStep
-            localPeer.createP2PSwarm( new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), env.getP2pKey(),
-                    env.getP2pTTL() ) );
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Could not setup initial p2p participant on local peer MH with explicit IP", e );
-        }
 
         ExecutorService p2pExecutor = Executors.newSingleThreadExecutor();
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
         P2PConfig config =
                 new P2PConfig( localPeer.getId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
+
+        for ( EnvironmentPeerRHDto rhDto : peerDto.getRhs() )
+        {
+            config.addRhP2pIp( new RhP2PIpEntity( rhDto.getId(), rhDto.getP2pIp() ) );
+        }
         p2pCompletionService.submit( new SetupP2PConnectionTask( localPeer, config ) );
 
         try
         {
 
             final Future<P2PConfig> f = p2pCompletionService.take();
-            P2PConfig createdConfig = f.get();
+            f.get();
             p2pExecutor.shutdown();
-            peerDto.setTunnelAddress( null );
-            peerDto.setCommunityName( createdConfig.getHash() );
-            peerDto.setP2pSecretKey( createdConfig.getSecretKey() );
         }
         catch ( ExecutionException | InterruptedException e )
         {
-            LOG.error( "Problems setting up p2p connection", e );
+            throw new EnvironmentCreationException( "Failed to setup P2P connection" );
         }
         return peerDto;
     }
 
 
-    public void setupTunnel( EnvironmentDto environmentDto ) throws InterruptedException, ExecutionException
+    public void setupTunnel( EnvironmentDto environmentDto ) throws EnvironmentCreationException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
         Set<RhP2pIp> setOfP2PIps = new HashSet<>();
@@ -249,10 +234,9 @@ public class HubEnvironmentManager
 
         for ( EnvironmentPeerDto peerDto : environmentDto.getPeers() )
         {
-            if ( !peerDto.getPeerId().equals( localPeer.getId() ) )
+            for ( EnvironmentPeerRHDto rhDto : peerDto.getRhs() )
             {
-                //todo reimplement
-                //                setOfP2PIps.add( new ( "RH_ID", peerDto.getTunnelAddress() ));
+                setOfP2PIps.add( new RhP2PIpEntity( rhDto.getId(), rhDto.getP2pIp() ) );
             }
         }
         p2pIps.addP2pIps( setOfP2PIps );
@@ -264,10 +248,16 @@ public class HubEnvironmentManager
 
             tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), p2pIps ) );
 
-            final Future<Boolean> f = tunnelCompletionService.take();
-            f.get();
-
-            tunnelExecutor.shutdown();
+            try
+            {
+                final Future<Boolean> f = tunnelCompletionService.take();
+                f.get();
+                tunnelExecutor.shutdown();
+            }
+            catch ( ExecutionException | InterruptedException e )
+            {
+                throw new EnvironmentCreationException( "Failed to setup tunnel" );
+            }
         }
     }
 
