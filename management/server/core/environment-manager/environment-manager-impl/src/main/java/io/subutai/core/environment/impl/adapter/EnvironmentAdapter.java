@@ -105,7 +105,7 @@ public class EnvironmentAdapter
             {
                 String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
-                log.debug( "Local container: hostname={}, id={}, ip={}", ch.getHostname(), ch.getId(), ip );
+                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip, ch.getContainerSize() );
             }
         }
     }
