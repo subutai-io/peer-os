@@ -43,6 +43,7 @@ import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandler;
@@ -70,6 +71,7 @@ import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
+import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
@@ -1775,6 +1777,56 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
+        }
+    }
+
+
+    @Override
+    public void startMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                 final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+        AlertHandler alertHandler = alertHandlers.get( handlerId );
+        if ( alertHandler == null )
+        {
+            throw new EnvironmentManagerException( "Alert handler not found." );
+        }
+        try
+        {
+            Environment environment = loadEnvironment( environmentId );
+
+            environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+
+            update( ( EnvironmentImpl ) environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on start monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public void stopMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+        //remove subscription from database
+        try
+        {
+            Environment environment = environmentDataService.find( environmentId );
+            environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+            environmentDataService.save( environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on stop monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
         }
     }
 
