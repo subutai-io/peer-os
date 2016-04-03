@@ -172,25 +172,18 @@ public class HubEnvironmentManager
     }
 
 
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId )
+    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
     {
-        try
-        {
-            io.subutai.common.security.PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
 
-            PublicKeyContainer keyContainer = new PublicKeyContainer();
-            keyContainer.setKey( publicKeyContainer.getKey() );
-            keyContainer.setHostId( publicKeyContainer.getHostId() );
-            keyContainer.setFingerprint( publicKeyContainer.getFingerprint() );
+        io.subutai.common.security.PublicKeyContainer publicKeyContainer =
+                peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
 
-            return keyContainer;
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( "Could not create local peer PEK" );
-        }
-        return null;
+        PublicKeyContainer keyContainer = new PublicKeyContainer();
+        keyContainer.setKey( publicKeyContainer.getKey() );
+        keyContainer.setHostId( publicKeyContainer.getHostId() );
+        keyContainer.setFingerprint( publicKeyContainer.getFingerprint() );
+
+        return keyContainer;
     }
 
 
