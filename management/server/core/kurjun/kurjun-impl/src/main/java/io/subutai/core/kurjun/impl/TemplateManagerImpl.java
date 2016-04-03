@@ -121,6 +121,7 @@ public class TemplateManagerImpl implements TemplateManager
             this.unifiedRepository.getRepositories()
                                   .add( repositoryFactory.createNonLocalTemplate( s, null, "public", null, "all" ) );
         }
+        this.unifiedRepository.getRepositories().add( this.localTemplateRepository );
     }
 
 
