@@ -28,7 +28,7 @@ public class P2PConfig
     @JsonProperty( "secretKeyTtlSec" )
     private long secretKeyTtlSec;
     @JsonProperty( "rhP2pIps" )
-    private Set<RhP2pIp> rhP2pIps = Sets.newHashSet();
+    private Set<RhP2pIpImpl> rhP2pIps = Sets.newHashSet();
 
 
     public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
@@ -48,12 +48,16 @@ public class P2PConfig
     {
         Preconditions.checkNotNull( rhP2pIp );
 
-        rhP2pIps.add( rhP2pIp );
+        rhP2pIps.add( new RhP2pIpImpl( rhP2pIp.getRhId(), rhP2pIp.getP2pIp() ) );
     }
 
 
     public Set<RhP2pIp> getRhP2pIps()
     {
+        Set<RhP2pIp> rhP2pIps = Sets.newHashSet();
+
+        rhP2pIps.addAll( this.rhP2pIps );
+
         return rhP2pIps;
     }
 

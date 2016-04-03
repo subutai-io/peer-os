@@ -71,7 +71,11 @@ public class PeerConfImpl implements PeerConf, Serializable
     {
         Preconditions.checkNotNull( rhP2pIps );
 
-        rhP2pIps.addAll( rhP2pIps );
+        for ( RhP2pIp rhP2pIp : rhP2pIps )
+        {
+
+            this.rhP2pIps.add( new RhP2PIpEntity( rhP2pIp.getRhId(), rhP2pIp.getP2pIp() ) );
+        }
     }
 
 
