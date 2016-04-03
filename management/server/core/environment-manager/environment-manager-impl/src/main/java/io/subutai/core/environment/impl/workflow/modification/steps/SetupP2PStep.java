@@ -108,6 +108,13 @@ public class SetupP2PStep
 
             if ( !CollectionUtil.isCollectionEmpty( rhIds ) )
             {
+                //remove already participating peers
+                for ( RhP2pIp rhP2pIp : environment.getP2pIps().getP2pIps() )
+                {
+                    rhIds.remove( rhP2pIp.getRhId() );
+                }
+
+                //assign p2p IPs to new RHs
                 for ( String rhId : rhIds )
                 {
                     config.addRhP2pIp( new RhP2PIpEntity( rhId, p2pAddressIterator.next() ) );
