@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +119,7 @@ public class TemplateManagerImpl implements TemplateManager
         for ( String s : SystemSettings.getGlobalKurjunUrls() )
         {
             this.unifiedRepository.getRepositories()
-                                  .add( repositoryFactory.createNonLocalTemplate( s, null, "public", null ) );
+                                  .add( repositoryFactory.createNonLocalTemplate( s, null, "public", null, "all" ) );
         }
     }
 
@@ -132,7 +131,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Read" )
     public TemplateKurjun getTemplate( String repository, byte[] md5, String templateOwner, boolean isKurjunClient )
             throws IOException
     {
@@ -153,7 +151,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Read" )
     public TemplateKurjun getTemplate( String repository, String name, String version, boolean isKurjunClient )
             throws IOException
     {
@@ -172,7 +169,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Read" )
     public TemplateKurjun getTemplate( final String name )
     {
         try
@@ -189,7 +185,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Read" )
     public InputStream getTemplateData( String repository, byte[] md5, String templateOwner, boolean isKurjunClient )
             throws IOException
     {
@@ -211,7 +206,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Read" )
     public List<TemplateKurjun> list( String repository, boolean isKurjunClient ) throws IOException
     {
         List<SerializableMetadata> metadatas = unifiedRepository.listPackages();
@@ -230,7 +224,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Read" )
     public List<TemplateKurjun> list()
     {
         try
@@ -261,7 +254,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Delete" )
     public boolean delete( String repository, String templateOwner, byte[] md5 ) throws IOException
     {
 
@@ -279,7 +271,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Write" )
     public void addRemoteRepository( URL url, String token )
     {
         try
@@ -306,7 +297,6 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    @RolesAllowed( "Template-Management|Delete" )
     public void removeRemoteRepository( URL url )
     {
         if ( url != null )
