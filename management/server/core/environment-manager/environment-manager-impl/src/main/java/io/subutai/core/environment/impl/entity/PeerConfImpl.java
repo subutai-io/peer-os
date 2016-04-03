@@ -94,12 +94,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     }
 
 
-    public void setVersion( final Long version )
-    {
-        this.version = version;
-    }
-
-
     @Override
     public Environment getEnvironment()
     {

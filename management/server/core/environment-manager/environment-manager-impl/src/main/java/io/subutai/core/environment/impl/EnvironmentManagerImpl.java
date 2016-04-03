@@ -69,9 +69,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
-import io.subutai.core.environment.impl.dao.EnvironmentContainerDataService;
 import io.subutai.core.environment.impl.dao.EnvironmentDataService;
-import io.subutai.core.environment.impl.dao.TopologyDataService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
@@ -118,8 +116,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     protected EnvironmentDataService environmentDataService;
-    protected EnvironmentContainerDataService environmentContainerDataService;
-    protected TopologyDataService topologyDataService;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
     private SecurityManager securityManager;
@@ -157,9 +153,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void init()
     {
-        this.topologyDataService = new TopologyDataService( daoManager );
         this.environmentDataService = new EnvironmentDataService( daoManager );
-        this.environmentContainerDataService = new EnvironmentContainerDataService( daoManager );
     }
 
 
@@ -864,10 +858,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-
-
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        // If environment from Hub, send destroy request to Hub
+        if ( environment instanceof ProxyEnvironment )
+        {
+            environmentAdapter.removeEnvironment( environment );
+
+            return;
+        }
+
         if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( environment ) )
         {
             throw new EnvironmentNotFoundException();
@@ -1194,7 +1196,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        EnvironmentContainerImpl environmentContainer = environmentContainerDataService.find( containerHostId );
+        EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environmentContainer ) )
         {
             throw new ContainerHostNotFoundException( "Container host not found." );
