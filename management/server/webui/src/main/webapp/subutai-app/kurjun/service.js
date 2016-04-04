@@ -82,8 +82,8 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 
 	function addTemplate(repository, file) {
 		//setUrlsValues();
-		//@todo repository=local
-		return uploadTemplate(file, LOCAL_TEMPLATE_URL + 'upload', "local");
+		//@todo repository=
+		return uploadTemplate(file, LOCAL_TEMPLATE_URL + 'upload');
 	}
 
 	function addApt(file) {
@@ -132,11 +132,11 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 		return $http.get (BASE_URL + "shared/users/" + templateId);
 	}
 
-	function uploadTemplate(file, url, repository) {
+	function uploadTemplate(file, url) {
 		setUrlsValues();
 		return Upload.upload({
 			url: url,
-			data: {file: file, repository: repository},
+			data: {package: file},
 			headers: {withCredentials: false, 'Content-Type': undefined},
 			transformRequest: angular.identity
 		});
