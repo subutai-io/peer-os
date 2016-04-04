@@ -91,7 +91,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     {
         Host host = this;
 
-        // If this is a remote host a command is sent via a proxyContainer b/c the remote host is not directly accessible from current peer.
+        // If this is a remote host then the command is sent via a proxyContainer
+        // b/c the remote host is not directly accessible from the current peer.
         if ( proxyContainer != null )
         {
             requestBuilder = wrapForProxy( requestBuilder );

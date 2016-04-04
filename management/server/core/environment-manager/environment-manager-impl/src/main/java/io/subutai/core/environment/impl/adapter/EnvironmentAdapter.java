@@ -83,7 +83,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager ) );
+                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
