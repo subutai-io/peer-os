@@ -345,10 +345,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						//SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						loadEnvironments();
-						$rootScope.notificationsUpdate = true;
+						$rootScope.notificationsUpdate = 'destroyEnvironment';
 					}).error(function (data) {
 						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
-						$rootScope.notificationsUpdate = true;
+						$rootScope.notificationsUpdate = 'destroyEnvironmentError';
 					});
 					loadEnvironments();
 				}

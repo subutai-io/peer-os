@@ -217,7 +217,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 			var logs = [];
 			for(var i = 0; i < logsArray.length; i++) {
 				var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
-				currentLog.date = moment(currentLog.date).format('MM.DD.YYYY HH:mm:ss');
+				currentLog.date = moment(currentLog.date).format('HH:mm:ss');
 				logs.push(currentLog);
 			}
 			vm.currentLog = logs;

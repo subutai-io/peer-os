@@ -212,7 +212,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 					}
 
-					$rootScope.notificationsUpdate = true;
+					$rootScope.notificationsUpdate = 'getLogByIdAdv';
 					$scope.$emit('reloadEnvironmentsList');
 					clearWorkspace();
 				}
@@ -252,7 +252,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				getLogById(data, true);
 				initScrollbar();
 
-				$rootScope.notificationsUpdate = true;
+				$rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuild';
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -260,7 +260,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
 				}
 				checkLastLog(false);
-				$rootScope.notificationsUpdate = true;
+				$rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuildError';
 			});
 		vm.environment2BuildName = '';
 	}
@@ -286,7 +286,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				getLogById(data, true);
 				$scope.$emit('reloadEnvironmentsList');
 
-				$rootScope.notificationsUpdate = true;
+				$rootScope.notificationsUpdate = 'modifyEnvironmentAdv';
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -296,7 +296,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				checkLastLog(false);
 				$scope.$emit('reloadEnvironmentsList');
 
-				$rootScope.notificationsUpdate = true;
+				$rootScope.notificationsUpdate = 'modifyEnvironmentAdvError';
 			});
 	}
 

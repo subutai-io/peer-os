@@ -1,4 +1,4 @@
-<div class="b-popup b-popup_log">
+<div class="b-popup">
 	<div class="b-popup__header">
 		{{ currentUserCtrl.currentLogTitle }}
 		<a href ng-click="closeThisDialog()">
@@ -16,7 +16,7 @@
 		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
 			<tr ng-repeat="(key, log) in currentUserCtrl.currentLog">
 				<td>{{ log.date }}</td>
-				<td class="b-main-table__mini-icon">
+				<td class="b-main-table__mini-icon" style="text-align: center;">
 					<i class="fa fa-check g-text-green" ng-if="log.state != 'FAILED'"></i>
 					<i class="fa fa-times g-text-red" ng-if="log.state == 'FAILED'"></i>
 				</td>
