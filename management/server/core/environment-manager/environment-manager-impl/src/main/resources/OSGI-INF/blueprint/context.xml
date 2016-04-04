@@ -3,12 +3,15 @@
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
+           xmlns:tx="http://aries.apache.org/xmlns/transactions/v1.0.0"
            default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
     >
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
   <!-- ***************************************************************** -->
   <authz:enable />
@@ -29,12 +32,38 @@
 
   <reference id="hubAdapter" interface="io.subutai.core.hubadapter.api.HubAdapter" />
 
+  <!-- JTA -->
 
-  <!-- ************************************************************************************************* -->
-  <bean id="daoManagerEnv" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
-    <jpa:unit unitname="envExtManagerPUnit2" property="entityManagerFactory" />
+  <bean id="envDb" class="org.apache.derby.jdbc.EmbeddedXADataSource">
+    <property name="databaseName" value="$[subutaiAppDataPath]/db/environment" />
+    <property name="createDatabase" value="create" />
   </bean>
-  <!-- ************************************************************************************************** -->
+
+  <service ref="envDb" interface="javax.sql.DataSource">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/env" />
+      <entry key="transactional" value="false" />
+    </service-properties>
+  </service>
+
+  <service ref="envDb" interface="javax.sql.XADataSource">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/envXa" />
+      <entry key="transactional" value="true" />
+    </service-properties>
+  </service>
+
+  <!-- JTA Transaction Manager setup. -->
+  <reference id="txManager" interface="javax.transaction.TransactionManager" availability="mandatory" />
+
+  <bean id="envMgrService" class="io.subutai.core.environment.impl.dao.EnvironmentServiceImpl">
+    <tx:transaction method="*" value="Required" />
+    <jpa:context property="entityManager" unitname="envMgrUnit" />
+  </bean>
+
+  <service ref="envMgrService" interface="io.subutai.core.environment.impl.dao.EnvironmentService" />
+
+  <!-- JTA -->
 
   <reference-list id="eventLstnr"
                   interface="io.subutai.core.environment.api.EnvironmentEventListener"
@@ -48,11 +77,11 @@
     <argument ref="templateRegistry" />
     <argument ref="peerManager" />
     <argument ref="securityManager" />
-    <argument ref="daoManagerEnv" />
     <argument ref="identityManager" />
     <argument ref="tracker" />
     <argument ref="relationManager" />
     <argument ref="hubAdapter" />
+    <argument ref="envMgrService" />
   </bean>
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />

@@ -457,6 +457,7 @@ input[type=checkbox] {
 }
 .b-main-table__mini-icon {
 	width: 20px;
+	text-align: center!important;
 }
 
 .b-main-table__tags {
