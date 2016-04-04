@@ -59,7 +59,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 						console.log(notifications[i].browserPluginMessage);
 						notifications.splice(i, 1);
 						localStorage.setItem('notifications', JSON.stringify(notifications));
-						$rootScope.$emit('notifications');
+						$rootScope.notifications = {};
 						break;
 					}
 				}
