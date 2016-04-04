@@ -68,6 +68,8 @@ public class ProxyEnvironment extends EnvironmentImpl
             {
                 ProxyEnvironmentContainer ch = new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
 
+                ch.setEnvironment( this );
+
                 containers.add( ch );
             }
         }
@@ -76,7 +78,7 @@ public class ProxyEnvironment extends EnvironmentImpl
             log.error( "Error to parse container json: ", e );
         }
 
-//        proxyContainerHelper.setProxyToRemoteContainers( envContainers );
+        proxyContainerHelper.setProxyToRemoteContainers( containers );
 
         Set<EnvironmentContainerImpl> resultSet = new HashSet<>();
 

@@ -48,7 +48,8 @@ class ProxyContainerHelper
     {
         for ( ProxyEnvironmentContainer host : envContainers )
         {
-            if ( localContainerIds.contains( host.getId() ) && host.getState() == ContainerHostState.RUNNING ) {
+            if ( localContainerIds.contains( host.getId() ) && host.getState() == ContainerHostState.RUNNING )
+            {
                 return host;
             }
         }
