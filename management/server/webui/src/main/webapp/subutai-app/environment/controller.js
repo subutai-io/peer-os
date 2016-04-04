@@ -23,8 +23,6 @@ var fileUploader = {};
 function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
 
 	var vm = this;
-	var GRID_CELL_SIZE = 100;
-	var GRID_SIZE = 100;
 
 	vm.activeMode = 'simple';
 
@@ -53,6 +51,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.users2Add = [];
 	vm.installedContainers = [];
 	vm.currentUser = {};
+	vm.restInProgress = false;
 
 	// functions
 	vm.changeMode = changeMode;
@@ -72,6 +71,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.removeDomain = removeDomain;
 	vm.minimizeLogs = minimizeLogs;
 	vm.getQuotaColor = getQuotaColor;
+	vm.initDataTable = initDataTable;
 
 	//share environment functions
 	vm.shareEnvironmentWindow = shareEnvironmentWindow;
@@ -120,16 +120,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	vm.containersTotal = [];
 	function loadEnvironments() {
-		vm.containersTotal = [];
-		environmentService.getEnvironments().success (function (data) {
-			vm.environments = [];
-			for (var i = 0; i < data.length; ++i) {
-				if (data[i].status !== "PENDING") {
+
+		if( !vm.restInProgress )
+		{
+			vm.restInProgress = true;
+			vm.containersTotal = [];
+			environmentService.getEnvironments().success (function (data) {
+				var environmentsList = [];
+				for (var i = 0; i < data.length; ++i) {
 					data[i].containersByQuota = getContainersSortedByQuota(data[i].containers);
-					vm.environments.push(data[i]);
+					environmentsList.push(data[i]);
 				}
-			}
-		});
+				vm.environments = environmentsList;
+				vm.restInProgress = false;
+			}).error(function (error){
+				console.log(error);
+				vm.restInProgress = false;
+			});
+		}
 	}
 	loadEnvironments();
 
@@ -146,19 +154,26 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	});
 
 	//installed environment table options
-	vm.dtOptionsInstallTable = DTOptionsBuilder
-		.newOptions()
-		.withOption('order', [[ 1, "asc" ]])
-		.withOption('stateSave', true)
-		.withPaginationType('full_numbers');
-	vm.dtColumnDefsInstallTable = [
-		DTColumnDefBuilder.newColumnDef(0).notSortable(),
-		DTColumnDefBuilder.newColumnDef(1),
-		DTColumnDefBuilder.newColumnDef(2).notSortable(),
-		DTColumnDefBuilder.newColumnDef(3).notSortable(),
-		DTColumnDefBuilder.newColumnDef(4).notSortable(),
-		DTColumnDefBuilder.newColumnDef(5).notSortable()
-	];
+	function initDataTable() {
+		console.log('checker');
+		vm.dtInstance = {};
+		vm.dtOptionsInstallTable = DTOptionsBuilder
+			.newOptions()
+			.withOption('order', [[ 1, "asc" ]])
+			.withOption('stateSave', true)
+			//.withOption('paging', false)
+			.withOption('searching', false)
+			//.withOption('retrieve', true)
+			.withPaginationType('full_numbers');
+		vm.dtColumnDefsInstallTable = [
+			DTColumnDefBuilder.newColumnDef(0).notSortable(),
+			DTColumnDefBuilder.newColumnDef(1),
+			DTColumnDefBuilder.newColumnDef(2).notSortable(),
+			DTColumnDefBuilder.newColumnDef(3).notSortable(),
+			DTColumnDefBuilder.newColumnDef(4).notSortable(),
+			DTColumnDefBuilder.newColumnDef(5).notSortable()
+		];
+	}
 
 	var refreshTable;
 	var reloadTableData = function() {
@@ -296,7 +311,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		return sortedContainers;
 	}
 
-	function destroyEnvironment(environmentId) {
+	function destroyEnvironment(environmentId, key) {
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 				title: "Are you sure?",
@@ -325,8 +340,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					var destroyEnvEvent = new CustomEvent('destroyEnvironment', {'detail': environmentId});
 					document.getElementById('js-environment-creation').dispatchEvent(destroyEnvEvent);
 
+					vm.environments[key].status = 'UNDER_MODIFICATION';
+
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
-						SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
+						//SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						loadEnvironments();
 					}).error(function (data) {
 						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
@@ -575,26 +592,30 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 }
 
 function imageExists(image_url){
-
     var http = new XMLHttpRequest();
 
     http.open('HEAD', image_url, false);
     http.send();
 
     return http.status != 404;
+}
 
+function initScrollbar() {
+	$('.js-scrollbar').perfectScrollbar({
+		"wheelPropagation": true,
+		"swipePropagation": false
+	});
 }
 
 function getDateFromString(string) {
-	var logTextTime = string.split(':');
-	var dateString = logTextTime[0].split(' ');
+	// var logTextTime = string.split(':');
+	var dateString = string.split(' ');
 	var temp = dateString[0].split('.');
-	dateString = [temp[2], temp[1], temp[0]].join('-') + 'T' + dateString[1];
-	var dateFullString = [dateString, logTextTime[1], logTextTime[2]].join(':');
+	var result = [temp[2], temp[1], temp[0]].join('-') + " " + dateString[1];
 
-	//var testDateUtc = moment.utc(Date.parse(dateFullString));
-	console.log(dateFullString);
-	var localDate = moment(Date.parse(dateFullString + '+0000')).local();
+	var a = result.split(/[^0-9]/);
+
+	var localDate = moment(Date.parse(new Date(a[0],a[1]-1,a[2],a[3],a[4],a[5] ))).local();
 
 	return localDate.format('HH:mm:ss');
 }

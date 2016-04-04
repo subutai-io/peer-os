@@ -52,7 +52,6 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -640,29 +639,19 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void createP2PSwarm( final String interfaceName, final String localIp, final String p2pHash,
-                                final String secretKey, final long secretKeyTtlSec ) throws ResourceHostException
+    public void joinP2PSwarm( final String p2pIp, final String interfaceName, final String p2pHash,
+                              final String secretKey, final long secretKeyTtlSec ) throws ResourceHostException
     {
         try
         {
-            getNetworkManager().createP2PSwarm( this, interfaceName, localIp, p2pHash, secretKey, secretKeyTtlSec );
-        }
-        catch ( NetworkManagerException e )
-        {
-            throw new ResourceHostException( "Failed to create P2P swarm", e );
-        }
-    }
-
-
-    @Override
-    public P2PConnection joinP2PSwarm( final String interfaceName, final String p2pHash, final String secretKey,
-                                       final long secretKeyTtlSec ) throws ResourceHostException
-    {
-        try
-        {
-            getNetworkManager().joinP2PSwarm( this, interfaceName, p2pHash, secretKey, secretKeyTtlSec );
-
-            return getP2PConnections().findByHash( p2pHash );
+            if ( getP2PConnections().findByHash( p2pHash ) != null )
+            {
+                getNetworkManager().resetSwarmSecretKey( this, p2pHash, secretKey, secretKeyTtlSec );
+            }
+            else
+            {
+                getNetworkManager().joinP2PSwarm( this, interfaceName, p2pIp, p2pHash, secretKey, secretKeyTtlSec );
+            }
         }
         catch ( NetworkManagerException e )
         {
@@ -677,7 +666,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            getNetworkManager().resetSwarmSecretKey( this, p2pHash, newSecretKey, ttlSeconds );
+            if ( getP2PConnections().findByHash( p2pHash ) != null )
+            {
+                getNetworkManager().resetSwarmSecretKey( this, p2pHash, newSecretKey, ttlSeconds );
+            }
         }
         catch ( NetworkManagerException e )
         {

@@ -2,15 +2,14 @@ package io.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,10 +20,11 @@ import javax.persistence.Version;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.environment.RhP2pIp;
 
 
 @Entity
@@ -37,16 +37,14 @@ public class PeerConfImpl implements PeerConf, Serializable
     @GeneratedValue( strategy = GenerationType.AUTO )
     private Long id;
 
-    @Version
-    private Long version;
-
     @Column( name = "peer_id", nullable = false )
     private String peerId;
 
-
-    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
-    @Column( name = "p2p_ips", nullable = false )
-    private Set<String> p2pIps = new HashSet<>();
+    @ElementCollection( targetClass = RhP2PIpEntity.class )
+    @CollectionTable(
+            name = "RH_P2P_IP",
+            joinColumns = @JoinColumn( name = "PEER_ID" ) )
+    private Set<RhP2pIp> rhP2pIps;
 
     @ManyToOne( targetEntity = EnvironmentImpl.class )
     @JoinColumn( name = "environment_id" )
@@ -58,21 +56,28 @@ public class PeerConfImpl implements PeerConf, Serializable
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.peerId = peerId;
-        this.p2pIps = new HashSet<>();
+        this.rhP2pIps = Sets.newHashSet();
     }
 
 
-    public void addP2pIps( Set<String> p2pIps )
-    {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( p2pIps ) );
+    public PeerConfImpl() {}
 
-        this.p2pIps.addAll( p2pIps );
+
+    public void addRhP2pIps( Set<RhP2pIp> rhP2pIps )
+    {
+        Preconditions.checkNotNull( rhP2pIps );
+
+        for ( RhP2pIp rhP2pIp : rhP2pIps )
+        {
+
+            this.rhP2pIps.add( new RhP2PIpEntity( rhP2pIp.getRhId(), rhP2pIp.getP2pIp() ) );
+        }
     }
 
 
-    public Set<String> getP2pIps()
+    public Set<RhP2pIp> getRhP2pIps()
     {
-        return p2pIps;
+        return rhP2pIps;
     }
 
 
@@ -85,18 +90,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     public void setId( final Long id )
     {
         this.id = id;
-    }
-
-
-    public Long getVersion()
-    {
-        return version;
-    }
-
-
-    public void setVersion( final Long version )
-    {
-        this.version = version;
     }
 
 

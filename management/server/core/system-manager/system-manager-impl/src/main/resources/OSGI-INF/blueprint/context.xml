@@ -23,7 +23,7 @@
     <argument value="${securePortX1}" />
     <argument value="${securePortX2}" />
     <argument value="${securePortX3}" />
-    <argument value="${publicURL}" />
+    <argument value="${localKurjunUrls}" />
 
   </bean>
 

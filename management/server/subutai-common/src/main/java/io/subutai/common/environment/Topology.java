@@ -83,6 +83,29 @@ public class Topology
     }
 
 
+    public Map<String, Set<String>> getPeerRhIds()
+    {
+        Map<String, Set<String>> peersRhIds = Maps.newHashMap();
+
+        for ( Map.Entry<String, Set<Node>> placementEntry : nodeGroupPlacement.entrySet() )
+        {
+            Set<String> peerRhIds = peersRhIds.get( placementEntry.getKey() );
+
+            if ( peerRhIds == null )
+            {
+                peerRhIds = Sets.newHashSet();
+                peersRhIds.put( placementEntry.getKey(), peerRhIds );
+            }
+            for ( Node node : placementEntry.getValue() )
+            {
+                peerRhIds.add( node.getHostId() );
+            }
+        }
+
+        return peersRhIds;
+    }
+
+
     public void addNodePlacement( String peerId, Node node )
     {
         Preconditions.checkNotNull( peerId, "Invalid peer" );

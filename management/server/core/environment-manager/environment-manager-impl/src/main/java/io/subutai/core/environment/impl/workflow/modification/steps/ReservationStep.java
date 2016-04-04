@@ -53,9 +53,9 @@ public class ReservationStep
     {
 
         Set<Peer> newPeers = peerManager.resolve( topology.getAllPeers() );
+
         //remove already participating peers
         newPeers.removeAll( environment.getPeers() );
-        newPeers.remove( peerManager.getLocalPeer() );
 
         if ( newPeers.isEmpty() )
         {
@@ -182,6 +182,7 @@ public class ReservationStep
         {
             trackerOperation
                     .addLog( String.format( "Reserved network resources on peer %s", succeededPeer.getName() ) );
+
             environment.addEnvironmentPeer( new PeerConfImpl( succeededPeer.getId() ) );
         }
 

@@ -28,7 +28,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -294,11 +293,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public P2PConnections joinP2PSwarm( final P2PConfig config )
+    public void joinP2PSwarm( final P2PConfig config )
     {
         try
         {
-            return localPeer.joinP2PSwarm( config );
+            localPeer.joinP2PSwarm( config );
         }
         catch ( Exception e )
         {
@@ -309,12 +308,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response createP2PSwarm( final P2PConfig config )
+    public void joinOrUpdateP2PSwarm( final P2PConfig config )
     {
         try
         {
-            localPeer.createP2PSwarm( config );
-            return Response.ok().build();
+            localPeer.joinOrUpdateP2PSwarm( config );
         }
         catch ( Exception e )
         {

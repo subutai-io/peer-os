@@ -25,7 +25,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.PublicKeyContainer;
@@ -113,15 +112,13 @@ public interface RestService
 
     @POST
     @Path( "p2ptunnel" )
-    @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    P2PConnections joinP2PSwarm( P2PConfig config );
+    void joinP2PSwarm( P2PConfig config );
 
-    @POST
-    @Path( "p2pinitial" )
+    @PUT
+    @Path( "p2ptunnel" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response createP2PSwarm( P2PConfig config );
-
+    void joinOrUpdateP2PSwarm( P2PConfig config );
 
     @DELETE
     @Path( "cleanup/{environmentId}" )

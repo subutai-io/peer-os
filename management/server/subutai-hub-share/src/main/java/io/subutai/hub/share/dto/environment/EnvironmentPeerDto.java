@@ -50,6 +50,8 @@ public class EnvironmentPeerDto
 
     private Boolean setupTunnel;
 
+    private Set<EnvironmentPeerRHDto> rhs = new HashSet<>();
+
 
     public EnvironmentPeerDto()
     {
@@ -239,5 +241,23 @@ public class EnvironmentPeerDto
     public void setSetupTunnel( final Boolean setupTunnel )
     {
         this.setupTunnel = setupTunnel;
+    }
+
+
+    public Set<EnvironmentPeerRHDto> getRhs()
+    {
+        return rhs;
+    }
+
+
+    public void setRhs( final Set<EnvironmentPeerRHDto> rhs )
+    {
+        this.rhs = rhs;
+    }
+
+
+    public void addRH( final EnvironmentPeerRHDto rh )
+    {
+        this.rhs.add( rh );
     }
 }
