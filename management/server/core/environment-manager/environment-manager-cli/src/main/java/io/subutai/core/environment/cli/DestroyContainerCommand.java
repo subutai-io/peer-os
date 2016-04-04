@@ -34,13 +34,6 @@ public class DestroyContainerCommand extends SubutaiShellCommandSupport
      */
             boolean async = false;
 
-    @Argument( name = "force", description = "force metadata removal",
-            index = 2, multiValued = false, required = false )
-    /**
-     * {@value forceMetadataRemoval} force remove stored info about environment
-     * <p> {@code required = false}, {@code default false} </p>
-     */
-            boolean forceMetadataRemoval = false;
 
     private final EnvironmentManager environmentManager;
 
@@ -63,8 +56,7 @@ public class DestroyContainerCommand extends SubutaiShellCommandSupport
             {
                 if ( containerHost.getId().equals( containerIdStr ) )
                 {
-                    environmentManager.destroyContainer( environment.getId(), containerHost.getId(), async,
-                            forceMetadataRemoval );
+                    environmentManager.destroyContainer( environment.getId(), containerHost.getId(), async );
 
                     System.out.println( "Container destroyed" );
 

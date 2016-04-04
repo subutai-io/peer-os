@@ -41,7 +41,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	vm.excludedContainers = [];
 	vm.cubeGrowth = 1;
-	vm.environment2BuildName = 'Environment name';
+	vm.environment2BuildName = '';
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
 	vm.buildCompleted = false;
@@ -155,26 +155,23 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
 
-							var logTextTime = logs[i].split(':');
-							var logTime = getDateFromString(logs[i]);
+							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+							var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
+
 							if(i+1 == logs.length) {
 								logTime = '';
 								logStatus = 'in-progress';
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
-							var logsTextString = logTextTime[3];
-							if(logTextTime[4] !== undefined) {
-								logsTextString += logTextTime[4] + logTextTime[5];
-							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logsTextString
+								"text": logObj.log
 							};
 							result.push(currentLog);
 
@@ -267,6 +264,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
 				getLogById(data, true);
+				initScrollbar();
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -282,6 +280,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function buildEditedEnvironment() {
@@ -677,6 +676,15 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function initJointJs() {
 
+		setTimeout(function (){
+			document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+				if(vm.editingEnv && vm.editingEnv.id == e.detail) {
+					clearWorkspace();
+					vm.editingEnv = false;
+				}
+			}, false);
+		}, 1000);
+
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
 			width: '100%',
@@ -726,10 +734,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			cellView.model.set('position', cellView.prevPos);
 		});
 
-		$('.js-scrollbar').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
+		initScrollbar();
 	}
 
 	vm.buildStep = 'confirm';
@@ -836,6 +841,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	function clearWorkspace() {
 		vm.cubeGrowth = 0;
 		PEER_MAP = {};
+		vm.environment2BuildName = '';
 
 		vm.env2Build = {};
 		vm.containers2Build = [];
@@ -982,20 +988,27 @@ function imageExists(image_url){
 
 function startDrag( event ) {
 
+	console.log('dragStart');
 	var containerImage = $(event.target).parent().find('img');
 
 	var ghostImage = document.createElement("span");
 	ghostImage.className = 'b-cloud-item b-hidden-object';
 	ghostImage.id = 'js-ghost-image';
 	ghostImage.style.backgroundImage = "url('" + containerImage.attr('src') + "')";
+
 	document.body.appendChild(ghostImage);
-	event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+		event.dataTransfer.setDragImage(ghostImage, 0, 0);
+	} else {
+		event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+	}
 
 	event.dataTransfer.setData( "template", $(event.target).data('template') );
 	event.dataTransfer.setData( "img", containerImage.attr('src') );
 }
 
 function dragOver( event ) {
+	console.log('dragOver');
 	var ghostImage = document.getElementById('js-ghost-image');	
 	ghostImage.style.left = event.pageX + 'px';
 	ghostImage.style.top = event.pageY + 'px';
@@ -1003,13 +1016,16 @@ function dragOver( event ) {
 }
 
 function endtDrag( event ) {
+	console.log('dragEnd');
+	event.preventDefault();
 	document.getElementById('js-ghost-image').remove();
 }
 
 var containerCounter = 1;
 function drop(event) {
-	event.preventDefault();
+	//event.preventDefault();
 
+	console.log('dragEvent');
 	var template = event.dataTransfer.getData("template");
 	var img = event.dataTransfer.getData("img");
 

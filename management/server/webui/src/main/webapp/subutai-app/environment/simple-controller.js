@@ -9,7 +9,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
-	var GRID_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 	$scope.identity = angular.identity;
@@ -33,7 +32,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	vm.templateGrid = [];
 	vm.cubeGrowth = 1;
-	vm.environment2BuildName = 'Environment name';
+	vm.environment2BuildName = '';
 	vm.buildCompleted = false;
 
 	// functions
@@ -128,8 +127,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
 
-							var logTextTime = logs[i].split(':');
-							var logTime = getDateFromString(logs[i]);
+							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+							var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
@@ -140,15 +139,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
-							var logsTextString = logTextTime[3];
-							if(logTextTime[4] !== undefined) {
-								logsTextString += logTextTime[4] + logTextTime[5];
-							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logsTextString
+								"text": logObj.log
 							};
 							result.push(currentLog);
 
@@ -242,6 +237,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
 				getLogById(data, true);
+				initScrollbar();
 
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
@@ -259,6 +255,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					"type": "error"
 				};
 			});
+		vm.environment2BuildName = '';
 	}
 
 	function notifyChanges() {
@@ -548,6 +545,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function initJointJs() {
 
+		setTimeout(function (){
+			document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+				if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
+					clearWorkspace();
+					vm.currentEnvironment = {};
+				}
+			}, false);
+		}, 1000);
+
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
 			width: '100%',
@@ -592,10 +598,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		);
 
-		$('.js-scrollbar').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
+		initScrollbar();
 
 		//zoom on scroll
 		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);
@@ -713,6 +716,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.cubeGrowth = 0;
 		vm.templateGrid = [];
 		graph.resetCells();
+		vm.environment2BuildName = '';
 	}
 
 	function addSettingsToTemplate(settings) {

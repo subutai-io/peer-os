@@ -2,10 +2,8 @@ package io.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,7 +22,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -51,6 +48,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
@@ -87,10 +85,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "environmentId" )
     protected String environmentId;
 
-    @Version
-    @JsonIgnore
-    private Long version;
-
     @Column( name = "peer_id", nullable = false )
     @JsonProperty( "peerId" )
     private String peerId;
@@ -126,7 +120,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = false )
+            cascade = CascadeType.ALL, orphanRemoval = true )
     @JsonIgnore
     private Set<PeerConf> peerConfs = Sets.newHashSet();
 
@@ -169,14 +163,12 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public EnvironmentImpl( String name, String subnetCidr, String sshKey, Long userId, String peerId )
+    public EnvironmentImpl( String name, String sshKey, Long userId, String peerId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
-        SubnetUtils cidr = new SubnetUtils( subnetCidr );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         this.name = name;
-        this.subnetCidr = cidr.getInfo().getCidrSignature();
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
             sshKeys.add( sshKey.trim() );
@@ -314,18 +306,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public Long getVersion()
-    {
-        return version;
-    }
-
-
-    public void setVersion( final Long version )
-    {
-        this.version = version;
-    }
-
-
     @Override
     public EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
     {
@@ -374,13 +354,25 @@ public class EnvironmentImpl implements Environment, Serializable
 
     public void addEnvironmentPeer( final PeerConf peerConf )
     {
-        if ( peerConf == null )
-        {
-            throw new IllegalArgumentException( "Environment peer could not be null." );
-        }
+
+        Preconditions.checkNotNull( peerConf, "Environment peer could not be null." );
 
         peerConf.setEnvironment( this );
         peerConfs.add( peerConf );
+    }
+
+
+    public PeerConf getPeerConf( String peerId )
+    {
+        for ( PeerConf peerConf : peerConfs )
+        {
+            if ( peerConf.getPeerId().equalsIgnoreCase( peerId ) )
+            {
+                return peerConf;
+            }
+        }
+
+        return null;
     }
 
 
@@ -439,7 +431,7 @@ public class EnvironmentImpl implements Environment, Serializable
     public void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
-        environmentManager.destroyContainer( getId(), containerHost.getId(), async, false );
+        environmentManager.destroyContainer( getId(), containerHost.getId(), async );
     }
 
 
@@ -478,7 +470,10 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Preconditions.checkNotNull( container );
 
-        containers.remove( container );
+        synchronized ( this.containers )
+        {
+            this.containers.remove( container );
+        }
     }
 
 
@@ -553,6 +548,15 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public void setSubnetCidr( final String cidr )
+    {
+        SubnetUtils subnetUtils = new SubnetUtils( cidr );
+
+        this.subnetCidr = cidr;
+    }
+
+
+    @Override
     public Long getVni()
     {
         return vni;
@@ -584,19 +588,19 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public void setP2PSubnet( final String tunnelNetwork )
+    public void setP2PSubnet( final String p2pSubnet )
     {
-        this.p2pSubnet = tunnelNetwork;
+        this.p2pSubnet = p2pSubnet;
     }
 
 
     @Override
-    public Map<String, String> getTunnels()
+    public P2pIps getP2pIps()
     {
-        Map<String, String> result = new HashMap<>();
+        P2pIps result = new P2pIps();
         for ( PeerConf peerConf : getPeerConfs() )
         {
-            result.put( peerConf.getPeerId(), peerConf.getTunnelAddress() );
+            result.addP2pIps( peerConf.getRhP2pIps() );
         }
         return result;
     }
@@ -652,10 +656,8 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public void addAlertHandler( EnvironmentAlertHandler environmentAlertHandler )
     {
-        if ( environmentAlertHandler == null )
-        {
-            throw new IllegalArgumentException( "Invalid alert handler id." );
-        }
+        Preconditions.checkNotNull( environmentAlertHandler, "Invalid alert handler id." );
+
         EnvironmentAlertHandlerImpl handlerId =
                 new EnvironmentAlertHandlerImpl( environmentAlertHandler.getAlertHandlerId(),
                         environmentAlertHandler.getAlertHandlerPriority() );
@@ -674,12 +676,11 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String toString()
     {
-        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", version=" + version + ", peerId='"
-                + peerId + '\'' + ", name='" + name + '\'' + ", creationTimestamp=" + creationTimestamp
-                + ", subnetCidr='" + subnetCidr + '\'' + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni
-                + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
-                + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
-                + alertHandlers + ", envId=" + envId + '}';
+        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
+                + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
+                + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\''
+                + ", containers=" + containers + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='"
+                + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
     }
 
 

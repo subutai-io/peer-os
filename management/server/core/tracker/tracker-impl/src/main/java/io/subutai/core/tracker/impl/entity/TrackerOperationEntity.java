@@ -19,8 +19,10 @@ import javax.persistence.Table;
 @IdClass( TrackerOperationPK.class )
 @NamedQueries( {
         @NamedQuery( name = "getTrackerOperation", query = "SELECT to FROM TrackerOperationEntity to WHERE to.source "
-                + "= :source AND to.operationTrackId = :operationTrackId" )
-} )
+                + "= :source AND to.operationTrackId = :operationTrackId" ),
+        @NamedQuery(name = "getTrackerUserOperation", query = "SELECT to FROM TrackerOperationEntity to WHERE to.source "
+                + "= :source AND to.operationTrackId = :operationTrackId AND to.userId = :userId")
+})
 public class TrackerOperationEntity
 {
 
@@ -40,13 +42,19 @@ public class TrackerOperationEntity
     @Column( name = "info" )
     private String info;
 
+    @Column( name = "user_id" )
+    private long userId;
 
-    public TrackerOperationEntity( final String source, final String id, final Long ts, final String info )
+    @Column( name = "viewed" )
+    private boolean viewState = false;
+
+    public TrackerOperationEntity( final String source, final String id, final Long ts, final String info, final long userId )
     {
         this.source = source;
         this.operationTrackId = id;
         this.ts = ts;
         this.info = info;
+        this.userId = userId;
     }
 
 
@@ -56,6 +64,21 @@ public class TrackerOperationEntity
     public String getInfo()
     {
         return info;
+    }
+
+    public long getUserId()
+    {
+        return userId;
+    }
+
+    public boolean isviewState()
+    {
+        return viewState;
+    }
+
+    public void setViewState( boolean viewState )
+    {
+        this.viewState = viewState;
     }
 
 

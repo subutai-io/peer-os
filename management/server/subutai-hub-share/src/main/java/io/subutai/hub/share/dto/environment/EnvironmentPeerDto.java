@@ -12,13 +12,12 @@ public class EnvironmentPeerDto
     public enum PeerState
     {
         EXCHANGE_INFO,
-        SETUP_P2P,
+        RESERVE_NETWORK,
         SETUP_TUNNEL,
         BUILD_CONTAINER,
         CONFIGURE_CONTAINER,
-        START_CONTAINER,
-        STOP_CONTAINER,
-        DESTROY_CONTAINER,
+        CONFIGURE_DOMAIN,
+        CHANGE_CONTAINER_STATE,
         DELETE_PEER,
         WAIT,
         READY
@@ -33,11 +32,11 @@ public class EnvironmentPeerDto
 
     private PeerState requestState;
 
-    private Set<String> usedIPs = new HashSet<>();
+    private Set<String> p2pSubnets = new HashSet<>();
 
     private Set<Long> vnis = new HashSet<>();
 
-    private Set<String> gateways = new HashSet<>();
+    private Set<String> containerSubnets = new HashSet<>();
 
     private PublicKeyContainer publicKey;
 
@@ -50,6 +49,8 @@ public class EnvironmentPeerDto
     private String p2pSecretKey;
 
     private Boolean setupTunnel;
+
+    private Set<EnvironmentPeerRHDto> rhs = new HashSet<>();
 
 
     public EnvironmentPeerDto()
@@ -111,27 +112,27 @@ public class EnvironmentPeerDto
     }
 
 
-    public Set<String> getUsedIPs()
+    public Set<String> getP2pSubnets()
     {
-        return usedIPs;
+        return p2pSubnets;
     }
 
 
-    public void setUsedIPs( final Set<String> usedIPs )
+    public void setP2pSubnets( final Set<String> p2pSubnets )
     {
-        this.usedIPs = usedIPs;
+        this.p2pSubnets = p2pSubnets;
     }
 
 
-    public void addUsedIP( final String usedId )
+    public void addP2pSubnet( final String p2pSubnet )
     {
-        this.usedIPs.add( usedId );
+        this.p2pSubnets.add( p2pSubnet );
     }
 
 
-    public void removeUsedIP( final String usedId )
+    public void removeP2pSubnet( final String p2pSubnet )
     {
-        this.usedIPs.remove( usedId );
+        this.p2pSubnets.remove( p2pSubnet );
     }
 
 
@@ -153,20 +154,21 @@ public class EnvironmentPeerDto
     }
 
 
-    public Set<String> getGateways()
+    public Set<String> getContainerSubnets()
     {
-        return gateways;
+        return containerSubnets;
     }
 
 
-    public void setGateways( final Set<String> gateways )
+    public void setContainerSubnets( final Set<String> containerSubnets )
     {
-        this.gateways = gateways;
+        this.containerSubnets = containerSubnets;
     }
 
-    public void addGateway( final String gateway )
+
+    public void addContainerSubnet( final String containerSubnet )
     {
-        this.gateways.add( gateway );
+        this.containerSubnets.add( containerSubnet );
     }
 
 
@@ -239,5 +241,23 @@ public class EnvironmentPeerDto
     public void setSetupTunnel( final Boolean setupTunnel )
     {
         this.setupTunnel = setupTunnel;
+    }
+
+
+    public Set<EnvironmentPeerRHDto> getRhs()
+    {
+        return rhs;
+    }
+
+
+    public void setRhs( final Set<EnvironmentPeerRHDto> rhs )
+    {
+        this.rhs = rhs;
+    }
+
+
+    public void addRH( final EnvironmentPeerRHDto rh )
+    {
+        this.rhs.add( rh );
     }
 }

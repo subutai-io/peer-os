@@ -2,10 +2,13 @@ package io.subutai.core.environment.impl.entity;
 
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,9 +18,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.environment.RhP2pIp;
 
 
 @Entity
@@ -30,24 +37,47 @@ public class PeerConfImpl implements PeerConf, Serializable
     @GeneratedValue( strategy = GenerationType.AUTO )
     private Long id;
 
-    @Version
-    private Long version;
-
     @Column( name = "peer_id", nullable = false )
     private String peerId;
 
-    @Column( name = "tunnel_address", nullable = false )
-    private String tunnelAddress;
+    @ElementCollection( targetClass = RhP2PIpEntity.class )
+    @CollectionTable(
+            name = "RH_P2P_IP",
+            joinColumns = @JoinColumn( name = "PEER_ID" ) )
+    private Set<RhP2pIp> rhP2pIps;
 
     @ManyToOne( targetEntity = EnvironmentImpl.class )
     @JoinColumn( name = "environment_id" )
     private Environment environment;
 
 
-    public PeerConfImpl( final P2PConfig config )
+    public PeerConfImpl( final String peerId )
     {
-        this.peerId = config.getPeerId();
-        this.tunnelAddress = config.getAddress();
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
+        this.peerId = peerId;
+        this.rhP2pIps = Sets.newHashSet();
+    }
+
+
+    public PeerConfImpl() {}
+
+
+    public void addRhP2pIps( Set<RhP2pIp> rhP2pIps )
+    {
+        Preconditions.checkNotNull( rhP2pIps );
+
+        for ( RhP2pIp rhP2pIp : rhP2pIps )
+        {
+
+            this.rhP2pIps.add( new RhP2PIpEntity( rhP2pIp.getRhId(), rhP2pIp.getP2pIp() ) );
+        }
+    }
+
+
+    public Set<RhP2pIp> getRhP2pIps()
+    {
+        return rhP2pIps;
     }
 
 
@@ -60,18 +90,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     public void setId( final Long id )
     {
         this.id = id;
-    }
-
-
-    public Long getVersion()
-    {
-        return version;
-    }
-
-
-    public void setVersion( final Long version )
-    {
-        this.version = version;
     }
 
 
@@ -95,32 +113,12 @@ public class PeerConfImpl implements PeerConf, Serializable
     }
 
 
-    public void setPeerId( final String peerId )
-    {
-        this.peerId = peerId;
-    }
-
-
-    @Override
-    public String getTunnelAddress()
-    {
-        return tunnelAddress;
-    }
-
-
-    public void setTunnelAddress( final String tunnelAddress )
-    {
-        this.tunnelAddress = tunnelAddress;
-    }
-
-
     @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer( "PeerConfImpl{" );
         sb.append( "id=" ).append( id );
         sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", tunnelAddress='" ).append( tunnelAddress ).append( '\'' );
         sb.append( ", environment=" ).append( environment.getId() );
         sb.append( '}' );
         return sb.toString();
@@ -145,10 +143,6 @@ public class PeerConfImpl implements PeerConf, Serializable
         {
             return false;
         }
-        if ( !tunnelAddress.equals( peerConf.tunnelAddress ) )
-        {
-            return false;
-        }
         return environment.equals( peerConf.environment );
     }
 
@@ -157,7 +151,6 @@ public class PeerConfImpl implements PeerConf, Serializable
     public int hashCode()
     {
         int result = peerId.hashCode();
-        result = 31 * result + tunnelAddress.hashCode();
         result = 31 * result + environment.hashCode();
         return result;
     }

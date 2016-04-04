@@ -26,19 +26,12 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupP2PConnectionCommand( String interfaceName, String localIp, String p2pHash,
-                                                        String secretKey, long secretKeyTtlSec )
+    public RequestBuilder getJoinP2PSwarmCommand( String interfaceName, String localIp, String p2pHash,
+                                                  String secretKey, long secretKeyTtlSec )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
                 Lists.newArrayList( "p2p", "-c", interfaceName, p2pHash, secretKey, String.valueOf( secretKeyTtlSec ),
-                        Strings.isNullOrEmpty( localIp ) ? "" : localIp ) ).withTimeout( 90 );
-    }
-
-
-    public RequestBuilder getRemoveP2PConnectionCommand( String p2pHash )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "p2p", "-d", p2pHash ) );
+                        localIp ) ).withTimeout( 90 );
     }
 
 
@@ -49,17 +42,25 @@ public class Commands
     }
 
 
+    public RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
+                Lists.newArrayList( "tunnel", "-create", tunnelName, "-remoteip", tunnelIp, "-vlan",
+                        String.valueOf( vlan ), "-vni", String.valueOf( vni ) ) );
+    }
+
+
+    public RequestBuilder getGetTunnelsCommand()
+    {
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.newArrayList( "tunnel", "-list" ) );
+    }
+
+
     public RequestBuilder getSetupTunnelCommand( String tunnelName, String tunnelIp, String tunnelType )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
                 .withCmdArgs( Lists.newArrayList( "-c", tunnelName, tunnelIp, tunnelType ) );
-    }
-
-
-    public RequestBuilder getRemoveTunnelCommand( String tunnelName )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-r", tunnelName ) );
     }
 
 
@@ -77,29 +78,9 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveVniVlanMappingCommand( String tunnelName, long vni, int vLanId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-M", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ) ) );
-    }
-
-
     public RequestBuilder getListVniVlanMappingsCommand()
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-v" ) );
-    }
-
-
-    public RequestBuilder getReserveVniCommand( long vni, int vlan, String environmentId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-E", String.valueOf( vni ), String.valueOf( vlan ), environmentId ) );
-    }
-
-
-    public RequestBuilder getListReservedVnisCommand()
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-Z", "list" ) );
     }
 
 

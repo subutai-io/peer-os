@@ -11,7 +11,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
-import io.subutai.core.environment.impl.workflow.destruction.steps.RemoveKeysStep;
+
 
 //todo use native fail for failing the workflow
 public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
@@ -21,7 +21,6 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     private final EnvironmentManagerImpl environmentManager;
     private EnvironmentImpl environment;
-    private final boolean forceMetadataRemoval;
     private final TrackerOperation operationTracker;
 
     private Throwable error;
@@ -31,20 +30,17 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     {
         INIT,
         CLEANUP_ENVIRONMENT,
-        REMOVE_KEYS,
         FINALIZE
     }
 
 
     public EnvironmentDestructionWorkflow( final EnvironmentManagerImpl environmentManager,
-                                           final EnvironmentImpl environment, final boolean forceMetadataRemoval,
-                                           final TrackerOperation operationTracker )
+                                           final EnvironmentImpl environment, final TrackerOperation operationTracker )
     {
         super( EnvironmentDestructionPhase.INIT );
 
         this.environmentManager = environmentManager;
         this.environment = environment;
-        this.forceMetadataRemoval = forceMetadataRemoval;
         this.operationTracker = operationTracker;
     }
 
@@ -66,32 +62,11 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     public EnvironmentDestructionPhase CLEANUP_ENVIRONMENT()
     {
-        operationTracker.addLog( "Cleaning up environment" );
+        operationTracker.addLog( "Destroying environment" );
 
         try
         {
             new CleanupEnvironmentStep( environment, operationTracker ).execute();
-
-            environment = environmentManager.update( environment );
-
-            return EnvironmentDestructionPhase.REMOVE_KEYS;
-        }
-        catch ( Exception e )
-        {
-            setError( e );
-
-            return null;
-        }
-    }
-
-
-    public EnvironmentDestructionPhase REMOVE_KEYS()
-    {
-        operationTracker.addLog( "Removing keys" );
-
-        try
-        {
-            new RemoveKeysStep( environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 

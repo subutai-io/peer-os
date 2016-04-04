@@ -9,6 +9,9 @@
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0
             http://aries.apache.org/xmlns/transactions/v1.0.0 http://aries.apache.org/xmlns/transactions/v1.0.0 ">
 
+  <reference id="identityManager"
+             interface="io.subutai.core.identity.api.IdentityManager" />
+
   <!-- ******************************************************************************** -->
   <bean id="daoManagerTracker" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="trackerPUnit" property="entityManagerFactory" />
@@ -17,6 +20,7 @@
 
   <bean id="tracker" class="io.subutai.core.tracker.impl.TrackerImpl"
         scope="singleton" activation="eager" init-method="init" depends-on="daoManagerTracker">
+    <property name="identityManager" ref="identityManager" />
     <property name="daoManager" ref="daoManagerTracker" />
   </bean>
 

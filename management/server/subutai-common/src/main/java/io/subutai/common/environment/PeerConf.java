@@ -1,6 +1,9 @@
 package io.subutai.common.environment;
 
 
+import java.util.Set;
+
+
 public interface PeerConf
 {
     String getPeerId();
@@ -9,5 +12,7 @@ public interface PeerConf
 
     void setEnvironment( Environment environment );
 
-    String getTunnelAddress();
+    public void addRhP2pIps( Set<RhP2pIp> rhP2pIps );
+
+    public Set<RhP2pIp> getRhP2pIps();
 }

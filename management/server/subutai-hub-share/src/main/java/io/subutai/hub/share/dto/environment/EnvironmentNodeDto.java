@@ -211,6 +211,14 @@ public class EnvironmentNodeDto
 
     public void addSshKey( final String sshKey )
     {
-        this.sshKeys.add( sshKey );
+        if ( !( this.sshKeys == null ) )
+        {
+            this.sshKeys.add( sshKey );
+        }
+        else
+        {
+            this.sshKeys = new HashSet<>();
+            this.sshKeys.add( sshKey );
+        }
     }
 }

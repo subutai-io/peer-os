@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package io.subutai.core.tracker.impl;
 
 
@@ -16,6 +11,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
@@ -43,6 +39,7 @@ public class TrackerImpl implements Tracker
     private static final String SOURCE_IS_EMPTY_MSG = "Source is null or empty";
     protected TrackerOperationDataService dataService;
     private DaoManager daoManager;
+    private IdentityManager identityManager;
 
 
     /**
@@ -58,7 +55,12 @@ public class TrackerImpl implements Tracker
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
 
-        return dataService.getTrackerOperation( source, operationTrackId );
+        // @todo add enums instead of values (check for admin)
+        if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+            return dataService.getTrackerOperation( source, operationTrackId );
+
+
+        return dataService.getTrackerUserOperation( source, operationTrackId, identityManager.getActiveUser().getId() );
     }
 
 
@@ -77,10 +79,10 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            dataService.saveTrackerOperation( source, po );
+            dataService.saveTrackerOperation( source, po, identityManager.getActiveUser().getId() );
             return true;
         }
-        catch ( SQLException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in saveTrackerOperation", e );
         }
@@ -132,7 +134,16 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
+            // @todo add enums instead of values (check for admin)
+            if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+            {
+                list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
+            }
+            else
+            {
+                list = dataService.getRecentUserOperations( source, fromDate, toDate, limit, identityManager.getActiveUser().getId() );
+            }
+
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
@@ -211,6 +222,26 @@ public class TrackerImpl implements Tracker
     }
 
 
+    @Override
+    public void setOperationViewState( String source, UUID operationId, boolean viewed ) throws SQLException
+    {
+        dataService.setOperationViewState( source, operationId, viewed );
+    }
+
+    @Override
+    public void setOperationsViewStates( boolean viewed ) throws SQLException
+    {
+        dataService.setOperationsViewState( viewed, identityManager.getActiveUser().getId() );
+    }
+
+    @Override
+    public List<TrackerOperationView> getNotifications() throws SQLException
+    {
+        return dataService.getNewOperations( identityManager.getActiveUser().getId() );
+    }
+
+
+
     public void init()
     {
         dataService = new TrackerOperationDataService( daoManager.getEntityManagerFactory() );
@@ -220,5 +251,10 @@ public class TrackerImpl implements Tracker
     public void setDaoManager( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
+    }
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 }

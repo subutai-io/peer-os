@@ -5,68 +5,72 @@
 		<!--<a href ng-click="environmentViewCtrl.minimizeLogs()" class="b-popup-header-controls"><i class="fa fa-minus"></i></a>-->
 	</div>
 
-	<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'confirm'">
-		<div class="b-form-group g-margin-bottom">
-			<div class="g-text g-margin-bottom-half">Enter environment name</div>
-			<input type="text" 
-				class="b-form-input b-form-input_fix-size-3" 
-				id="env-name" 
-				ng-model="environmentSimpleViewCtrl.environment2BuildName">
+	<form ng-submit="environmentSimpleViewCtrl.buildEnvironment()">
+		<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'confirm'">
+			<div class="b-form-group g-margin-bottom">
+				<div class="g-text g-margin-bottom-half">Enter environment name</div>
+				<input type="text" 
+					class="b-form-input b-form-input_fix-size-3" 
+					id="env-name" 
+					placeholder="Environment name" 
+					ng-model="environmentSimpleViewCtrl.environment2BuildName" 
+					required>
+			</div>
+
+			<div class="g-text g-margin-bottom-half">Create environment with following containers</div>
+			<div class="b-main-table-border">
+				<table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
+
+					<tr ng-repeat="(templateName, templateInfo) in environmentSimpleViewCtrl.env2Build">
+						<td class="b-main-table__20 g-text-center">
+							<img 
+								src="assets/templates/{{ templateName }}.jpg" 
+								alt="{{ templateName }}" 
+								onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+						</td>
+						<td>{{ templateName }}</td>
+						<td class="b-main-table__right">
+							<span 
+							class="g-circle-label g-margin-left-quarter" 
+							ng-repeat="(sizeName, count) in templateInfo.sizes" 
+							style="background-color: {{ environmentSimpleViewCtrl.colors[sizeName] }}" 
+							tooltips 
+							tooltip-template="{{ sizeName }}">
+								{{ count }}
+							</span>
+						</td>
+					</tr>
+
+				</table>
+			</div>
 		</div>
 
-		<div class="g-text g-margin-bottom-half">Create environment with following containers</div>
-		<div class="b-main-table-border">
-			<table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
-
-				<tr ng-repeat="(templateName, templateInfo) in environmentSimpleViewCtrl.env2Build">
-					<td class="b-main-table__20 g-text-center">
-						<img 
-							src="assets/templates/{{ templateName }}.jpg" 
-							alt="{{ templateName }}" 
-							onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
-					</td>
-					<td>{{ templateName }}</td>
-					<td class="b-main-table__right">
-						<span 
-						class="g-circle-label g-margin-left-quarter" 
-						ng-repeat="(sizeName, count) in templateInfo.sizes" 
-						style="background-color: {{ environmentSimpleViewCtrl.colors[sizeName] }}" 
-						tooltips 
-						tooltip-template="{{ sizeName }}">
-							{{ count }}
-						</span>
-					</td>
+		<div class="b-popup__body js-scrollbar b-popup-logs" ng-if="environmentSimpleViewCtrl.buildStep == 'showLogs'">
+			<table class="b-main-table b-main-table_none-border b-main-table_logs g-margin-bottom-half">
+				<tr ng-repeat="(key, log) in environmentSimpleViewCtrl.logMessages">
+					<td>{{ log.time }}</td>
+					<td class="b-main-table__mini-icon"><i class="fa" ng-class="log.classes"></i></td>
+					<td>{{ log.text }}</td>
 				</tr>
-
 			</table>
 		</div>
-	</div>
+		<div class="b-popup__footer b-popup__footer_undertable">
 
-	<div class="b-popup__body" ng-if="environmentSimpleViewCtrl.buildStep == 'showLogs'">
-		<table class="b-main-table b-main-table_none-border b-main-table_logs g-margin-bottom-half">
-			<tr ng-repeat="(key, log) in environmentSimpleViewCtrl.logMessages">
-				<td>{{ log.time }}</td>
-				<td class="b-main-table__mini-icon"><i class="fa" ng-class="log.classes"></i></td>
-				<td>{{ log.text }}</td>
-			</tr>
-		</table>
-	</div>
-	<div class="b-popup__footer b-popup__footer_undertable">
+			<button class="b-btn b-btn_green js-environment-build" 
+			ng-if="environmentSimpleViewCtrl.buildStep == 'confirm'" 
+			type="submit">
+				Build
+			</button>
 
-		<button class="b-btn b-btn_green js-environment-build" 
-		ng-if="environmentSimpleViewCtrl.buildStep == 'confirm'" 
-		ng-click="environmentSimpleViewCtrl.buildEnvironment()">
-			Build
-		</button>
+			<button class="b-btn b-btn_green js-environment-build" 
+			ng-if="environmentSimpleViewCtrl.buildCompleted" 
+			ng-click="environmentSimpleViewCtrl.closePopup()">
+				Close
+			</button>
 
-		<button class="b-btn b-btn_green js-environment-build" 
-		ng-if="environmentSimpleViewCtrl.buildCompleted" 
-		ng-click="environmentSimpleViewCtrl.closePopup()">
-			Close
-		</button>
-
-		<div class="clear"></div>
-	</div>
+			<div class="clear"></div>
+		</div>
+	</form>
 	<div class="b-loading-screen js-popup-loading-screen">
 		<div class="b-load-icon"></div>
 	</div>	

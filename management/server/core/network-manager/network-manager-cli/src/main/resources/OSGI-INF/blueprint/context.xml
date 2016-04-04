@@ -1,47 +1,20 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <reference id="networkManager" availability="mandatory"
-             interface="io.subutai.core.network.api.NetworkManager" />
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/tunnel-create">
-      <action class="io.subutai.core.network.cli.SetupTunnelCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/tunnel-list">
       <action class="io.subutai.core.network.cli.ListTunnelCommand">
-        <argument ref="networkManager" />
+        <argument ref="localPeer" />
       </action>
     </command>
   </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/tunnel-remove">
-      <action class="io.subutai.core.network.cli.RemoveTunnelCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/p2p-create">
-      <action class="io.subutai.core.network.cli.SetupP2PCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="net/p2p-list">
       <action class="io.subutai.core.network.cli.ListP2PCommand">
-        <argument ref="networkManager" />
-      </action>
-    </command>
-  </command-bundle>
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="net/p2p-remove">
-      <action class="io.subutai.core.network.cli.RemoveP2PCommand">
-        <argument ref="networkManager" />
+        <argument ref="localPeer" />
       </action>
     </command>
   </command-bundle>

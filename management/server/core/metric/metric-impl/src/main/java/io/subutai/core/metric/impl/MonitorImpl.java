@@ -246,7 +246,7 @@ public class MonitorImpl implements Monitor, HostListener
         {
             CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
 
-            if ( null != commandResult && commandResult.hasSucceeded() )
+            if ( commandResult.hasSucceeded() )
             {
                 result = commandResult.getStdOut();
             }
