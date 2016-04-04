@@ -154,6 +154,8 @@ public class RegisterSshStep
             } );
         }
 
+        executorService.shutdown();
+
         Set<Peer> succeededPeers = Sets.newHashSet();
         for ( Peer ignored : peers )
         {
