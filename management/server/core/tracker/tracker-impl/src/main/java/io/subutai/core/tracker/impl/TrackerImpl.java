@@ -79,11 +79,10 @@ public class TrackerImpl implements Tracker
 
         try
         {
-
             dataService.saveTrackerOperation( source, po, identityManager.getActiveUser().getId() );
             return true;
         }
-        catch ( SQLException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in saveTrackerOperation", e );
         }

@@ -12,6 +12,7 @@ func LxcDestroy(name string) {
 	container.Destroy(name)
 
 	if name == "management" {
+		template.MngStop()
 		template.MngDel()
 	}
 }

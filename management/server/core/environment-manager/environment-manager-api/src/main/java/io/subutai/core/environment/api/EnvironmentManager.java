@@ -207,7 +207,7 @@ public interface EnvironmentManager
      *
      * @return port for ssh connection
      */
-    int setupContainerSsh( String containerHostId, String environmentId )
+    int setupSshTunnelForContainer( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
