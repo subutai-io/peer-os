@@ -83,7 +83,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager ) );
+                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
@@ -105,7 +105,7 @@ public class EnvironmentAdapter
             {
                 String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
-                log.debug( "Local container: hostname={}, id={}, ip={}", ch.getHostname(), ch.getId(), ip );
+                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip, ch.getContainerSize() );
             }
         }
     }
