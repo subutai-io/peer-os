@@ -125,7 +125,7 @@ public class TrackerOperationImpl implements TrackerOperation
             {
                 log.append( "\n" );
             }
-            log.append( String.format( "{date : %s, log : '%s', state : '%s'},",
+            log.append( String.format( "{\"date\" : %s, \"log\" : \"%s\", \"state\" : \"%s\"},",
                     new Timestamp(System.currentTimeMillis()).getTime(),
                     logString, state ) );
         }

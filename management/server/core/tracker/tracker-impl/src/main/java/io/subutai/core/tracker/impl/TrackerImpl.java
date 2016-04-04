@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package io.subutai.core.tracker.impl;
 
 
@@ -60,7 +55,12 @@ public class TrackerImpl implements Tracker
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
 
-        return dataService.getTrackerOperation( source, operationTrackId );
+        // @todo add enums instead of values (check for admin)
+        if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+            return dataService.getTrackerOperation( source, operationTrackId );
+
+
+        return dataService.getTrackerUserOperation( source, operationTrackId, identityManager.getActiveUser().getId() );
     }
 
 
@@ -135,7 +135,16 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
+            // @todo add enums instead of values (check for admin)
+            if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+            {
+                list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
+            }
+            else
+            {
+                list = dataService.getRecentUserOperations( source, fromDate, toDate, limit, identityManager.getActiveUser().getId() );
+            }
+
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
@@ -213,6 +222,12 @@ public class TrackerImpl implements Tracker
         }
     }
 
+
+
+    public void setViewedOperation( String source, UUID operationId, boolean viewed )
+    {
+
+    }
 
     public void init()
     {
