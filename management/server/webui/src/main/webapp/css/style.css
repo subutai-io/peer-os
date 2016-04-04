@@ -3332,8 +3332,10 @@ td.b-main-table__status-col {
 .b-hub-status__dropdown .list li:last-child {
     border-bottom: none;
 }
-.b-hub-status__dropdown .list li a {
+.b-hub-status__dropdown .list li a,
+.b-hub-status__dropdown .list li span {
     text-decoration: none;
+	word-wrap: break-word;
 }
 
 .b-hub-status__dropdown .list li .date {
