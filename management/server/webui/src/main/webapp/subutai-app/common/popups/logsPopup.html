@@ -1,6 +1,6 @@
-<div class="b-popup b-popup_log">
+<div class="b-popup">
 	<div class="b-popup__header">
-		Selected module logs
+		{{ currentUserCtrl.currentLogTitle }}
 		<a href ng-click="closeThisDialog()">
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
@@ -14,7 +14,7 @@
 	</script>
 	<div class="b-popup__body js-scrollbar b-popup-logs">
 		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
-			<tr ng-repeat="(key, log) in trackerCtrl.currentLog">
+			<tr ng-repeat="(key, log) in currentUserCtrl.currentLog">
 				<td>{{ log.date }}</td>
 				<td class="b-main-table__mini-icon" style="text-align: center;">
 					<i class="fa fa-check g-text-green" ng-if="log.state != 'FAILED'"></i>

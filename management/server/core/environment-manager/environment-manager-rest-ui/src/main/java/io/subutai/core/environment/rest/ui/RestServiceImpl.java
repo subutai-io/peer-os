@@ -130,6 +130,7 @@ public class RestServiceImpl implements RestService
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             convertContainersToContainerJson( environment.getContainerHosts() ),
                             environment.getRelationDeclaration() );
+
             environmentDtos.add( environmentDto );
         }
 
@@ -838,6 +839,7 @@ public class RestServiceImpl implements RestService
     private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
         Set<ContainerDto> containerDtos = Sets.newHashSet();
+
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             try
@@ -847,16 +849,20 @@ public class RestServiceImpl implements RestService
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), containerHost.getResourceHostId().getId() ) );
+                        containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
+                        containerHost.getClass().getName() )
+                 );
             }
             catch ( Exception e )
             {
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), "UNKNOWN" ) );
+                        containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName() )
+                );
             }
         }
+
         return containerDtos;
     }
 
