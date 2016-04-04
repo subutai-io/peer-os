@@ -221,7 +221,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 				logs.push(currentLog);
 			}
 			vm.currentLog = logs;
-			console.log(vm.currentLog);
 
 			ngDialog.open({
 				template: 'subutai-app/common/popups/logsPopup.html',
@@ -266,7 +265,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 		localStorage.removeItem('notifications');
 
 		trackerSrv.deleteAllNotifications().success(function(data) {
-			console.log(data);
 		}).error(function(error) {
 			console.log(error);
 		});
@@ -282,9 +280,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 	}
 
    	function getBazaarChecksum() {
-   		console.log ("Getting checksum");
 		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
-			console.log (data);
 			return data;
 		});
 		return "";

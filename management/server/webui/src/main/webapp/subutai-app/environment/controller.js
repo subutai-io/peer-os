@@ -155,7 +155,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	//installed environment table options
 	function initDataTable() {
-		console.log('checker');
 		vm.dtInstance = {};
 		vm.dtOptionsInstallTable = DTOptionsBuilder
 			.newOptions()

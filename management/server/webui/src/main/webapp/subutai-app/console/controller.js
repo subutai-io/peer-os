@@ -60,7 +60,6 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	});
 
 	//Console UI
-	console.log($scope);
 	$scope.theme = 'modern';
 	setTimeout(function () {
 		$scope.$broadcast('terminal-output', {
@@ -186,7 +185,6 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	function setConsole(node, nodeType) {
 		if(nodeType === undefined || nodeType === null) nodeType = 'host';
-		console.log(nodeType);
 		vm.selectedNodeType = nodeType;
 		vm.activeConsole = node;
 		$scope.results.splice(0, $scope.results.length);
@@ -226,7 +224,6 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 	}
 
 	function showContainers(environmentId) {
-		console.log(environmentId);
 		vm.containers = [];
 		for(var i in vm.environments) {
 			if(environmentId == vm.environments[i].id) {
