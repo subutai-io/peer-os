@@ -69,8 +69,8 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
-import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
+import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
@@ -1356,7 +1356,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentCreationException( e );
         }
 
-        environment = save( environment );
+        save( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -1551,12 +1551,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public EnvironmentImpl save( final EnvironmentImpl environment )
+    public void save( final EnvironmentImpl environment )
     {
         environmentService.persist( environment );
+
         setEnvironmentTransientFields( environment );
+
         setContainersTransientFields( environment );
-        return environment;
     }
 
 
@@ -1564,7 +1565,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         //        environment = environmentDataService.merge( environment );
         environment = environmentService.merge( environment );
+
         setEnvironmentTransientFields( environment );
+
         setContainersTransientFields( environment );
 
         environmentAdapter.uploadEnvironment( environment );

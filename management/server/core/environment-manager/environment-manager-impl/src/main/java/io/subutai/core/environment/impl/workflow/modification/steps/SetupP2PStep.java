@@ -132,8 +132,12 @@ public class SetupP2PStep
             p2pCompletionService.submit( new SetupP2PConnectionTask( peer, config ) );
         }
 
-        Set<Peer> succeededPeers = Sets.newHashSet();
+        p2pExecutor.shutdown();
+
         List<P2PConfig> result = new ArrayList<>( peers.size() );
+        Set<Peer> succeededPeers = Sets.newHashSet();
+        Set<Peer> failedPeers = Sets.newHashSet( peers );
+
         for ( Peer peer : peers )
         {
             try
@@ -149,16 +153,14 @@ public class SetupP2PStep
             }
         }
 
-        p2pExecutor.shutdown();
-
         for ( Peer succeededPeer : succeededPeers )
         {
             trackerOperation.addLog( String.format( "P2P setup succeeded on peer %s", succeededPeer.getName() ) );
         }
 
-        peers.removeAll( succeededPeers );
+        failedPeers.removeAll( succeededPeers );
 
-        for ( Peer failedPeer : peers )
+        for ( Peer failedPeer : failedPeers )
         {
             trackerOperation.addLog( String.format( "P2P setup failed on peer %s", failedPeer.getName() ) );
         }
@@ -168,15 +170,15 @@ public class SetupP2PStep
             environment.getPeerConf( config.getPeerId() ).addRhP2pIps( config.getRhP2pIps() );
         }
 
-        if ( !peers.isEmpty() )
+        if ( !failedPeers.isEmpty() )
         {
             throw new EnvironmentModificationException( "Failed to setup P2P connection across all peers" );
         }
 
         // tunnel setup
         P2pIps p2pIps = environment.getP2pIps();
-        int peersCount = environment.getPeerConfs().size();
-        ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peersCount );
+
+        ExecutorService tunnelExecutor = Executors.newFixedThreadPool( peers.size() );
 
         ExecutorCompletionService<Boolean> tunnelCompletionService = new ExecutorCompletionService<>( tunnelExecutor );
 
@@ -185,8 +187,10 @@ public class SetupP2PStep
             tunnelCompletionService.submit( new SetupTunnelTask( peer, environment.getId(), p2pIps ) );
         }
 
+        tunnelExecutor.shutdown();
+
         succeededPeers = Sets.newHashSet();
-        peers = environment.getPeers();
+        failedPeers = Sets.newHashSet( peers );
 
         for ( Peer peer : peers )
         {
@@ -203,21 +207,20 @@ public class SetupP2PStep
             }
         }
 
-        tunnelExecutor.shutdown();
 
         for ( Peer succeededPeer : succeededPeers )
         {
             trackerOperation.addLog( String.format( "Tunnel setup succeeded on peer %s", succeededPeer.getName() ) );
         }
 
-        peers.removeAll( succeededPeers );
+        failedPeers.removeAll( succeededPeers );
 
-        for ( Peer failedPeer : peers )
+        for ( Peer failedPeer : failedPeers )
         {
             trackerOperation.addLog( String.format( "Tunnel setup failed on peer %s", failedPeer.getName() ) );
         }
 
-        if ( !peers.isEmpty() )
+        if ( !failedPeers.isEmpty() )
         {
             throw new EnvironmentModificationException( "Failed to setup tunnel across all peers" );
         }
