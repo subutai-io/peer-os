@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cheggaaa/pb"
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
 
@@ -89,7 +90,12 @@ func download(file, id string, kurjun *http.Client) string {
 	response, err := kurjun.Get(config.Management.Kurjun + "/template/get?id=" + id)
 	log.Check(log.FatalLevel, "Getting "+config.Management.Kurjun+"/template/get?id="+id, err)
 	defer response.Body.Close()
-	_, err = io.Copy(out, response.Body)
+
+	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
+	bar.Start()
+	rd := bar.NewProxyReader(response.Body)
+
+	_, err = io.Copy(out, rd)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
 	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+file) {
 		return config.Agent.LxcPrefix + "tmpdir/" + file
@@ -170,9 +176,11 @@ func LxcImport(templ, version, token string) {
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-home", config.Agent.LxcPrefix+templ+"/home")
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-var", config.Agent.LxcPrefix+templ+"/var")
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-opt", config.Agent.LxcPrefix+templ+"/opt")
+	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 
 	if templ == "management" {
 		template.MngInit()
+		return
 	}
 
 	container.SetContainerConf(templ, [][]string{
@@ -187,5 +195,4 @@ func LxcImport(templ, version, token string) {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/opt opt none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/var var none bind,rw 0 0"},
 	})
-	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 }
