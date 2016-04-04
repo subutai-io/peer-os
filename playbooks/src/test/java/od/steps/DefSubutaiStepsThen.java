@@ -4,7 +4,6 @@ import net.thucydides.core.annotations.Steps;
 import od.steps.serenity.SubutaiSteps;
 import org.jbehave.core.annotations.Then;
 import org.sikuli.script.FindFailed;
-import org.yecht.Data;
 
 import java.io.FileNotFoundException;
 
@@ -29,6 +28,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnSelectorHostsMonitoringPage();
         subutaiSteps.clickOnTitleEnvironment();
         subutaiSteps.userShouldObserveSelectorEnvironment();
+        subutaiSteps.clickOnTitleManagement();
     }
 
     @Then("the user should observe web elements on: Blueprints page")
@@ -281,5 +281,38 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnButtonUnregister();
         subutaiSteps.clickOnButtonUnregisterPopup();
         subutaiSteps.clickOnButtonOkUnregisterPeer();
+    }
+
+    @Then("the user should put the First RH in workspace")
+    public void user_put_the_first_rh() throws FindFailed {
+        subutaiSteps.clickOnPeer1();
+        subutaiSteps.clickOnResourceHost1();
+    }
+
+    @Then("the user should put the Second RH in workspace")
+    public void user_put_the_second_rh() throws FindFailed {
+        subutaiSteps.clickOnPeer2();
+        subutaiSteps.clickOnResourceHost1();
+    }
+
+    @Then("the user should drag and drop template to RH1: Master")
+    public void user_drag_and_drop_master_to_rh1() throws FindFailed {
+//        subutaiSteps.userShouldObservePNGs();
+        subutaiSteps.dragAndDropTemplateMasterToRH1();
+    }
+
+    @Then("the user should drag and drop template to RH2: Master")
+    public void user_drag_and_drop_master_to_rh2() throws FindFailed {
+//        subutaiSteps.userShouldObservePNGs();
+        subutaiSteps.dragAndDropTemplateMasterToRH2();
+    }
+
+    @Then("the user should create an environment")
+    public void user_create_an_environment() throws FindFailed {
+        subutaiSteps.clickOnButtonApply();
+        subutaiSteps.inputEnvironmentName("Cross peer environment");
+        subutaiSteps.clickOnButtonBuild();
+        subutaiSteps.clickOnButtonCloseBuildPopup();
+        subutaiSteps.waitFor(5000);
     }
 }

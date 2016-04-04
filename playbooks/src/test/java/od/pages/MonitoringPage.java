@@ -54,6 +54,7 @@ public class MonitoringPage extends PageObject {
 
     public String sikuliMenuIconRH = "src/test/resources/imgs/icons/iconRHMenuIcon.png";
     public String sikuliTitleEnvironment = "src/test/resources/imgs/titles/titleEnvironment.png";
+    public String sikuliTitleManagement = "src/test/resources/imgs/titles/titleManagement.png";
 
     //endregion
 

@@ -14,6 +14,9 @@ public class EnvironmentsPage extends PageObject {
     @FindBy(id = "env-name")
     public WebElementFacade inputEnvironmentName;
 
+    @FindBy(id = "js-search")
+    public WebElementFacade fieldSearch;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
@@ -58,6 +61,9 @@ public class EnvironmentsPage extends PageObject {
 
     //region WEB ELEMENTS: Tables
 
+    @FindBy(xpath = "*//span[contains(text(),\"Peer 1\")]")
+    public WebElementFacade peer1;
+
     //endregion
 
     //region WEB ELEMENTS: Pickers
@@ -95,6 +101,9 @@ public class EnvironmentsPage extends PageObject {
     @FindBy(xpath = "*//span[@class=\"b-cloud-item-text ng-binding\" and contains(text(),\"webdemo\")]")
     public WebElementFacade templateWebdemo;
 
+    @FindBy(xpath = "*//div[@data-template=\"cassandra\"]")
+    public WebElementFacade templateCassandra;
+
     //endregion
 
     //region SIKULI IMAGES: Templates
@@ -103,6 +112,7 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliTemplateMySite = "src/test/resources/imgs/templates/templateMySite.png";
     public String sikuliTemplateWebdemo = "src/test/resources/imgs/templates/templateWebdemo.png";
     public String sikuliTemplateCasandra = "src/test/resources/imgs/templates/templateCasandra.png";
+    public String sikuliTemplateMaster = "src/test/resources/imgs/templates/templateMaster.png";
 
     //endregion
 
@@ -125,6 +135,24 @@ public class EnvironmentsPage extends PageObject {
     public void waitForCloseButton(){
         waitFor(buttonClose);
     }
+
+    public void waitTemplateCassandra(){
+        waitFor(templateCassandra);
+    }
+
+    public void waitPeer1(){
+        waitFor(peer1);
+    }
+
+    //endregion
+
+    //region Action: Elements Sikuli
+
+    public String sikuliPeer1 = "src/test/resources/imgs/elements/peerPeer1.png";
+    public String sikuliPeer2 = "src/test/resources/imgs/elements/peerPeer2.png";
+    public String sikuliResourceHost1 = "src/test/resources/imgs/elements/resourceHost1.png";
+    public String sikuliPeerRH1 = "src/test/resources/imgs/elements/peerRH1.png";
+    public String sikuliPeerRH2 = "src/test/resources/imgs/elements/peerRH2.png";
 
     //endregion
 }

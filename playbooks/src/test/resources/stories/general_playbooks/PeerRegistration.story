@@ -10,8 +10,8 @@ Given the first user is on the Home page of Subutai
 And the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
 When the user clicks on the upper menu item: Register Peer
-And the user enters login for Peer Registration on the Hub: 'oleg2007_1988@mail.ru'
-And the user enters password for Peer Registration on the Hub: 't19a@9v!6s'
+And the user enters login for Peer Registration on the Hub: 'testhubuser@gmail.com'
+And the user enters password for Peer Registration on the Hub: 'optimaldynamics'
 And the user clicks on the button: Register
 Then the user should observe button: Go To HUB Green
 When user user clicks on the button: Close
@@ -21,4 +21,5 @@ When the user clicks on the button: Send Heartbeat
 And the user clicks on the button: OK
 And the user clicks on the button: Peer Registration Online
 And the user click on the buton: Go to HUB White
+
 

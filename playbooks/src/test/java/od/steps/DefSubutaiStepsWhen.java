@@ -242,4 +242,14 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.waitFor(5000);
     }
 
+    @When("the user clicks on templates")
+    public void user_clicks_on_templates() throws FindFailed {
+        subutaiSteps.clickOnTitleTemplates();
+    }
+
+    @When("the user should find template: Master")
+    public void user_finds_template_master(){
+        subutaiSteps.inputTemplateNameInSearchField("Master");
+    }
+
 }

@@ -127,6 +127,12 @@ public class SubutaiSteps extends ScenarioSteps {
         peerRegistrationPage.fieldPeerApprove.type(key);
     }
 
+    @Step
+    public void inputTemplateNameInSearchField(String name) {
+        environmentsPage.waitTemplateCassandra();
+        environmentsPage.fieldSearch.type(name);
+    }
+
     //endregion
 
     //region ACTION: Click
@@ -546,6 +552,47 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(commonPage.sikuliButtonOk);
     }
 
+    @Step
+    public void clickOnPeer1() throws FindFailed {
+        environmentsPage.waitPeer1();
+        screen.click(environmentsPage.sikuliPeer1);
+    }
+
+    @Step
+    public void clickOnPeer2() throws FindFailed {
+        screen.click(environmentsPage.sikuliPeer2);
+    }
+
+    @Step
+    public void clickOnResourceHost1() throws FindFailed {
+        screen.click(environmentsPage.sikuliResourceHost1);
+    }
+
+    @Step
+    public void clickOnTitleManagement() throws FindFailed {
+        screen.click(monitoringPage.sikuliTitleManagement);
+    }
+
+    //endregion
+
+    //region Action: Drag And Drop
+
+    @Step
+    public void dragAndDropTemplateCassandra() throws FindFailed {
+        screen.dragDrop(environmentsPage.sikuliTemplateCasandra, environmentsPage.sikuliPeerRH1);
+//        waitABit(5000);
+    }
+
+    @Step
+    public void dragAndDropTemplateMasterToRH1() throws FindFailed {
+        screen.dragDrop(environmentsPage.sikuliTemplateMaster, environmentsPage.sikuliPeerRH1);
+    }
+
+    @Step
+    public void dragAndDropTemplateMasterToRH2() throws FindFailed {
+        screen.dragDrop(environmentsPage.sikuliTemplateMaster, environmentsPage.sikuliPeerRH2);
+    }
+
     //endregion
 
     //region ACTION: Wait
@@ -841,7 +888,15 @@ public class SubutaiSteps extends ScenarioSteps {
         assertThat(peerRegistrationPage.buttonUnregister.isVisible(), is(true));
     }
 
+    @Step
+    public void userShouldObservePNGs() throws FindFailed {
+        environmentsPage.waitTemplateCassandra();
+        screen.find(environmentsPage.sikuliTemplateMaster);
+        screen.find(environmentsPage.sikuliPeerRH1);
+    }
     //endregion
+
+
 
     //region ACTION: Shell command
 
