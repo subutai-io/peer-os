@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
@@ -49,8 +50,9 @@ public class RestServiceImpl implements RestService
         }
         else
         {
-            authId = kurjunManager.getDataService().getKurjunData( id ).getAuthID();
+            authId = kurjunManager.getDataService().getKurjunData( Integer.parseInt( id ) ).getAuthID();
         }
+
         return Response.status( Response.Status.OK ).entity( authId ).build();
     }
 
@@ -74,15 +76,15 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getSignedMessage( final String signedMsg, final String id )
     {
-        //        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )
-        //        {
-        ////            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        //            return Response.status( Response.Status.OK ).build();
-        //        }
-        //        else
-        //        {
-        return Response.status( Response.Status.OK ).build();
-        //        }
+        if ( kurjunManager.authorizeUser( Integer.parseInt( id ), new String( Base64.decodeBase64( signedMsg ) ) )
+                == null )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.OK ).build();
+        }
     }
 
 

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,7 +200,8 @@ public class KurjunDataServiceImpl implements KurjunDataService
 
             Kurjun entity = getKurjunData( url );
 
-            entity.setSignedMessage( signedMessage );
+            byte[] signedMsg = org.apache.commons.codec.binary.Base64.encodeBase64( signedMessage.getBytes() );
+            entity.setSignedMessage( signedMsg );
 
             em.merge( entity );
             daoManager.commitTransaction( em );

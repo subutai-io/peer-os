@@ -25,6 +25,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -41,6 +42,8 @@ import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
+import io.subutai.hub.share.dto.SystemConfDto;
+import io.subutai.hub.share.dto.SystemConfigurationType;
 
 
 public class SystemManagerImpl implements SystemManager
@@ -50,6 +53,7 @@ public class SystemManagerImpl implements SystemManager
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
+    private Integration integration;
 
     protected Set<SettingsListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
@@ -105,26 +109,28 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final String globalKurjunUrls, final int securePortX1, final int securePortX2,
-                              final int securePortX3, final String publicUrl ) throws ConfigurationException
+    public SystemManagerImpl( final Integration integration/*, final String globalKurjunUrls, final int securePortX1, final int securePortX2,
+                              final int securePortX3, final String publicUrl*/ )
 
     {
-        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
+//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
 
-        String[] urls = new String[] { globalKurjunUrls };
+//        String[] urls = new String[] { globalKurjunUrls };
+//
+//        if ( urls.length < 1 )
+//        {
+//            urls = new String[] { DEFAULT_KURJUN_REPO };
+//        }
+//        validateGlobalKurjunUrls( urls );
+//        validatePublicUrl( publicUrl );
+//
+//        SystemSettings.setGlobalKurjunUrls( urls );
+//        SystemSettings.setSecurePortX1( securePortX1 );
+//        SystemSettings.setSecurePortX2( securePortX2 );
+//        SystemSettings.setSecurePortX3( securePortX3 );
+//        SystemSettings.setPublicUrl( publicUrl );
 
-        if ( urls.length < 1 )
-        {
-            urls = new String[] { DEFAULT_KURJUN_REPO };
-        }
-        validateGlobalKurjunUrls( urls );
-        validatePublicUrl( publicUrl );
-
-        SystemSettings.setGlobalKurjunUrls( urls );
-        SystemSettings.setSecurePortX1( securePortX1 );
-        SystemSettings.setSecurePortX2( securePortX2 );
-        SystemSettings.setSecurePortX3( securePortX3 );
-        SystemSettings.setPublicUrl( publicUrl );
+        this.integration = integration;
     }
 
 
@@ -281,6 +287,28 @@ public class SystemManagerImpl implements SystemManager
         boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
 
         return isPublicQuotaSaved && isTrustQuotaSaved;
+    }
+
+
+    @Override
+    public void sendSystemConfigToHub() throws ConfigurationException
+    {
+        SystemConfDto dto = new SystemConfDto( SystemConfigurationType.SUBUTAI_SOCIAL );
+
+        KurjunSettings kurjunSettings = getKurjunSettings();
+        NetworkSettings networkSettings = getNetworkSettings();
+
+        dto.setGlobalKurjunUrls( kurjunSettings.getGlobalKurjunUrls() );
+        dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
+        dto.setSecurePortX1( networkSettings.getSecurePortX1() );
+        dto.setSecurePortX2( networkSettings.getSecurePortX2() );
+        dto.setSecurePortX3( networkSettings.getSecurePortX3() );
+        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
+        dto.setPublicUrl( networkSettings.getPublicUrl() );
+        dto.setAgentPort( networkSettings.getAgentPort() );
+
+
+        integration.sendSystemConfiguration( dto );
     }
 
 
