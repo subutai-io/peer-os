@@ -20,7 +20,6 @@ import (
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
-	// cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -36,8 +35,8 @@ type Heartbeat struct {
 	Arch       string                `json:"arch"`
 	Instance   string                `json:"instance"`
 	Interfaces []utils.Iface         `json:"interfaces,omitempty"`
-	Containers []container.Container `json:"containers"`
-	Alert      []alert.Load          `json:"alert, omitempty"`
+	Containers []container.Container `json:"containers,omitempty"`
+	Alert      []alert.Load          `json:"alert,omitempty"`
 }
 
 var (
@@ -59,7 +58,6 @@ func initAgent() {
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()
-	connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
 }
 
 func Start(c *cli.Context) {
@@ -86,20 +84,20 @@ func Start(c *cli.Context) {
 func connectionMonitor() {
 	for {
 		hostname, _ = os.Hostname()
-		if fingerprint == "" {
+		if fingerprint == "" || config.Management.GpgUser == "" {
 			fingerprint = gpg.GetFingerprint(hostname + "@subutai.io")
 			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
-			continue
-		}
-		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
-		if err == nil && resp.StatusCode == http.StatusOK {
-			resp.Body.Close()
-			log.Debug("Connection monitor check - success")
 		} else {
-			log.Debug("Connection monitor check - failed")
-			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
-			lastHeartbeat = []byte{}
-			go heartbeat()
+			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
+			if err == nil && resp.StatusCode == http.StatusOK {
+				resp.Body.Close()
+				log.Debug("Connection monitor check - success")
+			} else {
+				log.Debug("Connection monitor check - failed")
+				connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
+				lastHeartbeat = []byte{}
+				go heartbeat()
+			}
 		}
 
 		time.Sleep(time.Second * 10)

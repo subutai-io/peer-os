@@ -122,7 +122,7 @@ func main() {
 			cli.BoolFlag{Name: "c", Usage: "containers only"},
 			cli.BoolFlag{Name: "t", Usage: "templates only"},
 			cli.BoolFlag{Name: "r", Usage: "registered only"},
-			cli.BoolFlag{Name: "i", Usage: "info ???? only"},
+			cli.BoolFlag{Name: "i", Usage: "detailed container info"},
 			cli.BoolFlag{Name: "a", Usage: "with ancestors"},
 			cli.BoolFlag{Name: "f", Usage: "fancy mode"},
 			cli.BoolFlag{Name: "p", Usage: "with parent"}},
@@ -134,18 +134,27 @@ func main() {
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
 			cli.StringFlag{Name: "createtunnel, c", Usage: "-c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE"},
-			cli.StringFlag{Name: "removetunnel, r", Usage: "-r tunnerPortName"},
 
 			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
 			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
-			cli.StringFlag{Name: "reservvni, E", Usage: "-E vni, vlanid, envid"},
-			cli.StringFlag{Name: "removevni, M", Usage: "-M TUNNELPORTNAME VNI VLANID"},
-
-			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
-			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
-			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [deleteall] | [list]"}},
+		},
 
 		Subcommands: []cli.Command{{
+			Name:  "tunnel",
+			Usage: "tunnels operation",
+			Flags: []cli.Flag{
+				cli.StringFlag{Name: "create", Usage: "create tunnel (tunnel -c)"},
+				cli.StringFlag{Name: "delete", Usage: "delete tunnel (tunnel -d)"},
+				cli.BoolFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
+
+				cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
+				cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
+				cli.StringFlag{Name: "vni", Usage: "vni"},
+			},
+			Action: func(c *cli.Context) {
+				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
+			}}, {
+
 			Name:  "p2p",
 			Usage: "p2p network operation",
 			Flags: []cli.Flag{
