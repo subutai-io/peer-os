@@ -1,6 +1,7 @@
 package io.subutai.core.plugincommon.mock;
 
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -44,5 +45,20 @@ public class TrackerMock implements Tracker
     public void printOperationLog( String source, UUID operationTrackId, long maxOperationDurationMs )
     {
 
+    }
+
+    @Override
+    public void setOperationViewState(String source, UUID operationId, boolean viewed) throws SQLException {
+
+    }
+
+    @Override
+    public void setOperationsViewStates(boolean viewed) throws SQLException {
+
+    }
+
+    @Override
+    public List<TrackerOperationView> getNotifications() throws SQLException {
+        return null;
     }
 }

@@ -19,7 +19,7 @@ var (
 	tableDisk = "host_disk"
 
 	timeRange = "day"
-	timeGroup = "1m"
+	timeGroup = "5m"
 )
 
 // queryDB convenience function to query the database
@@ -61,10 +61,10 @@ func HostMetrics(host, start, end string) {
 	delta := b.Sub(a)
 	if delta.Hours() <= 1 {
 		timeRange = "hour"
-		timeGroup = "30s"
+		timeGroup = "1m"
 	} else if delta.Hours() > 24 {
 		timeRange = "week"
-		timeGroup = "5m"
+		timeGroup = "20m"
 	}
 
 	fmt.Print("{\"Metrics\":")
