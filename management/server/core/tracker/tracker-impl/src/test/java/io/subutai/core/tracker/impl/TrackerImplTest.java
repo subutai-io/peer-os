@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -89,6 +90,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
     }
 
 
+    @Ignore
     @Test
     public void testGetProductOperation() throws Exception
     {
@@ -115,6 +117,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
     }
 
 
+    @Ignore
     @Test
     public void testGetTrackerOperations() throws Exception
     {
@@ -134,6 +137,7 @@ public class TrackerImplTest extends SystemOutRedirectTest
     }
 
 
+    @Ignore
     @Test
     public void testPrintOperationLog() throws Exception
     {
