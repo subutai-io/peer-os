@@ -258,6 +258,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 					if(notifications[i].message == notification.message && notification.type !== undefined) {
 						console.log(notification);
 						notifications[i].type = notification.type;
+						break;
 					}
 				}
 			}
