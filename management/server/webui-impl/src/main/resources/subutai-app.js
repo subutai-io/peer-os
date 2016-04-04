@@ -859,7 +859,7 @@ app.directive('dropdownMenu', function () {
 						$(this).next('.b-nav-menu__sub').stop().slideUp(300);
 					} else {
 						$('.b-nav-menu_active .b-nav-menu__sub').parent().removeClass('b-nav-menu_active')
-						$('.b-nav-menu__sub').slideUp(300);
+						$('.b-nav-menu__sub').stop().slideUp(300);
 						$(this).parent().addClass('b-nav-menu_active');
 						$(this).next('.b-nav-menu__sub').stop().slideDown(300);
 					}
@@ -868,20 +868,20 @@ app.directive('dropdownMenu', function () {
 					if($(this).parent().hasClass('b-nav-menu_active')) {
 						location.reload();
 					} else {
-						$('.b-nav-menu__sub').slideUp(300);
+						$('.b-nav-menu__sub').stop().slideUp(300);
 						$('.b-nav-menu_active').removeClass('b-nav-menu_active');
 					}
 				}
 			});
 
 			$('body').on('click', '.js-notification', function() {
-				$('.b-hub-status__dropdown').slideUp(100);
+				$('.b-hub-status__dropdown').stop().slideUp(100);
 				var currentDropDown = $(this).next('.b-hub-status__dropdown');
 				if(currentDropDown.hasClass('b-hub-status__dropdown_open')) {
 					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
 				} else {
 					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
-					currentDropDown.slideDown(200);
+					currentDropDown.stop().slideDown(200);
 					currentDropDown.addClass('b-hub-status__dropdown_open');
 				}
 				return false;
@@ -889,7 +889,7 @@ app.directive('dropdownMenu', function () {
 
 			$(document).on('click', function(event) {
 				if(!$(event.target).closest('.js-header-dropdown').hasClass('js-header-dropdown')){
-					$('.b-hub-status__dropdown').slideUp(100);
+					$('.b-hub-status__dropdown').stop().slideUp(100);
 					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
 				}
 
@@ -898,13 +898,13 @@ app.directive('dropdownMenu', function () {
 					$(event.target).closest('g').attr('class') != 'element-call-menu' && 
 					$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
 				){
-					$('.b-template-settings').slideUp(100);
+					$('.b-template-settings').stop().slideUp(100);
 				}
 			});
 
 			$(document).keyup(function(e) {
 				if (e.keyCode == 27) {
-					$('.b-hub-status__dropdown').slideUp(100);
+					$('.b-hub-status__dropdown').stop().slideUp(100);
 					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
 				}
 			});			
