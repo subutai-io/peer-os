@@ -189,25 +189,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
-						$rootScope.notifications = {
-							"message": "Error on building environment", 
-							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-							"type": "error"
-						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
-
-						if(vm.editingEnv) {
-							$rootScope.notifications = {
-								"message": "Environment has been changed successfully", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						} else {
-							$rootScope.notifications = {
-								"message": "Environment has been created", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						}
 
 						if(prevLogs) {
 							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
@@ -228,6 +211,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						vm.editingEnv = false;
 
 					}
+
+					$rootScope.notificationsUpdate = true;
 					$scope.$emit('reloadEnvironmentsList');
 					clearWorkspace();
 				}
@@ -267,6 +252,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				getLogById(data, true);
 				initScrollbar();
 
+				$rootScope.notificationsUpdate = true;
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -274,12 +260,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
 				}
 				checkLastLog(false);
-
-				$rootScope.notifications = {
-					"message": "Error on creating environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-					"type": "error"
-				};
+				$rootScope.notificationsUpdate = true;
 			});
 		vm.environment2BuildName = '';
 	}
@@ -305,6 +286,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				getLogById(data, true);
 				$scope.$emit('reloadEnvironmentsList');
 
+				$rootScope.notificationsUpdate = true;
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -314,10 +296,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				checkLastLog(false);
 				$scope.$emit('reloadEnvironmentsList');
 
-				$rootScope.notifications = {
-					"message": "Error on changing environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-				};
+				$rootScope.notificationsUpdate = true;
 			});
 	}
 
@@ -989,7 +968,6 @@ function imageExists(image_url){
 
 function startDrag( event ) {
 
-	console.log('dragStart');
 	var containerImage = $(event.target).parent().find('img');
 
 	var ghostImage = document.createElement("span");
@@ -1009,7 +987,6 @@ function startDrag( event ) {
 }
 
 function dragOver( event ) {
-	console.log('dragOver');
 	var ghostImage = document.getElementById('js-ghost-image');	
 	ghostImage.style.left = event.pageX + 'px';
 	ghostImage.style.top = event.pageY + 'px';
@@ -1017,7 +994,6 @@ function dragOver( event ) {
 }
 
 function endtDrag( event ) {
-	console.log('dragEnd');
 	event.preventDefault();
 	document.getElementById('js-ghost-image').remove();
 }
@@ -1026,7 +1002,6 @@ var containerCounter = 1;
 function drop(event) {
 	//event.preventDefault();
 
-	console.log('dragEvent');
 	var template = event.dataTransfer.getData("template");
 	var img = event.dataTransfer.getData("img");
 

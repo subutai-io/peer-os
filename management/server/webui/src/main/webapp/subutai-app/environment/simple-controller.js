@@ -130,8 +130,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
 							var logTime = moment(logObj.date).format('HH:mm:ss');
-							console.log(logObj.date);
-							console.log(logTime);
 
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
@@ -163,25 +161,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
-						$rootScope.notifications = {
-							"message": "Error on building environment", 
-							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-							"type": "error"
-						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
-
-						if(vm.isEditing) {
-							$rootScope.notifications = {
-								"message": "Environment has been changed successfully", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						} else {
-							$rootScope.notifications = {
-								"message": "Environment has been created", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						}
 
 						if(prevLogs) {
 							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
@@ -201,6 +182,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						vm.buildCompleted = true;
 						vm.isEditing = false;
 					}
+
+					$rootScope.notificationsUpdate = true;
 					$scope.$emit('reloadEnvironmentsList');
 					clearWorkspace();
 				}
@@ -242,6 +225,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				getLogById(data, true);
 				initScrollbar();
 
+				$rootScope.notificationsUpdate = true;
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -252,11 +236,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				currentLog.classes = ['fa-times', 'g-text-red'];
 				currentLog.time = moment().format('HH:mm:ss');				
 
-				$rootScope.notifications = {
-					"message": "Error on creating environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-					"type": "error"
-				};
+				$rootScope.notificationsUpdate = true;
 			});
 		vm.environment2BuildName = '';
 	}
@@ -358,12 +338,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			vm.isApplyingChanges = false;
 
 			getLogById(data, true);
+			$rootScope.notificationsUpdate = true;
 		}).error(function (data) {
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
 			vm.isApplyingChanges = false;
 			
 			checkLastLog(false);
+			$rootScope.notificationsUpdate = true;
 		});
 	}
 
