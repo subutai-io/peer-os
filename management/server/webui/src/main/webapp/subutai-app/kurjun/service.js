@@ -6,9 +6,8 @@ angular.module('subutai.kurjun.service', [])
 
 kurjunService.$inject = ['$http', 'Upload', 'SettingsKurjunSrv'];
 
-function kurjunService($http, Upload, SettingsKurjunSrv) {
-
-	console.log(GLOBAL_KURJUN_URL);
+function kurjunService($http, Upload, SettingsKurjunSrv)
+{
 	var BASE_URL = GLOBAL_KURJUN_URL + "/";
 	var TEMPLATE_URL = BASE_URL + "template/";
 	var REPOSITORY_URL = BASE_URL + "repository/";
