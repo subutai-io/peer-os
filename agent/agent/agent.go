@@ -226,6 +226,7 @@ func tlsConfig() *http.Client {
 		}
 		tlsconfig = newTLSConfig()
 	}
+
 	transport := &http.Transport{TLSClientConfig: tlsconfig}
 	return &http.Client{Transport: transport, Timeout: time.Second * 30}
 }
