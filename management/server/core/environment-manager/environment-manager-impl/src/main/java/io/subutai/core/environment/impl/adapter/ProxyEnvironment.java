@@ -60,18 +60,15 @@ public class ProxyEnvironment extends EnvironmentImpl
 
         JsonNode arr = json.get( "containerList" );
 
-        Set<String> localIds = proxyContainerHelper.getLocalContainerIds();
+        Set<String> localContainerIds = proxyContainerHelper.getLocalContainerIds();
 
         try
         {
             for ( JsonNode node : arr )
             {
-                ProxyEnvironmentContainer ch = new ProxyEnvironmentContainer( node, environmentManager );
+                ProxyEnvironmentContainer ch = new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
 
-                if ( localIds.contains( ch.getId() ) )
-                {
-                    containers.add( ch );
-                }
+                containers.add( ch );
             }
         }
         catch ( Exception e )
@@ -79,7 +76,7 @@ public class ProxyEnvironment extends EnvironmentImpl
             log.error( "Error to parse container json: ", e );
         }
 
-        //        proxyContainerHelper.setProxyToRemoteContainers( envContainers );
+//        proxyContainerHelper.setProxyToRemoteContainers( envContainers );
 
         Set<EnvironmentContainerImpl> resultSet = new HashSet<>();
 

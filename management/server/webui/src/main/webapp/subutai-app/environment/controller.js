@@ -281,10 +281,22 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function getContainersSortedByQuota(containers) {
+
 		var sortedContainers = containers.length > 0 ? {} : null;
+
 		for (var index = 0; index < containers.length; index++) {
+
+			var container = containers[index];
+			var remoteProxyContainer = !container.local && container.className.indexOf("ProxyEnvironmentContainer") > -1
+
+			if ( remoteProxyContainer )
+			{
+				continue;
+			}
+
 			var quotaSize = containers[index].type;
 			var templateName = containers[index].templateName;
+
 			if (!sortedContainers[quotaSize]) {
 				sortedContainers[quotaSize] = {};
 				sortedContainers[quotaSize].quantity = 1;

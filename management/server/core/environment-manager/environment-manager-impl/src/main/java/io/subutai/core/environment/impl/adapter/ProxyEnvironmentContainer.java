@@ -30,8 +30,10 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
     private Host proxyContainer;
 
+    private final boolean local;
 
-    ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager )
+
+    ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
     {
         super(
                 "hub",
@@ -54,7 +56,16 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
                 json.get( "name" ).asText()
         );
 
+        local = localContainerIds.contains( getId() );
+
         setEnvironmentManager( environmentManager );
+    }
+
+
+    @Override
+    public boolean isLocal()
+    {
+        return local;
     }
 
 

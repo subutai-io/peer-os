@@ -145,7 +145,9 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	function filterContainersList() {
 		vm.allTags = [];
 		vm.containers = [];
+
 		for(var i in vm.environments) {
+
 			if(
 				vm.environmentId == vm.environments[i].id || 
 				vm.environmentId === undefined || 
@@ -162,8 +164,16 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 						vm.containerState != vm.environments[i].containers[j].state && 
 						vm.containerState.length > 0
 					) {continue;}
-					vm.containers.push(vm.environments[i].containers[j]);
-					vm.allTags = vm.allTags.concat(vm.environments[i].containers[j].tags);
+
+
+					var container = vm.environments[i].containers[j];
+					var remoteProxyContainer = !container.local && container.className.indexOf("ProxyEnvironmentContainer") > -1
+
+					if ( !remoteProxyContainer )
+					{
+						vm.containers.push(vm.environments[i].containers[j]);
+						vm.allTags = vm.allTags.concat(vm.environments[i].containers[j].tags);
+					}
 				}
 			}
 		}
