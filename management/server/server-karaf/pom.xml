@@ -65,14 +65,14 @@
       <type>xml</type>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>io.hawt</groupId>
-      <artifactId>hawtio-karaf</artifactId>
-      <version>2.0.0</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>io.hawt</groupId>-->
+      <!--<artifactId>hawtio-karaf</artifactId>-->
+      <!--<version>2.0.0</version>-->
+      <!--<classifier>features</classifier>-->
+      <!--<type>xml</type>-->
+      <!--<scope>runtime</scope>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>pl.project13.maven</groupId>
@@ -176,7 +176,7 @@
             <feature>jndi</feature>
             <feature>transaction</feature>
             <feature>jdbc</feature>
-            <feature>hawtio</feature>
+            <!--<feature>hawtio</feature>-->
           </bootFeatures>
         </configuration>
         <executions>
@@ -194,7 +194,7 @@
                 <descriptor>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.cxf.karaf/apache-cxf/${org.apache.cxf.version}/xml/features</descriptor>
                 <descriptor>mvn:${project.groupId}/subutai-application/${project.version}/xml/features</descriptor>
-                <descriptor>mvn:io.hawt/hawtio-karaf/2.0.0/xml/features</descriptor>
+                <!--<descriptor>mvn:io.hawt/hawtio-karaf/2.0.0/xml/features</descriptor>-->
               </descriptors>
               <features>
                 <feature>standard</feature>
@@ -209,7 +209,7 @@
                 <feature>pax-http</feature>
                 <feature>pax-http-whiteboard</feature>
                 <feature>pax-war</feature>
-                <feature>hawtio</feature>
+                <!--<feature>hawtio</feature>-->
               </features>
               <repository>${assembly.directory}/system</repository>
             </configuration>
