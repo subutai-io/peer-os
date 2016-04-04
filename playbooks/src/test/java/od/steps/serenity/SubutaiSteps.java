@@ -282,7 +282,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonBuild() throws FindFailed {
         screen.click(environmentsPage.sikuliButtonBuild);
-        waitABit(20000);
+//        waitABit(20000);
     }
 
     @Step
@@ -545,6 +545,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void clickOnButtonUnregister() throws FindFailed {
+        peerRegistrationPage.waitButtonUnregister();
         screen.click(peerRegistrationPage.sikuliButtonUnregister);
     }
 

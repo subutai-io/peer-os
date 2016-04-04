@@ -116,7 +116,7 @@ public class DefSubutaiStepsWhen {
     }
 
     @When("the user creates environment using template: Master")
-    public void user_creates_environment_using_template_mongo() throws FindFailed, FileNotFoundException {
+    public void user_creates_environment_using_template_master() throws FindFailed, FileNotFoundException {
         subutaiSteps.clickOnIconTemplateMaster();
         subutaiSteps.clickOnButtonApply();
         subutaiSteps.inputEnvironmentName("Test Environment Master");

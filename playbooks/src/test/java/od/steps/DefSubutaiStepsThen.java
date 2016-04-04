@@ -272,8 +272,8 @@ public class DefSubutaiStepsThen {
     public void user_delete_environment() throws FindFailed {
         subutaiSteps.clickOnIconDeleteEnvironment();
         subutaiSteps.clickOnButtonDelete();
-        subutaiSteps.clickOnButtonOkPopupEnvironmentHasBeenDestroyed();
-        subutaiSteps.waitFor(5000);
+//        subutaiSteps.clickOnButtonOkPopupEnvironmentHasBeenDestroyed();
+//        subutaiSteps.waitFor(5000);
     }
 
     @Then("the user unregister peer")

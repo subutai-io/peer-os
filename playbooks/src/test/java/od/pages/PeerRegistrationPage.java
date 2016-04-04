@@ -72,4 +72,12 @@ public class PeerRegistrationPage extends PageObject {
     public WebElementFacade headerPeerRegistration;
 
     //endregion
+
+    //region WEB ELEMENTS: wait for
+
+    public void waitButtonUnregister(){
+        waitFor(buttonUnregister);
+    }
+
+    //endregion
 }
