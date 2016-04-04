@@ -21,13 +21,15 @@ var app = angular.module('subutai-app', [
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
 
+	.factory('trackerSrv', trackerSrv)
+
     .run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog'];
+CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
-function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog) {
+function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv) {
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
@@ -35,6 +37,9 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.notifications = [];
     vm.notificationsCount = 0;
     vm.notificationNew = false;
+	vm.notificationsLogs = [];
+	vm.currentLogTitle = '';
+	vm.currentLog = [];
     vm.currentUserRoles = [];
     $rootScope.notifications = {};
     vm.hubRegisterError = false;
@@ -83,6 +88,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.hubUnregister = hubUnregister;
     vm.hubHeartbeat = hubHeartbeat;
     vm.clearLogs = clearLogs;
+	vm.viewLogs = viewLogs;
 
 
     function hubPopupLoadScreen(show) {
@@ -177,41 +183,92 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         }
     });
 
-    //localStorage.removeItem('notifications');
-    $rootScope.$watch('notifications', function () {
+	function getNotificationsFromServer() {
+		vm.notificationsLogs = [];
+		trackerSrv.getNotifications().success(function(data) {
+			for(var i = 0; i < data.length; i++) {
+				var log = data[i];
+				var notification = {
+					"message": log.description,
+					"date": moment(log.timestamp).format('HH:mm:ss'),
+					"type": log.state,
+					"logId": log.id
+				};
+				addNewNotification(notification);
+				vm.notificationsLogs[log.id] = log;
+			}
+		}).error(function(error) {
+			console.log(error);
+		});
+	}
+	getNotificationsFromServer();
 
-        var notifications = localStorage.getItem('notifications');
-        console.log(notifications);
-        if (
-            notifications == null ||
-            notifications == undefined ||
-            notifications == 'null' ||
-            notifications.length <= 0
-        ) {
-            notifications = [];
-            localStorage.setItem('notifications', notifications);
-        } else {
-            notifications = JSON.parse(notifications);
-            vm.notificationsCount = notifications.length;
-        }
+	$rootScope.$watch('notificationsUpdate', function () {
+		getNotificationsFromServer();
+	});
 
-        if ($rootScope.notifications.message) {
-            if (!localStorage.getItem('notifications').includes(JSON.stringify($rootScope.notifications.message))) {
-                notifications.push($rootScope.notifications);
-                vm.notificationsCount++;
-                localStorage.setItem('notifications', JSON.stringify(notifications));
-            }
-            vm.notificationNew = true;
-        }
-        vm.notifications = notifications;
-    });
+	function viewLogs(logId) {
+		vm.currentLog = [];
+		vm.currentLogTitle = '';
 
-    function clearLogs() {
-        vm.notifications = [];
-        vm.notificationsCount = 0;
-        localStorage.removeItem('notifications');
-    }
+		if(vm.notificationsLogs[logId].log.length > 0) {
+			var logsArray = vm.notificationsLogs[logId].log.split(/(?:\r\n|\r|\n)/g);
+			vm.currentLogTitle = vm.notificationsLogs[logId].description;
+			var logs = [];
+			for(var i = 0; i < logsArray.length; i++) {
+				var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
+				currentLog.date = moment(currentLog.date).format('HH:mm:ss');
+				logs.push(currentLog);
+			}
+			vm.currentLog = logs;
 
+			ngDialog.open({
+				template: 'subutai-app/common/popups/logsPopup.html',
+				scope: $scope
+			});
+		}
+	}
+
+	$rootScope.$watch('notifications', function () {
+		addNewNotification($rootScope.notifications);
+	});
+
+	function addNewNotification(notification) {
+		var notifications = localStorage.getItem('notifications');
+		if (
+			notifications == null ||
+			notifications == undefined ||
+			notifications == 'null' ||
+			notifications.length <= 0
+		) {
+			notifications = [];
+			localStorage.setItem('notifications', notifications);
+		} else {
+			notifications = JSON.parse(notifications);
+			vm.notificationsCount = notifications.length;
+		}
+
+		if (notification.message) {
+			if (!localStorage.getItem('notifications').includes(JSON.stringify(notification.message))) {
+				notifications.push(notification);
+				vm.notificationsCount++;
+				localStorage.setItem('notifications', JSON.stringify(notifications));
+			}
+			vm.notificationNew = true;
+		}
+		vm.notifications = notifications;
+	}
+
+	function clearLogs() {
+		vm.notifications = [];
+		vm.notificationsCount = 0;
+		localStorage.removeItem('notifications');
+
+		trackerSrv.deleteAllNotifications().success(function(data) {
+		}).error(function(error) {
+			console.log(error);
+		});
+	}
 
 	if (localStorage.getItem ("bazaarMD5") === null) {
 		localStorage.setItem ("bazaarMD5", getBazaarChecksum());
@@ -223,9 +280,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 	}
 
    	function getBazaarChecksum() {
-   		console.log ("Getting checksum");
 		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
-			console.log (data);
 			return data;
 		});
 		return "";
@@ -654,7 +709,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             files: [
                                 'subutai-app/settingsKurjun/settingsKurjun.js',
                                 'subutai-app/settingsKurjun/controller.js',
-                                'subutai-app/settingsKurjun/service.js'
+								'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
@@ -848,38 +903,68 @@ function removeCookie(name) {
 }
 
 app.directive('dropdownMenu', function () {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attr) {
-            function colEqualHeight() {
-                if ($('.b-nav').height() > $('.b-workspace').height()) {
-                    $('.b-workspace').height($('.b-nav').height());
-                } else if ($('.b-nav').height() < $('.b-workspace').height()) {
-                    $('.b-nav').height($('.b-workspace').height());
-                }
-            }
+	return {
+		restrict: 'A',
+		link: function (scope, element, attr) {
 
-            //colEqualHeight();
+			$('.b-nav-menu-link').on('click', function () {
+				if ($(this).next('.b-nav-menu__sub').length > 0) {
+					if ($(this).parent().hasClass('b-nav-menu_active')) {
+						$(this).parent().removeClass('b-nav-menu_active');
+						$(this).next('.b-nav-menu__sub').stop().slideUp(300);
+					} else {
+						$('.b-nav-menu_active .b-nav-menu__sub').parent().removeClass('b-nav-menu_active')
+						$('.b-nav-menu__sub').stop().slideUp(300);
+						$(this).parent().addClass('b-nav-menu_active');
+						$(this).next('.b-nav-menu__sub').stop().slideDown(300);
+					}
+					return false;
+				} else {
+					if($(this).parent().hasClass('b-nav-menu_active')) {
+						location.reload();
+					} else {
+						$('.b-nav-menu__sub').stop().slideUp(300);
+						$('.b-nav-menu_active').removeClass('b-nav-menu_active');
+					}
+				}
+			});
 
-            $('.b-nav-menu-link').on('click', function () {
-                $('.b-nav-menu__sub').slideUp(300);
-                if ($(this).next('.b-nav-menu__sub').length > 0) {
-                    if ($(this).parent().hasClass('b-nav-menu_active')) {
-                        $(this).parent().removeClass('b-nav-menu_active');
-                        $(this).next('.b-nav-menu__sub').slideUp(300);
-                    } else {
-                        $('.b-nav-menu_active').removeClass('b-nav-menu_active')
-                        $(this).parent().addClass('b-nav-menu_active');
-                        $(this).next('.b-nav-menu__sub').slideDown(300);
-                    }
-                    return false;
-                } else {
-                    $('.b-nav-menu__sub').slideUp(300);
-                    $('.b-nav-menu_active').removeClass('b-nav-menu_active');
-                }
-            });
-        }
-    }
+			$('body').on('click', '.js-notification', function() {
+				$('.b-hub-status__dropdown').stop().slideUp(100);
+				var currentDropDown = $(this).next('.b-hub-status__dropdown');
+				if(currentDropDown.hasClass('b-hub-status__dropdown_open')) {
+					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+				} else {
+					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+					currentDropDown.stop().slideDown(200);
+					currentDropDown.addClass('b-hub-status__dropdown_open');
+				}
+				return false;
+			});
+
+			$(document).on('click', function(event) {
+				if(!$(event.target).closest('.js-header-dropdown').hasClass('js-header-dropdown')){
+					$('.b-hub-status__dropdown').stop().slideUp(100);
+					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+				}
+
+				if(
+					!$(event.target).closest('.js-dropen-menu').hasClass('js-dropen-menu') && 
+					$(event.target).closest('g').attr('class') != 'element-call-menu' && 
+					$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
+				){
+					$('.b-template-settings').stop().slideUp(100);
+				}
+			});
+
+			$(document).keyup(function(e) {
+				if (e.keyCode == 27) {
+					$('.b-hub-status__dropdown').stop().slideUp(100);
+					$('.b-hub-status__dropdown_open').removeClass('b-hub-status__dropdown_open');
+				}
+			});			
+		}
+	}
 });
 
 app.directive('checkbox-list-dropdown', function () {

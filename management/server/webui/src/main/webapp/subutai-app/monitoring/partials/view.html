@@ -35,7 +35,7 @@
 					<select class="b-popup-body-input"
 						ng-model="monitoringCtrl.selectedEnvironment"
 						ng-change="monitoringCtrl.showContainers(monitoringCtrl.selectedEnvironment)">
-						<option value="">Select Environment</option>
+						<option value="" disabled>Select Environment</option>
 						<option ng-repeat="environment in monitoringCtrl.environments" value="{{ environment.id }}">
 							{{ environment.name }}
 						</option>
@@ -48,7 +48,7 @@
 					<select class="b-popup-body-input"
 						ng-model="monitoringCtrl.currentHost"
 						ng-change="monitoringCtrl.getServerData()">
-						<option value="">Select Container</option>
+						<option value="" disabled>Select Container</option>
 						<option ng-repeat="container in monitoringCtrl.containers" value="{{ container.id }}">
 							{{ container.hostname }}
 						</option>
@@ -61,7 +61,7 @@
 					<select class="b-popup-body-input"
 						ng-model="monitoringCtrl.currentHost"
 						ng-change="monitoringCtrl.getServerData()">
-						<option value="">Select Host</option>
+						<option value="" disabled>Select Host</option>
 						<option ng-repeat="host in monitoringCtrl.hosts" value="{{ host.id }}" ng-selected="host.id == monitoringCtrl.currentHost">
 							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
 						</option>

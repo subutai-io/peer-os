@@ -19,15 +19,10 @@ func CalculateGW(ipS string) string {
 	return ip.String()
 }
 
-func DeleteGateway(vlan string) {
-	log.Debug("Removeing gateway gw-" + vlan)
-	exec.Command("ovs-vsctl", "del-port", "gw-"+vlan).Run()
-	exec.Command("ifconfig", "gw-"+vlan, "down").Run()
-}
-
 func DelIface(iface string) {
 	log.Debug("Removing interface " + iface)
-	exec.Command("ovs-vsctl", "del-port", iface).Run()
+	exec.Command("ovs-vsctl", "--if-exists", "del-br", iface).Run()
+	exec.Command("ovs-vsctl", "--if-exists", "del-port", iface).Run()
 	exec.Command("ifconfig", iface, "down").Run()
 }
 

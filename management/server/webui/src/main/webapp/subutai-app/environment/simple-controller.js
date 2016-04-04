@@ -9,7 +9,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	var vm = this;
 	var GRID_CELL_SIZE = 100;
-	var GRID_SIZE = 100;
 	var containerSettingMenu = $('.js-dropen-menu');
 	var currentTemplate = {};
 	$scope.identity = angular.identity;
@@ -84,12 +83,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	var timezone = new Date().getTimezoneOffset();
-	function checkLastLog(status, date) {
-		if(date === undefined || date === null) date = false;
+	function checkLastLog(status, log) {
+		if(log === undefined || log === null) log = false;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
 
-		if(date) {
-			lastLog.time = getDateFromString(date);
+		if(log) {
+			var logObj = JSON.parse(log.substring(0, log.length - 1));
+			lastLog.time = moment(logObj.date).format('HH:mm:ss');
 		} else {
 			lastLog.time = moment().format('HH:mm:ss');
 		}
@@ -128,8 +128,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
 
-							var logTextTime = logs[i].split(':');
-							var logTime = getDateFromString(logs[i]);
+							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+							var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
@@ -140,15 +140,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
-							var logsTextString = logTextTime[3];
-							if(logTextTime[4] !== undefined) {
-								logsTextString += logTextTime[4] + logTextTime[5];
-							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logsTextString
+								"text": logObj.log
 							};
 							result.push(currentLog);
 
@@ -165,25 +161,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
-						$rootScope.notifications = {
-							"message": "Error on building environment", 
-							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-							"type": "error"
-						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
-
-						if(vm.isEditing) {
-							$rootScope.notifications = {
-								"message": "Environment has been changed successfully", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						} else {
-							$rootScope.notifications = {
-								"message": "Environment has been created", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						}
 
 						if(prevLogs) {
 							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
@@ -203,6 +182,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 						vm.buildCompleted = true;
 						vm.isEditing = false;
 					}
+
+					$rootScope.notificationsUpdate = 'getLogById';
 					$scope.$emit('reloadEnvironmentsList');
 					clearWorkspace();
 				}
@@ -242,7 +223,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
 				getLogById(data, true);
+				initScrollbar();
 
+				$rootScope.notificationsUpdate = 'buildEnvironment';
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -253,11 +236,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				currentLog.classes = ['fa-times', 'g-text-red'];
 				currentLog.time = moment().format('HH:mm:ss');				
 
-				$rootScope.notifications = {
-					"message": "Error on creating environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-					"type": "error"
-				};
+				$rootScope.notificationsUpdate = 'buildEnvironmentError';
 			});
 		vm.environment2BuildName = '';
 	}
@@ -359,12 +338,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			vm.isApplyingChanges = false;
 
 			getLogById(data, true);
+			$rootScope.notificationsUpdate = 'modifyEnvironment';
 		}).error(function (data) {
 			vm.currentEnvironment.modifyStatus = 'error';
 			clearWorkspace();
 			vm.isApplyingChanges = false;
 			
 			checkLastLog(false);
+			$rootScope.notificationsUpdate = 'modifyEnvironmentError';
 		});
 	}
 
@@ -549,12 +530,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function initJointJs() {
 
-		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
-			if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
-				clearWorkspace();
-				vm.currentEnvironment = {};
-			}
-		}, false);
+		setTimeout(function (){
+			document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+				if(vm.currentEnvironment && vm.currentEnvironment.id == e.detail) {
+					clearWorkspace();
+					vm.currentEnvironment = {};
+				}
+			}, false);
+		}, 1000);
 
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
@@ -600,10 +583,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		);
 
-		$('.js-scrollbar').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
+		initScrollbar();
 
 		//zoom on scroll
 		/*paper.$el.on('mousewheel DOMMouseScroll', onMouseWheel);

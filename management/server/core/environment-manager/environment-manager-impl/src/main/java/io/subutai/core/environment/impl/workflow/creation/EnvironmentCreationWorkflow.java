@@ -78,7 +78,9 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         operationTracker.addLog( "Initializing environment creation" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
-        environment = saveEnvironment();
+
+        saveEnvironment();
+
         return EnvironmentCreationPhase.GENERATE_KEYS;
     }
 
@@ -91,13 +93,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
-            environment = saveEnvironment();
+            saveEnvironment();
 
             return EnvironmentCreationPhase.RESERVE_NET;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -111,13 +114,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new ReservationStep( topology, environment, peerManager, operationTracker ).execute();
 
-            environment = saveEnvironment();
+            saveEnvironment();
 
             return EnvironmentCreationPhase.SETUP_P2P;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -129,15 +133,16 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
+            new SetupP2PStep( topology, environment, operationTracker ).execute();
 
-            environment = saveEnvironment();
+            saveEnvironment();
 
             return EnvironmentCreationPhase.PREPARE_TEMPLATES;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -151,13 +156,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
-            environment = saveEnvironment();
+            saveEnvironment();
 
             return EnvironmentCreationPhase.CLONE_CONTAINERS;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -172,13 +178,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
             new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
                     operationTracker ).execute();
 
-            environment = saveEnvironment();
+            saveEnvironment();
 
             return EnvironmentCreationPhase.CONFIGURE_HOSTS;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -192,13 +199,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
         {
             new RegisterHostsStep( environment, operationTracker ).execute();
 
-            environment = saveEnvironment();
+            saveEnvironment();
 
             return EnvironmentCreationPhase.CONFIGURE_SSH;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -214,13 +222,14 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
             new RegisterSshStep( environment, operationTracker ).execute();
 
-            environment = saveEnvironment();
+            saveEnvironment();
 
             return EnvironmentCreationPhase.FINALIZE;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -228,11 +237,9 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-        //        LOG.info( "Finalizing environment creation" );
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = saveEnvironment();
+        saveEnvironment();
 
         operationTracker.addLogDone( "Environment is created" );
 
@@ -244,24 +251,18 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
     @Override
     public void fail( final String message, final Throwable e )
     {
-        super.fail( message, e );
         environment.setStatus( EnvironmentStatus.UNHEALTHY );
-        operationTracker.addLogFailed( getFailedReason() );
+
         saveEnvironment();
+
+        operationTracker.addLogFailed( message );
+
+        super.fail( message, e );
     }
 
 
-    protected EnvironmentImpl saveEnvironment()
+    protected void saveEnvironment()
     {
-        LOGGER.debug( "Saving environment..." );
-        try
-        {
-            environment = environmentManager.update( environment );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-        }
-        return environment;
+        environment = environmentManager.update( environment );
     }
 }

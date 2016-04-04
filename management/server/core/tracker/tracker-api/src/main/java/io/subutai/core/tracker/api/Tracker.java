@@ -6,6 +6,7 @@
 package io.subutai.core.tracker.api;
 
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public interface Tracker
      *
      * @return - operation view
      */
-    public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId );
+    TrackerOperationView getTrackerOperation( String source, UUID operationTrackId );
 
     /**
      * Creates operation and save it to DB
@@ -38,7 +39,7 @@ public interface Tracker
      *
      * @return - returns created operation
      */
-    public TrackerOperation createTrackerOperation( String source, String description );
+    TrackerOperation createTrackerOperation( String source, String description );
 
     /**
      * Returns list of operations (views) filtering them by date interval
@@ -50,14 +51,14 @@ public interface Tracker
      *
      * @return - list of operation views
      */
-    public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit );
+    List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit );
 
     /**
      * Returns list of all sources of operations for which operations exist in DB
      *
      * @return list of operation sources
      */
-    public List<String> getTrackerOperationSources();
+    List<String> getTrackerOperationSources();
 
     /**
      * Prints log of operation to std out stream
@@ -66,5 +67,28 @@ public interface Tracker
      * @param operationTrackId - id of operation
      * @param maxOperationDurationMs - max operation duration timeout after which printing ceases
      */
-    public void printOperationLog( String source, UUID operationTrackId, long maxOperationDurationMs );
+    void printOperationLog( String source, UUID operationTrackId, long maxOperationDurationMs );
+
+
+    /**
+     * changes viewState
+     * @param source
+     * @param operationId
+     * @param viewed
+     */
+    void setOperationViewState( String source, UUID operationId, boolean viewed ) throws SQLException;
+
+
+    /**
+     * changes all viewStates of user
+     * @param viewed
+     */
+    void setOperationsViewStates( boolean viewed ) throws SQLException;
+
+
+    /**
+     * get not viewed operations
+     * @throws SQLException
+     */
+    List<TrackerOperationView> getNotifications() throws SQLException;
 }

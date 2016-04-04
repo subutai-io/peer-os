@@ -31,8 +31,6 @@ class ProxyContainerHelper
     {
         Set<String> localContainerIds = getLocalContainerIds();
 
-//        localContainerIds.remove( "AF70232E4BCDC2436D21F1F31A248B945E6233B8" );
-
         Host proxyContainer = getProxyContainer( envContainers, localContainerIds );
 
         for ( ProxyEnvironmentContainer c : envContainers )
@@ -50,7 +48,8 @@ class ProxyContainerHelper
     {
         for ( ProxyEnvironmentContainer host : envContainers )
         {
-            if ( localContainerIds.contains( host.getId() ) && host.getState() == ContainerHostState.RUNNING ) {
+            if ( localContainerIds.contains( host.getId() ) && host.getState() == ContainerHostState.RUNNING )
+            {
                 return host;
             }
         }
@@ -59,7 +58,7 @@ class ProxyContainerHelper
     }
 
 
-    private Set<String> getLocalContainerIds()
+    public Set<String> getLocalContainerIds()
     {
         HashSet<String> ids = new HashSet<>();
 

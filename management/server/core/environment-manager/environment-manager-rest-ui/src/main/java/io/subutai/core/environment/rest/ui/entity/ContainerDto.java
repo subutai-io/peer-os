@@ -3,7 +3,6 @@ package io.subutai.core.environment.rest.ui.entity;
 
 import java.util.Set;
 
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerSize;
 
 
@@ -23,12 +22,14 @@ public class ContainerDto
 
     private String peerId;
     private String hostId;
+    private boolean local;
+    private String className;
 
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
                          final String ip, final String templateName,
                          final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
-                         final String hostId )
+                         final String hostId, boolean local, String className )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -40,6 +41,8 @@ public class ContainerDto
         this.tags = tags;
         this.peerId = peerId;
         this.hostId = hostId;
+        this.local = local;
+        this.className = className;
     }
 
 
@@ -160,5 +163,23 @@ public class ContainerDto
     public void setHostId( String hostId )
     {
         this.hostId = hostId;
+    }
+
+
+    public boolean isLocal()
+    {
+        return local;
+    }
+
+
+    public void setLocal( boolean local )
+    {
+        this.local = local;
+    }
+
+
+    public String getClassName()
+    {
+        return className;
     }
 }

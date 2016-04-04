@@ -12,7 +12,7 @@ public interface PeerConf
 
     void setEnvironment( Environment environment );
 
-    Set<String> getP2pIps();
+    public void addRhP2pIps( Set<RhP2pIp> rhP2pIps );
 
-    void addP2pIps( Set<String> p2pIps );
+    public Set<RhP2pIp> getRhP2pIps();
 }

@@ -22,7 +22,6 @@ import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDes
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -32,7 +31,6 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentModifyWorkflow.class );
 
-    private final TemplateManager templateRegistry;
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
@@ -61,15 +59,14 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public EnvironmentModifyWorkflow( String defaultDomain, TemplateManager templateRegistry, PeerManager peerManager,
-                                      SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
-                                      List<String> removedContainers, TrackerOperation operationTracker,
-                                      EnvironmentManagerImpl environmentManager, boolean forceMetadataRemoval )
+    public EnvironmentModifyWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
+                                      EnvironmentImpl environment, Topology topology, List<String> removedContainers,
+                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
+                                      boolean forceMetadataRemoval )
     {
 
         super( EnvironmentGrowingPhase.INIT );
 
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.environment = environment;
@@ -174,7 +171,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
+            new SetupP2PStep( topology, environment, operationTracker ).execute();
 
             environment = environmentManager.update( environment );
 
