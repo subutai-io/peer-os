@@ -7,7 +7,7 @@
 	</div>
 	<div class="b-popup__body">
 		<div class="b-logs-view b-logs-view_ssh">
-			{{ consoleViewCtrl.getBaseUrl() }}:{{ consoleViewCtrl.showSSHCommand }}
+			ssh root@{{ consoleViewCtrl.getBaseUrl() }} -p {{ consoleViewCtrl.showSSHCommand }}
 		</div>
 	</div>
 	<div class="b-popup__footer">
