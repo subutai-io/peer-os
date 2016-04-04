@@ -608,7 +608,6 @@ function initScrollbar() {
 }
 
 function getDateFromString(string) {
-	// var logTextTime = string.split(':');
 	var dateString = string.split(' ');
 	var temp = dateString[0].split('.');
 	var result = [temp[2], temp[1], temp[0]].join('-') + " " + dateString[1];

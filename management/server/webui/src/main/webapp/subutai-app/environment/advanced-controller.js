@@ -155,26 +155,23 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
 
-							var logTextTime = logs[i].split(':');
-							var logTime = getDateFromString(logs[i]);
+							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+							var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
+
 							if(i+1 == logs.length) {
 								logTime = '';
 								logStatus = 'in-progress';
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
-							var logsTextString = logTextTime[3];
-							if(logTextTime[4] !== undefined) {
-								logsTextString += logTextTime[4] + logTextTime[5];
-							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logsTextString
+								"text": logObj.log
 							};
 							result.push(currentLog);
 
