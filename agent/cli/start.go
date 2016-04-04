@@ -13,7 +13,8 @@ func LxcStart(name string) {
 		container.Start(name)
 	}
 	state := container.State(name)
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 60; i++ {
+		log.Info("Waiting for container start(60 sec).")
 		if state == "RUNNING" || state == "STARTING" {
 			log.Info(name + " started")
 			return

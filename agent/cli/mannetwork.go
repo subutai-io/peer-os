@@ -3,15 +3,53 @@ package lib
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/net"
 	"github.com/subutai-io/base/agent/lib/net/p2p"
 	"github.com/subutai-io/base/agent/log"
 )
+
+func VxlanTunnel(create, del, remoteip, vlan, vni string, list bool) {
+	if len(create) > 0 {
+		tunnelCreate(create, remoteip, vlan, vni)
+	} else if len(del) > 0 {
+		net.DelIface(del)
+		return
+	} else if list {
+		tunnelList()
+		return
+	}
+}
+
+func tunnelCreate(tunnel, addr, vlan, vni string) {
+	log.Check(log.WarnLevel, "Creating bridge ", exec.Command("ovs-vsctl", "--may-exist", "add-br", "gw-"+vlan).Run())
+
+	log.Check(log.FatalLevel, "Creating tunnel port",
+		exec.Command("ovs-vsctl", "--may-exist", "add-port", "gw-"+vlan, tunnel, "--", "set", "interface", tunnel, "type=vxlan",
+			"options:stp_enable=true", "options:key="+vni, "options:remote_ip="+string(addr)).Run())
+
+	log.Check(log.FatalLevel, "MakeVNIMap set port: ", exec.Command("ovs-vsctl", "--if-exists", "set", "port", tunnel, "tag="+vlan).Run())
+}
+
+func tunnelList() {
+	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
+	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
+	ports := strings.Split(string(ret), "\n")
+
+	for k, port := range ports {
+		if strings.Contains(port, "remote_ip") {
+			tunnel := strings.Trim(strings.Trim(ports[k-2], "Interface "), "\"")
+			tag := strings.TrimLeft(ports[k-3], "tag: ")
+			addr := strings.Fields(port)
+			vni := strings.Trim(strings.Trim(addr[1], "{key="), "\",")
+			ip := strings.Trim(strings.Trim(addr[2], "remote_ip="), "\",")
+			fmt.Println(tunnel, ip, tag, vni)
+		}
+	}
+}
 
 func P2P(c, d, u, l, p bool, args []string) {
 	if c {
@@ -50,70 +88,13 @@ func LxcManagementNetwork(args []string) {
 	switch args[2] {
 	case "-v", "--listvnimap":
 		displayVNIMap()
-	case "-r", "--removetunnel":
-		removeTunnel(args[3])
-	case "-T", "--creategateway":
-		return
-	case "-M", "--removevni":
-		return
-	case "-E", "--reservevni":
-		reserveVNI(args[3], args[4], args[5])
 	case "-m", "--createvnimap":
 		createVNIMap(args[3], args[4], args[5], args[6])
 	case "-c", "--createtunnel":
 		createTunnel(args[3], args[4], args[5])
 	case "-l", "--listtunnel":
 		listTunnel()
-	case "-Z", "--vniop":
-		switch args[3] {
-		case "deleteall":
-			return
-		case "delete":
-			return
-		case "list":
-			listVNI()
-		}
 	}
-}
-
-func createFile() {
-	if _, err := os.Stat(config.Agent.DataPrefix + "var/subutai-network/"); os.IsNotExist(err) {
-		log.Check(log.FatalLevel, "Creating network data folder", os.MkdirAll(config.Agent.DataPrefix+"var/subutai-network", 0755))
-	}
-	if _, err := os.Stat(config.Agent.DataPrefix + "var/subutai-network/vni_reserve"); os.IsNotExist(err) {
-		_, err = os.Create(config.Agent.DataPrefix + "var/subutai-network/vni_reserve")
-		log.Check(log.ErrorLevel, "Creating VNI file", err)
-	}
-}
-
-func listVNI() {
-	createFile()
-	var f []byte
-	var err error
-	for i := 0; i < 5; i++ {
-		f, err = ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve")
-		log.Check(log.ErrorLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err)
-		if len(f) > 5 {
-			break
-		}
-		time.Sleep(time.Millisecond * 100)
-	}
-	fmt.Println(strings.Replace(string(f), " ", ",", -1))
-}
-
-func checkVNI(vni, vlan, envid string) {
-	f, _ := ioutil.ReadFile(config.Agent.DataPrefix + "var/subutai-network/vni_reserve")
-	if strings.Contains(string(f), vni+" "+vlan+" "+envid) {
-		log.Error("Reservation already exist")
-	}
-}
-
-func reserveVNI(vni, vlan, envid string) {
-	createFile()
-	checkVNI(vni, vlan, envid)
-	f, _ := ioutil.ReadFile(config.Agent.DataPrefix + "var/subutai-network/vni_reserve")
-	err := ioutil.WriteFile(config.Agent.DataPrefix+"var/subutai-network/vni_reserve", []byte(string(f)+vni+" "+vlan+" "+envid+"\n"), 0600)
-	log.Check(log.FatalLevel, "Reserving VNI", err)
 }
 
 func listTunnel() {
@@ -127,7 +108,7 @@ func listTunnel() {
 			iface := strings.Fields(ports[k-2])
 			tunnel := strings.Trim(iface[1], "\"")
 			addr := strings.Fields(port)
-			fmt.Println(tunnel + "-" + strings.Trim(strings.Trim(addr[3], "remote_ip="), "\","))
+			fmt.Println(tunnel + "-" + strings.Trim(strings.Trim(addr[2], "remote_ip="), "\","))
 		}
 	}
 
@@ -181,41 +162,4 @@ func createVNIMap(tunnel, vni, vlan, envid string) {
 			"options:stp_enable=true", "options:key="+vni, "options:remote_ip="+string(addr), "options:env="+envid).Run())
 
 	log.Check(log.FatalLevel, "MakeVNIMap set port: ", exec.Command("ovs-vsctl", "--if-exists", "set", "port", tunnel, "tag="+vlan).Run())
-}
-
-func removeTunnel(tunnel string) {
-	log.Check(log.WarnLevel, "Removing port "+tunnel,
-		exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
-}
-
-func delTunById(envId string) {
-	ret, err := exec.Command("ovs-vsctl", "show").CombinedOutput()
-	log.Check(log.FatalLevel, "Getting OVS interfaces list", err)
-	ports := strings.Split(string(ret), "\n")
-
-	for k, port := range ports {
-		if strings.Contains(port, envId) {
-			tunnel := strings.Split(ports[k-2], "\"")[1]
-			log.Check(log.WarnLevel, "Removing port "+tunnel,
-				exec.Command("ovs-vsctl", "--if-exists", "del-port", tunnel).Run())
-		}
-	}
-
-}
-
-func ClearVlan(vlan string) {
-	var lines []string
-	f, err := ioutil.ReadFile(config.Agent.DataPrefix + "/var/subutai-network/vni_reserve")
-	if !log.Check(log.DebugLevel, "Reading "+config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", err) {
-		lines = strings.Split(string(f), "\n")
-		for k, v := range lines {
-			s := strings.Fields(v)
-			if len(s) > 2 && s[1] == vlan {
-				delTunById(s[2])
-				lines[k] = ""
-			}
-		}
-	}
-	err = ioutil.WriteFile(config.Agent.DataPrefix+"/var/subutai-network/vni_reserve", []byte(strings.Join(lines, "\n")), 0744)
-	log.Check(log.WarnLevel, config.Agent.DataPrefix+"/var/subutai-network/vni_reserve delete vni", err)
 }
