@@ -17,6 +17,7 @@
     <class>io.subutai.core.environment.impl.entity.EnvironmentImpl</class>
     <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>
+    <class>io.subutai.core.environment.impl.entity.RhP2PIpEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
     <properties>

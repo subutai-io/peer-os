@@ -27,7 +27,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
@@ -226,43 +225,39 @@ public class PeerWebClient
     }
 
 
-    public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
+    public void joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding remote peer to p2p swarm: %s %s", config.getHash(), config.getAddress() ) );
+        LOG.debug( String.format( "Adding remote peer %s to p2p swarm %s ", peerInfo.getId(), config.getHash() ) );
 
         String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
 
         try
         {
             final Response response = client.post( config );
+
             if ( response.getStatus() == 500 )
             {
                 throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( P2PConnections.class );
             }
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error setting up P2P connection", e );
+            throw new PeerException( "Error joining P2P swarm", e );
         }
     }
 
 
-    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Setting up initial p2p connection in swarm: %s %s", config.getHash(),
-                config.getAddress() ) );
+        LOG.debug( String.format( "Adding/updating remote peer %s to p2p swarm %s ", peerInfo.getId(),
+                config.getHash() ) );
 
-        String path = "/p2pinitial";
+        String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
@@ -270,7 +265,8 @@ public class PeerWebClient
 
         try
         {
-            final Response response = client.post( config );
+            final Response response = client.put( config );
+
             if ( response.getStatus() == 500 )
             {
                 throw new PeerException( response.readEntity( String.class ) );
@@ -279,7 +275,7 @@ public class PeerWebClient
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error setting up initial P2P connection", e );
+            throw new PeerException( "Error joining/updating P2P swarm", e );
         }
     }
 

@@ -33,6 +33,7 @@ func GetPk(name string) string {
 	stdout, err := exec.Command("/bin/bash", "-c", "gpg --export -a "+name).Output()
 	log.Check(log.WarnLevel, "Getting public key", err)
 	if len(stdout) == 0 {
+		log.Warn("GPG key for RH not found. Creating new.")
 		GenerateGPGKeys(name)
 	}
 	return string(stdout)
@@ -102,7 +103,8 @@ func ImportMHKeyNoDefaultKeyring(cont string) {
 
 func GenerateGPGKeys(email string) {
 	os.MkdirAll("/root/.gnupg/", 0700)
-	conf, _ := os.Create("/root/.gnupg/defaults")
+	conf, err := os.Create("/root/.gnupg/defaults")
+	log.Check(log.WarnLevel, "Creating defaults for GPG", err)
 	defer conf.Close()
 	conf.WriteString("%echo Generating default keys\n")
 	conf.WriteString("Key-Type: RSA\n")

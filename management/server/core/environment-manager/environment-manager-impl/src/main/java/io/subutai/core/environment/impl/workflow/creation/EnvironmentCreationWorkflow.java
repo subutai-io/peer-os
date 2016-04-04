@@ -131,7 +131,7 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
         try
         {
-            new SetupP2PStep( topology, environment, peerManager, operationTracker ).execute();
+            new SetupP2PStep( topology, environment, operationTracker ).execute();
 
             environment = saveEnvironment();
 
@@ -235,8 +235,6 @@ public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWor
 
     public void FINALIZE()
     {
-        //        LOG.info( "Finalizing environment creation" );
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
         environment = saveEnvironment();

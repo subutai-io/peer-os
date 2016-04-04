@@ -42,6 +42,7 @@ import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandler;
@@ -68,6 +69,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
+import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -859,10 +861,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-
-
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        // If environment from Hub, send destroy request to Hub
+        if ( environment instanceof ProxyEnvironment )
+        {
+            environmentAdapter.removeEnvironment( environment );
+
+            return;
+        }
+
         if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( environment ) )
         {
             throw new EnvironmentNotFoundException();
@@ -1183,46 +1193,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public int setupContainerSsh( final String containerHostId, final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
-
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environmentContainer ) )
-        {
-            throw new ContainerHostNotFoundException( "Container host not found." );
-        }
-
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Setting up ssh for container %s ", containerHostId ) );
-
-        environment.getContainerHostById( containerHostId );
-        try
-        {
-            int sshPort =
-                    peerManager.getLocalPeer().setupContainerSsh( containerHostId, Common.CONTAINER_SSH_TIMEOUT_SEC );
-
-            operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
-
-            return sshPort;
-        }
-        catch ( Exception e )
-        {
-            operationTracker.addLogFailed(
-                    String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
-            throw new EnvironmentModificationException( e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
@@ -1281,6 +1251,47 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
                     add ? "including container in" : "excluding container from", e.getMessage() ) );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public int setupSshTunnelForContainer( final String containerHostId, final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
+
+        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environmentContainer ) )
+        {
+            throw new ContainerHostNotFoundException( "Container host not found." );
+        }
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Setting up ssh tunnel for container %s ", containerHostId ) );
+
+        try
+        {
+            int sshPort = peerManager.getLocalPeer().setupSshTunnelForContainer(
+                    environmentContainer.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                    Common.CONTAINER_SSH_TIMEOUT_SEC );
+
+            operationTracker.addLogDone(
+                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
+
+            return sshPort;
+        }
+        catch ( Exception e )
+        {
+            operationTracker.addLogFailed(
+                    String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
     }
@@ -1771,6 +1782,56 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
+        }
+    }
+
+
+    @Override
+    public void startMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                 final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+        AlertHandler alertHandler = alertHandlers.get( handlerId );
+        if ( alertHandler == null )
+        {
+            throw new EnvironmentManagerException( "Alert handler not found." );
+        }
+        try
+        {
+            Environment environment = loadEnvironment( environmentId );
+
+            environment.addAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+
+            update( ( EnvironmentImpl ) environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on start monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public void stopMonitoring( final String handlerId, final AlertHandlerPriority handlerPriority,
+                                final String environmentId ) throws EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( handlerId ), "Invalid alert handler id." );
+        Preconditions.checkNotNull( handlerPriority, "Invalid alert priority." );
+
+        //remove subscription from database
+        try
+        {
+            Environment environment = environmentDataService.find( environmentId );
+            environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
+            environmentDataService.save( environment );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error on stop monitoring", e );
+            throw new EnvironmentManagerException( e.getMessage(), e );
         }
     }
 

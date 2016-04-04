@@ -37,17 +37,7 @@ type managementConfig struct {
 	RestVerify    string
 	RestPublicKey string
 }
-type brokerConfig struct {
-	Url               string
-	Port              string
-	Password          string
-	ResponseTopic     string
-	ExecuteTimeout    string
-	BroadcastTopic    string
-	HeartbeatTopic    string
-	ExecuteResponce   string
-	ExecuteTerminated string
-}
+
 type influxdbConfig struct {
 	Server string
 	Db     string
@@ -61,7 +51,6 @@ type templateConfig struct {
 type configFile struct {
 	Agent      agentConfig
 	Management managementConfig
-	Broker     brokerConfig
 	Template   templateConfig
 	Influxdb   influxdbConfig
 }
@@ -88,17 +77,6 @@ const defaultConfig = `
 	restVerify = /rest/v1/registration/verify/container-token
     cdn = cdn.subut.ai
 
-	[broker]
-	port = 8883
-	password = client
-	url = ssl://10.10.10.1
-	responseTopic = RESPONSE_TOPIC
-	executeTimeout = EXECUTE_TIMEOUT
-	BroadcastTopic = BROADCAST_TOPIC
-	heartbeatTopic = HEARTBEAT_TOPIC
-	executeResponce = EXECUTE_RESPONSE
-	executeTerminated = EXECUTE_TERMINATED
-
 	[influxdb]
 	server = 10.10.10.1
 	user = root
@@ -116,8 +94,6 @@ var (
 	Agent agentConfig
 	// Management describes configuration options that used for accessing Subutai Management server
 	Management managementConfig
-	// Broker describes configuration options that used for interaction with MQTT broker
-	Broker brokerConfig
 	// Influxdb describes configuration options for InluxDB server
 	Influxdb influxdbConfig
 	// Template describes template configuration options
@@ -145,7 +121,6 @@ func init() {
 	config.Agent.GpgUser = name + "@subutai.io"
 
 	Agent = config.Agent
-	Broker = config.Broker
 	Influxdb = config.Influxdb
 	Template = config.Template
 	Management = config.Management

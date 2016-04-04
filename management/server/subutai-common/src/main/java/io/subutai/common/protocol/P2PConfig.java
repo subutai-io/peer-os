@@ -9,6 +9,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.RhP2pIp;
+
 
 /**
  * P2P config
@@ -19,44 +21,60 @@ public class P2PConfig
     private String peerId;
     @JsonProperty( "hash" )
     private String hash;
-    @JsonProperty( "address" )
-    private String address;
     @JsonProperty( "secretKey" )
     private String secretKey;
     @JsonProperty( "environmentId" )
     private String environmentId;
     @JsonProperty( "secretKeyTtlSec" )
     private long secretKeyTtlSec;
-    @JsonProperty( "p2pIps" )
-    private Set<String> p2pIps = Sets.newHashSet();
+    @JsonProperty( "rhP2pIps" )
+    private Set<RhP2pIpImpl> rhP2pIps = Sets.newHashSet();
 
 
     public P2PConfig( @JsonProperty( "peerId" ) final String peerId,
                       @JsonProperty( "environmentId" ) final String environmentId,
-                      @JsonProperty( "hash" ) final String hash, @JsonProperty( "address" ) final String address,
-                      @JsonProperty( "secretKey" ) final String secretKey,
+                      @JsonProperty( "hash" ) final String hash, @JsonProperty( "secretKey" ) final String secretKey,
                       @JsonProperty( "secretKeyTtlSec" ) final long secretKeyTtlSec )
     {
         this.peerId = peerId;
         this.environmentId = environmentId;
         this.hash = hash;
-        this.address = address;
         this.secretKey = secretKey;
         this.secretKeyTtlSec = secretKeyTtlSec;
     }
 
 
-    public void addP2pIp( String p2pIp )
+    public void addRhP2pIp( RhP2pIp rhP2pIp )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pIp ) );
+        Preconditions.checkNotNull( rhP2pIp );
 
-        this.p2pIps.add( p2pIp );
+        rhP2pIps.add( new RhP2pIpImpl( rhP2pIp.getRhId(), rhP2pIp.getP2pIp() ) );
     }
 
 
-    public Set<String> getP2pIps()
+    public Set<RhP2pIp> getRhP2pIps()
     {
-        return p2pIps;
+        Set<RhP2pIp> rhP2pIps = Sets.newHashSet();
+
+        rhP2pIps.addAll( this.rhP2pIps );
+
+        return rhP2pIps;
+    }
+
+
+    public RhP2pIp findByRhId( String rhId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+
+        for ( RhP2pIp rhP2pIp : rhP2pIps )
+        {
+            if ( rhP2pIp.getRhId().equalsIgnoreCase( rhId ) )
+            {
+                return rhP2pIp;
+            }
+        }
+
+        return null;
     }
 
 
@@ -81,18 +99,6 @@ public class P2PConfig
     public String getHash()
     {
         return hash;
-    }
-
-
-    public String getAddress()
-    {
-        return address;
-    }
-
-
-    public void setAddress( final String address )
-    {
-        this.address = address;
     }
 
 
@@ -142,29 +148,4 @@ public class P2PConfig
         result = 31 * result + ( hash != null ? hash.hashCode() : 0 );
         return result;
     }
-
-    //
-    //    @Override
-    //    public boolean equals( final Object o )
-    //    {
-    //        if ( this == o )
-    //        {
-    //            return true;
-    //        }
-    //        if ( !( o instanceof P2PConfig ) )
-    //        {
-    //            return false;
-    //        }
-    //
-    //        final P2PConfig config = ( P2PConfig ) o;
-    //
-    //        return address.equals( config.address );
-    //    }
-    //
-    //
-    //    @Override
-    //    public int hashCode()
-    //    {
-    //        return address.hashCode();
-    //    }
 }

@@ -78,7 +78,7 @@
 			</div>
 		</div>
 
-		<div class="b-popup__body" ng-if="advEnvCtrl.buildStep == 'showLogs'">
+		<div class="b-popup__body js-scrollbar b-popup-logs" ng-if="advEnvCtrl.buildStep == 'showLogs'">
 			<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
 				<tr ng-repeat="(key, log) in advEnvCtrl.logMessages">
 					<td>{{ log.time }}</td>

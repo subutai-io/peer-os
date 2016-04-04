@@ -14,5 +14,6 @@ public interface NetworkResource
 
     public String getContainerSubnet();
 
+
     public int getVlan();
 }

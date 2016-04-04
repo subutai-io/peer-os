@@ -3600,3 +3600,9 @@ select.b-search-input {
 .js-accordion_open {
     height: auto !important;
 }
+
+.b-popup-logs {
+	max-height: 500px;
+	position: relative;
+}
+

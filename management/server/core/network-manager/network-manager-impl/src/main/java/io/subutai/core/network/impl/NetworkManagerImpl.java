@@ -51,8 +51,8 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void createP2PSwarm( final Host host, final String interfaceName, final String localIp, final String p2pHash,
-                                final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
+    public void joinP2PSwarm( final Host host, final String interfaceName, final String localIp, final String p2pHash,
+                              final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
@@ -63,24 +63,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
 
 
-        execute( host, commands.getCreateP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
-                getUnixTimestampOffset( secretKeyTtlSec ) ) );
-    }
-
-
-    @Override
-    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
-                              final long secretKeyTtlSec )
-            throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret key" );
-        Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
-
-
-        execute( host, commands.getJoinP2PSwarmCommand( interfaceName, p2pHash, secretKey,
+        execute( host, commands.getJoinP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 

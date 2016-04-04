@@ -16,6 +16,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
@@ -43,6 +44,7 @@ public class TrackerImpl implements Tracker
     private static final String SOURCE_IS_EMPTY_MSG = "Source is null or empty";
     protected TrackerOperationDataService dataService;
     private DaoManager daoManager;
+    private IdentityManager identityManager;
 
 
     /**
@@ -77,10 +79,10 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            dataService.saveTrackerOperation( source, po );
+            dataService.saveTrackerOperation( source, po, identityManager.getActiveUser().getId() );
             return true;
         }
-        catch ( SQLException e )
+        catch ( Exception e )
         {
             LOG.error( "Error in saveTrackerOperation", e );
         }
@@ -220,5 +222,10 @@ public class TrackerImpl implements Tracker
     public void setDaoManager( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
+    }
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
     }
 }
