@@ -16,6 +16,7 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
@@ -178,7 +179,8 @@ public class KurjunManagerImpl implements KurjunManager
         }
         else
         {
-            kurjun.setSignedMessage( signedMessage );
+            byte[] signedMsg = Base64.encodeBase64( signedMessage.getBytes() );
+            kurjun.setSignedMessage( signedMsg );
             kurjun.setToken( response.readEntity( String.class ) );
             kurjun.setState( true );
 

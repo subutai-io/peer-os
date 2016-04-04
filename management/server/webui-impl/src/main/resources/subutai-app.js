@@ -653,7 +653,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             name: 'subutai.settings-kurjun',
                             files: [
                                 'subutai-app/settingsKurjun/settingsKurjun.js',
-                                'subutai-app/settingsKurjun/controller.js'
+                                'subutai-app/settingsKurjun/controller.js',
+                                'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
