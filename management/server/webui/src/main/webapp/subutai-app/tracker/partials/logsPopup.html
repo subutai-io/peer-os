@@ -6,7 +6,10 @@
 		</a>
 	</div>
 	<div class="b-popup__body">
-		<div class="b-logs-view" data-ng-bind-html="trackerPopupCtrl.logText">
+		<div class="b-logs-view">
+			<span ng-repeat="log in trackerCtrl.currentLog">
+				<span class="g-text-red">{{ log.date }}</span> - {{ log.log }}<br/>
+			</span>
 		</div>
 	</div>
 	<div class="b-popup__footer">

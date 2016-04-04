@@ -18,7 +18,6 @@ import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -27,7 +26,6 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentGrowingWorkflow.class );
 
-    private final TemplateManager templateRegistry;
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
@@ -53,13 +51,12 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     }
 
 
-    public EnvironmentGrowingWorkflow( String defaultDomain, TemplateManager templateRegistry, PeerManager peerManager,
-                                       SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
+    public EnvironmentGrowingWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
+                                       EnvironmentImpl environment, Topology topology,
                                        TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
         super( EnvironmentGrowingPhase.INIT );
 
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.environment = environment;

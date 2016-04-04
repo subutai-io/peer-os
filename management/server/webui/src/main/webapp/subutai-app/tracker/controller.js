@@ -1,17 +1,17 @@
 'use strict';
 
 angular.module('subutai.tracker.controller', [])
-	.controller('TrackerCtrl', TrackerCtrl)
-	.controller('TrackerPopupCtrl', TrackerPopupCtrl);
+	.controller('TrackerCtrl', TrackerCtrl);
 
 
 TrackerCtrl.$inject = ['trackerSrv', '$scope', '$rootScope', 'DTOptionsBuilder', 'DTColumnBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
-TrackerPopupCtrl.$inject = ['trackerSrv', '$scope', '$sce'];
 
 
 function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
+	vm.logs = [];
+	vm.currentLog = [];
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
@@ -30,7 +30,6 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	});
 
 	vm.dtInstance = {};
-	vm.users = {};
 	vm.dtOptions = DTOptionsBuilder
 		.fromFnPromise(function() {
 			var logsDates = getDateInStringFormat();
@@ -71,7 +70,7 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	}
 
 	function statusHTML(data, type, full, meta) {
-		vm.users[data.id] = data;
+		vm.logs[data.id] = data;
 		return '<div class="b-status-icon b-status-icon_' + data.state + '" tooltips tooltip-template="' + data.state + '" tooltip-smart="true"></div>';
 	}
 
@@ -87,11 +86,22 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	}
 
 	function viewLogs(id) {
+		vm.currentLog = [];
 		ngDialog.open({
 			template: 'subutai-app/tracker/partials/logsPopup.html',
-			controller: 'TrackerPopupCtrl',
-			controllerAs: 'trackerPopupCtrl',
-			data: {"module": vm.selectedModule, "logId": id}
+			scope: $scope
+		});
+
+		trackerSrv.getOperation(vm.selectedModule, id).success(function (data) {
+			var logsArray = data.log.split(/(?:\r\n|\r|\n)/g);
+			var logs = [];
+			for(var i = 0; i < logsArray.length; i++) {
+				var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
+				currentLog.date = moment(currentLog.date).format('MM.DD.YYYY HH:mm:ss');
+				logs.push(currentLog);
+			}
+			vm.currentLog = logs;
+			console.log(vm.currentLog);
 		});
 	}
 
@@ -109,18 +119,6 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 			+ vm.endDate.getDateFormatted();
 		
 		return result;
-	}
-}
-
-function TrackerPopupCtrl(trackerSrv, $scope, $sce) {
-
-	var vm = this;
-	vm.logText = '';
-
-	if($scope.ngDialogData !== undefined) {
-		trackerSrv.getOperation($scope.ngDialogData.module, $scope.ngDialogData.logId).success(function (data) {
-			vm.logText = $sce.trustAsHtml(data.log.replace(/(?:\r\n|\r|\n)/g, '<br />'));
-		});
 	}
 }
 

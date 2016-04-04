@@ -584,7 +584,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ), this );
+            commandUtil
+                    .execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ).withTimeout( 60 * 60 ),
+                            this );
         }
         catch ( CommandException e )
         {
