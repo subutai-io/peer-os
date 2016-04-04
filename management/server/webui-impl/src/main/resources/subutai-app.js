@@ -253,6 +253,14 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 				notifications.push(notification);
 				vm.notificationsCount++;
 				localStorage.setItem('notifications', JSON.stringify(notifications));
+			} else {
+				for(var i = 0; i < notifications.length; i++) {
+					if(notifications[i].message == notification.message && notification.type !== undefined) {
+						console.log(notification);
+						notifications[i].type = notification.type;
+						break;
+					}
+				}
 			}
 			vm.notificationNew = true;
 		}
