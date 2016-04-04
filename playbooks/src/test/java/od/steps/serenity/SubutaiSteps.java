@@ -129,8 +129,14 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void inputTemplateNameInSearchField(String name) {
-        environmentsPage.waitTemplateCassandra();
+//        environmentsPage.waitTemplateCassandra();
+        waitABit(3000);
         environmentsPage.fieldSearch.type(name);
+    }
+
+    @Step
+    public void inputPluginName(String plugin) {
+        bazaarPage.fieldSearch.type(plugin);
     }
 
     //endregion
@@ -573,6 +579,16 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(monitoringPage.sikuliTitleManagement);
     }
 
+    @Step
+    public void clickOnButtonInstall() throws FindFailed {
+        screen.click(bazaarPage.sikuliMenuButtonInstall);
+    }
+
+    @Step
+    public void clickOnIconTemplateMaster() throws FindFailed {
+        screen.click(environmentsPage.sikuliTemplateMaster);
+    }
+
     //endregion
 
     //region Action: Drag And Drop
@@ -981,5 +997,4 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnButtonGoToHUBWhite() throws FindFailed {
         screen.click(commonPage.sikuliButtonGoToHUBWhite);
     }
-
 }

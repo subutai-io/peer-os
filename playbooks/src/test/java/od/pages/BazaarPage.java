@@ -3,10 +3,14 @@ package od.pages;
 import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
+import sun.security.pkcs11.P11Util;
 
 public class BazaarPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
+
+    @FindBy(id = "js-search")
+    public WebElementFacade fieldSearch;
 
     //endregion
 
@@ -14,6 +18,8 @@ public class BazaarPage extends PageObject {
 
     @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green g-margin-bottom ng-scope\"]")
     public WebElementFacade buttonUploadNewPlugin;
+
+    public String sikuliMenuButtonInstall = "src/test/resources/imgs/buttons/buttonInstall.png";
 
     //endregion
 

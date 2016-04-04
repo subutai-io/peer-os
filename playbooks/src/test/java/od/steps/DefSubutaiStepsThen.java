@@ -315,4 +315,9 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnButtonCloseBuildPopup();
         subutaiSteps.waitFor(5000);
     }
+
+    @Then("the user search plugin: '$plugin'")
+    public void user_search_plugin(String plugin){
+        subutaiSteps.inputPluginName(plugin);
+    }
 }

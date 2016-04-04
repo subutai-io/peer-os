@@ -115,11 +115,11 @@ public class DefSubutaiStepsWhen {
 //        subutaiSteps.clickOnButtonOkE2EKeyPopup();
     }
 
-    @When("the user creates environment using template: Mongo")
+    @When("the user creates environment using template: Master")
     public void user_creates_environment_using_template_mongo() throws FindFailed, FileNotFoundException {
-        subutaiSteps.clickOnIconTemplateMongo();
+        subutaiSteps.clickOnIconTemplateMaster();
         subutaiSteps.clickOnButtonApply();
-        subutaiSteps.inputEnvironmentName("Test Environment Mongo");
+        subutaiSteps.inputEnvironmentName("Test Environment Master");
         subutaiSteps.clickOnButtonBuild();
         subutaiSteps.clickOnButtonCloseBuildPopup();
         subutaiSteps.waitFor(5000);
@@ -250,6 +250,11 @@ public class DefSubutaiStepsWhen {
     @When("the user should find template: Master")
     public void user_finds_template_master(){
         subutaiSteps.inputTemplateNameInSearchField("Master");
+    }
+
+    @When("the user should install plugin")
+    public void user_install_plugin() throws FindFailed {
+        subutaiSteps.clickOnButtonInstall();
     }
 
 }
