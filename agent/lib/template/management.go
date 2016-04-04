@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"net"
-	"os"
 	"os/exec"
 	"strings"
 
@@ -54,16 +53,18 @@ func MngInit() {
 			log.Info("******************************")
 		}
 	}
-
-	os.Exit(0)
 }
 
 func MngStop() {
-	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING").Run()
+	for _, port := range []string{"5005", "8443", "8444"} {
+		exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-i", "wan", "-p",
+			"tcp", "--dport", port, "-j", "DNAT", "--to-destination", "10.10.10.1:"+port).Run()
+	}
+	exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-i", "wan", "-p",
+		"tcp", "--dport", "2222", "-j", "DNAT", "--to-destination", "10.10.10.1:22").Run()
 }
 
 func MngDel() {
-	exec.Command("iptables", "-t", "nat", "--flush", "PREROUTING").Run()
 	exec.Command("ovs-vsctl", "del-port", "wan", "management").Run()
 	exec.Command("ovs-vsctl", "del-port", "wan", "mng-gw").Run()
 	exec.Command("dhclient", "-r", "mng-net").Run()
