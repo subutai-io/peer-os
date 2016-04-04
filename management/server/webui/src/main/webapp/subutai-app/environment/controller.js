@@ -155,7 +155,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	//installed environment table options
 	function initDataTable() {
-		console.log('checker');
 		vm.dtInstance = {};
 		vm.dtOptionsInstallTable = DTOptionsBuilder
 			.newOptions()
@@ -359,8 +358,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						//SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						loadEnvironments();
+						$rootScope.notificationsUpdate = 'destroyEnvironment';
 					}).error(function (data) {
 						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
+						$rootScope.notificationsUpdate = 'destroyEnvironmentError';
 					});
 					loadEnvironments();
 				}

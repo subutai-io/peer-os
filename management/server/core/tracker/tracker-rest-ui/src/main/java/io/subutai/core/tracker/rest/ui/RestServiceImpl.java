@@ -100,7 +100,7 @@ public class RestServiceImpl implements RestService
         }
         catch (Exception e)
         {
-            return Response.serverError().entity( e ).build();
+            return Response.serverError().entity( GSON.toJson( e ) ).build();
         }
     }
 
