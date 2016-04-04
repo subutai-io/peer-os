@@ -16,14 +16,19 @@
 
   <reference id="templateRegistry" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
+
   <reference id="peerManager"
              interface="io.subutai.core.peer.api.PeerManager" />
+
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
+
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
+
   <reference id="tracker"
              interface="io.subutai.core.tracker.api.Tracker" />
+
   <reference id="relationManager"
              interface="io.subutai.core.object.relation.api.RelationManager" />
 
