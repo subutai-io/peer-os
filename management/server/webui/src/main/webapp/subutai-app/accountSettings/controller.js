@@ -29,6 +29,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 
 			$rootScope.notifications = {
 				"message": "Life is hard when you're stupid dude! Install the subutai browser plugin for added security with end to end encryption.", 
+				"browserPluginMessage": true,
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [
 					{
@@ -43,8 +44,29 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 					}
 				]
 			};
+		} else {
+
+			var notifications = localStorage.getItem('notifications');
+			if (
+				notifications !== null &&
+				notifications !== undefined &&
+				notifications !== 'null' &&
+				notifications.length > 0
+			) {
+				notifications = JSON.parse(notifications);
+				for(var i = 0; i < notifications.length; i++) {
+					if(notifications[i].browserPluginMessage !== undefined && notifications[i].browserPluginMessage) {
+						console.log(notifications[i].browserPluginMessage);
+						notifications.splice(i, 1);
+						localStorage.setItem('notifications', JSON.stringify(notifications));
+						$rootScope.$emit('notifications');
+						break;
+					}
+				}
+			}
+
 		}
-	}, 1000);
+	}, 3000);
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {

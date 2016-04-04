@@ -83,12 +83,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	var timezone = new Date().getTimezoneOffset();
-	function checkLastLog(status, date) {
-		if(date === undefined || date === null) date = false;
+	function checkLastLog(status, log) {
+		if(log === undefined || log === null) log = false;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
 
-		if(date) {
-			lastLog.time = getDateFromString(date);
+		if(log) {
+			var logObj = JSON.parse(log.substring(0, log.length - 1));
+			lastLog.time = moment(logObj.date).format('HH:mm:ss');
 		} else {
 			lastLog.time = moment().format('HH:mm:ss');
 		}
@@ -129,6 +130,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
 							var logTime = moment(logObj.date).format('HH:mm:ss');
+							console.log(logObj.date);
+							console.log(logTime);
 
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
