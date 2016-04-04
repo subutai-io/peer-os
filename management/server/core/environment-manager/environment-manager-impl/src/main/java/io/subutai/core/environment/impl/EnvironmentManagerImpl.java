@@ -1565,6 +1565,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public EnvironmentImpl update( EnvironmentImpl environment )
     {
+        if ( environment instanceof ProxyEnvironment )
+        {
+            // Environment from Hub
+            return environment;
+        }
+
         //        environment = environmentDataService.merge( environment );
         environment = environmentService.merge( environment );
 
