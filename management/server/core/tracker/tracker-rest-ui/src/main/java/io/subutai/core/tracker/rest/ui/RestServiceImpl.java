@@ -87,4 +87,46 @@ public class RestServiceImpl implements RestService
     {
         return Response.ok().entity( GSON.toJson( tracker.getTrackerOperationSources() ) ).build();
     }
+
+    @Override
+    public Response getNotification()
+    {
+        try
+        {
+            return Response.ok( GSON.toJson( tracker.getNotifications() ) ).build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( e ).build();
+        }
+    }
+
+    @Override
+    public Response clearAllNotifications()
+    {
+        try
+        {
+            tracker.setOperationsViewStates( false );
+            return Response.ok().build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( e ).build();
+        }
+    }
+
+    @Override
+    public Response clearNotification(String source, String uuid)
+    {
+        try
+        {
+            UUID poUUID = UUID.fromString( uuid );
+            tracker.setOperationViewState( source, poUUID, false );
+            return Response.ok().build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( e ).build();
+        }
+    }
 }

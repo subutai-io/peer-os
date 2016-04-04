@@ -222,11 +222,25 @@ public class TrackerImpl implements Tracker
     }
 
 
-
-    public void setViewedOperation( String source, UUID operationId, boolean viewed )
+    @Override
+    public void setOperationViewState( String source, UUID operationId, boolean viewed ) throws SQLException
     {
-
+        dataService.setOperationViewState( source, operationId, viewed );
     }
+
+    @Override
+    public void setOperationsViewStates( boolean viewed ) throws SQLException
+    {
+        dataService.setOperationsViewState( viewed, identityManager.getActiveUser().getId() );
+    }
+
+    @Override
+    public List<TrackerOperationView> getNotifications() throws SQLException
+    {
+        return dataService.getNewOperations( identityManager.getActiveUser().getId() );
+    }
+
+
 
     public void init()
     {

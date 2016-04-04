@@ -6,10 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 
 import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.impl.TrackerOperationImpl;
@@ -318,6 +315,116 @@ public class TrackerOperationDataService
         {
             em.close();
         }
+        return result;
+    }
+
+    public void setOperationViewState( String source, final UUID operationTrackId, boolean viewState ) throws SQLException
+    {
+        EntityManager em = emf.createEntityManager();
+        source = source.toUpperCase();
+
+        try {
+            TrackerOperationEntity result;
+
+            em.getTransaction().begin();
+
+            TypedQuery<TrackerOperationEntity> query =
+                    em.createNamedQuery( TrackerOperationEntity.QUERY_GET_OPERATION, TrackerOperationEntity.class );
+            query.setParameter( "source", source );
+            query.setParameter( "operationTrackId", operationTrackId.toString() );
+
+            List<TrackerOperationEntity> operations = query.getResultList();
+
+            if ( operations != null && operations.size() > 0 )
+            {
+                result = operations.get( 0 );
+                result.setViewState( viewState );
+
+                em.merge( result );
+            }
+
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error in getTrackerOperations.", e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    public void setOperationsViewState( boolean viewState, long userId ) throws SQLException
+    {
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            em.getTransaction().begin();
+
+            Query query = em.createQuery(
+                    "update TrackerOperationEntity to set to.viewState = :viewState where to.userId = :userId" );
+            query.setParameter( "viewState", viewState );
+            query.setParameter( "userId", userId );
+            query.executeUpdate();
+
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error in getTrackerOperations.", e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+    }
+
+    public List<TrackerOperationView> getNewOperations(long userId ) throws SQLException
+    {
+        List<TrackerOperationView> result = Lists.newArrayList();
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            em.getTransaction().begin();
+
+            TypedQuery<String> query = em.createQuery(
+                    "select to.info from TrackerOperationEntity to where to.viewState = true and to.userId = :userId order by to.ts desc", String.class );
+            query.setParameter( "userId", userId );
+
+            List<String> infoList = query.getResultList();
+            for ( final String info : infoList )
+            {
+                result.add( createTrackerOperation( info ) );
+            }
+
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error in getTrackerOperations.", e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+
         return result;
     }
 }
