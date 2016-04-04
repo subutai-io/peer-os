@@ -8,24 +8,8 @@
 	<form ng-submit="kurjunCtrl.proceedTemplate(kurjunCtrl.currentTemplate); processing=true">
 		<div class="b-popup__body">
 
+
 			<div class="popup-body-box">
-				<label class="b-popup-body-label">Repository</label>
-				<select ng-init="kurjunCtrl.setDefaultRepository()"
-						class="b-popup-body-input b-popup-body-input_full"
-						ng-change="kurjunCtrl.checkRepositoryStatus(kurjunCtrl.currentTemplate.repository)"
-						ng-model="kurjunCtrl.currentTemplate.repository"
-						ng-options="repository for repository in kurjunCtrl.repositories">
-				</select>
-				<div class="clear"></div>
-			</div>
-
-			<div class="popup-body-box" ng-if="!kurjunCtrl.isUploadAllowed">
-				<span class="b-error-h3">Sorry you haven't a permission to upload</span>
-				<br/>
-				<span class="b-error-h3"> to this repository. Try with another one</span>
-			</div>
-
-			<div class="popup-body-box" ng-if="kurjunCtrl.isUploadAllowed">
 				<label class="b-popup-body-label">Template upload</label>
 
 				<div class="b-file-uploader">
@@ -34,8 +18,8 @@
 						   class="b-popup-body-input"
 						   disabled="disabled">
 					<label for="js-uploadBtn"
-						   class="b-popup-body-label"
-						   ng-class="!kurjunCtrl.isUploadAllowed ? 'disabled' : ''">Browse</label>
+						   class="b-popup-body-label">
+						Browse</label>
 					<input id="js-uploadBtn"
 						   type="file"
 						   class="upload"
@@ -43,7 +27,6 @@
 						   ng-hide="true"
 						   ngf-select
 						   ng-model="kurjunCtrl.currentTemplate.file"
-						   ng-disabled="!kurjunCtrl.isUploadAllowed"
 						   required/>
 				</div>
 				<div class="b-progress" ng-style="processing ? {'display':'block'} : {'display':'none'}">
@@ -60,10 +43,7 @@
 					class="b-btn b-btn_green g-right"
 					type="submit"
 					id="subt_button__environment-add-domain"
-					ng-disabled="!kurjunCtrl.currentTemplate.repository ||
-					!kurjunCtrl.isUploadAllowed ||
-					!kurjunCtrl.currentTemplate.file ||
-					processing">
+					ng-disabled="!kurjunCtrl.currentTemplate.file || processing">
 				Add
 			</button>
 			<div class="clear"></div>

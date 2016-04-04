@@ -10,15 +10,15 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 {
 	var BASE_URL = GLOBAL_KURJUN_URL + "/";
 	var TEMPLATE_URL = BASE_URL + "template/";
-	var REPOSITORY_URL = BASE_URL + "repository/";
 	var DEB_URL = BASE_URL + "deb/";
 	var RAW_URL = BASE_URL + "file/";
 
 	var LOCAL_BASE_URL = SERVER_URL + "rest/kurjun/"
 	var LOCAL_TEMPLATE_URL = LOCAL_BASE_URL + "template/";
-	var LOCAL_REPOSITORY_URL = LOCAL_BASE_URL + "repository/";
 	var LOCAL_DEB_URL = LOCAL_BASE_URL + "deb/";
 	var LOCAL_RAW_URL = LOCAL_BASE_URL + "file/";
+
+	var REPOSITORY_URL = LOCAL_BASE_URL + "templates/repositories";
 
 
 	var kurjunService = {
@@ -41,14 +41,14 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	function setUrlsValues() {
 		BASE_URL = GLOBAL_KURJUN_URL + "/";
 		TEMPLATE_URL = BASE_URL + "template/";
-		REPOSITORY_URL = BASE_URL + "repository/";
+		// REPOSITORY_URL = BASE_URL + "repository/";
 		DEB_URL = BASE_URL + "deb/";
 		RAW_URL = BASE_URL + "file/";
 	}
 
 	function getRepositories() {
 		setUrlsValues();
-		return $http.get(REPOSITORY_URL + "list?repository=all", {withCredentials: false, headers: {'Content-Type': 'application/json'}});
+		return $http.get(REPOSITORY_URL, {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
@@ -81,8 +81,9 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function addTemplate(repository, file) {
-		setUrlsValues();
-		return uploadTemplate(file, LOCAL_TEMPLATE_URL + 'upload', repository);
+		//setUrlsValues();
+		//@todo repository=local
+		return uploadTemplate(file, LOCAL_TEMPLATE_URL + 'upload', "local");
 	}
 
 	function addApt(file) {
