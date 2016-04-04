@@ -279,29 +279,45 @@ public class TrackerOperationDataService
         return result;
     }
 
-    private List<TrackerOperationView> getRecentUserOperations() throws SQLException
+    public List<TrackerOperationView> getRecentUserOperations( String source, final Date fromDate, final Date toDate,
+                                                               int limit, long userId ) throws SQLException
     {
+        source = source.toUpperCase();
+        List<TrackerOperationView> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
         try
         {
             em.getTransaction().begin();
 
-            TypedQuery<String> query =
-                    em.createQuery( "select distinct to.source from TrackerOperationEntity to", String.class );
-//            result.addAll( query.getResultList() );
+            TypedQuery<String> query = em.createQuery(
+                    "select to.info from TrackerOperationEntity to where to.source = :source and to.ts >= :fromDate "
+                            + "and to.ts <= :toDate and to.userId = :userId order by to.ts desc", String.class );
+            query.setParameter( "source", source );
+            query.setParameter( "fromDate", fromDate.getTime() );
+            query.setParameter( "toDate", toDate.getTime() );
+            query.setParameter( "userId", userId );
+            query.setMaxResults( limit );
+            List<String> infoList = query.getResultList();
+            for ( final String info : infoList )
+            {
+                result.add( createTrackerOperation( info ) );
+            }
 
             em.getTransaction().commit();
         }
-        catch ( PersistenceException e )
+        catch ( Exception e )
         {
-            LOGGER.error( "Error getting getRecentUserOperations.", e );
+            LOGGER.error( "Error in getTrackerOperations.", e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
             throw new SQLException( e );
         }
         finally
         {
             em.close();
         }
-
-        return null;
+        return result;
     }
 }

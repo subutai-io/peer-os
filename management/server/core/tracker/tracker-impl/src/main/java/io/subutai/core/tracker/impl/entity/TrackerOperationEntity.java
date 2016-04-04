@@ -45,6 +45,9 @@ public class TrackerOperationEntity
     @Column( name = "user_id" )
     private long userId;
 
+    @Column( name = "viewed" )
+    private boolean viewed = false;
+
     public TrackerOperationEntity( final String source, final String id, final Long ts, final String info, final long userId )
     {
         this.source = source;
@@ -66,6 +69,16 @@ public class TrackerOperationEntity
     public long getUserId()
     {
         return userId;
+    }
+
+    public boolean isViewed()
+    {
+        return viewed;
+    }
+
+    public void setViewed( boolean viewed )
+    {
+        this.viewed = viewed;
     }
 
 
