@@ -4,6 +4,7 @@ package io.subutai.core.tracker.rest.ui;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.api.Tracker;
 import org.slf4j.Logger;
@@ -97,7 +98,7 @@ public class RestServiceImpl implements RestService
         }
         catch (Exception e)
         {
-            return Response.serverError().entity( e ).build();
+            return Response.serverError().entity( GSON.toJson( e ) ).build();
         }
     }
 

@@ -46,7 +46,7 @@ public class TrackerOperationEntity
     private long userId;
 
     @Column( name = "viewed" )
-    private boolean viewState = false;
+    private boolean viewState = true;
 
     public TrackerOperationEntity( final String source, final String id, final Long ts, final String info, final long userId )
     {

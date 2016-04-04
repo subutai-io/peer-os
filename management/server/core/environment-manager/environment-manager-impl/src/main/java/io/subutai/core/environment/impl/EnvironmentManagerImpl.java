@@ -597,7 +597,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
         if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( environment ) )
@@ -614,8 +613,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            allPeers.addAll( getPeers( topology ) );
-            allPeers.addAll( environment.getPeers() );
+            if( topology != null )
+            {
+                allPeers.addAll( getPeers( topology ) );
+                allPeers.addAll( environment.getPeers() );
+            }
         }
         catch ( PeerException e )
         {
