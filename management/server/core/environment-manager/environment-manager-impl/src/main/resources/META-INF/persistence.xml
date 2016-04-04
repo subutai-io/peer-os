@@ -8,9 +8,9 @@
 
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
 
-    <jta-data-source>osgi:service/javax.sql.XADataSource/(osgi.jndi.service.name=openjpa/xaSubutaiDS)</jta-data-source>
-    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/subutaiDS)
-    </non-jta-data-source>
+    <jta-data-source>osgi:service/javax.sql.XADataSource/(osgi.jndi.service.name=openjpa/envXa)</jta-data-source>
+
+    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=openjpa/env)</non-jta-data-source>
 
     <class>io.subutai.core.environment.impl.entity.HostInterfaceImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl</class>
@@ -18,12 +18,13 @@
     <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>
     <class>io.subutai.core.environment.impl.entity.RhP2PIpEntity</class>
+
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
     <properties>
       <!-- OpenJPA Properties -->
       <property name="openjpa.ConnectionDriverName" value="org.apache.derby.jdbc.EmbeddedDriver.class" />
-      <property name="openjpa.ConnectionURL" value="jdbc:derby:${subutaiAppDataPath}/db/subutaiDb2;create=true" />
+      <property name="openjpa.ConnectionURL" value="jdbc:derby:${subutaiAppDataPath}/db/environment;create=true" />
       <property name="openjpa.Multithreaded" value="true" />
       <property name="openjpa.TransactionMode" value="managed" />
       <property name="openjpa.ConnectionFactoryMode" value="managed" />

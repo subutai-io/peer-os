@@ -1824,9 +1824,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //remove subscription from database
         try
         {
-            Environment environment = environmentDataService.find( environmentId );
+            Environment environment = environmentService.find( environmentId );
             environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
-            environmentDataService.save( environment );
+            update( ( EnvironmentImpl ) environment );
         }
         catch ( Exception e )
         {

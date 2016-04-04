@@ -42,6 +42,8 @@ public class EnvironmentServiceImpl implements EnvironmentService
         em.persist( item );
 
         em.flush();
+
+        em.refresh( item );
     }
 
 
@@ -59,6 +61,8 @@ public class EnvironmentServiceImpl implements EnvironmentService
         EnvironmentImpl environment = em.merge( item );
 
         em.flush();
+
+        em.refresh( environment );
 
         return environment;
     }

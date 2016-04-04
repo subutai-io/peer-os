@@ -1744,7 +1744,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                         usedNetworkResources.addVlan( tunnel.getVlan() );
                         usedNetworkResources.addP2pSubnet( tunnel.getTunnelIp() );
                     }
-                    //todo gather p2p connections from RHs
 
                     //p2p connections
                     P2PConnections p2PConnections = resourceHost.getP2PConnections();

@@ -32,6 +32,25 @@
 
   <!-- JTA -->
 
+  <bean id="envDb" class="org.apache.derby.jdbc.EmbeddedXADataSource">
+     <property name="databaseName" value="$[subutaiAppDataPath]/db/environment"/>
+     <property name="createDatabase" value="create" />
+  </bean>
+
+  <service ref="envDb" interface="javax.sql.DataSource">
+    <service-properties>
+      <entry key="osgi.jndi.service.name" value="openjpa/env" />
+      <entry key="transactional" value="false"/>
+    </service-properties>
+  </service>
+
+  <service ref="envDb" interface="javax.sql.XADataSource">
+      <service-properties>
+          <entry key="osgi.jndi.service.name" value="openjpa/envXa"/>
+          <entry key="transactional" value="true"/>
+      </service-properties>
+  </service>
+
   <!-- JTA Transaction Manager setup. -->
   <reference id="txManager" interface="javax.transaction.TransactionManager" availability="mandatory" />
 
@@ -41,6 +60,7 @@
   </bean>
 
   <service ref="envMgrService" interface="io.subutai.core.environment.impl.dao.EnvironmentService" />
+
   <!-- JTA -->
 
   <reference-list id="eventLstnr"
