@@ -6,18 +6,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
-import io.subutai.common.tracker.TrackerOperationView;
-import io.subutai.core.tracker.impl.TrackerOperationImpl;
-import io.subutai.core.tracker.impl.TrackerOperationViewImpl;
-import io.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.core.tracker.impl.TrackerOperationImpl;
+import io.subutai.core.tracker.impl.TrackerOperationViewImpl;
+import io.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 
 
 public class TrackerOperationDataService
