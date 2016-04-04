@@ -1190,45 +1190,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public int setupContainerSsh( final String containerHostId, final String environmentId )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environmentContainer ) )
-        {
-            throw new ContainerHostNotFoundException( "Container host not found." );
-        }
-
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Setting up ssh for container %s ", containerHostId ) );
-
-        environment.getContainerHostById( containerHostId );
-        try
-        {
-            int sshPort =
-                    peerManager.getLocalPeer().setupContainerSsh( containerHostId, Common.CONTAINER_SSH_TIMEOUT_SEC );
-
-            operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
-
-            return sshPort;
-        }
-        catch ( Exception e )
-        {
-            operationTracker.addLogFailed(
-                    String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
-            throw new EnvironmentModificationException( e );
-        }
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
@@ -1287,6 +1248,47 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             operationTracker.addLogFailed( String.format( "Error %s environment domain: %s",
                     add ? "including container in" : "excluding container from", e.getMessage() ) );
+            throw new EnvironmentModificationException( e );
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public int setupSshTunnelForContainer( final String containerHostId, final String environmentId )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ), "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
+
+        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environmentContainer ) )
+        {
+            throw new ContainerHostNotFoundException( "Container host not found." );
+        }
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Setting up ssh tunnel for container %s ", containerHostId ) );
+
+        try
+        {
+            int sshPort = peerManager.getLocalPeer().setupSshTunnelForContainer(
+                    environmentContainer.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                    Common.CONTAINER_SSH_TIMEOUT_SEC );
+
+            operationTracker.addLogDone(
+                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
+
+            return sshPort;
+        }
+        catch ( Exception e )
+        {
+            operationTracker.addLogFailed(
+                    String.format( "Error setting up ssh for container %s: %s", containerHostId, e.getMessage() ) );
             throw new EnvironmentModificationException( e );
         }
     }

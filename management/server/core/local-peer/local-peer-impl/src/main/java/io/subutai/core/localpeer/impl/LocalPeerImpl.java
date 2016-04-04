@@ -58,7 +58,6 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -1523,27 +1522,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public int setupContainerSsh( final String containerHostId, final int sshIdleTimeout ) throws PeerException
+    public int setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerHostId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
+        Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
         Preconditions.checkArgument( sshIdleTimeout > 0 );
 
-        ContainerHost containerHost = getContainerHostById( containerHostId );
-
-        HostInterface hostInterface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-        if ( hostInterface instanceof NullHostInterface )
-        {
-            throw new PeerException( "Container IP not found" );
-        }
 
         try
         {
-            return getNetworkManager().setupContainerSsh( hostInterface.getIp(), sshIdleTimeout );
+            return getNetworkManager().setupContainerSsh( containerIp, sshIdleTimeout );
         }
         catch ( NetworkManagerException e )
         {
-            throw new PeerException( String.format( "Error setting up ssh for container ip %s", hostInterface.getIp() ),
+            throw new PeerException( String.format( "Error setting up ssh tunnel for container ip %s", containerIp ),
                     e );
         }
     }

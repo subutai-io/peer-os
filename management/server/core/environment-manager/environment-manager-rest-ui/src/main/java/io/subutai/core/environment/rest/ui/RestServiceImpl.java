@@ -781,7 +781,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( environmentManager.setupContainerSsh( containerId, environmentId ) ).build();
+            return Response.ok( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ).build();
         }
         catch ( Exception e )
         {
