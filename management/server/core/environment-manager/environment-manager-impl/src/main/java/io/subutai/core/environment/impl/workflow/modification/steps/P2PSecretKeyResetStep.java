@@ -58,6 +58,8 @@ public class P2PSecretKeyResetStep
             } );
         }
 
+        executorService.shutdown();
+
         Set<Peer> succeededPeers = Sets.newHashSet();
         for ( Peer ignored : peers )
         {

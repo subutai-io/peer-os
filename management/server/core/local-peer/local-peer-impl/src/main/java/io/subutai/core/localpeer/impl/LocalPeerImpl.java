@@ -1810,6 +1810,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return usedNetworkResources;
     }
 
+
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
@@ -1830,11 +1831,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
         ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
 
+        int taskCount = 0;
         for ( final ResourceHost resourceHost : resourceHosts )
         {
             //setup tunnel only if this RH participates in the swarm
             if ( p2pIps.findByRhId( resourceHost.getId() ) != null )
             {
+                taskCount++;
                 completionService.submit( new Callable<Object>()
                 {
                     @Override
@@ -1853,7 +1856,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            for ( final ResourceHost ignored : resourceHosts )
+            for ( int i = 0; i < taskCount; i++ )
             {
                 completionService.take().get();
             }

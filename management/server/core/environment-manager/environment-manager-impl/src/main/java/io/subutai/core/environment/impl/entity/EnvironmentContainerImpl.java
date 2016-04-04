@@ -407,7 +407,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     private void validateTrustChain() throws CommandException
     {
-        if ( environmentManager instanceof EnvironmentManagerImpl )
+        if ( environmentManager != null )
         {
             logger.warn( "Trust chain validation is on..." );
             // TODO call relationManager validation here instead
