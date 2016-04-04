@@ -391,18 +391,24 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            String path = null;
             DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-            if ( attr == null || attr.getDataHandler().getContent() == null )
+
+            try
             {
-                throw new Exception( "Error, cannot read an attachment", null );
+                attr.getDataHandler().getContent();
+                File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+                file.createNewFile();
+                attr.transferTo( file );
+
+                path = System.getProperty( "java.io.tmpdir" ) + "/" + environmentId;
+            }
+            catch ( Exception e )
+            {
+                // path
             }
 
-            File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
-            file.createNewFile();
-            attr.transferTo( file );
-
-            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy,
-                    System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy, path);
         }
         catch ( Exception e )
         {
