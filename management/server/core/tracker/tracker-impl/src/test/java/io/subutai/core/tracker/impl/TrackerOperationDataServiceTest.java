@@ -17,12 +17,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.tracker.impl.TrackerImpl;
-import io.subutai.core.tracker.impl.TrackerOperationImpl;
+import com.google.common.collect.Lists;
+
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 import io.subutai.core.tracker.impl.entity.TrackerOperationEntity;
-
-import com.google.common.collect.Lists;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;

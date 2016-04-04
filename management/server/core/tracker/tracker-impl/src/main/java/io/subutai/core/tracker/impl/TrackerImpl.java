@@ -12,14 +12,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import io.subutai.common.dao.DaoManager;
-import io.subutai.common.tracker.OperationState;
-import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.common.tracker.TrackerOperationView;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.tracker.api.Tracker;
-import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +20,14 @@ import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.tracker.OperationState;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.tracker.api.Tracker;
+import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
 
 /**
