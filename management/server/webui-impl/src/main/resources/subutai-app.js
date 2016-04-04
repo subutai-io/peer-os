@@ -853,20 +853,24 @@ app.directive('dropdownMenu', function () {
 		link: function (scope, element, attr) {
 
 			$('.b-nav-menu-link').on('click', function () {
-				$('.b-nav-menu__sub').stop().slideUp(300);
 				if ($(this).next('.b-nav-menu__sub').length > 0) {
 					if ($(this).parent().hasClass('b-nav-menu_active')) {
 						$(this).parent().removeClass('b-nav-menu_active');
 						$(this).next('.b-nav-menu__sub').stop().slideUp(300);
 					} else {
-						$('.b-nav-menu_active').removeClass('b-nav-menu_active')
+						$('.b-nav-menu_active .b-nav-menu__sub').parent().removeClass('b-nav-menu_active')
+						$('.b-nav-menu__sub').slideUp(300);
 						$(this).parent().addClass('b-nav-menu_active');
 						$(this).next('.b-nav-menu__sub').stop().slideDown(300);
 					}
 					return false;
 				} else {
-					$('.b-nav-menu__sub').stop().slideUp(300);
-					$('.b-nav-menu_active').removeClass('b-nav-menu_active');
+					if($(this).parent().hasClass('b-nav-menu_active')) {
+						location.reload();
+					} else {
+						$('.b-nav-menu__sub').slideUp(300);
+						$('.b-nav-menu_active').removeClass('b-nav-menu_active');
+					}
 				}
 			});
 
