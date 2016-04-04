@@ -82,9 +82,9 @@
     <!-- global properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Sonar -->
-    <!--<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>-->
-    <!--<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>-->
-    <!--<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>-->
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <!-- Runtime -->
     <karaf.version>3.0.5</karaf.version>
     <osgi.framework.version>5.0.0</osgi.framework.version>
