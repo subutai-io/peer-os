@@ -73,6 +73,8 @@ public class PEKGenerationStep
                             environment, peer, securityManager.getKeyManager() ) );
         }
 
+        executorService.shutdown();
+
         Set<Peer> succeededPeers = Sets.newHashSet();
         for ( Peer ignored : peers )
         {

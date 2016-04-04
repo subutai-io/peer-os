@@ -1419,8 +1419,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                         final Topology topology,
                                                                         final TrackerOperation operationTracker )
     {
-        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, peerManager,
-                securityManager, environment, topology, operationTracker, this );
+        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
+                topology, operationTracker, this );
     }
 
 
@@ -1431,8 +1431,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                          final boolean removeMetaData )
 
     {
-        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, peerManager,
-                securityManager, environment, topology, removedContainers, operationTracker, this, removeMetaData );
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
+                topology, removedContainers, operationTracker, this, removeMetaData );
     }
 
 
