@@ -3,11 +3,19 @@ package io.subutai.common.metric;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.subutai.common.host.HostId;
+import io.subutai.common.quota.ContainerCpuResource;
+import io.subutai.common.quota.ContainerHomeResource;
+import io.subutai.common.quota.ContainerOptResource;
+import io.subutai.common.quota.ContainerRamResource;
+import io.subutai.common.quota.ContainerResource;
+import io.subutai.common.quota.ContainerRootfsResource;
+import io.subutai.common.quota.ContainerVarResource;
 import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.CpuResource;
 import io.subutai.common.resource.NumericValueResource;
 import io.subutai.common.resource.ResourceValue;
 
@@ -17,6 +25,8 @@ import io.subutai.common.resource.ResourceValue;
  */
 public class ExceededQuota
 {
+    private static final Logger LOG = LoggerFactory.getLogger( ExceededQuota.class );
+
     @JsonProperty( "hostId" )
     protected final HostId hostId;
     @JsonProperty( "resourceType" )
@@ -51,6 +61,53 @@ public class ExceededQuota
     }
 
 
+    public <T extends ContainerResource> T getContainerResource( final Class<T> format )
+    {
+        ContainerResource result = null;
+        try
+        {
+            switch ( containerResourceType )
+            {
+                case CPU:
+                    result = new ContainerCpuResource( ( NumericValueResource ) quotaValue );
+                    break;
+                case RAM:
+                    result = new ContainerRamResource( ( ByteValueResource ) quotaValue );
+                    break;
+                case ROOTFS:
+                    result = new ContainerRootfsResource( ( ByteValueResource ) quotaValue );
+                    break;
+                case HOME:
+                    result = new ContainerHomeResource( ( ByteValueResource ) quotaValue );
+                    break;
+                case OPT:
+                    result = new ContainerOptResource( ( ByteValueResource ) quotaValue );
+                    break;
+                case VAR:
+                    result = new ContainerVarResource( ( ByteValueResource ) quotaValue );
+                    break;
+            }
+
+            if ( result != null )
+            {
+                return ( T ) result;
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage() );
+        }
+
+        return null;
+    }
+
+
+    public double getPercentage()
+    {
+        return ( ( ByteValueResource ) currentValue.getValue() ).doubleValue();
+    }
+
+
     @SuppressWarnings( "unchecked" )
     public <T> T getQuotaValue( final Class<T> format )
     {
@@ -79,12 +136,14 @@ public class ExceededQuota
     }
 
 
+    @Deprecated
     public ResourceValue getQuotaValue()
     {
         return quotaValue;
     }
 
 
+    @Deprecated
     public ResourceValue getCurrentValue()
     {
         return currentValue;
