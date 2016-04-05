@@ -17,6 +17,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
+//todo move logic to Peer
 public class AddSshKeyStep
 {
     private final String sshKey;

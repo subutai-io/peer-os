@@ -75,6 +75,8 @@ public class PeerUtil<T>
             peerFutures.put( peerTask.getPeer(), taskCompletionService.submit( peerTask.getTask() ) );
         }
 
+        taskExecutor.shutdown();
+
         for ( Map.Entry<Peer, Future<T>> peerFutureEntry : peerFutures.entrySet() )
         {
             Future<T> peerFuture = peerFutureEntry.getValue();
