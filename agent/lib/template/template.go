@@ -15,7 +15,7 @@ import (
 
 func IsRegistered(templateName string) bool {
 	returnValue := true
-	restTemplateURL := config.Management.Kurjun + templateName
+	restTemplateURL := config.Cdn.Kurjun + templateName
 
 	// token := gpg.GetToken()
 	tr := &http.Transport{
