@@ -17,9 +17,9 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
+import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDestroyStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
-import io.subutai.core.environment.impl.workflow.modification.steps.RegisterSshStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
 import io.subutai.core.peer.api.PeerManager;
@@ -38,7 +38,6 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
-    private boolean forceMetadataRemoval;
     private final SecurityManager securityManager;
 
 
@@ -61,8 +60,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public EnvironmentModifyWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
                                       EnvironmentImpl environment, Topology topology, List<String> removedContainers,
-                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager,
-                                      boolean forceMetadataRemoval )
+                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
 
         super( EnvironmentGrowingPhase.INIT );
@@ -75,9 +73,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         this.defaultDomain = defaultDomain;
         this.environmentManager = environmentManager;
         this.removedContainers = new ArrayList<>();
-        this.forceMetadataRemoval = false;
         this.removedContainers = removedContainers;
-        this.forceMetadataRemoval = forceMetadataRemoval;
     }
 
 
@@ -102,8 +98,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new ContainerDestroyStep( environment, environmentManager, removedContainers, forceMetadataRemoval,
-                    operationTracker ).execute();
+            new ContainerDestroyStep( environment, environmentManager, removedContainers ).execute();
 
             environment = environmentManager.update( environment );
 
