@@ -29,7 +29,7 @@ var (
 func templId(templ, arch, version string, kurjun *http.Client) string {
 	url := config.Cdn.Kurjun + "/template/info?name=" + templ + "&version=" + version + "&type=text"
 	if strings.HasSuffix(version, "stable") || len(version) == 0 {
-		url = config.Cdn.Kurjun + "/template/info?name=" + templ + "&type=text"
+		url = config.Cdn.Kurjun + "/template/info?name=" + templ + "&version=" + config.Template.Version + "&type=text"
 	}
 	response, err := kurjun.Get(url)
 	log.Debug("GET: " + url)
