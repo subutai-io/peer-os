@@ -15,7 +15,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>blueprint-authz</module>
     <module>identity-manager-api</module>
     <module>identity-manager-impl</module>
     <module>identity-manager-rest</module>
