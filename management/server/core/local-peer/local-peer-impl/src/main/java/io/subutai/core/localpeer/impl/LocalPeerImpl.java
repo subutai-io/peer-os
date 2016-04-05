@@ -466,10 +466,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return sshPublicKeys;
         }
 
-
+        //read ssh keys if exist
         Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getReadSSHCommand(), hosts );
 
         Set<Host> succeededHosts = Sets.newHashSet();
+        Set<Host> failedHosts = Sets.newHashSet( hosts );
 
         for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
         {
@@ -484,12 +485,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        hosts.removeAll( succeededHosts );
+        failedHosts.removeAll( succeededHosts );
 
-        results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
+        //create ssh keys
+        results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), failedHosts );
 
-
-        Set<Host> failedHosts = Sets.newHashSet( hosts );
+        succeededHosts = Sets.newHashSet();
 
         for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
         {
