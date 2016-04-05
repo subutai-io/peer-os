@@ -730,7 +730,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 if ( "management".equals( info.getHostname() ) )
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getHostname(), "management", info.getArch().name(),
+                            info.getHostInterfaces(), info.getContainerName(), "management", info.getArch().name(),
                             "management", null, null, ContainerSize.SMALL, info.getState() );
                     addContainerHost( containerHost );
                 }

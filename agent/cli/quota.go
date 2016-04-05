@@ -9,15 +9,15 @@ import (
 // LxcQuota sets quotas for containers
 func LxcQuota(name, res, size string) {
 	switch res {
-	case "networkRate":
+	case "network":
 		fmt.Println(container.QuotaNet(name, size))
-	case "diskRootfs":
+	case "rootfs":
 		fmt.Println(fs.Quota(name+"/rootfs", size))
-	case "diskHome":
+	case "home":
 		fmt.Println(fs.Quota(name+"/home", size))
-	case "diskVar":
+	case "var":
 		fmt.Println(fs.Quota(name+"/var", size))
-	case "diskOpt":
+	case "opt":
 		fmt.Println(fs.Quota(name+"/opt", size))
 	case "disk":
 		fmt.Println(fs.DiskQuota(name, size))

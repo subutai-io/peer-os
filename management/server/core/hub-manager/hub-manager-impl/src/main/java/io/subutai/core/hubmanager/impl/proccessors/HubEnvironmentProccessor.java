@@ -421,14 +421,32 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 String.format( "/rest/v1/environments/%s/peers/%s/domain", peerDto.getEnvironmentInfo().getId(),
                         peerDto.getPeerId() );
         try
-
         {
-            boolean assign = !Strings.isNullOrEmpty( env.getDomainName() );
             //TODO balanceStrategy should come from HUB
-            DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
+            EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
+            boolean assign = !Strings.isNullOrEmpty( env.getDomainName() );
+            assert environmentDto != null;
             if ( assign )
             {
+                DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
                 localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
+                for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
+                {
+                    if ( nodesDto.getPeerId().equals( localPeer.getId() ) )
+                    {
+                        for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
+                        {
+                            try
+                            {
+                                localPeer.addIpToVniDomain( nodeDto.getIp(), env.getVni() );
+                            }
+                            catch ( Exception e )
+                            {
+                                LOG.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
+                            }
+                        }
+                    }
+                }
             }
             else
             {

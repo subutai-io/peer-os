@@ -35,26 +35,14 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
     ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
     {
-        super(
-                "hub",
-                json.get( "peerId" ).asText(),
-                json.get( "hostName" ).asText(),
+        super( "hub", json.get( "peerId" ).asText(), json.get( "hostName" ).asText(),
 
-                new ContainerHostInfoModel(
-                        json.get( "id" ).asText(),
-                        json.get( "hostName" ).asText(),
-                        initHostInterfaces( json ),
-                        HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING
-                ),
+                new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
+                        json.get( "containerName" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
+                        ContainerHostState.RUNNING ),
 
-                json.get( "templateName" ).asText(),
-                HostArchitecture.AMD64, 0, 0,
-                json.get( "domainName" ).asText(),
-                parseSize( json ),
-                json.get( "hostId" ).asText(),
-                json.get( "name" ).asText()
-        );
+                json.get( "templateName" ).asText(), HostArchitecture.AMD64, 0, 0, json.get( "domainName" ).asText(),
+                parseSize( json ), json.get( "hostId" ).asText(), json.get( "name" ).asText() );
 
         local = localContainerIds.contains( getId() );
 
@@ -129,5 +117,4 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         return new RequestBuilder( command );
     }
-
 }

@@ -209,11 +209,13 @@ public class ContainerCloneStep
         interfaces.addHostInterface(
                 new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
         final ContainerHostInfoModel infoModel =
-                new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(), interfaces,
-                        cloneResponse.getTemplateArch(), ContainerHostState.RUNNING );
+                new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(),
+                        cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
+                        ContainerHostState.RUNNING );
         return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
                 cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
-                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(), node.getName() );
+                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(),
+                cloneResponse.getContainerName() );
     }
 
 

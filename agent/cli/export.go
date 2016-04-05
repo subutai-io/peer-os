@@ -43,7 +43,7 @@ func LxcExport(name, version string) {
 	// changeConfigFile(name, packageVersion, dst)
 	container.SetContainerConf(name, [][]string{
 		{"subutai.template.package", dst + ".tar.gz"},
-		// {"subutai.template.version", packageVersion},
+		{"subutai.template.version", version},
 	})
 
 	src := config.Agent.LxcPrefix + name

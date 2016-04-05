@@ -23,8 +23,8 @@ type update struct {
 }
 
 func getList(kurjun *http.Client) (list []map[string]interface{}) {
-	resp, err := kurjun.Get(config.Management.Kurjun + "/file/list")
-	log.Check(log.FatalLevel, "GET: "+config.Management.Kurjun+"/file/list", err)
+	resp, err := kurjun.Get(config.Cdn.Kurjun + "/file/list")
+	log.Check(log.FatalLevel, "GET: "+config.Cdn.Kurjun+"/file/list", err)
 	defer resp.Body.Close()
 	jsonlist, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
@@ -87,8 +87,8 @@ func Update(name string, check bool) {
 		file, err := os.Create("/tmp/" + rmt.name)
 		log.Check(log.FatalLevel, "Creating update file", err)
 		defer file.Close()
-		resp, err := kurjun.Get(config.Management.Kurjun + "/file/get?id=" + rmt.id)
-		log.Check(log.FatalLevel, "GET: "+config.Management.Kurjun+"/file/get?id="+rmt.id, err)
+		resp, err := kurjun.Get(config.Cdn.Kurjun + "/file/get?id=" + rmt.id)
+		log.Check(log.FatalLevel, "GET: "+config.Cdn.Kurjun+"/file/get?id="+rmt.id, err)
 		defer resp.Body.Close()
 		_, err = io.Copy(file, resp.Body)
 		log.Check(log.FatalLevel, "Writing response to file", err)
