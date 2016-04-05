@@ -145,7 +145,7 @@ func LxcImport(templ, version, token string) {
 	// token = gpg.GetToken()
 	// }
 	if len(version) == 0 && templ == "management" {
-		version = config.Template.Version
+		version = config.Template.Version + "-" + config.Management.Version
 	}
 	fullname := templ + "-subutai-template_" + version + "_" + config.Template.Arch + ".tar.gz"
 	kurjun := config.CheckKurjun()
