@@ -488,33 +488,36 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         failedHosts.removeAll( succeededHosts );
 
         //create ssh keys
-        results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), failedHosts );
-
-        succeededHosts = Sets.newHashSet();
-
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
-        {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
-            {
-                sshPublicKeys.addSshPublicKey( result.getStdOut() );
-
-                succeededHosts.add( host );
-            }
-        }
-
-        failedHosts.removeAll( succeededHosts );
-
-        for ( Host failedHost : failedHosts )
-        {
-            LOG.error( "Failed to generate ssh key on host {}", failedHost.getHostname() );
-        }
-
         if ( !failedHosts.isEmpty() )
         {
-            throw new PeerException( "Failed to generate ssh keys on all hosts" );
+            results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), failedHosts );
+
+            succeededHosts = Sets.newHashSet();
+
+            for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+            {
+                CommandResult result = resultEntry.getValue();
+                Host host = resultEntry.getKey();
+
+                if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+                {
+                    sshPublicKeys.addSshPublicKey( result.getStdOut() );
+
+                    succeededHosts.add( host );
+                }
+            }
+
+            failedHosts.removeAll( succeededHosts );
+
+            for ( Host failedHost : failedHosts )
+            {
+                LOG.error( "Failed to generate ssh key on host {}", failedHost.getHostname() );
+            }
+
+            if ( !failedHosts.isEmpty() )
+            {
+                throw new PeerException( "Failed to generate ssh keys on all hosts" );
+            }
         }
 
 
