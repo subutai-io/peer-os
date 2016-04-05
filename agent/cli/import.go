@@ -26,13 +26,26 @@ var (
 	lock lockfile.Lockfile
 )
 
-func templId(templ, arch, version string, kurjun *http.Client) string {
-	url := config.Cdn.Kurjun + "/template/info?name=" + templ + "&version=" + version + "&type=text"
-	if strings.HasSuffix(version, "stable") || len(version) == 0 {
-		url = config.Cdn.Kurjun + "/template/info?name=" + templ + "&version=" + config.Template.Version + "&type=text"
+type templ struct {
+	name    string
+	file    string
+	version string
+	branch  string
+	id      string
+	hash    string
+}
+
+func templId(t templ, arch string, kurjun *http.Client) string {
+	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&type=text"
+	if len(t.branch) == 0 {
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&type=text"
 	}
 	response, err := kurjun.Get(url)
-	log.Debug("GET: " + url)
+	log.Debug("Retrieving id, get: " + url)
+	if err == nil && response.StatusCode == 204 {
+		log.Warn("Cannot get template with specified version, trying without version")
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name + "&type=text")
+	}
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
 	}
@@ -61,37 +74,33 @@ func md5sum(filePath string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func checkLocal(templ, md5, arch, version string) string {
+func checkLocal(t templ) bool {
 	var response string
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
-		file := strings.Split(f.Name(), "-subutai-template_"+version)
-		if version == "stable" || len(version) == 0 {
-			file = strings.Split(f.Name(), "-subutai-template_")
-		}
-		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
-			if len(md5) == 0 {
-				fmt.Print("Cannot check md5 of local template. Trust anyway? (y/n)")
+		if t.file == f.Name() {
+			if len(t.hash) == 0 {
+				fmt.Print("Cannot check md5 of local archive. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
-					return config.Agent.LxcPrefix + "tmpdir/" + f.Name()
+					return true
 				}
 			}
-			if md5 == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
-				return config.Agent.LxcPrefix + "tmpdir/" + f.Name()
+			if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
+				return true
 			}
 		}
 	}
-	return ""
+	return false
 }
 
-func download(file, id string, kurjun *http.Client) string {
-	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + file)
-	log.Check(log.FatalLevel, "Creating file "+file, err)
+func download(t templ, kurjun *http.Client) bool {
+	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
+	log.Check(log.FatalLevel, "Creating file "+t.file, err)
 	defer out.Close()
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/get?id=" + id)
-	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/get?id="+id, err)
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/get?id=" + t.id)
+	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/get?id="+t.id, err)
 	defer response.Body.Close()
 
 	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
@@ -99,12 +108,12 @@ func download(file, id string, kurjun *http.Client) string {
 	rd := bar.NewProxyReader(response.Body)
 
 	_, err = io.Copy(out, rd)
-	log.Check(log.FatalLevel, "Writing file "+file, err)
-	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+file) {
-		return config.Agent.LxcPrefix + "tmpdir/" + file
+	log.Check(log.FatalLevel, "Writing file "+t.file, err)
+	if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
+		return true
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
-	return ""
+	return false
 }
 func lockSubutai(file string) bool {
 	lock, err := lockfile.New("/var/run/lock/subutai." + file)
@@ -124,78 +133,100 @@ func unlockSubutai() {
 	lock.Unlock()
 }
 
-func LxcImport(templ, version, token string) {
-	log.Info("Importing " + templ)
-	for !lockSubutai(templ + ".import") {
-		time.Sleep(time.Second * 1)
-	}
-	defer unlockSubutai()
-
-	if container.IsContainer(templ) && templ == "management" && len(token) > 1 {
+func LxcImport(name, version, token string) {
+	if container.IsContainer(name) && name == "management" && len(token) > 1 {
 		gpg.ExchageAndEncrypt("management", token)
 		return
 	}
 
-	if container.IsContainer(templ) {
-		log.Info(templ + " container exist")
+	if container.IsContainer(name) {
+		log.Info(name + " instance exist")
 		return
 	}
 
-	// if len(token) == 0 {
-	// token = gpg.GetToken()
-	// }
-	if len(version) == 0 && templ == "management" {
-		version = config.Template.Version + "-" + config.Management.Version
+	log.Info("Importing " + name)
+	for !lockSubutai(name + ".import") {
+		time.Sleep(time.Second * 1)
 	}
-	fullname := templ + "-subutai-template_" + version + "_" + config.Template.Arch + ".tar.gz"
+	defer unlockSubutai()
+
+	var t templ
+
+	t.name = name
+	t.version = config.Template.Version
+	t.branch = config.Template.Branch
+	if len(version) != 0 {
+		if strings.Contains(version, "-") {
+			verstr := strings.Split(version, "-")
+			if len(verstr) == 2 {
+				t.version = verstr[0]
+				t.branch = verstr[1]
+			} else {
+				log.Error("Invalid version")
+			}
+		} else {
+			if strings.Contains(version, ".") {
+				t.version = version
+				t.branch = config.Template.Branch
+			} else {
+				t.version = config.Template.Version
+				t.branch = version
+			}
+		}
+	}
+
+	log.Info("Version: " + t.version + ", branch: " + t.branch)
+
+	if t.branch == "stable" {
+		t.branch = ""
+		t.file = t.name + "-subutai-template_" + t.version + "_" + config.Template.Arch + ".tar.gz"
+	} else {
+		t.file = t.name + "-subutai-template_" + t.version + "-" + t.branch + "_" + config.Template.Arch + ".tar.gz"
+	}
+
 	kurjun := config.CheckKurjun()
-	id := templId(templ, runtime.GOARCH, version, kurjun)
-	md5 := ""
-	if len(strings.Split(id, ".")) > 1 {
-		md5 = strings.Split(id, ".")[1]
+	t.id = templId(t, runtime.GOARCH, kurjun)
+	if len(strings.Split(t.id, ".")) > 1 {
+		t.hash = strings.Split(t.id, ".")[1]
 	}
 
-	archive := checkLocal(templ, md5, runtime.GOARCH, version)
-	if len(archive) == 0 && len(md5) != 0 {
-		log.Info("Downloading " + templ)
-		archive = download(fullname, id, kurjun)
-	} else if len(archive) == 0 && len(md5) == 0 {
-		log.Error(templ + " " + version + " template not found")
+	if !checkLocal(t) && !download(t, kurjun) {
+		log.Error(t.name + " template not found")
 	}
 
-	log.Info("Unpacking template " + templ)
+	log.Info("Unpacking template " + t.name)
 	tgz := extractor.NewTgz()
-	tgz.Extract(archive, config.Agent.LxcPrefix+"tmpdir/"+templ)
-	templdir := config.Agent.LxcPrefix + "tmpdir/" + templ
+	templdir := config.Agent.LxcPrefix + "tmpdir/" + t.name
+	tgz.Extract(config.Agent.LxcPrefix+"tmpdir/"+t.file, templdir)
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
-	if parent != "" && parent != templ && !container.IsTemplate(parent) {
+	if parent != "" && parent != t.name && !container.IsTemplate(parent) {
 		log.Info("Parent template required: " + parent)
 		LxcImport(parent, "", token)
 	}
 
-	log.Info("Installing template " + templ)
-	template.Install(parent, templ)
+	log.Info("Installing template " + t.name)
+	template.Install(parent, t.name)
 	// TODO following lines kept for back compatibility with old templates, should be deleted when all templates will be replaced.
-	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-home", config.Agent.LxcPrefix+templ+"/home")
-	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-var", config.Agent.LxcPrefix+templ+"/var")
-	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-opt", config.Agent.LxcPrefix+templ+"/opt")
+	os.Rename(config.Agent.LxcPrefix+t.name+"/"+t.name+"-home", config.Agent.LxcPrefix+t.name+"/home")
+	os.Rename(config.Agent.LxcPrefix+t.name+"/"+t.name+"-var", config.Agent.LxcPrefix+t.name+"/var")
+	os.Rename(config.Agent.LxcPrefix+t.name+"/"+t.name+"-opt", config.Agent.LxcPrefix+t.name+"/opt")
 	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 
-	if templ == "management" {
+	if t.name == "management" {
 		template.MngInit()
 		return
 	}
 
-	container.SetContainerConf(templ, [][]string{
-		{"lxc.rootfs", config.Agent.LxcPrefix + templ + "/rootfs"},
-		{"lxc.mount", config.Agent.LxcPrefix + templ + "/fstab"},
+	container.SetContainerConf(t.name, [][]string{
+		{"lxc.rootfs", config.Agent.LxcPrefix + t.name + "/rootfs"},
+		{"lxc.mount", config.Agent.LxcPrefix + t.name + "/fstab"},
 		{"lxc.hook.pre-start", ""},
 		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.common.conf"},
 		{"lxc.include", config.Agent.AppPrefix + "share/lxc/config/ubuntu.userns.conf"},
 		{"subutai.config.path", config.Agent.AppPrefix + "etc"},
 		{"lxc.network.script.up", config.Agent.AppPrefix + "bin/create_ovs_interface"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/home home none bind,rw 0 0"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/opt opt none bind,rw 0 0"},
-		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/var var none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + t.name + "/home home none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + t.name + "/opt opt none bind,rw 0 0"},
+		{"lxc.mount.entry", config.Agent.LxcPrefix + t.name + "/var var none bind,rw 0 0"},
 	})
 }

@@ -30,7 +30,6 @@ type managementConfig struct {
 	Login         string
 	Secret        string
 	GpgUser       string
-	Version       string
 	Password      string
 	RestToken     string
 	RestVerify    string
@@ -50,6 +49,7 @@ type cdnConfig struct {
 	Kurjun        string
 }
 type templateConfig struct {
+	Branch  string
 	Version string
 	Arch    string
 }
@@ -71,7 +71,6 @@ const defaultConfig = `
 	lxcPrefix = /mnt/lib/lxc/
 
 	[management]
-	version = stable
 	gpgUser =
 	port = 8443
 	host = 10.10.10.1
@@ -95,6 +94,7 @@ const defaultConfig = `
 
 	[template]
 	version = 4.0.0
+	branch = stable
 	arch = amd64
 `
 
