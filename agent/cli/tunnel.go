@@ -23,7 +23,7 @@ func Tunnel(dst, timeout, dstport string, global bool) {
 	}
 
 	if global {
-		cdn, err := net.LookupIP(config.Management.Cdn)
+		cdn, err := net.LookupIP(config.Cdn.Url)
 		tunsrv = cdn[0].String()
 		log.Check(log.ErrorLevel, "Resolving nearest tunnel node address", err)
 		args = []string{"-i", config.Agent.AppPrefix + "etc/ssh.pem", "-N", "-f", "-R", "0:" + dst + ":" + dstport, "-o", "StrictHostKeyChecking=no", "tunnel@" + tunsrv, "sleep", timeout}

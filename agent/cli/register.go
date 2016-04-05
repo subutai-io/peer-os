@@ -35,8 +35,8 @@ func LxcRegister(name string) {
 	_, err = io.Copy(fw, f)
 	log.Check(log.FatalLevel, "Copying file to request", err)
 
-	req, err := http.NewRequest("POST", config.Management.Kurjun+"/upload/public?sptoken="+gpg.GetToken(), &data)
-	log.Debug(config.Management.Kurjun + "/upload/public?sptoken=" + gpg.GetToken())
+	req, err := http.NewRequest("POST", config.Cdn.Kurjun+"/upload/public?sptoken="+gpg.GetToken(), &data)
+	log.Debug(config.Cdn.Kurjun + "/upload/public?sptoken=" + gpg.GetToken())
 
 	log.Check(log.FatalLevel, "Creating post request", err)
 
