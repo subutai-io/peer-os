@@ -1,8 +1,0 @@
-Package: subutai-activemq
-Priority: optional
-Section: devel
-Installed-Size: 89000
-Maintainer: <subut.ai>
-Architecture: amd64
-Version: 1.0.2
-Description: This is an Apache Activemq package of subutai distribution.
