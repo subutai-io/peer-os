@@ -30,7 +30,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.common.util.ExceptionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -60,7 +59,6 @@ public class ContainerCloneStep
     private final IdentityManager identityManager;
     private final TrackerOperation operationTracker;
     private final String localPeerId;
-    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     private PeerManager peerManager;
 
 
