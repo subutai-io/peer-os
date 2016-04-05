@@ -6,9 +6,9 @@ package io.subutai.common.resource;
  */
 public enum ContainerResourceType
 {
-    RAM( "ram" ), CPU( "cpu" ), OPT( "diskOpt" ),
-    HOME( "diskHome" ), VAR( "diskVar" ),
-    ROOTFS( "diskRootfs" );
+    RAM( "ram" ), CPU( "cpu" ), OPT( "opt" ),
+    HOME( "home" ), VAR( "var" ),
+    ROOTFS( "rootfs" );
 
     private String key;
 
