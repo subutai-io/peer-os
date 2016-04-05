@@ -3629,3 +3629,137 @@ select.b-search-input {
 	padding: 5px 0 20px 0;
 }
 
+/* SSH button for Environment containers */
+
+.b-workspace__content.containers-list {
+    padding: 15px 15px 56px;
+}
+
+.ssh-button {
+    width: 110px;
+}
+
+.ssh-key-button_block {
+    float: left;
+    height: 29px;
+}
+
+.ssh-key-button_block .ssh-key-button {
+    width: 13px;
+    height: 13px;
+}
+
+svg.ssh-key-button {
+    margin: 8px 7px 0 0;
+}
+
+.ssh-key-button_title {
+    float: right;
+    height: 29px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.ssh-info_block {
+    height: 30px;
+    float: right;
+}
+
+span.ssh-info-button
+{
+    margin-left: 10px;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 50%;
+    border: 2px solid #cbcbcb;
+    font-weight: bold;
+    color: #cbcbcb;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.ssh-info-button .ssh-plugin-info-tooltip {
+    cursor: default;
+    width: 150px;
+    display:none;
+    height: 80px;
+    position: absolute;
+    margin: 15px 0 0 -75px;
+    border: 1px solid #B8B8B8;
+    background-color: #FFFFFF;
+    border-radius: 8px 8px 5px 5px;
+    padding: 8px;
+    font-weight: normal;
+    color: #3d3d3d;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+.ssh-info-button .ssh-plugin-info-tooltip:after {
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    content: '';
+    width: 0;
+    height: 0;
+    border-bottom: solid 8px #FFFFFF;
+    border-left: solid 8px transparent;
+    border-right: solid 8px transparent;
+}
+
+.ssh-info-button .ssh-plugin-info-tooltip:before
+{
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    content: '';
+    width: 0;
+    height: 0;
+    border-bottom: solid 8px black;
+    border-left: solid 8px transparent;
+    border-right: solid 8px transparent;
+}
+
+.b-btn_blue:disabled {
+    background-color: #a0e0f3;
+    border-color: #a0e0f3;
+    color: #fff;
+}
+.b-btn_blue {
+    background-color: #61cbeb;
+    border-color: #61cbeb;
+    color: #fff;
+}
+
+.b-btn {
+    border: 1px solid #cbcbcb;
+    display: inline-block;
+    padding: 0 15px;
+    height: 30px;
+    line-height: 30px;
+    background-color: #f2f2f2;
+    border-radius: 2px;
+    color: #3d3d3d;
+    font-size: 12px;
+    text-decoration: none;
+    -webkit-transition: all .4s ease-in-out;
+    -moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -ms-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+    cursor: pointer;
+    vertical-align: middle;
+    box-sizing: border-box;
+    text-align: center;
+}
