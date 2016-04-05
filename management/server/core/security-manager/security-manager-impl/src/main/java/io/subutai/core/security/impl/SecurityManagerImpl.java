@@ -227,6 +227,11 @@ public class SecurityManagerImpl implements SecurityManager
         //obtain target host pub key for encrypting
         PGPPublicKey hostKeyForEncrypting = keyManager.getPublicKey( hostId );
 
+        if ( hostKeyForEncrypting == null )
+        {
+            throw new PGPException( String.format( "Public key not found by host id %s", hostId ) );
+        }
+
         String encryptedRequestString =
                 new String( encryptionTool.signAndEncrypt( message.getBytes(), hostKeyForEncrypting, true ) );
 
@@ -246,6 +251,12 @@ public class SecurityManagerImpl implements SecurityManager
                 encryptionTool.decryptAndReturnSignatures( responseWrapper.getResponse().getBytes() );
 
         PGPPublicKey hostKeyForVerifying = keyManager.getPublicKey( responseWrapper.getHostId() );
+
+        if ( hostKeyForVerifying == null )
+        {
+            throw new PGPException(
+                    String.format( "Public key not found by host id %s", responseWrapper.getHostId() ) );
+        }
 
         if ( encryptionTool.verifySignature( contentAndSignatures, hostKeyForVerifying ) )
         {

@@ -105,12 +105,11 @@ func connectionMonitor() {
 }
 
 func heartbeat() bool {
-	if time.Since(lastHeartbeatTime) < time.Second*3 {
-		return false
-	}
-	lastHeartbeatTime = time.Now()
 	mutex.Lock()
 	defer mutex.Unlock()
+	if len(lastHeartbeat) > 0 && time.Since(lastHeartbeatTime) < time.Second*5 {
+		return false
+	}
 
 	pool = container.GetActiveContainers(false)
 	beat := Heartbeat{
@@ -126,6 +125,7 @@ func heartbeat() bool {
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
 
+	lastHeartbeatTime = time.Now()
 	if string(jbeat) == string(lastHeartbeat) {
 		return true
 	}
