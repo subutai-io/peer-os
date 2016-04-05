@@ -10,7 +10,7 @@
     <version>4.0.0-RC7-SNAPSHOT</version>
   </parent>
 
-  <artifactId>blueprint-auth2</artifactId>
+  <artifactId>blueprint-auth</artifactId>
   <name>Subutai Social Blueprint Authz</name>
   <description>Interceptor for osgi bundle initialization</description>
   <packaging>bundle</packaging>
