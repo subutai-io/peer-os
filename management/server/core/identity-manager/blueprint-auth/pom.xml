@@ -88,6 +88,7 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.groupId}.blueprint.auth</Bundle-SymbolicName>
             <Export-Package>${aries.osgi.export.pkg}</Export-Package>
             <Private-Package>${aries.osgi.private.pkg}</Private-Package>
             <Import-Package>${aries.osgi.import.pkg}</Import-Package>
