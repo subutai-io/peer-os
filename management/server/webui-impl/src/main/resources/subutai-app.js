@@ -34,6 +34,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
     vm.userId = "";
+    vm.userEmail = "";
     vm.notifications = [];
     vm.notificationsCount = 0;
     vm.notificationNew = false;
@@ -56,8 +57,10 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		}).success(function (data) {
+
 			vm.hubStatus = data.isRegisteredToHub;
 			vm.userId = data.ownerId;
+			vm.userEmail = data.ownerEmail;
 
 			if (vm.hubStatus != "true" && vm.hubStatus != true) {
 				vm.hubStatus = false;

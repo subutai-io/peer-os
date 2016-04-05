@@ -36,6 +36,7 @@ import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
 import io.subutai.hub.share.dto.TrustDataDto;
+import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.json.JsonUtil;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
@@ -129,6 +130,7 @@ public class RegistrationManager
         try
         {
             String path = String.format( "/rest/v1/peers/%s", peerId );
+
             WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
             byte[] cborData = JsonUtil.toCbor( registrationData );
@@ -139,7 +141,6 @@ public class RegistrationManager
 
             Response r = client.post( encryptedData );
 
-
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 Config config = new ConfigEntity();
@@ -147,24 +148,67 @@ public class RegistrationManager
                 config.setPeerId( configManager.getPeerId() );
                 config.setOwnerId( manager.getPeerInfo().get( "OwnerId" ) );
 
+                //
+                // Get user email
+                //
+
+                UserDto userDto = getUserDataFromHub( config.getOwnerId() );
+
+                if ( userDto != null )
+                {
+                    config.setOwnerEmail( userDto.getEmail() );
+                }
+
                 manager.getConfigDataService().saveHubConfig( config );
-                LOG.info( "Hub configuration saved successfully." );
+
                 LOG.info( "Peer registered successfully." );
             }
             else
             {
-                LOG.error( "Could not register Peer: ", r.readEntity( String.class ) );
-                throw new HubPluginException( "Could not register Peer: " + r.readEntity( String.class ) );
+                String error = r.readEntity( String.class );
+
+                LOG.error( "Error to register peer: {}", error );
+
+                throw new HubPluginException( "Error to register peer: " + error );
             }
         }
-        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException
-                e )
+        catch ( Exception e )
         {
-            LOG.error( "Could not register Peer", e );
+            LOG.error( "Error to register peer: ", e );
+
             throw new HubPluginException( e.toString(), e );
         }
     }
 
+
+    private UserDto getUserDataFromHub( String userId )
+    {
+        String path = "/rest/v1/users/" + userId;
+
+        UserDto userDto = null;
+
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+            Response r = client.get();
+
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                byte[] encryptedContent = configManager.readContent( r );
+
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
+                userDto = JsonUtil.fromCbor( plainContent, UserDto.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to get user data: ", e );
+        }
+
+        return userDto;
+    }
 
     public void registerOwnerPubKey() throws HubPluginException
     {
