@@ -142,7 +142,7 @@ public class SetupP2PStep
 
         Set<PeerUtil.PeerTaskResult<Boolean>> tunnelResults = tunnelUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult<Boolean> tunnelResult : tunnelResults )
+        for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults )
         {
             if ( tunnelResult.hasSucceeded() )
             {
