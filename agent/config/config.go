@@ -29,7 +29,6 @@ type managementConfig struct {
 	Port          string
 	Login         string
 	Secret        string
-	Kurjun        string
 	GpgUser       string
 	Version       string
 	Password      string
@@ -44,6 +43,11 @@ type influxdbConfig struct {
 	User   string
 	Pass   string
 }
+type cdnConfig struct {
+	Url     string
+	Sslport string
+	Kurjun  string
+}
 type templateConfig struct {
 	Version string
 	Arch    string
@@ -51,8 +55,9 @@ type templateConfig struct {
 type configFile struct {
 	Agent      agentConfig
 	Management managementConfig
-	Template   templateConfig
 	Influxdb   influxdbConfig
+	Cdn        cdnConfig
+	Template   templateConfig
 }
 
 const defaultConfig = `
@@ -75,7 +80,10 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    cdn = cdn.subut.ai
+
+    [cdn]
+    url = cdn.subut.ai
+    sslport = 8338
 
 	[influxdb]
 	server = 10.10.10.1
@@ -96,6 +104,8 @@ var (
 	Management managementConfig
 	// Influxdb describes configuration options for InluxDB server
 	Influxdb influxdbConfig
+	// CDN url and port
+	Cdn cdnConfig
 	// Template describes template configuration options
 	Template templateConfig
 )
@@ -124,6 +134,7 @@ func init() {
 	Influxdb = config.Influxdb
 	Template = config.Template
 	Management = config.Management
+	Cdn = config.Cdn
 }
 
 func InitAgentDebug() {
@@ -133,13 +144,13 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() (client *http.Client) {
-	_, err := net.DialTimeout("tcp", Management.Host+":8338", time.Duration(3)*time.Second)
-	if !log.Check(log.InfoLevel, "Trying local Kurjun", err) {
-		Management.Kurjun = "https://" + Management.Host + ":8338/rest/kurjun"
+	_, err := net.DialTimeout("tcp", Management.Host+":"+Cdn.Sslport, time.Duration(3)*time.Second)
+	if !log.Check(log.InfoLevel, "Trying local repo", err) {
+		Cdn.Kurjun = "https://" + Management.Host + ":" + Cdn.Sslport + "/rest/kurjun"
 		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 		client = &http.Client{Transport: tr}
 	} else {
-		Management.Kurjun = "https://" + Management.Cdn + ":8338/kurjun/rest"
+		Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
 		client = &http.Client{}
 	}
 	return
