@@ -51,6 +51,10 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     @Expose
     private String hostname;
 
+    @Column( name = "container_name" )
+    @Expose
+    private String containerName;
+
     @Column( name = "vlan" )
     @Expose
     private Integer vlan;
@@ -101,6 +105,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     {
         this.id = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
+        this.containerName = hostInfo.getContainerName();
         this.templateName = hostInfo.getTemplateName();
         this.state = hostInfo.getState();
         this.vlan = hostInfo.getVlan();
@@ -162,6 +167,13 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return containerName;
     }
 
 

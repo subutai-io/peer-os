@@ -11,7 +11,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Strings;
 
-
+//todo move to local peer
 @Command( scope = "peer", name = "tag-container" )
 public class TagCommand extends SubutaiShellCommandSupport
 {

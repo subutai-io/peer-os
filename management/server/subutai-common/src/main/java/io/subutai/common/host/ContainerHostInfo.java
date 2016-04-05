@@ -16,4 +16,6 @@ public interface ContainerHostInfo extends HostInfo
      * Returns status/state of container
      */
     ContainerHostState getState();
+
+    String getContainerName();
 }

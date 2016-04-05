@@ -92,6 +92,4 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
     void setQuota( ContainerQuota containerQuota ) throws PeerException;
 
     public HostId getResourceHostId() throws PeerException;
-
-    public String getContainerName();
 }

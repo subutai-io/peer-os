@@ -18,6 +18,7 @@ public class ContainerInfoJson implements ContainerInfo
 {
     private String id;
     private String hostname;
+    private String containerName;
     private Integer vlan;
     private String templateName;
     private Set<HostInterfaceJson> interfaces = new HashSet<>();
@@ -36,8 +37,9 @@ public class ContainerInfoJson implements ContainerInfo
 
     public ContainerInfoJson( ContainerInfo hostInfo )
     {
-        this.id = hostInfo.getId().toString();
+        this.id = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
+        this.containerName = hostInfo.getContainerName();
         this.templateName = hostInfo.getTemplateName();
         this.vlan = hostInfo.getVlan();
         this.arch = hostInfo.getArch();
@@ -67,6 +69,13 @@ public class ContainerInfoJson implements ContainerInfo
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return containerName;
     }
 
 

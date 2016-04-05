@@ -14,7 +14,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
-
+//todo move to local peer
 @Command( scope = "peer", name = "hosts" )
 public class HostsCommand extends SubutaiShellCommandSupport
 {
