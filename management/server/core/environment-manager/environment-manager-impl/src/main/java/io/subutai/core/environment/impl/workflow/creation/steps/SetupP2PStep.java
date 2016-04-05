@@ -88,6 +88,8 @@ public class SetupP2PStep
         //generate p2p secret key
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
 
+        environment.setP2pKey( sharedKey );
+
         ExecutorService p2pExecutor = Executors.newFixedThreadPool( peers.size() );
         ExecutorCompletionService<P2PConfig> p2pCompletionService = new ExecutorCompletionService<>( p2pExecutor );
 
