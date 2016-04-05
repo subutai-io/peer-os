@@ -61,11 +61,14 @@ func md5sum(filePath string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func checkLocal(templ, md5, arch string) string {
+func checkLocal(templ, md5, arch, version string) string {
 	var response string
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
-		file := strings.Split(f.Name(), "-subutai-template_")
+		file := strings.Split(f.Name(), "-subutai-template_"+version)
+		if version == "stable" || len(version) == 0 {
+			file = strings.Split(f.Name(), "-subutai-template_")
+		}
 		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
 			if len(md5) == 0 {
 				fmt.Print("Cannot check md5 of local template. Trust anyway? (y/n)")
@@ -152,7 +155,7 @@ func LxcImport(templ, version, token string) {
 		md5 = strings.Split(id, ".")[1]
 	}
 
-	archive := checkLocal(templ, md5, runtime.GOARCH)
+	archive := checkLocal(templ, md5, runtime.GOARCH, version)
 	if len(archive) == 0 && len(md5) != 0 {
 		log.Info("Downloading " + templ)
 		archive = download(fullname, id, kurjun)

@@ -105,8 +105,10 @@ func main() {
 		}}, {
 
 		Name: "export", Usage: "export Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "v", Usage: "template version"}},
 		Action: func(c *cli.Context) {
-			lib.LxcExport(c.Args().Get(0))
+			lib.LxcExport(c.Args().Get(0), c.String("v"))
 		}}, {
 
 		Name: "import", Usage: "import Subutai template",

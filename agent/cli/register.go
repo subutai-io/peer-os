@@ -20,7 +20,7 @@ func LxcRegister(name string) {
 
 	_, err := os.Stat(tarFullPath)
 	if log.Check(log.WarnLevel, "Looking for archive", err) {
-		LxcExport(name)
+		LxcExport(name, "")
 	}
 
 	var data bytes.Buffer
