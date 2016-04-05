@@ -26,6 +26,8 @@ public class ConfigEntity implements Config
     @Column( name = "user_id" )
     private String ownerId;
 
+    @Column( name = "user_email" )
+    private String ownerEmail;
 
 
     public String getPeerId()
@@ -58,8 +60,20 @@ public class ConfigEntity implements Config
     }
 
 
-    public void setOwnerId( final String ownerId )
+    public void setOwnerId( String ownerId )
     {
         this.ownerId = ownerId;
+    }
+
+
+    public String getOwnerEmail()
+    {
+        return ownerEmail;
+    }
+
+
+    public void setOwnerEmail( String ownerEmail )
+    {
+        this.ownerEmail = ownerEmail;
     }
 }

@@ -537,7 +537,6 @@ public class IntegrationImpl implements Integration
 
                 Response r = client.post( encryptedData );
 
-
                 if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
                 {
                     LOG.info( "SS configuration sent successfully." );
