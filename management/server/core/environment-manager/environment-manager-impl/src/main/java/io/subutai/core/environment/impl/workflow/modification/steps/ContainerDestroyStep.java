@@ -8,7 +8,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -22,19 +21,14 @@ public class ContainerDestroyStep
     private final EnvironmentImpl environment;
     private final EnvironmentManagerImpl environmentManager;
     private final List<String> removedContainers;
-    private final boolean forceMetadataRemoval;
-    private final TrackerOperation operationTracker;
 
 
     public ContainerDestroyStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
-                                 final List<String> removedContainers, final boolean forceMetadataRemoval,
-                                 final TrackerOperation operationTracker )
+                                 final List<String> removedContainers )
     {
         this.environment = environment;
         this.environmentManager = environmentManager;
         this.removedContainers = removedContainers;
-        this.forceMetadataRemoval = forceMetadataRemoval;
-        this.operationTracker = operationTracker;
     }
 
 
@@ -61,14 +55,7 @@ public class ContainerDestroyStep
                 }
                 if ( !skipError )
                 {
-                    if ( forceMetadataRemoval )
-                    {
-                        operationTracker.addLog( String.format( "Error destroying container: %s", e.getMessage() ) );
-                    }
-                    else
-                    {
-                        throw e;
-                    }
+                    throw e;
                 }
             }
 

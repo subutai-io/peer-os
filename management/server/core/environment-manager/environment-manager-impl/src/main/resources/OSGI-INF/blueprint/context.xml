@@ -17,9 +17,6 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-  <reference id="templateRegistry" availability="mandatory"
-             interface="io.subutai.core.kurjun.api.TemplateManager" />
-
   <reference id="peerManager"
              interface="io.subutai.core.peer.api.PeerManager" />
 
@@ -79,7 +76,6 @@
 
   <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
         class="io.subutai.core.environment.impl.EnvironmentManagerImpl">
-    <argument ref="templateRegistry" />
     <argument ref="peerManager" />
     <argument ref="securityManager" />
     <argument ref="identityManager" />

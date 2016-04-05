@@ -85,7 +85,6 @@ import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -112,7 +111,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private final RelationManager relationManager;
     private final PeerManager peerManager;
     private final Tracker tracker;
-    private final TemplateManager templateRegistry;
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
@@ -124,19 +122,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private EnvironmentService environmentService;
 
 
-    public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
-                                   SecurityManager securityManager, final IdentityManager identityManager,
-                                   final Tracker tracker, final RelationManager relationManager, HubAdapter hubAdapter,
+    public EnvironmentManagerImpl( final PeerManager peerManager, SecurityManager securityManager,
+                                   final IdentityManager identityManager, final Tracker tracker,
+                                   final RelationManager relationManager, HubAdapter hubAdapter,
                                    final EnvironmentService environmentService )
     {
-        Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( tracker );
 
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.identityManager = identityManager;
@@ -614,7 +610,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            if( topology != null )
+            if ( topology != null )
             {
                 allPeers.addAll( getPeers( topology ) );
                 allPeers.addAll( environment.getPeers() );
@@ -648,7 +644,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //launch environment growing workflow
 
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
-                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers, false );
+                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers );
 
         //start environment growing workflow
         executor.execute( new Runnable()
@@ -1429,12 +1425,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final EnvironmentImpl environment,
                                                                          final Topology topology,
                                                                          final TrackerOperation operationTracker,
-                                                                         final List<String> removedContainers,
-                                                                         final boolean removeMetaData )
+                                                                         final List<String> removedContainers )
 
     {
         return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
-                topology, removedContainers, operationTracker, this, removeMetaData );
+                topology, removedContainers, operationTracker, this );
     }
 
 
