@@ -198,35 +198,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         setHostInterfaces( hostInfo.getHostInterfaces() );
     }
 
-
-    public EnvironmentContainerImpl( final String hostId, final String hostname, final String containerName,
-                                     final HostArchitecture hostArchitecture, final HostInterfaces hostInterfaces,
-                                     final String localPeerId, final String peerId, final String nodeGroupName,
-                                     final String templateName, final HostArchitecture templateArch, int sshGroupId,
-                                     int hostsGroupId, String domainName, ContainerSize containerSize )
-    {
-        Preconditions.checkNotNull( peerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
-        Preconditions.checkNotNull( containerSize );
-
-        this.hostId = hostId;
-        this.hostname = hostname;
-        this.creatorPeerId = localPeerId;
-        this.peerId = peerId;
-        this.containerName = containerName;
-        this.hostArchitecture = hostArchitecture;
-        this.nodeGroupName = nodeGroupName;
-        this.templateName = templateName;
-        this.templateArch = templateArch;
-        this.sshGroupId = sshGroupId;
-        this.hostsGroupId = hostsGroupId;
-        this.domainName = domainName;
-        this.containerSize = containerSize;
-        setHostInterfaces( hostInterfaces );
-    }
-
-
     public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
     {
         Preconditions.checkNotNull( environmentManager );
