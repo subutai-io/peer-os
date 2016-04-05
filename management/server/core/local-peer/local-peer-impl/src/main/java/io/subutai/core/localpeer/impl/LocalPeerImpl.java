@@ -538,8 +538,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             keysString.append( key );
             i++;
-            //send next 5 keys
-            if ( i % 5 == 0 || i == keys.size() )
+            //send next 100 keys
+            if ( i % 100 == 0 || i == keys.size() )
             {
                 Set<Host> succeededHosts = Sets.newHashSet();
                 Set<Host> failedHosts = Sets.newHashSet( hosts );
