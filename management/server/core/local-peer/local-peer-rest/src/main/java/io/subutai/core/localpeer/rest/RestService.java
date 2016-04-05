@@ -25,7 +25,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.PublicKeyContainer;
@@ -110,22 +109,15 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void resetP2PSecretKey( P2PCredentials p2PCredentials );
 
-    @GET
-    @Path( "p2pip/{rhId}/{hash}" )
-    @Produces( MediaType.TEXT_PLAIN )
-    Response getP2PIP( @PathParam( "rhId" ) String resourceHostId, @PathParam( "hash" ) String swarmHash );
-
     @POST
     @Path( "p2ptunnel" )
-    @Produces( MediaType.APPLICATION_JSON )
     @Consumes( MediaType.APPLICATION_JSON )
-    P2PConnections setupP2PConnection( P2PConfig config );
+    void joinP2PSwarm( P2PConfig config );
 
-    @POST
-    @Path( "p2pinitial" )
+    @PUT
+    @Path( "p2ptunnel" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response setupInitialP2PConnection( P2PConfig config );
-
+    void joinOrUpdateP2PSwarm( P2PConfig config );
 
     @DELETE
     @Path( "cleanup/{environmentId}" )

@@ -17,10 +17,14 @@
   <dependencies>
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <!-- blueprint-authz -->
+    <!--<dependency>-->
+      <!--<groupId>org.apache.aries.blueprint</groupId>-->
+      <!--<artifactId>org.apache.aries.blueprint.authz</artifactId>-->
+      <!--<version>1.0.1-CUSTOM</version>-->
+    <!--</dependency>-->
     <dependency>
-      <groupId>org.apache.aries.blueprint</groupId>
-      <artifactId>org.apache.aries.blueprint.authz</artifactId>
-      <version>1.0.1-CUSTOM</version>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>blueprint-auth</artifactId>
     </dependency>
 
     <!-- subutai-common -->

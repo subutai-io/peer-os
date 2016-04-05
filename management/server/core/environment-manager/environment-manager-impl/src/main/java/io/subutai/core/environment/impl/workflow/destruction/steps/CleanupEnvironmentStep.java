@@ -59,6 +59,8 @@ public class CleanupEnvironmentStep
             } );
         }
 
+        executorService.shutdown();
+
         Set<Peer> succeededPeers = Sets.newHashSet();
         for ( Peer ignored : peers )
         {

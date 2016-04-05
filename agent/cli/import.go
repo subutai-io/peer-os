@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cheggaaa/pb"
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
 
@@ -60,11 +61,14 @@ func md5sum(filePath string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func checkLocal(templ, md5, arch string) string {
+func checkLocal(templ, md5, arch, version string) string {
 	var response string
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
-		file := strings.Split(f.Name(), "-subutai-template_")
+		file := strings.Split(f.Name(), "-subutai-template_"+version)
+		if version == "stable" || len(version) == 0 {
+			file = strings.Split(f.Name(), "-subutai-template_")
+		}
 		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
 			if len(md5) == 0 {
 				fmt.Print("Cannot check md5 of local template. Trust anyway? (y/n)")
@@ -89,7 +93,12 @@ func download(file, id string, kurjun *http.Client) string {
 	response, err := kurjun.Get(config.Management.Kurjun + "/template/get?id=" + id)
 	log.Check(log.FatalLevel, "Getting "+config.Management.Kurjun+"/template/get?id="+id, err)
 	defer response.Body.Close()
-	_, err = io.Copy(out, response.Body)
+
+	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
+	bar.Start()
+	rd := bar.NewProxyReader(response.Body)
+
+	_, err = io.Copy(out, rd)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
 	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+file) {
 		return config.Agent.LxcPrefix + "tmpdir/" + file
@@ -146,7 +155,7 @@ func LxcImport(templ, version, token string) {
 		md5 = strings.Split(id, ".")[1]
 	}
 
-	archive := checkLocal(templ, md5, runtime.GOARCH)
+	archive := checkLocal(templ, md5, runtime.GOARCH, version)
 	if len(archive) == 0 && len(md5) != 0 {
 		log.Info("Downloading " + templ)
 		archive = download(fullname, id, kurjun)
@@ -170,9 +179,11 @@ func LxcImport(templ, version, token string) {
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-home", config.Agent.LxcPrefix+templ+"/home")
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-var", config.Agent.LxcPrefix+templ+"/var")
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-opt", config.Agent.LxcPrefix+templ+"/opt")
+	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 
 	if templ == "management" {
 		template.MngInit()
+		return
 	}
 
 	container.SetContainerConf(templ, [][]string{
@@ -187,5 +198,4 @@ func LxcImport(templ, version, token string) {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/opt opt none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/var var none bind,rw 0 0"},
 	})
-	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 }

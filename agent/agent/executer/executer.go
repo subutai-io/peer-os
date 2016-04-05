@@ -156,7 +156,7 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 			<-done
 		} else {
 			cmd.Process.Kill()
-			response.Type = config.Broker.ExecuteTimeout
+			response.Type = "EXECUTE_TIMEOUT"
 			cmd.Process.Wait()
 			if cmd.ProcessState != nil {
 				response.ExitCode = strconv.Itoa(cmd.ProcessState.Sys().(syscall.WaitStatus).ExitStatus())
@@ -202,7 +202,7 @@ func buildCmd(r *RequestOptions) *exec.Cmd {
 //prepare basic response
 func genericResponse(req *RequestOptions) ResponseOptions {
 	return ResponseOptions{
-		Type:      config.Broker.ExecuteResponce,
+		Type:      "EXECUTE_RESPONSE",
 		CommandId: req.CommandId,
 		Id:        req.Id,
 	}
@@ -269,7 +269,7 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 
 	io.Copy(&e, e_read)
 	if exitCode == 0 {
-		res.Type = config.Broker.ExecuteResponce
+		res.Type = "EXECUTE_RESPONSE"
 		res.ExitCode = strconv.Itoa(exitCode)
 		if chunk.Len() > 0 {
 			res.StdOut = chunk.String()
@@ -278,7 +278,7 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 		out_c <- res
 	} else {
 		if exitCode/256 == 124 {
-			res.Type = config.Broker.ExecuteTimeout
+			res.Type = "EXECUTE_TIMEOUT"
 		}
 		res.ExitCode = strconv.Itoa(exitCode / 256)
 		res.StdOut = chunk.String()

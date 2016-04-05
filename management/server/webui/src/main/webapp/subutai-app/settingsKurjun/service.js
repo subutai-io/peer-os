@@ -71,7 +71,7 @@ function SettingsKurjunSrv($http) {
 
 
     function signedMsg(id, signedMsg) {
-        var postData = "signedMsg=" + signedMsg + "&id=" + id;
+        var postData = "signedMsg=" + btoa(signedMsg) + "&id=" + id;
         return $http.post(
             SIGNED_MESSAGE_URL,
             postData,

@@ -34,7 +34,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -48,7 +47,6 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ByteValueResource;
@@ -136,7 +134,7 @@ public class LocalPeerImplTest
     @Mock
     TemplateManager templateRegistry;
     @Mock
-    Host managementHost;
+    ResourceHost managementHost;
     @Mock
     CommandExecutor commandExecutor;
     @Mock
@@ -199,8 +197,6 @@ public class LocalPeerImplTest
 
     @Mock
     EntityManagerFactoryImpl entityManagerFactory;
-    @Mock
-    private ContainerGateway containerGateway;
 
     @Mock
     private ByteValueResource cpuQuota;
@@ -252,7 +248,6 @@ public class LocalPeerImplTest
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
-        when( containerGateway.getContainerId() ).thenReturn( containerId );
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
@@ -766,14 +761,5 @@ public class LocalPeerImplTest
         doThrow( new QuotaException() ).when( quotaManager ).setCpuSet( eq( containerId ), anySet() );
 
         localPeer.setCpuSet( containerHost, Sets.newHashSet( QUOTA ) );
-    }
-
-
-    @Test
-    public void testRemoveTunnel() throws Exception
-    {
-        Tunnel tunnel = mock( Tunnel.class );
-        when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
-        when( tunnel.getTunnelIp() ).thenReturn( IP );
     }
 }

@@ -51,11 +51,19 @@ public class ProductDto
         this.id = objProduct.getString( "id" );
         this.name = objProduct.getString( "name" );
         this.type = Type.valueOf( objProduct.getString( "type" ) );
-        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" );
+        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss" );
         sdf.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-        this.createDate = sdf.parse( "2013-09-29T18:46:19Z" );
+        try
+        {
+            this.createDate = sdf.parse( objProduct.getString( "createDate" ) );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
         this.ownerId = objProduct.getString( "ownerId" );
         this.version = objProduct.getString( "version" );
+        this.description = objProduct.getString( "description" );
 
         JSONArray metadataJson = objProduct.getJSONArray( "metadata" );
         for ( int i = 0; i < metadataJson.length(); i++ )

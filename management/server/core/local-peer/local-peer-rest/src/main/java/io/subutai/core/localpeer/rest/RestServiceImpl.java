@@ -28,7 +28,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -282,7 +281,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            localPeer.resetP2PSecretKey( p2PCredentials );
+            localPeer.resetSwarmSecretKey( p2PCredentials );
         }
         catch ( Exception e )
         {
@@ -293,12 +292,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getP2PIP( final String resourceHostId, final String swarmHash )
+    public void joinP2PSwarm( final P2PConfig config )
     {
         try
         {
-            String p2pIp = localPeer.getP2PIP( resourceHostId, swarmHash );
-            return Response.ok( p2pIp ).build();
+            localPeer.joinP2PSwarm( config );
         }
         catch ( Exception e )
         {
@@ -309,27 +307,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public P2PConnections setupP2PConnection( final P2PConfig config )
+    public void joinOrUpdateP2PSwarm( final P2PConfig config )
     {
         try
         {
-            return localPeer.setupP2PConnection( config );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response setupInitialP2PConnection( final P2PConfig config )
-    {
-        try
-        {
-            localPeer.setupInitialP2PConnection( config );
-            return Response.ok().build();
+            localPeer.joinOrUpdateP2PSwarm( config );
         }
         catch ( Exception e )
         {

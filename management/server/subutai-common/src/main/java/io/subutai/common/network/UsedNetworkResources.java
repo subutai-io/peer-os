@@ -50,7 +50,7 @@ public class UsedNetworkResources
     }
 
 
-    public void addVni( long vni )
+    public synchronized void addVni( long vni )
     {
         Preconditions.checkArgument( NumUtil.isLongBetween( vni, Common.MIN_VNI_ID, Common.MAX_VNI_ID ) );
 
@@ -58,7 +58,7 @@ public class UsedNetworkResources
     }
 
 
-    public void addVlan( int vlan )
+    public synchronized void addVlan( int vlan )
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ) );
 
@@ -66,7 +66,7 @@ public class UsedNetworkResources
     }
 
 
-    public void addP2pSubnet( String p2pSubnet )
+    public synchronized void addP2pSubnet( String p2pSubnet )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ) );
 
@@ -74,7 +74,7 @@ public class UsedNetworkResources
     }
 
 
-    public void addContainerSubnet( String containerSubnet )
+    public synchronized void addContainerSubnet( String containerSubnet )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerSubnet ) );
 

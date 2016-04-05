@@ -344,7 +344,7 @@ public class HostRegistryImpl implements HostRegistry
     {
         if ( resourceHostInfo instanceof ResourceHost )
         {
-            for ( HostInterface hostInterface : ( ( ResourceHost ) resourceHostInfo ).getNetInterfaces() )
+            for ( HostInterface hostInterface : ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces() )
             {
                 if ( SystemSettings.getMgmtInterface().equals( hostInterface.getName() ) )
                 {

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 /**
@@ -46,13 +47,29 @@ public class P2PConnections
     }
 
 
-    public P2PConnection findConnectionByHash( final String hash )
+    public P2PConnection findByHash( final String hash )
     {
         Preconditions.checkNotNull( hash );
 
         for ( P2PConnection p2PConnection : getConnections() )
         {
             if ( p2PConnection.getHash().equalsIgnoreCase( hash ) )
+            {
+                return p2PConnection;
+            }
+        }
+
+        return null;
+    }
+
+
+    public P2PConnection findByIp( final String ip )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ) );
+
+        for ( P2PConnection p2PConnection : getConnections() )
+        {
+            if ( p2PConnection.getIp().equalsIgnoreCase( ip ) )
             {
                 return p2PConnection;
             }

@@ -52,8 +52,11 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
+import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
@@ -65,10 +68,11 @@ import io.subutai.core.localpeer.impl.container.CreateContainerTask;
 import io.subutai.core.localpeer.impl.container.DestroyContainerTask;
 import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
 import io.subutai.core.network.api.NetworkManager;
+import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
- * Resource host implementation.
+ * Resource host implementation. TODO review all methods to see which ones must be run sequentially like setupTunnels
  */
 @Entity
 @Table( name = "r_host" )
@@ -136,20 +140,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         this.instanceType = resourceHostInfo.getInstanceType();
 
-        setNetInterfaces( resourceHostInfo.getHostInterfaces() );
+        setSavedHostInterfaces( resourceHostInfo.getHostInterfaces() );
 
         init();
     }
 
 
     @Override
-    public Set<HostInterface> getNetInterfaces()
+    public Set<HostInterface> getSavedHostInterfaces()
     {
         return netInterfaces;
     }
 
 
-    public void setNetInterfaces( HostInterfaces hostInterfaces )
+    public void setSavedHostInterfaces( HostInterfaces hostInterfaces )
     {
         Preconditions.checkNotNull( hostInterfaces );
 
@@ -211,8 +215,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         Preconditions.checkNotNull( networkResource, "Invalid networkResource" );
 
         //need to execute sequentially since other parallel executions can setup the same tunnel
-        Future<Boolean> future =
-                queueSequentialTask( new SetupTunnelsTask( getNetworkManager(), this, p2pIps, networkResource ) );
+        Future<Boolean> future = queueSequentialTask( new SetupTunnelsTask( this, p2pIps, networkResource ) );
 
         try
         {
@@ -318,12 +321,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throw new ResourceHostException( "Error on starting container", e );
         }
 
-        poolContainerAvailability( containerHost );
+        waitContainerStart( containerHost );
     }
 
 
-    private void poolContainerAvailability( final ContainerHost containerHost ) throws ResourceHostException
+    private void waitContainerStart( final ContainerHost containerHost ) throws ResourceHostException
     {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+
         //wait container connection
         long ts = System.currentTimeMillis();
         while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !containerHost.isConnected() )
@@ -579,7 +584,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ), this );
+            commandUtil
+                    .execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ).withTimeout( 60 * 60 ),
+                            this );
         }
         catch ( CommandException e )
         {
@@ -619,11 +626,94 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public P2PConnections getP2PConnections() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getP2PConnections( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( "Failed to get P2P connections", e );
+        }
+    }
+
+
+    @Override
+    public void joinP2PSwarm( final String p2pIp, final String interfaceName, final String p2pHash,
+                              final String secretKey, final long secretKeyTtlSec ) throws ResourceHostException
+    {
+        try
+        {
+            if ( getP2PConnections().findByHash( p2pHash ) != null )
+            {
+                getNetworkManager().resetSwarmSecretKey( this, p2pHash, secretKey, secretKeyTtlSec );
+            }
+            else
+            {
+                getNetworkManager().joinP2PSwarm( this, interfaceName, p2pIp, p2pHash, secretKey, secretKeyTtlSec );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( "Failed to join P2P swarm", e );
+        }
+    }
+
+
+    @Override
+    public void resetSwarmSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
+            throws ResourceHostException
+    {
+        try
+        {
+            if ( getP2PConnections().findByHash( p2pHash ) != null )
+            {
+                getNetworkManager().resetSwarmSecretKey( this, p2pHash, newSecretKey, ttlSeconds );
+            }
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( "Failed to reset P2P connection secret key", e );
+        }
+    }
+
+
+    @Override
+    public Tunnels getTunnels() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getTunnels( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( "Failed to get tunnels", e );
+        }
+    }
+
+
+    @Override
+    public void createTunnel( final Tunnel tunnel ) throws ResourceHostException
+    {
+        try
+        {
+            getNetworkManager().createTunnel( this, tunnel.getTunnelName(), tunnel.getTunnelIp(), tunnel.getVlan(),
+                    tunnel.getVni() );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( "Failed to create tunnel", e );
+        }
+    }
+
+
+    @Override
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );
 
-        setNetInterfaces( hostInfo.getHostInterfaces() );
+        setSavedHostInterfaces( hostInfo.getHostInterfaces() );
 
         ResourceHostInfo resourceHostInfo = ( ResourceHostInfo ) hostInfo;
 
@@ -640,7 +730,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 if ( "management".equals( info.getHostname() ) )
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getHostname(), "management", info.getArch().name(),
+                            info.getHostInterfaces(), info.getContainerName(), "management", info.getArch().name(),
                             "management", null, null, ContainerSize.SMALL, info.getState() );
                     addContainerHost( containerHost );
                 }

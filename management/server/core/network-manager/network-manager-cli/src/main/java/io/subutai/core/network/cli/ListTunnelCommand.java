@@ -1,8 +1,6 @@
 package io.subutai.core.network.cli;
 
 
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +12,8 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.network.api.NetworkManager;
 
 
 @Command( scope = "net", name = "tunnel-list", description = "Lists tunnels" )
@@ -23,7 +21,6 @@ public class ListTunnelCommand extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( ListTunnelCommand.class.getName() );
 
-    private final NetworkManager networkManager;
     private final LocalPeer localPeer;
 
     @Argument( index = 0, name = "host id", required = false, multiValued = false,
@@ -31,12 +28,10 @@ public class ListTunnelCommand extends SubutaiShellCommandSupport
     String hostId;
 
 
-    public ListTunnelCommand( final NetworkManager networkManager, final LocalPeer localPeer )
+    public ListTunnelCommand( final LocalPeer localPeer )
     {
-        Preconditions.checkNotNull( networkManager );
         Preconditions.checkNotNull( localPeer );
 
-        this.networkManager = networkManager;
         this.localPeer = localPeer;
     }
 
@@ -47,14 +42,15 @@ public class ListTunnelCommand extends SubutaiShellCommandSupport
 
         try
         {
-            Set<Tunnel> tunnels = Strings.isNullOrEmpty( hostId ) ? networkManager.listTunnels() :
-                                  networkManager.listTunnels( localPeer.getResourceHostById( hostId ) );
+            Tunnels tunnels = Strings.isNullOrEmpty( hostId ) ? localPeer.getManagementHost().getTunnels() :
+                              localPeer.getResourceHostById( hostId ).getTunnels();
 
-            System.out.format( "Found %d tunnel(s)%n", tunnels.size() );
+            System.out.format( "Found %d tunnel(s)%n", tunnels.getTunnels().size() );
 
-            for ( Tunnel tunnel : tunnels )
+            for ( Tunnel tunnel : tunnels.getTunnels() )
             {
-                System.out.format( "%d %s %s%n", tunnel.getTunnelId(), tunnel.getTunnelName(), tunnel.getTunnelIp() );
+                System.out.format( "%s %s %d %d%n", tunnel.getTunnelName(), tunnel.getTunnelIp(), tunnel.getVlan(),
+                        tunnel.getVni() );
             }
         }
         catch ( Exception e )

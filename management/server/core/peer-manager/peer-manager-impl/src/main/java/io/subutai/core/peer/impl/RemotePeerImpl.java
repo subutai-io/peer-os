@@ -58,7 +58,6 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
@@ -771,7 +770,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
+    public void resetSwarmSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
@@ -782,30 +781,27 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getP2PIP( final String resourceHostId, final String swarmHash ) throws PeerException
+    public void joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( resourceHostId ), "Invalid resource host id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( swarmHash ), "Invalid p2p swarm hash" );
+        Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        return new PeerWebClient( peerInfo, provider ).getP2PIP( resourceHostId, swarmHash );
+        new PeerWebClient( peerInfo, provider ).joinP2PSwarm( config );
     }
 
 
     @Override
-    public P2PConnections setupP2PConnection( final P2PConfig config ) throws PeerException
+    public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        return new PeerWebClient( peerInfo, provider ).setupP2PConnection( config );
+        new PeerWebClient( peerInfo, provider ).joinOrUpdateP2PSwarm( config );
     }
 
 
     @Override
-    public void setupInitialP2PConnection( final P2PConfig config ) throws PeerException
+    public void createP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        Preconditions.checkNotNull( config, "Invalid p2p config" );
-
-        new PeerWebClient( peerInfo, provider ).setupInitialP2PConnection( config );
+        //no-op
     }
 
 
