@@ -94,7 +94,10 @@
 									<span class="b-nowrap">ID: {{ container.id }}</span><br>
 									<span class="b-nowrap">Host Name: {{ container.hostname }}</span>
 								' 
-								tooltip-side="right">
+								tooltip-side="right"
+								env-id="{{ container.environmentId }}"
+								env-data-source="{{ container.dataSource }}"
+							>
 								{{ container.templateName }}
 							</a>
 						</td>

@@ -23,7 +23,9 @@ public class ContainerDto
     private String peerId;
     private String hostId;
     private boolean local;
-    private String className;
+
+    // Where environment of container created: subutai, hub
+    private String dataSource;
 
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
@@ -42,7 +44,8 @@ public class ContainerDto
         this.peerId = peerId;
         this.hostId = hostId;
         this.local = local;
-        this.className = className;
+
+        dataSource = className.contains( "ProxyEnvironment" ) ? "hub" : "subutai";
     }
 
 
@@ -178,8 +181,8 @@ public class ContainerDto
     }
 
 
-    public String getClassName()
+    public String getDataSource()
     {
-        return className;
+        return dataSource;
     }
 }
