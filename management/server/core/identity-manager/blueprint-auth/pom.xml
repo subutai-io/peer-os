@@ -11,8 +11,8 @@
   </parent>
 
   <artifactId>blueprint-auth2</artifactId>
-  <name>Apache Aries Blueprint Authz2</name>
-
+  <name>Subutai Social Blueprint Authz</name>
+  <description>Interceptor for osgi bundle initialization</description>
   <packaging>bundle</packaging>
 
   <properties>
