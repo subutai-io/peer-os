@@ -109,10 +109,13 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonIgnore
     private Long vni;
 
-
     @Column( name = "p2p_subnet" )
     @JsonIgnore
     private String p2pSubnet;
+
+    @Column( name = "p2p_key" )
+    @JsonIgnore
+    private String p2pKey;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
@@ -626,6 +629,18 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getP2PHash()
     {
         return P2PUtil.generateHash( environmentId );
+    }
+
+
+    public String getP2pKey()
+    {
+        return p2pKey;
+    }
+
+
+    public void setP2pKey( final String p2pKey )
+    {
+        this.p2pKey = p2pKey;
     }
 
 
