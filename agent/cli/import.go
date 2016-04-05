@@ -28,11 +28,11 @@ var (
 
 func templId(templ, arch, version string, kurjun *http.Client) string {
 	url := config.Cdn.Kurjun + "/template/info?name=" + templ + "&version=" + version + "&type=text"
-	if version == "stable" || len(version) == 0 {
+	if strings.HasSuffix(version, "stable") || len(version) == 0 {
 		url = config.Cdn.Kurjun + "/template/info?name=" + templ + "&type=text"
 	}
 	response, err := kurjun.Get(url)
-	log.Debug(config.Cdn.Kurjun + "/template/info?name=" + templ + "&type=text")
+	log.Debug("GET: " + url)
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
 	}
@@ -141,13 +141,13 @@ func LxcImport(templ, version, token string) {
 		return
 	}
 
-	fullname := templ + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
 	// if len(token) == 0 {
 	// token = gpg.GetToken()
 	// }
 	if len(version) == 0 && templ == "management" {
-		version = config.Management.Version
+		version = config.Template.Version
 	}
+	fullname := templ + "-subutai-template_" + version + "_" + config.Template.Arch + ".tar.gz"
 	kurjun := config.CheckKurjun()
 	id := templId(templ, runtime.GOARCH, version, kurjun)
 	md5 := ""
@@ -170,7 +170,7 @@ func LxcImport(templ, version, token string) {
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != templ && !container.IsTemplate(parent) {
 		log.Info("Parent template required: " + parent)
-		LxcImport(parent, "stable", token)
+		LxcImport(parent, "", token)
 	}
 
 	log.Info("Installing template " + templ)

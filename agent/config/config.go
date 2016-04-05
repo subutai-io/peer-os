@@ -44,9 +44,10 @@ type influxdbConfig struct {
 	Pass   string
 }
 type cdnConfig struct {
-	Url     string
-	Sslport string
-	Kurjun  string
+	Allowinsecure bool
+	Url           string
+	Sslport       string
+	Kurjun        string
 }
 type templateConfig struct {
 	Version string
@@ -84,6 +85,7 @@ const defaultConfig = `
     [cdn]
     url = cdn.subut.ai
     sslport = 8338
+    allowinsecure = false
 
 	[influxdb]
 	server = 10.10.10.1
@@ -144,14 +146,16 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() (client *http.Client) {
-	_, err := net.DialTimeout("tcp", Management.Host+":"+Cdn.Sslport, time.Duration(3)*time.Second)
+	_, err := net.DialTimeout("tcp", Management.Host+":"+Cdn.Sslport, time.Duration(2)*time.Second)
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client = &http.Client{Transport: tr}
 	if !log.Check(log.InfoLevel, "Trying local repo", err) {
 		Cdn.Kurjun = "https://" + Management.Host + ":" + Cdn.Sslport + "/rest/kurjun"
-		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-		client = &http.Client{Transport: tr}
 	} else {
 		Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
-		client = &http.Client{}
+		if !Cdn.Allowinsecure {
+			client = &http.Client{}
+		}
 	}
 	return
 }
