@@ -466,29 +466,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return sshPublicKeys;
         }
 
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
 
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getReadSSHCommand(), hosts );
 
         Set<Host> succeededHosts = Sets.newHashSet();
-
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
-        {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
-            {
-                sshPublicKeys.addSshPublicKey( result.getStdOut() );
-
-                succeededHosts.add( host );
-            }
-        }
-
-        hosts.removeAll( succeededHosts );
-
-        results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
-
-
         Set<Host> failedHosts = Sets.newHashSet( hosts );
 
         for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
@@ -518,12 +499,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
         return sshPublicKeys;
-    }
-
-
-    protected RequestBuilder getReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "cat %1$s/id_dsa.pub", Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
