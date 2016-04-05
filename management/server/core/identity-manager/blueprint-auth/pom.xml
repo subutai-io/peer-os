@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>blueprint-auth2</artifactId>
-  <name>Apache Aries Blueprint Authz-Custom</name>
+  <name>Apache Aries Blueprint Authz2</name>
 
   <packaging>bundle</packaging>
 
