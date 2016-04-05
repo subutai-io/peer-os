@@ -46,10 +46,13 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
@@ -74,7 +77,7 @@ import io.subutai.core.security.api.SecurityManager;
  * PeerManager implementation
  */
 @PermitAll
-public class PeerManagerImpl implements PeerManager
+public class PeerManagerImpl implements PeerManager, SettingsListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
@@ -119,7 +122,7 @@ public class PeerManagerImpl implements PeerManager
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
         localIpSetter = Executors.newSingleThreadScheduledExecutor();
-        localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 5, 5, TimeUnit.SECONDS );
+        localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 1, 1, TimeUnit.SECONDS );
     }
 
 
@@ -147,8 +150,8 @@ public class PeerManagerImpl implements PeerManager
 
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
-                Peer peer = createPeer( peerData );
-                addPeer( peer );
+                Peer peer = constructPeerPojo( peerData );
+                addPeerToRegistry( peer );
             }
         }
         catch ( Exception e )
@@ -230,11 +233,12 @@ public class PeerManagerImpl implements PeerManager
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ), order );
+
             updatePeerData( peerData );
 
-            Peer newPeer = createPeer( peerData );
+            Peer newPeer = constructPeerPojo( peerData );
 
-            addPeer( newPeer );
+            addPeerToRegistry( newPeer );
 
             templateManager.addRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
@@ -284,12 +288,10 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void addPeer( final Peer peer ) throws PeerException
+    protected void addPeerToRegistry( final Peer peer ) throws PeerException
     {
-        if ( peer == null )
-        {
-            throw new IllegalArgumentException( "Peer could not be null." );
-        }
+        Preconditions.checkNotNull( peer, "Peer could not be null." );
+
         this.peers.put( peer.getId(), peer );
     }
 
@@ -312,10 +314,8 @@ public class PeerManagerImpl implements PeerManager
 
     private void updatePeerData( final PeerData peerData ) throws PeerException
     {
-        if ( peerData == null )
-        {
-            throw new IllegalArgumentException( "Peer data could not be null." );
-        }
+        Preconditions.checkNotNull( peerData, "Peer data could not be null." );
+
         this.peerDataService.saveOrUpdate( peerData );
     }
 
@@ -333,15 +333,14 @@ public class PeerManagerImpl implements PeerManager
      *
      * @return peer instance
      */
-    private Peer createPeer( final PeerData peerData ) throws PeerException
+    private Peer constructPeerPojo( final PeerData peerData ) throws PeerException
     {
-        if ( peerData == null )
-        {
-            throw new IllegalArgumentException( "Peer info could not be null." );
-        }
+        Preconditions.checkNotNull( peerData, "Peer info could not be null." );
+
         try
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
+
             if ( localPeerId.equals( peerData.getId() ) )
             {
                 localPeer.setPeerInfo( peerInfo );
@@ -473,7 +472,7 @@ public class PeerManagerImpl implements PeerManager
         }
         catch ( PeerException e )
         {
-            throw new PeerException( String.format( "Registration request rejected. Provided URL %s not accessable.",
+            throw new PeerException( String.format( "Registration request rejected. Provided URL %s not accessible.",
                     registrationData.getPeerInfo().getPublicUrl() ) );
         }
 
@@ -487,11 +486,11 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processUnregisterRequest( final RegistrationData registrationData ) throws PeerException
     {
-        // Check peer consumers. This remote peer is used?
+        // Check peer consumers. This remote peer in use?
         if ( !notifyPeerActionListeners(
                 new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer in used." );
+            throw new PeerException( "Could not unregister peer. Peer in use." );
         }
         Peer p = getPeer( registrationData.getPeerInfo().getId() );
         if ( p == null )
@@ -580,14 +579,16 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void processApproveRequest( final RegistrationData registrationData ) throws PeerException
     {
-        RegistrationData initRequest = getRequest( registrationData.getPeerInfo().getId() );
+        final PeerInfo peerInfo = registrationData.getPeerInfo();
+
+        RegistrationData initRequest = getRequest( peerInfo.getId() );
         if ( initRequest == null )
         {
             throw new PeerException( "Registration request not found." );
         }
         register( initRequest.getKeyPhrase(), registrationData );
-        removeRequest( registrationData.getPeerInfo().getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( registrationData.getPeerInfo() );
+        removeRequest( peerInfo.getId() );
+        securityManager.getKeyManager().getRemoteHostPublicKey( peerInfo );
     }
 
 
@@ -653,9 +654,16 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Invalid URL." );
         }
 
-        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
+                .getPeerInfo().getPublicSecurePort() )
         {
             throw new PeerException( "Could not send registration request to ourselves." );
+        }
+
+        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
         }
 
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
@@ -689,8 +697,7 @@ public class PeerManagerImpl implements PeerManager
     {
         try
         {
-            URL url = new URL( destinationHost );
-            return url;
+            return new URL( destinationHost );
         }
         catch ( MalformedURLException e )
         {
@@ -724,6 +731,12 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void doApproveRequest( final String keyPhrase, final RegistrationData request ) throws PeerException
     {
+        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
+        }
+
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
         {
@@ -823,7 +836,7 @@ public class PeerManagerImpl implements PeerManager
 
 
     @Override
-    public String getPeerIdByIp( final String ip ) throws PeerException
+    public String getRemotePeerIdByIp( final String ip ) throws PeerException
     {
         Preconditions.checkNotNull( ip );
 
@@ -831,10 +844,13 @@ public class PeerManagerImpl implements PeerManager
 
         for ( Peer peer : this.peers.values() )
         {
-            PeerInfo peerInfo = peer.getPeerInfo();
-            if ( ip.equals( peerInfo.getIp() ) )
+            if ( peer instanceof RemotePeer )
             {
-                result = peerInfo.getId();
+                PeerInfo peerInfo = peer.getPeerInfo();
+                if ( ip.equals( peerInfo.getIp() ) )
+                {
+                    result = peerInfo.getId();
+                }
             }
         }
 
@@ -1059,11 +1075,11 @@ public class PeerManagerImpl implements PeerManager
         {
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
             peerInfo.setPublicUrl( publicUrl );
-            peerInfo.setPort( securePort );
+            peerInfo.setPublicSecurePort( securePort );
             peerData.setInfo( toJson( peerInfo ) );
             peerDataService.saveOrUpdate( peerData );
-            Peer peer = createPeer( peerData );
-            addPeer( peer );
+            Peer peer = constructPeerPojo( peerData );
+            addPeerToRegistry( peer );
             //update settings
             if ( getLocalPeer().getId().equalsIgnoreCase( peerId ) )
             {
@@ -1074,6 +1090,31 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             throw new PeerException( "Error setting public url ", e );
+        }
+    }
+
+
+    @Override
+    public void settingsChanged()
+    {
+        try
+        {
+            if ( localPeer.getPeerInfo().getPublicSecurePort() != SystemSettings.getPublicSecurePort() || !localPeer
+                    .getPeerInfo().getPublicUrl().equalsIgnoreCase( SystemSettings.getPublicUrl() ) )
+            {
+                //modify local peer info
+                localPeer.getPeerInfo().setPublicUrl( SystemSettings.getPublicUrl() );
+                localPeer.getPeerInfo().setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+
+                //update db
+                PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
+                peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
+                updatePeerData( peerData );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error updating local peer info", e );
         }
     }
 
@@ -1123,22 +1164,23 @@ public class PeerManagerImpl implements PeerManager
                         return;
                     }
 
+                    //modify local peer info
+                    localPeer.getPeerInfo().setPublicUrl( externalInterface.getIp() );
+                    localPeer.getPeerInfo()
+                             .setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
+
+                    //update db
                     PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-
-                    PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
-
-                    peerInfo.setPublicUrl( externalInterface.getIp() );
-
-                    peerInfo.setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
-
-                    peerData.setInfo( toJson( peerInfo ) );
-
+                    peerData.setInfo( toJson(  localPeer.getPeerInfo() ) );
                     updatePeerData( peerData );
 
-                    Peer newPeer = createPeer( peerData );
+                    //modify settings
+                    SystemSettings.setPublicUrl( localPeer.getPeerInfo().getPublicUrl() );
 
-                    addPeer( newPeer );
-
+                    localIpSetter.shutdown();
+                }
+                else
+                {
                     localIpSetter.shutdown();
                 }
             }

@@ -3,7 +3,6 @@ package io.subutai.core.environment.rest.ui.entity;
 
 import java.util.Set;
 
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerSize;
 
 
@@ -15,7 +14,6 @@ public class ContainerDto
     private String id;
     private String environmentId;
     private String hostname;
-    private ContainerHostState state;
     private String ip;
     private String templateName;
     private ContainerSize type;
@@ -24,17 +22,20 @@ public class ContainerDto
 
     private String peerId;
     private String hostId;
+    private boolean local;
+
+    // Where environment of container created: subutai, hub
+    private String dataSource;
 
 
     public ContainerDto( final String id, final String environmentId, final String hostname,
-                         final ContainerHostState state, final String ip, final String templateName,
+                         final String ip, final String templateName,
                          final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
-                         final String hostId )
+                         final String hostId, boolean local, String className )
     {
         this.id = id;
         this.environmentId = environmentId;
         this.hostname = hostname;
-        this.state = state;
         this.ip = ip;
         this.templateName = templateName;
         this.type = type;
@@ -42,6 +43,9 @@ public class ContainerDto
         this.tags = tags;
         this.peerId = peerId;
         this.hostId = hostId;
+        this.local = local;
+
+        dataSource = className.contains( "ProxyEnvironment" ) ? "hub" : "subutai";
     }
 
 
@@ -78,18 +82,6 @@ public class ContainerDto
     public void setHostname( final String hostname )
     {
         this.hostname = hostname;
-    }
-
-
-    public ContainerHostState getState()
-    {
-        return state;
-    }
-
-
-    public void setState( final ContainerHostState state )
-    {
-        this.state = state;
     }
 
 
@@ -174,5 +166,23 @@ public class ContainerDto
     public void setHostId( String hostId )
     {
         this.hostId = hostId;
+    }
+
+
+    public boolean isLocal()
+    {
+        return local;
+    }
+
+
+    public void setLocal( boolean local )
+    {
+        this.local = local;
+    }
+
+
+    public String getDataSource()
+    {
+        return dataSource;
     }
 }

@@ -2,11 +2,10 @@
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
-            http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
+           xsi:schemaLocation="http://www.w3.org/201/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             0">
 
-  <cm:property-placeholder persistent-id="subutaisystem" update-strategy="reload" />
+  <!--<cm:property-placeholder persistent-id="subutaisystem" update-strategy="reload" />-->
 
   <reference id="templateManager" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
@@ -14,22 +13,32 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="integration"
+             interface="io.subutai.core.hubmanager.api.Integration" />
 
   <bean id="systemManagerImpl" scope="singleton"
-        class="io.subutai.core.systemmanager.impl.SystemManagerImpl">
+        class="io.subutai.core.systemmanager.impl.SystemManagerImpl" destroy-method="dispose">
     <property name="templateManager" ref="templateManager" />
     <property name="identityManager" ref="identityManager" />
     <property name="peerManager" ref="peerManager" />
 
-    <argument value="${globalKurjunUrls}" />
-    <argument value="${securePortX1}" />
-    <argument value="${securePortX2}" />
-    <argument value="${securePortX3}" />
-    <argument value="${publicURL}" />
+    <argument ref="integration" />
+    <!--<argument value="${globalKurjunUrls}" />-->
+    <!--<argument value="${securePortX1}" />-->
+    <!--<argument value="${securePortX2}" />-->
+    <!--<argument value="${securePortX3}" />-->
+    <!--<argument value="${publicURL}" />-->
 
   </bean>
 
   <service ref="systemManagerImpl"
            interface="io.subutai.core.systemmanager.api.SystemManager" />
+
+  <reference-list id="listener"
+                  interface="io.subutai.common.settings.SettingsListener"
+                  availability="optional">
+    <reference-listener ref="systemManagerImpl"
+                        bind-method="addListener" unbind-method="removeListener" />
+  </reference-list>
 
 </blueprint>

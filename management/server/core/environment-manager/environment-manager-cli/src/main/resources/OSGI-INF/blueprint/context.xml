@@ -56,22 +56,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/add-alert-handler">
-      <action class="io.subutai.core.environment.cli.MonitoringStartCommand">
-        <argument ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="environment/remove-alert-handler">
-      <action class="io.subutai.core.environment.cli.MonitoringStopCommand">
-        <argument ref="environmentManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/alert-handlers">
       <action class="io.subutai.core.environment.cli.MonitoringListCommand">
         <argument ref="environmentManager" />
@@ -90,6 +74,13 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/get-quota">
       <action class="io.subutai.core.environment.cli.GetContainerQuotaCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/add-domain">
+      <action class="io.subutai.core.environment.cli.AddDomainToEnvironmentCommand">
         <argument ref="environmentManager" />
       </action>
     </command>

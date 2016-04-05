@@ -30,7 +30,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -41,9 +40,8 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.environment.EnvironmentBuilder;
-import io.subutai.core.hubmanager.impl.environment.EnvironmentDestroyer;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
@@ -56,6 +54,7 @@ import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PeerDto;
+import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -64,12 +63,16 @@ public class IntegrationImpl implements Integration
 {
     private static final long TIME_15_MINUTES = 900;
 
-    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class );
 
     private SecurityManager securityManager;
+
     private EnvironmentManager environmentManager;
+
     private PeerManager peerManager;
+
     private ConfigManager configManager;
+
     private CommandExecutor commandExecutor;
 
     private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -82,26 +85,32 @@ public class IntegrationImpl implements Integration
 
     private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
-
     private HeartbeatProcessor heartbeatProcessor;
+
     private ResourceHostConfProcessor resourceHostConfProcessor;
+
     private SystemConfProcessor systemConfProcessor;
+
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
+
     private HubLoggerProcessor hubLoggerProcessor;
 
     private DaoManager daoManager;
+
     private ConfigDataService configDataService;
+
     private Monitor monitor;
+
     private IdentityManager identityManager;
+
     private HubEnvironmentManager hubEnvironmentManager;
+
     private NetworkManager networkManager;
 
     private ContainerEventProcessor containerEventProcessor;
 
-    private EnvironmentBuilder envBuilder;
-
-    private EnvironmentDestroyer envDestroyer;
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+
     private String checksum = "";
 
 
@@ -134,13 +143,16 @@ public class IntegrationImpl implements Integration
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
+            EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
+                    environmentManager );
+
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor );
+                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor, environmentUserHelper );
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
-            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 120, TimeUnit.SECONDS );
+            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
             resourceHostConfExecutorService
                     .scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
@@ -155,10 +167,6 @@ public class IntegrationImpl implements Integration
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
-
-            //            envBuilder = new EnvironmentBuilder( peerManager.getLocalPeer() );
-            //
-            //            envDestroyer = new EnvironmentDestroyer( peerManager.getLocalPeer() );
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
                 @Override
@@ -188,14 +196,8 @@ public class IntegrationImpl implements Integration
     public void sendHeartbeat() throws HubPluginException
     {
         heartbeatProcessor.sendHeartbeat();
-
         resourceHostConfProcessor.sendResourceHostConf();
-
         containerEventProcessor.process();
-
-        //        envBuilder.test();
-
-        //        envDestroyer.test();
     }
 
 
@@ -209,9 +211,6 @@ public class IntegrationImpl implements Integration
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
     {
-
-        // todo revert
-
         configManager.addHubConfig( hupIp );
 
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
@@ -241,11 +240,11 @@ public class IntegrationImpl implements Integration
     @Override
     public String getProducts() throws HubPluginException
     {
-        ProductsDto result;
         try
         {
-            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client = configManager.getTrustedWebClientWithAuth( "/rest/v1.1/marketplace/products", hubIp );
+            //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+            WebClient client =
+                    configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -261,17 +260,11 @@ public class IntegrationImpl implements Integration
                 return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( r );
-            ObjectMapper mapper = createMapper( new CBORFactory() );
-
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            result = mapper.readValue( plainContent, ProductsDto.class );
-            String output = JsonUtil.toJson( result );
-            LOG.debug( "ProductsDataDTO: " + result.toString() );
-            return output;
+            String result = r.readEntity( String.class );
+            ProductsDto productsDto = new ProductsDto( result );
+            return JsonUtil.toJson( productsDto );
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException e )
         {
             e.printStackTrace();
             throw new HubPluginException( "Could not retrieve product data", e );
@@ -483,39 +476,39 @@ public class IntegrationImpl implements Integration
 
     private void generateChecksum()
     {
-        if ( getRegistrationState() )
+/*		if (getRegistrationState ())
+        {*/
+        try
         {
-            try
-            {
-                LOG.info( "Generating plugins list md5 checksum" );
-                String productList = getProducts();
-                MessageDigest md = MessageDigest.getInstance( "MD5" );
-                byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
-                StringBuilder hexString = new StringBuilder();
+            LOG.info( "Generating plugins list md5 checksum" );
+            String productList = getProducts();
+            MessageDigest md = MessageDigest.getInstance( "MD5" );
+            byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
+            StringBuilder hexString = new StringBuilder();
 
-                for ( int i = 0; i < bytes.length; i++ )
+            for ( int i = 0; i < bytes.length; i++ )
+            {
+                String hex = Integer.toHexString( 0xFF & bytes[i] );
+                if ( hex.length() == 1 )
                 {
-                    String hex = Integer.toHexString( 0xFF & bytes[i] );
-                    if ( hex.length() == 1 )
-                    {
-                        hexString.append( '0' );
-                    }
-                    hexString.append( hex );
+                    hexString.append( '0' );
                 }
+                hexString.append( hex );
+            }
 
-                checksum = hexString.toString();
-                LOG.info( "Checksum generated: " + checksum );
-            }
-            catch ( NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e )
-            {
-                LOG.error( e.getMessage() );
-                e.printStackTrace();
-            }
+            checksum = hexString.toString();
+            LOG.info( "Checksum generated: " + checksum );
         }
-        else
+        catch ( NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e )
         {
-            LOG.info( "Peer not registered. Trying again in 1 hour." );
+            LOG.error( e.getMessage() );
+            e.printStackTrace();
         }
+/*		}
+		else
+		{
+			LOG.info ("Peer not registered. Trying again in 1 hour.");
+		}*/
     }
 
 
@@ -523,5 +516,45 @@ public class IntegrationImpl implements Integration
     public String getChecksum()
     {
         return this.checksum;
+    }
+
+
+    @Override
+    public void sendSystemConfiguration( final SystemConfDto dto )
+    {
+        if ( getRegistrationState() )
+        {
+            try
+            {
+                String path = "/rest/v1/system-changes";
+                WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+                byte[] cborData = JsonUtil.toCbor( dto );
+
+                byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+                LOG.info( "Sending Configuration of SS to Hub..." );
+
+                Response r = client.post( encryptedData );
+
+
+                if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                {
+                    LOG.info( "SS configuration sent successfully." );
+                }
+                else
+                {
+                    LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
+//                    throw new HubPluginException(
+//                            "Could not send SS configuration to Hub: " + r.readEntity( String.class ) );
+                }
+            }
+            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
+                    NoSuchAlgorithmException e )
+            {
+                LOG.error( "Could not send SS configuration to Hub", e );
+//                throw new HubPluginException( e.toString(), e );
+            }
+        }
     }
 }

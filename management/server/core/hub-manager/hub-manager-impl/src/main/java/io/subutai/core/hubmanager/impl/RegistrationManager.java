@@ -42,7 +42,7 @@ import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 public class RegistrationManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class );
 
     private ConfigManager configManager;
     private IntegrationImpl manager;
@@ -135,7 +135,7 @@ public class RegistrationManager
 
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
-            LOG.debug( "Registering Peer. Sending RegistrationDTO to Hub..." );
+            LOG.info( "Registering Peer. Sending RegistrationDTO to Hub..." );
 
             Response r = client.post( encryptedData );
 
@@ -148,12 +148,12 @@ public class RegistrationManager
                 config.setOwnerId( manager.getPeerInfo().get( "OwnerId" ) );
 
                 manager.getConfigDataService().saveHubConfig( config );
-                LOG.debug( "Hub configuration saved successfully." );
-                LOG.debug( "Peer registered successfully." );
+                LOG.info( "Hub configuration saved successfully." );
+                LOG.info( "Peer registered successfully." );
             }
             else
             {
-                LOG.debug( "Could not register Peer: ", r.readEntity( String.class ) );
+                LOG.error( "Could not register Peer: ", r.readEntity( String.class ) );
                 throw new HubPluginException( "Could not register Peer: " + r.readEntity( String.class ) );
             }
         }

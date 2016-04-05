@@ -1,13 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package io.subutai.core.tracker.impl;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -129,9 +123,9 @@ public class TrackerOperationImpl implements TrackerOperation
             {
                 log.append( "\n" );
             }
-            log.append( String.format( "%s: %s",
-                    new SimpleDateFormat( "dd.MM.yyyy HH:mm:ss" ).format( Calendar.getInstance().getTime() ),
-                    logString ) );
+            log.append( String.format( "{\"date\" : %s, \"log\" : \"%s\", \"state\" : \"%s\"},",
+                    new Timestamp(System.currentTimeMillis()).getTime(),
+                    logString, state ) );
         }
         this.state = state;
         tracker.saveTrackerOperation( source, this );

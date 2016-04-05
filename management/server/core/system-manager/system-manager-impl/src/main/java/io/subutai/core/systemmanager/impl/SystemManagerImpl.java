@@ -6,6 +6,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -17,8 +22,10 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -35,37 +42,95 @@ import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
+import io.subutai.hub.share.dto.SystemConfDto;
+import io.subutai.hub.share.dto.SystemConfigurationType;
 
 
 public class SystemManagerImpl implements SystemManager
 {
-    private static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
+    private static final String DEFAULT_KURJUN_REPO = "https://peer.noip.me:8338/kurjun/rest";
 
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
+    private Integration integration;
+
+    protected Set<SettingsListener> listeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
+
+    protected ExecutorService notifierPool = Executors.newCachedThreadPool();
 
 
-    public SystemManagerImpl( final String globalKurjunUrls, final int securePortX1, final int securePortX2,
-                              final int securePortX3, final String publicUrl ) throws ConfigurationException
+    public void addListener( SettingsListener listener )
+    {
+
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( SettingsListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+
+    public void dispose()
+    {
+        notifierPool.shutdown();
+        listeners.clear();
+    }
+
+
+    protected void notifyListeners()
+    {
+        for ( final SettingsListener listener : listeners )
+        {
+            notifierPool.execute( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        listener.settingsChanged();
+                    }
+                    catch ( Exception ignore )
+                    {
+                    }
+                }
+            } );
+        }
+    }
+
+
+    public SystemManagerImpl( final Integration integration/*, final String globalKurjunUrls, final int securePortX1, final int securePortX2,
+                              final int securePortX3, final String publicUrl*/ )
 
     {
-        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
+//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
 
-        String[] urls = new String[] { globalKurjunUrls };
+//        String[] urls = new String[] { globalKurjunUrls };
+//
+//        if ( urls.length < 1 )
+//        {
+//            urls = new String[] { DEFAULT_KURJUN_REPO };
+//        }
+//        validateGlobalKurjunUrls( urls );
+//        validatePublicUrl( publicUrl );
+//
+//        SystemSettings.setGlobalKurjunUrls( urls );
+//        SystemSettings.setSecurePortX1( securePortX1 );
+//        SystemSettings.setSecurePortX2( securePortX2 );
+//        SystemSettings.setSecurePortX3( securePortX3 );
+//        SystemSettings.setPublicUrl( publicUrl );
 
-        if ( urls.length < 1 )
-        {
-            urls = new String[] { DEFAULT_KURJUN_REPO };
-        }
-        validateGlobalKurjunUrls( urls );
-        validatePublicUrl( publicUrl );
-
-        SystemSettings.setGlobalKurjunUrls( urls );
-        SystemSettings.setSecurePortX1( securePortX1 );
-        SystemSettings.setSecurePortX2( securePortX2 );
-        SystemSettings.setSecurePortX3( securePortX3 );
-        SystemSettings.setPublicUrl( publicUrl );
+        this.integration = integration;
     }
 
 
@@ -161,13 +226,17 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     public void setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                    final String publicUrl, final String agentPort ) throws ConfigurationException
+                                    final String publicUrl, final String agentPort, final String publicSecurePort )
+            throws ConfigurationException
     {
         SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
         SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
         SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
         SystemSettings.setPublicUrl( publicUrl );
         SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
+        SystemSettings.setPublicSecurePort( Integer.parseInt( publicSecurePort ) );
+
+        notifyListeners();
     }
 
 
@@ -193,7 +262,8 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setKurjunSettingsUrls( final String[] globalKurjunUrls, final String[] localKurjunUrls ) throws ConfigurationException
+    public void setKurjunSettingsUrls( final String[] globalKurjunUrls, final String[] localKurjunUrls )
+            throws ConfigurationException
     {
         SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
         SystemSettings.setLocalKurjunUrls( localKurjunUrls );
@@ -221,6 +291,28 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
+    public void sendSystemConfigToHub() throws ConfigurationException
+    {
+        SystemConfDto dto = new SystemConfDto( SystemConfigurationType.SUBUTAI_SOCIAL );
+
+        KurjunSettings kurjunSettings = getKurjunSettings();
+        NetworkSettings networkSettings = getNetworkSettings();
+
+        dto.setGlobalKurjunUrls( kurjunSettings.getGlobalKurjunUrls() );
+        dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
+        dto.setSecurePortX1( networkSettings.getSecurePortX1() );
+        dto.setSecurePortX2( networkSettings.getSecurePortX2() );
+        dto.setSecurePortX3( networkSettings.getSecurePortX3() );
+        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
+        dto.setPublicUrl( networkSettings.getPublicUrl() );
+        dto.setAgentPort( networkSettings.getAgentPort() );
+
+
+        integration.sendSystemConfiguration( dto );
+    }
+
+
+    @Override
     public NetworkSettings getNetworkSettings() throws ConfigurationException
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
@@ -230,6 +322,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setSecurePortX3( SystemSettings.getSecurePortX3() );
         pojo.setPublicUrl( SystemSettings.getPublicUrl() );
         pojo.setAgentPort( SystemSettings.getAgentPort() );
+        pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
 
         return pojo;
     }

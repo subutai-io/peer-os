@@ -1,7 +1,10 @@
 <div class="b-workspace-content__row">
-        <button class="b-btn b-btn_green b-btn_search-field-level" ng-click="kurjunCtrl.addTemplate()">
-            <i class="fa fa-plus"></i> Add Template
-        </button>
+
+	<button class="b-btn b-btn_green b-btn_search-field-level" ng-click="kurjunCtrl.addTemplate()">
+		<i class="fa fa-plus"></i> Add Template
+	</button>
+	<button class = "b-btn b-btn_blue b-btn_search-field-level" ng-click="kurjunCtrl.getTemplates()">Refresh</button>
+
     <div class="b-data-table">
         <table datatable="ng"
                dt-options="kurjunCtrl.dtOptions"
@@ -9,22 +12,25 @@
                class="b-main-table b-main-table_with-header">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Context</th>
-                <th>Architecture</th>
-                <th>Parent</th>
-                <th>Version</th>
-                <th></th>
+				<th>Name</th>
+				<th>Repository</th>
+				<th>Architecture</th>
+				<th>Parent</th>
+				<th>Version</th>
+				<th>Size</th>
+				<th></th>
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="template in kurjunCtrl.templates">
+            <tr ng-repeat="template in kurjunCtrl.templates track by $index">
                 <td>{{ template.name }}</td>
                 <td>{{ template.repository }}</td>
                 <td>{{ template.architecture }}</td>
                 <td>{{ template.parent }}</td>
                 <td>{{ template.version }}</td>
+				<td>{{ template.size }}</td>
                 <td>
+
                     <a href
                        class="b-icon b-icon_share"
                        tooltips

@@ -31,9 +31,17 @@
       </action>
     </command>
   </command-bundle>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="localpeer/list-gw">
-      <action class="io.subutai.core.localpeer.cli.ListGatewaysCommand">
+    <command name="localpeer/reserve-net-resource">
+      <action class="io.subutai.core.localpeer.cli.ReserveNetworkResourceCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/list-net-resources">
+      <action class="io.subutai.core.localpeer.cli.ListNetworkResourceCommand">
         <argument ref="localPeer" />
       </action>
     </command>

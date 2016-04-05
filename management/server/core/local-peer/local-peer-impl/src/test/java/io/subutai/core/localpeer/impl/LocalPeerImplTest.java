@@ -34,8 +34,6 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.network.Gateways;
-import io.subutai.common.peer.ContainerGateway;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -49,7 +47,6 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ByteValueResource;
@@ -68,7 +65,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
-import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -138,7 +134,7 @@ public class LocalPeerImplTest
     @Mock
     TemplateManager templateRegistry;
     @Mock
-    Host managementHost;
+    ResourceHost managementHost;
     @Mock
     CommandExecutor commandExecutor;
     @Mock
@@ -201,8 +197,6 @@ public class LocalPeerImplTest
 
     @Mock
     EntityManagerFactoryImpl entityManagerFactory;
-    @Mock
-    private ContainerGateway containerGateway;
 
     @Mock
     private ByteValueResource cpuQuota;
@@ -244,17 +238,16 @@ public class LocalPeerImplTest
 
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
-        localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager,/* strategyManager,*/
-                commandExecutor, hostRegistry, monitor, securityManager ) );
+        localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, commandExecutor, hostRegistry,
+                monitor, securityManager ) );
 
+        localPeer.peerInfo = peerInfo;
         localPeer.resourceHostDataService = resourceHostDataService;
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
         localPeer.commandUtil = commandUtil;
         localPeer.exceptionUtil = exceptionUtil;
         localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
-        localPeer.setPeerInfo( peerInfo );
-        when( containerGateway.getContainerId() ).thenReturn( containerId );
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
         when( managementHost.getId() ).thenReturn( MANAGEMENT_HOST_ID );
@@ -569,27 +562,27 @@ public class LocalPeerImplTest
 
         verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder );
 
-//        when( containerHost.isConnected() ).thenReturn( false );
-//
-//        try
-//        {
-//            localPeer.execute( requestBuilder, containerHost );
-//            fail( "Expected CommandException" );
-//        }
-//        catch ( CommandException e )
-//        {
-//        }
+        //        when( containerHost.isConnected() ).thenReturn( false );
+        //
+        //        try
+        //        {
+        //            localPeer.execute( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
 
-//        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-//
-//        try
-//        {
-//            localPeer.execute( requestBuilder, containerHost );
-//            fail( "Expected CommandException" );
-//        }
-//        catch ( CommandException e )
-//        {
-//        }
+        //        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
+        //
+        //        try
+        //        {
+        //            localPeer.execute( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
     }
 
 
@@ -604,27 +597,27 @@ public class LocalPeerImplTest
 
         verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder );
 
-//        when( containerHost.isConnected() ).thenReturn( false );
-//
-//        try
-//        {
-//            localPeer.executeAsync( requestBuilder, containerHost );
-//            fail( "Expected CommandException" );
-//        }
-//        catch ( CommandException e )
-//        {
-//        }
+        //        when( containerHost.isConnected() ).thenReturn( false );
+        //
+        //        try
+        //        {
+        //            localPeer.executeAsync( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
 
-//        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-//
-//        try
-//        {
-//            localPeer.executeAsync( requestBuilder, containerHost );
-//            fail( "Expected CommandException" );
-//        }
-//        catch ( CommandException e )
-//        {
-//        }
+        //        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
+        //
+        //        try
+        //        {
+        //            localPeer.executeAsync( requestBuilder, containerHost );
+        //            fail( "Expected CommandException" );
+        //        }
+        //        catch ( CommandException e )
+        //        {
+        //        }
     }
 
 
@@ -768,37 +761,5 @@ public class LocalPeerImplTest
         doThrow( new QuotaException() ).when( quotaManager ).setCpuSet( eq( containerId ), anySet() );
 
         localPeer.setCpuSet( containerHost, Sets.newHashSet( QUOTA ) );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testListTunnels() throws Exception
-    {
-        localPeer.listTunnels();
-
-        verify( networkManager ).listTunnels();
-
-        doThrow( new NetworkManagerException( "" ) ).when( networkManager ).listTunnels();
-
-        localPeer.listTunnels();
-    }
-
-
-    @Test
-    public void testRemoveTunnel() throws Exception
-    {
-        Tunnel tunnel = mock( Tunnel.class );
-        when( networkManager.listTunnels() ).thenReturn( Sets.newHashSet( tunnel ) );
-        when( tunnel.getTunnelIp() ).thenReturn( IP );
-    }
-
-
-    @Test
-    @Ignore
-    public void testGetGateways() throws Exception
-    {
-        Gateways gateways = localPeer.getGateways();
-
-        assertEquals( 1, gateways.list().size() );
     }
 }

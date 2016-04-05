@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -23,19 +22,9 @@ type update struct {
 	timestamp int
 }
 
-func getBody(url string) (response *http.Response) {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-	response, err := client.Get(url)
-	log.Check(log.FatalLevel, "Getting response from "+url, err)
-	return
-}
-
-func getList() (list []map[string]interface{}) {
-	//replace peer.noip.me with cdn after kurjun update
-	resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/list")
+func getList(kurjun *http.Client) (list []map[string]interface{}) {
+	resp, err := kurjun.Get(config.Management.Kurjun + "/file/list")
+	log.Check(log.FatalLevel, "GET: "+config.Management.Kurjun+"/file/list", err)
 	defer resp.Body.Close()
 	jsonlist, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
@@ -46,11 +35,12 @@ func getList() (list []map[string]interface{}) {
 func Update(name string, check bool) {
 	switch name {
 	case "rh":
-		for !lockSubutai("rh.update") {
+		if !lockSubutai("rh.update") {
 			log.Error("Another update process is already running")
 		}
 		defer unlockSubutai()
 
+		kurjun := config.CheckKurjun()
 		var lcl int
 		var rmt update
 		var date int64
@@ -68,7 +58,7 @@ func Update(name string, check bool) {
 			}
 		}
 
-		for _, v := range getList() {
+		for _, v := range getList(kurjun) {
 			item := v["name"].(string)
 			if strings.HasPrefix(item, "subutai") && strings.HasSuffix(item, ".snap") {
 				if version := strings.Split(strings.Trim(item, "subutai_ _amd64.snap"), "-"); len(version) > 1 {
@@ -85,7 +75,7 @@ func Update(name string, check bool) {
 			}
 		}
 
-		if lcl > rmt.timestamp {
+		if lcl >= rmt.timestamp {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
@@ -97,8 +87,8 @@ func Update(name string, check bool) {
 		file, err := os.Create("/tmp/" + rmt.name)
 		log.Check(log.FatalLevel, "Creating update file", err)
 		defer file.Close()
-		//replace peer.noip.me with cdn after kurjun update
-		resp := getBody("https://peer.noip.me:8339/kurjun/rest/file/get?id=" + rmt.id)
+		resp, err := kurjun.Get(config.Management.Kurjun + "/file/get?id=" + rmt.id)
+		log.Check(log.FatalLevel, "GET: "+config.Management.Kurjun+"/file/get?id="+rmt.id, err)
 		defer resp.Body.Close()
 		_, err = io.Copy(file, resp.Body)
 		log.Check(log.FatalLevel, "Writing response to file", err)

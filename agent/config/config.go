@@ -1,8 +1,10 @@
 package config
 
 import (
+	"crypto/tls"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 	"time"
 
@@ -10,6 +12,8 @@ import (
 
 	"gopkg.in/gcfg.v1"
 )
+
+var client *http.Client
 
 type agentConfig struct {
 	Debug       bool
@@ -33,17 +37,7 @@ type managementConfig struct {
 	RestVerify    string
 	RestPublicKey string
 }
-type brokerConfig struct {
-	Url               string
-	Port              string
-	Password          string
-	ResponseTopic     string
-	ExecuteTimeout    string
-	BroadcastTopic    string
-	HeartbeatTopic    string
-	ExecuteResponce   string
-	ExecuteTerminated string
-}
+
 type influxdbConfig struct {
 	Server string
 	Db     string
@@ -57,7 +51,6 @@ type templateConfig struct {
 type configFile struct {
 	Agent      agentConfig
 	Management managementConfig
-	Broker     brokerConfig
 	Template   templateConfig
 	Influxdb   influxdbConfig
 }
@@ -82,18 +75,7 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    cdn = kurjun.cdn.subutai.io
-
-	[broker]
-	port = 8883
-	password = client
-	url = ssl://10.10.10.1
-	responseTopic = RESPONSE_TOPIC
-	executeTimeout = EXECUTE_TIMEOUT
-	BroadcastTopic = BROADCAST_TOPIC
-	heartbeatTopic = HEARTBEAT_TOPIC
-	executeResponce = EXECUTE_RESPONSE
-	executeTerminated = EXECUTE_TERMINATED
+    cdn = cdn.subut.ai
 
 	[influxdb]
 	server = 10.10.10.1
@@ -112,8 +94,6 @@ var (
 	Agent agentConfig
 	// Management describes configuration options that used for accessing Subutai Management server
 	Management managementConfig
-	// Broker describes configuration options that used for interaction with MQTT broker
-	Broker brokerConfig
 	// Influxdb describes configuration options for InluxDB server
 	Influxdb influxdbConfig
 	// Template describes template configuration options
@@ -141,7 +121,6 @@ func init() {
 	config.Agent.GpgUser = name + "@subutai.io"
 
 	Agent = config.Agent
-	Broker = config.Broker
 	Influxdb = config.Influxdb
 	Template = config.Template
 	Management = config.Management
@@ -153,11 +132,15 @@ func InitAgentDebug() {
 	}
 }
 
-func CheckKurjun() {
-	_, err := net.DialTimeout("tcp", Management.Host+":8551", time.Duration(3)*time.Second)
-	if !log.Check(log.InfoLevel, "Connecting to local Kurjun", err) {
-		Management.Kurjun = "http://" + Management.Host + ":8551/rest/kurjun/templates"
+func CheckKurjun() (client *http.Client) {
+	_, err := net.DialTimeout("tcp", Management.Host+":8338", time.Duration(3)*time.Second)
+	if !log.Check(log.InfoLevel, "Trying local Kurjun", err) {
+		Management.Kurjun = "https://" + Management.Host + ":8338/rest/kurjun"
+		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+		client = &http.Client{Transport: tr}
 	} else {
-		Management.Kurjun = "http://" + Management.Cdn + ":8081/rest/kurjun/templates"
+		Management.Kurjun = "https://" + Management.Cdn + ":8338/kurjun/rest"
+		client = &http.Client{}
 	}
+	return
 }

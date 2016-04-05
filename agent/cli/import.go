@@ -2,7 +2,6 @@ package lib
 
 import (
 	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cheggaaa/pb"
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
 
@@ -26,16 +26,13 @@ var (
 	lock lockfile.Lockfile
 )
 
-func templId(templ, arch, version, token string) string {
-	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	// client := &http.Client{Transport: tr}
-	client := &http.Client{}
-	url := config.Management.Kurjun + "/public/get?name=" + templ + "&version=" + version + "&type=id&sptoken=" + token
+func templId(templ, arch, version string, kurjun *http.Client) string {
+	url := config.Management.Kurjun + "/template/info?name=" + templ + "&version=" + version + "&type=text"
 	if version == "stable" || len(version) == 0 {
-		url = config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token
+		url = config.Management.Kurjun + "/template/info?name=" + templ + "&type=text"
 	}
-	response, err := client.Get(url)
-	log.Debug(config.Management.Kurjun + "/public/get?name=" + templ + "&type=id&sptoken=" + token)
+	response, err := kurjun.Get(url)
+	log.Debug(config.Management.Kurjun + "/template/info?name=" + templ + "&type=text")
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return ""
 	}
@@ -50,20 +47,28 @@ func templId(templ, arch, version, token string) string {
 	return string(hash)
 }
 
-func md5sum(file string) string {
-	var hashChannel = make(chan []byte, 1)
-	a, err := ioutil.ReadFile(file)
-	log.Check(log.FatalLevel, "Reading file "+file, err)
-	s := md5.Sum(a)
-	hashChannel <- s[:]
-	return hex.EncodeToString(<-hashChannel)
+func md5sum(filePath string) string {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func checkLocal(templ, md5, arch string) string {
+func checkLocal(templ, md5, arch, version string) string {
 	var response string
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
-		file := strings.Split(f.Name(), "-subutai-template_")
+		file := strings.Split(f.Name(), "-subutai-template_"+version)
+		if version == "stable" || len(version) == 0 {
+			file = strings.Split(f.Name(), "-subutai-template_")
+		}
 		if len(file) == 2 && file[0] == templ && strings.Contains(file[1], arch) {
 			if len(md5) == 0 {
 				fmt.Print("Cannot check md5 of local template. Trust anyway? (y/n)")
@@ -81,17 +86,19 @@ func checkLocal(templ, md5, arch string) string {
 	return ""
 }
 
-func download(file, id, token string) string {
+func download(file, id string, kurjun *http.Client) string {
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + file)
 	log.Check(log.FatalLevel, "Creating file "+file, err)
 	defer out.Close()
-	// tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	// client := &http.Client{Transport: tr}
-	client := &http.Client{}
-	response, err := client.Get(config.Management.Kurjun + "/public/get?id=" + id + "&sptoken=" + token)
-	log.Check(log.FatalLevel, "Getting "+config.Management.Kurjun+"/public/get?id="+id+"&sptoken="+token, err)
+	response, err := kurjun.Get(config.Management.Kurjun + "/template/get?id=" + id)
+	log.Check(log.FatalLevel, "Getting "+config.Management.Kurjun+"/template/get?id="+id, err)
 	defer response.Body.Close()
-	_, err = io.Copy(out, response.Body)
+
+	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
+	bar.Start()
+	rd := bar.NewProxyReader(response.Body)
+
+	_, err = io.Copy(out, rd)
 	log.Check(log.FatalLevel, "Writing file "+file, err)
 	if strings.Split(id, ".")[1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+file) {
 		return config.Agent.LxcPrefix + "tmpdir/" + file
@@ -134,24 +141,24 @@ func LxcImport(templ, version, token string) {
 		return
 	}
 
-	config.CheckKurjun()
 	fullname := templ + "-subutai-template_" + config.Template.Version + "_" + config.Template.Arch + ".tar.gz"
 	// if len(token) == 0 {
-	token = gpg.GetToken()
+	// token = gpg.GetToken()
 	// }
 	if len(version) == 0 && templ == "management" {
 		version = config.Management.Version
 	}
-	id := templId(templ, runtime.GOARCH, version, token)
+	kurjun := config.CheckKurjun()
+	id := templId(templ, runtime.GOARCH, version, kurjun)
 	md5 := ""
 	if len(strings.Split(id, ".")) > 1 {
 		md5 = strings.Split(id, ".")[1]
 	}
 
-	archive := checkLocal(templ, md5, runtime.GOARCH)
+	archive := checkLocal(templ, md5, runtime.GOARCH, version)
 	if len(archive) == 0 && len(md5) != 0 {
 		log.Info("Downloading " + templ)
-		archive = download(fullname, id, token)
+		archive = download(fullname, id, kurjun)
 	} else if len(archive) == 0 && len(md5) == 0 {
 		log.Error(templ + " " + version + " template not found")
 	}
@@ -172,9 +179,11 @@ func LxcImport(templ, version, token string) {
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-home", config.Agent.LxcPrefix+templ+"/home")
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-var", config.Agent.LxcPrefix+templ+"/var")
 	os.Rename(config.Agent.LxcPrefix+templ+"/"+templ+"-opt", config.Agent.LxcPrefix+templ+"/opt")
+	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 
 	if templ == "management" {
 		template.MngInit()
+		return
 	}
 
 	container.SetContainerConf(templ, [][]string{
@@ -189,5 +198,4 @@ func LxcImport(templ, version, token string) {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/opt opt none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + templ + "/var var none bind,rw 0 0"},
 	})
-	log.Check(log.FatalLevel, "Removing temp dir "+templdir, os.RemoveAll(templdir))
 }

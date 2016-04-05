@@ -1,27 +1,28 @@
 package io.subutai.core.environment.impl.adapter;
 
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.host.ContainerHostInfoModel;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.json.JsonUtil;
 
 
 public class EnvironmentAdapter
@@ -32,132 +33,180 @@ public class EnvironmentAdapter
 
     private final ProxyContainerHelper proxyContainerHelper;
 
+    private final PeerManager peerManager;
 
-    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager )
+    private final HubAdapter hubAdapter;
+
+
+    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager, HubAdapter hubAdapter )
     {
         this.environmentManager = environmentManager;
 
         proxyContainerHelper = new ProxyContainerHelper( peerManager );
+
+        this.peerManager = peerManager;
+
+        this.hubAdapter = hubAdapter;
     }
 
 
-    //
-    // Env
-    //
-
-    static String envId = "90e7ad5d-1497-45ab-a301-8d1cbad7944d";
-
-    static String peerId = "0D091F8269B5B608F2E065601DD655B5A7C3DA37";
-
-    static String subnetCidr = "192.168.3.1/24";
-
-    static long vni = 674804;
-
-    static String p2pSubnet = "10.11.2.0";
-
-    static String peerP2p = "10.11.2.1";
-
-    //
-    // Containers
-    //
-
-    static String rhId = "5B7E40F52DD51F07FB098BABFCD5D347679AD897";
-
-    static String templateName = "elasticsearch";
-
-
-    private ProxyEnvironmentContainer getContainer( String ip, String id, String lxcName )
+    public ProxyEnvironment get( String id )
     {
-        HostInterfaceModel him = new HostInterfaceModel( "eth0", ip );
+        for ( ProxyEnvironment e : getEnvironments() )
+        {
+            if ( e.getId().equals( id ) )
+            {
+                return e;
+            }
+        }
 
-        Set<HostInterfaceModel> set = Sets.newHashSet();
-        set.add( him );
-
-        HostInterfaces hi = new HostInterfaces( id, set );
-
-        ProxyEnvironmentContainer ec = new ProxyEnvironmentContainer(
-                peerId,
-                peerId,
-                lxcName,
-
-                new ContainerHostInfoModel(
-                        id,
-                        lxcName, hi,
-                        HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING
-                ),
-
-                templateName,
-                HostArchitecture.AMD64, 0, 0,
-                "intra.lan", ContainerSize.SMALL,
-                rhId,
-                "Container 2"
-        );
-
-        ec.setEnvironmentManager( environmentManager );
-
-        return ec;
+        return null;
     }
 
 
-    private Set<ProxyEnvironmentContainer> getContainers()
+    public Set<ProxyEnvironment> getEnvironments()
     {
-        HashSet<ProxyEnvironmentContainer> envContainers = new HashSet<>();
+        String json = hubAdapter.getUserEnvironmentsForPeer();
 
-        envContainers.add( getContainer( "192.168.3.2", "AF70232E4BCDC2436D21F1F31A248B945E6233B8", "1e221fd8-9c8c-43b3-9806-d84a41c30f50" ) );
+        if ( json == null )
+        {
+            return Collections.emptySet();
+        }
 
-        envContainers.add( getContainer( "192.168.3.3", "DC10DA1433EF35D905A0F9D434FDD7C3821BEC17", "6b8d4cb4-2e80-421f-b26b-4b9a1249cf82" ) );
+        log.debug( "Json with environments: {}", json );
 
-        proxyContainerHelper.setProxyToRemoteContainers( envContainers );
+        HashSet<ProxyEnvironment> envs = new HashSet<>();
 
-        return envContainers;
+        try
+        {
+            ArrayNode arr = JsonUtil.fromJson( json, ArrayNode.class );
+
+            for ( int i = 0; i < arr.size(); i++ )
+            {
+                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, proxyContainerHelper ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to parse json: ", e );
+        }
+
+        printLocalContainers();
+
+        return envs;
     }
 
 
-    public ProxyEnvironment get( final String id )
+    private void printLocalContainers()
     {
-        ProxyEnvironment e = new ProxyEnvironment(
-                "Mock Env",
-                subnetCidr,
-                null,
-                3L,
-                peerId
-        );
+        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+        {
+            for ( ContainerHost ch : rh.getContainerHosts() )
+            {
+                String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
-        e.setId( id );
-        e.setP2PSubnet( p2pSubnet );
-        e.setVni( vni );
-        e.setVersion( 1L );
-        e.setStatus( EnvironmentStatus.HEALTHY );
-        e.getEnvironmentId();
-
-
-        P2PConfig p2PConfig = new P2PConfig( peerId, null, null, peerP2p, null, 0 );
-
-        PeerConfImpl peerConf = new PeerConfImpl( p2PConfig );
-        peerConf.setId( 51L );
-
-        e.addEnvironmentPeer( peerConf );
-
-        e.setEnvironmentManager( environmentManager );
-
-        Set<EnvironmentContainerImpl> containers = new HashSet<>();
-
-        containers.addAll( getContainers() );
-
-        e.addContainers( containers );
-
-        return e;
+                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip, ch.getContainerSize() );
+            }
+        }
     }
 
 
-    public Set<Environment> getEnvironments()
+    public void destroyContainer( ProxyEnvironment env, String containerId )
     {
-        HashSet<Environment> set = new HashSet<>();
+        try
+        {
+            EnvironmentContainerHost ch = env.getContainerHostById( containerId );
 
-        Environment env = get( envId );
-        set.add( env );
+            ( ( EnvironmentContainerImpl ) ch ).destroy();
 
-        return set;
+            hubAdapter.destroyContainer( env.getId(), containerId );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to destroy container: ", e );
+        }
+    }
+
+
+    public void removeEnvironment( EnvironmentImpl env )
+    {
+        hubAdapter.removeEnvironment( env.getId() );
+    }
+
+
+    public void uploadEnvironment( EnvironmentImpl env )
+    {
+        if ( env.getStatus() != EnvironmentStatus.HEALTHY )
+        {
+            return;
+        }
+
+        try
+        {
+            ObjectNode envJson = environmentToJson( env );
+
+            environmentPeersToJson( env, envJson );
+
+            environmentContainersToJson( env, envJson );
+
+            hubAdapter.uploadEnvironment( envJson.toString() );
+        }
+        catch ( Exception e )
+        {
+            log.debug( "Error to post local environment to Hub: ", e );
+        }
+    }
+
+
+    private void environmentContainersToJson( EnvironmentImpl env, ObjectNode json )
+    {
+        ArrayNode contNode = json.putArray( "containers" );
+
+        for ( ContainerHost ch : env.getContainerHosts() )
+        {
+            ObjectNode peerJson = JsonUtil.createNode( "id", ch.getId() );
+
+            peerJson.put( "name", ch.getContainerName() );
+
+            peerJson.put( "state", ch.getState().toString() );
+
+            peerJson.put( "template", ch.getTemplateName() );
+
+            peerJson.put( "size", ch.getContainerSize().toString() );
+
+            peerJson.put( "peerId", ch.getPeer().getId() );
+
+            String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
+
+            peerJson.put( "ip", ip );
+
+            contNode.add( peerJson );
+        }
+    }
+
+
+    private ObjectNode environmentToJson( EnvironmentImpl env )
+    {
+        ObjectNode json = JsonUtil.createNode( "id", env.getEnvironmentId().getId() );
+
+        json.put( "name", env.getName() );
+        json.put( "status", env.getStatus().toString() );
+
+        return json;
+    }
+
+
+    private void environmentPeersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
+    {
+        ArrayNode peers = json.putArray( "peers" );
+
+        for ( Peer peer : env.getPeers() )
+        {
+            ObjectNode peerJson = JsonUtil.createNode( "id", peer.getId() );
+
+            peerJson.put( "online", peer.isOnline() );
+
+            peers.add( peerJson );
+        }
     }
 }

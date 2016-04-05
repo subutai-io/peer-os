@@ -20,7 +20,6 @@ import (
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
-	cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -36,8 +35,8 @@ type Heartbeat struct {
 	Arch       string                `json:"arch"`
 	Instance   string                `json:"instance"`
 	Interfaces []utils.Iface         `json:"interfaces,omitempty"`
-	Containers []container.Container `json:"containers"`
-	Alert      []alert.Load          `json:"alert, omitempty"`
+	Containers []container.Container `json:"containers,omitempty"`
+	Alert      []alert.Load          `json:"alert,omitempty"`
 }
 
 var (
@@ -56,9 +55,6 @@ func initAgent() {
 	// move .gnupg dir to app home
 	os.Setenv("GNUPGHOME", config.Agent.DataPrefix+".gnupg")
 
-	if cont.State("management") == "STOPPED" {
-		cont.Start("management")
-	}
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()
@@ -76,7 +72,6 @@ func Start(c *cli.Context) {
 	go alert.AlertProcessing()
 
 	for {
-		Instance()
 		if heartbeat() {
 			time.Sleep(30 * time.Second)
 		} else {
@@ -89,20 +84,20 @@ func Start(c *cli.Context) {
 func connectionMonitor() {
 	for {
 		hostname, _ = os.Hostname()
-		if fingerprint == "" {
+		if fingerprint == "" || config.Management.GpgUser == "" {
 			fingerprint = gpg.GetFingerprint(hostname + "@subutai.io")
 			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
-			continue
-		}
-		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
-		if err == nil && resp.StatusCode == http.StatusOK {
-			resp.Body.Close()
-			log.Debug("Connection monitor check - success")
 		} else {
-			log.Debug("Connection monitor check - failed")
-			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
-			lastHeartbeat = []byte{}
-			go heartbeat()
+			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
+			if err == nil && resp.StatusCode == http.StatusOK {
+				resp.Body.Close()
+				log.Debug("Connection monitor check - success")
+			} else {
+				log.Debug("Connection monitor check - failed")
+				connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
+				lastHeartbeat = []byte{}
+				go heartbeat()
+			}
 		}
 
 		time.Sleep(time.Second * 10)
@@ -110,12 +105,11 @@ func connectionMonitor() {
 }
 
 func heartbeat() bool {
-	if time.Since(lastHeartbeatTime) < time.Second*3 {
-		return false
-	}
-	lastHeartbeatTime = time.Now()
 	mutex.Lock()
 	defer mutex.Unlock()
+	if len(lastHeartbeat) > 0 && time.Since(lastHeartbeatTime) < time.Second*5 {
+		return false
+	}
 
 	pool = container.GetActiveContainers(false)
 	beat := Heartbeat{
@@ -131,6 +125,7 @@ func heartbeat() bool {
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
 
+	lastHeartbeatTime = time.Now()
 	if string(jbeat) == string(lastHeartbeat) {
 		return true
 	}
@@ -177,7 +172,6 @@ func execute(rsp executer.EncRequest) {
 		log.Info("Getting public keyring", "keyring", keyring)
 		md = gpg.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
 	}
-
 	i := strings.Index(md, "{")
 	j := strings.LastIndex(md, "}") + 1
 	if i > j && i > 0 {
@@ -234,8 +228,7 @@ func tlsConfig() *http.Client {
 	}
 
 	transport := &http.Transport{TLSClientConfig: tlsconfig}
-	client := &http.Client{Transport: transport, Timeout: time.Second * 30}
-	return client
+	return &http.Client{Transport: transport, Timeout: time.Second * 30}
 }
 
 func response(msg []byte) {

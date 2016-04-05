@@ -1,6 +1,10 @@
 package io.subutai.hub.share.dto.environment;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+
 public class EnvironmentInfoDto
 {
     private String id;
@@ -10,8 +14,6 @@ public class EnvironmentInfoDto
     private String subnetCidr;
 
     private String p2pSubnet;
-
-    private String tunnelNetwork;
 
     private EnvironmentDto.State state;
 
@@ -25,9 +27,17 @@ public class EnvironmentInfoDto
 
     private String description;
 
+    private String domainName;
+
+    private String domainLoadBalanceStrategy;
+
+    private String sslCertPath;
+
     private Long vni;
 
     private String VEHS;
+
+    private Set<SSHKeyDto> sshKeys = new HashSet<>();
 
 
     public EnvironmentInfoDto()
@@ -167,15 +177,21 @@ public class EnvironmentInfoDto
     }
 
 
-    public String getTunnelNetwork()
+    public Set<SSHKeyDto> getSshKeys()
     {
-        return tunnelNetwork;
+        return sshKeys;
     }
 
 
-    public void setTunnelNetwork( final String tunnelNetwork )
+    public void setSshKeys( final Set<SSHKeyDto> sshKeys )
     {
-        this.tunnelNetwork = tunnelNetwork;
+        this.sshKeys = sshKeys;
+    }
+
+
+    public void addSshKey( final SSHKeyDto sshKey )
+    {
+        this.sshKeys.add( sshKey );
     }
 
 
@@ -188,5 +204,41 @@ public class EnvironmentInfoDto
     public void setVEHS( final String VEHS )
     {
         this.VEHS = VEHS;
+    }
+
+
+    public String getDomainName()
+    {
+        return domainName;
+    }
+
+
+    public void setDomainName( final String domainName )
+    {
+        this.domainName = domainName;
+    }
+
+
+    public String getDomainLoadBalanceStrategy()
+    {
+        return domainLoadBalanceStrategy;
+    }
+
+
+    public void setDomainLoadBalanceStrategy( final String domainLoadBalanceStrategy )
+    {
+        this.domainLoadBalanceStrategy = domainLoadBalanceStrategy;
+    }
+
+
+    public String getSslCertPath()
+    {
+        return sslCertPath;
+    }
+
+
+    public void setSslCertPath( final String sslCertPath )
+    {
+        this.sslCertPath = sslCertPath;
     }
 }

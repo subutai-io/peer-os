@@ -4,22 +4,25 @@ angular.module('subutai.kurjun.controller', [])
 	.controller('KurjunCtrl', KurjunCtrl)
 	.directive('fileModel', fileModel);
 
-KurjunCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'identitySrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
+KurjunCtrl.$inject = ['$scope', '$rootScope', 'kurjunSrv', 'SettingsKurjunSrv', 'identitySrv', 'SweetAlert', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$resource', '$compile', 'ngDialog', '$timeout', 'cfpLoadingBar'];
 fileModel.$inject = ['$parse'];
 
 var fileUploader = {};
 
-function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
+function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilder, $resource, $compile, ngDialog, $timeout, cfpLoadingBar) {
 
 	var vm = this;
 	vm.activeTab = 'templates';
 	vm.repositories = [];
 	vm.templates = [];
 	vm.apts = [];
+	vm.files = [];
 	vm.isUploadAllowed = false;
 	vm.listOfUsers = [];
 	vm.users2Add = [];
 
+	vm.uploadFileWindow = uploadFileWindow;
+	vm.uploadFile = uploadFile;
 	vm.openTab = openTab;
 	vm.addTemplate = addTemplate;
 	vm.proceedTemplate = proceedTemplate;
@@ -33,42 +36,73 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
 
+	//get Lists functions
+	vm.getTemplates = getTemplates;
+	vm.getAPTs = getAPTs;
+	vm.getRawFiles = getRawFiles;
+
 	identitySrv.getCurrentUser().success (function (data) {
 		vm.currentUser = data;
 	});
 
 
 	/*** Get templates according to repositories ***/
-	function getTemplates() {
-		kurjunSrv.getRepositories().success(function (repositories) {
-			vm.repositories = repositories;
-			vm.templates = [];
-			var getTemplatesRecursively = function (index, repositories) {
-				kurjunSrv.getTemplates(repositories[index]).then(function (templates) {
-					for (var template in templates.data) {
-						templates.data[template].repository = repositories[index];
-						vm.templates.push(templates.data[template]);
-					}
-					if (( index + 1 ) < repositories.length) {
-						getTemplatesRecursively(index + 1, repositories);
-					} else {
-						return;
-					}
-				});
-			};
-			getTemplatesRecursively(0, repositories);
+	function sturtup() {
+		LOADING_SCREEN();
+		SettingsKurjunSrv.getConfig().success (function (data) {
+			GLOBAL_KURJUN_URL = data.globalKurjunUrls[0];
+			getTemplates();
+			getAPTs();
+			getRawFiles();
+		}).error(function (error){
+			SweetAlert.swal("ERROR!", error, "error");
+			LOADING_SCREEN('none');
 		});
 	}
-	getTemplates();
+	sturtup();
+
+	function getTemplates() {
+		LOADING_SCREEN();
+		/*kurjunSrv.getRepositories().success(function (repositories) {
+			vm.repositories = repositories;
+
+			kurjunSrv.getTemplates().success(function (data) {
+				vm.templates = data;
+				LOADING_SCREEN('none');
+			}).error(function (error){
+				LOADING_SCREEN('none');
+			});
+		});*/
+
+		kurjunSrv.getTemplates().success(function (data) {
+			vm.templates = data;
+			LOADING_SCREEN('none');
+		}).error(function (error){
+			LOADING_SCREEN('none');
+		});
+	}
 
 	/*** Get all APTs ***/
 	function getAPTs() {
+		LOADING_SCREEN();
 		kurjunSrv.getAPTList().success(function (aptList) {
 			vm.aptList = aptList;
+			LOADING_SCREEN('none');
+		}).error(function (error){
+			LOADING_SCREEN('none');
 		});
 	}
-	getAPTs();
 
+
+	function getRawFiles() {
+		LOADING_SCREEN();
+		kurjunSrv.getRawFiles().success (function (data) {
+			vm.files = data;
+			LOADING_SCREEN('none');
+		}).error(function (error){
+			LOADING_SCREEN('none');
+		});
+	}
 
 	function openTab(tab) {
 		vm.dtOptions = DTOptionsBuilder
@@ -85,7 +119,8 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(2),
 					DTColumnDefBuilder.newColumnDef(3),
 					DTColumnDefBuilder.newColumnDef(4),
-					DTColumnDefBuilder.newColumnDef(5).notSortable()
+					DTColumnDefBuilder.newColumnDef(5),
+					DTColumnDefBuilder.newColumnDef(6).notSortable()
 				];
 				break;
 			case 'apt':
@@ -97,7 +132,13 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 					DTColumnDefBuilder.newColumnDef(4).notSortable()
 				];
 				break;
-			default:
+			case 'raw':
+				vm.dtColumnDefs = [
+					DTColumnDefBuilder.newColumnDef(0),
+					DTColumnDefBuilder.newColumnDef(1),
+					DTColumnDefBuilder.newColumnDef(2).notSortable(),
+				];
+				default:
 				break;
 		}
 		vm.activeTab = tab;
@@ -201,7 +242,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 				window.onkeydown = previousWindowKeyDown;
 				if (isConfirm) {
 					LOADING_SCREEN();
-					kurjunSrv.deleteTemplate(template.md5Sum, template.repository).success(function (data) {
+					kurjunSrv.deleteTemplate(template.id).success(function (data) {
 						LOADING_SCREEN('none');
 						SweetAlert.swal("Deleted!", "Template has been deleted.", "success");
 						getTemplates();
@@ -322,6 +363,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 
 
 	function checkRepositoryStatus(repository) {
+		console.log(repository);
 		kurjunSrv.isUploadAllowed(repository).success(function (data) {
 			vm.isUploadAllowed = (data === 'false' ? false : true);
 		});
@@ -330,6 +372,24 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, identitySrv, SweetAlert, DTOp
 	function setDefaultRepository() {
 		vm.currentTemplate.repository = vm.repositories[0];
 		vm.checkRepositoryStatus(vm.currentTemplate.repository)
+	}
+
+
+	function uploadFileWindow() {
+		ngDialog.open ({
+			template: "subutai-app/kurjun/partials/uploadFile.html",
+			scope: $scope
+		});
+	}
+
+	function uploadFile() {
+		kurjunSrv.uploadFile (fileUploader).success (function (data) {
+			SweetAlert.swal("Success!", "You have successfully uploaded file", "success");
+			getRawFiles();
+			ngDialog.closeAll();
+		}).error (function (error) {
+			SweetAlert.swal("ERROR!", error, "error");
+		});
 	}
 
 	cfpLoadingBar.start();
@@ -348,7 +408,7 @@ function fileModel($parse) {
 			var modelSetter = model.assign;
 
 			element.bind('change', function () {
-				document.getElementById("js-uploadFile").value = element[0].files[0].name;
+				document.getElementById("filename").value = element[0].files[0].name;
 				scope.$apply(function () {
 					modelSetter(scope, element[0].files[0]);
 					fileUploader = element[0].files[0];

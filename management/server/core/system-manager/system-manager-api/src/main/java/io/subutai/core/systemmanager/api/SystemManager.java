@@ -2,6 +2,7 @@ package io.subutai.core.systemmanager.api;
 
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.SystemConfiguration;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.HostNotFoundException;
@@ -27,12 +28,15 @@ public interface SystemManager
     PeerSettings getPeerSettings();
 
     void setNetworkSettings( String securePortX1, String securePortX2, String securePortX3, final String publicUrl,
-                             final String agentPort ) throws ConfigurationException;
+                             final String agentPort, final String publicSecurePort ) throws ConfigurationException;
 
     AdvancedSettings getAdvancedSettings();
 
-    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls ) throws ConfigurationException;
+    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls )
+            throws ConfigurationException;
 
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
+
+    void sendSystemConfigToHub() throws ConfigurationException;
 }

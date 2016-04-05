@@ -7,6 +7,11 @@ import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.network.NetworkResource;
+import io.subutai.common.protocol.P2PConnections;
+import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Tunnel;
+import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
 
 
@@ -50,12 +55,17 @@ public interface ResourceHost extends Host, ResourceHostInfo
      */
     public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
-    Set<HostInterface> getNetInterfaces();
+    /**
+     * Returns network interfaces from db
+     */
+    Set<HostInterface> getSavedHostInterfaces();
 
     /**
      * Returns state of hosted container
      */
     public ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
+
+    public void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
 
     /**
@@ -84,4 +94,15 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void cleanup( EnvironmentId environmentId, int vlan ) throws ResourceHostException;
 
     int getNumberOfCpuCores() throws ResourceHostException;
+
+    P2PConnections getP2PConnections() throws ResourceHostException;
+
+    void joinP2PSwarm( String p2pIp, String interfaceName, String p2pHash, String secretKey, long secretKeyTtlSec )
+            throws ResourceHostException;
+
+    void resetSwarmSecretKey( String p2pHash, String newSecretKey, long ttlSeconds ) throws ResourceHostException;
+
+    Tunnels getTunnels() throws ResourceHostException;
+
+    void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 }

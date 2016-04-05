@@ -44,6 +44,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.removeTag = removeTag;
 	vm.showDomainForm = showDomainForm;
 	vm.checkDomain = checkDomain;
+	vm.getContainerStatus = getContainerStatus;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
@@ -144,7 +145,9 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	function filterContainersList() {
 		vm.allTags = [];
 		vm.containers = [];
+
 		for(var i in vm.environments) {
+
 			if(
 				vm.environmentId == vm.environments[i].id || 
 				vm.environmentId === undefined || 
@@ -161,8 +164,17 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 						vm.containerState != vm.environments[i].containers[j].state && 
 						vm.containerState.length > 0
 					) {continue;}
-					vm.containers.push(vm.environments[i].containers[j]);
-					vm.allTags = vm.allTags.concat(vm.environments[i].containers[j].tags);
+
+					// We don't show on UI containers created by Hub, located on other peers.
+					// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
+					var container = vm.environments[i].containers[j];
+					var remoteProxyContainer = !container.local && container.dataSource == "hub";
+
+					if ( !remoteProxyContainer )
+					{
+						vm.containers.push(vm.environments[i].containers[j]);
+						vm.allTags = vm.allTags.concat(vm.environments[i].containers[j].tags);
+					}
 				}
 			}
 		}
@@ -183,19 +195,19 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		DTColumnDefBuilder.newColumnDef(6).notSortable()
 	];
 
-	var refreshTable;
+	/*var refreshTable;
 	var reloadTableData = function() {
 		refreshTable = $timeout(function myFunction() {
 			getContainers();
 			refreshTable = $timeout(reloadTableData, 30000);
 		}, 30000);
 	};
-	reloadTableData();
+	reloadTableData();*/
 
-	$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
+	/*$rootScope.$on('$stateChangeStart',	function(event, toState, toParams, fromState, fromParams){
 		console.log('cancel');
 		$timeout.cancel(refreshTable);
-	});
+	});*/
 
 	function destroyContainer(containerId, key) {
 		var previousWindowKeyDown = window.onkeydown;
@@ -243,6 +255,13 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 				vm.containers[key].state = 'RUNNING';
 			}
 		});		
+	}
+
+	function getContainerStatus(container) {
+		container.state = 'checking';
+		environmentService.getContainerStatus(container.id).success(function (data) {
+			container.state = data.STATE;
+		});
 	}
 
 }

@@ -43,6 +43,27 @@ public class TrustedWebClientFactoryModule extends AbstractModule implements Web
 
 
     @Override
+    public WebClient makeSecure( final RemoteRepository remoteRepository, final String s,
+                                 final Map<String, String> map )
+    {
+        try
+        {
+            URL url = WebClientFactory.buildUrl( remoteRepository, s, map );
+
+            WebClient webClient = RestUtil.createTrustedWebClient( url.toExternalForm() );
+
+            return webClient;
+        }
+        catch ( URISyntaxException | MalformedURLException e )
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+    @Override
     protected void configure()
     {
         OptionalBinder<WebClientFactory> opb = OptionalBinder.newOptionalBinder( binder(), WebClientFactory.class );

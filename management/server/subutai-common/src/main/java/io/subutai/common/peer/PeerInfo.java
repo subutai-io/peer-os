@@ -31,20 +31,21 @@ public class PeerInfo implements Serializable
     @JsonProperty( "name" )
     private String name;
 
-    @JsonProperty( "port" )
-    private int port = SystemSettings.getSecurePortX2();
+    @JsonProperty( "publicSecurePort" )
+    private int publicSecurePort = SystemSettings.getSecurePortX2();
 
 
     public PeerInfo( @JsonProperty( "id" ) final String id, @JsonProperty( "ownerId" ) final String ownerId,
                      @JsonProperty( "publicUrl" ) final String publicUrl, @JsonProperty( "ip" ) final String ip,
-                     @JsonProperty( "name" ) final String name, @JsonProperty( "port" ) final int port )
+                     @JsonProperty( "name" ) final String name,
+                     @JsonProperty( "publicSecurePort" ) final int publicSecurePort )
     {
         this.id = id;
         this.ownerId = ownerId;
         this.publicUrl = publicUrl;
         this.ip = ip;
         this.name = name;
-        this.port = port;
+        this.publicSecurePort = publicSecurePort;
     }
 
 
@@ -128,15 +129,15 @@ public class PeerInfo implements Serializable
     }
 
 
-    public int getPort()
+    public int getPublicSecurePort()
     {
-        return port;
+        return publicSecurePort;
     }
 
 
-    public void setPort( final int port )
+    public void setPublicSecurePort( final int publicSecurePort )
     {
-        this.port = port;
+        this.publicSecurePort = publicSecurePort;
     }
 
 
@@ -164,13 +165,8 @@ public class PeerInfo implements Serializable
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "PeerInfo{" );
-        sb.append( "ip='" ).append( ip ).append( '\'' );
-        sb.append( ", name='" ).append( name ).append( '\'' );
-        sb.append( ", id=" ).append( id );
-        sb.append( ", ownerId=" ).append( ownerId );
-        sb.append( '}' );
-        return sb.toString();
+        return "PeerInfo{" + "ip='" + ip + '\'' + ", name='" + name + '\'' + ", id=" + id + ", ownerId=" + ownerId
+                + '}';
     }
 }
 

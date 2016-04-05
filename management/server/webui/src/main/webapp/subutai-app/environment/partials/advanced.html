@@ -1,4 +1,4 @@
-<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="dragOver(event)">
+<div class="b-cloud" ng-controller="AdvancedEnvironmentCtrl as advEnvCtrl" ondragover="return dragOver(event)">
 	<div class="b-cloud__tools">
 		<div class="b-cloud-tools">
 			<div class="b-tabs-menu b-tabs-menu_cloud-env">
@@ -20,28 +20,27 @@
 					<input type="text" class="b-search-input" ng-model="searchTemplate" id="js-search">
 				</div>
 				<div class="b-tools-menu__inpit">
-					<select class="b-search-input" ng-model="advEnvCtrl.templatesType">
+					<select class="b-search-input" ng-model="advEnvCtrl.templatesType" ng-change="advEnvCtrl.getFilteredTemplates()">
 						<option value="all">All</option>
 						<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
 							{{ templatesType }} ({{ templateList.length }})
 						</option>
 					</select>
 				</div>
-				<ul ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" 
-					ng-if="advEnvCtrl.templatesType == 'all' || advEnvCtrl.templatesType == templatesType">
-					<li ng-repeat="template in templateList  | filter:searchTemplate" 
+				<ul>
+					<li ng-repeat="template in advEnvCtrl.templatesList  | filter:searchTemplate | orderBy: identity" 
 						data-template="{{ template }}">
 						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
 								<img
-									src="assets/templates/{{ template }}.jpg"
+									ng-src="assets/templates/{{ template }}.jpg"
 									alt="{{ template }}"
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</span>
 							<span class="b-cloud-item-text">{{ template }}</span>
 						</span>
 						<div class="b-dragAndDrop-item"
-							ondragstart="startDrag(event)" ondrop="drop(event)" ondragend="endtDrag(event)" draggable="true" 
+							ondragstart="startDrag(event)" ondragend="endtDrag(event)" draggable="true" 
 							data-template="{{ template }}">
 						</div>
 					</li>
@@ -139,7 +138,7 @@
 				class="b-cloud-space-work"
 				id="js-environment-creation"
 				ng-init="advEnvCtrl.initJointJs()" 
-				ondrop="drop(event)">
+				ondrop="return drop(event);" ondragenter="return false;" ondragover="return false;">
 
 					<div class="b-template-settings js-dropen-menu">
 						<div class="header"></div>
@@ -210,8 +209,10 @@
 			</div>
 			<div class="b-cloud-space__table">
 				<table datatable="ng"
+				ng-init="environmentViewCtrl.initDataTable()" 
 				dt-options="environmentViewCtrl.dtOptionsInstallTable"
 				dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
+				dt-instance="environmentViewCtrl.dtInstance" 
 				class="row-border hover subt_table-containers-table">
 					<thead>
 						<tr>
@@ -224,7 +225,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat = "environment in environmentViewCtrl.environments">
+						<tr ng-repeat = "(key, environment) in environmentViewCtrl.environments">
 							<td>
 								<div class="b-status-icon b-status-icon_{{ environment.status }}"
 									tooltips
@@ -236,6 +237,7 @@
 								<span tooltips
 									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
+									env-data-source="{{ environment.dataSource }}"
 								>
 									{{ environment.name }}
 								</span>
@@ -262,7 +264,7 @@
 									style = "margin-left: 10px; margin-top: 5px">
 								</a>
 								<a href class="b-icon b-icon_edit" ng-click="advEnvCtrl.editEnvironment(environment)" style = "margin-left: 10px; margin-top: 5px; visibility: visible"></a>
-								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)" style = "margin-left: 10px; margin-top: 5px"></a>
+								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)" style = "margin-left: 10px; margin-top: 5px"></a>
 							</td>
 						</tr>
 					</tbody>

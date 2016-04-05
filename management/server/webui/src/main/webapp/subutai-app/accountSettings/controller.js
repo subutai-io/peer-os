@@ -17,16 +17,56 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 	$timeout(function() {
 		vm.hasPGPplugin = hasPGPplugin();
 		if(!vm.hasPGPplugin) {
+			var pluginUrl = 'https://github.com/subutai-io/browsers/releases/tag/2.0.0';
+			var isFirefox = typeof InstallTrigger !== 'undefined';
+			var isChrome = !!window.chrome && !!window.chrome.webstore;
+
+			if(isChrome) {
+				pluginUrl = 'https://chrome.google.com/webstore/detail/subutai-social-e2e-plugin/kpmiofpmlciacjblommkcinncmneeoaa?utm_source=chrome-ntp-icon';
+			} else if(isFirefox) {
+				pluginUrl = 'https://addons.mozilla.org/en-US/firefox/addon/subutai-social-e2e-plugin/';
+			}
+
 			$rootScope.notifications = {
 				"message": "Life is hard when you're stupid dude! Install the subutai browser plugin for added security with end to end encryption.", 
+				"browserPluginMessage": true,
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [
-					{"text": "Take it!", "href": "https://github.com/subutai-io/Tooling-pgp-plugin/releases/latest"},
-					{"text": "Set manualy", "href": "/#/account-settings"}
+					{
+						"text": "Install",
+						"href": pluginUrl,
+						"newTab": true
+					},
+					{
+						"text": "Setup Manually",
+						"href": "/#/account-settings",
+						"tooltip": "Set PGP key manually without plugin"
+					}
 				]
 			};
+		} else {
+
+			var notifications = localStorage.getItem('notifications');
+			if (
+				notifications !== null &&
+				notifications !== undefined &&
+				notifications !== 'null' &&
+				notifications.length > 0
+			) {
+				notifications = JSON.parse(notifications);
+				for(var i = 0; i < notifications.length; i++) {
+					if(notifications[i].browserPluginMessage !== undefined && notifications[i].browserPluginMessage) {
+						console.log(notifications[i].browserPluginMessage);
+						notifications.splice(i, 1);
+						localStorage.setItem('notifications', JSON.stringify(notifications));
+						$rootScope.notifications = {};
+						break;
+					}
+				}
+			}
+
 		}
-	}, 1000);
+	}, 3000);
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {

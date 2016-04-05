@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.task.Task;
 
@@ -82,7 +83,7 @@ public interface LocalPeer extends Peer
     /**
      * Returns instance of management host
      */
-    public Host getManagementHost() throws HostNotFoundException;
+    public ResourceHost getManagementHost() throws HostNotFoundException;
 
     /**
      * Returns all local peer's resource hosts
@@ -138,8 +139,6 @@ public interface LocalPeer extends Peer
 
     public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 
-    void setPeerInfo( PeerInfo peerInfo );
-
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
@@ -150,7 +149,7 @@ public interface LocalPeer extends Peer
 
     ContainerHost findContainerById( ContainerId containerId );
 
-    int setupContainerSsh( String containerHostId, int sshIdleTimeout ) throws PeerException;
+    int setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
 
     List<ContainerHost> getPeerContainers( String peerId );
 
@@ -159,4 +158,9 @@ public interface LocalPeer extends Peer
     List<Task> getTaskList();
 
     public void exchangeMhKeysWithRH() throws Exception;
+
+    void setPeerInfo( PeerInfo peerInfo );
+
+    public ReservedNetworkResources getReservedNetworkResources() throws PeerException;
 }
+

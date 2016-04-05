@@ -31,7 +31,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
  */
 public interface EnvironmentManager
 {
-    //TODO implement startContainer, stopContainer and resetP2PSecretKey methods
+    //TODO implement startContainer, stopContainer and resetSwarmSecretKey methods
 
     /**
      * Returns all existing environments
@@ -40,12 +40,7 @@ public interface EnvironmentManager
      */
     Set<Environment> getEnvironments();
 
-
-    Environment setupRequisites( Topology topology ) throws EnvironmentCreationException;
-
-
-    Environment startEnvironmentBuild( String environmentId, String signedMessage, boolean async )
-            throws EnvironmentCreationException;
+    Set<Environment> getEnvironmentsByOwnerId( long userId );
 
     /**
      * Creates environment based on a passed topology
@@ -120,13 +115,12 @@ public interface EnvironmentManager
      *
      * @param environmentId - environment id
      * @param async - indicates whether environment is destroyed synchronously or asynchronously to the calling party
-     * @param forceMetadataRemoval - if true, the call will remove environment metadata from database even if not all
      * containers were destroyed, otherwise an exception is thrown when first error occurs
      *
      * @throws EnvironmentDestructionException - thrown if error occurs during environment destruction
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    void destroyEnvironment( String environmentId, boolean async, boolean forceMetadataRemoval )
+    void destroyEnvironment( String environmentId, boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException;
 
 
@@ -135,14 +129,13 @@ public interface EnvironmentManager
      *
      * @param environmentId - id of container environment
      * @param containerId - id of container to destroy
-     * @param async - indicates whether container is destroyed synchronously or asynchronously to the calling party
-     * @param forceMetadataRemoval - if true, the call will remove container metadata from database even if container
-     * was not destroyed due to some error, otherwise an exception is thrown
+     * @param async - indicates whether container is destroyed synchronously or asynchronously to the calling party was
+     * not destroyed due to some error, otherwise an exception is thrown
      *
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
-    void destroyContainer( String environmentId, String containerId, boolean async, boolean forceMetadataRemoval )
+    void destroyContainer( String environmentId, String containerId, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 
@@ -165,57 +158,6 @@ public interface EnvironmentManager
      */
     String getDefaultDomainName();
 
-    /**
-     * Removes environment from database only. Used to cleanup environment records.
-     *
-     * @param environmentId - environment id
-     *
-     * @throws EnvironmentNotFoundException - thrown if environment not found
-     */
-    void removeEnvironment( String environmentId ) throws EnvironmentNotFoundException;
-
-
-    /**
-     * Save environment topology
-     *
-     * @param topology - topology to save
-     */
-    void saveTopology( Topology topology ) throws EnvironmentManagerException;
-
-    /**
-     * Loads environment blueprint from DB
-     *
-     * @param id blueprint primary key
-     *
-     * @return environment blueprint
-     */
-    Topology getTopology( UUID id ) throws EnvironmentManagerException;
-
-    ;
-
-
-    /**
-     * Remove blueprint from database
-     *
-     * @param topologyId - blueprint id to remove
-     */
-    void removeTopology( UUID topologyId ) throws EnvironmentManagerException;
-
-
-    /**
-     * Get All blueprints
-     *
-     * @return - set of blueprints
-     */
-    Set<Topology> getBlueprints() throws EnvironmentManagerException;
-
-
-    /**
-     * Updates environment container hosts metadata (hostname, network interface)
-     *
-     * @param environmentId - target environment Id
-     */
-    void updateEnvironmentContainersMetadata( String environmentId ) throws EnvironmentManagerException;
 
     /**
      * Removes an assigned domain if any from the environment
@@ -265,7 +207,7 @@ public interface EnvironmentManager
      *
      * @return port for ssh connection
      */
-    int setupContainerSsh( String containerHostId, String environmentId )
+    int setupSshTunnelForContainer( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
@@ -284,13 +226,15 @@ public interface EnvironmentManager
     EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
             throws EnvironmentNotFoundException;
 
+
+    List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
+
+    void shareEnvironment( ShareDto[] shareDto, String environmentId );
+
+
     void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
             throws EnvironmentManagerException;
 
     void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
             throws EnvironmentManagerException;
-
-    List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
-
-    void shareEnvironment( ShareDto[] shareDto, String environmentId );
 }

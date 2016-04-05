@@ -22,6 +22,11 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
     </dependency>
 
@@ -35,14 +40,17 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>tracker-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>kurjun-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>network-manager-api</artifactId>
@@ -91,6 +99,37 @@
 
   <build>
     <plugins>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>openjpa-maven-plugin</artifactId>
+        <configuration>
+          <addDefaultConstructor>true</addDefaultConstructor>
+          <!--<enforcePropertyRestriction>true</enforcePropertyRestriction>-->
+        </configuration>
+        <executions>
+          <execution>
+            <id>enhancer</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>enhance</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.openjpa</groupId>
+            <artifactId>openjpa</artifactId>
+            <version>${openjpa.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

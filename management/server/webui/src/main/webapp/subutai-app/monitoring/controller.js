@@ -3,9 +3,9 @@
 angular.module('subutai.monitoring.controller', [])
 	.controller('MonitoringCtrl', MonitoringCtrl);
 
-MonitoringCtrl.$inject = ['$scope', '$timeout', 'monitoringSrv', 'cfpLoadingBar'];
+MonitoringCtrl.$inject = ['$scope', 'monitoringSrv', 'cfpLoadingBar'];
 
-function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
+function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar) {
 
 	var vm = this;
 
@@ -50,6 +50,11 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		vm.selectedEnvironment = '';
 		vm.currentHost = '';
 		vm.currentType = type;
+
+		if( type == 'management' )
+		{
+			getServerData();
+		}
 	}
 
 	function showContainers(environmentId) {
@@ -63,9 +68,18 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	}
 
 	function getServerData() {
-		if (vm.period > 0 && vm.currentHost) {
+		if (vm.period > 0 && ( vm.currentHost || vm.currentType == 'management' )) {
 			LOADING_SCREEN();
-			monitoringSrv.getInfo(vm.selectedEnvironment, vm.currentHost, vm.period).success(function (data) {
+			var env = vm.selectedEnvironment;
+			var host = vm.currentHost;
+
+			if( vm.currentType == 'management' )
+			{
+				env = "";
+				host = "management";
+			}
+
+			monitoringSrv.getInfo(env, host, vm.period).success(function (data) {
 
 				vm.charts = [];
 				if(data['Metrics']) {
@@ -93,7 +107,6 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 	};
 
 	function getChartData(obj) {
-		console.log(obj);
 		var series = obj.Series;
 		var seriesName = obj.Series[0].name;
 
@@ -253,15 +266,15 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		}
 
 		/** Calculate amount of incomplete data received form rest **/
-		start = moment.unix((series[0].values[0][0]));
-		end = moment.unix((getEndDate(series)));
+		start = moment.unix(series[0].values[0][0]);
+		end = moment.unix(getEndDate(series));
 		duration = moment.duration(end.diff(start)).asMinutes();
 		diff = vm.period * 60 - duration;
-		leftLimit = moment.unix((series[0].values[0][0])).subtract(diff, 'minutes');
+		leftLimit = moment.unix(series[0].values[0][0]).subtract(diff, 'minutes');
 
 		/** Generate stub values if data is incomplete at the begining **/
 		if (diff > 0) {
-			var startPoint = moment.unix((series[0].values[0][0]));
+			var startPoint = moment.unix(series[0].values[0][0]);
 			while (startPoint.subtract(1, "minutes") >= leftLimit) {
 				stubValues.unshift({
 					x: startPoint.valueOf(),
@@ -274,13 +287,14 @@ function MonitoringCtrl($scope, $timeout, monitoringSrv, cfpLoadingBar) {
 		for(var item in series) {
 
 			if(moment.unix((series[item].values[series[item].values.length - 1][0])).valueOf() < moment.unix((getEndDate(series))).valueOf()) {
-				var from = moment.unix((series[item].values[series[item].values.length - 1][0])).valueOf();
-				var to = moment.unix((getEndDate(series)).valueOf());
+				var from = moment.unix(series[item].values[series[item].values.length - 1][0]);
+				var to = moment.unix(getEndDate(series));
 
 
 				from.add(1, "minutes");
-				while(from.valueOf() <= to) {
-					series[item].values.push([from.valueOf(), 0]);
+
+				while(from.valueOf() <= to.valueOf()) {
+					series[item].values.push([from.valueOf() / 1000, 0]);
 					from.add(1, "minutes");
 				}
 			}

@@ -27,9 +27,6 @@ import io.subutai.hub.share.dto.HeartbeatResponseDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-/**
- * Hearbeat processor
- */
 public class HeartbeatProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( HeartbeatProcessor.class );
@@ -50,16 +47,15 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            LOG.debug( "Heartbeat sending started..." );
+            LOG.debug( "Sending heartbeat..." );
 
             sendHeartbeat();
 
-            LOG.debug( "Heartbeat sending finished successfully." );
+            LOG.debug( "Heartbeat sent successfully" );
         }
         catch ( Exception e )
         {
-            LOG.debug( "Heartbeat sending failed." );
-            LOG.error( e.getMessage(), e );
+            LOG.error( "Error to send heartbeat: ", e );
         }
     }
 

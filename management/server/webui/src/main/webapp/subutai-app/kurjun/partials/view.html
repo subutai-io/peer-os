@@ -1,5 +1,6 @@
 <div ng-controller="KurjunCtrl as kurjunCtrl">
 
+
 	<div class="b-workspace__header b-workspace__header_tabs">
 
 		<div class="b-tabs-menu b-tabs-menu_header">
@@ -15,6 +16,11 @@
 						ng-class="kurjunCtrl.activeTab == 'apt' ? 'b-tabs-menu__item_active' : ''">
 					APT
 				</li>
+				<li class="b-tabs-menu__item"
+					ng-click="kurjunCtrl.openTab('raw')"
+					ng-class="kurjunCtrl.activeTab == 'raw' ? 'b-tabs-menu__item_active' : ''">
+					Raw files
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -29,7 +35,11 @@
 				ng-if="kurjunCtrl.activeTab == 'apt'"
 				ng-include="'subutai-app/kurjun/partials/apt.html'">
 		</div>
+		<div
+				ng-if="kurjunCtrl.activeTab == 'raw'"
+				ng-include="'subutai-app/kurjun/partials/raw.html'">
+		</div>
 
 	</div>
-	
+
 </div>

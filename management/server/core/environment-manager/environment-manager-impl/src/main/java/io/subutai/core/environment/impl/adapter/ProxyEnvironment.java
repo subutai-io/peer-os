@@ -1,30 +1,96 @@
 package io.subutai.core.environment.impl.adapter;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
-class ProxyEnvironment extends EnvironmentImpl
+/**
+ * NOTE: Using environmentManager from parent EnvironmentImpl gives side effects. For example, empty container list.
+ */
+public class ProxyEnvironment extends EnvironmentImpl
 {
-    // NOTE: Using environmentManager from EnvironmentImpl gives side effects. For example, empty container list.
-    private EnvironmentManagerImpl environmentManager;
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    ProxyEnvironment( String name, String subnetCidr, String sshKey, Long userId, String peerId )
+
+    ProxyEnvironment( JsonNode json, EnvironmentManagerImpl environmentManager, ProxyContainerHelper proxyContainerHelper )
     {
-        super( name, subnetCidr, sshKey, userId, peerId );
+        super(
+                json.get( "name" ).asText(),
+                json.get( "subnetCidr" ).asText(),
+                0L,
+                "hub" // peerId
+        );
+
+        init( json );
+
+        addContainers( parseContainers( json, environmentManager, proxyContainerHelper ) );
     }
 
 
-    public void setId( String id )
+    private void init( JsonNode json )
     {
-        environmentId = id;
+        environmentId = json.get( "id" ).asText();
+
+        envId = new EnvironmentId( environmentId );
+
+        setP2PSubnet( json.get( "p2pSubnet" ).asText() );
+
+        setVni( json.get( "vni" ).asLong() );
+
+        setStatus( EnvironmentStatus.HEALTHY );
+    }
+
+
+    private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager,
+                                                           ProxyContainerHelper proxyContainerHelper )
+    {
+        Set<ProxyEnvironmentContainer> containers = new HashSet<>();
+
+        JsonNode arr = json.get( "containerList" );
+
+        Set<String> localContainerIds = proxyContainerHelper.getLocalContainerIds();
+
+        try
+        {
+            for ( JsonNode node : arr )
+            {
+                ProxyEnvironmentContainer ch = new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
+
+                ch.setEnvironment( this );
+
+                containers.add( ch );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to parse container json: ", e );
+        }
+
+        proxyContainerHelper.setProxyToRemoteContainers( containers );
+
+        Set<EnvironmentContainerImpl> resultSet = new HashSet<>();
+
+        resultSet.addAll( containers );
+
+        return resultSet;
     }
 
 
     @Override
-    public void setEnvironmentManager( final EnvironmentManagerImpl environmentManager )
+    public String toString()
     {
-        this.environmentManager = environmentManager;
+        return "ProxyEnvironment:" + super.toString();
     }
 }

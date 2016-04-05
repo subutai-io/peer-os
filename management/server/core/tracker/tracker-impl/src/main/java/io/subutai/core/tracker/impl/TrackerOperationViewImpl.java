@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package io.subutai.core.tracker.impl;
 
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -43,6 +39,8 @@ public class TrackerOperationViewImpl implements TrackerOperationView
      */
     private final Date createDate;
 
+    private final long timestamp;
+
 
     public TrackerOperationViewImpl( TrackerOperation po )
     {
@@ -53,6 +51,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         log = po.getLog();
         state = po.getState();
         createDate = po.createDate();
+        timestamp = po.createDate().getTime();
     }
 
 
@@ -85,6 +84,10 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         return state;
     }
 
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
 
     @Override
     public int hashCode()

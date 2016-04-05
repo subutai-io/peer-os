@@ -1,6 +1,7 @@
 package io.subutai.common.util;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +20,14 @@ public class CollectionUtil
     public static boolean isCollectionEmpty( Collection col )
     {
         return col == null || col.isEmpty();
+    }
+
+
+    public static <T extends Comparable<? super T>> List<T> asSortedList( Collection<T> c )
+    {
+        List<T> list = new ArrayList<T>( c );
+        java.util.Collections.sort( list );
+        return list;
     }
 
 

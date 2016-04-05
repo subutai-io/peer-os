@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"crypto/tls"
 	"net/http"
+	"os"
 
+	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -12,9 +14,9 @@ import (
 func Connect(host, port, user, pass string) {
 	log.Debug("Connecting to " + host + ":" + port)
 
-	mgn := Instance()
-	mgn.Ipv4 = host
-	mgn.Port = port
+	mng := Instance()
+	mng.Ipv4 = host
+	mng.Port = port
 
 	rh := NewRH()
 	rh.Pk = gpg.GetPk(user)
@@ -23,19 +25,22 @@ func Connect(host, port, user, pass string) {
 
 	log.Info(rh.Json())
 
-	enMsg := ""
-	pk := mgn.GetKey()
+	pk := mng.GetKey()
 	if pk == nil {
 		return
 	}
 	pk.Store()
-	enMsg = gpg.EncryptWrapper(user, pk.Id, rh.Json())
 
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
+	hostname, _ := os.Hostname()
+	config.Agent.GpgUser = hostname + "@subutai.io"
+	config.Management.GpgUser = pk.ExtractKeyID()
 
-	resp, err := client.Post(mgn.URL(), "text/plain", bytes.NewBuffer([]byte(enMsg)))
-	if !log.Check(log.WarnLevel, "POSTing request to "+mgn.URL(), err) {
+	enMsg := gpg.EncryptWrapper(user, config.Management.GpgUser, rh.Json())
+
+	client := &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+
+	resp, err := client.Post(mng.URL(), "text/plain", bytes.NewBuffer([]byte(enMsg)))
+	if !log.Check(log.WarnLevel, "POSTing request to "+mng.URL(), err) {
 		resp.Body.Close()
 	}
 }
