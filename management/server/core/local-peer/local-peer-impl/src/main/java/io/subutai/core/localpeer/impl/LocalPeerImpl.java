@@ -634,6 +634,87 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( getAppendSshKeyCommand( sshPublicKey ), hosts );
+
+        hosts.removeAll( results.keySet() );
+
+        for ( Host failedHost : hosts )
+        {
+            LOG.error( "SSH key addition failed on host {}", failedHost.getHostname() );
+        }
+
+        if ( !hosts.isEmpty() )
+        {
+            throw new PeerException( "Failed to add SSH key on all hosts" );
+        }
+    }
+
+
+    @Override
+    public void removeSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( getRemoveSshKeyCommand( sshPublicKey ), hosts );
+
+        hosts.removeAll( results.keySet() );
+
+        for ( Host failedHost : hosts )
+        {
+            LOG.error( "SSH key removal failed on host {}", failedHost.getHostname() );
+        }
+
+        if ( !hosts.isEmpty() )
+        {
+            throw new PeerException( "Failed to remove SSH key on all hosts" );
+        }
+    }
+
+
+    //todo move commands to CommandFactory
+    public RequestBuilder getAppendSshKeyCommand( String key )
+    {
+        return new RequestBuilder( String.format(
+                "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
+                        + "sort -u '%2$s' -o '%2$s'", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, key ) );
+    }
+
+
+    protected RequestBuilder getRemoveSshKeyCommand( final String key )
+    {
+        return new RequestBuilder( String.format( "chmod 700 %1$s && " +
+                "sed -i \"\\,%3$s,d\" %2$s && " +
+                "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, key ) );
+    }
+
+
     protected RequestBuilder getAppendSshKeysCommand( String keys )
     {
         return new RequestBuilder( String.format( "mkdir -p %1$s && " +
@@ -2073,13 +2154,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Failed to join/update P2P swarm", e );
         }
-    }
-
-
-    @Deprecated
-    public void createP2PSwarm( final P2PConfig config ) throws PeerException
-    {
-        ///no-op
     }
 
 
