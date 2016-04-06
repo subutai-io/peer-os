@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.helpers.ContainerDestroyTask;
@@ -34,34 +35,37 @@ public class DestroyContainersStep
 
     public void execute() throws Exception
     {
-        TaskUtil<Object> destroyUtil = new TaskUtil<>();
-
-        for ( String containerId : removedContainers )
+        if ( !CollectionUtil.isCollectionEmpty( removedContainers ) )
         {
-            final ContainerHost containerHost = environment.getContainerHostById( containerId );
+            TaskUtil<Object> destroyUtil = new TaskUtil<>();
 
-            destroyUtil.addTask( new ContainerDestroyTask( containerHost ) );
-        }
-
-        TaskUtil.TaskResults<Object> destroyResults = destroyUtil.executeParallel();
-
-        for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getTaskResults() )
-        {
-            ContainerHost containerHost = ( ( ContainerDestroyTask ) destroyResult.getTask() ).getContainerHost();
-
-            if ( destroyResult.hasSucceeded() )
+            for ( String containerId : removedContainers )
             {
-                environment.removeContainer( containerHost );
+                final ContainerHost containerHost = environment.getContainerHostById( containerId );
 
-                environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
-
-                trackerOperation.addLog( String.format( "Container %s destroyed", containerHost.getHostname() ) );
+                destroyUtil.addTask( new ContainerDestroyTask( containerHost ) );
             }
-            else
+
+            TaskUtil.TaskResults<Object> destroyResults = destroyUtil.executeParallel();
+
+            for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getTaskResults() )
             {
-                trackerOperation.addLog(
-                        String.format( "Failed to destroy container %s. Reason: %s", containerHost.getHostname(),
-                                destroyResult.getFailureReason() ) );
+                ContainerHost containerHost = ( ( ContainerDestroyTask ) destroyResult.getTask() ).getContainerHost();
+
+                if ( destroyResult.hasSucceeded() )
+                {
+                    environment.removeContainer( containerHost );
+
+                    environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
+
+                    trackerOperation.addLog( String.format( "Container %s destroyed", containerHost.getHostname() ) );
+                }
+                else
+                {
+                    trackerOperation.addLog(
+                            String.format( "Failed to destroy container %s. Reason: %s", containerHost.getHostname(),
+                                    destroyResult.getFailureReason() ) );
+                }
             }
         }
     }
