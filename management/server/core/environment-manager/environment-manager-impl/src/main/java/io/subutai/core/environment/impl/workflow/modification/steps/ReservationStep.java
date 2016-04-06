@@ -73,11 +73,9 @@ public class ReservationStep
             } ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Object>> netQueryResults = netQueryUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> netQueryResults = netQueryUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults )
+        for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults.getPeerTaskResults() )
         {
             if ( netQueryResult.hasSucceeded() )
             {
@@ -86,15 +84,13 @@ public class ReservationStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog(
                         String.format( "Failed to obtain reserved network resources from peer %s. Reason: %s",
                                 netQueryResult.getPeer().getName(), netQueryResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( netQueryResults.hasFailures() )
         {
             throw new EnvironmentModificationException( "Failed to obtain reserved network resources from all peers" );
         }
@@ -144,9 +140,9 @@ public class ReservationStep
             } ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Object>> netReservationResults = netReservationUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> netReservationResults = netReservationUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult netReservationResult : netReservationResults )
+        for ( PeerUtil.PeerTaskResult netReservationResult : netReservationResults.getPeerTaskResults() )
         {
             if ( netReservationResult.hasSucceeded() )
             {
@@ -157,14 +153,12 @@ public class ReservationStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog( String.format( "Failed to reserve network resources on peer %s. Reason: %s",
                         netReservationResult.getPeer().getName(), netReservationResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( netReservationResults.hasFailures() )
         {
             throw new EnvironmentModificationException( "Failed to reserve network resources on all peers" );
         }

@@ -46,7 +46,7 @@ public class PeerUtil<T>
      *
      * @return set of {@code PeerTaskResult}
      */
-    public Set<PeerTaskResult<T>> executeParallel()
+    public PeerTaskResults<T> executeParallel()
     {
         Preconditions
                 .checkArgument( !CollectionUtil.isCollectionEmpty( peerTasks ), "No peer task found for execution" );
@@ -55,7 +55,7 @@ public class PeerUtil<T>
 
         peerTasks.clear();
 
-        return results;
+        return new PeerTaskResults<>( results );
     }
 
 
@@ -175,6 +175,43 @@ public class PeerUtil<T>
         public boolean hasSucceeded()
         {
             return hasSucceeded;
+        }
+    }
+
+
+    public static class PeerTaskResults<T>
+    {
+        private final Set<PeerTaskResult<T>> peerTaskResults;
+        private boolean hasFailures = false;
+
+
+        protected PeerTaskResults( final Set<PeerTaskResult<T>> peerTaskResults )
+        {
+            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerTaskResults ) );
+
+            this.peerTaskResults = peerTaskResults;
+
+            for ( PeerTaskResult peerTaskResult : peerTaskResults )
+            {
+                if ( !peerTaskResult.hasSucceeded() )
+                {
+                    hasFailures = true;
+
+                    break;
+                }
+            }
+        }
+
+
+        public boolean hasFailures()
+        {
+            return hasFailures;
+        }
+
+
+        public Set<PeerTaskResult<T>> getPeerTaskResults()
+        {
+            return peerTaskResults;
         }
     }
 }

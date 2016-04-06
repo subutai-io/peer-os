@@ -123,13 +123,14 @@ public class ContainerCloneStep
             environment.setLastUsedIpIndex( currentLastUsedIpIndex );
         }
 
-        Set<PeerUtil.PeerTaskResult<CreateEnvironmentContainerResponseCollector>> cloneResults =
+        PeerUtil.PeerTaskResults<CreateEnvironmentContainerResponseCollector> cloneResults =
                 cloneUtil.executeParallel();
 
         //collect results
         boolean succeeded = true;
 
-        for ( PeerUtil.PeerTaskResult<CreateEnvironmentContainerResponseCollector> cloneResult : cloneResults )
+        for ( PeerUtil.PeerTaskResult<CreateEnvironmentContainerResponseCollector> cloneResult : cloneResults
+                .getPeerTaskResults() )
         {
             CreateEnvironmentContainerResponseCollector response = cloneResult.getResult();
             addLogs( response );

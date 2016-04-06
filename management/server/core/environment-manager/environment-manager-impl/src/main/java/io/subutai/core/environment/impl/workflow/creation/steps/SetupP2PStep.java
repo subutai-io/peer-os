@@ -100,11 +100,9 @@ public class SetupP2PStep
             p2pUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new SetupP2PConnectionTask( peer, config ) ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<P2PConfig>> p2pResults = p2pUtil.executeParallel();
+        PeerUtil.PeerTaskResults<P2PConfig> p2pResults = p2pUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult<P2PConfig> p2pResult : p2pResults )
+        for ( PeerUtil.PeerTaskResult<P2PConfig> p2pResult : p2pResults.getPeerTaskResults() )
         {
             if ( p2pResult.hasSucceeded() )
             {
@@ -116,15 +114,13 @@ public class SetupP2PStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog(
                         String.format( "P2P setup failed on peer %s. Reason: %s", p2pResult.getPeer().getName(),
                                 p2pResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( p2pResults.hasFailures() )
         {
             throw new EnvironmentCreationException( "Failed to setup P2P connection across all peers" );
         }
@@ -141,9 +137,9 @@ public class SetupP2PStep
                     new PeerUtil.PeerTask<>( peer, new SetupTunnelTask( peer, environment.getId(), p2pIps ) ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Boolean>> tunnelResults = tunnelUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Boolean> tunnelResults = tunnelUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults )
+        for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults.getPeerTaskResults() )
         {
             if ( tunnelResult.hasSucceeded() )
             {
@@ -152,15 +148,13 @@ public class SetupP2PStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog(
                         String.format( "Tunnel setup failed on peer %s. Reason: %s", tunnelResult.getPeer().getName(),
                                 tunnelResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( tunnelResults.hasFailures() )
         {
             throw new EnvironmentCreationException( "Failed to setup tunnel across all peers" );
         }

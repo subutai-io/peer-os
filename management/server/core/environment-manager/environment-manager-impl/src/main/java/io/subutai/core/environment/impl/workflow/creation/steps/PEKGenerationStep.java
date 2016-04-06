@@ -88,11 +88,9 @@ public class PEKGenerationStep
                             environment, peer, securityManager.getKeyManager() ) ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Peer>> pekResults = pekUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Peer> pekResults = pekUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult pekResult : pekResults )
+        for ( PeerUtil.PeerTaskResult pekResult : pekResults.getPeerTaskResults() )
         {
             if ( pekResult.hasSucceeded() )
             {
@@ -101,15 +99,13 @@ public class PEKGenerationStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog(
                         String.format( "PEK generation failed on peer %s. Reason: %s", pekResult.getPeer().getName(),
                                 pekResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( pekResults.hasFailures() )
         {
             throw new PeerException( "Failed to generate PEK across all peers" );
         }

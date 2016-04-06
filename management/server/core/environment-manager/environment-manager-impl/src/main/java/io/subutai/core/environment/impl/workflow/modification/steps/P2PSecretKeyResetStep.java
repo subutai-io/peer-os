@@ -48,11 +48,9 @@ public class P2PSecretKeyResetStep
             } ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Object>> resetResults = resetUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> resetResults = resetUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult resetResult : resetResults )
+        for ( PeerUtil.PeerTaskResult resetResult : resetResults.getPeerTaskResults() )
         {
             if ( resetResult.hasSucceeded() )
             {
@@ -61,14 +59,12 @@ public class P2PSecretKeyResetStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog( String.format( "P2P secret key reset failed on peer %s. Reason: %s",
                         resetResult.getPeer().getName(), resetResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( resetResults.hasFailures() )
         {
             throw new PeerException( "Failed to reset p2p key across all peers" );
         }

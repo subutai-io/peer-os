@@ -49,9 +49,9 @@ public class CleanupEnvironmentStep
             } ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Object>> cleanupResults = cleanupUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> cleanupResults = cleanupUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult cleanupResult : cleanupResults )
+        for ( PeerUtil.PeerTaskResult cleanupResult : cleanupResults.getPeerTaskResults() )
         {
             if ( cleanupResult.hasSucceeded() )
             {
