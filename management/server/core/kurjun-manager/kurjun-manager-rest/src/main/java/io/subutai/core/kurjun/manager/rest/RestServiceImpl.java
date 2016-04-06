@@ -74,6 +74,22 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response deleteUrl( final String urlId )
+    {
+        try
+        {
+            kurjunManager.deleteUrl( Integer.parseInt( urlId ) );
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in updating system settings:" + e.getMessage() );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
     public Response getSignedMessage( final String signedMsg, final String id )
     {
         if ( kurjunManager.authorizeUser( Integer.parseInt( id ), new String( Base64.decodeBase64( signedMsg ) ) )
