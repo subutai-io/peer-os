@@ -177,8 +177,7 @@ func LxcImport(name, version, token string) {
 
 	log.Info("Version: " + t.version + ", branch: " + t.branch)
 
-	if t.branch == "stable" {
-		t.branch = ""
+	if t.branch == "" {
 		t.file = t.name + "-subutai-template_" + t.version + "_" + config.Template.Arch + ".tar.gz"
 	} else {
 		t.file = t.name + "-subutai-template_" + t.version + "-" + t.branch + "_" + config.Template.Arch + ".tar.gz"
