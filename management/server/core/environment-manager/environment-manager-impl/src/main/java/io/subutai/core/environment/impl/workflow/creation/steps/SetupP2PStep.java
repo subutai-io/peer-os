@@ -4,7 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.net.util.SubnetUtils;
@@ -21,6 +20,8 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
 import io.subutai.core.environment.impl.workflow.PeerUtil;
+import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupP2PConnectionTask;
+import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTunnelTask;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
@@ -130,9 +131,9 @@ public class SetupP2PStep
 
 
         //tunnel setup
-        PeerUtil<Boolean> tunnelUtil = new PeerUtil<>();
-
         P2pIps p2pIps = environment.getP2pIps();
+
+        PeerUtil<Boolean> tunnelUtil = new PeerUtil<>();
 
         for ( Peer peer : peers )
         {
@@ -162,54 +163,6 @@ public class SetupP2PStep
         if ( hasFailures )
         {
             throw new EnvironmentCreationException( "Failed to setup tunnel across all peers" );
-        }
-    }
-
-
-    private class SetupP2PConnectionTask implements Callable<P2PConfig>
-    {
-        private Peer peer;
-        private P2PConfig p2PConfig;
-
-
-        public SetupP2PConnectionTask( final Peer peer, final P2PConfig config )
-        {
-            this.peer = peer;
-            this.p2PConfig = config;
-        }
-
-
-        @Override
-        public P2PConfig call() throws Exception
-        {
-            peer.joinP2PSwarm( p2PConfig );
-
-            return p2PConfig;
-        }
-    }
-
-
-    private class SetupTunnelTask implements Callable<Boolean>
-    {
-        private final Peer peer;
-        private final String environmentId;
-        private final P2pIps p2pIps;
-
-
-        public SetupTunnelTask( final Peer peer, final String environmentId, final P2pIps p2pIps )
-        {
-            this.peer = peer;
-            this.environmentId = environmentId;
-            this.p2pIps = p2pIps;
-        }
-
-
-        @Override
-        public Boolean call() throws Exception
-        {
-            peer.setupTunnels( p2pIps, environmentId );
-
-            return true;
         }
     }
 }

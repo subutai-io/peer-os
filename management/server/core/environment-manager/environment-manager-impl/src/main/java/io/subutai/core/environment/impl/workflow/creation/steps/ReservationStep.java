@@ -49,10 +49,10 @@ public class ReservationStep
 
         Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
 
-        PeerUtil<Object> netQueryUtil = new PeerUtil<>();
-
         //obtain reserved net resources
         final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
+
+        PeerUtil<Object> netQueryUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {

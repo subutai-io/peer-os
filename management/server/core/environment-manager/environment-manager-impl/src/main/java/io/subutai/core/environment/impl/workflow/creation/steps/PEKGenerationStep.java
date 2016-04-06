@@ -15,7 +15,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.workflow.PeerUtil;
-import io.subutai.core.environment.impl.workflow.task.PeerEnvironmentKeyTask;
+import io.subutai.core.environment.impl.workflow.creation.steps.helpers.PeerEnvironmentKeyTask;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
