@@ -26,8 +26,6 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
 
     EnvironmentId getEnvironmentId();
 
-    String getNodeGroupName();
-
     void dispose() throws PeerException;
 
     void start() throws PeerException;

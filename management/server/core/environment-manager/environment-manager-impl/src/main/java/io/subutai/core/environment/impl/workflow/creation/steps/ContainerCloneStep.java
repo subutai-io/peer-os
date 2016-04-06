@@ -203,7 +203,7 @@ public class ContainerCloneStep
                 new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(),
                         cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
                         ContainerHostState.RUNNING );
-        return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
+        return new EnvironmentContainerImpl( localPeerId, peerId, infoModel,
                 cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
                 node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(),
                 cloneResponse.getContainerName() );
