@@ -61,10 +61,9 @@ public class CreatePeerNodeGroupsTask implements Callable<CreateEnvironmentConta
                 ContainerSize size = node.getType();
                 //todo put common fields to CreateEnvironmentContainerGroupRequest instead of duplicating in
                 // CloneRequest
-                CloneRequest cloneRequest =
-                        new CloneRequest( node.getHostId(), node.getHostname(), node.getName(), ip + "/" + maskLength,
-                                environment.getId(), localPeer.getId(), localPeer.getOwnerId(), node.getTemplateName(),
-                                HostArchitecture.AMD64, size );
+                CloneRequest cloneRequest = new CloneRequest( node.getHostId(), node.getHostname(), node.getHostname(),
+                        ip + "/" + maskLength, environment.getId(), localPeer.getId(), localPeer.getOwnerId(),
+                        node.getTemplateName(), HostArchitecture.AMD64, size );
 
                 request.addRequest( cloneRequest );
 

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.kurjun.manager.api.dao.*;
+import io.subutai.core.kurjun.manager.api.dao.KurjunDataService;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 import io.subutai.core.kurjun.manager.impl.model.KurjunEntity;
 
@@ -199,7 +199,8 @@ public class KurjunDataServiceImpl implements KurjunDataService
 
             Kurjun entity = getKurjunData( url );
 
-            entity.setSignedMessage( signedMessage );
+            byte[] signedMsg = org.apache.commons.codec.binary.Base64.encodeBase64( signedMessage.getBytes() );
+            entity.setSignedMessage( signedMsg );
 
             em.merge( entity );
             daoManager.commitTransaction( em );
@@ -236,5 +237,31 @@ public class KurjunDataServiceImpl implements KurjunDataService
             daoManager.closeEntityManager( em );
         }
         return result;
+    }
+
+
+    @Override
+    public void deleteKurjunData( final int id )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            KurjunEntity entity = em.find( KurjunEntity.class, id );
+            em.remove( entity );
+            em.flush();
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+            LOG.error( "ConfigDataService deleteOperation:" + ex.toString() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
     }
 }

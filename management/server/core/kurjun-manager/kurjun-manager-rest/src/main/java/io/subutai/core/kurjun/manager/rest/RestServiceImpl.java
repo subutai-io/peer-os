@@ -3,20 +3,17 @@ package io.subutai.core.kurjun.manager.rest;
 
 import java.util.List;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 
@@ -49,8 +46,9 @@ public class RestServiceImpl implements RestService
         }
         else
         {
-            authId = kurjunManager.getDataService().getKurjunData( id ).getAuthID();
+            authId = kurjunManager.getDataService().getKurjunData( Integer.parseInt( id ) ).getAuthID();
         }
+
         return Response.status( Response.Status.OK ).entity( authId ).build();
     }
 
@@ -72,17 +70,33 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response deleteUrl( final String urlId )
+    {
+        try
+        {
+            kurjunManager.deleteUrl( Integer.parseInt( urlId ) );
+            return Response.status( Response.Status.OK ).build();
+        }
+        catch ( ConfigurationException e )
+        {
+            LOG.error( "Error in updating system settings:" + e.getMessage() );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( e.getMessage() ).build();
+        }
+    }
+
+
+    @Override
     public Response getSignedMessage( final String signedMsg, final String id )
     {
-        //        if ( kurjunManager.authorizeUser( url, type, signedMsg ) == null )
-        //        {
-        ////            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        //            return Response.status( Response.Status.OK ).build();
-        //        }
-        //        else
-        //        {
-        return Response.status( Response.Status.OK ).build();
-        //        }
+        if ( kurjunManager.authorizeUser( Integer.parseInt( id ), new String( Base64.decodeBase64( signedMsg ) ) )
+                == null )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.OK ).build();
+        }
     }
 
 

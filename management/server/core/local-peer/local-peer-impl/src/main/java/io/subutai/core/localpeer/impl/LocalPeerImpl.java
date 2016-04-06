@@ -466,8 +466,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return sshPublicKeys;
         }
 
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
-
+        //read ssh keys if exist
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getReadSSHCommand(), hosts );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -487,18 +487,47 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         failedHosts.removeAll( succeededHosts );
 
-        for ( Host failedHost : failedHosts )
-        {
-            LOG.error( "Failed to generate ssh key on host {}", failedHost.getHostname() );
-        }
-
+        //create ssh keys
         if ( !failedHosts.isEmpty() )
         {
-            throw new PeerException( "Failed to generate ssh keys on all hosts" );
+            results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), failedHosts );
+
+            succeededHosts = Sets.newHashSet();
+
+            for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+            {
+                CommandResult result = resultEntry.getValue();
+                Host host = resultEntry.getKey();
+
+                if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+                {
+                    sshPublicKeys.addSshPublicKey( result.getStdOut() );
+
+                    succeededHosts.add( host );
+                }
+            }
+
+            failedHosts.removeAll( succeededHosts );
+
+            for ( Host failedHost : failedHosts )
+            {
+                LOG.error( "Failed to generate ssh key on host {}", failedHost.getHostname() );
+            }
+
+            if ( !failedHosts.isEmpty() )
+            {
+                throw new PeerException( "Failed to generate ssh keys on all hosts" );
+            }
         }
 
 
         return sshPublicKeys;
+    }
+
+
+    protected RequestBuilder getReadSSHCommand()
+    {
+        return new RequestBuilder( String.format( "cat %1$s/id_dsa.pub", Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
@@ -538,8 +567,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             keysString.append( key );
             i++;
-            //send next 5 keys
-            if ( i % 5 == 0 || i == keys.size() )
+            //send next 100 keys
+            if ( i % 100 == 0 || i == keys.size() )
             {
                 Set<Host> succeededHosts = Sets.newHashSet();
                 Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -1810,6 +1839,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return usedNetworkResources;
     }
 
+
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
@@ -1830,11 +1860,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
         ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
 
+        int taskCount = 0;
         for ( final ResourceHost resourceHost : resourceHosts )
         {
             //setup tunnel only if this RH participates in the swarm
             if ( p2pIps.findByRhId( resourceHost.getId() ) != null )
             {
+                taskCount++;
                 completionService.submit( new Callable<Object>()
                 {
                     @Override
@@ -1853,7 +1885,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            for ( final ResourceHost ignored : resourceHosts )
+            for ( int i = 0; i < taskCount; i++ )
             {
                 completionService.take().get();
             }

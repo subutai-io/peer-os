@@ -3,15 +3,19 @@ package io.subutai.core.hubmanager.api.model;
 
 public interface Config
 {
-    public String getPeerId();
+    String getPeerId();
 
-    public void setPeerId( final String peerId );
+    void setPeerId( final String peerId );
 
-    public String getHubIp();
+    String getHubIp();
 
-    public void setHubIp( final String serverIp );
+    void setHubIp( final String serverIp );
 
-    public String getOwnerId();
+    String getOwnerId();
 
-    public void setOwnerId( final String ownerId );
+    void setOwnerId( final String ownerId );
+
+    String getOwnerEmail();
+
+    void setOwnerEmail( String ownerEmail );
 }

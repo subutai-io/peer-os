@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
+import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.plugincommon.api.PluginDAO;
 
 
@@ -26,53 +27,44 @@ import io.subutai.core.plugincommon.api.PluginDAO;
  */
 public class PluginDAOImpl implements PluginDAO
 {
-
     private static final Logger LOG = LoggerFactory.getLogger( PluginDAOImpl.class.getName() );
-    private Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().disableHtmlEscaping().create();
-    private PluginDataService dataService;
-    private EntityManagerFactory entityManagerFactory = null;
 
     private static final ReentrantLock lock = new ReentrantLock( true );
 
+    private PluginDataService dataService;
 
-    /* *******************************************************************
-     *
-     */
-    public PluginDAOImpl( DataSource dataSource ) throws SQLException
+    private EntityManagerFactory entityManagerFactory = null;
+
+    private final HubAdapter hubAdapter;
+
+
+    public PluginDAOImpl( HubAdapter hubAdapter )
     {
+        this.hubAdapter = hubAdapter;
     }
 
 
-    public PluginDAOImpl() throws SQLException
-    {
-    }
-
-
-    public PluginDAOImpl( final DataSource dataSource, final GsonBuilder gsonBuilder ) throws SQLException
-    {
-        Preconditions.checkNotNull( dataSource, "GsonBuilder is null" );
-    }
-
-
-    /* *******************************************************************
-     *
-     */
     public void init() throws SQLException
     {
         this.dataService = new PluginDataService( entityManagerFactory );
     }
 
 
-
-    /* *******************************************************************
-     *
-     */
     @Override
     public boolean saveInfo( String source, String key, Object info )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( info, "Info is null" );
+
+        boolean saved = hubAdapter.uploadPluginData( source, key, info );
+
+        if ( saved )
+        {
+            // The data is for environment created on Hub. We save the plugin data there only,
+            // i.e. no need to store in the local DB too.
+            return true;
+        }
 
         try
         {
@@ -137,6 +129,7 @@ public class PluginDAOImpl implements PluginDAO
         Preconditions.checkNotNull( clazz, "Class is null" );
 
         List<T> list = new ArrayList<>();
+
         try
         {
             lock.lock();
@@ -150,6 +143,10 @@ public class PluginDAOImpl implements PluginDAO
         {
             lock.unlock();
         }
+
+        // Add plugin data from Hub
+        list.addAll( hubAdapter.getPluginData( source, clazz ) );
+
         return list;
     }
 
@@ -184,6 +181,7 @@ public class PluginDAOImpl implements PluginDAO
         {
             lock.unlock();
         }
+
         return null;
     }
 

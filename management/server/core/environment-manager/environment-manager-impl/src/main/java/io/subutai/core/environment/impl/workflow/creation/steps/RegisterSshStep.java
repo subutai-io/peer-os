@@ -3,13 +3,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
@@ -21,12 +14,11 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.PeerUtil;
 
 
 public class RegisterSshStep
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RegisterSshStep.class );
-
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
 
@@ -80,50 +72,39 @@ public class RegisterSshStep
     {
         Set<Peer> peers = environment.getPeers();
 
-        ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
-        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+        PeerUtil<Object> appendUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            completionService.submit( new Callable<Peer>()
+            appendUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
-                public Peer call() throws Exception
+                public Object call() throws Exception
                 {
                     peer.configureSshInEnvironment( environment.getEnvironmentId(), new SshPublicKeys( sshKeys ) );
-                    return peer;
+
+                    return null;
                 }
-            } );
+            } ) );
         }
 
-        Set<Peer> succeededPeers = Sets.newHashSet();
-        for ( Peer ignored : peers )
+        PeerUtil.PeerTaskResults<Object> appendResults = appendUtil.executeParallel();
+
+        for ( PeerUtil.PeerTaskResult appendResult : appendResults.getPeerTaskResults() )
         {
-            try
+            if ( appendResult.hasSucceeded() )
             {
-                Future<Peer> f = completionService.take();
-                succeededPeers.add( f.get() );
+                trackerOperation
+                        .addLog( String.format( "Registered ssh keys on peer %s", appendResult.getPeer().getName() ) );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Problems registering ssh keys in environment", e );
+                trackerOperation.addLog( String.format( "Failed to register ssh keys on peer %s. Reason: %s",
+                        appendResult.getPeer().getName(), appendResult.getFailureReason() ) );
             }
         }
 
-        for ( Peer succeededPeer : succeededPeers )
-        {
-            trackerOperation.addLog( String.format( "Registered ssh keys on peer %s", succeededPeer.getName() ) );
-        }
-
-        Set<Peer> failedPeers = Sets.newHashSet( peers );
-        failedPeers.removeAll( succeededPeers );
-
-        for ( Peer failedPeer : failedPeers )
-        {
-            trackerOperation.addLog( String.format( "Failed to register ssh keys on peer %s", failedPeer.getName() ) );
-        }
-
-        if ( !failedPeers.isEmpty() )
+        if ( appendResults.hasFailures() )
         {
             throw new EnvironmentManagerException( "Failed to register ssh keys on all peers" );
         }
@@ -133,55 +114,45 @@ public class RegisterSshStep
     protected Set<String> createSshKeys() throws EnvironmentManagerException, PeerException
     {
 
-        final Set<String> keys = Sets.newHashSet();
+        final Set<String> keys = Sets.newConcurrentHashSet();
 
         Set<Peer> peers = environment.getPeers();
 
-        ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
-        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
+        PeerUtil<Object> createUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            completionService.submit( new Callable<Peer>()
+            createUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
-                public Peer call() throws Exception
+                public Object call() throws Exception
                 {
                     SshPublicKeys sshPublicKeys = peer.generateSshKeyForEnvironment( environment.getEnvironmentId() );
+
                     keys.addAll( sshPublicKeys.getSshPublicKeys() );
-                    return peer;
+
+                    return null;
                 }
-            } );
+            } ) );
         }
 
-        Set<Peer> succeededPeers = Sets.newHashSet();
-        for ( Peer ignored : peers )
+        PeerUtil.PeerTaskResults<Object> createResults = createUtil.executeParallel();
+
+        for ( PeerUtil.PeerTaskResult createResult : createResults.getPeerTaskResults() )
         {
-            try
+            if ( createResult.hasSucceeded() )
             {
-                Future<Peer> f = completionService.take();
-                succeededPeers.add( f.get() );
+                trackerOperation
+                        .addLog( String.format( "Generated ssh keys on peer %s", createResult.getPeer().getName() ) );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Problems generating ssh keys in environment", e );
+                trackerOperation.addLog( String.format( "Failed to generate ssh keys on peer %s. Reason: %s",
+                        createResult.getPeer().getName(), createResult.getFailureReason() ) );
             }
         }
 
-        for ( Peer succeededPeer : succeededPeers )
-        {
-            trackerOperation.addLog( String.format( "Generated ssh keys on peer %s", succeededPeer.getName() ) );
-        }
-
-        Set<Peer> failedPeers = Sets.newHashSet( peers );
-        failedPeers.removeAll( succeededPeers );
-
-        for ( Peer failedPeer : failedPeers )
-        {
-            trackerOperation.addLog( String.format( "Failed to generate ssh keys on peer %s", failedPeer.getName() ) );
-        }
-
-        if ( !failedPeers.isEmpty() )
+        if ( createResults.hasFailures() )
         {
             throw new EnvironmentManagerException( "Failed to generate ssh keys on all peers" );
         }

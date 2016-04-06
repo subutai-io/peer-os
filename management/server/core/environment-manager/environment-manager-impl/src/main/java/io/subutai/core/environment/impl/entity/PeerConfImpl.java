@@ -10,13 +10,13 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -40,7 +40,7 @@ public class PeerConfImpl implements PeerConf, Serializable
     @Column( name = "peer_id", nullable = false )
     private String peerId;
 
-    @ElementCollection( targetClass = RhP2PIpEntity.class )
+    @ElementCollection( targetClass = RhP2PIpEntity.class, fetch = FetchType.EAGER)
     @CollectionTable(
             name = "RH_P2P_IP",
             joinColumns = @JoinColumn( name = "PEER_ID" ) )

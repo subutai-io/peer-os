@@ -243,9 +243,13 @@ function environmentService($http, $q) {
 		var fd = new FormData();
 		fd.append('hostName', domain.name);
 		fd.append('strategy', domain.strategy);
-		if( jQuery.isEmptyObject(file) )
+		if( !jQuery.isEmptyObject(file) )
 		{
 			fd.append('file', file);
+		}
+		else
+		{
+			fd.append('file', "");
 		}
 
 		return $http.post(

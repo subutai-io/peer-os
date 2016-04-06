@@ -16,16 +16,21 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     @SerializedName( "status" )
     @JsonProperty( "status" )
     protected ContainerHostState state;
+    @SerializedName( "name" )
+    @JsonProperty( "name" )
+    protected String name;
 
 
     public ContainerHostInfoModel( @JsonProperty( "id" ) final String id,
                                    @JsonProperty( "hostname" ) final String hostname,
+                                   @JsonProperty( "containerName" ) final String containerName,
                                    @JsonProperty( "interfaces" ) final HostInterfaces hostInterfaces,
                                    @JsonProperty( "arch" ) final HostArchitecture hostArchitecture,
                                    @JsonProperty( "status" ) final ContainerHostState state )
     {
         super( id, hostname, hostInterfaces, hostArchitecture );
         this.state = state;
+        this.name = containerName;
     }
 
 
@@ -33,6 +38,7 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     {
         super( info );
         this.state = info.getState();
+        this.name = info.getContainerName();
     }
 
 
@@ -40,6 +46,13 @@ public class ContainerHostInfoModel extends HostInfoModel implements ContainerHo
     public ContainerHostState getState()
     {
         return state;
+    }
+
+
+    @Override
+    public String getContainerName()
+    {
+        return name;
     }
 
 

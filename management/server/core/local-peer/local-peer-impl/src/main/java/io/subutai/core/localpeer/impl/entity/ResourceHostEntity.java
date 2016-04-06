@@ -584,7 +584,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ), this );
+            commandUtil
+                    .execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ).withTimeout( 60 * 60 ),
+                            this );
         }
         catch ( CommandException e )
         {
@@ -728,7 +730,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 if ( "management".equals( info.getHostname() ) )
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getHostname(), "management", info.getArch().name(),
+                            info.getHostInterfaces(), info.getContainerName(), "management", info.getArch().name(),
                             "management", null, null, ContainerSize.SMALL, info.getState() );
                     addContainerHost( containerHost );
                 }

@@ -63,6 +63,17 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 
 	function getTemplates() {
 		LOADING_SCREEN();
+		/*kurjunSrv.getRepositories().success(function (repositories) {
+			vm.repositories = repositories;
+
+			kurjunSrv.getTemplates().success(function (data) {
+				vm.templates = data;
+				LOADING_SCREEN('none');
+			}).error(function (error){
+				LOADING_SCREEN('none');
+			});
+		});*/
+
 		kurjunSrv.getTemplates().success(function (data) {
 			vm.templates = data;
 			LOADING_SCREEN('none');

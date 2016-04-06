@@ -30,7 +30,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -70,7 +69,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
-import io.subutai.core.environment.impl.dao.EnvironmentDataService;
+import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -86,7 +85,6 @@ import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
 import io.subutai.core.object.relation.api.model.RelationInfo;
@@ -113,36 +111,30 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private final RelationManager relationManager;
     private final PeerManager peerManager;
     private final Tracker tracker;
-    private final TemplateManager templateRegistry;
-    private final DaoManager daoManager;
     protected Set<EnvironmentEventListener> listeners = Sets.newConcurrentHashSet();
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
-    protected EnvironmentDataService environmentDataService;
     protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
 
     private EnvironmentAdapter environmentAdapter;
+    private EnvironmentService environmentService;
 
 
-    public EnvironmentManagerImpl( final TemplateManager templateRegistry, final PeerManager peerManager,
-                                   SecurityManager securityManager, final DaoManager daoManager,
+    public EnvironmentManagerImpl( final PeerManager peerManager, SecurityManager securityManager,
                                    final IdentityManager identityManager, final Tracker tracker,
-                                   final RelationManager relationManager, HubAdapter hubAdapter )
+                                   final RelationManager relationManager, HubAdapter hubAdapter,
+                                   final EnvironmentService environmentService )
     {
-        Preconditions.checkNotNull( templateRegistry );
         Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( relationManager );
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( tracker );
 
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
-        this.daoManager = daoManager;
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
@@ -150,12 +142,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
         environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
+
+        this.environmentService = environmentService;
     }
 
 
     public void init()
     {
-        this.environmentDataService = new EnvironmentDataService( daoManager );
     }
 
 
@@ -211,7 +204,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private boolean isPeerInUse( String peerId )
     {
         boolean inUse = false;
-        for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext(); )
+        for ( Iterator<EnvironmentImpl> i = environmentService.getAll().iterator(); !inUse && i.hasNext(); )
         {
             EnvironmentImpl e = i.next();
             if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
@@ -252,7 +245,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         Set<Environment> environments = new HashSet<>();
 
-        for ( Environment environment : environmentDataService.getAll() )
+        for ( Environment environment : environmentService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
 
@@ -280,7 +273,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Set<Environment> environments = new HashSet<>();
 
-        for ( Environment environment : environmentDataService.getAll() )
+        for ( Environment environment : environmentService.getAll() )
         {
             if ( environment.getUserId().equals( userId ) )
             {
@@ -597,7 +590,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
         if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( environment ) )
@@ -614,8 +606,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            allPeers.addAll( getPeers( topology ) );
-            allPeers.addAll( environment.getPeers() );
+            if ( topology != null )
+            {
+                allPeers.addAll( getPeers( topology ) );
+                allPeers.addAll( environment.getPeers() );
+            }
         }
         catch ( PeerException e )
         {
@@ -645,7 +640,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //launch environment growing workflow
 
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
-                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers, false );
+                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers );
 
         //start environment growing workflow
         executor.execute( new Runnable()
@@ -1036,7 +1031,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return environment;
         }
 
-        environment = environmentDataService.find( environmentId );
+        environment = environmentService.find( environmentId );
 
         if ( environment == null )
         {
@@ -1096,7 +1091,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        EnvironmentImpl environment = environmentDataService.find( environmentId );
+        EnvironmentImpl environment = environmentService.find( environmentId );
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
         {
             throw new EnvironmentNotFoundException();
@@ -1353,7 +1348,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentCreationException( e );
         }
 
-        environment = save( environment );
+        save( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -1416,20 +1411,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                         final Topology topology,
                                                                         final TrackerOperation operationTracker )
     {
-        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, peerManager,
-                securityManager, environment, topology, operationTracker, this );
+        return new EnvironmentGrowingWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
+                topology, operationTracker, this );
     }
 
 
     protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final EnvironmentImpl environment,
                                                                          final Topology topology,
                                                                          final TrackerOperation operationTracker,
-                                                                         final List<String> removedContainers,
-                                                                         final boolean removeMetaData )
+                                                                         final List<String> removedContainers )
 
     {
-        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, templateRegistry, peerManager,
-                securityManager, environment, topology, removedContainers, operationTracker, this, removeMetaData );
+        return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
+                topology, removedContainers, operationTracker, this );
     }
 
 
@@ -1538,7 +1532,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected Long getUserId()
     {
-        return ( long ) 0;//getUser().getId();
+        return identityManager.getActiveUser().getId();
     }
 
 
@@ -1548,18 +1542,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public EnvironmentImpl save( final Environment environment )
+    public void save( final EnvironmentImpl environment )
     {
-        EnvironmentImpl env = environmentDataService.save( environment );
-        setEnvironmentTransientFields( env );
-        setContainersTransientFields( env );
-        return env;
+        environmentService.persist( environment );
+
+        setEnvironmentTransientFields( environment );
+
+        setContainersTransientFields( environment );
     }
 
 
     public EnvironmentImpl update( EnvironmentImpl environment )
     {
-        environment = environmentDataService.merge( environment );
+        if ( environment instanceof ProxyEnvironment )
+        {
+            // Environment from Hub
+            return environment;
+        }
+
+        environment = environmentService.merge( environment );
 
         setEnvironmentTransientFields( environment );
 
@@ -1573,7 +1574,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void remove( final EnvironmentImpl environment )
     {
-        environmentDataService.remove( environment );
+        environmentService.remove( environment.getId() );
 
         environmentAdapter.removeEnvironment( environment );
     }
@@ -1821,9 +1822,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //remove subscription from database
         try
         {
-            Environment environment = environmentDataService.find( environmentId );
+            Environment environment = environmentService.find( environmentId );
             environment.removeAlertHandler( new EnvironmentAlertHandlerImpl( handlerId, handlerPriority ) );
-            environmentDataService.save( environment );
+            update( ( EnvironmentImpl ) environment );
         }
         catch ( Exception e )
         {

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import javax.ws.rs.core.Response;
@@ -16,6 +15,7 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
@@ -178,7 +178,8 @@ public class KurjunManagerImpl implements KurjunManager
         }
         else
         {
-            kurjun.setSignedMessage( signedMessage );
+            byte[] signedMsg = Base64.encodeBase64( signedMessage.getBytes() );
+            kurjun.setSignedMessage( signedMsg );
             kurjun.setToken( response.readEntity( String.class ) );
             kurjun.setState( true );
 
@@ -297,6 +298,15 @@ public class KurjunManagerImpl implements KurjunManager
         kurjun.setUrl( url );
 
         dataService.updateKurjunData( kurjun );
+        updateSystemSettings();
+    }
+
+
+    @Override
+    public void deleteUrl( final int id ) throws ConfigurationException
+    {
+        dataService.deleteKurjunData( id );
+
         updateSystemSettings();
     }
 
