@@ -262,4 +262,9 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnButtonLaunch();
     }
 
+    @When("the user input the cluster name: '$cluster'")
+    public void user_search_plugin(String cluster){
+        subutaiSteps.inputClusterName(cluster);
+    }
+
 }

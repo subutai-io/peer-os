@@ -8,6 +8,9 @@ public class PluginsPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
+    @FindBy(xpath = "*//input[@placeholder=\"Enter cluster name\"]")
+    public WebElementFacade fieldClusterName;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
@@ -31,7 +34,10 @@ public class PluginsPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Selectors
+    public String sikuliSelectorEnvironment = "src/test/resources/imgs/icons/selectorSelectEnvironment.png";
 
+    @FindBy(xpath = "*//option[contains(text(), \"Test Environment Master\")]")
+    public WebElementFacade selectorEnvironmentMaster;
     //endregion
 
     //region WEB ELEMENTS: Images

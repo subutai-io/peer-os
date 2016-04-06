@@ -40,6 +40,7 @@ public class SubutaiSteps extends ScenarioSteps {
     AdvancedPage advancedPage;
     AboutPage aboutPage;
     PgpPlugin pgpPlugin;
+    PluginsPage pluginsPage;
     Screen screen = new Screen();
     //endregion
 
@@ -137,6 +138,11 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void inputPluginName(String plugin) {
         bazaarPage.fieldSearch.type(plugin);
+    }
+
+    @Step
+    public void inputClusterName(String cluster) {
+        pluginsPage.fieldClusterName.type(cluster);
     }
 
     //endregion
@@ -389,6 +395,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnMenuItemKurjun() throws FindFailed {
         screen.click(commonPage.sikuliMenuItemKurjun);
+        waitABit(5000);
     }
 
     @Step
@@ -590,6 +597,32 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(environmentsPage.sikuliTemplateMaster);
     }
 
+    @Step
+    public void clickOnButtonLaunch() throws FindFailed {
+        bazaarPage.waitButtonLaunch();
+        screen.click(bazaarPage.sikuliButtonLaunch);
+    }
+
+    @Step
+    public void clickOnTitleRawFiles() throws FindFailed {
+        screen.click(kurjunPage.sikuliTitleRawFiles);
+    }
+
+    @Step
+    public void clickOnTitleUrlsList() throws FindFailed {
+        screen.click(kurjunSettingsPage.sikuliTitleUrlsList);
+    }
+
+    @Step
+
+    public void clickOnSelectorEnvironment() throws FindFailed {
+        screen.click(pluginsPage.sikuliSelectorEnvironment);
+    }
+
+    @Step
+    public void clickOnEnvironmentFromSelector() {
+        pluginsPage.selectorEnvironmentMaster.click();
+    }
     //endregion
 
     //region Action: Drag And Drop
@@ -911,6 +944,27 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.find(environmentsPage.sikuliTemplateMaster);
         screen.find(environmentsPage.sikuliPeerRH1);
     }
+
+    @Step
+    public void userShouldObserveButtonUploadFile() {
+        assertThat(kurjunPage.buttonUploadFile.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonRefresh() {
+        assertThat(kurjunPage.buttonRefresh.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonAddUrl() {
+        assertThat(kurjunSettingsPage.buttonAddUrl.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObservePluginCassandra() {
+        assertThat(environmentsPage.templateCassandra.isVisible(), is(true));
+    }
+
     //endregion
 
 
@@ -998,4 +1052,5 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnButtonGoToHUBWhite() throws FindFailed {
         screen.click(commonPage.sikuliButtonGoToHUBWhite);
     }
+
 }

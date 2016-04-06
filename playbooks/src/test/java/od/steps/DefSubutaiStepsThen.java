@@ -325,4 +325,10 @@ public class DefSubutaiStepsThen {
     public void user_search_plugin(String plugin){
         subutaiSteps.inputPluginName(plugin);
     }
+
+    @Then("the user chooses the environment")
+    public void user_chooses_enviroenment() throws FindFailed {
+        subutaiSteps.clickOnSelectorEnvironment();
+        subutaiSteps.clickOnEnvironmentFromSelector();
+    }
 }

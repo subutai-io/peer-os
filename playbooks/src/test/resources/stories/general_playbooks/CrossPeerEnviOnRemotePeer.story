@@ -11,7 +11,6 @@ Then the user should observe web elements on: Login page
 Given the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
 When the user clicks on the menu item: Peer Registration
-
 And the user clicks on the button: Сreate peer
 Then the user should create a peer request with: '158.181.133.65', 'test'
 And the user should observe button: Cancel
