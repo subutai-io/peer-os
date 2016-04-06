@@ -404,7 +404,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
 				layout: 'default'
 			},
 			controller: function ($location ) {
-				$location.path('/');
+				window.location.path('/');
 			}
 		})
         .state('environments', {
