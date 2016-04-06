@@ -326,6 +326,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
     });
 
     //$locationProvider.html5Mode(true);
+    $urlRouterProvider.when('', '/');
 
     $stateProvider
         .state('login', {
@@ -396,17 +397,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
-		.state('main', {
-			url: '',
-			templateUrl: '',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			controller: function ($location ) {
-				window.location.path('/');
-			}
-		})
         .state('environments', {
             url: '/environments/{activeTab}',
             templateUrl: 'subutai-app/environment/partials/view.html',
