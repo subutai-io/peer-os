@@ -1,6 +1,8 @@
 package io.subutai.common.metric;
 
 
+import java.math.BigDecimal;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
@@ -32,14 +34,14 @@ public class ExceededQuota
     @JsonProperty( "resourceType" )
     protected final ContainerResourceType containerResourceType;
     @JsonProperty( "currentValue" )
-    protected final ResourceValue currentValue;
+    protected final NumericValueResource currentValue;
     @JsonProperty( "quotaValue" )
     protected final ResourceValue quotaValue;
 
 
     public ExceededQuota( @JsonProperty( "hostId" ) final HostId hostId,
                           @JsonProperty( "resourceType" ) final ContainerResourceType containerResourceType,
-                          @JsonProperty( "currentValue" ) final ResourceValue currentValue,
+                          @JsonProperty( "currentValue" ) final NumericValueResource currentValue,
                           @JsonProperty( "quotaValue" ) final ResourceValue quotaValue )
     {
         this.hostId = hostId;
@@ -104,7 +106,18 @@ public class ExceededQuota
 
     public double getPercentage()
     {
-        return ( ( ByteValueResource ) currentValue.getValue() ).doubleValue();
+        return currentValue.getValue().doubleValue();
+    }
+
+
+    public BigDecimal getUsedValue()
+    {
+        if ( quotaValue instanceof NumericValueResource )
+        {
+            return ( ( NumericValueResource ) quotaValue ).getValue().multiply( currentValue.getValue() )
+                                                          .multiply( new BigDecimal( 0.01 ) );
+        }
+        throw new UnsupportedOperationException( "Used value unsupported." );
     }
 
 
