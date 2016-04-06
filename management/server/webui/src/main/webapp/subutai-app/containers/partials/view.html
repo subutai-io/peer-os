@@ -64,7 +64,7 @@
 			<table datatable="ng" 
 				dt-options="containerViewCtrl.dtOptions" 
 				dt-column-defs="containerViewCtrl.dtColumnDefs" 
-				class="row-border hover subt_table-containers-table">
+				class="row-border hover subt_table-containers-table ez-ssh-table">
 				<thead>
 					<tr>
 						<th>Status</th>
@@ -97,6 +97,7 @@
 								' 
 								tooltip-side="right"
 								env-id="{{ container.environmentId }}"
+								container-id="{{ container.id }}"
 								env-data-source="{{ container.dataSource }}"
 							>
 								{{ container.templateName }}
@@ -145,8 +146,9 @@
 							</span>
 						</td>
 						<td>
-							<div ng-if="container.dataSource === 'hub'">
-							<button class="b-btn b-btn_blue" disabled>
+							<div>
+							<!--<div ng-if="container.dataSource === 'hub'">-->
+							<button class="b-btn b-btn_blue ez-ssh-btn" disabled>
 								<div class="ssh-key-button_block">
 									<svg class="ssh-key-button" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"  x="0px" y="0px" viewBox="0 0 28 26" enable-background="new 0 0 28 26" xml:space="preserve">
 										<g>

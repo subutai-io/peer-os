@@ -3741,25 +3741,3 @@ span.ssh-info-button
     border-color: #61cbeb;
     color: #fff;
 }
-
-.b-btn {
-    border: 1px solid #cbcbcb;
-    display: inline-block;
-    padding: 0 15px;
-    height: 30px;
-    line-height: 30px;
-    background-color: #f2f2f2;
-    border-radius: 2px;
-    color: #3d3d3d;
-    font-size: 12px;
-    text-decoration: none;
-    -webkit-transition: all .4s ease-in-out;
-    -moz-transition: all .4s ease-in-out;
-    -o-transition: all .4s ease-in-out;
-    -ms-transition: all .4s ease-in-out;
-    transition: all .4s ease-in-out;
-    cursor: pointer;
-    vertical-align: middle;
-    box-sizing: border-box;
-    text-align: center;
-}
