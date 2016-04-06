@@ -15,6 +15,8 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 /**
  * Container destroy step
+ *
+ * todo parallelize
  */
 public class ContainerDestroyStep
 {

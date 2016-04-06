@@ -56,7 +56,7 @@ public class SetupP2PStep
     public void execute() throws EnvironmentModificationException, PeerException
     {
 
-        //create p2p subnet util
+        // create p2p subnet util
         SubnetUtils.SubnetInfo p2pSubnetInfo =
                 new SubnetUtils( environment.getP2pSubnet(), P2PUtil.P2P_SUBNET_MASK ).getInfo();
 
