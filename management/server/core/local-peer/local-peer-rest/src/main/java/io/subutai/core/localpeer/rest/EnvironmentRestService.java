@@ -107,6 +107,14 @@ public interface EnvironmentRestService
     SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @POST
+    @Path( "{environmentId}/containers/sshkey/add" )
+    void addSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId, String sshPublicKey );
+
+    @POST
+    @Path( "{environmentId}/containers/sshkey/remove" )
+    void removeSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId, String sshPublicKey );
+
+    @POST
     @Path( "{environmentId}/containers/hosts" )
     @Consumes( MediaType.APPLICATION_JSON )
     Response configureHostsInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,

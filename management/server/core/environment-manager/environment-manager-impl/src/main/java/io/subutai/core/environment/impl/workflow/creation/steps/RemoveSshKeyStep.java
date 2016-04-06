@@ -1,29 +1,24 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.Host;
-import io.subutai.common.settings.Common;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.util.PeerUtil;
 
 
-//todo move logic to Peer
 public class RemoveSshKeyStep
 {
     private final String sshKey;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
-    protected CommandUtil commandUtil = new CommandUtil();
 
 
     public RemoveSshKeyStep( final String sshKey, final EnvironmentImpl environment,
@@ -35,44 +30,52 @@ public class RemoveSshKeyStep
     }
 
 
-    public void execute() throws EnvironmentManagerException
+    public void execute() throws EnvironmentManagerException, PeerException
     {
 
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
-            Set<Host> hosts = Sets.newHashSet();
-            hosts.addAll( environment.getContainerHosts() );
 
-            Map<Host, CommandResult> results =
-                    commandUtil.executeParallelSilent( getRemoveSshKeyCommand( sshKey ), hosts );
+            PeerUtil<Object> keyUtil = new PeerUtil<>();
 
-            for ( Host succeededHost : results.keySet() )
+            Set<Peer> peers = environment.getPeers();
+
+            for ( final Peer peer : peers )
             {
-                trackerOperation.addLog( String.format( "SSH key removed on host %s", succeededHost.getHostname() ) );
+                keyUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+                {
+                    @Override
+                    public Object call() throws Exception
+                    {
+                        peer.removeSshKey( environment.getEnvironmentId(), sshKey );
+
+                        return null;
+                    }
+                } ) );
             }
 
-            hosts.removeAll( results.keySet() );
+            PeerUtil.PeerTaskResults<Object> keyResults = keyUtil.executeParallel();
 
-            for ( Host failedHost : hosts )
+            for ( PeerUtil.PeerTaskResult keyResult : keyResults.getPeerTaskResults() )
             {
-                trackerOperation
-                        .addLog( String.format( "SSH key removal failed on host %s", failedHost.getHostname() ) );
+                if ( keyResult.hasSucceeded() )
+                {
+                    trackerOperation
+                            .addLog( String.format( "SSH key removed on peer %s", keyResult.getPeer().getName() ) );
+                }
+                else
+                {
+                    trackerOperation.addLog( String.format( "SSH key removal failed on peer %s. Reason: %s",
+                            keyResult.getPeer().getName(), keyResult.getFailureReason() ) );
+                }
             }
 
-            if ( !hosts.isEmpty() )
+            if ( keyResults.hasFailures() )
             {
-                throw new EnvironmentManagerException( "Failed to remove SSH key on all hosts" );
+                throw new EnvironmentManagerException( "Failed to remove SSH key on all peers" );
             }
 
             environment.removeSshKey( sshKey );
         }
-    }
-
-
-    public RequestBuilder getRemoveSshKeyCommand( final String key )
-    {
-        return new RequestBuilder( String.format( "chmod 700 %1$s && " +
-                "sed -i \"\\,%3$s,d\" %2$s && " +
-                "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, key ) );
     }
 }

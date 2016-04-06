@@ -263,9 +263,6 @@ public interface Peer
 
     void joinOrUpdateP2PSwarm( P2PConfig config ) throws PeerException;
 
-    @Deprecated
-    public void createP2PSwarm( final P2PConfig config ) throws PeerException;
-
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
 
@@ -297,6 +294,9 @@ public interface Peer
 
     void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
 
-    void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
+    void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
+    void addSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+
+    void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 }

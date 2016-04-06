@@ -392,6 +392,26 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
+    @Override
+    public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        new EnvironmentWebClient( provider ).addSshKey( peerInfo, environmentId, sshPublicKey );
+    }
+
+
+    @Override
+    public void removeSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        new EnvironmentWebClient( provider ).removeSshKey( peerInfo, environmentId, sshPublicKey );
+    }
+
+
     @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
@@ -795,13 +815,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
         new PeerWebClient( peerInfo, provider ).joinOrUpdateP2PSwarm( config );
-    }
-
-
-    @Override
-    public void createP2PSwarm( final P2PConfig config ) throws PeerException
-    {
-        //no-op
     }
 
 

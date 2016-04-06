@@ -368,6 +368,57 @@ public class EnvironmentWebClient
     }
 
 
+    public void addSshKey( final PeerInfo peerInfo, final EnvironmentId environmentId, final String sshPublicKey )
+            throws PeerException
+    {
+        String path = String.format( "/%s/containers/sshkey/add", environmentId.getId() );
+
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+        Response response;
+
+        try
+        {
+            response = client.post( sshPublicKey );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error adding ssh key in environment", e );
+        }
+
+        if ( response.getStatus() == 500 )
+        {
+            throw new PeerException( response.readEntity( String.class ) );
+        }
+    }
+
+    public void removeSshKey( final PeerInfo peerInfo, final EnvironmentId environmentId, final String sshPublicKey )
+            throws PeerException
+    {
+        String path = String.format( "/%s/containers/sshkey/remove", environmentId.getId() );
+
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+        Response response;
+
+        try
+        {
+            response = client.post( sshPublicKey );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error removing ssh key in environment", e );
+        }
+
+        if ( response.getStatus() == 500 )
+        {
+            throw new PeerException( response.readEntity( String.class ) );
+        }
+    }
+
+
     public void configureHostsInEnvironment( final PeerInfo peerInfo, final EnvironmentId environmentId,
                                              final HostAddresses hostAddresses ) throws PeerException
     {
