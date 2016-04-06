@@ -239,13 +239,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    //unsupported START
-    public String getNodeGroupName()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-
     public String getTemplateName()
     {
         return this.templateName;
@@ -260,9 +253,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public TemplateKurjun getTemplate() throws PeerException
     {
-        throw new UnsupportedOperationException();
+        return getPeer().getTemplate( this.templateName );
     }
-    //unsupported END
 
 
     public void dispose() throws PeerException

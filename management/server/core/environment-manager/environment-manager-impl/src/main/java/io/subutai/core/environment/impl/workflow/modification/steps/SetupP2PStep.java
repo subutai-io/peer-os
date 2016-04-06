@@ -24,7 +24,7 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
-import io.subutai.core.environment.impl.workflow.PeerUtil;
+import io.subutai.core.environment.impl.workflow.util.PeerUtil;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTunnelTask;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.SetupP2PConnectionTask;
 

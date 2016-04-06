@@ -56,7 +56,6 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "Container hostname: %s", containerHost.getHostname() ) );
             System.out.println( String.format( "Environment id: %s", containerHost.getEnvironmentId() ) );
             System.out.println( String.format( "Peer id: %s", containerHost.getPeerId() ) );
-            System.out.println( String.format( "NodeGroup name: %s", containerHost.getNodeGroupName() ) );
             System.out.println( String.format( "Template name: %s", containerHost.getTemplateName() ) );
             System.out.println( String.format( "IP: %s",
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );

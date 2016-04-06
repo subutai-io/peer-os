@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -24,8 +21,6 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkflow.EnvironmentGrowingPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentGrowingWorkflow.class );
-
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
@@ -76,7 +71,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         return EnvironmentGrowingPhase.GENERATE_KEYS;
     }
@@ -90,7 +85,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.RESERVE_NET;
         }
@@ -111,7 +106,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new ReservationStep( topology, environment, peerManager, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.SETUP_P2P;
         }
@@ -132,7 +127,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new SetupP2PStep( topology, environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.PREPARE_TEMPLATES;
         }
@@ -153,7 +148,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
@@ -175,7 +170,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
             new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
                     operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.CONFIGURE_HOSTS;
         }
@@ -196,7 +191,7 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new RegisterHostsStep( environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.CONFIGURE_SSH;
         }
@@ -217,13 +212,14 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
         {
             new RegisterSshStep( environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.FINALIZE;
         }
         catch ( Exception e )
         {
             fail( e.getMessage(), e );
+
             return null;
         }
     }
@@ -231,11 +227,9 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing environment growth" );
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         operationTracker.addLogDone( "Environment is grown" );
 
@@ -247,16 +241,18 @@ public class EnvironmentGrowingWorkflow extends Workflow<EnvironmentGrowingWorkf
     @Override
     public void fail( final String message, final Throwable e )
     {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( message );
+
         super.fail( message, e );
-        saveFailState();
     }
 
 
-    private void saveFailState()
+    protected void saveEnvironment()
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.update( environment );
-        operationTracker.addLogFailed( getFailedReason() );
-        LOG.error( "Error growing environment", getFailedException() );
     }
 }
