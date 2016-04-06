@@ -360,8 +360,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 						loadEnvironments();
 						$rootScope.notificationsUpdate = 'destroyEnvironment';
 					}).error(function (data) {
-						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
-						$rootScope.notificationsUpdate = 'destroyEnvironmentError';
+						$timeout(function() {
+							SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
+							$rootScope.notificationsUpdate = 'destroyEnvironmentError';
+						}, 2000);
 					});
 					loadEnvironments();
 				}
