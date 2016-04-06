@@ -19,7 +19,11 @@ public class BazaarPage extends PageObject {
     @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green g-margin-bottom ng-scope\"]")
     public WebElementFacade buttonUploadNewPlugin;
 
+    @FindBy(xpath = "//a[@class=\"loading-button\"]")
+    public WebElementFacade buttonLaunch;
+
     public String sikuliMenuButtonInstall = "src/test/resources/imgs/buttons/buttonInstall.png";
+    public String sikuliButtonLaunch = "src/test/resources/imgs/buttons/buttonLaunch.png";
 
     //endregion
 
@@ -54,7 +58,11 @@ public class BazaarPage extends PageObject {
 
     //endregion
 
-    //region WEB ELEMENTS: Headers
+    //region WEB ELEMENTS: Wait For
+
+    public void waitButtonLaunch(){
+        waitFor(buttonLaunch);
+    }
 
 
     //endregion

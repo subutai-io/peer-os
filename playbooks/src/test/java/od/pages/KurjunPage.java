@@ -12,11 +12,18 @@ public class KurjunPage extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
+    public WebElementFacade buttonUploadFile;
+
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_blue b-btn_search-field-level\"]")
+    public WebElementFacade buttonRefresh;
+
     //endregion
 
     //region SIKULI IMAGES: Titles
 
     public String sikuliTitleAPT = "src/test/resources/imgs/titles/titleAPT.png";
+    public String sikuliTitleRawFiles = "src/test/resources/imgs/titles/titleRawFiles.png";
 
     //endregion
 

@@ -257,4 +257,9 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnButtonInstall();
     }
 
+    @When("the user clicks on Launch button")
+    public void user_clicks_launch_button() throws FindFailed {
+        subutaiSteps.clickOnButtonLaunch();
+    }
+
 }

@@ -41,7 +41,7 @@ public class DefSubutaiStepsThen {
     public void user_observe_environments(){
         subutaiSteps.userShouldObserveButtonModes();
         subutaiSteps.userShouldObserveButtonApply();
-        subutaiSteps.userShouldObservePluginMongo();
+//        subutaiSteps.userShouldObservePluginMongo();
     }
 
     @Then("the user should create the local environment")
@@ -140,7 +140,7 @@ public class DefSubutaiStepsThen {
 
     @Then("the user should observe web elements on drop down menu: Notifications")
     public void user_observe_elements_of_notifications(){
-        subutaiSteps.userShouldObserveNotificationsBody();
+//        subutaiSteps.userShouldObserveNotificationsBody();
         subutaiSteps.userShouldObserveLinkClear();
     }
 
@@ -162,6 +162,9 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnTitleAPT();
         subutaiSteps.userShouldObserveGreenButton();
         subutaiSteps.userShouldObserveFieldSearch();
+        subutaiSteps.clickOnTitleRawFiles();
+        subutaiSteps.userShouldObserveButtonUploadFile();
+        subutaiSteps.userShouldObserveButtonRefresh();
     }
 
     @Then("the user should observe web elements on: Account Settings page")
