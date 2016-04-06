@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.destruction.steps.helpers;
+package io.subutai.core.environment.impl.workflow.modification.steps.helpers;
 
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
