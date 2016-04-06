@@ -3,7 +3,6 @@ package io.subutai.core.kurjun.manager.rest;
 
 import java.util.List;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -11,13 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
 import io.subutai.core.kurjun.manager.api.KurjunManager;
 import io.subutai.core.kurjun.manager.api.model.Kurjun;
 
