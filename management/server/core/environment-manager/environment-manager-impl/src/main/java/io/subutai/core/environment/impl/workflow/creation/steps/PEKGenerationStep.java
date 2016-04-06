@@ -15,7 +15,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.workflow.PeerUtil;
-import io.subutai.core.environment.impl.workflow.task.PeerEnvironmentKeyTask;
+import io.subutai.core.environment.impl.workflow.creation.steps.helpers.PeerEnvironmentKeyTask;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
@@ -88,11 +88,9 @@ public class PEKGenerationStep
                             environment, peer, securityManager.getKeyManager() ) ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Peer>> pekResults = pekUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Peer> pekResults = pekUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult pekResult : pekResults )
+        for ( PeerUtil.PeerTaskResult pekResult : pekResults.getPeerTaskResults() )
         {
             if ( pekResult.hasSucceeded() )
             {
@@ -101,15 +99,13 @@ public class PEKGenerationStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog(
                         String.format( "PEK generation failed on peer %s. Reason: %s", pekResult.getPeer().getName(),
                                 pekResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( pekResults.hasFailures() )
         {
             throw new PeerException( "Failed to generate PEK across all peers" );
         }

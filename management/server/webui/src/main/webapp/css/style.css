@@ -3731,3 +3731,13 @@ span.ssh-info-button
     border-right: solid 8px transparent;
 }
 
+.b-btn_blue:disabled {
+    background-color: #a0e0f3;
+    border-color: #a0e0f3;
+    color: #fff;
+}
+.b-btn_blue {
+    background-color: #61cbeb;
+    border-color: #61cbeb;
+    color: #fff;
+}
