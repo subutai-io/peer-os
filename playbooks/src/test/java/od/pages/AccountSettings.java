@@ -15,7 +15,7 @@ public class AccountSettings extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
-    @FindBy(xpath = "*//button[contains(text(),\"Set public key\")]")
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_blue e2e-plugin-btn\"]")
     public WebElementFacade buttonSetPublicKey;
 
     @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green\"]")

@@ -153,7 +153,7 @@ public class DefSubutaiStepsThen {
     public void user_observe_elements_on_advanced_page() throws FindFailed {
         subutaiSteps.userShouldObserveTitlePeers();
         subutaiSteps.clickOnTitleTemplates();
-        subutaiSteps.userShouldObservePluginMongo();
+        subutaiSteps.userShouldObservePluginCassandra();
     }
 
     @Then("the user should observe web elements on: Kurjun page")
@@ -169,8 +169,8 @@ public class DefSubutaiStepsThen {
 
     @Then("the user should observe web elements on: Account Settings page")
     public void user_observe_elements_on_account_settings_page() throws FindFailed {
-        subutaiSteps.userShouldObserveFieldPGP();
-        subutaiSteps.userShouldObserveButtonSetPublicKey();
+//        subutaiSteps.userShouldObserveFieldPGP();
+//        subutaiSteps.userShouldObserveButtonSetPublicKey();
         subutaiSteps.clickOnTitleChangePassword();
         subutaiSteps.userShouldObserveButtonSave();
     }
@@ -181,6 +181,8 @@ public class DefSubutaiStepsThen {
         subutaiSteps.userShouldObserveButtonAddOnKurjunSettingsPage();
         subutaiSteps.clickOnTitleQuotas();
         subutaiSteps.userShouldObserveButtonSaveOnKurjunSettingsQuotasPage();
+        subutaiSteps.clickOnTitleUrlsList();
+        subutaiSteps.userShouldObserveButtonAddUrl();
     }
 
     @Then("the user should observe web elements on: Network Settings page")
