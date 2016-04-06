@@ -22,8 +22,6 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
-    private Throwable error;
-
 
     public enum SshKeyAdditionPhase
     {

@@ -15,16 +15,18 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 /**
  * Container destroy step
+ *
+ * todo parallelize
  */
-public class ContainerDestroyStep
+public class DestroyContainersStep
 {
     private final EnvironmentImpl environment;
     private final EnvironmentManagerImpl environmentManager;
     private final List<String> removedContainers;
 
 
-    public ContainerDestroyStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
-                                 final List<String> removedContainers )
+    public DestroyContainersStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
+                                  final List<String> removedContainers )
     {
         this.environment = environment;
         this.environmentManager = environmentManager;
@@ -46,19 +48,12 @@ public class ContainerDestroyStep
             }
             catch ( PeerException e )
             {
-                boolean skipError = false;
-                if ( e instanceof HostNotFoundException || ( ExceptionUtils.getRootCauseMessage( e )
-                                                                           .contains( "HostNotFoundException" ) ) )
-                {
-                    //skip error since host is not found
-                    skipError = true;
-                }
-                if ( !skipError )
+                if ( !( e instanceof HostNotFoundException || ( ExceptionUtils.getRootCauseMessage( e )
+                                                                              .contains( "HostNotFoundException" ) ) ) )
                 {
                     throw e;
                 }
             }
-
 
             environment.removeContainer( containerHost );
             environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );

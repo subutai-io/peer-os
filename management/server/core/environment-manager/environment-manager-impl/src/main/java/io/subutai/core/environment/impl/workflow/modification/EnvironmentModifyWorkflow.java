@@ -18,7 +18,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneSt
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDestroyStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.DestroyContainersStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
@@ -98,7 +98,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new ContainerDestroyStep( environment, environmentManager, removedContainers ).execute();
+            new DestroyContainersStep( environment, environmentManager, removedContainers ).execute();
 
             environment = environmentManager.update( environment );
 

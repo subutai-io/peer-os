@@ -4,13 +4,6 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -26,6 +19,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.environment.impl.workflow.PeerUtil;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -34,7 +28,6 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class ReservationStep
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ReservationStep.class );
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final PeerManager peerManager;
@@ -53,60 +46,46 @@ public class ReservationStep
 
     public void execute() throws EnvironmentCreationException, PeerException
     {
-        LOG.debug( "Network resource reservation step started..." );
 
         Set<Peer> peers = peerManager.resolve( topology.getAllPeers() );
 
-        ExecutorService executorService = Executors.newFixedThreadPool( peers.size() );
-        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
-
         //obtain reserved net resources
         final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
+
+        PeerUtil<Object> netQueryUtil = new PeerUtil<>();
+
         for ( final Peer peer : peers )
         {
-            completionService.submit( new Callable<Peer>()
+            netQueryUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
-                public Peer call() throws Exception
+                public Object call() throws Exception
                 {
                     reservedNetResources.put( peer, peer.getUsedNetworkResources() );
-                    return peer;
+
+                    return null;
                 }
-            } );
+            } ) );
         }
 
-        executorService.shutdown();
+        PeerUtil.PeerTaskResults<Object> netQueryResults = netQueryUtil.executeParallel();
 
-        Set<Peer> succeededPeers = Sets.newHashSet();
-        for ( Peer ignored : peers )
+        for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults.getPeerTaskResults() )
         {
-            try
+            if ( netQueryResult.hasSucceeded() )
             {
-                Future<Peer> f = completionService.take();
-                succeededPeers.add( f.get() );
+                trackerOperation.addLog( String.format( "Obtained reserved network resources from peer %s",
+                        netQueryResult.getPeer().getName() ) );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Problems obtaining reserved network resources", e );
+                trackerOperation.addLog(
+                        String.format( "Failed to obtain reserved network resources from peer %s. Reason: %s",
+                                netQueryResult.getPeer().getName(), netQueryResult.getFailureReason() ) );
             }
         }
 
-        for ( Peer succeededPeer : succeededPeers )
-        {
-            trackerOperation.addLog(
-                    String.format( "Obtained reserved network resources from peer %s", succeededPeer.getName() ) );
-        }
-
-        Set<Peer> failedPeers = Sets.newHashSet( peers );
-        failedPeers.removeAll( succeededPeers );
-
-        for ( Peer failedPeer : failedPeers )
-        {
-            trackerOperation.addLog(
-                    String.format( "Failed to obtain reserved network resources from peer %s", failedPeer.getName() ) );
-        }
-
-        if ( !failedPeers.isEmpty() )
+        if ( netQueryResults.hasFailures() )
         {
             throw new EnvironmentCreationException( "Failed to obtain reserved network resources from all peers" );
         }
@@ -147,57 +126,42 @@ public class ReservationStep
         }
 
         //reserve network resources
-        executorService = Executors.newFixedThreadPool( peers.size() );
-        completionService = new ExecutorCompletionService<>( executorService );
+        PeerUtil<Object> netReservationUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            completionService.submit( new Callable<Peer>()
+            netReservationUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
-                public Peer call() throws Exception
+                public Object call() throws Exception
                 {
                     peer.reserveNetworkResource( new NetworkResourceImpl( environment.getId(), freeVni, freeP2pSubnet,
                             freeContainerSubnet ) );
-                    return peer;
+
+                    return null;
                 }
-            } );
+            } ) );
         }
 
-        executorService.shutdown();
+        PeerUtil.PeerTaskResults<Object> netReservationResults = netReservationUtil.executeParallel();
 
-        succeededPeers.clear();
-        for ( Peer ignored : peers )
+        for ( PeerUtil.PeerTaskResult netReservationResult : netReservationResults.getPeerTaskResults() )
         {
-            try
+            if ( netReservationResult.hasSucceeded() )
             {
-                Future<Peer> f = completionService.take();
-                succeededPeers.add( f.get() );
+                trackerOperation.addLog( String.format( "Reserved network resources on peer %s",
+                        netReservationResult.getPeer().getName() ) );
+
+                environment.addEnvironmentPeer( new PeerConfImpl( netReservationResult.getPeer().getId() ) );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Problems reserving network resources", e );
+                trackerOperation.addLog( String.format( "Failed to reserve network resources on peer %s. Reason: %s",
+                        netReservationResult.getPeer().getName(), netReservationResult.getFailureReason() ) );
             }
         }
 
-        for ( Peer succeededPeer : succeededPeers )
-        {
-            trackerOperation
-                    .addLog( String.format( "Reserved network resources on peer %s", succeededPeer.getName() ) );
-
-            environment.addEnvironmentPeer( new PeerConfImpl( succeededPeer.getId() ) );
-        }
-
-        failedPeers = Sets.newHashSet( peers );
-        failedPeers.removeAll( succeededPeers );
-
-        for ( Peer failedPeer : failedPeers )
-        {
-            trackerOperation
-                    .addLog( String.format( "Failed to reserve network resources on peer %s", failedPeer.getName() ) );
-        }
-
-        if ( !failedPeers.isEmpty() )
+        if ( netReservationResults.hasFailures() )
         {
             throw new EnvironmentCreationException( "Failed to reserve network resources on all peers" );
         }
