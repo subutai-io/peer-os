@@ -303,6 +303,15 @@ public class KurjunManagerImpl implements KurjunManager
     }
 
 
+    @Override
+    public void deleteUrl( final int id ) throws ConfigurationException
+    {
+        dataService.deleteKurjunData( id );
+
+        updateSystemSettings();
+    }
+
+
     private void updateSystemSettings() throws ConfigurationException
     {
         ArrayList<String> globalUrls = Lists.newArrayList();

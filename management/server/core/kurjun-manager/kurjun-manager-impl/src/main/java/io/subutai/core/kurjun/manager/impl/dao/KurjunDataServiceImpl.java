@@ -239,4 +239,30 @@ public class KurjunDataServiceImpl implements KurjunDataService
         }
         return result;
     }
+
+
+    @Override
+    public void deleteKurjunData( final int id )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+
+        try
+        {
+            daoManager.startTransaction( em );
+            KurjunEntity entity = em.find( KurjunEntity.class, id );
+            em.remove( entity );
+            em.flush();
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+            LOG.error( "ConfigDataService deleteOperation:" + ex.toString() );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+    }
 }

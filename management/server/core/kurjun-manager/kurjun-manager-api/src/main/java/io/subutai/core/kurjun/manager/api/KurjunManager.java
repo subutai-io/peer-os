@@ -42,4 +42,8 @@ public interface KurjunManager
 
     //****************************************
     void updateUrl( int id, String url ) throws ConfigurationException;
+
+
+    //****************************************
+    void deleteUrl( int id ) throws ConfigurationException;
 }
