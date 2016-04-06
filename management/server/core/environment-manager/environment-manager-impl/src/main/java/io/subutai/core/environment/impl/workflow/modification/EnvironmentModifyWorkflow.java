@@ -92,7 +92,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new DestroyContainersStep( environment, environmentManager, removedContainers ).execute();
+            new DestroyContainersStep( environment, environmentManager, removedContainers, operationTracker ).execute();
 
             saveEnvironment();
 

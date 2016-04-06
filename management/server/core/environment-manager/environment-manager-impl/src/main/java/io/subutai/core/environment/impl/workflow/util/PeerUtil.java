@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow;
+package io.subutai.core.environment.impl.workflow.util;
 
 
 import java.util.Map;
@@ -88,7 +88,7 @@ public class PeerUtil<T>
             }
             catch ( Exception e )
             {
-                LOG.error( "Error executing task on peer %s", targetPeer.getName(), e );
+                LOG.error( "Error executing task on peer {}", targetPeer.getName(), e );
 
                 peerTaskResults.add( new PeerTaskResult<T>( targetPeer, e ) );
             }
