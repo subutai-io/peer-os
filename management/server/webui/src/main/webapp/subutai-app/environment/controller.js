@@ -286,8 +286,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		for (var index = 0; index < containers.length; index++) {
 
 			var container = containers[index];
-			// @todo no className presented
-			var remoteProxyContainer = !container.local; //&& container.className.indexOf("ProxyEnvironmentContainer") > -1
+			var remoteProxyContainer = !container.local && container.dataSource == "hub";
 
 			// We don't show on UI containers created by Hub, located on other peers.
 			// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
