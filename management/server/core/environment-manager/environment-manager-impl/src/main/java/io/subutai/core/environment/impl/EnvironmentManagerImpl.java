@@ -204,8 +204,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private boolean isPeerInUse( String peerId )
     {
         boolean inUse = false;
-        //        for ( Iterator<EnvironmentImpl> i = environmentDataService.getAll().iterator(); !inUse && i.hasNext
-        // (); )
         for ( Iterator<EnvironmentImpl> i = environmentService.getAll().iterator(); !inUse && i.hasNext(); )
         {
             EnvironmentImpl e = i.next();
@@ -247,7 +245,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         Set<Environment> environments = new HashSet<>();
 
-        //        for ( Environment environment : environmentDataService.getAll() )
         for ( Environment environment : environmentService.getAll() )
         {
             boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
@@ -276,7 +273,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Set<Environment> environments = new HashSet<>();
 
-        //        for ( Environment environment : environmentDataService.getAll() )
         for ( Environment environment : environmentService.getAll() )
         {
             if ( environment.getUserId().equals( userId ) )
@@ -1035,7 +1031,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return environment;
         }
 
-        //        environment = environmentDataService.find( environmentId );
         environment = environmentService.find( environmentId );
 
         if ( environment == null )
@@ -1096,7 +1091,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
 
-        //        EnvironmentImpl environment = environmentDataService.find( environmentId );
         EnvironmentImpl environment = environmentService.find( environmentId );
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
         {
@@ -1538,7 +1532,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     protected Long getUserId()
     {
-        return ( long ) 0;//getUser().getId();
+        return identityManager.getActiveUser().getId();
     }
 
 
@@ -1566,7 +1560,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return environment;
         }
 
-        //        environment = environmentDataService.merge( environment );
         environment = environmentService.merge( environment );
 
         setEnvironmentTransientFields( environment );
@@ -1581,7 +1574,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void remove( final EnvironmentImpl environment )
     {
-        //        environmentDataService.remove( environment );
         environmentService.remove( environment.getId() );
 
         environmentAdapter.removeEnvironment( environment );

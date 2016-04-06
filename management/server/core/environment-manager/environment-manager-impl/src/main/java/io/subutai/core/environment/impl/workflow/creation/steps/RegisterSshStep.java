@@ -76,7 +76,7 @@ public class RegisterSshStep
 
         for ( final Peer peer : peers )
         {
-            appendUtil.addPeerTask( new PeerUtil.PeerTask<Object>( peer, new Callable<Object>()
+            appendUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Object call() throws Exception
@@ -88,11 +88,9 @@ public class RegisterSshStep
             } ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Object>> appendResults = appendUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> appendResults = appendUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult appendResult : appendResults )
+        for ( PeerUtil.PeerTaskResult appendResult : appendResults.getPeerTaskResults() )
         {
             if ( appendResult.hasSucceeded() )
             {
@@ -101,14 +99,12 @@ public class RegisterSshStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog( String.format( "Failed to register ssh keys on peer %s. Reason: %s",
                         appendResult.getPeer().getName(), appendResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( appendResults.hasFailures() )
         {
             throw new EnvironmentManagerException( "Failed to register ssh keys on all peers" );
         }
@@ -126,7 +122,7 @@ public class RegisterSshStep
 
         for ( final Peer peer : peers )
         {
-            createUtil.addPeerTask( new PeerUtil.PeerTask<Object>( peer, new Callable<Object>()
+            createUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Object call() throws Exception
@@ -140,11 +136,9 @@ public class RegisterSshStep
             } ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Object>> createResults = createUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> createResults = createUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult createResult : createResults )
+        for ( PeerUtil.PeerTaskResult createResult : createResults.getPeerTaskResults() )
         {
             if ( createResult.hasSucceeded() )
             {
@@ -153,14 +147,12 @@ public class RegisterSshStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog( String.format( "Failed to generate ssh keys on peer %s. Reason: %s",
                         createResult.getPeer().getName(), createResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( createResults.hasFailures() )
         {
             throw new EnvironmentManagerException( "Failed to generate ssh keys on all peers" );
         }

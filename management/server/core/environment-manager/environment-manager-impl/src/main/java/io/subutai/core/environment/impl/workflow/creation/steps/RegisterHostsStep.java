@@ -73,11 +73,9 @@ public class RegisterHostsStep
             } ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<Object>> hostResults = hostUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> hostResults = hostUtil.executeParallel();
 
-        boolean hasFailures = false;
-
-        for ( PeerUtil.PeerTaskResult hostResult : hostResults )
+        for ( PeerUtil.PeerTaskResult hostResult : hostResults.getPeerTaskResults() )
         {
 
             if ( hostResult.hasSucceeded() )
@@ -87,14 +85,12 @@ public class RegisterHostsStep
             }
             else
             {
-                hasFailures = true;
-
                 trackerOperation.addLog( String.format( "Failed to register hosts on peer %s. Reason: %s",
                         hostResult.getPeer().getName(), hostResult.getFailureReason() ) );
             }
         }
 
-        if ( hasFailures )
+        if ( hostResults.hasFailures() )
         {
             throw new EnvironmentManagerException( "Failed to register hosts on all peers" );
         }

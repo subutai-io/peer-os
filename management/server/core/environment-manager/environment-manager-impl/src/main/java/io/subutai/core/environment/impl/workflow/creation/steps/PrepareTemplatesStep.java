@@ -57,13 +57,13 @@ public class PrepareTemplatesStep
                     new CreatePeerTemplatePrepareTask( peer, peerPlacement.getValue() ) ) );
         }
 
-        Set<PeerUtil.PeerTaskResult<PrepareTemplatesResponseCollector>> templateResults =
-                templateUtil.executeParallel();
+        PeerUtil.PeerTaskResults<PrepareTemplatesResponseCollector> templateResults = templateUtil.executeParallel();
 
         //collect results
         boolean succeeded = true;
 
-        for ( PeerUtil.PeerTaskResult<PrepareTemplatesResponseCollector> templateResult : templateResults )
+        for ( PeerUtil.PeerTaskResult<PrepareTemplatesResponseCollector> templateResult : templateResults
+                .getPeerTaskResults() )
         {
             PrepareTemplatesResponseCollector prepareTemplatesResponse = templateResult.getResult();
             succeeded &= prepareTemplatesResponse.hasSucceeded();
