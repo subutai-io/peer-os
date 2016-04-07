@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.api.DataService;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
 
@@ -156,41 +155,5 @@ public class ResourceHostDataService implements DataService<String, ResourceHost
         {
             em.close();
         }
-    }
-
-
-    public synchronized ResourceHostEntity saveOrUpdate( ResourceHost item )
-    {
-        EntityManager em = emf.createEntityManager();
-
-        try
-        {
-
-            em.getTransaction().begin();
-            if ( em.find( ResourceHostEntity.class, item.getId() ) == null )
-            {
-                em.persist( item );
-                em.refresh( item );
-            }
-            else
-            {
-                item = em.merge( item );
-            }
-            em.getTransaction().commit();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.toString(), e );
-            if ( em.getTransaction().isActive() )
-            {
-                em.getTransaction().rollback();
-            }
-        }
-        finally
-        {
-            em.close();
-        }
-
-        return ( ResourceHostEntity ) item;
     }
 }

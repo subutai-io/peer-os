@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.network.NetworkResource;
@@ -187,62 +186,6 @@ public class NetworkResourceDaoImpl implements NetworkResourceDao<NetworkResourc
     }
 
 
-    @Override
-    public synchronized NetworkResourceEntity findByVni( long vni ) throws DaoException
-    {
-        List<NetworkResourceEntity> networkResources = readAll();
-
-        for ( NetworkResourceEntity networkResource : networkResources )
-        {
-            if ( vni == networkResource.getVni() )
-            {
-                return networkResource;
-            }
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public NetworkResourceEntity findByP2pSubnet( String p2pSubnet ) throws DaoException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSubnet ) );
-
-        List<NetworkResourceEntity> networkResources = readAll();
-
-        for ( NetworkResourceEntity networkResource : networkResources )
-        {
-            if ( p2pSubnet.equalsIgnoreCase( networkResource.getP2pSubnet() ) )
-            {
-                return networkResource;
-            }
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public NetworkResourceEntity findByContainerSubnet( String containerSubnet ) throws DaoException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerSubnet ) );
-
-        List<NetworkResourceEntity> networkResources = readAll();
-
-        for ( NetworkResourceEntity networkResource : networkResources )
-        {
-            if ( containerSubnet.equalsIgnoreCase( networkResource.getP2pSubnet() ) )
-            {
-                return networkResource;
-            }
-        }
-
-        return null;
-    }
-
-
-    //    @Override
     public NetworkResourceEntity find( final NetworkResource networkResource ) throws DaoException
     {
         Preconditions.checkNotNull( networkResource );
