@@ -19,15 +19,6 @@ import io.subutai.common.resource.ResourceValueParser;
  */
 public interface QuotaManager
 {
-    /**
-     * Returns available quota values of container.
-     *
-     * @param containerId container id
-     *
-     * @return quota value
-     */
-
-    ContainerQuota getAvailableQuota( ContainerId containerId ) throws QuotaException;
 
     PeerResources getResourceLimits( String peerId );
 
@@ -40,7 +31,6 @@ public interface QuotaManager
      */
     ContainerQuota getQuota( final ContainerId containerId ) throws QuotaException;
 
-    //    MeasureUnit getDefaultMeasureUnit( ContainerResourceType type );
 
     /**
      * Sets quota values of container.
@@ -63,7 +53,6 @@ public interface QuotaManager
      */
     ContainerQuota getDefaultContainerQuota( ContainerSize containerSize );
 
-    //    <T extends ContainerResource> T getQuota( ContainerId containerId, Class<T> type ) throws QuotaException;
 
     /**
      * Returns allowed cpus/cores ids on container

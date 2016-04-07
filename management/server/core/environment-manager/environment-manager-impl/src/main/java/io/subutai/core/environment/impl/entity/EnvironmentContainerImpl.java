@@ -500,13 +500,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerQuota getAvailableQuota() throws PeerException
-    {
-        return getPeer().getAvailableQuota( this.getContainerId() );
-    }
-
-
-    @Override
     public ContainerQuota getQuota() throws PeerException
     {
         return getPeer().getQuota( this.getContainerId() );

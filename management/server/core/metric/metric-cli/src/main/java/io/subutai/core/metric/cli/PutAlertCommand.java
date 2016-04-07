@@ -8,6 +8,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.resource.ByteUnit;
 import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.resource.ContainerResourceType;
@@ -38,11 +39,13 @@ public class PutAlertCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
+        final ResourceHostMetric resourceHostMetric = new ResourceHostMetric();
 
         QuotaAlertValue alertValue = new QuotaAlertValue(
                 new ExceededQuota( new HostId( containerId ), ContainerResourceType.parse( type ),
                         new ByteValueResource( ByteValueResource.toBytes( "2.3", ByteUnit.MB ) ),
-                        new ByteValueResource( ByteValueResource.toBytes( "2.2", ByteUnit.MB ) ) ) );
+                        new ByteValueResource( ByteValueResource.toBytes( "2.2", ByteUnit.MB ) ),
+                        resourceHostMetric ) );
 
 
         QuotaAlert value = new QuotaAlert( alertValue, System.currentTimeMillis() );

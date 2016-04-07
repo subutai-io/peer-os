@@ -17,12 +17,4 @@ public interface NetworkResourceDao<NetworkResource, String>
     NetworkResource update( NetworkResource t ) throws DaoException;
 
     void delete( NetworkResource t ) throws DaoException;
-
-    NetworkResource findByVni( long vni ) throws DaoException;
-
-    NetworkResource findByP2pSubnet( String p2pSubnet ) throws DaoException;
-
-    NetworkResource findByContainerSubnet( String containerSubnet ) throws DaoException;
-
-//    NetworkResource find( NetworkResource networkResource ) throws DaoException;
 }

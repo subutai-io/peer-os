@@ -1,8 +1,10 @@
 package io.subutai.core.executor.impl;
 
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,6 +30,8 @@ import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
+import io.subutai.common.host.HeartBeat;
+import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
@@ -58,6 +62,52 @@ public class CommandProcessor implements RestProcessor
     protected final ExpiringCache<String, Set<String>> requests = new ExpiringCache<>();
     protected ScheduledExecutorService notifier = Executors.newSingleThreadScheduledExecutor();
     protected ExecutorService notifierPool = Executors.newCachedThreadPool();
+    protected Set<HeartbeatListener> listeners =
+            Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
+
+
+    public void addListener( HeartbeatListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( HeartbeatListener listener )
+    {
+        if ( listener != null )
+        {
+            listeners.remove( listener );
+        }
+    }
+
+
+    @Override
+    public void handleHeartbeat( final HeartBeat heartBeat )
+    {
+        LOG.debug( String.format( "Heartbeat:%n%s", JsonUtil.toJson( heartBeat ) ) );
+
+        for ( final HeartbeatListener listener : listeners )
+        {
+            notifierPool.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        listener.onHeartbeat( heartBeat );
+                    }
+                    catch ( Exception e )
+                    {
+                        LOG.error( "Error in handleHeartbeat", e );
+                    }
+                }
+            } );
+        }
+    }
 
 
     public CommandProcessor( final HostRegistry hostRegistry, final IdentityManager identityManager )
@@ -115,7 +165,7 @@ public class CommandProcessor implements RestProcessor
 
             String command = JsonUtil.toJson( new RequestWrapper( request ) );
 
-            LOG.info( String.format( "Sending:%n%s", command ) );
+            LOG.debug( String.format( "Sending:%n%s", command ) );
 
             //queue request
             queueRequest( resourceHostInfo, request );
@@ -145,7 +195,7 @@ public class CommandProcessor implements RestProcessor
                 hostRequests = Sets.newLinkedHashSet();
                 requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
             }
-            String encryptedRequest = encrypt( JsonUtil.toJson( request ), request.getId() );
+            String encryptedRequest = encrypt( JsonUtil.toJsonMinified( request ), request.getId() );
             hostRequests.add( encryptedRequest );
         }
     }
@@ -287,7 +337,7 @@ public class CommandProcessor implements RestProcessor
             if ( commandProcess != null )
             {
 
-                LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( response ) ) );
+                LOG.debug( String.format( "Response:%n%s", JsonUtil.toJson( response ) ) );
 
                 //process response
                 commandProcess.processResponse( response );
