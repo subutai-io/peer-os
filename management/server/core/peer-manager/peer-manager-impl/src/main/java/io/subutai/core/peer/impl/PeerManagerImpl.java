@@ -824,7 +824,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 {
                     r.add( new RegistrationData( peer.getPeerInfo(), RegistrationStatus.APPROVED ) );
                 }
-                catch ( PeerException e )
+                catch ( Exception e )
                 {
                     LOG.warn( String.format( "Could not get peer info from %s. %s", peer.getId(), e.getMessage() ) );
                 }

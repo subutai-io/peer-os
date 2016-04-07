@@ -16,13 +16,11 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 
@@ -30,7 +28,6 @@ import static org.mockito.Mockito.when;
 public class ListCommandTest extends SystemOutRedirectTest
 {
     private static final String PEER_ID = UUID.randomUUID().toString();
-    private static final String ERR_MSG = "error";
     private static final String HOST_NAME = "host_name";
     private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String CPU_MODEL = "Intel Core 5";
@@ -77,6 +74,5 @@ public class ListCommandTest extends SystemOutRedirectTest
         command.doExecute();
 
         assertTrue( getSysOut().contains( PEER_ID ) );
-
     }
 }
