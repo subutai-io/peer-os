@@ -266,25 +266,19 @@ func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions
 			start_time = now()
 		}
 	}
-
 	io.Copy(&e, e_read)
 	if exitCode == 0 {
 		res.Type = "EXECUTE_RESPONSE"
 		res.ExitCode = strconv.Itoa(exitCode)
-		if chunk.Len() > 0 {
-			res.StdOut = chunk.String()
-		}
-		res.StdErr = e.String()
-		out_c <- res
 	} else {
 		if exitCode/256 == 124 {
 			res.Type = "EXECUTE_TIMEOUT"
 		}
 		res.ExitCode = strconv.Itoa(exitCode / 256)
-		res.StdOut = chunk.String()
-		res.StdErr = e.String()
-		out_c <- res
 	}
+	res.StdOut = chunk.String()
+	res.StdErr = e.String()
+	out_c <- res
 	lxc.Release(lxc_c)
 	close(out_c)
 }
