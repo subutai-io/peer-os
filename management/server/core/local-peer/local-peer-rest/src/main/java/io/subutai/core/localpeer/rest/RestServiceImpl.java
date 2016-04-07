@@ -11,13 +11,11 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerInfo;
@@ -225,24 +223,6 @@ public class RestServiceImpl implements RestService
             Preconditions.checkNotNull( networkResource );
 
             localPeer.reserveNetworkResource( networkResource );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public HostId getResourceHostIdByContainerId( final ContainerId containerId )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            return localPeer.getResourceHostIdByContainerId( containerId );
         }
         catch ( Exception e )
         {

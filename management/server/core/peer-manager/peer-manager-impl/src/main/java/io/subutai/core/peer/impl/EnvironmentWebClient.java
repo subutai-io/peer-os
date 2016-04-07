@@ -62,7 +62,7 @@ public class EnvironmentWebClient
 
         try
         {
-            response = client.get();
+            response = client.post( null );
         }
         catch ( Exception e )
         {
@@ -74,10 +74,10 @@ public class EnvironmentWebClient
     }
 
 
-    //todo make consistent with other methods , use container id in path
     void stopContainer( ContainerId containerId ) throws PeerException
     {
-        String path = String.format( "/%s/container/stop", containerId.getEnvironmentId().getId() );
+        String path =
+                String.format( "/%s/container/%s/stop", containerId.getEnvironmentId().getId(), containerId.getId() );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
@@ -88,7 +88,7 @@ public class EnvironmentWebClient
 
         try
         {
-            response = client.post( containerId );
+            response = client.post( null );
         }
         catch ( Exception e )
         {
@@ -100,10 +100,10 @@ public class EnvironmentWebClient
     }
 
 
-    //todo make consistent with other methods , use container id in path
     public void destroyContainer( ContainerId containerId ) throws PeerException
     {
-        String path = String.format( "/%s/container/destroy", containerId.getEnvironmentId().getId() );
+        String path = String.format( "/%s/container/%s/destroy", containerId.getEnvironmentId().getId(),
+                containerId.getId() );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
@@ -114,7 +114,7 @@ public class EnvironmentWebClient
 
         try
         {
-            response = client.post( containerId );
+            response = client.post( null );
         }
         catch ( Exception e )
         {

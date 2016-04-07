@@ -14,13 +14,11 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Containers;
-import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -435,32 +433,6 @@ public class PeerWebClient
         }
 
         checkResponse( response );
-    }
-
-
-    public HostId getResourceHosIdByContainerId( final ContainerId containerId ) throws PeerException
-    {
-        String path = String.format( "/container/%s/rhId", containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        Response response;
-
-        try
-        {
-            response = client.get();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException(
-                    String.format( "Error on obtaining resource host id by container id: %s", e.getMessage() ) );
-        }
-
-        return checkResponse( response, HostId.class );
     }
 
 

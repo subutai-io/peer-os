@@ -89,10 +89,7 @@ public class RemotePeerImpl implements RemotePeer
     private final CommandResponseListener commandResponseListener;
     private final MessageResponseListener messageResponseListener;
     private final Object provider;
-
     protected JsonUtil jsonUtil = new JsonUtil();
-
-    //todo cope paste preconditions from localPeer
 
 
     public RemotePeerImpl( String localPeerId, SecurityManager securityManager, final PeerInfo peerInfo,
@@ -221,6 +218,9 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
+
         new EnvironmentWebClient( peerInfo, provider ).destroyContainer( containerId );
     }
 
@@ -249,6 +249,7 @@ public class RemotePeerImpl implements RemotePeer
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
         Preconditions.checkArgument( pid > 0, "Process pid must be greater than 0" );
 
         return new EnvironmentWebClient( peerInfo, provider ).getProcessResourceUsage( containerId, pid );
@@ -356,6 +357,7 @@ public class RemotePeerImpl implements RemotePeer
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         return new EnvironmentWebClient( peerInfo, provider ).getQuota( containerId );
     }
@@ -365,6 +367,7 @@ public class RemotePeerImpl implements RemotePeer
     public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
         Preconditions.checkNotNull( containerQuota, "Container quota is null" );
 
         new EnvironmentWebClient( peerInfo, provider ).setQuota( containerId, containerQuota );
@@ -375,6 +378,7 @@ public class RemotePeerImpl implements RemotePeer
     public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
         return new EnvironmentWebClient( peerInfo, provider ).getAvailableQuota( containerId );
     }
@@ -608,14 +612,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        try
-        {
-            new PeerWebClient( peerInfo, provider ).setupTunnels( p2pIps, environmentId );
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( String.format( "Error setting up tunnels on peer %s", getName() ), e );
-        }
+        new PeerWebClient( peerInfo, provider ).setupTunnels( p2pIps, environmentId );
     }
 
 
@@ -728,16 +725,10 @@ public class RemotePeerImpl implements RemotePeer
     public HostId getResourceHostIdByContainerId( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkNotNull( containerId.getEnvironmentId(), "Environment id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        if ( containerId.getEnvironmentId() == null )
-        {
-            return new PeerWebClient( peerInfo, provider ).getResourceHosIdByContainerId( containerId );
-        }
-        else
-        {
-            return new EnvironmentWebClient( peerInfo, provider ).getResourceHostIdByContainerId( containerId );
-        }
+        return new EnvironmentWebClient( peerInfo, provider ).getResourceHostIdByContainerId( containerId );
     }
 
 
@@ -751,6 +742,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void alert( final AlertEvent alert ) throws PeerException
     {
+        Preconditions.checkNotNull( alert );
+
         new PeerWebClient( peerInfo, provider ).alert( alert );
     }
 
@@ -759,6 +752,10 @@ public class RemotePeerImpl implements RemotePeer
     public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkNotNull( startTime );
+        Preconditions.checkNotNull( endTime );
+
         return new PeerWebClient( peerInfo, provider ).getHistoricalMetrics( hostname, startTime, endTime );
     }
 
@@ -766,6 +763,8 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerResources getResourceLimits( final String peerId ) throws PeerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
         return new PeerWebClient( peerInfo, provider ).getResourceLimits( peerId );
     }
 
@@ -773,6 +772,9 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ) );
+        Preconditions.checkNotNull( maxAddress );
+
         return new PeerWebClient( peerInfo, provider ).getP2PSwarmDistances( p2pHash, maxAddress );
     }
 

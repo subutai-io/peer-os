@@ -12,13 +12,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
@@ -144,11 +142,4 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     Response getP2PSwarmDistances( @PathParam( "p2pHash" ) final String p2pHash,
                                    @PathParam( "count" ) final Integer count );
-
-
-    @GET
-    @Path( "container/{containerId}/rhId" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    HostId getResourceHostIdByContainerId( @PathParam( "containerId" ) final ContainerId containerId );
 }

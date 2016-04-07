@@ -625,8 +625,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 }
                 break;
             case UNREGISTERED:
-                String ip =
-                        securityManager.getKeyStoreManager().exportCertificate( SystemSettings.getSecurePortX2(), "" );
                 try
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );

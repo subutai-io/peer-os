@@ -32,16 +32,7 @@ public class ContainerId extends HostId
         this.hostName = hostName;
         this.peerId = peerId;
         this.environmentId = environmentId;
-    }/*
-    public ContainerId( @JsonProperty( "id" ) final String id, @JsonProperty( "hostName" ) final String hostName,
-                        @JsonProperty( "peerId" ) final PeerId peerId,
-                        @JsonProperty( "environmentId" ) final EnvironmentId environmentId )
-    {
-        super( id );
-        this.hostName = hostName;
-        this.peerId = peerId;
-        this.environmentId = environmentId;
-    }*/
+    }
 
 
     public String getHostName()
