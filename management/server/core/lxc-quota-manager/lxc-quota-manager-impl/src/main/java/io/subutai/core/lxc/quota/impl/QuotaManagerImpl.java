@@ -322,27 +322,27 @@ public class QuotaManagerImpl implements QuotaManager
             }
             else
             {
-                LOGGER.warn( "Invalid quota threshold:", quota );
+                LOGGER.warn( "Invalid quota threshold.", quota );
             }
         }
 
-        QuotaEntity entity = new QuotaEntity( containerId.getPeerId().getId(), containerId.getEnvironmentId().getId(),
-                containerId.getId(),
-                containerQuota.get( ContainerResourceType.CPU ).getAsCpuResource().getResource().getValue(),
-                containerQuota.get( ContainerResourceType.RAM ).getAsRamResource().getResource().getValue(),
-                containerQuota.get( ContainerResourceType.ROOTFS ).getAsDiskResource().getResource().getValue(),
-                containerQuota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue(),
-                containerQuota.get( ContainerResourceType.OPT ).getAsDiskResource().getResource().getValue(),
-                containerQuota.get( ContainerResourceType.VAR ).getAsDiskResource().getResource().getValue() );
-
-        quotaDataService.saveOrUpdate( entity );
+//        QuotaEntity entity = new QuotaEntity( containerId.getPeerId().getId(), containerId.getEnvironmentId().getId(),
+//                containerId.getId(),
+//                containerQuota.get( ContainerResourceType.CPU ).getAsCpuResource().getResource().getValue(),
+//                containerQuota.get( ContainerResourceType.RAM ).getAsRamResource().getResource().getValue(),
+//                containerQuota.get( ContainerResourceType.ROOTFS ).getAsDiskResource().getResource().getValue(),
+//                containerQuota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue(),
+//                containerQuota.get( ContainerResourceType.OPT ).getAsDiskResource().getResource().getValue(),
+//                containerQuota.get( ContainerResourceType.VAR ).getAsDiskResource().getResource().getValue() );
+//
+//        quotaDataService.saveOrUpdate( entity );
     }
 
 
     @Override
     public void removeQuota( final ContainerId containerId )
     {
-        quotaDataService.remove( containerId.getId() );
+//        quotaDataService.remove( containerId.getId() );
     }
 
 

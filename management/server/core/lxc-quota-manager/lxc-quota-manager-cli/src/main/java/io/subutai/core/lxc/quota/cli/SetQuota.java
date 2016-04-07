@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.quota.ContainerQuota;
@@ -27,9 +28,9 @@ public class SetQuota extends SubutaiShellCommandSupport
     private final LocalPeer localPeer;
     private QuotaManager quotaManager;
 
-    @Argument( index = 0, name = "container id", required = true, multiValued = false, description = "specify "
-            + "container id" )
-    private String containerId;
+    @Argument( index = 0, name = "container name", required = true, multiValued = false, description = "specify "
+            + "container name" )
+    private String containerName;
 
     @Argument( index = 1, name = "resource type", required = true, multiValued = false, description =
             "specify resource " + "type" )
@@ -50,9 +51,9 @@ public class SetQuota extends SubutaiShellCommandSupport
     }
 
 
-    public void setContainerId( final String containerId )
+    public void setContainerName( final String containerName )
     {
-        this.containerId = containerId;
+        this.containerName = containerName;
     }
 
 
@@ -88,10 +89,16 @@ public class SetQuota extends SubutaiShellCommandSupport
         ContainerResource containerResource = ContainerResourceFactory.createContainerResource( type, value );
 
         containerQuota.add( new Quota( containerResource, threshold ) );
-
-        final ContainerId id = localPeer.findContainerById( new ContainerId( containerId ) ).getContainerId();
-        quotaManager.setQuota( id, containerQuota );
-
+        final ContainerHost container = localPeer.getContainerHostByName( containerName );
+        if ( container == null )
+        {
+            System.out.println( "Container not found by id." );
+        }
+        else
+        {
+            final ContainerId id = container.getContainerId();
+            quotaManager.setQuota( id, containerQuota );
+        }
         return null;
     }
 }

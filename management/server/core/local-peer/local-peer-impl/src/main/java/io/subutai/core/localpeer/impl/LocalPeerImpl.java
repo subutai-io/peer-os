@@ -793,16 +793,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public ContainerHost findContainerById( final ContainerId containerId )
+    public ContainerHost findContainerById( final String containerId )
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkNotNull( containerId.getId(), "Invalid container id" );
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             try
             {
-                return resourceHost.getContainerHostById( containerId.getId() );
+                return resourceHost.getContainerHostById( containerId );
             }
             catch ( HostNotFoundException ignore )
             {
@@ -2147,26 +2147,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         return templateRegistry.getTemplate( name );
     }
-
-
-    //    @Override
-    //    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
-    //    {
-    //        Preconditions.checkNotNull( containerId );
-    //
-    //        try
-    //        {
-    //            ContainerHost containerHost = getContainerHostById( containerId.getId() );
-    //            return quotaManager.getAvailableQuota( containerHost.getContainerId() );
-    //        }
-    //        catch ( QuotaException e )
-    //        {
-    //            LOG.error( e.getMessage() );
-    //            throw new PeerException(
-    //                    String.format( "Could not obtain quota for %s: %s", containerId, e.getMessage() ) );
-    //        }
-    //    }
-
 
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
