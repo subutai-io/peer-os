@@ -35,6 +35,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
     public EnvironmentRestServiceImpl( final LocalPeer localPeer )
     {
+        Preconditions.checkNotNull( localPeer );
+
         this.localPeer = localPeer;
     }
 
@@ -154,6 +156,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             localPeer.getContainerHostById( containerId.getId() ).setCpuSet( cpuSet );
+
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -268,6 +271,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             ContainerQuota resourceValue = localPeer.getQuota( containerId );
+
             return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )
@@ -288,6 +292,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             localPeer.setQuota( containerId, containerQuota );
+
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -307,6 +312,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             ContainerQuota resourceValue = localPeer.getAvailableQuota( containerId );
+
             return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )

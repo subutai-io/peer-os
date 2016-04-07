@@ -19,7 +19,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
