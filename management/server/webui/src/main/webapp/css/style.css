@@ -3192,7 +3192,7 @@ td.b-main-table__status-col {
 .b-notification-count {
 	position: absolute;
 	top: 0;
-	right: -2px;
+	left: 12px;
 	border: 1px solid #ccceee;
 	border-radius: 50px;
 	font-size: 10px;
