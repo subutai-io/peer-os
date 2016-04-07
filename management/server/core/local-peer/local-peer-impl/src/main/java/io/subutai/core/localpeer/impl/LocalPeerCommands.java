@@ -47,19 +47,15 @@ public class LocalPeerCommands
     }
 
 
-    protected RequestBuilder getReadSSHCommand()
+    protected RequestBuilder getReadOrCreateSSHCommand()
     {
-        return new RequestBuilder( String.format( "cat %1$s/id_dsa.pub", Common.CONTAINER_SSH_FOLDER ) );
-    }
-
-
-    protected RequestBuilder getCreateNReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "rm -rf %1$s && " +
-                        "mkdir -p %1$s && " +
-                        "chmod 700 %1$s && " +
-                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
-                Common.CONTAINER_SSH_FOLDER ) );
+        return new RequestBuilder( String.format( "if [ -f %1$s/id_dsa.pub ]; " +
+                "then cat %1$s/id_dsa.pub ;" +
+                "else rm -rf %1$s && " +
+                "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " +
+                "cat %1$s/id_dsa.pub; fi", Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
