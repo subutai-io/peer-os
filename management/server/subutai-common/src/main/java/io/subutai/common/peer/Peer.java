@@ -28,7 +28,6 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -270,8 +269,6 @@ public interface Peer
     void alert( AlertEvent alert ) throws PeerException;
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
-
-    PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 

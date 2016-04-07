@@ -73,7 +73,7 @@ public class ContainerHostInfoModelTest
 
         assertThat( toString, containsString( HOSTNAME ) );
         assertThat( toString, containsString( IP ) );
-        assertThat( toString, containsString( ID.toString() ) );
+        assertThat( toString, containsString( ID ) );
         assertThat( toString, containsString( CONTAINER_STATUS.name() ) );
         assertThat( toString, containsString( ARCH.name() ) );
     }

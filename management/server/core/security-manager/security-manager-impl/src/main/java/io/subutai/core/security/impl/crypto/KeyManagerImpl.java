@@ -728,7 +728,6 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public PGPPublicKeyRing getPublicKeyRingByFingerprint( String fingerprint )
     {
-        PGPPublicKeyRing pubKeyRing = null;
         try
         {
             byte[] keyData = keyServer.getPublicKeyByFingerprint( fingerprint ).getKeyData();
@@ -742,7 +741,7 @@ public class KeyManagerImpl implements KeyManager
         {
         }
 
-        return pubKeyRing;
+        return null;
     }
 
 

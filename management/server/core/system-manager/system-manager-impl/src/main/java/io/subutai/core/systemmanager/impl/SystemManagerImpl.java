@@ -2,8 +2,6 @@ package io.subutai.core.systemmanager.impl;
 
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -14,8 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.ConfigurationException;
-
-import com.google.common.base.Preconditions;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
@@ -48,7 +44,6 @@ import io.subutai.hub.share.dto.SystemConfigurationType;
 
 public class SystemManagerImpl implements SystemManager
 {
-    private static final String DEFAULT_KURJUN_REPO = "https://peer.noip.me:8338/kurjun/rest";
 
     private TemplateManager templateManager;
     private IdentityManager identityManager;
@@ -109,27 +104,9 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final Integration integration/*, final String globalKurjunUrls, final int securePortX1, final int securePortX2,
-                              final int securePortX3, final String publicUrl*/ )
+    public SystemManagerImpl( final Integration integration )
 
     {
-//        Preconditions.checkNotNull( globalKurjunUrls, "Invalid Global Kurjun URLs could not be null." );
-
-//        String[] urls = new String[] { globalKurjunUrls };
-//
-//        if ( urls.length < 1 )
-//        {
-//            urls = new String[] { DEFAULT_KURJUN_REPO };
-//        }
-//        validateGlobalKurjunUrls( urls );
-//        validatePublicUrl( publicUrl );
-//
-//        SystemSettings.setGlobalKurjunUrls( urls );
-//        SystemSettings.setSecurePortX1( securePortX1 );
-//        SystemSettings.setSecurePortX2( securePortX2 );
-//        SystemSettings.setSecurePortX3( securePortX3 );
-//        SystemSettings.setPublicUrl( publicUrl );
-
         this.integration = integration;
     }
 
@@ -181,7 +158,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
         pojo.setProjectVersion( SubutaiInfo.getVersion() );
 
-        CommandResult result = null;
+        CommandResult result;
         RequestBuilder requestBuilder = new RequestBuilder( "subutai -v" );
         try
         {
@@ -245,7 +222,7 @@ public class SystemManagerImpl implements SystemManager
     {
         AdvancedSettings pojo = new AdvancedSettingsPojo();
 
-        String content = null;
+        String content;
         try
         {
             content = new String( Files.readAllBytes(
@@ -325,35 +302,6 @@ public class SystemManagerImpl implements SystemManager
         pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
 
         return pojo;
-    }
-
-
-    protected static void validateGlobalKurjunUrls( final String[] urls ) throws ConfigurationException
-    {
-        for ( String url : urls )
-        {
-            try
-            {
-                new URL( url );
-            }
-            catch ( MalformedURLException e )
-            {
-                throw new ConfigurationException( "Invalid URL: " + url );
-            }
-        }
-    }
-
-
-    protected static void validatePublicUrl( String publicUrl ) throws ConfigurationException
-    {
-        try
-        {
-            new URL( publicUrl );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new ConfigurationException( "Invalid URL: " + publicUrl );
-        }
     }
 
 

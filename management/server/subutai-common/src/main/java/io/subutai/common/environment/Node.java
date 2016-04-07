@@ -120,17 +120,9 @@ public class Node
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "Node{" );
-        sb.append( "name='" ).append( name ).append( '\'' );
-        sb.append( ", templateName='" ).append( templateName ).append( '\'' );
-        sb.append( ", type=" ).append( type );
-        sb.append( ", sshGroupId=" ).append( sshGroupId );
-        sb.append( ", hostsGroupId=" ).append( hostsGroupId );
-        sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", hostId='" ).append( hostId ).append( '\'' );
-        sb.append( ", hostname='" ).append( hostname ).append( '\'' );
-        sb.append( '}' );
-        return sb.toString();
+        return "Node{" + "name='" + name + '\'' + ", templateName='" + templateName + '\'' + ", type=" + type
+                + ", sshGroupId=" + sshGroupId + ", hostsGroupId=" + hostsGroupId + ", peerId='" + peerId + '\''
+                + ", hostId='" + hostId + '\'' + ", hostname='" + hostname + '\'' + '}';
     }
 
 

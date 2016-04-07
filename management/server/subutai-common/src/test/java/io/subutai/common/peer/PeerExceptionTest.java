@@ -20,7 +20,6 @@ public class PeerExceptionTest
     {
         peerException = new PeerException( new Throwable(  ) );
         peerException = new PeerException( "exception" );
-        peerException = new PeerException( "exception", "description" );
         peerException = new PeerException( "exception", new Throwable(  ) );
     }
 

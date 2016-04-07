@@ -218,7 +218,7 @@ public class MonitorImpl implements Monitor, HostListener
             else
             {
                 LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
-                        commandResult.getStdErr() ) );
+                        commandResult != null ? commandResult.getStdErr() : "" ) );
             }
         }
         catch ( IOException | CommandException e )

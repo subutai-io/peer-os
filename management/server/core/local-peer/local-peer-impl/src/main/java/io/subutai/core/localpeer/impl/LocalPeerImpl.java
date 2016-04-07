@@ -9,23 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.security.PermitAll;
-import javax.naming.NamingException;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -83,8 +78,6 @@ import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistance;
-import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
@@ -106,7 +99,6 @@ import io.subutai.common.task.QuotaRequest;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskCallbackHandler;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.ControlNetworkUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -186,7 +178,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public void init() throws PeerException
+    public void init()
     {
         LOG.debug( "********************************************** Initializing peer "
                 + "******************************************" );
@@ -2222,17 +2214,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected NetworkManager getNetworkManager() throws PeerException
+    protected NetworkManager getNetworkManager()
     {
-        try
-        {
-            return serviceLocator.getService( NetworkManager.class );
-        }
-        catch ( NamingException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( e );
-        }
+
+        return serviceLocator.getService( NetworkManager.class );
     }
 
 
@@ -2251,7 +2236,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public String getExternalIp() throws PeerException
+    public String getExternalIp()
     {
         return getPeerInfo().getIp();
     }
@@ -2261,89 +2246,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostId getResourceHostIdByContainerId( final ContainerId id ) throws PeerException
     {
         return new HostId( getResourceHostByContainerId( id.getId() ).getId() );
-    }
-
-
-    @Override
-    @Deprecated
-    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
-    {
-        PingDistances result = new PingDistances();
-        try
-        {
-            final P2PConnections p2PConnections = getNetworkManager().getP2PConnections( getManagementHost() );
-
-            final P2PConnection p2PConnection = p2PConnections.findByHash( p2pHash );
-
-            if ( p2PConnection == null )
-            {
-                return result;
-            }
-            String p2pIP = p2PConnection.getIp();
-            final SubnetUtils.SubnetInfo info = new SubnetUtils( p2pIP, ControlNetworkUtil.NETWORK_MASK ).getInfo();
-
-            ExecutorService pool = Executors.newCachedThreadPool();
-            ExecutorCompletionService<PingDistance> completionService = new ExecutorCompletionService<>( pool );
-            int counter = 0;
-            for ( int i = 0; i < maxAddress; i++ )
-            {
-                if ( !p2PConnection.getIp().equals( info.getAllAddresses()[i] ) )
-                {
-                    completionService
-                            .submit( new PingDistanceTask( p2PConnection.getIp(), info.getAllAddresses()[i] ) );
-                    counter++;
-                }
-            }
-
-            pool.shutdown();
-
-            while ( counter-- > 0 )
-            {
-                try
-                {
-                    Future<PingDistance> d = completionService.take();
-                    result.add( d.get() );
-                }
-                catch ( ExecutionException | InterruptedException e )
-                {
-                    // ignore
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( e.getMessage() );
-        }
-        return result;
-    }
-
-
-    private class PingDistanceTask implements Callable<PingDistance>
-    {
-        private final String sourceIp;
-        private final String targetIp;
-
-
-        public PingDistanceTask( final String sourceIp, final String targetIp )
-        {
-            this.sourceIp = sourceIp;
-            this.targetIp = targetIp;
-        }
-
-
-        @Override
-        public PingDistance call() throws Exception
-        {
-            try
-            {
-                return getNetworkManager().getPingDistance( getManagementHost(), sourceIp, targetIp );
-            }
-            catch ( Exception e )
-            {
-                return new PingDistance( sourceIp, targetIp, null, null, null, null );
-            }
-        }
     }
 
 

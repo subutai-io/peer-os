@@ -34,6 +34,4 @@ public interface Request
     public Integer getTimeout();
 
     public Integer isDaemon();
-
-    public Integer getPid();
 }

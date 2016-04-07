@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.subutai.common.metric.Alert;
-import io.subutai.common.metric.AlertValue;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.peer.AlertEvent;

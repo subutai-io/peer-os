@@ -29,7 +29,6 @@ import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.security.api.SecurityManager;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
@@ -127,17 +126,6 @@ public class CommandProcessorTest
         commandProcessor.remove( request );
 
         verify( commands ).remove( COMMAND_ID );
-    }
-
-
-    @Test
-    public void testGetTargetHost() throws Exception
-    {
-        when( containerHostInfo.getState() ).thenReturn( ContainerHostState.RUNNING );
-
-        ResourceHostInfo targetHost = commandProcessor.getTargetHost( HOST_ID );
-
-        assertEquals( resourceHostInfo, targetHost );
     }
 
 
@@ -254,13 +242,6 @@ public class CommandProcessorTest
 
             @Override
             public Integer isDaemon()
-            {
-                return null;
-            }
-
-
-            @Override
-            public Integer getPid()
             {
                 return null;
             }

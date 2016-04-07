@@ -125,7 +125,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    public void init() throws PeerException
+    public void init()
     {
         try
         {
@@ -287,7 +287,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    protected void addPeerToRegistry( final Peer peer ) throws PeerException
+    protected void addPeerToRegistry( final Peer peer )
     {
         Preconditions.checkNotNull( peer, "Peer could not be null." );
 

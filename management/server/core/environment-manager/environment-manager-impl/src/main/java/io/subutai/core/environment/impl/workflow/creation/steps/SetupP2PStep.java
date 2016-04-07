@@ -19,10 +19,9 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
-import io.subutai.core.environment.impl.workflow.util.PeerUtil;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupP2PConnectionTask;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTunnelTask;
-import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.environment.impl.workflow.util.PeerUtil;
 
 
 /**
@@ -44,7 +43,7 @@ public class SetupP2PStep
     }
 
 
-    public void execute() throws EnvironmentCreationException, PeerException, NetworkManagerException
+    public void execute() throws EnvironmentCreationException, PeerException
     {
 
         //create p2p subnet util

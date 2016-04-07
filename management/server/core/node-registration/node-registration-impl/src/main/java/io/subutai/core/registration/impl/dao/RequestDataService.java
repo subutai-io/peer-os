@@ -115,7 +115,7 @@ public class RequestDataService implements DataService<String, RequestedHostImpl
         try
         {
             em.getTransaction().begin();
-            RequestedHostImpl item = em.find( RequestedHostImpl.class, id.toString() );
+            RequestedHostImpl item = em.find( RequestedHostImpl.class, id );
             em.remove( item );
             em.getTransaction().commit();
         }

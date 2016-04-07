@@ -558,7 +558,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                         CommandResult result =
                                 execute( environmentNodeDto.getContainerId(), "bash /checksum.sh  /var/www/" );
 
-                        jsonObject.put( "checksum", result.getStdOut().toString() );
+                        jsonObject.put( "checksum", result.getStdOut() );
 
                         updatedNodes.setVEHS( jsonObject.toString() );
                     }
@@ -583,7 +583,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         while ( exec )
         {
             tryCount++;
-            exec = tryCount > 3 ? false : true;
+            exec = tryCount <= 3;
             try
             {
                 result = commandExecutor.execute( hostId, new RequestBuilder( cmd ) );

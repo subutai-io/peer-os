@@ -23,7 +23,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.exception.HTTPException;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -94,8 +93,7 @@ public class RemotePeerImplTest
 
     @Mock
     JsonUtil jsonUtil;
-    @Mock
-    HTTPException httpException;
+
     @Mock
     EnvironmentContainerHost containerHost;
     @Mock
@@ -159,12 +157,6 @@ public class RemotePeerImplTest
     }
 
 
-    private void throwWebClientException() throws HTTPException
-    {
-        doThrow( httpException ).when( webClient ).post( anyObject(), any( Class.class ) );
-    }
-
-
     @Test
     public void testGetId() throws Exception
     {
@@ -217,8 +209,6 @@ public class RemotePeerImplTest
         remotePeer.startContainer( containerHost.getContainerId() );
 
 
-        throwWebClientException();
-
         remotePeer.startContainer( containerHost.getContainerId() );
     }
 
@@ -228,8 +218,6 @@ public class RemotePeerImplTest
     {
         remotePeer.stopContainer( containerHost.getContainerId() );
 
-
-        throwWebClientException();
 
         remotePeer.stopContainer( containerHost.getContainerId() );
     }
@@ -241,8 +229,6 @@ public class RemotePeerImplTest
         remotePeer.destroyContainer( containerHost.getContainerId() );
 
 
-        throwWebClientException();
-
         remotePeer.destroyContainer( containerHost.getContainerId() );
     }
 
@@ -252,7 +238,6 @@ public class RemotePeerImplTest
     {
         remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
 
-        throwWebClientException();
 
         remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
     }
@@ -263,8 +248,6 @@ public class RemotePeerImplTest
     {
         remotePeer.getContainerState( containerHost.getContainerId() );
 
-
-        throwWebClientException();
 
         remotePeer.getContainerState( containerHost.getContainerId() );
     }
@@ -278,8 +261,6 @@ public class RemotePeerImplTest
         remotePeer.getCpuSet( containerHost );
 
 
-        throwWebClientException();
-
         remotePeer.getCpuSet( containerHost );
     }
 
@@ -289,8 +270,6 @@ public class RemotePeerImplTest
     {
         remotePeer.setCpuSet( containerHost, CPU_SET );
 
-
-        throwWebClientException();
 
         remotePeer.setCpuSet( containerHost, CPU_SET );
     }

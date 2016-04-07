@@ -1,28 +1,21 @@
 package io.subutai.core.metric.cli;
 
 
-import java.util.UUID;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.test.SystemOutRedirectTest;
-import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.common.metric.ContainerHostMetric;
 import io.subutai.core.metric.api.Monitor;
 
 import com.google.common.collect.Sets;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

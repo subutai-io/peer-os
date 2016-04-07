@@ -3,7 +3,6 @@ package io.subutai.common.host;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
@@ -11,7 +10,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.JsonUtil;
 
 
 /**
@@ -215,13 +213,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         @Override
         public String toString()
         {
-            final StringBuffer sb = new StringBuffer( "Alert{" );
-            sb.append( "id='" ).append( id ).append( '\'' );
-            sb.append( ", cpu=" ).append( cpu );
-            sb.append( ", ram=" ).append( ram );
-            sb.append( ", hdd=" ).append( hdd );
-            sb.append( '}' );
-            return sb.toString();
+            return "Alert{" + "id='" + id + '\'' + ", cpu=" + cpu + ", ram=" + ram + ", hdd=" + hdd + '}';
         }
     }
 
@@ -280,11 +272,7 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         @Override
         public String toString()
         {
-            final StringBuffer sb = new StringBuffer( "Ram{" );
-            sb.append( "current='" ).append( current ).append( '\'' );
-            sb.append( ", quota='" ).append( quota ).append( '\'' );
-            sb.append( '}' );
-            return sb.toString();
+            return "Ram{" + "current='" + current + '\'' + ", quota='" + quota + '\'' + '}';
         }
     }
 
@@ -325,44 +313,12 @@ public class ResourceHostInfoModel extends HostInfoModel implements ResourceHost
         @Override
         public String toString()
         {
-            final StringBuffer sb = new StringBuffer( "Hdd{" );
-            sb.append( "partition='" ).append( partition ).append( '\'' );
-            sb.append( ", current='" ).append( current ).append( '\'' );
-            sb.append( ", quota='" ).append( quota ).append( '\'' );
-            sb.append( '}' );
-            return sb.toString();
+            return "Hdd{" + "partition='" + partition + '\'' + ", current='" + current + '\'' + ", quota='" + quota
+                    + '\'' + '}';
         }
     }
 
-    //
-    //    public static void main( String[] args )
-    //    {
-    //        ResourceHostInfoModel info = new ResourceHostInfoModel();
-    //        info.test();
-    //    }
 
 
-    private void test()
-    {
-        Alert alert = new Alert();
-        alert.id = UUID.randomUUID().toString();
-        //        alert.cpu = new Cpu( 1, 2 );
-        alert.ram = new Ram( "3", "4" );
 
-        Hdd opt = new Hdd( "Opt", "5", "6" );
-        Hdd home = new Hdd( "Home", "5", "6" );
-        Hdd var = new Hdd( "Var", "5", "6" );
-        alert.hdd = new HashSet<>();
-        alert.hdd.add( opt );
-        alert.hdd.add( home );
-        alert.hdd.add( var );
-        final String json = JsonUtil.toJson( alert );
-        System.out.println( json );
-
-        Alert a = JsonUtil.fromJson( json, Alert.class );
-        final String aJson = JsonUtil.toJson( a );
-        System.out.println( aJson );
-        System.out.println( json.equals( aJson ) );
-        System.out.println( a.cpu );
-    }
 }

@@ -6,5 +6,5 @@ package io.subutai.common.resource;
  */
 public enum ResourceType
 {
-    RAM, CPU, DISK;
+    RAM, CPU, DISK
 }

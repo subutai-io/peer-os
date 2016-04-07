@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -233,7 +232,7 @@ public class KeyStoreTool
 
             while ( enumeration.hasMoreElements() )
             {
-                String alias = ( String ) enumeration.nextElement();
+                String alias = enumeration.nextElement();
                 entryData.append( "\nalias name: " ).append( alias );
                 Certificate certificate = keyStore.getCertificate( alias );
                 entryData.append( "\nCertificate: " ).append( certificate.toString() );
@@ -399,7 +398,6 @@ public class KeyStoreTool
      */
     public void importCertificateInPem( KeyStore keyStore, KeyStoreData keyStoreData )
     {
-        InputStream inputStream = null;
 
         try
         {
@@ -413,10 +411,6 @@ public class KeyStoreTool
         catch ( Exception e )
         {
             throw new RuntimeException( "Error importing certificate", e );
-        }
-        finally
-        {
-            SafeCloseUtil.close( inputStream );
         }
     }
 

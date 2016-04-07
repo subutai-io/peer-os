@@ -100,11 +100,11 @@ public class ResourceHostInfoModelTest
 
         assertThat( toString, containsString( HOST_HOSTNAME ) );
         assertThat( toString, containsString( HOST_IP ) );
-        assertThat( toString, containsString( HOST_ID.toString() ) );
+        assertThat( toString, containsString( HOST_ID ) );
         assertThat( toString, containsString( HOST_MAC_ADDRESS ) );
         assertThat( toString, containsString( CONTAINER_HOSTNAME ) );
         assertThat( toString, containsString( CONTAINER_IP ) );
-        assertThat( toString, containsString( CONTAINER_ID.toString() ) );
+        assertThat( toString, containsString( CONTAINER_ID ) );
         assertThat( toString, containsString( CONTAINER_STATUS.name() ) );
         assertThat( toString, containsString( ARCH.name() ) );
     }

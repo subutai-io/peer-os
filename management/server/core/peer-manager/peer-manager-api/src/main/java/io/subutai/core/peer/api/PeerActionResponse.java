@@ -8,7 +8,7 @@ public class PeerActionResponse
 {
     private enum ResponseType
     {
-        OK, FAIL;
+        OK, FAIL
     }
 
     public boolean isOk()

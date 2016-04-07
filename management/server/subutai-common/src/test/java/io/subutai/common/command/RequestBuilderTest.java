@@ -102,13 +102,6 @@ public class RequestBuilderTest
 
 
     @Test
-    public void testWithPid() throws Exception
-    {
-        assertNotNull( requestBuilder.withPid( 5 ) );
-    }
-
-
-    @Test
     public void testDaemon() throws Exception
     {
         assertNotNull( requestBuilder.daemon() );
@@ -158,6 +151,5 @@ public class RequestBuilderTest
         requestBuilder.build( UUID.randomUUID().toString() ).getRunAs();
         requestBuilder.build( UUID.randomUUID().toString() ).getTimeout();
         requestBuilder.build( UUID.randomUUID().toString() ).isDaemon();
-        requestBuilder.build( UUID.randomUUID().toString() ).getPid();
     }
 }

@@ -6,8 +6,6 @@ package io.subutai.common.peer;
  */
 public class PeerException extends Exception
 {
-    private String description = "";
-
 
     public PeerException( final Throwable cause )
     {
@@ -21,13 +19,6 @@ public class PeerException extends Exception
     }
 
 
-    public PeerException( final String message, String description )
-    {
-        super( message );
-        this.description = description;
-    }
-
-
     public PeerException( final String message, final Throwable cause )
     {
         super( message, cause );
@@ -36,6 +27,6 @@ public class PeerException extends Exception
 
     public String toString()
     {
-        return super.toString() + " (" + this.description + ")";
+        return super.toString();
     }
 }

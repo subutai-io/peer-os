@@ -1,8 +1,6 @@
 package io.subutai.core.identity.api;
 
 
-import javax.annotation.security.PermitAll;
-
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 

@@ -5,8 +5,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +43,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
     }
 
 
-    public static RegistrationManager getRegistrationManager() throws NamingException
+    public static RegistrationManager getRegistrationManager()
     {
         return ServiceLocator.getServiceNoCache( RegistrationManager.class );
     }

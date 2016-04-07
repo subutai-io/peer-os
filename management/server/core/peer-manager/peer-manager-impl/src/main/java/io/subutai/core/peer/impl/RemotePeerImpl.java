@@ -57,7 +57,6 @@ import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -756,16 +755,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         return new PeerWebClient( peerInfo, provider ).getResourceLimits( peerId );
-    }
-
-
-    @Override
-    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ) );
-        Preconditions.checkNotNull( maxAddress );
-
-        return new PeerWebClient( peerInfo, provider ).getP2PSwarmDistances( p2pHash, maxAddress );
     }
 
 

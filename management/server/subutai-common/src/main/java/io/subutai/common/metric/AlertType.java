@@ -6,5 +6,5 @@ package io.subutai.common.metric;
  */
 public enum AlertType
 {
-    ENVIRONMENT_ALERT, PEER_ALERT;
+    ENVIRONMENT_ALERT, PEER_ALERT
 }

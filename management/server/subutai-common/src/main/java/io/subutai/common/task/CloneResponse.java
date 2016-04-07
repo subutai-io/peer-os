@@ -89,15 +89,8 @@ public class CloneResponse implements TaskResponse
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder( "CloneResponse{" );
-        sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
-        sb.append( ", hostname='" ).append( hostname ).append( '\'' );
-        sb.append( ", templateName='" ).append( templateName ).append( '\'' );
-        sb.append( ", templateArch=" ).append( templateArch );
-        sb.append( ", containerName='" ).append( containerName ).append( '\'' );
-        sb.append( ", ip='" ).append( ip ).append( '\'' );
-        sb.append( ", containerId='" ).append( containerId ).append( '\'' );
-        sb.append( '}' );
-        return sb.toString();
+        return "CloneResponse{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
+                + ", templateName='" + templateName + '\'' + ", templateArch=" + templateArch + ", containerName='"
+                + containerName + '\'' + ", ip='" + ip + '\'' + ", containerId='" + containerId + '\'' + '}';
     }
 }

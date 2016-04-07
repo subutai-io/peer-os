@@ -2,7 +2,6 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyPairGenerator;
@@ -18,8 +17,6 @@ import javax.ws.rs.core.Response;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.bouncycastle.openpgp.PGPSecretKey;
-import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +29,9 @@ import io.subutai.common.security.crypto.key.KeyPairType;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.keystore.KeyStoreType;
-import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;

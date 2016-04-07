@@ -80,7 +80,7 @@ public class StrategyManagerImpl implements StrategyManager
 
     public List<String> getPlacementStrategyTitles()
     {
-        return this.getPlacementStrategies().stream().filter( n -> Strings.isNullOrEmpty( n.getId() ) == false )
-                   .map( n -> n.getId() ).collect( Collectors.toList() );
+        return this.getPlacementStrategies().stream().filter( n -> !Strings.isNullOrEmpty( n.getId() ) )
+                   .map( ContainerPlacementStrategy::getId ).collect( Collectors.toList() );
     }
 }
