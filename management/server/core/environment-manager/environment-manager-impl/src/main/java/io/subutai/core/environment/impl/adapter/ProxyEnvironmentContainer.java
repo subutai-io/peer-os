@@ -82,6 +82,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     void setProxyContainer( Host proxyContainer )
     {
         this.proxyContainer = proxyContainer;
+
+        LOG.debug( "Set proxy: container={}, proxy={}", getId(), proxyContainer.getId() );
     }
 
 
@@ -99,7 +101,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
             host = proxyContainer;
         }
 
-        return getPeer().execute( requestBuilder, host );
+        return host.getPeer().execute( requestBuilder, host );
     }
 
 
