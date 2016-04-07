@@ -312,6 +312,18 @@ public class QuotaManagerImpl implements QuotaManager
         {
             executeOnContainersResourceHost( containerId,
                     commands.getWriteQuotaCommand( containerId.getHostName(), quota.getResource() ) );
+
+            final Integer threshold = quota.getThreshold();
+            if ( threshold != null && threshold >= 0 && threshold <= 100 )
+            {
+                executeOnContainersResourceHost( containerId,
+                        commands.getWriteQuotaThresholdCommand( containerId.getHostName(),
+                                quota.getResource().getContainerResourceType(), threshold ) );
+            }
+            else
+            {
+                LOGGER.warn( "Invalid quota threshold:", quota );
+            }
         }
 
         QuotaEntity entity = new QuotaEntity( containerId.getPeerId().getId(), containerId.getEnvironmentId().getId(),
@@ -429,34 +441,6 @@ public class QuotaManagerImpl implements QuotaManager
 
         executeOnContainersResourceHost( containerId,
                 commands.getWriteCpuSetCommand( containerId.getHostName(), cpuSetString.toString() ) );
-    }
-
-
-    @Override
-    public void setAlertThreshold( final ContainerId containerId, ContainerResourceType containerResourceType,
-                                   final Integer threshold ) throws QuotaException
-    {
-        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-        Preconditions.checkNotNull( containerResourceType, "Container resource type cannot be null" );
-        Preconditions.checkNotNull( threshold, "Threshold cannot be null" );
-        Preconditions.checkArgument( threshold >= 0 && threshold <= 100, "Threshold value should be from 0 till 100" );
-
-        CommandResult result = null;
-        boolean failed = false;
-        try
-        {
-            result = executeOnContainersResourceHost( containerId,
-                    commands.getQuotaThresholdCommand( containerId.getHostName(), containerResourceType, threshold ) );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            failed = true;
-        }
-        if ( failed || !result.hasSucceeded() )
-        {
-            throw new QuotaException( "Set quota threshold failed." );
-        }
     }
 
 

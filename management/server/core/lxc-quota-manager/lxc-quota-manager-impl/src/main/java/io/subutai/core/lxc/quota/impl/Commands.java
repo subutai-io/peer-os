@@ -53,9 +53,9 @@ public class Commands
     }
 
 
-    public RequestBuilder getQuotaThresholdCommand( final String containerName,
-                                                    final ContainerResourceType containerResourceType,
-                                                    final Integer threshold )
+    public RequestBuilder getWriteQuotaThresholdCommand( final String containerName,
+                                                         final ContainerResourceType containerResourceType,
+                                                         final Integer threshold )
     {
         return new RequestBuilder( QUOTA_BINDING ).withCmdArgs(
                 Lists.newArrayList( "threshold", "-n", containerName, "-type", containerResourceType.getKey(),

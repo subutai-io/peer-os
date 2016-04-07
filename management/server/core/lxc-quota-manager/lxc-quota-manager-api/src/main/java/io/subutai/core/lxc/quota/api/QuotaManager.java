@@ -4,7 +4,6 @@ package io.subutai.core.lxc.quota.api;
 import java.util.Map;
 import java.util.Set;
 
-import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
@@ -89,13 +88,4 @@ public interface QuotaManager
     void removeQuota( ContainerId containerId );
 
     Map<ContainerSize, ContainerQuota> getDefaultQuotas();
-
-    /**
-     * Sets alert threshold for container
-     *
-     * @param containerId - id of container
-     * @param threshold - threshold value. The possible values are from 0 till 100.
-     */
-    void setAlertThreshold( ContainerId containerId, ContainerResourceType containerResourceType, Integer threshold )
-            throws QuotaException;
 }
