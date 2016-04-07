@@ -89,6 +89,7 @@ public class PeerManagerImplTest
     ControlNetworkConfig controlNetworkConfig;
     @Mock
     PeerData localPeerData;
+    @Mock Object provider;
 
 
     @Before
@@ -103,7 +104,7 @@ public class PeerManagerImplTest
 
         peerManager =
                 spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,
-                        templateManager, identityManager, null ) );
+                        templateManager, identityManager, provider ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;

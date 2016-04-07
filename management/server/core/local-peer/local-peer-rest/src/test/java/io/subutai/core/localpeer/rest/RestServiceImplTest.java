@@ -30,6 +30,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -126,8 +127,8 @@ public class RestServiceImplTest
 
         doThrow( exception ).when( localPeer ).getTemplate( TEMPLATE_NAME );
 
-        Response response1 = restService.getTemplate( TEMPLATE_NAME );
+        TemplateKurjun response1 = restService.getTemplate( TEMPLATE_NAME );
 
-        assertEquals( Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response1.getStatus() );
+        assertNotNull(response1 );
     }
 }

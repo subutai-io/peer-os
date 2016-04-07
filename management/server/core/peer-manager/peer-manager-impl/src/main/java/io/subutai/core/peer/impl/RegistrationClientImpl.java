@@ -9,6 +9,8 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
@@ -29,6 +31,9 @@ public class RegistrationClientImpl implements RegistrationClient
 
     public RegistrationClientImpl( final Object provider )
     {
+
+        Preconditions.checkNotNull( provider );
+
         this.provider = provider;
     }
 

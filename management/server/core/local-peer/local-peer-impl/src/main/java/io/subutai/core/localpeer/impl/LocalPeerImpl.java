@@ -910,16 +910,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @PermitAll
     @Override
-    public ContainerHostInfo getContainerHostInfoById( final String containerHostId ) throws PeerException
-    {
-        ContainerHost containerHost = getContainerHostById( containerHostId );
-
-        return new ContainerHostInfoModel( containerHost );
-    }
-
-
-    @PermitAll
-    @Override
     public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid resource host hostname" );
