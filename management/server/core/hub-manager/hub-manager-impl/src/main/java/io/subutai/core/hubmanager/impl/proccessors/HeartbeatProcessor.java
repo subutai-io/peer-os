@@ -47,11 +47,7 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            LOG.debug( "Sending heartbeat..." );
-
             sendHeartbeat();
-
-            LOG.debug( "Heartbeat sent successfully" );
         }
         catch ( Exception e )
         {

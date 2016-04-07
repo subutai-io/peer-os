@@ -357,14 +357,6 @@ public class LocalPeerImplTest
     }
 
 
-    @Test
-    @Ignore
-    public void testGetContainerHostInfoById() throws Exception
-    {
-        assertNotNull( localPeer.getContainerHostInfoById( CONTAINER_HOST_ID ) );
-    }
-
-
     @Test( expected = HostNotFoundException.class )
     public void testGetResourceHostByName() throws Exception
     {

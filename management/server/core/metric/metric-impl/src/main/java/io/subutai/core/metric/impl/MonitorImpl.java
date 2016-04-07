@@ -473,7 +473,6 @@ public class MonitorImpl implements Monitor, HostListener
         @Override
         public void run()
         {
-            LOG.debug( "Background task runner started..." );
             try
             {
                 deliverAlerts();
@@ -482,9 +481,8 @@ public class MonitorImpl implements Monitor, HostListener
             }
             catch ( Exception e )
             {
-                LOG.warn( "Background task execution faild: " + e.getMessage() );
+                LOG.warn( "Background task execution failed: " + e.getMessage() );
             }
-            LOG.debug( "Background task runner finished." );
         }
     }
 

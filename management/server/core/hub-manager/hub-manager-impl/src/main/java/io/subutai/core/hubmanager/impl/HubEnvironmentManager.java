@@ -21,7 +21,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
@@ -450,18 +449,18 @@ public class HubEnvironmentManager
 
     public String createSshKey( Set<Host> hosts )
     {
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), hosts );
+        CommandUtil.HostCommandResults results = commandUtil.executeParallel( getCreateNReadSSHCommand(), hosts );
 
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
-            CommandResult result = resultEntry.getValue();
-            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
             {
-                return result.getStdOut();
+                return result.getCommandResult().getStdOut();
             }
             else
             {
-                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getStdErr(), result.getExitCode() ) );
+                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getCommandResult().getStdErr(),
+                        result.getCommandResult().getExitCode() ) );
             }
         }
         return null;

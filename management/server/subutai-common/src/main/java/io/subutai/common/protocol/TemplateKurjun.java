@@ -1,38 +1,48 @@
 package io.subutai.common.protocol;
 
 
-import com.google.gson.annotations.Expose;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 
 public class TemplateKurjun
 {
 
-    @Expose
+    @JsonProperty( "id" )
     private String id;
-    @Expose
+
+    @JsonProperty( "md5Sum" )
     private String md5Sum;
-    @Expose
+
+    @JsonProperty( "name" )
     private String name;
-    @Expose
+
+    @JsonProperty( "version" )
     private String version;
-    @Expose
+
+    @JsonProperty( "architecture" )
     private String architecture;
-    @Expose
+
+    @JsonProperty( "parent" )
     private String parent;
-    @Expose
+
+    @JsonProperty( "packageName" )
     private String packageName;
-    @Expose
+
+    @JsonProperty( "ownerFprint" )
     private String ownerFprint;
-    @Expose
+
+    @JsonProperty( "configContents" )
     private String configContents;
-    @Expose
+
+    @JsonProperty( "packagesContents" )
     private String packagesContents;
 
-    @Expose
+    @JsonProperty( "size" )
     private long size;
 
+
     public TemplateKurjun( String id, String md5Sum, String name, String version, String architecture, String parent,
-            String packageName, String ownerFprint )
+                           String packageName, String ownerFprint )
     {
         this.id = id;
         this.md5Sum = md5Sum;
@@ -174,8 +184,8 @@ public class TemplateKurjun
     @Override
     public String toString()
     {
-        return "TemplateKurjun{" + "md5Sum=" + md5Sum + ", name=" + name + ", version=" + version + ", architecture=" + architecture
-                + ", parent=" + parent + ", packageName=" + packageName + ", ownerFprint=" + ownerFprint + '}';
+        return "TemplateKurjun{" + "md5Sum=" + md5Sum + ", name=" + name + ", version=" + version + ", architecture="
+                + architecture + ", parent=" + parent + ", packageName=" + packageName + ", ownerFprint=" + ownerFprint
+                + '}';
     }
-
 }

@@ -8,7 +8,7 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <bean id="commandProcessor" class="io.subutai.core.executor.impl.CommandProcessor"
-        destroy-method="dispose">
+        destroy-method="dispose" scope="singleton">
     <argument ref="hostRegistry" />
     <argument ref="identityManager" />
   </bean>
@@ -22,5 +22,14 @@
   <service ref="commandProcessor" interface="io.subutai.core.executor.api.RestProcessor" />
 
   <service ref="executor" interface="io.subutai.core.executor.api.CommandExecutor" />
+
+  <!--subscription service for heartbeat listeners-->
+
+  <reference-list id="hbLstnr"
+                  interface="io.subutai.common.host.HeartbeatListener"
+                  availability="optional">
+    <reference-listener ref="commandProcessor"
+                        bind-method="addListener" unbind-method="removeListener" />
+  </reference-list>
 
 </blueprint>

@@ -3,29 +3,26 @@ package io.subutai.core.localpeer.rest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
 
@@ -40,9 +37,9 @@ public interface RestService
     public PeerInfo getPeerInfo();
 
     @GET
-    @Path( "template/get" )
+    @Path( "template/{templateName}/get" )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getTemplate( @FormParam( "templateName" ) String templateName );
+    public TemplateKurjun getTemplate( @PathParam( "templateName" ) String templateName );
 
 
     @POST
@@ -69,9 +66,6 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     void addInitiatorPeerEnvironmentPubKey( @PathParam( "keyId" ) String keyId, String pek );
 
-    @GET
-    @Path( "container/info" )
-    Response getContainerHostInfoById( @QueryParam( "containerId" ) String containerId );
 
     @GET
     @Path( "containers/{environmentId}" )
@@ -148,11 +142,4 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     Response getP2PSwarmDistances( @PathParam( "p2pHash" ) final String p2pHash,
                                    @PathParam( "count" ) final Integer count );
-
-
-    @GET
-    @Path( "container/{containerId}/rhId" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    HostId getResourceHostIdByContainerId( @PathParam( "containerId" ) final ContainerId containerId );
 }

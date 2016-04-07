@@ -20,7 +20,6 @@ import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -220,16 +219,6 @@ public interface Peer
      * Sets up tunnels on the local peer to the specified remote peers todo use EnvironmentId instead of string
      */
     public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
-
-
-    /**
-     * Gets containerHost by Id specified
-     *
-     * @return - containerHost
-     *
-     * todo use ContainerId instead of string
-     */
-    public HostInfo getContainerHostInfoById( String containerHostId ) throws PeerException;
 
 
     /* **************************************************************

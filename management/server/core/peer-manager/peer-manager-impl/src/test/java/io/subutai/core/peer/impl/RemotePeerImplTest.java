@@ -37,7 +37,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
@@ -66,8 +65,6 @@ import static org.mockito.Mockito.when;
 @Ignore
 public class RemotePeerImplTest
 {
-    private static final String PATH = "path";
-    private static final String ALIAS = "alias";
     private static final String PARAM_NAME = "param";
     private static final String PARAM_VALUE = "param value";
     private static final String HEADER_NAME = "header";
@@ -78,16 +75,11 @@ public class RemotePeerImplTest
     private static final String PEER_ID = UUID.randomUUID().toString();
     private static final String IP = "127.0.0.1";
     private static final int PID = 123;
-    private static final int VLAN = 123;
-    private static final int QUOTA = 123;
-    private static final int PERCENT = 75;
     private static final Set<Integer> CPU_SET = Sets.newHashSet( 1, 2, 3 );
     private static final UUID MESSAGE_ID = UUID.randomUUID();
     private static final int TIMEOUT = 100;
     private static final String RECIPIENT = "recipient";
     private static final Object REQUEST = new Object();
-    private static final String SUBNET = "192.168.1.0/24";
-    private static final String RESPONSE = "RESPONSE";
     private static final String P2P_IP = "10.11.0.1";
     @Mock
     LocalPeer localPeer;
@@ -99,8 +91,7 @@ public class RemotePeerImplTest
     CommandResponseListener commandResponseListener;
     @Mock
     MessageResponseListener messageResponseListener;
-    @Mock
-    RestUtil restUtil;
+
     @Mock
     JsonUtil jsonUtil;
     @Mock
@@ -151,7 +142,6 @@ public class RemotePeerImplTest
         headers.put( HEADER_NAME, HEADER_VALUE );
         remotePeer = spy( new RemotePeerImpl( localPeer.getId(), securityManager, peerInfo, messenger,
                 commandResponseListener, messageResponseListener, null ) );
-        remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );
@@ -161,20 +151,11 @@ public class RemotePeerImplTest
         when( localPeer.getId() ).thenReturn( PEER_ID );
         when( peerInfo.getId() ).thenReturn( PEER_ID );
         when( remotePeer.getId() ).thenReturn( PEER_ID );
-        //        when( remotePeer.getPeerInfo() ).thenReturn( new PeerInfo() );
         when( containerHost.isConnected() ).thenReturn( true );
         when( envId.getId() ).thenReturn( ENV_ID );
         when( containerHost.getEnvironmentId() ).thenReturn( envId );
         when( messenger.createMessage( anyObject() ) ).thenReturn( message );
         when( message.getId() ).thenReturn( MESSAGE_ID );
-    }
-
-
-    private void throwException() throws HTTPException
-    {
-        doThrow( httpException ).when( restUtil )
-                                .request( any( RestUtil.RequestType.class ), anyString(), anyString(), anyMap(),
-                                        anyMap(), any() );
     }
 
 
@@ -185,90 +166,12 @@ public class RemotePeerImplTest
 
 
     @Test
-    public void testRequest() throws Exception
-    {
-        remotePeer.request( RestUtil.RequestType.GET, PATH, ALIAS, params, headers );
-
-        verify( restUtil )
-                .request( eq( RestUtil.RequestType.GET ), anyString(), eq( ALIAS ), eq( params ), eq( headers ),
-                        any() );
-    }
-
-
-    @Test
-    public void testGet() throws Exception
-    {
-
-        remotePeer.get( PATH, ALIAS, params, headers );
-
-        verify( restUtil )
-                .request( eq( RestUtil.RequestType.GET ), anyString(), eq( ALIAS ), eq( params ), eq( headers ),
-                        any() );
-    }
-
-
-    @Test
-    public void testPost() throws Exception
-    {
-        remotePeer.post( PATH, ALIAS, params, headers );
-
-        verify( restUtil )
-                .request( eq( RestUtil.RequestType.POST ), anyString(), eq( ALIAS ), eq( params ), eq( headers ),
-                        any() );
-    }
-
-
-    @Test
-    public void testDelete() throws Exception
-    {
-        remotePeer.delete( PATH, ALIAS, params, headers );
-
-        verify( restUtil )
-                .request( eq( RestUtil.RequestType.DELETE ), anyString(), eq( ALIAS ), eq( params ), eq( headers ),
-                        any() );
-    }
-
-
-    @Test
     public void testGetId() throws Exception
     {
         remotePeer.getId();
 
         verify( peerInfo ).getId();
     }
-
-
-    //    @Test( expected = PeerException.class )
-    //    public void testGetRemoteId() throws Exception
-    //    {
-    //        String ID = UUID.randomUUID().toString();
-    //        when( restUtil.request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() ) )
-    //                .thenReturn( ID );
-    //
-    //        PeerInfo id = remotePeer.getPeerInfo();
-    //
-    //        assertEquals( ID, id.toString() );
-    //
-    //        throwException();
-    //
-    //        //        remotePeer.getRemoteId();
-    //    }
-
-
-    //    @Test( expected = PeerException.class )
-    //    public void testIsOnline() throws Exception
-    //    {
-    //        UUID ID = UUID.randomUUID();
-    //        when( restUtil.request( eq( RestUtil.RequestType.GET ), anyString(), anyString(), anyMap(), anyMap() ) )
-    //                .thenReturn( ID.toString() );
-    //        when( peerInfo.getId() ).thenReturn( ID.toString() );
-    //
-    //        assertTrue( remotePeer.isOnline() );
-    //
-    //        throwException();
-    //
-    //        remotePeer.isOnline();
-    //    }
 
 
     @Test
@@ -296,13 +199,6 @@ public class RemotePeerImplTest
     }
 
 
-    //    @Test
-    //    public void testGetPeerInfo() throws Exception
-    //    {
-    //        assertEquals( peerInfo, remotePeer.getPeerInfo() );
-    //    }
-
-
     @Test( expected = PeerException.class )
     public void testGetTemplate() throws Exception
     {
@@ -310,7 +206,6 @@ public class RemotePeerImplTest
 
         verify( jsonUtil ).from( anyString(), eq( TemplateKurjun.class ) );
 
-        throwException();
 
         remotePeer.getTemplate( TEMPLATE_NAME );
     }
@@ -321,7 +216,6 @@ public class RemotePeerImplTest
     {
         remotePeer.startContainer( containerHost.getContainerId() );
 
-        //verify( localPeer ).getId();
 
         throwWebClientException();
 
@@ -334,7 +228,6 @@ public class RemotePeerImplTest
     {
         remotePeer.stopContainer( containerHost.getContainerId() );
 
-        //verify( localPeer ).getId();
 
         throwWebClientException();
 
@@ -347,7 +240,6 @@ public class RemotePeerImplTest
     {
         remotePeer.destroyContainer( containerHost.getContainerId() );
 
-        //verify( localPeer ).getId();
 
         throwWebClientException();
 
@@ -356,37 +248,11 @@ public class RemotePeerImplTest
 
 
     @Test( expected = PeerException.class )
-    public void testSetDefaultGateway() throws Exception
-    {
-        //remotePeer.setDefaultGateway( containerGateway );
-
-        //verify( localPeer ).getId();
-
-        throwException();
-
-        //remotePeer.setDefaultGateway( containerGateway );
-    }
-
-
-    //    @Test
-    //    public void testIsConnected() throws Exception
-    //    {
-    //        assertTrue( remotePeer.isConnected( containerHost.getContainerId() ) );
-    //
-    //        throwException();
-    //
-    //        //assertFalse( remotePeer.isConnected( containerHost ) );
-    //    }
-
-
-    @Test( expected = PeerException.class )
     public void testGetProcessResourceUsage() throws Exception
     {
         remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
 
-        //verify( localPeer ).getId();
-
-        throwException();
+        throwWebClientException();
 
         remotePeer.getProcessResourceUsage( containerHost.getContainerId(), PID );
     }
@@ -397,7 +263,6 @@ public class RemotePeerImplTest
     {
         remotePeer.getContainerState( containerHost.getContainerId() );
 
-        //verify( localPeer ).getId();
 
         throwWebClientException();
 
@@ -412,9 +277,8 @@ public class RemotePeerImplTest
 
         remotePeer.getCpuSet( containerHost );
 
-        //verify( localPeer ).getId();
 
-        throwException();
+        throwWebClientException();
 
         remotePeer.getCpuSet( containerHost );
     }
@@ -425,9 +289,8 @@ public class RemotePeerImplTest
     {
         remotePeer.setCpuSet( containerHost, CPU_SET );
 
-        //verify( localPeer ).getId();
 
-        throwException();
+        throwWebClientException();
 
         remotePeer.setCpuSet( containerHost, CPU_SET );
     }
