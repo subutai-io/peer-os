@@ -61,7 +61,7 @@ public interface Peer
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo() throws PeerException;
+    public PeerInfo getPeerInfo();
 
     /**
      * Creates environment container group on the peer

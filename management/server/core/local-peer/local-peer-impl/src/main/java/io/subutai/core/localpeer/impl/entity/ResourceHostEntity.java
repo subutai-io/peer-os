@@ -72,7 +72,7 @@ import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
- * Resource host implementation. TODO review all methods to see which ones must be run sequentially like setupTunnels
+ * Resource host implementation.
  */
 @Entity
 @Table( name = "r_host" )
@@ -731,7 +731,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
                             info.getHostInterfaces(), info.getContainerName(), "management", info.getArch().name(),
-                            "management", null, null, ContainerSize.SMALL, info.getState() );
+                            "management", null, null, ContainerSize.SMALL );
                     addContainerHost( containerHost );
                 }
                 else

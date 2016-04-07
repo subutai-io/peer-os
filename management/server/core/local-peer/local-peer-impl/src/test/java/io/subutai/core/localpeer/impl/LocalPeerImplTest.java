@@ -102,28 +102,18 @@ public class LocalPeerImplTest
     private static final String CONTAINER_HOST_NAME = "container_host_name";
     private static final String RESOURCE_HOST_NAME = "foo";
     private static final String TEMPLATE_NAME = "master";
-    private static final String SUBNET = "172.16.1.1/24";
     private static final String IP = "127.0.0.1";
     private static final Object REQUEST = new Object();
     private static final Object RESPONSE = new Object();
     private static final String RECIPIENT = "recipient";
     private static final int PID = 123;
     private static final int QUOTA = 123;
-    private static final String ALIAS = "alias";
-    private static final String CERT = "cert";
     private static final String P2P_IP = "10.11.0.1";
-    private static final String RAMQUOTA = "123M";
-    private static final String CPUQUOTA = "123";
     private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String ENV_ID = UUID.randomUUID().toString();
-    private static final String NAME = "name";
     private static final String HOSTNAME = "hostname";
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
-    private static final String MAC = "mac";
-    private static final int VLAN = 100;
-    private static final int VNI = 10000;
-    private static final int TUNNEL_ID = 123;
 
     @Mock
     NetworkManager networkManager;
@@ -292,7 +282,6 @@ public class LocalPeerImplTest
         when( hostInterfaces.getAll() ).thenReturn( Sets.newHashSet( anHostInterface ) );
         when( hostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
 
-        localPeer.singleThreadExecutorService = singleThreadExecutorService;
         localPeer.serviceLocator = serviceLocator;
         when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
         when( serviceLocator.getService( NetworkManager.class ) ).thenReturn( networkManager );
@@ -556,33 +545,11 @@ public class LocalPeerImplTest
     {
         localPeer.execute( requestBuilder, containerHost, commandCallback );
 
-        verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder, commandCallback );
+        verify( commandExecutor ).execute( CONTAINER_HOST_ID, requestBuilder, commandCallback );
 
         localPeer.execute( requestBuilder, containerHost );
 
-        verify( commandExecutor ).execute( CONTAINER_HOST_ID.toString(), requestBuilder );
-
-        //        when( containerHost.isConnected() ).thenReturn( false );
-        //
-        //        try
-        //        {
-        //            localPeer.execute( requestBuilder, containerHost );
-        //            fail( "Expected CommandException" );
-        //        }
-        //        catch ( CommandException e )
-        //        {
-        //        }
-
-        //        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-        //
-        //        try
-        //        {
-        //            localPeer.execute( requestBuilder, containerHost );
-        //            fail( "Expected CommandException" );
-        //        }
-        //        catch ( CommandException e )
-        //        {
-        //        }
+        verify( commandExecutor ).execute( CONTAINER_HOST_ID, requestBuilder );
     }
 
 
@@ -591,33 +558,11 @@ public class LocalPeerImplTest
     {
         localPeer.executeAsync( requestBuilder, containerHost, commandCallback );
 
-        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder, commandCallback );
+        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID, requestBuilder, commandCallback );
 
         localPeer.executeAsync( requestBuilder, containerHost );
 
-        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID.toString(), requestBuilder );
-
-        //        when( containerHost.isConnected() ).thenReturn( false );
-        //
-        //        try
-        //        {
-        //            localPeer.executeAsync( requestBuilder, containerHost );
-        //            fail( "Expected CommandException" );
-        //        }
-        //        catch ( CommandException e )
-        //        {
-        //        }
-
-        //        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).bindHost( CONTAINER_HOST_ID );
-        //
-        //        try
-        //        {
-        //            localPeer.executeAsync( requestBuilder, containerHost );
-        //            fail( "Expected CommandException" );
-        //        }
-        //        catch ( CommandException e )
-        //        {
-        //        }
+        verify( commandExecutor ).executeAsync( CONTAINER_HOST_ID, requestBuilder );
     }
 
 

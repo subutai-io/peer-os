@@ -22,16 +22,12 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
-
-//todo please check all endpoints for returned media type, do we return correct type if we just return response code
-// then no need to indicate it at all!!!
 
 
 public interface RestService
@@ -41,7 +37,7 @@ public interface RestService
     @Path( "/info" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public PeerInfo getPeerInfo() throws PeerException;
+    public PeerInfo getPeerInfo();
 
     @GET
     @Path( "template/get" )
