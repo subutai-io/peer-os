@@ -63,8 +63,7 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
 
             try
             {
-                System.out.println( String.format( "quota: %s/%s", containerHost.getQuota(),
-                                containerHost.getAvailableQuota() ) );
+                System.out.println( String.format( "quota: %s", containerHost.getQuota() ) );
             }
             catch ( Exception e )
             {

@@ -375,16 +375,6 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Container id is null" );
-        Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
-
-        return new EnvironmentWebClient( peerInfo, provider ).getAvailableQuota( containerId );
-    }
-
-
-    @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
         return execute( requestBuilder, host, null );

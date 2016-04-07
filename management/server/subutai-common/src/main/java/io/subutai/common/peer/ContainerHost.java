@@ -75,7 +75,7 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
      *
      * @return quota value
      */
-    ContainerQuota getAvailableQuota() throws PeerException;
+//    ContainerQuota getAvailableQuota() throws PeerException;
 
     /**
      * Returns current quota values

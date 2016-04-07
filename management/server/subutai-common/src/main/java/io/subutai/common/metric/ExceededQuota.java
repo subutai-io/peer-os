@@ -37,23 +37,39 @@ public class ExceededQuota
     protected final NumericValueResource currentValue;
     @JsonProperty( "quotaValue" )
     protected final ResourceValue quotaValue;
+    @JsonProperty( "rhMetrics" )
+    protected ResourceHostMetric resourceHostMetric;
 
 
     public ExceededQuota( @JsonProperty( "hostId" ) final HostId hostId,
                           @JsonProperty( "resourceType" ) final ContainerResourceType containerResourceType,
                           @JsonProperty( "currentValue" ) final NumericValueResource currentValue,
-                          @JsonProperty( "quotaValue" ) final ResourceValue quotaValue )
+                          @JsonProperty( "quotaValue" ) final ResourceValue quotaValue,
+                          @JsonProperty( "rhMetrics" ) final ResourceHostMetric resourceHostMetric )
     {
         this.hostId = hostId;
         this.containerResourceType = containerResourceType;
         this.currentValue = currentValue;
         this.quotaValue = quotaValue;
+        this.resourceHostMetric = resourceHostMetric;
     }
 
 
     public HostId getHostId()
     {
         return hostId;
+    }
+
+
+    public ResourceHostMetric getResourceHostMetric()
+    {
+        return resourceHostMetric;
+    }
+
+
+    public void setResourceHostMetric( final ResourceHostMetric resourceHostMetric )
+    {
+        this.resourceHostMetric = resourceHostMetric;
     }
 
 

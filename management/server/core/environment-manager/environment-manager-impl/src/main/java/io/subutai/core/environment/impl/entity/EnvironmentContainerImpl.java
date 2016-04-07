@@ -498,12 +498,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         getPeer().setCpuSet( this, cpuSet );
     }
 
-
-    @Override
-    public ContainerQuota getAvailableQuota() throws PeerException
-    {
-        return getPeer().getAvailableQuota( this.getContainerId() );
-    }
+//
+//    @Override
+//    public ContainerQuota getAvailableQuota() throws PeerException
+//    {
+//        return getPeer().getAvailableQuota( this.getContainerId() );
+//    }
 
 
     @Override

@@ -121,9 +121,9 @@ public class QuotaManagerImplTest
         // ) )
         //                .thenReturn( commandResultRam );
 
-        when( resourceHost
-                .execute( commands.getReadAvailableQuotaCommand( containerHostname, ContainerResourceType.RAM ) ) )
-                .thenReturn( commandResultRam );
+//        when( resourceHost
+//                .execute( commands.getReadAvailableQuotaCommand( containerHostname, ContainerResourceType.RAM ) ) )
+//                .thenReturn( commandResultRam );
 
         //        when( resourceHost.execute( commands.getWriteRamQuotaCommand2( containerHostname,
         //                String.format( "%s%s", ramQuotaInfo.getRamQuotaValue(),
@@ -133,14 +133,14 @@ public class QuotaManagerImplTest
         //                .execute( commands.getWriteQuotaCommand( containerHostname, ContainerResourceType.CPU,
         // cpuQuota ) ) )
         //                .thenReturn( commandResultCpu );
-
-        when( resourceHost
-                .execute( commands.getReadAvailableQuotaCommand( containerHostname, ContainerResourceType.CPU ) ) )
-                .thenReturn( commandResultCpu );
-
-        when( resourceHost
-                .execute( commands.getReadAvailableQuotaCommand( containerHostname, ContainerResourceType.HOME ) ) )
-                .thenReturn( commandResultDisk );
+//
+//        when( resourceHost
+//                .execute( commands.getReadAvailableQuotaCommand( containerHostname, ContainerResourceType.CPU ) ) )
+//                .thenReturn( commandResultCpu );
+//
+//        when( resourceHost
+//                .execute( commands.getReadAvailableQuotaCommand( containerHostname, ContainerResourceType.HOME ) ) )
+//                .thenReturn( commandResultDisk );
 
         //        when( resourceHost
         //                .execute( commands.getWriteQuotaCommand( containerHostname, ContainerResourceType.HOME,

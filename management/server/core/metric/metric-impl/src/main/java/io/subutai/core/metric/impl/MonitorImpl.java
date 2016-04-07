@@ -363,26 +363,32 @@ public class MonitorImpl implements Monitor, HostListener
 
         for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
-
-            try
-            {
-                ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
-                HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
-                resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
-                ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
-                if ( m != null )
-                {
-                    resourceHostMetric.updateMetrics( m );
-                    resourceHostMetric.setConnected( true );
-                    result.addMetric( resourceHostMetric );
-                }
-            }
-            catch ( Exception ignore )
-            {
-            }
+            final ResourceHostMetric m = getResourceHostMetric( resourceHost );
+            result.addMetric( m );
         }
 
         return result;
+    }
+
+
+    private ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
+    {
+        ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+        try
+        {
+            HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
+            resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
+            ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
+            if ( m != null )
+            {
+                resourceHostMetric.updateMetrics( m );
+                resourceHostMetric.setConnected( true );
+            }
+        }
+        catch ( Exception ignore )
+        {
+        }
+        return resourceHostMetric;
     }
 
 
@@ -488,6 +494,17 @@ public class MonitorImpl implements Monitor, HostListener
         {
             for ( QuotaAlertValue quotaAlertValue : alerts )
             {
+                final ResourceHostMetric metrics;
+                try
+                {
+                    metrics = getResourceHostMetric(
+                            peerManager.getLocalPeer().getResourceHostById( resourceHostInfo.getId() ) );
+                    quotaAlertValue.getValue().setResourceHostMetric( metrics );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.warn( e.getMessage() );
+                }
                 queueAlertResource( new QuotaAlert( quotaAlertValue, System.currentTimeMillis() ) );
             }
         }

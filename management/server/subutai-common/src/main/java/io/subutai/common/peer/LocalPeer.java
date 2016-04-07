@@ -7,6 +7,7 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.task.Task;
 
 
@@ -147,7 +148,7 @@ public interface LocalPeer extends Peer
 
     TemplateKurjun getTemplateByName( String templateName );
 
-    ContainerHost findContainerById( ContainerId containerId );
+    ContainerHost findContainerById( String containerId );
 
     int setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
 
