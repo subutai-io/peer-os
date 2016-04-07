@@ -49,9 +49,7 @@ public class ResourceHostMonitorProcessor implements Runnable
     {
         try
         {
-            LOG.debug( "Sending resource hosts monitoring data started..." );
             sendResourceHostMonitoringData();
-            LOG.debug( "Sending resource hosts monitoring data finished successfully..." );
         }
         catch ( Exception e )
         {
