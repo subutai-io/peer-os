@@ -87,6 +87,8 @@ public class CommandProcessor implements RestProcessor
     @Override
     public void handleHeartbeat( final HeartBeat heartBeat )
     {
+        LOG.debug( String.format( "Heartbeat:%n%s", JsonUtil.toJson( heartBeat ) ) );
+
         for ( final HeartbeatListener listener : listeners )
         {
             notifierPool.submit( new Runnable()
@@ -163,7 +165,7 @@ public class CommandProcessor implements RestProcessor
 
             String command = JsonUtil.toJson( new RequestWrapper( request ) );
 
-            LOG.info( String.format( "Sending:%n%s", command ) );
+            LOG.debug( String.format( "Sending:%n%s", command ) );
 
             //queue request
             queueRequest( resourceHostInfo, request );
@@ -193,7 +195,7 @@ public class CommandProcessor implements RestProcessor
                 hostRequests = Sets.newLinkedHashSet();
                 requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
             }
-            String encryptedRequest = encrypt( JsonUtil.toJson( request ), request.getId() );
+            String encryptedRequest = encrypt( JsonUtil.toJsonMinified( request ), request.getId() );
             hostRequests.add( encryptedRequest );
         }
     }
@@ -335,7 +337,7 @@ public class CommandProcessor implements RestProcessor
             if ( commandProcess != null )
             {
 
-                LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( response ) ) );
+                LOG.debug( String.format( "Response:%n%s", JsonUtil.toJson( response ) ) );
 
                 //process response
                 commandProcess.processResponse( response );
