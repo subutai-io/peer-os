@@ -376,32 +376,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent(
-                localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .executeParallel( localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ),
+                        hosts );
 
-
-        Set<Host> succeededHosts = Sets.newHashSet();
-        Set<Host> failedHosts = Sets.newHashSet( hosts );
-
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() )
+            if ( !result.hasSucceeded() )
             {
-                succeededHosts.add( host );
+                LOG.error( "Host registration failed on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
             }
         }
 
-        failedHosts.removeAll( succeededHosts );
-
-        for ( Host failedHost : failedHosts )
-        {
-            LOG.error( "Host registration failed on host {}", failedHost.getHostname() );
-        }
-
-        if ( !failedHosts.isEmpty() )
+        if ( results.hasFailures() )
         {
             throw new PeerException( "Failed to register all hosts" );
         }
@@ -425,53 +413,48 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //read ssh keys if exist
-        Map<Host, CommandResult> results =
-                commandUtil.executeParallelSilent( localPeerCommands.getReadSSHCommand(), hosts );
+        CommandUtil.HostCommandResults readResults =
+                commandUtil.executeParallel( localPeerCommands.getReadSSHCommand(), hosts );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
 
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        for ( CommandUtil.HostCommandResult result : readResults.getCommandResults() )
         {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
             {
-                sshPublicKeys.addSshPublicKey( result.getStdOut() );
+                sshPublicKeys.addSshPublicKey( result.getCommandResult().getStdOut() );
 
-                succeededHosts.add( host );
+                succeededHosts.add( result.getHost() );
             }
         }
 
+        //key might be never generated on these hosts
         failedHosts.removeAll( succeededHosts );
 
-        //create ssh keys
+        //create ssh keys on these hosts
         if ( !failedHosts.isEmpty() )
         {
-            results = commandUtil.executeParallelSilent( localPeerCommands.getCreateNReadSSHCommand(), failedHosts );
+            readResults = commandUtil.executeParallel( localPeerCommands.getCreateNReadSSHCommand(), failedHosts );
 
             succeededHosts = Sets.newHashSet();
 
-            for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+            for ( CommandUtil.HostCommandResult result : readResults.getCommandResults() )
             {
-                CommandResult result = resultEntry.getValue();
-                Host host = resultEntry.getKey();
-
-                if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getStdOut() ) )
+                if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
                 {
-                    sshPublicKeys.addSshPublicKey( result.getStdOut() );
+                    sshPublicKeys.addSshPublicKey( result.getCommandResult().getStdOut() );
 
-                    succeededHosts.add( host );
+                    succeededHosts.add( result.getHost() );
+                }
+                else
+                {
+                    LOG.error( "Failed to generate ssh key on host {}: {}", result.getHost().getHostname(),
+                            result.getFailureReason() );
                 }
             }
 
             failedHosts.removeAll( succeededHosts );
-
-            for ( Host failedHost : failedHosts )
-            {
-                LOG.error( "Failed to generate ssh key on host {}", failedHost.getHostname() );
-            }
 
             if ( !failedHosts.isEmpty() )
             {
@@ -502,6 +485,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //add keys in portions, since all can not fit into one command, it fails
+        int portionSize = 100;
         int i = 0;
         StringBuilder keysString = new StringBuilder();
         Set<String> keys = sshPublicKeys.getSshPublicKeys();
@@ -509,38 +493,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         for ( String key : keys )
         {
             keysString.append( key );
-            i++;
-            //send next 100 keys
-            if ( i % 100 == 0 || i == keys.size() )
-            {
-                Set<Host> succeededHosts = Sets.newHashSet();
-                Set<Host> failedHosts = Sets.newHashSet( hosts );
 
-                Map<Host, CommandResult> results = commandUtil
-                        .executeParallelSilent( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ),
-                                hosts );
+            i++;
+
+            //send next portion of keys
+            if ( i % portionSize == 0 || i == keys.size() )
+            {
+                CommandUtil.HostCommandResults appendResults = commandUtil
+                        .executeParallel( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ), hosts );
 
                 keysString.setLength( 0 );
 
-                for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+                for ( CommandUtil.HostCommandResult result : appendResults.getCommandResults() )
                 {
-                    CommandResult result = resultEntry.getValue();
-                    Host host = resultEntry.getKey();
-
-                    if ( result.hasSucceeded() )
+                    if ( !result.hasSucceeded() )
                     {
-                        succeededHosts.add( host );
+                        LOG.error( "Failed to add ssh keys on host {}: {}", result.getHost().getHostname(),
+                                result.getFailureReason() );
                     }
                 }
 
-                failedHosts.removeAll( succeededHosts );
-
-                for ( Host failedHost : failedHosts )
-                {
-                    LOG.error( "Failed to add ssh keys on host {}", failedHost.getHostname() );
-                }
-
-                if ( !failedHosts.isEmpty() )
+                if ( appendResults.hasFailures() )
                 {
                     throw new PeerException( "Failed to add ssh keys on all hosts" );
                 }
@@ -548,31 +521,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //config ssh
-        Set<Host> succeededHosts = Sets.newHashSet();
-        Set<Host> failedHosts = Sets.newHashSet( hosts );
+        CommandUtil.HostCommandResults configResults =
+                commandUtil.executeParallel( localPeerCommands.getConfigSSHCommand(), hosts );
 
-        Map<Host, CommandResult> results =
-                commandUtil.executeParallelSilent( localPeerCommands.getConfigSSHCommand(), hosts );
-
-        for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
+        for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
         {
-            CommandResult result = resultEntry.getValue();
-            Host host = resultEntry.getKey();
-
-            if ( result.hasSucceeded() )
+            if ( !result.hasSucceeded() )
             {
-                succeededHosts.add( host );
+                LOG.error( "Failed to configure ssh on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
             }
         }
 
-        failedHosts.removeAll( succeededHosts );
-
-        for ( Host failedHost : failedHosts )
-        {
-            LOG.error( "Failed to configure ssh on host {}", failedHost.getHostname() );
-        }
-
-        if ( !failedHosts.isEmpty() )
+        if ( configResults.hasFailures() )
         {
             throw new PeerException( "Failed to configure ssh on all hosts" );
         }
@@ -594,17 +555,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        Map<Host, CommandResult> results =
-                commandUtil.executeParallelSilent( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results =
+                commandUtil.executeParallel( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts );
 
-        hosts.removeAll( results.keySet() );
-
-        for ( Host failedHost : hosts )
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
-            LOG.error( "SSH key addition failed on host {}", failedHost.getHostname() );
+            if ( !result.hasSucceeded() )
+            {
+                LOG.error( "SSH key addition failed on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
         }
 
-        if ( !hosts.isEmpty() )
+        if ( results.hasFailures() )
         {
             throw new PeerException( "Failed to add SSH key on all hosts" );
         }
@@ -626,17 +589,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        Map<Host, CommandResult> results =
-                commandUtil.executeParallelSilent( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results =
+                commandUtil.executeParallel( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts );
 
-        hosts.removeAll( results.keySet() );
 
-        for ( Host failedHost : hosts )
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
-            LOG.error( "SSH key removal failed on host {}", failedHost.getHostname() );
+            if ( !result.hasSucceeded() )
+            {
+                LOG.error( "SSH key removal failed on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
         }
 
-        if ( !hosts.isEmpty() )
+        if ( results.hasFailures() )
         {
             throw new PeerException( "Failed to remove SSH key on all hosts" );
         }

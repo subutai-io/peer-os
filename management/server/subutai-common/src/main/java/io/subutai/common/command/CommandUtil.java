@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.peer.Host;
 import io.subutai.common.util.CollectionUtil;
@@ -163,53 +163,6 @@ public class CommandUtil
 
 
     /**
-     * Allows to execute command on all hosts in parallel
-     *
-     * @param requestBuilder - request
-     * @param hosts - hosts
-     *
-     * @return -  map containing command results
-     *
-     * @throws CommandException - exception thrown if something went wrong
-     */
-    public Map<Host, CommandResult> executeParallel( RequestBuilder requestBuilder, Set<Host> hosts )
-            throws CommandException
-    {
-        Preconditions.checkNotNull( requestBuilder );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
-
-        final Map<Host, CommandResult> resultMap = Maps.newConcurrentMap();
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
-        CompletionService<HostCommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
-
-        for ( Host host : hosts )
-        {
-            taskCompletionService.submit( new CommandTask( host, requestBuilder ) );
-        }
-
-        for ( int i = 0; i < hosts.size(); i++ )
-        {
-            try
-            {
-                Future<HostCommandResult> result = taskCompletionService.take();
-                HostCommandResult hostCommandResult = result.get();
-                resultMap.put( hostCommandResult.getHost(), hostCommandResult.getCommandResult() );
-            }
-            catch ( ExecutionException | InterruptedException e )
-            {
-                throw new CommandException( e );
-            }
-        }
-
-        taskExecutor.shutdown();
-
-        return resultMap;
-    }
-
-    //todo add more flexible command execution method. See PeerUtil
-
-
-    /**
      * Allows to execute command on all hosts in parallel. If any exception is thrown, ignores is and collects results
      * of only succeeded executions
      *
@@ -218,51 +171,122 @@ public class CommandUtil
      *
      * @return -  map containing command results
      */
-    public Map<Host, CommandResult> executeParallelSilent( RequestBuilder requestBuilder, Set<Host> hosts )
+    public HostCommandResults executeParallel( final RequestBuilder requestBuilder, Set<Host> hosts )
 
     {
         Preconditions.checkNotNull( requestBuilder );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
 
-        final Map<Host, CommandResult> resultMap = Maps.newConcurrentMap();
+        final Set<HostCommandResult> hostCommandResults = Sets.newHashSet();
+
         ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
-        CompletionService<HostCommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
+        CompletionService<CommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
 
-        for ( Host host : hosts )
-        {
-            taskCompletionService.submit( new CommandTask( host, requestBuilder ) );
-        }
+        Map<Host, Future<CommandResult>> commandFutures = Maps.newHashMap();
 
-        for ( int i = 0; i < hosts.size(); i++ )
+        for ( final Host host : hosts )
         {
-            try
+            commandFutures.put( host, taskCompletionService.submit( new Callable<CommandResult>()
             {
-                Future<HostCommandResult> result = taskCompletionService.take();
-                HostCommandResult hostCommandResult = result.get();
-                resultMap.put( hostCommandResult.getHost(), hostCommandResult.getCommandResult() );
-            }
-            catch ( Exception e )
-            {
-                LOG.error( "Error in #executeParallelSilent", e );
-            }
+                @Override
+                public CommandResult call() throws Exception
+                {
+                    return execute( requestBuilder, host );
+                }
+            } ) );
         }
 
         taskExecutor.shutdown();
 
-        return resultMap;
+        for ( Map.Entry<Host, Future<CommandResult>> commandFuture : commandFutures.entrySet() )
+        {
+
+            try
+            {
+                hostCommandResults
+                        .add( new HostCommandResult( commandFuture.getKey(), commandFuture.getValue().get() ) );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error executing command ", e );
+
+                hostCommandResults.add( new HostCommandResult( commandFuture.getKey(), e ) );
+            }
+        }
+
+        return new HostCommandResults( hostCommandResults );
     }
 
 
-    private class HostCommandResult
+    public static class HostCommandResults
+    {
+        private final Set<HostCommandResult> commandResults;
+        private boolean hasFailures = false;
+
+
+        public HostCommandResults( final Set<HostCommandResult> commandResults )
+        {
+            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( commandResults ) );
+
+            this.commandResults = commandResults;
+
+            for ( HostCommandResult commandResult : commandResults )
+            {
+                if ( !commandResult.hasSucceeded() )
+                {
+                    hasFailures = true;
+
+                    break;
+                }
+            }
+        }
+
+
+        public Set<HostCommandResult> getCommandResults()
+        {
+            return commandResults;
+        }
+
+
+        public boolean hasFailures()
+        {
+            return hasFailures;
+        }
+    }
+
+
+    public static class HostCommandResult
     {
         private Host host;
         private CommandResult commandResult;
+        private Exception exception;
+        private boolean hasSucceeded = true;
 
 
         public HostCommandResult( final Host host, final CommandResult commandResult )
         {
             this.host = host;
             this.commandResult = commandResult;
+        }
+
+
+        public HostCommandResult( final Host host, final Exception exception )
+        {
+            this.host = host;
+            this.exception = exception;
+            this.hasSucceeded = false;
+        }
+
+
+        public Exception getException()
+        {
+            return exception;
+        }
+
+
+        public boolean hasSucceeded()
+        {
+            return hasSucceeded;
         }
 
 
@@ -276,26 +300,11 @@ public class CommandUtil
         {
             return commandResult;
         }
-    }
 
 
-    private class CommandTask implements Callable<HostCommandResult>
-    {
-        private Host host;
-        private RequestBuilder requestBuilder;
-
-
-        public CommandTask( final Host host, final RequestBuilder requestBuilder )
+        public String getFailureReason()
         {
-            this.host = host;
-            this.requestBuilder = requestBuilder;
-        }
-
-
-        @Override
-        public HostCommandResult call() throws Exception
-        {
-            return new HostCommandResult( host, host.execute( requestBuilder ) );
+            return exception == null ? "Unknown" : exception.getMessage();
         }
     }
 
