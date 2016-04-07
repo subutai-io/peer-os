@@ -19,15 +19,15 @@ import io.subutai.common.resource.ResourceValueParser;
  */
 public interface QuotaManager
 {
-    /**
-     * Returns available quota values of container.
-     *
-     * @param containerId container id
-     *
-     * @return quota value
-     */
-
-    ContainerQuota getAvailableQuota( ContainerId containerId ) throws QuotaException;
+//    /**
+//     * Returns available quota values of container.
+//     *
+//     * @param containerId container id
+//     *
+//     * @return quota value
+//     */
+//
+//    ContainerQuota getAvailableQuota( ContainerId containerId ) throws QuotaException;
 
     PeerResources getResourceLimits( String peerId );
 

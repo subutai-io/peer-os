@@ -25,6 +25,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.ContainerResource;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.NumUtil;
@@ -93,14 +94,14 @@ public class CreateContainerTask implements Callable<ContainerHostInfo>
                                                 .getToken() ) );
 
         actions.add( cloneAction );
-        for ( ContainerResource r : quota.getAllResources() )
+        for ( Quota r : quota.getAll() )
         {
 
             BatchAction quotaAction = new BatchAction( "quota" );
             quotaAction.addArgument( hostname );
-            quotaAction.addArgument( r.getContainerResourceType().getKey() );
+            quotaAction.addArgument( r.getResource().getContainerResourceType().getKey() );
             quotaAction.addArgument( "-s" );
-            quotaAction.addArgument( r.getWriteValue() );
+            quotaAction.addArgument( r.getResource().getWriteValue() );
             actions.add( quotaAction );
         }
 

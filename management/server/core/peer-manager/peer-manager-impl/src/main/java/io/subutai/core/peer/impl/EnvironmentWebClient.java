@@ -232,33 +232,6 @@ public class EnvironmentWebClient
         checkResponse( response );
     }
 
-
-    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
-    {
-        String path = String.format( "/%s/container/%s/quota/available", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        Response response;
-
-        try
-        {
-            response = client.get();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on obtaining available quota: " + e.getMessage() );
-        }
-
-        return checkResponse( response, ContainerQuota.class );
-    }
-
-
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
         String path =

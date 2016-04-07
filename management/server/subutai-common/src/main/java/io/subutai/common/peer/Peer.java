@@ -261,7 +261,7 @@ public interface Peer
     //todo use PeerId instead of string
     PeerResources getResourceLimits( String peerId ) throws PeerException;
 
-    ContainerQuota getAvailableQuota( ContainerId containerId ) throws PeerException;
+    //    ContainerQuota getAvailableQuota( ContainerId containerId ) throws PeerException;
 
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
 
