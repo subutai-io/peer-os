@@ -4,6 +4,7 @@ package io.subutai.core.lxc.quota.impl;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.resource.ContainerResourceType;
 
@@ -23,8 +24,7 @@ public class Commands
     }
 
 
-    public RequestBuilder getWriteQuotaCommand( String containerHostname,
-                                                ContainerResource resourceValue )
+    public RequestBuilder getWriteQuotaCommand( String containerHostname, ContainerResource resourceValue )
     {
         return new RequestBuilder( QUOTA_BINDING ).withCmdArgs(
                 Lists.newArrayList( containerHostname, resourceValue.getContainerResourceType().getKey(), "-s",
@@ -50,5 +50,15 @@ public class Commands
     {
         return new RequestBuilder( QUOTA_BINDING )
                 .withCmdArgs( Lists.newArrayList( containerHostname, "cpuset", "-s", cpuset ) );
+    }
+
+
+    public RequestBuilder getQuotaThresholdCommand( final String containerName,
+                                                    final ContainerResourceType containerResourceType,
+                                                    final Integer threshold )
+    {
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs(
+                Lists.newArrayList( "threshold", "-n", containerName, "-type", containerResourceType.getKey(),
+                        threshold.toString() ) );
     }
 }
