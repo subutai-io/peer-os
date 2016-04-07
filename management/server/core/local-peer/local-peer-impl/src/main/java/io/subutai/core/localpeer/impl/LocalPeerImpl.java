@@ -749,7 +749,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
 
-        resourceHostDataService.saveOrUpdate( resourceHost );
+        resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
 
         LOG.debug( "New container host registered: " + containerHostEntity.getHostname() );
     }
@@ -2146,6 +2146,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         return templateRegistry.getTemplate( name );
     }
+
 
     @Override
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
