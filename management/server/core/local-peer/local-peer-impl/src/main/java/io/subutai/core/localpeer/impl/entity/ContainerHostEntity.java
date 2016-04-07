@@ -262,13 +262,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-//    @Override
-//    public ContainerQuota getAvailableQuota() throws PeerException
-//    {
-//        return getPeer().getAvailableQuota( this.getContainerId() );
-//    }
-
-
     @Override
     public ContainerQuota getQuota() throws PeerException
     {

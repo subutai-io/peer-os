@@ -49,7 +49,6 @@ import io.subutai.common.resource.ResourceValueParser;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.lxc.quota.impl.dao.QuotaDataService;
-import io.subutai.core.lxc.quota.impl.entity.QuotaEntity;
 import io.subutai.core.lxc.quota.impl.parser.CommonResourceValueParser;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -326,54 +325,14 @@ public class QuotaManagerImpl implements QuotaManager
             }
         }
 
-//        QuotaEntity entity = new QuotaEntity( containerId.getPeerId().getId(), containerId.getEnvironmentId().getId(),
-//                containerId.getId(),
-//                containerQuota.get( ContainerResourceType.CPU ).getAsCpuResource().getResource().getValue(),
-//                containerQuota.get( ContainerResourceType.RAM ).getAsRamResource().getResource().getValue(),
-//                containerQuota.get( ContainerResourceType.ROOTFS ).getAsDiskResource().getResource().getValue(),
-//                containerQuota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue(),
-//                containerQuota.get( ContainerResourceType.OPT ).getAsDiskResource().getResource().getValue(),
-//                containerQuota.get( ContainerResourceType.VAR ).getAsDiskResource().getResource().getValue() );
-//
-//        quotaDataService.saveOrUpdate( entity );
     }
 
 
     @Override
     public void removeQuota( final ContainerId containerId )
     {
-//        quotaDataService.remove( containerId.getId() );
+        //no-op
     }
-
-
-    //    @Override
-    //    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws QuotaException
-    //    {
-    //        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-    //
-    //        ContainerQuota containerQuota = new ContainerQuota();
-    //        for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
-    //        {
-    //            CommandResult result = executeOnContainersResourceHost( containerId,
-    //                    commands.getReadAvailableQuotaCommand( containerId.getHostName(), containerResourceType ) );
-    //
-    //            try
-    //            {
-    //                ResourceValue resourceValue =
-    //                        CommonResourceValueParser.parse( result.getStdOut(), containerResourceType );
-    //
-    //                ContainerResource containerResource =
-    //                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-    //                containerQuota.addResource( containerResource );
-    //            }
-    //            catch ( Exception e )
-    //            {
-    //                LOGGER.error( e.getMessage(), e );
-    //            }
-    //        }
-    //
-    //        return containerQuota;
-    //    }
 
 
     @Override

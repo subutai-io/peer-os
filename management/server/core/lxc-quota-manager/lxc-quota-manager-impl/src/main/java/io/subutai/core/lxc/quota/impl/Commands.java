@@ -4,7 +4,6 @@ package io.subutai.core.lxc.quota.impl;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.resource.ContainerResourceType;
 
@@ -30,6 +29,7 @@ public class Commands
                 Lists.newArrayList( containerHostname, resourceValue.getContainerResourceType().getKey(), "-s",
                         resourceValue.getWriteValue() ) );
     }
+
 
     public RequestBuilder getReadCpuSetCommand( String containerHostname )
     {
