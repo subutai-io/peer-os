@@ -36,6 +36,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.quota.ContainerResourceFactory;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.CpuResource;
@@ -114,28 +115,28 @@ public class QuotaManagerImpl implements QuotaManager
                 final ContainerQuota quota = new ContainerQuota();
 
                 ResourceValueParser quotaParser = getResourceValueParser( ContainerResourceType.RAM );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.RAM, quotaParser.parse( quotas[0] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.RAM, quotaParser.parse( quotas[0] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.CPU );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.CPU, quotaParser.parse( quotas[1] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.CPU, quotaParser.parse( quotas[1] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.OPT );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.OPT, quotaParser.parse( quotas[2] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.OPT, quotaParser.parse( quotas[2] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.HOME );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.HOME, quotaParser.parse( quotas[3] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.HOME, quotaParser.parse( quotas[3] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.VAR );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.VAR, quotaParser.parse( quotas[4] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.VAR, quotaParser.parse( quotas[4] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.ROOTFS );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.ROOTFS, quotaParser.parse( quotas[5] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.ROOTFS, quotaParser.parse( quotas[5] ) ), 0 ) );
 
                 containerQuotas.put( containerSize, quota );
 
@@ -287,7 +288,8 @@ public class QuotaManagerImpl implements QuotaManager
 
                 ContainerResource containerResource =
                         ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-                containerQuota.addResource( containerResource );
+                //todo: should be implemented threshold in agent
+                containerQuota.add( new Quota( containerResource, 0 ) );
             }
             catch ( Exception e )
             {
@@ -306,17 +308,20 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
 
-        for ( ContainerResource containerResource : containerQuota.getAllResources() )
+        for ( Quota quota : containerQuota.getAll() )
         {
             executeOnContainersResourceHost( containerId,
-                    commands.getWriteQuotaCommand( containerId.getHostName(), containerResource ) );
+                    commands.getWriteQuotaCommand( containerId.getHostName(), quota.getResource() ) );
         }
 
         QuotaEntity entity = new QuotaEntity( containerId.getPeerId().getId(), containerId.getEnvironmentId().getId(),
-                containerId.getId(), containerQuota.getCpu().getResource().getValue(),
-                containerQuota.getRam().getResource().getValue(), containerQuota.getRootfs().getResource().getValue(),
-                containerQuota.getHome().getResource().getValue(), containerQuota.getOpt().getResource().getValue(),
-                containerQuota.getVar().getResource().getValue() );
+                containerId.getId(),
+                containerQuota.get( ContainerResourceType.CPU ).getAsCpuResource().getResource().getValue(),
+                containerQuota.get( ContainerResourceType.RAM ).getAsRamResource().getResource().getValue(),
+                containerQuota.get( ContainerResourceType.ROOTFS ).getAsDiskResource().getResource().getValue(),
+                containerQuota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue(),
+                containerQuota.get( ContainerResourceType.OPT ).getAsDiskResource().getResource().getValue(),
+                containerQuota.get( ContainerResourceType.VAR ).getAsDiskResource().getResource().getValue() );
 
         quotaDataService.saveOrUpdate( entity );
     }
@@ -329,34 +334,34 @@ public class QuotaManagerImpl implements QuotaManager
     }
 
 
-    @Override
-    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws QuotaException
-    {
-        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-
-        ContainerQuota containerQuota = new ContainerQuota();
-        for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
-        {
-            CommandResult result = executeOnContainersResourceHost( containerId,
-                    commands.getReadAvailableQuotaCommand( containerId.getHostName(), containerResourceType ) );
-
-            try
-            {
-                ResourceValue resourceValue =
-                        CommonResourceValueParser.parse( result.getStdOut(), containerResourceType );
-
-                ContainerResource containerResource =
-                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-                containerQuota.addResource( containerResource );
-            }
-            catch ( Exception e )
-            {
-                LOGGER.error( e.getMessage(), e );
-            }
-        }
-
-        return containerQuota;
-    }
+    //    @Override
+    //    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws QuotaException
+    //    {
+    //        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
+    //
+    //        ContainerQuota containerQuota = new ContainerQuota();
+    //        for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
+    //        {
+    //            CommandResult result = executeOnContainersResourceHost( containerId,
+    //                    commands.getReadAvailableQuotaCommand( containerId.getHostName(), containerResourceType ) );
+    //
+    //            try
+    //            {
+    //                ResourceValue resourceValue =
+    //                        CommonResourceValueParser.parse( result.getStdOut(), containerResourceType );
+    //
+    //                ContainerResource containerResource =
+    //                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
+    //                containerQuota.addResource( containerResource );
+    //            }
+    //            catch ( Exception e )
+    //            {
+    //                LOGGER.error( e.getMessage(), e );
+    //            }
+    //        }
+    //
+    //        return containerQuota;
+    //    }
 
 
     @Override

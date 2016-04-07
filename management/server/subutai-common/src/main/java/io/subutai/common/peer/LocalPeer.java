@@ -7,6 +7,7 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.task.Task;
 
 

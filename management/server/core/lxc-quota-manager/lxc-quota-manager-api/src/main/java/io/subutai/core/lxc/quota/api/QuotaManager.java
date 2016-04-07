@@ -4,6 +4,7 @@ package io.subutai.core.lxc.quota.api;
 import java.util.Map;
 import java.util.Set;
 
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
@@ -19,15 +20,15 @@ import io.subutai.common.resource.ResourceValueParser;
  */
 public interface QuotaManager
 {
-    /**
-     * Returns available quota values of container.
-     *
-     * @param containerId container id
-     *
-     * @return quota value
-     */
-
-    ContainerQuota getAvailableQuota( ContainerId containerId ) throws QuotaException;
+//    /**
+//     * Returns available quota values of container.
+//     *
+//     * @param containerId container id
+//     *
+//     * @return quota value
+//     */
+//
+//    ContainerQuota getAvailableQuota( ContainerId containerId ) throws QuotaException;
 
     PeerResources getResourceLimits( String peerId );
 

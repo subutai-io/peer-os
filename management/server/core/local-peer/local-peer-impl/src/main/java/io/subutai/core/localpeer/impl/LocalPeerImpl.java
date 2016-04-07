@@ -2193,23 +2193,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId );
-
-        try
-        {
-            ContainerHost containerHost = getContainerHostById( containerId.getId() );
-            return quotaManager.getAvailableQuota( containerHost.getContainerId() );
-        }
-        catch ( QuotaException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException(
-                    String.format( "Could not obtain quota for %s: %s", containerId, e.getMessage() ) );
-        }
-    }
+    //    @Override
+    //    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
+    //    {
+    //        Preconditions.checkNotNull( containerId );
+    //
+    //        try
+    //        {
+    //            ContainerHost containerHost = getContainerHostById( containerId.getId() );
+    //            return quotaManager.getAvailableQuota( containerHost.getContainerId() );
+    //        }
+    //        catch ( QuotaException e )
+    //        {
+    //            LOG.error( e.getMessage() );
+    //            throw new PeerException(
+    //                    String.format( "Could not obtain quota for %s: %s", containerId, e.getMessage() ) );
+    //        }
+    //    }
 
 
     @Override

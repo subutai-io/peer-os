@@ -62,13 +62,18 @@ public class HostResources
     public boolean allocate( ContainerQuota containerQuota )
     {
         BigDecimal diskValue = BigDecimal.ZERO;
-        diskValue = diskValue.add( containerQuota.getHome().getResource().getValue() );
-        diskValue = diskValue.add( containerQuota.getOpt().getResource().getValue() );
-        diskValue = diskValue.add( containerQuota.getRootfs().getResource().getValue() );
-        diskValue = diskValue.add( containerQuota.getVar().getResource().getValue() );
+        diskValue = diskValue
+                .add( containerQuota.get( ContainerResourceType.HOME ).getAsDiskResource().getResource().getValue() );
+        diskValue = diskValue
+                .add( containerQuota.get( ContainerResourceType.OPT ).getAsDiskResource().getResource().getValue() );
+        diskValue = diskValue
+                .add( containerQuota.get( ContainerResourceType.ROOTFS ).getAsDiskResource().getResource().getValue() );
+        diskValue = diskValue
+                .add( containerQuota.get( ContainerResourceType.VAR ).getAsDiskResource().getResource().getValue() );
 
-        return allocate( containerQuota.getCpu().getResource().getValue(),
-                containerQuota.getRam().getResource().getValue(), diskValue );
+        return allocate( containerQuota.get( ContainerResourceType.CPU ).getAsCpuResource().getResource().getValue(),
+                containerQuota.get( ContainerResourceType.RAM ).getAsRamResource().getResource().getValue(),
+                diskValue );
     }
 
 

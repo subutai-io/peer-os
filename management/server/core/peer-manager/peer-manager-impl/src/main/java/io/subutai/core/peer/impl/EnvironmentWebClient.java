@@ -24,6 +24,8 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.Quota;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.security.WebClientBuilder;
 
 
@@ -393,6 +395,7 @@ public class EnvironmentWebClient
         }
     }
 
+
     public void removeSshKey( final PeerInfo peerInfo, final EnvironmentId environmentId, final String sshPublicKey )
             throws PeerException
     {
@@ -445,4 +448,5 @@ public class EnvironmentWebClient
             throw new PeerException( response.readEntity( String.class ) );
         }
     }
+
 }

@@ -63,6 +63,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -443,14 +444,13 @@ public class RemotePeerImpl implements RemotePeer
         new EnvironmentWebClient( provider ).setQuota( peerInfo, containerId, containerQuota );
     }
 
-
-    @Override
-    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerId, "Container id is null" );
-
-        return new EnvironmentWebClient( provider ).getAvailableQuota( peerInfo, containerId );
-    }
+//    @Override
+//    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws PeerException
+//    {
+//        Preconditions.checkNotNull( containerId, "Container id is null" );
+//
+//        return new EnvironmentWebClient( provider ).getAvailableQuota( peerInfo, containerId );
+//    }
 
 
     @PermitAll
