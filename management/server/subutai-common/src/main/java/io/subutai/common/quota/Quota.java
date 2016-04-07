@@ -66,4 +66,15 @@ public class Quota
         }
         throw new IllegalStateException( "Could not get as disk resource." );
     }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "Quota{" );
+        sb.append( "resource=" ).append( resource );
+        sb.append( ", threshold=" ).append( threshold );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

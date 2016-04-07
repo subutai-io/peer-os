@@ -31,15 +31,6 @@ public class Commands
                         resourceValue.getWriteValue() ) );
     }
 
-
-    public RequestBuilder getReadAvailableQuotaCommand( final String containerName,
-                                                        final ContainerResourceType containerResourceType )
-    {
-        return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, containerResourceType.getKey(), "-m" ) );
-    }
-
-
     public RequestBuilder getReadCpuSetCommand( String containerHostname )
     {
         return new RequestBuilder( QUOTA_BINDING ).withCmdArgs( Lists.newArrayList( containerHostname, "cpuset" ) );
