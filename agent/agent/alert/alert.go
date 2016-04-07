@@ -12,6 +12,7 @@ import (
 
 	"github.com/subutai-io/base/agent/agent/container"
 	"github.com/subutai-io/base/agent/config"
+	cont "github.com/subutai-io/base/agent/lib/container"
 )
 
 type Values struct {
@@ -182,16 +183,20 @@ func CurrentAlerts(list []container.Container) []Load {
 	for _, v := range list {
 		var item Load
 
-		if stats[v.Name].CPU != nil && stats[v.Name].CPU.Current > 80 {
+		threshold, _ := strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.cpu"))
+		if threshold > 0 && stats[v.Name].CPU != nil && stats[v.Name].CPU.Current > threshold {
 			item.CPU = &Values{Current: stats[v.Name].CPU.Current, Quota: stats[v.Name].CPU.Quota}
 		}
-		if stats[v.Name].RAM != nil && stats[v.Name].RAM.Current > 80 {
+
+		threshold, _ = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.ram"))
+		if threshold > 0 && stats[v.Name].RAM != nil && stats[v.Name].RAM.Current > threshold {
 			item.RAM = &Values{Current: stats[v.Name].RAM.Current, Quota: stats[v.Name].RAM.Quota}
 		}
 
-		for _, v := range stats[v.Name].Disk {
-			if v.Current > 80 {
-				item.Disk = append(item.Disk, HDD{Current: v.Current, Quota: v.Quota, Partition: v.Partition})
+		for _, value := range stats[v.Name].Disk {
+			threshold, _ = strconv.Atoi(cont.GetConfigItem(config.Agent.LxcPrefix+v.Name+"/config", "subutai.alert.disk."+value.Partition))
+			if threshold > 0 && value.Current > threshold {
+				item.Disk = append(item.Disk, HDD{Current: value.Current, Quota: value.Quota, Partition: value.Partition})
 			}
 		}
 
