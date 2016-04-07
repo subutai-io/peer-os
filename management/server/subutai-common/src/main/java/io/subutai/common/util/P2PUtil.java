@@ -1,7 +1,10 @@
 package io.subutai.common.util;
 
 
+import java.util.Random;
 import java.util.Set;
+
+import io.subutai.common.protocol.Tunnels;
 
 
 /**
@@ -74,5 +77,30 @@ public abstract class P2PUtil
     public static String generateInterfaceName( final int vlan )
     {
         return String.format( "p2p-%d", vlan );
+    }
+
+
+    public static String generateTunnelName( Tunnels tunnels )
+    {
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        String name;
+
+        Random rnd = new Random();
+
+        do
+        {
+            int n = 10000 + rnd.nextInt( 90000 );
+            name = String.format( "tunnel-%d", n );
+            currentIteration++;
+        }
+        while ( tunnels.findByName( name ) != null && currentIteration < maxIterations );
+
+        if ( tunnels.findByName( name ) != null )
+        {
+            return null;
+        }
+
+        return name;
     }
 }
