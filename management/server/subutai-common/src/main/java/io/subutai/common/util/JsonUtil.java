@@ -15,6 +15,7 @@ import com.google.gson.GsonBuilder;
 public class JsonUtil
 {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final Gson GSON_MINIFIED = new GsonBuilder().create();
 
 
     public static <T, V> String toJson( T key, V value )
@@ -65,10 +66,24 @@ public class JsonUtil
     }
 
 
+    public static <T> String toJsonMinified( T value, Type type )
+    {
+
+        return GSON_MINIFIED.toJson( value, type );
+    }
+
+
     public static <T> String toJson( T value )
     {
 
         return GSON.toJson( value );
+    }
+
+
+    public static <T> String toJsonMinified( T value )
+    {
+
+        return GSON_MINIFIED.toJson( value );
     }
 
 
@@ -79,9 +94,23 @@ public class JsonUtil
     }
 
 
+    public <T> String toMinified( T value )
+    {
+
+        return GSON_MINIFIED.toJson( value );
+    }
+
+
     public <T> String to( T value, Type type )
     {
 
         return GSON.toJson( value, type );
+    }
+
+
+    public <T> String toMinified( T value, Type type )
+    {
+
+        return GSON_MINIFIED.toJson( value, type );
     }
 }

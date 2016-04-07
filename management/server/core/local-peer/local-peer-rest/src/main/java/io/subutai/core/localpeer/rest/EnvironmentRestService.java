@@ -82,12 +82,6 @@ public interface EnvironmentRestService
     Response setQuota( @PathParam( "containerId" ) ContainerId containerId, ContainerQuota containerQuota );
 
     @GET
-    @Path( "{environmentId}/container/{containerId}/quota/available" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableQuota( @PathParam( "containerId" ) ContainerId containerId );
-
-    @GET
     @Path( "{environmentId}/container/{containerId}/rhId" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )

@@ -3,7 +3,6 @@ package io.subutai.common.peer;
 
 import java.util.Set;
 
-import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
@@ -12,7 +11,6 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.common.quota.ContainerQuota;
 
 
 /**
@@ -20,10 +18,6 @@ import io.subutai.common.quota.ContainerQuota;
  */
 public interface ResourceHost extends Host, ResourceHostInfo
 {
-    /**
-     * Returns resource usage metric of the resource host
-     */
-    //    public ResourceHostMetric getHostMetric();
 
     /**
      * Returns hosts containers
@@ -66,22 +60,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     public ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
 
     public void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
-
-
-    /**
-     * Creates container on the resource host
-     *
-     * @param templateName - name of template from which to clone container
-     * @param hostname - hostname for container
-     * @param ip - IP to assign to container
-     * @param vlan - vlan to assign to container
-     * @param timeout - timeout to wait until container connects to server
-     * @param environmentId - id of environment to which the container will belong
-     */
-    @Deprecated
-    public ContainerHostInfo createContainer( String templateName, String hostname, ContainerQuota quota, String ip,
-                                              int vlan, int timeout, String environmentId )
-            throws ResourceHostException;
 
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 

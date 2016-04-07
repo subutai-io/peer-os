@@ -23,20 +23,11 @@ public class Commands
     }
 
 
-    public RequestBuilder getWriteQuotaCommand( String containerHostname,
-                                                ContainerResource resourceValue )
+    public RequestBuilder getWriteQuotaCommand( String containerHostname, ContainerResource resourceValue )
     {
         return new RequestBuilder( QUOTA_BINDING ).withCmdArgs(
                 Lists.newArrayList( containerHostname, resourceValue.getContainerResourceType().getKey(), "-s",
                         resourceValue.getWriteValue() ) );
-    }
-
-
-    public RequestBuilder getReadAvailableQuotaCommand( final String containerName,
-                                                        final ContainerResourceType containerResourceType )
-    {
-        return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, containerResourceType.getKey(), "-m" ) );
     }
 
 
@@ -50,5 +41,15 @@ public class Commands
     {
         return new RequestBuilder( QUOTA_BINDING )
                 .withCmdArgs( Lists.newArrayList( containerHostname, "cpuset", "-s", cpuset ) );
+    }
+
+
+    public RequestBuilder getWriteQuotaThresholdCommand( final String containerName,
+                                                         final ContainerResourceType containerResourceType,
+                                                         final Integer threshold )
+    {
+        return new RequestBuilder( QUOTA_BINDING ).withCmdArgs(
+                Lists.newArrayList( "threshold", "-n", containerName, "-type", containerResourceType.getKey(),
+                        threshold.toString() ) );
     }
 }

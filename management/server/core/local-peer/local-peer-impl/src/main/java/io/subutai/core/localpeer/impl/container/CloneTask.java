@@ -23,6 +23,7 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.registration.api.RegistrationManager;
 
 
+//todo call RH.createContainer
 public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
         implements TaskResponseBuilder<CloneRequest, CloneResponse>
 {
