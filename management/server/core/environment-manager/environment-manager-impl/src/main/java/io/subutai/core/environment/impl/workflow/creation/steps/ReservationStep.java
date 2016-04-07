@@ -102,7 +102,7 @@ public class ReservationStep
         }
 
         //calculate free container subnet
-        final String freeContainerSubnet = P2PUtil.findFreeContainerSubnet( allContainerSubnets );
+        final String freeContainerSubnet = P2PUtil.generateContainerSubnet( allContainerSubnets );
 
         if ( freeContainerSubnet == null )
         {
@@ -110,7 +110,7 @@ public class ReservationStep
         }
 
         //calculate free p2p subnet
-        final String freeP2pSubnet = P2PUtil.findFreeP2PSubnet( allP2pSubnets );
+        final String freeP2pSubnet = P2PUtil.generateP2PSubnet( allP2pSubnets );
 
         if ( freeP2pSubnet == null )
         {
