@@ -15,6 +15,7 @@ import io.subutai.common.task.TaskResponseBuilder;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 
 
+//todo call RH.setContainerQuota
 public class QuotaTask extends AbstractTask<QuotaRequest, QuotaResponse>
         implements TaskResponseBuilder<QuotaRequest, QuotaResponse>
 {

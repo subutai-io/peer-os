@@ -13,6 +13,7 @@ import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.task.TaskResponseBuilder;
 
 
+//todo call RH.importTemplate
 public class ImportTask extends AbstractTask<ImportTemplateRequest, ImportTemplateResponse>
         implements TaskResponseBuilder<ImportTemplateRequest, ImportTemplateResponse>
 

@@ -302,26 +302,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         }
     }
 
-//
-//    @Override
-//    public Response getAvailableQuota( final ContainerId containerId )
-//    {
-//        try
-//        {
-//            Preconditions.checkNotNull( containerId );
-//            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-//
-//            ContainerQuota resourceValue = localPeer.getAvailableQuota( containerId );
-//
-//            return Response.ok( resourceValue ).build();
-//        }
-//        catch ( Exception e )
-//        {
-//            LOGGER.error( e.getMessage(), e );
-//            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-//        }
-//    }
-
 
     @Override
     public HostId getResourceHostIdByContainerId( final ContainerId containerId )

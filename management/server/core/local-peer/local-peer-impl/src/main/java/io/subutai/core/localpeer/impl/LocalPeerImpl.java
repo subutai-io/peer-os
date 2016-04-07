@@ -796,7 +796,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public ContainerHost findContainerById( final String containerId )
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
