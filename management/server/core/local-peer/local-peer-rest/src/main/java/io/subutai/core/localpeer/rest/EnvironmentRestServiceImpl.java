@@ -35,6 +35,8 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
     public EnvironmentRestServiceImpl( final LocalPeer localPeer )
     {
+        Preconditions.checkNotNull( localPeer );
+
         this.localPeer = localPeer;
     }
 
@@ -42,9 +44,10 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public void destroyContainer( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerId );
         try
         {
+            Preconditions.checkNotNull( containerId );
+
             localPeer.destroyContainer( containerId );
         }
         catch ( Exception e )
@@ -58,9 +61,10 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public void startContainer( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerId );
         try
         {
+            Preconditions.checkNotNull( containerId );
+
             localPeer.startContainer( containerId );
         }
         catch ( Exception e )
@@ -74,9 +78,10 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public void stopContainer( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerId );
         try
         {
+            Preconditions.checkNotNull( containerId );
+
             localPeer.stopContainer( containerId );
         }
         catch ( Exception e )
@@ -90,10 +95,10 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public ContainerHostState getContainerState( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkNotNull( containerId.getId() );
         try
         {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerId.getId() );
             return localPeer.getContainerState( containerId );
         }
         catch ( Exception e )
@@ -107,11 +112,11 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid )
     {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkArgument( pid > 0 );
-
         try
         {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( pid > 0 );
+
             return localPeer.getProcessResourceUsage( containerId, pid );
         }
         catch ( Exception e )
@@ -151,6 +156,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             localPeer.getContainerHostById( containerId.getId() ).setCpuSet( cpuSet );
+
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -169,6 +175,42 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
 
             return localPeer.generateSshKeyForEnvironment( environmentId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
+
+            localPeer.addSshKey( environmentId, sshPublicKey );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void removeSshKey( final EnvironmentId environmentId, final String sshPublicKey )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
+
+            localPeer.removeSshKey( environmentId, sshPublicKey );
         }
         catch ( Exception e )
         {
@@ -223,11 +265,13 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public Response getQuota( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
         try
         {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+
             ContainerQuota resourceValue = localPeer.getQuota( containerId );
+
             return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )
@@ -241,13 +285,14 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public Response setQuota( final ContainerId containerId, ContainerQuota containerQuota )
     {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkNotNull( containerQuota );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
         try
         {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerQuota );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+
             localPeer.setQuota( containerId, containerQuota );
+
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -261,12 +306,13 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public Response getAvailableQuota( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
         try
         {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             ContainerQuota resourceValue = localPeer.getAvailableQuota( containerId );
+
             return Response.ok( resourceValue ).build();
         }
         catch ( Exception e )
@@ -280,11 +326,11 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     @Override
     public HostId getResourceHostIdByContainerId( final ContainerId containerId )
     {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
         try
         {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+
             return localPeer.getResourceHostIdByContainerId( containerId );
         }
         catch ( Exception e )

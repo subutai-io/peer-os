@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/fs"
+	"github.com/subutai-io/base/agent/log"
 )
 
 // LxcQuota sets quotas for containers
@@ -29,4 +30,16 @@ func LxcQuota(name, res, size string) {
 		fmt.Println(container.QuotaCPU(name, size))
 	}
 	return
+}
+
+// QuotaThreshold sets threshold for quota alerts
+func QuotaThreshold(name, resource, size string) {
+	if resource == "rootfs" || resource == "var" || resource == "opt" || resource == "home" {
+		container.SetContainerConf(name, [][]string{{"subutai.alert.disk." + resource, size}})
+		return
+	} else if resource == "cpu" || resource == "ram" {
+		container.SetContainerConf(name, [][]string{{"subutai.alert." + resource, size}})
+		return
+	}
+	log.Fatal("Failed to set threshold for " + resource)
 }

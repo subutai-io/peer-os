@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -15,8 +12,6 @@ import io.subutai.core.environment.impl.workflow.creation.steps.AddSshKeyStep;
 
 public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshKeyAdditionPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SshKeyAdditionWorkflow.class );
-
     private EnvironmentImpl environment;
     private final String sshKey;
     private final TrackerOperation operationTracker;
@@ -51,7 +46,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         return SshKeyAdditionPhase.ADD_KEY;
     }
@@ -66,7 +61,7 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
         {
             new AddSshKeyStep( sshKey, environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return SshKeyAdditionPhase.FINALIZE;
         }
@@ -81,11 +76,9 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing ssh key addition" );
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         operationTracker.addLogDone( "Ssh key is added" );
 
@@ -97,16 +90,18 @@ public class SshKeyAdditionWorkflow extends Workflow<SshKeyAdditionWorkflow.SshK
     @Override
     public void fail( final String message, final Throwable e )
     {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( message );
+
         super.fail( message, e );
-        saveFailState();
     }
 
 
-    private void saveFailState()
+    protected void saveEnvironment()
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.update( environment );
-        operationTracker.addLogFailed( getFailedReason() );
-        LOG.error( "Error adding ssh key", getFailedException() );
     }
 }

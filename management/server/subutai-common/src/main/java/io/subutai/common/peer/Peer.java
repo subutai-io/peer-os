@@ -20,7 +20,6 @@ import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -61,7 +60,7 @@ public interface Peer
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo() throws PeerException;
+    public PeerInfo getPeerInfo();
 
     /**
      * Creates environment container group on the peer
@@ -222,16 +221,6 @@ public interface Peer
     public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
 
 
-    /**
-     * Gets containerHost by Id specified
-     *
-     * @return - containerHost
-     *
-     * todo use ContainerId instead of string
-     */
-    public HostInfo getContainerHostInfoById( String containerHostId ) throws PeerException;
-
-
     /* **************************************************************
      *
      */
@@ -262,9 +251,6 @@ public interface Peer
     void joinP2PSwarm( P2PConfig config ) throws PeerException;
 
     void joinOrUpdateP2PSwarm( P2PConfig config ) throws PeerException;
-
-    @Deprecated
-    public void createP2PSwarm( final P2PConfig config ) throws PeerException;
 
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
@@ -297,6 +283,9 @@ public interface Peer
 
     void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
 
-    void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
+    void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
+    void addSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+
+    void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 }

@@ -101,10 +101,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "subnet" )
     private String subnetCidr;
 
-    @Column( name = "last_used_ip_idx" )
-    @JsonIgnore
-    private int lastUsedIpIndex;
-
     @Column( name = "vni" )
     @JsonIgnore
     private Long vni;
@@ -179,7 +175,6 @@ public class EnvironmentImpl implements Environment, Serializable
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
-        this.lastUsedIpIndex = 0;//0 is reserved for gateway
         this.userId = userId;
         this.peerId = peerId;
     }
@@ -572,18 +567,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public int getLastUsedIpIndex()
-    {
-        return lastUsedIpIndex;
-    }
-
-
-    public void setLastUsedIpIndex( int lastUsedIpIndex )
-    {
-        this.lastUsedIpIndex = lastUsedIpIndex;
-    }
-
-
     @Override
     public String getP2pSubnet()
     {
@@ -693,9 +676,9 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
                 + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
-                + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\''
-                + ", containers=" + containers + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='"
-                + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
+                + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers
+                + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId="
+                + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
     }
 
 

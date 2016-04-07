@@ -22,28 +22,26 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.quota.ContainerQuota;
 
-//TODO make all methods consistent about parameters
-
 
 public interface EnvironmentRestService
 {
-    @GET
+    @POST
     @Path( "{environmentId}/container/{id}/start" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     void startContainer( @PathParam( "id" ) ContainerId containerId );
 
     @POST
-    @Path( "{environmentId}/container/stop" )
+    @Path( "{environmentId}/container/{id}/stop" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    void stopContainer( ContainerId containerId );
+    void stopContainer( @PathParam( "id" ) ContainerId containerId );
 
     @POST
-    @Path( "{environmentId}/container/destroy" )
+    @Path( "{environmentId}/container/{id}/destroy" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    void destroyContainer( ContainerId containerId );
+    void destroyContainer( @PathParam( "id" ) ContainerId containerId );
 
 
     @GET
@@ -105,6 +103,14 @@ public interface EnvironmentRestService
     @Path( "{environmentId}/containers/sshkeys" )
     @Produces( MediaType.APPLICATION_JSON )
     SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
+
+    @POST
+    @Path( "{environmentId}/containers/sshkey/add" )
+    void addSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId, String sshPublicKey );
+
+    @POST
+    @Path( "{environmentId}/containers/sshkey/remove" )
+    void removeSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId, String sshPublicKey );
 
     @POST
     @Path( "{environmentId}/containers/hosts" )

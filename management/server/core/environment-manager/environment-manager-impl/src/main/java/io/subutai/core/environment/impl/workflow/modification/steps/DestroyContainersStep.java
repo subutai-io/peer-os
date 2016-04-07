@@ -3,60 +3,70 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.List;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.PeerException;
+import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.modification.steps.helpers.ContainerDestroyTask;
+import io.subutai.core.environment.impl.workflow.util.TaskUtil;
 
 
 /**
  * Container destroy step
- *
- * todo parallelize
  */
 public class DestroyContainersStep
 {
     private final EnvironmentImpl environment;
     private final EnvironmentManagerImpl environmentManager;
     private final List<String> removedContainers;
+    private final TrackerOperation trackerOperation;
 
 
     public DestroyContainersStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
-                                  final List<String> removedContainers )
+                                  final List<String> removedContainers, TrackerOperation trackerOperation )
     {
         this.environment = environment;
         this.environmentManager = environmentManager;
         this.removedContainers = removedContainers;
+        this.trackerOperation = trackerOperation;
     }
 
 
     public void execute() throws Exception
     {
-        for ( String containerId : removedContainers )
+        if ( !CollectionUtil.isCollectionEmpty( removedContainers ) )
         {
-            ContainerHost containerHost;
+            TaskUtil<Object> destroyUtil = new TaskUtil<>();
 
-            containerHost = environment.getContainerHostById( containerId );
-
-            try
+            for ( String containerId : removedContainers )
             {
-                ( ( EnvironmentContainerImpl ) containerHost ).destroy();
+                final ContainerHost containerHost = environment.getContainerHostById( containerId );
+
+                destroyUtil.addTask( new ContainerDestroyTask( containerHost ) );
             }
-            catch ( PeerException e )
+
+            TaskUtil.TaskResults<Object> destroyResults = destroyUtil.executeParallel();
+
+            for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getTaskResults() )
             {
-                if ( !( e instanceof HostNotFoundException || ( ExceptionUtils.getRootCauseMessage( e )
-                                                                              .contains( "HostNotFoundException" ) ) ) )
+                ContainerHost containerHost = ( ( ContainerDestroyTask ) destroyResult.getTask() ).getContainerHost();
+
+                if ( destroyResult.hasSucceeded() )
                 {
-                    throw e;
+                    environment.removeContainer( containerHost );
+
+                    environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
+
+                    trackerOperation.addLog( String.format( "Container %s destroyed", containerHost.getHostname() ) );
+                }
+                else
+                {
+                    trackerOperation.addLog(
+                            String.format( "Failed to destroy container %s. Reason: %s", containerHost.getHostname(),
+                                    destroyResult.getFailureReason() ) );
                 }
             }
-
-            environment.removeContainer( containerHost );
-            environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
         }
     }
 }

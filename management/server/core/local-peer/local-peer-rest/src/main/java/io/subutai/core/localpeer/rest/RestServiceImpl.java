@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -9,23 +8,16 @@ import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -35,7 +27,6 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.util.DateTimeParam;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.RestUtil;
 
 
 public class RestServiceImpl implements RestService
@@ -43,17 +34,18 @@ public class RestServiceImpl implements RestService
     private static final Logger LOGGER = LoggerFactory.getLogger( RestServiceImpl.class );
     private final LocalPeer localPeer;
     protected JsonUtil jsonUtil = new JsonUtil();
-    protected RestUtil restUtil = new RestUtil();
 
 
     public RestServiceImpl( final LocalPeer localPeer )
     {
+        Preconditions.checkNotNull( localPeer );
+
         this.localPeer = localPeer;
     }
 
 
     @Override
-    public PeerInfo getPeerInfo() throws PeerException
+    public PeerInfo getPeerInfo()
     {
         try
         {
@@ -67,38 +59,14 @@ public class RestServiceImpl implements RestService
     }
 
 
-    protected String getRequestIp()
-    {
-        Message message = PhaseInterceptorChain.getCurrentMessage();
-        HttpServletRequest request = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
-        return request.getRemoteAddr();
-    }
-
-
     @Override
-    public Response getTemplate( final String templateName )
+    public TemplateKurjun getTemplate( final String templateName )
     {
         try
         {
-            TemplateKurjun result = localPeer.getTemplate( templateName );
-            return Response.ok( result ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
 
-
-    @Override
-    public Response getContainerHostInfoById( final String containerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            return Response.ok( jsonUtil.to( localPeer.getContainerHostInfoById( containerId ) ) ).build();
+            return localPeer.getTemplate( templateName );
         }
         catch ( Exception e )
         {
@@ -128,10 +96,10 @@ public class RestServiceImpl implements RestService
     @Override
     public PublicKeyContainer createEnvironmentKeyPair( final EnvironmentId environmentId )
     {
-        Preconditions.checkNotNull( environmentId );
-
         try
         {
+            Preconditions.checkNotNull( environmentId );
+
             return localPeer.createPeerEnvironmentKeyPair( environmentId );
         }
         catch ( Exception e )
@@ -145,13 +113,13 @@ public class RestServiceImpl implements RestService
     @Override
     public void updateEnvironmentKey( final PublicKeyContainer publicKeyContainer )
     {
-        Preconditions.checkNotNull( publicKeyContainer );
-        Preconditions.checkNotNull( publicKeyContainer.getKey() );
-        Preconditions.checkNotNull( publicKeyContainer.getHostId() );
-        Preconditions.checkNotNull( publicKeyContainer.getFingerprint() );
-
         try
         {
+            Preconditions.checkNotNull( publicKeyContainer );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( publicKeyContainer.getKey() ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( publicKeyContainer.getHostId() ) );
+            Preconditions.checkNotNull( publicKeyContainer.getFingerprint() );
+
             final PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
             localPeer.updatePeerEnvironmentPubKey( new EnvironmentId( publicKeyContainer.getHostId() ), pubKeyRing );
         }
@@ -168,6 +136,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( keyId ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( pek ) );
+
             PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( pek );
             localPeer.addPeerEnvironmentPubKey( keyId, pubKeyRing );
         }
@@ -182,10 +153,11 @@ public class RestServiceImpl implements RestService
     @Override
     public Response setupTunnels( final String environmentId, final P2pIps p2pIps )
     {
-        Preconditions.checkNotNull( environmentId );
-        Preconditions.checkNotNull( p2pIps );
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+            Preconditions.checkNotNull( p2pIps );
+
             localPeer.setupTunnels( p2pIps, environmentId );
 
             return Response.ok().build();
@@ -248,25 +220,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkNotNull( networkResource );
+
             localPeer.reserveNetworkResource( networkResource );
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public HostId getResourceHostIdByContainerId( final ContainerId containerId )
-    {
-        Preconditions.checkNotNull( containerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-        try
-        {
-
-            return localPeer.getResourceHostIdByContainerId( containerId );
         }
         catch ( Exception e )
         {
@@ -296,6 +252,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkNotNull( config );
+
             localPeer.joinP2PSwarm( config );
         }
         catch ( Exception e )
@@ -311,6 +269,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkNotNull( config );
+
             localPeer.joinOrUpdateP2PSwarm( config );
         }
         catch ( Exception e )
@@ -326,6 +286,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkNotNull( environmentId );
+
             localPeer.cleanupEnvironment( environmentId );
         }
         catch ( Exception e )
@@ -341,11 +303,13 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkNotNull( alertEvent );
+
             localPeer.alert( alertEvent );
 
             return Response.accepted().build();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
@@ -362,7 +326,7 @@ public class RestServiceImpl implements RestService
             return Response.ok( localPeer.getHistoricalMetrics( hostName, startTime.getDate(), endTime.getDate() ) )
                            .build();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
@@ -375,9 +339,11 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
             return Response.ok( localPeer.getResourceLimits( peerId ) ).build();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
@@ -388,15 +354,14 @@ public class RestServiceImpl implements RestService
     @Override
     public Response getP2PSwarmDistances( final String p2pHash, final Integer count )
     {
-
-        Preconditions.checkNotNull( p2pHash );
-        Preconditions.checkNotNull( count );
-
         try
         {
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ) );
+            Preconditions.checkNotNull( count );
+
             return Response.ok( localPeer.getP2PSwarmDistances( p2pHash, count ) ).build();
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             LOGGER.error( e.getMessage(), e );
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );

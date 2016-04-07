@@ -206,6 +206,8 @@ public class CommandUtil
         return resultMap;
     }
 
+    //todo add more flexible command execution method. See PeerUtil
+
 
     /**
      * Allows to execute command on all hosts in parallel. If any exception is thrown, ignores is and collects results

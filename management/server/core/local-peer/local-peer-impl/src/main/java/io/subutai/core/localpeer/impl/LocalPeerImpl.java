@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.impl;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -21,7 +20,6 @@ import java.util.regex.Pattern;
 import javax.annotation.security.PermitAll;
 import javax.naming.NamingException;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
@@ -58,7 +56,6 @@ import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
-import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -157,7 +154,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
     protected ResourceHost managementHost;
-    protected Set<ResourceHost> resourceHosts = Sets.newHashSet();
+    protected Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
     private CommandExecutor commandExecutor;
     private QuotaManager quotaManager;
     private Monitor monitor;
@@ -169,12 +166,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
     protected ServiceLocator serviceLocator = new ServiceLocator();
-
-
-    protected boolean initialized = false;
-    protected ExecutorService singleThreadExecutorService = SubutaiExecutors.newSingleThreadExecutor();
+    protected volatile boolean initialized = false;
     private TaskManagerImpl taskManager;
     private NetworkResourceDaoImpl networkResourceDao;
+    LocalPeerCommands localPeerCommands = new LocalPeerCommands();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
@@ -209,15 +204,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             //add prepare templates listener
             addRequestListener( new PrepareTemplateRequestListener( this ) );
 
-
             resourceHostDataService = createResourceHostDataService();
+
             resourceHosts.clear();
-            synchronized ( resourceHosts )
+
+            for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
             {
-                for ( ResourceHost resourceHost : resourceHostDataService.getAll() )
-                {
-                    resourceHosts.add( resourceHost );
-                }
+                resourceHosts.add( resourceHost );
             }
 
             setResourceHostTransientFields( getResourceHosts() );
@@ -228,6 +221,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage(), e );
             throw new LocalPeerInitializationError( "Failed to init Local Peer", e );
         }
 
@@ -237,7 +231,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     protected void initPeerInfo()
     {
-
         peerInfo = new PeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
@@ -308,13 +301,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public PeerInfo getPeerInfo() throws PeerException
+    public PeerInfo getPeerInfo()
     {
-        if ( peerInfo == null )
-        {
-            throw new PeerException( "Peer info unavailable." );
-        }
-
         return peerInfo;
     }
 
@@ -332,7 +320,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error getting container state ", e );
+            LOG.error( e.getMessage() );
+            throw new PeerException( String.format( "Error getting container state: %s", e.getMessage() ), e );
         }
     }
 
@@ -364,7 +353,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error getting container state ", e );
+            LOG.error( e.getMessage() );
+            throw new PeerException( String.format( "Error getting environment containers: %s", e.getMessage() ), e );
         }
     }
 
@@ -386,8 +376,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        Map<Host, CommandResult> results = commandUtil
-                .executeParallelSilent( getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ), hosts );
+        Map<Host, CommandResult> results = commandUtil.executeParallelSilent(
+                localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ), hosts );
 
 
         Set<Host> succeededHosts = Sets.newHashSet();
@@ -418,38 +408,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected RequestBuilder getAddIpHostToEtcHostsCommand( Map<String, String> hostAddresses )
-    {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
-        StringBuilder appendHosts = new StringBuilder();
-
-        for ( Map.Entry<String, String> hostEntry : hostAddresses.entrySet() )
-        {
-            String hostname = hostEntry.getKey();
-            String ip = hostEntry.getValue();
-            cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
-                    append( ip ).append( " " ).
-                               append( hostname ).append( "." ).append( Common.DEFAULT_DOMAIN_NAME ).
-                               append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
-        }
-
-        if ( cleanHosts.length() > 0 )
-        {
-            //drop pipe | symbol
-            cleanHosts.setLength( cleanHosts.length() - 1 );
-            cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
-            appendHosts.insert( 0, cleanHosts );
-        }
-
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
-
-        return new RequestBuilder( appendHosts.toString() );
-    }
-
-
     @Override
     public SshPublicKeys generateSshKeyForEnvironment( final EnvironmentId environmentId ) throws PeerException
     {
@@ -467,7 +425,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //read ssh keys if exist
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getReadSSHCommand(), hosts );
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( localPeerCommands.getReadSSHCommand(), hosts );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -490,7 +449,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //create ssh keys
         if ( !failedHosts.isEmpty() )
         {
-            results = commandUtil.executeParallelSilent( getCreateNReadSSHCommand(), failedHosts );
+            results = commandUtil.executeParallelSilent( localPeerCommands.getCreateNReadSSHCommand(), failedHosts );
 
             succeededHosts = Sets.newHashSet();
 
@@ -522,22 +481,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
         return sshPublicKeys;
-    }
-
-
-    protected RequestBuilder getReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "cat %1$s/id_dsa.pub", Common.CONTAINER_SSH_FOLDER ) );
-    }
-
-
-    protected RequestBuilder getCreateNReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "rm -rf %1$s && " +
-                        "mkdir -p %1$s && " +
-                        "chmod 700 %1$s && " +
-                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
-                Common.CONTAINER_SSH_FOLDER ) );
     }
 
 
@@ -573,8 +516,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 Set<Host> succeededHosts = Sets.newHashSet();
                 Set<Host> failedHosts = Sets.newHashSet( hosts );
 
-                Map<Host, CommandResult> results =
-                        commandUtil.executeParallelSilent( getAppendSshKeysCommand( keysString.toString() ), hosts );
+                Map<Host, CommandResult> results = commandUtil
+                        .executeParallelSilent( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ),
+                                hosts );
 
                 keysString.setLength( 0 );
 
@@ -607,7 +551,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
 
-        Map<Host, CommandResult> results = commandUtil.executeParallelSilent( getConfigSSHCommand(), hosts );
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( localPeerCommands.getConfigSSHCommand(), hosts );
 
         for ( Map.Entry<Host, CommandResult> resultEntry : results.entrySet() )
         {
@@ -634,20 +579,67 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected RequestBuilder getAppendSshKeysCommand( String keys )
+    @Override
+    public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
-        return new RequestBuilder( String.format( "mkdir -p %1$s && " +
-                "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && " +
-                "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts );
+
+        hosts.removeAll( results.keySet() );
+
+        for ( Host failedHost : hosts )
+        {
+            LOG.error( "SSH key addition failed on host {}", failedHost.getHostname() );
+        }
+
+        if ( !hosts.isEmpty() )
+        {
+            throw new PeerException( "Failed to add SSH key on all hosts" );
+        }
     }
 
 
-    protected RequestBuilder getConfigSSHCommand()
+    @Override
+    public void removeSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
-        return new RequestBuilder( String.format( "echo 'Host *' > %1$s/config && " +
-                "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
-                "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        Map<Host, CommandResult> results =
+                commandUtil.executeParallelSilent( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts );
+
+        hosts.removeAll( results.keySet() );
+
+        for ( Host failedHost : hosts )
+        {
+            LOG.error( "SSH key removal failed on host {}", failedHost.getHostname() );
+        }
+
+        if ( !hosts.isEmpty() )
+        {
+            throw new PeerException( "Failed to remove SSH key on all hosts" );
+        }
     }
 
 
@@ -663,7 +655,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( String templateName : request.getTemplates().get( resourceHostId ) )
             {
-                //todo move import template logic to RH
                 ImportTask task = new ImportTask( new ImportTemplateRequest( resourceHostId, templateName ) );
                 prepareTemplatesResponse.addTask( taskManager.schedule( task, prepareTemplatesResponse ) );
             }
@@ -702,7 +693,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 int rhCoresNumber = getResourceHostById( request.getResourceHostId() ).getNumberOfCpuCores();
 
-                //todo move container clone logic to RH
                 CloneTask task = new CloneTask( request, reservedNetworkResource.getVlan(), rhCoresNumber );
 
                 task.onSuccess( successResultHandler );
@@ -750,7 +740,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                             new ContainerHostEntity( localPeerId, hostId, hostname, arch, interfaces,
                                     request.getContainerName(), request.getTemplateName(), arch.name(),
                                     request.getEnvironmentId(), request.getOwnerId(), request.getInitiatorPeerId(),
-                                    request.getContainerSize(), ContainerHostState.RUNNING );
+                                    request.getContainerSize() );
 
                     registerContainer( request.getResourceHostId(), containerHostEntity );
 
@@ -812,9 +802,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             securityManager.getKeyManager().updatePublicKeyRing( signedKey );
         }
-        catch ( Exception ex )
+        catch ( Exception e )
         {
-            throw new PeerException( ex );
+            LOG.error( e.getMessage() );
+            throw new PeerException( e );
         }
     }
 
@@ -914,16 +905,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         throw new HostNotFoundException( String.format( "Container host not found by id %s", hostId ) );
-    }
-
-
-    @PermitAll
-    @Override
-    public ContainerHostInfo getContainerHostInfoById( final String containerHostId ) throws PeerException
-    {
-        ContainerHost containerHost = getContainerHostById( containerHostId );
-
-        return new ContainerHostInfoModel( containerHost );
     }
 
 
@@ -1036,7 +1017,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Could not start LXC container [%s]", e.toString() ) );
+            String errMsg =
+                    String.format( "Could not start container %s: %s", containerHost.getHostname(), e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -1056,7 +1040,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( String.format( "Could not stop LXC container [%s]", e.toString() ) );
+            String errMsg =
+                    String.format( "Could not stop container %s: %s", containerHost.getHostname(), e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -1078,9 +1065,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( ResourceHostException e )
         {
-            String errMsg = String.format( "Could not destroy container [%s]", host.getHostname() );
+            String errMsg = String.format( "Could not destroy container %s: %s", host.getHostname(), e.getMessage() );
             LOG.error( errMsg, e );
-            throw new PeerException( errMsg, e.toString() );
+            throw new PeerException( errMsg, e );
         }
 
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
@@ -1119,10 +1106,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public Set<ResourceHost> getResourceHosts()
     {
-        synchronized ( resourceHosts )
-        {
-            return Sets.newConcurrentHashSet( this.resourceHosts );
-        }
+        return Collections.unmodifiableSet( this.resourceHosts );
     }
 
 
@@ -1130,10 +1114,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( host, "Resource host could not be null." );
 
-        synchronized ( resourceHosts )
-        {
-            resourceHosts.add( host );
-        }
+        resourceHosts.add( host );
     }
 
 
@@ -1255,6 +1236,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 }
                 catch ( Exception e )
                 {
+                    LOG.error( e.getMessage() );
                     throw new PeerException( e );
                 }
             }
@@ -1315,15 +1297,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void exchangeMhKeysWithRH() throws Exception
     {
-
         RegistrationManager registrationManager = ServiceLocator.getServiceNoCache( RegistrationManager.class );
 
         String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
 
-        final RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "subutai import management -t %s", token ) );
-
-        commandUtil.execute( requestBuilder, getManagementHost() );
+        commandUtil.execute( localPeerCommands.getManagementExchangeKeyCommand( token ), getManagementHost() );
     }
 
 
@@ -1339,6 +1317,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( MonitorException e )
         {
+            LOG.error( e.getMessage() );
             throw new PeerException( e );
         }
     }
@@ -1355,6 +1334,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( QuotaException e )
         {
+            LOG.error( e.getMessage() );
             throw new PeerException( e );
         }
     }
@@ -1373,6 +1353,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( QuotaException e )
         {
+            LOG.error( e.getMessage() );
             throw new PeerException( e );
         }
     }
@@ -1394,13 +1375,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException(
-                        String.format( "Error obtaining domain by vlan %d", reservedNetworkResource.getVlan() ), e );
+                String errMsg =
+                        String.format( "Error obtaining domain by vlan %d: %s", reservedNetworkResource.getVlan(),
+                                e.getMessage() );
+                LOG.error( errMsg );
+                throw new PeerException( errMsg, e );
             }
         }
         else
         {
-
             throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
         }
     }
@@ -1420,13 +1403,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException(
-                        String.format( "Error removing domain by vlan %d", reservedNetworkResource.getVlan() ), e );
+                String errMsg =
+                        String.format( "Error removing domain by vlan %d: %s", reservedNetworkResource.getVlan(),
+                                e.getMessage() );
+                LOG.error( errMsg );
+                throw new PeerException( errMsg, e );
             }
         }
         else
         {
-
             throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
         }
     }
@@ -1452,13 +1437,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException(
-                        String.format( "Error setting domain by vlan %d", reservedNetworkResource.getVlan() ), e );
+                String errMsg = String.format( "Error setting domain by vlan %d: %s", reservedNetworkResource.getVlan(),
+                        e.getMessage() );
+                LOG.error( errMsg );
+                throw new PeerException( errMsg, e );
             }
         }
         else
         {
-
             throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
         }
     }
@@ -1479,13 +1465,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format( "Error checking domain by ip %s and vlan %d", hostIp,
-                        reservedNetworkResource.getVlan() ), e );
+                String errMsg = String.format( "Error checking domain by ip %s and vlan %d: %s", hostIp,
+                        reservedNetworkResource.getVlan(), e.getMessage() );
+                LOG.error( errMsg );
+                throw new PeerException( errMsg, e );
             }
         }
         else
         {
-
             throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
         }
     }
@@ -1507,13 +1494,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format( "Error adding ip %s to domain by vlan %d", hostIp,
-                        reservedNetworkResource.getVlan() ), e );
+                String errMsg = String.format( "Error adding ip %s to domain by vlan %d: %s", hostIp,
+                        reservedNetworkResource.getVlan(), e.getMessage() );
+                LOG.error( errMsg );
+                throw new PeerException( errMsg, e );
             }
         }
         else
         {
-
             throw new PeerException( String.format( "Vlan for vni %d not found", vni ) );
         }
     }
@@ -1535,8 +1523,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( NetworkManagerException e )
             {
-                throw new PeerException( String.format( "Error removing ip %s from domain by vlan %d", hostIp,
-                        reservedNetworkResource.getVlan() ), e );
+                String errMsg = String.format( "Error removing ip %s from domain by vlan %d: %s", hostIp,
+                        reservedNetworkResource.getVlan(), e.getMessage() );
+                LOG.error( errMsg );
+                throw new PeerException( errMsg, e );
             }
         }
         else
@@ -1563,8 +1553,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( NetworkManagerException e )
         {
-            throw new PeerException( String.format( "Error setting up ssh tunnel for container ip %s", containerIp ),
-                    e );
+            String errMsg =
+                    String.format( "Error setting up ssh tunnel for container ip %s: %s", containerIp, e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -1642,9 +1634,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
                     encTool.armorByteArrayToString( pubRing.getEncoded() ) );
         }
-        catch ( IOException | PGPException ex )
+        catch ( Exception e )
         {
-            throw new PeerException( ex );
+            String errMsg = String.format( "Error creating PEK: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -1720,9 +1714,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 networkResourceDao.create( new NetworkResourceEntity( networkResource, freeVlan ) );
             }
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
-            throw new PeerException( "Error reserving network resources", e );
+            String errMsg = String.format( "Error reserving network resources: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -1739,9 +1735,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 reservedNetworkResources.addNetworkResource( networkResource );
             }
         }
-        catch ( DaoException e )
+        catch ( Exception e )
         {
-            throw new PeerException( "Error getting reserved network resources", e );
+            String errMsg = String.format( "Error getting reserved network resources: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
 
         return reservedNetworkResources;
@@ -1823,7 +1821,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error gathering reserved net resources", e );
+            String errMsg = String.format( "Error gathering reserved net resources: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
 
         //add reserved ones too
@@ -1892,7 +1892,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error setting up tunnels", e );
+            String errMsg = String.format( "Error setting up tunnels: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -1935,7 +1937,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error resetting P2P secret key", e );
+            String errMsg = String.format( "Error resetting P2P secret key: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -1993,8 +1997,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Failed to join P2P swarm", e );
+            String errMsg = String.format( "Failed to join P2P swarm: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
     }
 
@@ -2002,7 +2007,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        //for existing rhp2pip call joinswarm, for missing call resetswarmkey
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
         LOG.debug( String.format( "Joining/updating P2P swarm: %s", config.getHash() ) );
@@ -2070,16 +2074,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Failed to join/update P2P swarm", e );
+            String errMsg = String.format( "Failed to join/update P2P swarm: %s", e.getMessage() );
+            LOG.error( errMsg );
+            throw new PeerException( errMsg, e );
         }
-    }
-
-
-    @Deprecated
-    public void createP2PSwarm( final P2PConfig config ) throws PeerException
-    {
-        ///no-op
     }
 
 
@@ -2197,7 +2195,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( QuotaException e )
         {
-            throw new PeerException( String.format( "Could not obtain quota for: %s", containerId ) );
+            LOG.error( e.getMessage() );
+            throw new PeerException(
+                    String.format( "Could not obtain quota for %s: %s", containerId, e.getMessage() ) );
         }
     }
 
@@ -2213,7 +2213,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( QuotaException e )
         {
-            throw new PeerException( String.format( "Could not obtain quota for: %s.", containerId.getId() ) );
+            LOG.error( e.getMessage() );
+            throw new PeerException(
+                    String.format( "Could not obtain quota for %s: %s", containerId.getId(), e.getMessage() ) );
         }
     }
 
@@ -2230,7 +2232,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( QuotaException e )
         {
-            throw new PeerException( String.format( "Could not set quota for: %s", containerId.getId() ) );
+            LOG.error( e.getMessage() );
+            throw new PeerException(
+                    String.format( "Could not set quota for %s: %s", containerId.getId(), e.getMessage() ) );
         }
     }
 
@@ -2259,6 +2263,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( HostNotFoundException e )
         {
+            LOG.error( e.getMessage() );
             throw new PeerException( e.getMessage(), e );
         }
     }
@@ -2294,14 +2299,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public <T> Future<T> queueSequentialTask( Callable<T> callable )
-    {
-        Preconditions.checkNotNull( callable );
-
-        return singleThreadExecutorService.submit( callable );
-    }
-
-
     protected NetworkManager getNetworkManager() throws PeerException
     {
         try
@@ -2310,6 +2307,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
         catch ( NamingException e )
         {
+            LOG.error( e.getMessage() );
             throw new PeerException( e );
         }
     }

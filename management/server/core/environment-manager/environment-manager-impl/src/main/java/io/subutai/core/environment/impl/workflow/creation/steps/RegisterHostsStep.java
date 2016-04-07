@@ -16,7 +16,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.PeerUtil;
+import io.subutai.core.environment.impl.workflow.util.PeerUtil;
 
 
 public class RegisterHostsStep
