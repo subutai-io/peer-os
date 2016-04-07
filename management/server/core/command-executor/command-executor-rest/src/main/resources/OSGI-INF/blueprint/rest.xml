@@ -16,8 +16,7 @@
   <reference id="responseHandler" availability="mandatory"
              interface="io.subutai.core.executor.api.RestProcessor" />
 
-  <bean id="commandExecutorRest" class="io.subutai.core.executor.rest.RestServiceImpl" scope="singleton"
-        destroy-method="dispose">
+  <bean id="commandExecutorRest" class="io.subutai.core.executor.rest.RestServiceImpl" scope="singleton">
     <argument ref="securityManager" />
     <argument ref="responseHandler" />
   </bean>
@@ -27,14 +26,5 @@
       <ref component-id="commandExecutorRest" />
     </jaxrs:serviceBeans>
   </jaxrs:server>
-
-  <!--temporarily make rest-rest as subscription service for heartbeat listeners-->
-
-  <reference-list id="hbLstnr"
-                  interface="io.subutai.common.host.HeartbeatListener"
-                  availability="optional">
-    <reference-listener ref="commandExecutorRest"
-                        bind-method="addListener" unbind-method="removeListener" />
-  </reference-list>
 
 </blueprint>
