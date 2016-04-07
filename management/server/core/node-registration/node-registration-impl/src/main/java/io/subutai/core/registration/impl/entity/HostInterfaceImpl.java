@@ -39,13 +39,6 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     }
 
 
-    public HostInterfaceImpl( final String interfaceName, final String ipc )
-    {
-        this.interfaceName = interfaceName;
-        this.ip = ip;
-    }
-
-
     public HostInterfaceImpl( final io.subutai.common.host.HostInterface aHostInterface )
     {
         Preconditions.checkNotNull( aHostInterface, "Invalid null argument aInterface" );

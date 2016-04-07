@@ -61,15 +61,14 @@ import ai.subut.kurjun.storage.factory.FileStoreFactory;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.AptPackage;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
 import io.subutai.core.kurjun.api.vapt.AptManager;
+import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 import io.subutai.core.kurjun.impl.model.RepoUrl;
 import io.subutai.core.kurjun.impl.store.RepoUrlStore;
-import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
 
 
 public class AptManagerImpl implements AptManager
@@ -192,7 +191,8 @@ public class AptManagerImpl implements AptManager
     {
 
         Optional<ReleaseFile> distr =
-                unifiedRepository.getDistributions().stream().filter( r -> r.getCodename().equals( release ) ).findFirst();
+                unifiedRepository.getDistributions().stream().filter( r -> r.getCodename().equals( release ) )
+                                 .findFirst();
         if ( !distr.isPresent() )
         {
             throw new IllegalArgumentException( "Release not found." );
@@ -218,7 +218,8 @@ public class AptManagerImpl implements AptManager
         try ( ByteArrayOutputStream os = new ByteArrayOutputStream() )
         {
             packagesIndexBuilder
-                    .buildIndex( packagesProviderFactory.create( unifiedRepository, component, architecture ), os, compressionType );
+                    .buildIndex( packagesProviderFactory.create( unifiedRepository, component, architecture ), os,
+                            compressionType );
             return new ByteArrayInputStream( os.toByteArray() );
         }
         catch ( IOException ex )
@@ -431,7 +432,7 @@ public class AptManagerImpl implements AptManager
                 return localPeer.getExternalIp();
             }
         }
-        catch ( PeerException | SocketException | IndexOutOfBoundsException ex )
+        catch ( SocketException | IndexOutOfBoundsException ex )
         {
             LOGGER.error( "Cannot get external ip. Returning null.", ex );
             return null;
@@ -518,7 +519,6 @@ public class AptManagerImpl implements AptManager
             return false;
         }
     }
-
 
 
     private LocalRepository getLocalRepository()

@@ -8,7 +8,6 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.resource.ByteUnit;
 import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.NumericValueResource;
 import io.subutai.common.resource.ResourceValueParser;
 
 

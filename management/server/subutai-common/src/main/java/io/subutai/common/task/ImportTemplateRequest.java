@@ -35,10 +35,7 @@ public class ImportTemplateRequest implements TaskRequest
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ImportTemplateRequest{" );
-        sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
-        sb.append( ", templateName='" ).append( templateName ).append( '\'' );
-        sb.append( '}' );
-        return sb.toString();
+        return "ImportTemplateRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", templateName='" + templateName
+                + '\'' + '}';
     }
 }

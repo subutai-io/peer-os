@@ -210,7 +210,7 @@ public class HexUtil
 			if ( ( !Character.isISOControl( (char) i ) )
 			        && ( Character.isDefined( (char) i ) ) )
 			{
-				c = ( Character ) ( char ) i;
+				c =  ( char ) i;
 			}
 
 			sbClr.append( c );

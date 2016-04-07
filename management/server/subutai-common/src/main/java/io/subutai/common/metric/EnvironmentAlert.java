@@ -16,7 +16,7 @@ public class EnvironmentAlert
 {
     public enum State
     {
-        NEW, PROCESSING, DONE;
+        NEW, PROCESSING, DONE
     }
 
 

@@ -46,14 +46,14 @@ public class MonitoringListCommand extends SubutaiShellCommandSupport
             AlertHandler alertHandler = handlers.getHandler( environmentAlertHandler );
             if ( alertHandler == null )
             {
-                System.out.println( String.format( "%s\t%s\tNOT AVAILABLE", environmentId,
+                System.out.println( String.format( "%s\t%s\t%s NOT AVAILABLE", environmentId,
                         environmentAlertHandler.getAlertHandlerPriority(),
                         environmentAlertHandler.getAlertHandlerId() ) );
             }
             else
             {
-                System.out.println(
-                        String.format( "%s\t%s\t%s", environmentId, environmentAlertHandler.getAlertHandlerPriority(),
+                System.out.println( String.format( "%s\t%s\t%s\t%s", environmentId,
+                                environmentAlertHandler.getAlertHandlerPriority(),
                                 environmentAlertHandler.getAlertHandlerId(), alertHandler.getDescription() ) );
             }
         }

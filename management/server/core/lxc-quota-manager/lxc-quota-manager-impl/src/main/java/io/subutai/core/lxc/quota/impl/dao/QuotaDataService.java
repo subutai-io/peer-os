@@ -16,8 +16,8 @@ import io.subutai.core.lxc.quota.impl.entity.QuotaEntity;
 
 
 /**
- * {@link QuotaDataService} implements {@link DataService} interface. {@link
- * QuotaDataService} manages {@link io.subutai.core.lxc.quota.impl.entity.QuotaEntity} entity in database
+ * {@link QuotaDataService} implements {@link DataService} interface. {@link QuotaDataService} manages {@link
+ * io.subutai.core.lxc.quota.impl.entity.QuotaEntity} entity in database
  */
 public class QuotaDataService implements DataService<String, QuotaEntity>
 {
@@ -84,8 +84,8 @@ public class QuotaDataService implements DataService<String, QuotaEntity>
 
 
     /**
-     * Save {@link io.subutai.core.lxc.quota.impl.entity.QuotaEntity} object to database <b>Warning your entity
-     * object key must be unique in database otherwise rollback transaction will be applied </b>
+     * Save {@link io.subutai.core.lxc.quota.impl.entity.QuotaEntity} object to database <b>Warning your entity object
+     * key must be unique in database otherwise rollback transaction will be applied </b>
      *
      * @param item - entity object to save
      */
@@ -191,7 +191,7 @@ public class QuotaDataService implements DataService<String, QuotaEntity>
     }
 
 
-    public  QuotaEntity saveOrUpdate( QuotaEntity item )
+    public QuotaEntity saveOrUpdate( QuotaEntity item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -218,6 +218,6 @@ public class QuotaDataService implements DataService<String, QuotaEntity>
             daoManager.closeEntityManager( em );
         }
 
-        return ( QuotaEntity ) item;
+        return item;
     }
 }

@@ -43,6 +43,6 @@ public class GetIdCommandTest extends SystemOutRedirectTest
     {
         command.doExecute();
 
-        assertTrue( getSysOut().contains( ID.toString() ) );
+        assertTrue( getSysOut().contains( ID ) );
     }
 }

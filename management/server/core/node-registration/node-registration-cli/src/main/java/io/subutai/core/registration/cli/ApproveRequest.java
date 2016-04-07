@@ -1,8 +1,6 @@
 package io.subutai.core.registration.cli;
 
 
-import java.util.UUID;
-
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 

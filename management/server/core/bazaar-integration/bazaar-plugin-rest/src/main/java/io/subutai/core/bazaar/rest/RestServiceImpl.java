@@ -1,7 +1,6 @@
 package io.subutai.core.bazaar.rest;
 
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.util.JsonUtil;

@@ -136,23 +136,4 @@ public class NetworkManagerImplTest
 
         networkManager.getManagementHost();
     }
-
-
-    @Test( expected = NetworkManagerException.class )
-    public void testGetResourceHost() throws Exception
-    {
-
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getResourceHostByContainerName( anyString() );
-
-        networkManager.getResourceHost( CONTAINER_NAME );
-    }
-
-
-    @Test( expected = NetworkManagerException.class )
-    public void testGetContainerHost() throws Exception
-    {
-        doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getContainerHostByName( anyString() );
-
-        networkManager.getContainerHost( CONTAINER_NAME );
-    }
 }

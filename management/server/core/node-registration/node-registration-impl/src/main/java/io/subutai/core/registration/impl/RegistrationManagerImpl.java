@@ -2,8 +2,6 @@ package io.subutai.core.registration.impl;
 
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -12,30 +10,15 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.net.util.SubnetUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaceModel;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
@@ -59,15 +42,12 @@ public class RegistrationManagerImpl implements RegistrationManager
     private RequestDataService requestDataService;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
-    private LocalPeer localPeer;
 
 
-    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager,
-                                    final LocalPeer localPeer )
+    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
     {
         this.securityManager = securityManager;
         this.daoManager = daoManager;
-        this.localPeer = localPeer;
     }
 
 
@@ -161,40 +141,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     }
 
 
-    private Set<String> getTunnelNetworks( final Set<Peer> peers )
-    {
-        Set<String> result = new HashSet<>();
-
-        for ( Peer peer : peers )
-        {
-            Set<HostInterfaceModel> r = null;
-            try
-            {
-                r = peer.getInterfaces().filterByIp( P2PUtil.P2P_INTERFACE_IP_PATTERN );
-            }
-            catch ( PeerException e )
-            {
-                e.printStackTrace();
-            }
-
-            Collection tunnels = CollectionUtils.collect( r, new Transformer()
-            {
-                @Override
-                public Object transform( final Object o )
-                {
-                    HostInterface i = ( HostInterface ) o;
-                    SubnetUtils u = new SubnetUtils( i.getIp(), P2PUtil.P2P_SUBNET_MASK );
-                    return u.getInfo().getNetworkAddress();
-                }
-            } );
-
-            result.addAll( tunnels );
-        }
-
-        return result;
-    }
-
-
     @Override
     public void approveRequest( final String requestId )
     {
@@ -238,56 +184,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     public void removeRequest( final String requestId )
     {
         requestDataService.remove( requestId );
-    }
-
-
-    @Override
-    public void deployResourceHost( List<String> args ) throws NodeRegistrationException
-    {
-        Host managementHost;
-        CommandResult result;
-
-        try
-        {
-            managementHost = localPeer.getManagementHost();
-
-            Set<Peer> peers = Sets.newHashSet( managementHost.getPeer() );
-
-            Set<String> existingNetworks = getTunnelNetworks( peers );
-
-            String freeP2PSubnet = P2PUtil.findFreeP2PSubnet( existingNetworks );
-            args.add( "-I" );
-            freeP2PSubnet = freeP2PSubnet.substring( 0, freeP2PSubnet.length() - 1 ) + (
-                    Integer.valueOf( freeP2PSubnet.substring( freeP2PSubnet.length() - 1 ) ) + 1 );
-            args.add( freeP2PSubnet );
-
-            int ipOctet = ( Integer.valueOf( freeP2PSubnet.substring( freeP2PSubnet.length() - 1 ) ) + 1 );
-            String ipRh = freeP2PSubnet.substring( 0, freeP2PSubnet.length() - 1 ) + ipOctet;
-            args.add( "-i" );
-            args.add( ipRh );
-
-            String p2pHash = P2PUtil.generateHash( freeP2PSubnet );
-            args.add( "-n" );
-            args.add( p2pHash );
-
-            String deviceName = "aws_rh_p2p_if";
-            args.add( "-d" );
-            args.add( deviceName );
-            String runUser = "root";
-            result = managementHost.execute(
-                    new RequestBuilder( "/apps/subutai-mng/current/awsdeploy/awsdeploy" ).withCmdArgs( args )
-                                                                                         .withRunAs( runUser )
-                                                                                         .withTimeout( 600 ) );
-
-            if ( result.getExitCode() != 0 )
-            {
-                throw new NodeRegistrationException( result.getStdErr() );
-            }
-        }
-        catch ( HostNotFoundException | CommandException e )
-        {
-            e.printStackTrace();
-        }
     }
 
 

@@ -71,10 +71,6 @@ public class Quota
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "Quota{" );
-        sb.append( "resource=" ).append( resource );
-        sb.append( ", threshold=" ).append( threshold );
-        sb.append( '}' );
-        return sb.toString();
+        return "Quota{" + "resource=" + resource + ", threshold=" + threshold + '}';
     }
 }

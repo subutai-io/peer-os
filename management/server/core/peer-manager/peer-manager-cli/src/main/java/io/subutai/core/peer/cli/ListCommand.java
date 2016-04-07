@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.host.HostInterface;
-import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;

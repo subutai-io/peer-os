@@ -116,12 +116,8 @@ public class PeerConfImpl implements PeerConf, Serializable
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "PeerConfImpl{" );
-        sb.append( "id=" ).append( id );
-        sb.append( ", peerId='" ).append( peerId ).append( '\'' );
-        sb.append( ", environment=" ).append( environment.getId() );
-        sb.append( '}' );
-        return sb.toString();
+        return "PeerConfImpl{" + "id=" + id + ", peerId='" + peerId + '\'' + ", environment=" + environment.getId()
+                + '}';
     }
 
 

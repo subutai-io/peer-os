@@ -3,7 +3,6 @@ package io.subutai.core.lxc.quota.impl.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collection;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -11,8 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import io.subutai.common.quota.ContainerResource;
 
 
 @Entity

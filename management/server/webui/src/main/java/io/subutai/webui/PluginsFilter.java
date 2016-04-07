@@ -3,7 +3,6 @@ package io.subutai.webui;
 
 import java.io.IOException;
 
-import javax.naming.NamingException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -25,6 +24,7 @@ public class PluginsFilter implements Filter
 
     private static final Logger LOG = LoggerFactory.getLogger( AngularAppFilter.class.getName() );
 
+
     @Override
     public void init( final FilterConfig filterConfig ) throws ServletException
     {
@@ -36,14 +36,8 @@ public class PluginsFilter implements Filter
     public void doFilter( final ServletRequest servletRequest, final ServletResponse servletResponse,
                           final FilterChain filterChain ) throws IOException, ServletException
     {
-        try
-        {
-            webuiModuleService = ServiceLocator.getServiceNoCache( WebuiModuleService.class );
-        }
-        catch ( NamingException e )
-        {
-            LOG.error( "Service locator cannot find WebuiModuleService", e );
-        }
+
+        webuiModuleService = ServiceLocator.getServiceNoCache( WebuiModuleService.class );
 
         servletResponse.getWriter().write( webuiModuleService.getModulesListJson() );
     }

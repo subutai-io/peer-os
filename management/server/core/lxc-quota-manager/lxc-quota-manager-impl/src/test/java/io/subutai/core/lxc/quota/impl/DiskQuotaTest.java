@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.resource.DiskResource;
 import io.subutai.common.resource.ResourceType;
 

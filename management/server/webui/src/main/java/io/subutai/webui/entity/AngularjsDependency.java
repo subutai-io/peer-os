@@ -31,7 +31,7 @@ public class AngularjsDependency {
     public String getAngularjsList()
     {
         StringBuilder filesCsv = new StringBuilder();
-        files.forEach( f -> filesCsv.append( "'" + f + "'," ) );
+        files.forEach( f -> filesCsv.append( "'" ).append( f ).append( "'," ) );
 
         String fileString = filesCsv.toString();
 

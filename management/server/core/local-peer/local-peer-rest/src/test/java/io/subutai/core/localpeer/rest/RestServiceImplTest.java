@@ -29,7 +29,6 @@ import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;

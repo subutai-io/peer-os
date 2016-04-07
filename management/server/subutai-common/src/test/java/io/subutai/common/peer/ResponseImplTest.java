@@ -9,8 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.command.Response;
 import io.subutai.common.command.ResponseImpl;
 import io.subutai.common.command.ResponseType;

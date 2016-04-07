@@ -7,5 +7,5 @@ package io.subutai.common.environment;
  */
 public enum ContainerDistributionType
 {
-    AUTO, CUSTOM;
+    AUTO, CUSTOM
 }

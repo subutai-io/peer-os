@@ -140,9 +140,10 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "secretSubutai", "System User", "internal@subutai.io", 1,3,false,false );
-            User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1 ,3,false,false);
-            User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2 ,3,true,true);
+            User internal =
+                    createUser( "internal", "secretSubutai", "System User", "internal@subutai.io", 1, 3, false, false );
+            User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
+            User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, 3, true, true );
             //***********************************************************
 
             //***Create Token *******************************************
@@ -162,7 +163,7 @@ public class IdentityManagerImpl implements IdentityManager
             //*********************************************
             role = createRole( "Administrator", UserType.Regular.getId() );
             assignUserRole( admin.getId(), role );
-            
+
             for ( int a = 0; a < permsp.length; a++ )
             {
                 per = createPermission( permsp[a].getId(), 1, true, true, true, true );
@@ -176,8 +177,7 @@ public class IdentityManagerImpl implements IdentityManager
             //*********************************************
             for ( int a = 0; a < permsp.length; a++ )
             {
-                if (permsp[a] == PermissionObject.PeerManagement ||
-                    permsp[a] == PermissionObject.ResourceManagement )
+                if ( permsp[a] == PermissionObject.PeerManagement || permsp[a] == PermissionObject.ResourceManagement )
                 {
                     per = createPermission( permsp[a].getId(), 3, true, true, true, true );
                     assignRolePermission( role, per );
@@ -209,8 +209,8 @@ public class IdentityManagerImpl implements IdentityManager
             //*********************************************
             for ( int a = 0; a < permsp.length; a++ )
             {
-                if ( permsp[a] != PermissionObject.IdentityManagement &&
-                        permsp[a] != PermissionObject.KarafServerAdministration )
+                if ( permsp[a] != PermissionObject.IdentityManagement
+                        && permsp[a] != PermissionObject.KarafServerAdministration )
                 {
                     per = createPermission( permsp[a].getId(), 1, true, true, true, true );
                     assignRolePermission( role, per );
@@ -539,20 +539,19 @@ public class IdentityManagerImpl implements IdentityManager
         {
             SecurityKey key = securityManager.getKeyManager().getKeyDataByFingerprint( fingerprint );
 
-            if(key != null)
+            if ( key != null )
             {
-                return identityDataService.getUserByKeyId( key.getIdentityId());
+                return identityDataService.getUserByKeyId( key.getIdentityId() );
             }
             else
             {
-                LOGGER.info( "******* User not found with fingerprint:" + fingerprint);
+                LOGGER.info( "******* User not found with fingerprint:" + fingerprint );
                 return null;
             }
-
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            LOGGER.error("******* Error !! Error getting User by fingerprint",ex);
+            LOGGER.error( "******* Error !! Error getting User by fingerprint", ex );
             return null;
         }
     }
@@ -564,7 +563,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public UserDelegate getUserDelegate( long userId )
     {
-        return identityDataService.getUserDelegateByUserId(userId);
+        return identityDataService.getUserDelegateByUserId( userId );
     }
 
 
@@ -572,12 +571,16 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public UserDelegate getUserDelegate(User user)
+    public UserDelegate getUserDelegate( User user )
     {
-        if(user == null)
+        if ( user == null )
+        {
             return null;
+        }
         else
-            return identityDataService.getUserDelegateByUserId(user.getId());
+        {
+            return identityDataService.getUserDelegateByUserId( user.getId() );
+        }
     }
 
 
@@ -600,17 +603,17 @@ public class IdentityManagerImpl implements IdentityManager
 
         User user = identityDataService.getUser( userId );
 
-        if(user!=null)
+        if ( user != null )
         {
             String secId = user.getSecurityKeyId();
 
-            if(Strings.isNullOrEmpty(secId))
+            if ( Strings.isNullOrEmpty( secId ) )
             {
-                secId = userId + "-"+ UUID.randomUUID();
+                secId = userId + "-" + UUID.randomUUID();
                 user.setSecurityKeyId( secId );
             }
             publicKeyASCII = publicKeyASCII.trim();
-            securityManager.getKeyManager().savePublicKeyRing( secId,1,publicKeyASCII );
+            securityManager.getKeyManager().savePublicKeyRing( secId, 1, publicKeyASCII );
             user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
             identityDataService.updateUser( user );
         }
@@ -640,8 +643,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Write" ).
-     * See createUser() for details.
+     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Write" ). See
+     * createUser() for details.
      */
     @PermitAll
     @Override
@@ -853,9 +856,9 @@ public class IdentityManagerImpl implements IdentityManager
         identityDataService.persistUserDelegate( userDelegate );
 
 
-        if(genKeyPair)
+        if ( genKeyPair )
         {
-            generateKeyPair(id,SecurityKeyType.UserKey.getId());
+            generateKeyPair( id, SecurityKeyType.UserKey.getId() );
         }
 
         return userDelegate;
@@ -877,13 +880,9 @@ public class IdentityManagerImpl implements IdentityManager
                 relationManager.processTrustMessage( trustMessage, delegatedUser.getId() );
             }
         }
-        catch ( NamingException e )
-        {
-            LOGGER.error("RelationManager service not found", e);
-        }
         catch ( RelationVerificationException e )
         {
-            LOGGER.error("Message verification failed", e);
+            LOGGER.error( "Message verification failed", e );
         }
     }
 
@@ -932,16 +931,12 @@ public class IdentityManagerImpl implements IdentityManager
             String encryptedMessage = "\n" + new String( relationEncrypted, "UTF-8" );
             delegatedUser.setRelationDocument( encryptedMessage );
             identityDataService.updateUserDelegate( delegatedUser );
-            LOGGER.info(encryptedMessage);
-            LOGGER.info(delegatedUser.getId());
-        }
-        catch ( NamingException e )
-        {
-            LOGGER.error("Relation Manager service is unavailable", e);
+            LOGGER.info( encryptedMessage );
+            LOGGER.info( delegatedUser.getId() );
         }
         catch ( UnsupportedEncodingException e )
         {
-            LOGGER.error("Error decoding byte array", e);
+            LOGGER.error( "Error decoding byte array", e );
         }
     }
 
@@ -951,26 +946,23 @@ public class IdentityManagerImpl implements IdentityManager
     private void generateKeyPair( String securityKeyId, int type )
     {
         KeyPair kp = securityManager.getKeyManager().generateKeyPair( securityKeyId, false );
-        securityManager.getKeyManager().saveKeyPair(securityKeyId,type, kp );
+        securityManager.getKeyManager().saveKeyPair( securityKeyId, type, kp );
     }
 
 
     /**
-     * IMPORTANT. Here we have quick and dirty workaround for https://github.com/optdyn/hub/issues/413.
-     * We have to create a new account in SS for an environment owner from Hub.
-     * Normally this method should be annotated with @RolesAllowed( "Identity-Management|Write" ) but then the hub-manager module
-     * gets error: "AccessControlException: No JAAS login present". To workaround this, we use @PermitAll which is not good.
-     * In future this should be fixed.
+     * IMPORTANT. Here we have quick and dirty workaround for https://github.com/optdyn/hub/issues/413. We have to
+     * create a new account in SS for an environment owner from Hub. Normally this method should be annotated with
      */
     @PermitAll
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
-                            boolean generateKeyPair,boolean createUserDelegate) throws Exception
+                            boolean generateKeyPair, boolean createUserDelegate ) throws Exception
     {
-        User user   = new UserEntity();
+        User user = new UserEntity();
         String salt = "";
 
-        isValidUserName(userName);
+        isValidUserName( userName );
         isValidPassword( userName, password );
 
         try
@@ -990,19 +982,19 @@ public class IdentityManagerImpl implements IdentityManager
             identityDataService.persistUser( user );
 
             //***************************************
-            if(generateKeyPair)
+            if ( generateKeyPair )
             {
                 String securityKeyId = user.getId() + "-" + UUID.randomUUID();
                 generateKeyPair( securityKeyId, 1 );
-                user.setSecurityKeyId( securityKeyId);
+                user.setSecurityKeyId( securityKeyId );
                 identityDataService.updateUser( user );
             }
             //***************************************
 
             //***************************************
-            if(createUserDelegate)
+            if ( createUserDelegate )
             {
-                createUserDelegate( user,null,true );
+                createUserDelegate( user, null, true );
             }
             //***************************************
             
@@ -1020,7 +1012,8 @@ public class IdentityManagerImpl implements IdentityManager
 
         return user;
     }
-    
+
+
     /* *************************************************
      */
     @RolesAllowed( "Identity-Management|Read" )
@@ -1037,19 +1030,20 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User modifyUser( User user, String password ) throws Exception
     {
-        try {
+        try
+        {
 
-            if( !Strings.isNullOrEmpty( password ) )
+            if ( !Strings.isNullOrEmpty( password ) )
             {
                 isValidPassword( user.getUserName(), password );
 
                 String salt = user.getSalt();
-                password = SecurityUtil.generateSecurePassword(password, salt);
+                password = SecurityUtil.generateSecurePassword( password, salt );
 
-                user.setPassword(password);
+                user.setPassword( password );
             }
 
-            identityDataService.updateUser(user);
+            identityDataService.updateUser( user );
         }
         catch ( IllegalArgumentException e )
         {
@@ -1116,7 +1110,8 @@ public class IdentityManagerImpl implements IdentityManager
             user.setPassword( newPassword );
             identityDataService.updateUser( user );
         }
-        catch ( NoSuchAlgorithmException | NoSuchProviderException e ){
+        catch ( NoSuchAlgorithmException | NoSuchProviderException e )
+        {
             throw new Exception( "Internal error" );
         }
 
@@ -1159,8 +1154,8 @@ public class IdentityManagerImpl implements IdentityManager
 
 
     /**
-     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Delete" ).
-     * See createUser() for details.
+     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Delete" ). See
+     * createUser() for details.
      */
     @PermitAll
     @Override
@@ -1180,16 +1175,16 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private void isValidUserName( String userName)
+    private void isValidUserName( String userName )
     {
-        if ( Strings.isNullOrEmpty(userName) || userName.length() < 4)
+        if ( Strings.isNullOrEmpty( userName ) || userName.length() < 4 )
         {
             throw new IllegalArgumentException( "User name cannot be shorter than 4 characters." );
         }
 
-        if ( userName.equalsIgnoreCase( "token" )  ||
-                    userName.equalsIgnoreCase( "administrator" ) ||
-                    userName.equalsIgnoreCase( "system" ))
+        if ( userName.equalsIgnoreCase( "token" ) ||
+                userName.equalsIgnoreCase( "administrator" ) ||
+                userName.equalsIgnoreCase( "system" ) )
         {
             throw new IllegalArgumentException( "User name is reserved by the system." );
         }
@@ -1198,16 +1193,16 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private void isValidPassword( String userName, String password)
+    private void isValidPassword( String userName, String password )
     {
-        if(Strings.isNullOrEmpty(password) && password.length() < 4)
+        if ( Strings.isNullOrEmpty( password ) && password.length() < 4 )
         {
             throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
         }
 
         if ( password.equalsIgnoreCase( userName ) ||
-                  password.equalsIgnoreCase( "password" ) ||
-                  password.equalsIgnoreCase( "system" ) )
+                password.equalsIgnoreCase( "password" ) ||
+                password.equalsIgnoreCase( "system" ) )
         {
             throw new IllegalArgumentException( "Password doesn't match security measures" );
         }
@@ -1221,7 +1216,6 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean isUserPermitted( User user, PermissionObject permObj, PermissionScope permScope,
                                     PermissionOperation permOp )
     {
-        boolean isPermitted = false;
 
         List<Role> roles = user.getRoles();
 
@@ -1246,7 +1240,7 @@ public class IdentityManagerImpl implements IdentityManager
             }
         }
 
-        return isPermitted;
+        return false;
     }
 
 

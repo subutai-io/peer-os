@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.RegistrationStatus;
 import org.slf4j.Logger;

@@ -28,8 +28,6 @@
       <property name="openjpa.Multithreaded" value="true" />
       <property name="openjpa.TransactionMode" value="managed" />
       <property name="openjpa.ConnectionFactoryMode" value="managed" />
-      <property name="openjpa.LockManager"
-                value="pessimistic(VersionCheckOnReadLock=true,VersionUpdateOnWriteLock=true)" />
       <property name="openjpa.LockTimeout" value="30000" />
       <property name="openjpa.jdbc.MappingDefaults"
                 value="ForeignKeyDeleteAction=restrict, JoinForeignKeyDeleteAction=restrict" />
