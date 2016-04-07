@@ -62,31 +62,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getTemplate( final String templateName )
+    public TemplateKurjun getTemplate( final String templateName )
     {
         try
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
 
-            TemplateKurjun result = localPeer.getTemplate( templateName );
-            return Response.ok( result ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response getContainerHostInfoById( final String containerId )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId ) );
-
-            return Response.ok( jsonUtil.to( localPeer.getContainerHostInfoById( containerId ) ) ).build();
+            return localPeer.getTemplate( templateName );
         }
         catch ( Exception e )
         {

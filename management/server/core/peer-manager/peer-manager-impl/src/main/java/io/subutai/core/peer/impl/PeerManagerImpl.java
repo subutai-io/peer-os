@@ -101,8 +101,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService localIpSetter;
 
-    private String controlNetwork;
-    private long controlNetworkTtl = 0;
     private PingDistances distances;
 
 
@@ -110,6 +108,15 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                             MessageResponseListener messageResponseListener, SecurityManager securityManager,
                             TemplateManager templateManager, IdentityManager identityManager, Object provider )
     {
+        Preconditions.checkNotNull( messenger );
+        Preconditions.checkNotNull( localPeer );
+        Preconditions.checkNotNull( daoManager );
+        Preconditions.checkNotNull( messageResponseListener );
+        Preconditions.checkNotNull( securityManager );
+        Preconditions.checkNotNull( templateManager );
+        Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( provider );
+
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
@@ -357,7 +364,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    //TODO:Remove x509 cert from keystore
     private void unregister( final RegistrationData registrationData ) throws PeerException
     {
 
@@ -367,12 +373,17 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             throw new PeerException( "Could not unregister peer." );
         }
 
-        //*********Remove Security Relationship  ****************************
-        securityManager.getKeyManager().removePublicKeyRing( registrationData.getPeerInfo().getId() );
-        //*******************************************************************
-
         try
         {
+            //*********Remove Security Relationship  ****************************
+            securityManager.getKeyManager().removePublicKeyRing( registrationData.getPeerInfo().getId() );
+            //*******************************************************************
+
+            securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(),
+                    registrationData.getPeerInfo().getId() );
+
+            securityManager.getHttpContextManager().reloadKeyStore();
+
             templateManager.removeRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             SystemSettings.getSecurePortX1() ) ) );
@@ -468,7 +479,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     {
         try
         {
-            PeerInfo p = getRemotePeerInfo( registrationData.getPeerInfo().getPublicUrl() );
+            getRemotePeerInfo( registrationData.getPeerInfo().getPublicUrl() );
         }
         catch ( PeerException e )
         {
@@ -738,6 +749,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         }
 
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
         try
         {
             RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
@@ -749,6 +761,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
+
             securityManager.getKeyManager().getRemoteHostPublicKey( request.getPeerInfo() );
         }
         catch ( Exception e )
@@ -1171,7 +1184,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
                     //update db
                     PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-                    peerData.setInfo( toJson(  localPeer.getPeerInfo() ) );
+                    peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
                     updatePeerData( peerData );
 
                     //modify settings
