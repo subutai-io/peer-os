@@ -412,9 +412,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return sshPublicKeys;
         }
 
-        //read ssh keys if exist
         CommandUtil.HostCommandResults readResults =
-                commandUtil.executeParallel( localPeerCommands.getReadSSHCommand(), hosts );
+                commandUtil.executeParallel( localPeerCommands.getReadOrCreateSSHCommand(), hosts );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -427,41 +426,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 succeededHosts.add( result.getHost() );
             }
+            else
+            {
+                LOG.error( "Failed to generate ssh key on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
         }
 
-        //key might be never generated on these hosts
         failedHosts.removeAll( succeededHosts );
 
-        //create ssh keys on these hosts
         if ( !failedHosts.isEmpty() )
         {
-            readResults = commandUtil.executeParallel( localPeerCommands.getCreateNReadSSHCommand(), failedHosts );
-
-            succeededHosts = Sets.newHashSet();
-
-            for ( CommandUtil.HostCommandResult result : readResults.getCommandResults() )
-            {
-                if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
-                {
-                    sshPublicKeys.addSshPublicKey( result.getCommandResult().getStdOut() );
-
-                    succeededHosts.add( result.getHost() );
-                }
-                else
-                {
-                    LOG.error( "Failed to generate ssh key on host {}: {}", result.getHost().getHostname(),
-                            result.getFailureReason() );
-                }
-            }
-
-            failedHosts.removeAll( succeededHosts );
-
-            if ( !failedHosts.isEmpty() )
-            {
-                throw new PeerException( "Failed to generate ssh keys on all hosts" );
-            }
+            throw new PeerException( "Failed to generate ssh keys on all hosts" );
         }
-
 
         return sshPublicKeys;
     }
