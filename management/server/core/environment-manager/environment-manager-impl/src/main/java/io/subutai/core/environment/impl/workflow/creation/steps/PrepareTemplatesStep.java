@@ -18,7 +18,7 @@ import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.impl.workflow.util.PeerUtil;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerTemplatePrepareTask;
 import io.subutai.core.peer.api.PeerManager;
 

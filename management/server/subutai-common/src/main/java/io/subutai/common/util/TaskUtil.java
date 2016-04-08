@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.util;
+package io.subutai.common.util;
 
 
 import java.util.Map;
@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import io.subutai.common.util.CollectionUtil;
 
 
 public class TaskUtil<T>
