@@ -200,8 +200,6 @@ public class HostUtil
 
     protected <R> Future submitTask( Host host, final Task<R> task )
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
-
         ExecutorService taskExecutor = getTaskExecutor( host, task );
 
         task.setHost( host );
