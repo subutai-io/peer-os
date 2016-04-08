@@ -7,15 +7,12 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.core.hubadapter.api.HubAdapter;

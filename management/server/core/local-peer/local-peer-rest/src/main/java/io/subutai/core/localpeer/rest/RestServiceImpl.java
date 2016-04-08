@@ -349,22 +349,4 @@ public class RestServiceImpl implements RestService
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
-
-
-    @Override
-    public Response getP2PSwarmDistances( final String p2pHash, final Integer count )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ) );
-            Preconditions.checkNotNull( count );
-
-            return Response.ok( localPeer.getP2PSwarmDistances( p2pHash, count ) ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
 }

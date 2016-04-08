@@ -106,10 +106,7 @@ public class ExceededQuota
                     break;
             }
 
-            if ( result != null )
-            {
-                return ( T ) result;
-            }
+            return ( T ) result;
         }
         catch ( Exception e )
         {
@@ -189,12 +186,7 @@ public class ExceededQuota
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ResourceAlert{" );
-        sb.append( "hostId=" ).append( hostId );
-        sb.append( ", resourceType=" ).append( containerResourceType );
-        sb.append( ", currentValue=" ).append( currentValue );
-        sb.append( ", quotaValue=" ).append( quotaValue );
-        sb.append( '}' );
-        return sb.toString();
+        return "ResourceAlert{" + "hostId=" + hostId + ", resourceType=" + containerResourceType + ", currentValue="
+                + currentValue + ", quotaValue=" + quotaValue + '}';
     }
 }

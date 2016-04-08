@@ -38,7 +38,7 @@ public class Common
     public static final String MANAGEMENT_HOSTNAME = "management";
     public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
     public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 90 * 60;// 1.5 hour
-    public static String DEFAULT_TEMPLATE_VERSION = "2.1.0";
+    public static final String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";
     public static final String DEFAULT_DOMAIN_NAME = "intra.lan";

@@ -46,7 +46,7 @@ public class PeerPolicyCommand extends SubutaiShellCommandSupport
             }
             else
             {
-                w.append( "Nothing granted to: " + peer.getId() + "\n" );
+                w.append( "Nothing granted to: " ).append( peer.getId() ).append( "\n" );
             }
         }
 

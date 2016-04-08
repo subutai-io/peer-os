@@ -254,7 +254,7 @@
 									{{value.quantity}}
 								</span>
 							</td>
-							<td>
+							<td class="b-main-table__controls">
 								<a href
 									class="b-icon b-icon_share"
 									tooltips
@@ -263,8 +263,18 @@
 									ng-show = "environment.status === 'HEALTHY'"
 									style = "margin-left: 10px; margin-top: 5px">
 								</a>
-								<a href class="b-icon b-icon_edit" ng-click="advEnvCtrl.editEnvironment(environment)" style = "margin-left: 10px; margin-top: 5px; visibility: visible"></a>
-								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)" style = "margin-left: 10px; margin-top: 5px"></a>
+								<a href 
+									class="b-icon b-icon_edit" 
+									tooltips
+									tooltip-template='Edit' 
+									ng-click="advEnvCtrl.editEnvironment(environment)" style = "visibility: visible">
+								</a>
+								<a href 
+									class="b-icon b-icon_remove" 
+									tooltips
+									tooltip-template='Destroy' 
+									ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)">
+								</a>
 							</td>
 						</tr>
 					</tbody>

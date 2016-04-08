@@ -91,13 +91,14 @@ public class RestServiceImpl implements RestService
 
             if ( CollectionUtil.isCollectionEmpty( hostRequests ) )
             {
-                LOG.info( String.format( "Requested commands for RH %s. No requests", hostId ) );
+                LOG.debug( String.format( "Requested commands for RH %s. No requests", hostId ) );
+
                 return Response.noContent().build();
             }
             else
             {
-                LOG.info( String.format( "Requested commands for RH %s. Requests: %s", hostId,
-                        hostRequests.toString() ) );
+                LOG.debug( String.format( "Requested commands for RH %s. %d requests", hostId, hostRequests.size() ) );
+
                 return Response.ok( hostRequests.toString() ).build();
             }
         }

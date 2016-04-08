@@ -29,7 +29,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
@@ -87,6 +86,8 @@ public class CommandProcessor implements RestProcessor
     @Override
     public void handleHeartbeat( final HeartBeat heartBeat )
     {
+        LOG.debug( String.format( "Heartbeat:%n%s", JsonUtil.toJson( heartBeat ) ) );
+
         for ( final HeartbeatListener listener : listeners )
         {
             notifierPool.submit( new Runnable()
@@ -163,7 +164,7 @@ public class CommandProcessor implements RestProcessor
 
             String command = JsonUtil.toJson( new RequestWrapper( request ) );
 
-            LOG.info( String.format( "Sending:%n%s", command ) );
+            LOG.debug( String.format( "Sending:%n%s", command ) );
 
             //queue request
             queueRequest( resourceHostInfo, request );
@@ -193,7 +194,7 @@ public class CommandProcessor implements RestProcessor
                 hostRequests = Sets.newLinkedHashSet();
                 requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
             }
-            String encryptedRequest = encrypt( JsonUtil.toJson( request ), request.getId() );
+            String encryptedRequest = encrypt( JsonUtil.toJsonMinified( request ), request.getId() );
             hostRequests.add( encryptedRequest );
         }
     }
@@ -294,7 +295,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected SecurityManager getSecurityManager() throws NamingException
+    protected SecurityManager getSecurityManager()
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
     }
@@ -335,7 +336,7 @@ public class CommandProcessor implements RestProcessor
             if ( commandProcess != null )
             {
 
-                LOG.info( String.format( "Received:%n%s", JsonUtil.toJson( response ) ) );
+                LOG.debug( String.format( "Response:%n%s", JsonUtil.toJson( response ) ) );
 
                 //process response
                 commandProcess.processResponse( response );
@@ -354,29 +355,6 @@ public class CommandProcessor implements RestProcessor
         {
             LOG.error( "Error processing response", e );
         }
-    }
-
-
-    protected ResourceHostInfo getTargetHost( String hostId ) throws HostDisconnectedException
-    {
-        ResourceHostInfo targetHost;
-
-        try
-        {
-            targetHost = hostRegistry.getResourceHostInfoById( hostId );
-        }
-        catch ( HostDisconnectedException e )
-        {
-            ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostId );
-            if ( containerHostInfo.getState() != ContainerHostState.RUNNING )
-            {
-                throw new HostDisconnectedException(
-                        String.format( "Container state is %s", containerHostInfo.getState() ) );
-            }
-            targetHost = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
-        }
-
-        return targetHost;
     }
 
 

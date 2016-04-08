@@ -8,7 +8,6 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;

@@ -89,7 +89,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public HostId getResourceHostId() throws PeerException
+    public HostId getResourceHostId()
     {
         return new HostId( parent.getId() );
     }
@@ -118,11 +118,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
         this.containerSize = containerSize;
     }
 
-
-    public void setEnvironmentId( final String environmentId )
-    {
-        this.environmentId = environmentId;
-    }
 
 
     public EnvironmentId getEnvironmentId()

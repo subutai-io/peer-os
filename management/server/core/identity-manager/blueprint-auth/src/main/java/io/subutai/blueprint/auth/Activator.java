@@ -29,7 +29,7 @@ public class Activator implements BundleActivator
     public void start( BundleContext context ) throws Exception
     {
         AuthorizationNsHandler handler = new AuthorizationNsHandler();
-        Dictionary<String, String> props = new Hashtable<String, String>();
+        Dictionary<String, String> props = new Hashtable<>();
         props.put( "osgi.service.blueprint.namespace", "http://aries.apache.org/xmlns/authorization/v1.0.0" );
         context.registerService( NamespaceHandler.class, handler, props );
     }

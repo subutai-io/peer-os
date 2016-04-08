@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
@@ -63,25 +62,19 @@ public class PluginDataService
     public void init()
     {
         ServiceLocator serviceLocator = new ServiceLocator();
-        try
-        {
-            identityManager = serviceLocator.getService( IdentityManager.class );
-        }
-        catch ( NamingException e )
-        {
-            LOG.error( e.getMessage() );
-            e.printStackTrace();
-        }
+
+        identityManager = serviceLocator.getService( IdentityManager.class );
     }
 
 
     //**********************************************
-    private boolean checkActiveUser(User user)
+    private boolean checkActiveUser( User user )
     {
         return identityManager.isUserPermitted( user, PermissionObject.EnvironmentManagement, PermissionScope.ALL_SCOPE,
                 PermissionOperation.Read );
     }
     //**********************************************
+
 
     private long getActiveUserId()
     {
@@ -91,10 +84,14 @@ public class PluginDataService
         {
             User user = identityManager.getActiveUser();
 
-            if(user == null)
+            if ( user == null )
+            {
                 userId = 0;
+            }
             else
+            {
                 userId = user.getId();
+            }
         }
         catch ( Exception e )
         {
@@ -196,7 +193,7 @@ public class PluginDataService
         {
             userId = getActiveUserId();
 
-            if(userId == 0 )
+            if ( userId == 0 )
             {
                 isAdmin = true;
             }
@@ -256,7 +253,7 @@ public class PluginDataService
         {
             userId = getActiveUserId();
 
-            if(userId == 0 )
+            if ( userId == 0 )
             {
                 isAdmin = true;
             }
@@ -315,7 +312,7 @@ public class PluginDataService
         {
             userId = getActiveUserId();
 
-            if(userId == 0 )
+            if ( userId == 0 )
             {
                 isAdmin = true;
             }
@@ -369,7 +366,7 @@ public class PluginDataService
         {
             userId = getActiveUserId();
 
-            if(userId == 0 )
+            if ( userId == 0 )
             {
                 isAdmin = true;
             }

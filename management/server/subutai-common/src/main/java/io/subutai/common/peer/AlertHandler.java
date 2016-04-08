@@ -2,9 +2,7 @@ package io.subutai.common.peer;
 
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.metric.Alert;
 import io.subutai.common.metric.AlertValue;
-import io.subutai.common.metric.QuotaAlertValue;
 
 
 /**

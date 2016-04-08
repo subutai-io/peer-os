@@ -197,13 +197,13 @@ public class VEHServiceImpl
                             "/sbin/ifconfig $1 | grep \"inet addr\" |grep 192 | awk -F: '{print "
                                     + "$2}' | awk '{print $1}'" ) );
 
-                    return commandResult.getStdOut().toString();
+                    return commandResult.getStdOut();
                 }
                 catch ( Exception e )
                 {
                     LOG.error( e.getMessage() );
                 }
-                LOG.error( commandResult.getStdOut().toString() );
+                LOG.error( commandResult.getStdOut() );
             }
         }
 
@@ -331,13 +331,13 @@ public class VEHServiceImpl
                 {
                     commandResult = containerHost.execute( new RequestBuilder( "bash checksum.sh /var/www" ) );
 
-                    return Response.ok().entity( commandResult.getStdOut().toString() ).build();
+                    return Response.ok().entity( commandResult.getStdOut() ).build();
                 }
                 catch ( Exception e )
                 {
                     LOG.error( e.getMessage() );
                 }
-                LOG.error( commandResult.getStdOut().toString() );
+                LOG.error( commandResult != null ? commandResult.getStdOut() : null );
             }
         }
 

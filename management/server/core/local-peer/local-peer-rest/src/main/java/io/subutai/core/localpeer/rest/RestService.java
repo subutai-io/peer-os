@@ -134,12 +134,4 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
-
-
-    @GET
-    @Path( "control/{p2pHash}/{count}/distance/" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getP2PSwarmDistances( @PathParam( "p2pHash" ) final String p2pHash,
-                                   @PathParam( "count" ) final Integer count );
 }

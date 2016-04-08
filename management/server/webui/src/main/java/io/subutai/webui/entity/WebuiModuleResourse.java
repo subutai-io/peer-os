@@ -60,7 +60,7 @@ public class WebuiModuleResourse
     public String getAngularjsList()
     {
         StringBuilder strBuilder = new StringBuilder();
-        dependencies.forEach( d -> strBuilder.append( d.getAngularjsList() + "," ) );
+        dependencies.forEach( d -> strBuilder.append( d.getAngularjsList() ).append( "," ) );
 
         String depsArg = strBuilder.toString();
         if( depsArg.length() > 0 )

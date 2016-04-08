@@ -22,13 +22,8 @@ public class SubutaiErrorEvent
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder( "SubutaiLogEvent{" );
-        sb.append( "timeStamp=" ).append( timeStamp );
-        sb.append( ", loggerName='" ).append( loggerName ).append( '\'' );
-        sb.append( ", renderedMessage='" ).append( renderedMessage ).append( '\'' );
-        sb.append( ", stackTrace='" ).append( stackTrace ).append( '\'' );
-        sb.append( '}' );
-        return sb.toString();
+        return "SubutaiLogEvent{" + "timeStamp=" + timeStamp + ", loggerName='" + loggerName + '\''
+                + ", renderedMessage='" + renderedMessage + '\'' + ", stackTrace='" + stackTrace + '\'' + '}';
     }
 
 

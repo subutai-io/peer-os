@@ -17,14 +17,6 @@ public class ExceptionsTest
     RuntimeException cause;
 
 
-    @Test
-    public void testContainerCreationException() throws Exception
-    {
-        ContainerCreationException exception = new ContainerCreationException( ERR_MSG );
-
-        assertEquals( ERR_MSG, exception.getMessage() );
-    }
-
 
     @Test
     public void testHostNotFoundException() throws Exception

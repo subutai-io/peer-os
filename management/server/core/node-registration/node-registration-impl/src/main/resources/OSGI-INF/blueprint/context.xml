@@ -10,15 +10,11 @@
         init-method="init">
     <argument ref="securityManagerRef" />
     <argument ref="daoManager" />
-    <argument ref="localPeerRef" />
   </bean>
 
   <service ref="registrationManager" interface="io.subutai.core.registration.api.RegistrationManager" />
 
   <reference id="securityManagerRef" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />
-
-  <reference id="localPeerRef" availability="mandatory"
-             interface="io.subutai.common.peer.LocalPeer" />
 
 </blueprint>

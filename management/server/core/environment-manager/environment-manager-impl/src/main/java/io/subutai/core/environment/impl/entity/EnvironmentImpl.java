@@ -386,13 +386,11 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Set<EnvironmentContainerHost> containerHosts;
 
-        if ( containers == null )
+        synchronized ( this.containers )
         {
-            containerHosts = Sets.newHashSet();
-        }
-        else
-        {
-            containerHosts = Sets.newConcurrentHashSet( containers );
+            containerHosts =
+                    CollectionUtil.isCollectionEmpty( this.containers ) ? Sets.<EnvironmentContainerHost>newHashSet() :
+                    Sets.newConcurrentHashSet( this.containers );
         }
 
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) && environmentManager != null )

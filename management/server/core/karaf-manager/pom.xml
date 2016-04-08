@@ -9,7 +9,6 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.subutai</groupId>
   <artifactId>karaf-manager-parent</artifactId>
   <name>Subutai Karaf Manager Parent</name>
   <description>Subutai Karaf Manager Parent</description>

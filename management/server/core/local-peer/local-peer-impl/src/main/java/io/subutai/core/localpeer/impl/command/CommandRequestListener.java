@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl.command;
 
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +17,10 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.peer.RecipientType;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -31,16 +29,9 @@ public class CommandRequestListener extends RequestListener
     private static final Logger LOG = LoggerFactory.getLogger( CommandRequestListener.class.getName() );
 
 
-    protected PeerManager getPeerManager() throws PeerException
+    protected PeerManager getPeerManager()
     {
-        try
-        {
-            return ServiceLocator.getServiceNoCache( PeerManager.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new PeerException( e );
-        }
+        return ServiceLocator.getServiceNoCache( PeerManager.class );
     }
 
 

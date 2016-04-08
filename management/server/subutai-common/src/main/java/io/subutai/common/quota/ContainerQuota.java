@@ -61,9 +61,6 @@ public class ContainerQuota
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ContainerQuota{" );
-        sb.append( "resources=" ).append( resources );
-        sb.append( '}' );
-        return sb.toString();
+        return "ContainerQuota{" + "resources=" + resources + '}';
     }
 }

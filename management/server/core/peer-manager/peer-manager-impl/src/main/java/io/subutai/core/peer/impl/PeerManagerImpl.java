@@ -12,14 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +42,6 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
-import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
@@ -101,8 +95,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService localIpSetter;
 
-    private PingDistances distances;
-
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
                             MessageResponseListener messageResponseListener, SecurityManager securityManager,
@@ -133,7 +125,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    public void init() throws PeerException
+    public void init()
     {
         try
         {
@@ -295,7 +287,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    protected void addPeerToRegistry( final Peer peer ) throws PeerException
+    protected void addPeerToRegistry( final Peer peer )
     {
         Preconditions.checkNotNull( peer, "Peer could not be null." );
 
@@ -890,7 +882,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             }
         }
 
-        return new PeerGroupResources( resources, getP2PSwarmDistances() );
+        return new PeerGroupResources( resources );
     }
 
 
@@ -1036,43 +1028,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
 
     @Override
-    public PingDistances getP2PSwarmDistances()
-    {
-        if ( distances != null )
-        {
-            return distances;
-        }
-
-        distances = new PingDistances();
-
-        final List<Peer> peers = getPeers();
-        ExecutorService pool = Executors.newFixedThreadPool( peers.size() );
-        ExecutorCompletionService<PingDistances> completionService = new ExecutorCompletionService<>( pool );
-        for ( Peer peer : peers )
-        {
-            completionService.submit( new P2PSwarmDistanceTask( peer ) );
-        }
-
-        pool.shutdown();
-
-        for ( int i = 0; i < peers.size(); i++ )
-        {
-            try
-            {
-                final Future<PingDistances> f = completionService.take();
-                PingDistances r = f.get();
-                distances.addAll( r.getAll() );
-            }
-            catch ( ExecutionException | InterruptedException e )
-            {
-                LOG.warn( "Could not get distances : " + e.getMessage() );
-            }
-        }
-        return distances;
-    }
-
-
-    @Override
     public void setPublicUrl( final String peerId, final String publicUrl, final int securePort ) throws PeerException
     {
         Preconditions.checkNotNull( peerId );
@@ -1126,25 +1081,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         catch ( Exception e )
         {
             LOG.error( "Error updating local peer info", e );
-        }
-    }
-
-
-    private class P2PSwarmDistanceTask implements Callable<PingDistances>
-    {
-        private Peer peer;
-
-
-        public P2PSwarmDistanceTask( final Peer peer )
-        {
-            this.peer = peer;
-        }
-
-
-        @Override
-        public PingDistances call() throws Exception
-        {
-            return peer.getP2PSwarmDistances( getLocalPeer().getId(), getMaxOrder() );
         }
     }
 

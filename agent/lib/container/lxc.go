@@ -124,9 +124,8 @@ func Start(name string) {
 		log.Check(log.WarnLevel, "Creating .start file to "+name, err)
 		defer f.Close()
 	}
-	// err = c.Start()
-	// log.Check(log.FatalLevel, "Starting container "+name, err)
 }
+
 func Stop(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+name, err)

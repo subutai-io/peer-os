@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.api.DataService;
-import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.impl.entity.PeerData;
 
 

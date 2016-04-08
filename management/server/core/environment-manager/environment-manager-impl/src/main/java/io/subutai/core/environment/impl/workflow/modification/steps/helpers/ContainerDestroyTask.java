@@ -7,7 +7,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
-import io.subutai.core.environment.impl.workflow.util.TaskUtil;
+import io.subutai.common.util.TaskUtil;
 
 
 public class ContainerDestroyTask extends TaskUtil.Task<Object>

@@ -14,8 +14,9 @@ import (
 // cfg declared in promote.go
 // LxcExport exports the given name if it suits the needs.
 func LxcExport(name, version string) {
+	srcver := container.GetConfigItem(config.Agent.LxcPrefix+name+"/config", "subutai.template.version")
 	if len(version) == 0 {
-		version = container.GetConfigItem(config.Agent.LxcPrefix+name+"/config", "subutai.template.version")
+		version = srcver
 	}
 	dst := config.Agent.LxcPrefix + "tmpdir/" + name +
 		"-subutai-template_" + version + "_" + runtime.GOARCH
@@ -29,16 +30,14 @@ func LxcExport(name, version string) {
 		log.Error("Parent " + parent + " is not a template")
 	}
 
-	deltaFolder := dst + "/deltas"
-	diffFolder := dst + "/diff"
 	os.MkdirAll(dst, 0755)
-	os.MkdirAll(deltaFolder, 0755)
-	os.MkdirAll(diffFolder, 0755)
+	os.MkdirAll(dst+"/deltas", 0755)
+	os.MkdirAll(dst+"/diff", 0755)
 
-	fs.Send(config.Agent.LxcPrefix+parent+"/rootfs", config.Agent.LxcPrefix+name+"/rootfs", deltaFolder+"/rootfs.delta")
-	fs.Send(config.Agent.LxcPrefix+parent+"/home", config.Agent.LxcPrefix+name+"/home", deltaFolder+"/home.delta")
-	fs.Send(config.Agent.LxcPrefix+parent+"/opt", config.Agent.LxcPrefix+name+"/opt", deltaFolder+"/opt.delta")
-	fs.Send(config.Agent.LxcPrefix+parent+"/var", config.Agent.LxcPrefix+name+"/var", deltaFolder+"/var.delta")
+	fs.Send(config.Agent.LxcPrefix+parent+"/rootfs", config.Agent.LxcPrefix+name+"/rootfs", dst+"/deltas/rootfs.delta")
+	fs.Send(config.Agent.LxcPrefix+parent+"/home", config.Agent.LxcPrefix+name+"/home", dst+"/deltas/home.delta")
+	fs.Send(config.Agent.LxcPrefix+parent+"/opt", config.Agent.LxcPrefix+name+"/opt", dst+"/deltas/opt.delta")
+	fs.Send(config.Agent.LxcPrefix+parent+"/var", config.Agent.LxcPrefix+name+"/var", dst+"/deltas/var.delta")
 
 	// changeConfigFile(name, packageVersion, dst)
 	container.SetContainerConf(name, [][]string{
@@ -56,6 +55,12 @@ func LxcExport(name, version string) {
 		lib.CopyFile(src+"/diff/home.diff", dst+"/diff/home.diff")
 		lib.CopyFile(src+"/diff/rootfs.diff", dst+"/diff/rootfs.diff")
 	}
+
+	container.SetContainerConf(name, [][]string{
+		{"subutai.template.package", config.Agent.LxcPrefix + "tmpdir/" + name +
+			"-subutai-template_" + srcver + "_" + runtime.GOARCH + ".tar.gz"},
+		{"subutai.template.version", srcver},
+	})
 
 	template.Tar(dst, dst+".tar.gz")
 	log.Check(log.FatalLevel, "Remove tmpdir", os.RemoveAll(dst))

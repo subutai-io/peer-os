@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -16,7 +15,6 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
-import io.subutai.common.protocol.ControlNetworkConfig;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
@@ -86,10 +84,9 @@ public class PeerManagerImplTest
 
     PeerManagerImpl peerManager;
     @Mock
-    ControlNetworkConfig controlNetworkConfig;
-    @Mock
     PeerData localPeerData;
-    @Mock Object provider;
+    @Mock
+    Object provider;
 
 
     @Before
@@ -99,8 +96,6 @@ public class PeerManagerImplTest
         when( localPeer.getPeerInfo() ).thenReturn( peerInfo );
         when( localPeer.getId() ).thenReturn( PEER_ID );
 
-        final List<String> list = Arrays.asList( "10.200.0.0", "10.200.1.0", "10.200.3.0" );
-        when( controlNetworkConfig.getUsedNetworks() ).thenReturn( list );
 
         peerManager =
                 spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,

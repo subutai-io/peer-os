@@ -1,13 +1,7 @@
 package io.subutai.core.bazaar.impl;
 
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.bazaar.api.Bazaar;
@@ -25,7 +19,7 @@ public class BazaarImpl implements Bazaar
 	private static final Logger LOG = LoggerFactory.getLogger( BazaarImpl.class );
     private Integration integration;
     private DaoManager daoManager;
-    private ConfigDataService configDataService;;
+    private ConfigDataService configDataService;
 
 
     public BazaarImpl( final Integration integration, final DaoManager daoManager )

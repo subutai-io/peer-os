@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.NamingException;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
@@ -248,14 +247,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     protected NetworkManager getNetworkManager() throws ResourceHostException
     {
-        try
-        {
-            return ServiceLocator.getServiceNoCache( NetworkManager.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new ResourceHostException( e );
-        }
+        return ServiceLocator.getServiceNoCache( NetworkManager.class );
     }
 
 

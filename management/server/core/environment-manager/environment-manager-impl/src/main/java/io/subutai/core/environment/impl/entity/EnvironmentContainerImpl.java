@@ -210,7 +210,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public HostId getResourceHostId() throws PeerException
+    public HostId getResourceHostId()
     {
         return new HostId( resourceHostId );
     }
@@ -370,7 +370,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         {
             logger.warn( "Trust chain validation is on..." );
             // TODO call relationManager validation here instead
-            EnvironmentManagerImpl envImpl = ( EnvironmentManagerImpl ) environmentManager;
+            EnvironmentManagerImpl envImpl = environmentManager;
             if ( SystemSettings.getKeyTrustCheckState() )
             {
                 IdentityManager identityManager = envImpl.getIdentityManager();

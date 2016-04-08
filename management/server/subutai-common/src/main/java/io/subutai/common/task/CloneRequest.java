@@ -109,18 +109,10 @@ public class CloneRequest implements TaskRequest
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "CloneRequest{" );
-        sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
-        sb.append( ", hostname='" ).append( hostname ).append( '\'' );
-        sb.append( ", containerName='" ).append( containerName ).append( '\'' );
-        sb.append( ", ip='" ).append( ip ).append( '\'' );
-        sb.append( ", environmentId='" ).append( environmentId ).append( '\'' );
-        sb.append( ", initiatorPeerId='" ).append( initiatorPeerId ).append( '\'' );
-        sb.append( ", ownerId='" ).append( ownerId ).append( '\'' );
-        sb.append( ", templateName='" ).append( templateName ).append( '\'' );
-        sb.append( ", templateArch=" ).append( templateArch );
-        sb.append( ", containerSize=" ).append( containerSize );
-        sb.append( '}' );
-        return sb.toString();
+        return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
+                + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", environmentId='"
+                + environmentId + '\'' + ", initiatorPeerId='" + initiatorPeerId + '\'' + ", ownerId='" + ownerId + '\''
+                + ", templateName='" + templateName + '\'' + ", templateArch=" + templateArch + ", containerSize="
+                + containerSize + '}';
     }
 }

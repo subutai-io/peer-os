@@ -1,6 +1,7 @@
 package io.subutai.common.quota;
 
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.resource.ContainerResourceType;
@@ -35,6 +36,7 @@ public class Quota
     }
 
 
+    @JsonIgnore
     public ContainerCpuResource getAsCpuResource()
     {
         if ( resource.getContainerResourceType() == ContainerResourceType.CPU )
@@ -45,6 +47,7 @@ public class Quota
     }
 
 
+    @JsonIgnore
     public ContainerRamResource getAsRamResource()
     {
         if ( resource.getContainerResourceType() == ContainerResourceType.RAM )
@@ -55,6 +58,7 @@ public class Quota
     }
 
 
+    @JsonIgnore
     public ContainerDiskResource getAsDiskResource()
     {
         if ( resource.getContainerResourceType() == ContainerResourceType.OPT
@@ -71,10 +75,6 @@ public class Quota
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "Quota{" );
-        sb.append( "resource=" ).append( resource );
-        sb.append( ", threshold=" ).append( threshold );
-        sb.append( '}' );
-        return sb.toString();
+        return "Quota{" + "resource=" + resource + ", threshold=" + threshold + '}';
     }
 }

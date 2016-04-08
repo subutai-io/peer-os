@@ -8,7 +8,6 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
@@ -37,7 +36,8 @@ public class PeerData implements Serializable
     private String policy;
 
 
-    public PeerData( final String id, final String info, final String keyPhrase, final String policy, final Integer order )
+    public PeerData( final String id, final String info, final String keyPhrase, final String policy,
+                     final Integer order )
     {
         this.id = id;
         this.info = info;
@@ -50,12 +50,6 @@ public class PeerData implements Serializable
     public String getId()
     {
         return id;
-    }
-
-
-    public void setId( final String id )
-    {
-        this.id = id;
     }
 
 
@@ -76,11 +70,6 @@ public class PeerData implements Serializable
         return keyPhrase;
     }
 
-
-    public void setKeyPhrase( final String keyPhrase )
-    {
-        this.keyPhrase = keyPhrase;
-    }
 
 
     public String getPolicy()

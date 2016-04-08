@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 /**
@@ -75,6 +76,6 @@ public class SecurityUtil
         byte[] salt = new byte[16];
         sr.nextBytes( salt );
 
-        return salt.toString();
+        return Arrays.toString( salt );
     }
 }

@@ -1,7 +1,6 @@
 package io.subutai.core.security.rest;
 
 
-import javax.naming.NamingException;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -74,7 +73,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKeyRing( final String identityId )
     {
-        String key = "";
+        String key;
 
         try
         {
@@ -82,7 +81,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
 
             if ( Strings.isNullOrEmpty( key ) )
             {
-                logger.info( " ************* Public Key not found with id:" +  identityId);
+                logger.info( " ************* Public Key not found with id:" + identityId );
                 return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
             }
             else
@@ -90,12 +89,11 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
                 return Response.ok( key ).build();
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            logger.error( "************ Error in getPublicKeyRest identityId:" + identityId,ex);
+            logger.error( "************ Error in getPublicKeyRest identityId:" + identityId, ex );
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-
     }
 
 
@@ -105,7 +103,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKey( final String identityId )
     {
-        String key = "";
+        String key;
 
         try
         {
@@ -113,7 +111,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
 
             if ( Strings.isNullOrEmpty( key ) )
             {
-                logger.info( " ************* Public Key not found with id:" +  identityId);
+                logger.info( " ************* Public Key not found with id:" + identityId );
                 return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
             }
             else
@@ -121,13 +119,12 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
                 return Response.ok( key ).build();
             }
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            logger.info( " ************* Error ! Public Key not found with id:" +  identityId,ex);
+            logger.info( " ************* Error ! Public Key not found with id:" + identityId, ex );
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-
- }
+    }
 
 
     /* ******************************
@@ -143,21 +140,19 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
 
             if ( key == null )
             {
-                logger.info( " ************* Public Key not found with id:" +  identityId);
+                logger.info( " ************* Public Key not found with id:" + identityId );
                 return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
             }
             else
             {
                 return Response.ok( PGPKeyUtil.encodeNumericKeyId( key.getKeyID() ) ).build();
             }
-
         }
-        catch(Exception ex)
+        catch ( Exception ex )
         {
-            logger.info( " ************* Error ! Public Key not found with id:" +  identityId,ex);
+            logger.info( " ************* Error ! Public Key not found with id:" + identityId, ex );
             return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
         }
-
     }
 
 
@@ -170,14 +165,14 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         try
         {
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-            User user = null;
+            User user;
             if ( identityManager != null )
             {
                 user = identityManager.getActiveUser();
                 return getKeyTrustTree( user.getSecurityKeyId() );
             }
         }
-        catch ( NamingException e )
+        catch ( Exception e )
         {
             logger.error( "Error getting identity manager.", e );
         }
@@ -243,7 +238,6 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
         }
         return Response.ok().build();
     }
-
 
 
     /* ***********************************************************
@@ -313,7 +307,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     {
         KeyManager keyManager = securityManager.getKeyManager();
 
-        boolean certfied = keyManager.verifySignature( sourceFingerprint, targetFingerprint  );
+        boolean certfied = keyManager.verifySignature( sourceFingerprint, targetFingerprint );
 
         return Response.ok( certfied ).build();
     }
@@ -327,5 +321,4 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     {
         return null;
     }
-
 }
