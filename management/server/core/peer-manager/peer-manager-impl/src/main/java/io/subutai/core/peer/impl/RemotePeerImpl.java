@@ -57,6 +57,7 @@ import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -755,6 +756,13 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
         return new PeerWebClient( peerInfo, provider ).getResourceLimits( peerId );
+    }
+
+
+    @Override
+    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
+    {
+        new PeerWebClient( peerInfo, provider ).addReverseProxy( reverseProxyConfig );
     }
 
 
