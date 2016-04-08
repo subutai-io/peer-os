@@ -336,10 +336,12 @@ public class HubEnvironmentManager
         CreateEnvironmentContainerGroupRequest containerGroupRequest =
                 new CreateEnvironmentContainerGroupRequest( peerDto.getEnvironmentInfo().getId() );
 
+        Set<EnvironmentNodeDto> failedNodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
             if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
             {
+                failedNodes.add( nodeDto );
                 ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
 
                 nodeDto.setState( ContainerStateDto.UNKNOWN );
@@ -363,6 +365,7 @@ public class HubEnvironmentManager
                 {
                     if ( cloneResponse.getHostname().equals( nodeDto.getHostName() ) )
                     {
+                        failedNodes.remove( nodeDto );
                         nodeDto.setIp( cloneResponse.getIp() );
                         nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
@@ -381,10 +384,26 @@ public class HubEnvironmentManager
         }
         catch ( PeerException e )
         {
-            String msg = "Failed on cloning containers";
-            sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.SUBUTAI,
-                    EnvironmentPeerLogDto.LogType.ERROR, null );
-            LOG.error( msg, e.getMessage() );
+            String msg = "Failed on cloning container: ";
+            for ( EnvironmentNodeDto nodeDto : failedNodes )
+            {
+                msg += nodeDto.getContainerId();
+                sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.CONTAINER,
+                        EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
+                LOG.error( msg, e.getMessage() );
+            }
+            throw new EnvironmentCreationException( msg );
+        }
+
+        if ( failedNodes.size() != 0 )
+        {
+            String msg = "Failed on cloning container: ";
+            for ( EnvironmentNodeDto nodeDto : failedNodes )
+            {
+                sendLogToHub( peerDto, msg + nodeDto.getContainerId(), null, EnvironmentPeerLogDto.LogEvent.CONTAINER,
+                        EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
+                LOG.error( msg + nodeDto.getContainerId() );
+            }
             throw new EnvironmentCreationException( msg );
         }
         return envNodes;
@@ -392,7 +411,7 @@ public class HubEnvironmentManager
 
 
     public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
-            throws EnvironmentManagerException
+            throws EnvironmentManagerException, EnvironmentCreationException
     {
 
         final EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
@@ -439,12 +458,14 @@ public class HubEnvironmentManager
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.SUBUTAI,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
             LOG.error( msg, e );
+            throw new EnvironmentCreationException( msg );
         }
         return peerDto;
     }
 
 
-    public void configureHash( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws EnvironmentManagerException
+    public void configureHash( EnvironmentPeerDto peerDto, EnvironmentDto envDto )
+            throws EnvironmentManagerException, EnvironmentCreationException
     {
         final LocalPeer localPeer = peerManager.getLocalPeer();
 
@@ -482,6 +503,7 @@ public class HubEnvironmentManager
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.SUBUTAI,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
             LOG.error( msg, e );
+            throw new EnvironmentCreationException( msg );
         }
     }
 

@@ -327,7 +327,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         catch ( Exception e )
         {
             String mgs = "Could not configure SSH/Hash";
-            hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
             LOG.error( mgs, e );
         }
     }
