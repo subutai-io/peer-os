@@ -139,16 +139,16 @@ func LxcImport(name, version, token string) {
 		return
 	}
 
-	if container.IsContainer(name) {
-		log.Info(name + " instance exist")
-		return
-	}
-
 	log.Info("Importing " + name)
 	for !lockSubutai(name + ".import") {
 		time.Sleep(time.Second * 1)
 	}
 	defer unlockSubutai()
+
+	if container.IsContainer(name) {
+		log.Info(name + " instance exist")
+		return
+	}
 
 	var t templ
 
