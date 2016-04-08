@@ -23,11 +23,11 @@ public class SystemConfDto
     }
 
 
-    public SystemConfDto( final SystemConfigurationType key /*final String value, final String description*/ )
+    public SystemConfDto( final SystemConfigurationType key, final String value, final String description )
     {
         this.key = key;
-        //        this.value = value;
-        //        this.description = description;
+        this.value = value;
+        this.description = description;
     }
 
 
