@@ -3,11 +3,6 @@ package executer
 import (
 	"bufio"
 	"bytes"
-	"github.com/subutai-io/base/agent/agent/container"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
-	"gopkg.in/lxc/go-lxc.v2"
-	"io"
 	"os"
 	"os/exec"
 	"os/user"
@@ -17,6 +12,12 @@ import (
 	"syscall"
 	"time"
 	"unsafe"
+
+	"gopkg.in/lxc/go-lxc.v2"
+
+	"github.com/subutai-io/base/agent/agent/container"
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 )
 
 type EncRequest struct {
@@ -65,11 +66,8 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 		close(out_c)
 		return
 	}
-	//read/write pipes stdout
 	rop, wop, _ := os.Pipe()
-	//read/out pipes stderr
 	rep, wep, _ := os.Pipe()
-
 	defer rop.Close()
 	defer rep.Close()
 
@@ -86,63 +84,23 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	wop.Close()
 	wep.Close()
 
-	start := time.Now().Unix()
-	end := time.Now().Add(time.Duration(req.Timeout) * time.Second).Unix()
-	var response = genericResponse(&req)
-	response.ResponseNumber = 1
+	stdout := make(chan string)
+	stderr := make(chan string)
+	go outputReader(rop, stdout)
+	go outputReader(rep, stderr)
+
+	var response = genericResponse(req)
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		r := bufio.NewReader(rop)
-		for line, isPrefix, err := r.ReadLine(); err == nil; line, isPrefix, err = r.ReadLine() {
-			response.StdOut = response.StdOut + string(line)
-			if !isPrefix {
-				response.StdOut = response.StdOut + "\n"
-			}
-			if len(response.StdOut) > 50000 {
-				out_c <- response
-				start = now()
-				response.StdErr, response.StdOut = "", ""
-				response.ResponseNumber++
-			}
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		scanErr := bufio.NewScanner(rep)
-		for scanErr.Scan() {
-			response.StdErr = response.StdErr + scanErr.Text() + "\n"
-			if len(response.StdErr) > 50000 {
-				out_c <- response
-				start = now()
-				response.StdErr, response.StdOut = "", ""
-				response.ResponseNumber++
-			}
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for end-now() > 0 {
-			if now()-start > 10 {
-				out_c <- response
-				start = now()
-				response.StdErr, response.StdOut = "", ""
-				response.ResponseNumber++
-			}
-			time.Sleep(time.Millisecond * 100)
-		}
+		outputSender(stdout, stderr, out_c, &response)
 	}()
 
 	done := make(chan error)
 	go func() { done <- cmd.Wait() }()
 	select {
 	case <-done:
-		end = -1
 		wg.Wait()
 		response.ExitCode = "0"
 		if req.IsDaemon != 1 {
@@ -165,9 +123,45 @@ func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 			}
 			out_c <- response
 		}
-		wg.Wait()
 	}
 	close(out_c)
+}
+
+func outputReader(read *os.File, ch chan<- string) {
+	r := bufio.NewReader(read)
+	for line, isPrefix, err := r.ReadLine(); err == nil; line, isPrefix, err = r.ReadLine() {
+		if isPrefix {
+			ch <- string(line)
+		} else {
+			ch <- string(line) + "\n"
+		}
+	}
+	close(ch)
+}
+
+func outputSender(stdout, stderr chan string, ch chan<- ResponseOptions, response *ResponseOptions) {
+	for stdout != nil || stderr != nil {
+		alive := false
+		select {
+		case buf, ok := <-stdout:
+			response.StdOut = response.StdOut + buf
+			if !ok {
+				stdout = nil
+			}
+		case buf, ok := <-stderr:
+			response.StdErr = response.StdErr + buf
+			if !ok {
+				stderr = nil
+			}
+		case <-time.After(time.Second * 10):
+			alive = true
+		}
+		if len(response.StdOut) > 50000 || len(response.StdErr) > 50000 || alive {
+			ch <- *response
+			response.StdErr, response.StdOut = "", ""
+			response.ResponseNumber++
+		}
+	}
 }
 
 func buildCmd(r *RequestOptions) *exec.Cmd {
@@ -200,85 +194,61 @@ func buildCmd(r *RequestOptions) *exec.Cmd {
 }
 
 //prepare basic response
-func genericResponse(req *RequestOptions) ResponseOptions {
+func genericResponse(req RequestOptions) ResponseOptions {
 	return ResponseOptions{
-		Type:      "EXECUTE_RESPONSE",
-		CommandId: req.CommandId,
-		Id:        req.Id,
+		Type:           "EXECUTE_RESPONSE",
+		CommandId:      req.CommandId,
+		Id:             req.Id,
+		ResponseNumber: 1,
 	}
 }
 
-func now() int64 {
-	return time.Now().Unix()
-}
-
-func AttachContainer(name string, r RequestOptions, out_c chan<- ResponseOptions) {
+func AttachContainer(name string, req RequestOptions, out_c chan<- ResponseOptions) {
 	lxc_c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
+
+	rop, wop, _ := os.Pipe()
+	rep, wep, _ := os.Pipe()
+	defer rop.Close()
+	defer rep.Close()
+
 	opts := lxc.DefaultAttachOptions
-
-	var res ResponseOptions = genericResponse(&r)
-
-	o_read, o_write, _ := os.Pipe()
-	e_read, e_write, _ := os.Pipe()
-
-	var chunk bytes.Buffer
-	defer o_read.Close()
-	defer e_read.Close()
-
-	opts.StdoutFd = o_write.Fd()
-	opts.StderrFd = e_write.Fd()
-
-	opts.UID, opts.GID = container.GetCredentials(r.RunAs, name)
-
-	opts.Cwd = r.WorkingDir
+	opts.UID, opts.GID = container.GetCredentials(req.RunAs, name)
+	opts.StdoutFd = wop.Fd()
+	opts.StderrFd = wep.Fd()
+	opts.Cwd = req.WorkingDir
 
 	var exitCode int
 	var cmd bytes.Buffer
 
-	cmd.WriteString(r.Command)
-	for _, a := range r.Args {
+	cmd.WriteString(req.Command)
+	for _, a := range req.Args {
 		cmd.WriteString(a + " ")
 	}
 
 	log.Debug("Executing command in container " + name + ":" + cmd.String())
 	go func() {
-		exitCode, _ = lxc_c.RunCommandStatus([]string{"timeout", strconv.Itoa(r.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
-
-		o_write.Close()
-		e_write.Close()
+		exitCode, _ = lxc_c.RunCommandStatus([]string{"timeout", strconv.Itoa(req.Timeout), "/bin/bash", "-c", cmd.String()}, opts)
+		wop.Close()
+		wep.Close()
 	}()
 
-	out := bufio.NewScanner(o_read)
-	var e bytes.Buffer
-	start_time := time.Now().Unix()
+	stdout := make(chan string)
+	stderr := make(chan string)
+	go outputReader(rop, stdout)
+	go outputReader(rep, stderr)
 
-	res.ResponseNumber = 1
-	for out.Scan() {
-		//we have more stdout coming in
-		//collect 1000 bytes and send the chunk
-		chunk.WriteString(out.Text() + "\n")
-		//send chunk every 1000 bytes or 10 seconds
-		if chunk.Len() >= 1000 || now()-start_time >= 10 {
-			res.StdOut = chunk.String()
-			out_c <- res
-			chunk.Truncate(0)
-			res.ResponseNumber++
-			start_time = now()
-		}
-	}
-	io.Copy(&e, e_read)
+	var response = genericResponse(req)
+	outputSender(stdout, stderr, out_c, &response)
 	if exitCode == 0 {
-		res.Type = "EXECUTE_RESPONSE"
-		res.ExitCode = strconv.Itoa(exitCode)
+		response.Type = "EXECUTE_RESPONSE"
+		response.ExitCode = strconv.Itoa(exitCode)
 	} else {
 		if exitCode/256 == 124 {
-			res.Type = "EXECUTE_TIMEOUT"
+			response.Type = "EXECUTE_TIMEOUT"
 		}
-		res.ExitCode = strconv.Itoa(exitCode / 256)
+		response.ExitCode = strconv.Itoa(exitCode / 256)
 	}
-	res.StdOut = chunk.String()
-	res.StdErr = e.String()
-	out_c <- res
+	out_c <- response
 	lxc.Release(lxc_c)
 	close(out_c)
 }
