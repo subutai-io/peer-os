@@ -80,25 +80,18 @@ public class AppScaleProcessor implements StateLinkProccessor
             {
                 processLinks.add( stateLink );
 
-//                appScaleManager.installCluster( config );
-
                 try
                 {
-                    Thread.sleep( 10000 );
+                    appScaleManager.installCluster( config );
+
+                    update( stateLink );
                 }
-                catch ( InterruptedException e )
+                finally
                 {
-                    e.printStackTrace();
+                    processLinks.remove( stateLink );
                 }
-                ;
-
-                update( stateLink );
-
-                processLinks.remove( stateLink );
             }
         } );
-
-        executor.shutdown();
     }
 
 

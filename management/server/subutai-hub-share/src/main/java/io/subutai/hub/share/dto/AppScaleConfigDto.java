@@ -20,9 +20,9 @@ public class AppScaleConfigDto
     private String cassandraName;
     private String appengine;
 
-    private List<String> zooList;
-    private List<String> cassList;
-    private List<String> appenList;
+    private List<String> zooList = new ArrayList<>();
+    private List<String> cassList = new ArrayList<>();
+    private List<String> appenList = new ArrayList<>();
 
     private String domainName = "intra.lan";
     private List<String> nodes = new ArrayList<>();
@@ -45,12 +45,6 @@ public class AppScaleConfigDto
     {
         return containerAddresses;
     }
-
-
-//    public void setContainerAddresses( HashMap<String, String> containerAddresses )
-//    {
-//        this.containerAddresses = containerAddresses;
-//    }
 
 
     public String getClusterName()
@@ -262,7 +256,7 @@ public class AppScaleConfigDto
     {
         return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE )
                 .append( "clusterName", clusterName )
-                .append( "domainName", domainName )
+                .append( "userDomain", userDomain )
                 .append( "appenList", appenList )
                 .append( "zooList", zooList )
                 .append( "cassList", cassList )
