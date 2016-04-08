@@ -379,4 +379,11 @@ public class DefSubutaiStepsThen {
     public void user_observe_button_console(){
         subutaiSteps.userShouldObserveButtonConsole();
     }
+
+    @Then("the user fills out Quick Install")
+    public void user_fills_quick_install() throws FindFailed {
+        subutaiSteps.inputEnvironmentName("AppScaleEnvi");
+        subutaiSteps.inputDomain("test.ai");
+        subutaiSteps.clickOnButtonInstall();
+    }
 }

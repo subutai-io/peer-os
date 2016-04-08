@@ -254,7 +254,7 @@ public class DefSubutaiStepsWhen {
 
     @When("the user should install plugin")
     public void user_install_plugin() throws FindFailed {
-        subutaiSteps.clickOnButtonInstall();
+        subutaiSteps.clickOnMenuButtonInstall();
     }
 
     @When("the user clicks on Launch button")

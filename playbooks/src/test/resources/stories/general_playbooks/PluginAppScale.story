@@ -13,6 +13,7 @@ When the user clicks on the menu item: Bazaar
 Then the user search plugin: 'AppScale'
 When the user clicks on Launch button
 When the user clicks on the buton: Quick install
+Then the user fills out Quick Install
 When the user clicks on the title manage
 Then the user should observe button: Console
 

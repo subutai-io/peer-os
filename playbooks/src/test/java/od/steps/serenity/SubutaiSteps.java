@@ -165,6 +165,11 @@ public class SubutaiSteps extends ScenarioSteps {
         pluginsPage.fieldOperation.type(ls);
     }
 
+    @Step
+    public void inputDomain(String name) {
+        pluginsPage.fieldDomain.type(name);
+    }
+
     //endregion
 
     //region ACTION: Click
@@ -609,7 +614,7 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnButtonInstall() throws FindFailed {
+    public void clickOnMenuButtonInstall() throws FindFailed {
         screen.click(bazaarPage.sikuliMenuButtonInstall);
     }
 
@@ -683,6 +688,11 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonConsole() throws FindFailed {
         screen.click(pluginsPage.sikuliButtonConsole);
+    }
+
+    @Step
+    public void clickOnButtonInstall() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonInstall);
     }
     //endregion
 

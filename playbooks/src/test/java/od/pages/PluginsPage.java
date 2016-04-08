@@ -23,6 +23,12 @@ public class PluginsPage extends PageObject {
     @FindBy(xpath = "*//textarea[@ng-model=\"genericCtrl.newOperation.commandName\"]")
     public WebElementFacade fieldOperation;
 
+    @FindBy(xpath = "*//input[@ng-model=\"value.name\"]")
+    public WebElementFacade fieldEnvironmentName;
+
+    @FindBy(xpath = "*//input[@ng-model=\"value.domain\"]")
+    public WebElementFacade fieldDomain;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
