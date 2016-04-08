@@ -2,11 +2,10 @@ package io.subutai.common.util;
 
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -27,7 +27,7 @@ public class HostUtil
 
     private static final Logger LOG = LoggerFactory.getLogger( HostUtil.class );
 
-    private final Set<HostTask> tasks = Sets.newConcurrentHashSet();
+    private final Set<Task> tasks = Sets.newConcurrentHashSet();
 
     private Map<String, ExecutorService> taskExecutors = Maps.newConcurrentMap();
 
@@ -38,19 +38,35 @@ public class HostUtil
     }
 
 
-    public TaskResults execute( Set<HostTask> tasks )
+    public void execute( Host host, Set<Task> tasks )
     {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No task found for execution" );
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No tasks" );
 
         this.tasks.addAll( tasks );
 
-        executeParallel( tasks );
+        List<Future> futures = Lists.newArrayList();
 
-        return new TaskResults( tasks );
+        for ( Task task : tasks )
+        {
+            futures.add( submitTask( host, task ) );
+        }
+
+        for ( Future future : futures )
+        {
+            try
+            {
+                future.get();
+            }
+            catch ( Exception e )
+            {
+                //ignore
+            }
+        }
     }
 
 
-    public abstract static class HostTask<R> implements Callable<R>
+    public abstract static class Task<R> implements Callable<R>
     {
 
         public static enum TaskState
@@ -61,7 +77,7 @@ public class HostUtil
 
         private long submitTimestamp;
 
-        private final Host host;
+        private Host host;
 
         private R result;
 
@@ -70,10 +86,7 @@ public class HostUtil
         private TaskState taskState = TaskState.NEW;
 
 
-        public HostTask( final Host host )
-        {
-            this.host = host;
-        }
+        private void setHost( Host host ) {this.host = host;}
 
 
         private void setSubmitTimestamp( long submitTimestamp )
@@ -166,46 +179,9 @@ public class HostUtil
     }
 
 
-    public static class TaskResults
+    protected ExecutorService getTaskExecutor( Host host, Task task )
     {
-        private final Set<HostTask> tasks;
-        private boolean hasFailures = false;
-
-
-        protected TaskResults( final Set<HostTask> tasks )
-        {
-            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
-
-            this.tasks = tasks;
-
-            for ( HostTask task : tasks )
-            {
-                if ( task.getTaskState() == HostTask.TaskState.FAILED )
-                {
-                    hasFailures = true;
-
-                    break;
-                }
-            }
-        }
-
-
-        public boolean hasFailures()
-        {
-            return hasFailures;
-        }
-
-
-        public Set<HostTask> getTasks()
-        {
-            return tasks;
-        }
-    }
-
-
-    private ExecutorService getTaskExecutor( HostTask task )
-    {
-        String executorId = task.name() + "-" + task.getClass().getName();
+        String executorId = host.getId() + "-" + task.getClass().getName();
 
         ExecutorService executorService = taskExecutors.get( executorId );
 
@@ -222,42 +198,39 @@ public class HostUtil
     }
 
 
-    protected void executeParallel( Set<HostTask> tasks )
+    protected <R> Future submitTask( Host host, final Task<R> task )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
 
-        //todo use maxParallelTasks to obtain executor from static cache
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( tasks.size() );
-        CompletionService taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
+        ExecutorService taskExecutor = getTaskExecutor( host, task );
 
-        Map<HostTask, Future> taskFutures = Maps.newHashMap();
+        task.setHost( host );
+        task.setSubmitTimestamp( System.currentTimeMillis() );
+        task.setTaskState( Task.TaskState.RUNNING );
 
-        for ( HostTask task : tasks )
+        return taskExecutor.submit( new Callable<Object>()
         {
-            task.setSubmitTimestamp( System.currentTimeMillis() );
-            task.setTaskState( HostTask.TaskState.RUNNING );
-            taskFutures.put( task, taskCompletionService.submit( task ) );
-        }
-
-        taskExecutor.shutdown();
-
-        for ( Map.Entry<HostTask, Future> taskFuture : taskFutures.entrySet() )
-        {
-            try
+            @Override
+            public R call() throws Exception
             {
-                taskFuture.getKey().setTaskState( HostTask.TaskState.SUCCEEDED );
-                taskFuture.getKey().setResult( taskFuture.getValue().get() );
-            }
-            catch ( Exception e )
-            {
-                LOG.error( "Error executing task ", e );
+                try
+                {
+                    task.setResult( task.call() );
+                    task.setTaskState( Task.TaskState.SUCCEEDED );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error executing task {}", task.name(), e );
 
-                taskFuture.getKey().setTaskState( HostTask.TaskState.FAILED );
-                taskFuture.getKey().setException( e );
-            }
+                    task.setException( e );
+                    task.setTaskState( Task.TaskState.FAILED );
+                }
 
-            //remove completed task
-            this.tasks.remove( taskFuture.getKey() );
-        }
+                //remove completed task
+                tasks.remove( task );
+
+                return null;
+            }
+        } );
     }
 }
