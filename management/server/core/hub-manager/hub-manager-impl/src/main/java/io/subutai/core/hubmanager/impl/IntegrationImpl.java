@@ -39,6 +39,8 @@ import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
+import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
+import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
@@ -151,6 +153,12 @@ public class IntegrationImpl implements Integration
 
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
+
+            AppScaleManager appScaleManager = new AppScaleManager( peerManager );
+
+            AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, appScaleManager );
+
+            heartbeatProcessor.addProccessor( appScaleProcessor );
 
             hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
