@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 
 /**
  * Copy from AppScale plugin
@@ -251,6 +254,20 @@ public class AppScaleConfigDto
     public void setDomainName ( String domainName )
     {
         this.domainName = domainName;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE )
+                .append( "clusterName", clusterName )
+                .append( "domainName", domainName )
+                .append( "appenList", appenList )
+                .append( "zooList", zooList )
+                .append( "cassList", cassList )
+                .append( "containerAddresses", containerAddresses )
+                .toString();
     }
 }
 

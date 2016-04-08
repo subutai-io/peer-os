@@ -160,7 +160,7 @@ public class IntegrationImpl implements Integration
 
             heartbeatProcessor.addProccessor( appScaleProcessor );
 
-            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
+//            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
             resourceHostConfExecutorService
                     .scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
@@ -204,8 +204,8 @@ public class IntegrationImpl implements Integration
     public void sendHeartbeat() throws HubPluginException
     {
         heartbeatProcessor.sendHeartbeat();
-        resourceHostConfProcessor.sendResourceHostConf();
-        containerEventProcessor.process();
+//        resourceHostConfProcessor.sendResourceHostConf();
+//        containerEventProcessor.process();
     }
 
 
