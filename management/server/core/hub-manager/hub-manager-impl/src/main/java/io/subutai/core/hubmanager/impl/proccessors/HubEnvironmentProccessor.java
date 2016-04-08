@@ -29,6 +29,8 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -620,8 +622,14 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             EnvironmentId envId = new EnvironmentId( env.getId() );
 
             localPeer.cleanupEnvironment( envId );
-
-            //            localPeer.removePeerEnvironmentKeyPair( envId );
+            ReservedNetworkResources  reservedNetworkResources = localPeer.getReservedNetworkResources();
+            for ( NetworkResource networkResource: reservedNetworkResources.getNetworkResources())
+            {
+                if (networkResource.getEnvironmentId().equals( env.getId() ))
+                {
+                    throw new Exception( "Environment network resources are not cleaned yet." );
+                }
+            }
 
             environmentUserHelper.handleEnvironmentOwnerDeletion( peerDto );
 
