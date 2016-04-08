@@ -267,4 +267,38 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.inputClusterName(cluster);
     }
 
+    @When("the user enters profile Domain name")
+    public void user_enters_domain_name(){
+        subutaiSteps.inputDomainName("testAppScale");
+    }
+
+    @When("the user clicks on the title manage")
+    public void user_clicks_title_manage() throws FindFailed {
+        subutaiSteps.clickOnTitleManage();
+    }
+
+    @When("the user clicks on the buton: Configure operations")
+    public void user_clicks_configure_operations() throws FindFailed {
+        subutaiSteps.clickOnButtonConfigureOperations();
+    }
+
+    @When("the user clicks on the buton: Add operation")
+    public void user_clicks_button_add_operation() throws FindFailed {
+        subutaiSteps.clickOnButtonAddOperation();
+    }
+
+    @When("the user moves to page Manage")
+    public void user_chooses_operation() throws FindFailed {
+        subutaiSteps.clickOnTitleManage();
+    }
+
+    @When("the user moves to page Create")
+    public void user_moves_page_create() throws FindFailed {
+        subutaiSteps.clickOnTitleCreate();
+    }
+
+    @When("the user clicks on the buton: Quick install")
+    public void user_clicks_button_quick_install() throws FindFailed {
+        subutaiSteps.clickOnButtonQuickInstall();
+    }
 }

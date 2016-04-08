@@ -331,4 +331,52 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnSelectorEnvironment();
         subutaiSteps.clickOnEnvironmentFromSelector();
     }
+
+    @Then("the user creates profile name")
+    public void user_creates_profile_name() throws FindFailed {
+        subutaiSteps.inputProfileName("test profile");
+        subutaiSteps.clickOnButtonCreate();
+        subutaiSteps.clickOnButtonOk();
+//        subutaiSteps.userShouldObserveProfileName();
+    }
+
+    @Then("the user should add an operation")
+    public void user_add_operation() throws FindFailed {
+        subutaiSteps.inputOperationName("ls_operation");
+        subutaiSteps.inputOperation("ls");
+        subutaiSteps.clickOnButtonSave();
+    }
+
+    @Then("the user should execute the ls opeartion")
+    public void user_execute_ls_operation() throws FindFailed {
+        subutaiSteps.clickOnButtonExecute();
+        subutaiSteps.seeOutputOfLsCommand();
+    }
+
+    @Then("the user should delete a profile")
+    public void delete_profile() throws FindFailed {
+        subutaiSteps.clickOnIconDeleteEnvironment();
+        subutaiSteps.clickOnButtonDelete();
+        subutaiSteps.clickOnButtonOk();
+    }
+
+    @Then("the user uninstall plugin")
+    public void user_uninstall_plugin() throws FindFailed {
+        subutaiSteps.clickOnButtonUninstall();
+    }
+
+    @Then("the user clicks button: Quick install")
+    public void user_clicks_quick_install() throws FindFailed {
+        subutaiSteps.clickOnButtonQuickInstall();
+    }
+
+    @Then("the user clicks on the buton: Console")
+    public void user_clicks_button_console() throws FindFailed {
+        subutaiSteps.clickOnButtonConsole();
+    }
+
+    @Then("the user should observe button: Console")
+    public void user_observe_button_console(){
+        subutaiSteps.userShouldObserveButtonConsole();
+    }
 }

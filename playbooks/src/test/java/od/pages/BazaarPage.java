@@ -22,7 +22,7 @@ public class BazaarPage extends PageObject {
     @FindBy(xpath = "//a[@class=\"loading-button\"]")
     public WebElementFacade buttonLaunch;
 
-    public String sikuliMenuButtonInstall = "src/test/resources/imgs/buttons/buttonInstall.png";
+    public String sikuliMenuButtonInstall = "src/test/resources/imgs/buttons/buttonInstallPlugin.png";
     public String sikuliButtonLaunch = "src/test/resources/imgs/buttons/buttonLaunch.png";
 
     //endregion

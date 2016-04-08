@@ -145,6 +145,26 @@ public class SubutaiSteps extends ScenarioSteps {
         pluginsPage.fieldClusterName.type(cluster);
     }
 
+    @Step
+    public void inputProfileName(String profile) {
+        pluginsPage.fieldProfile.type(profile);
+    }
+
+    @Step
+    public void inputDomainName(String name) {
+        pluginsPage.fieldDomainName.type(name);
+    }
+
+    @Step
+    public void inputOperationName(String operation) {
+        pluginsPage.fieldOperationName.type(operation);
+    }
+
+    @Step
+    public void inputOperation(String ls) {
+        pluginsPage.fieldOperation.type(ls);
+    }
+
     //endregion
 
     //region ACTION: Click
@@ -259,6 +279,7 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnMenuItemBazaar() throws FindFailed {
 //        commonPage.linkPlugins.click();
         screen.click(commonPage.sikuliMenuItemBazaar);
+        waitABit(4000);
     }
 
     @Step
@@ -623,6 +644,46 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnEnvironmentFromSelector() {
         pluginsPage.selectorEnvironmentMaster.click();
     }
+
+    @Step
+    public void clickOnTitleManage() throws FindFailed {
+        screen.click(pluginsPage.sikuliTitleManage);
+    }
+
+    @Step
+    public void clickOnButtonConfigureOperations() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonConfigureOperations);
+    }
+
+    @Step
+    public void clickOnButtonAddOperation() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonAddOperation);
+    }
+
+    @Step
+    public void clickOnButtonExecute() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonExecute);
+    }
+
+    @Step
+    public void clickOnTitleCreate() throws FindFailed {
+        screen.click(pluginsPage.sikuliTitleCreate);
+    }
+
+    @Step
+    public void clickOnButtonUninstall() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonUninstall);
+    }
+
+    @Step
+    public void clickOnButtonQuickInstall() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonQuickInstall);
+    }
+
+    @Step
+    public void clickOnButtonConsole() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonConsole);
+    }
     //endregion
 
     //region Action: Drag And Drop
@@ -965,6 +1026,15 @@ public class SubutaiSteps extends ScenarioSteps {
         assertThat(environmentsPage.templateCassandra.isVisible(), is(true));
     }
 
+    @Step
+    public void userShouldObserveProfileName() {
+        assertThat(pluginsPage.titleOfProfileName.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveButtonConsole() {
+        assertThat(pluginsPage.buttonConsole.isVisible(), is(true));
+    }
     //endregion
 
 
@@ -979,6 +1049,11 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void seeOutputOfPwdCommand() {
         assertThat(consolePage.outputOfPwdCommand.isVisible(), Matchers.is(true));
+    }
+
+    @Step
+    public void seeOutputOfLsCommand() {
+        assertThat(pluginsPage.outputOfLsCommand.isVisible(), Matchers.is(true));
     }
 
 
@@ -1052,5 +1127,4 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnButtonGoToHUBWhite() throws FindFailed {
         screen.click(commonPage.sikuliButtonGoToHUBWhite);
     }
-
 }
