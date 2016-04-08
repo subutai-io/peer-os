@@ -11,7 +11,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.util.PeerUtil;
+import io.subutai.common.util.PeerUtil;
 
 
 public class AddSshKeyStep

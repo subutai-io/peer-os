@@ -22,6 +22,8 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -78,6 +80,7 @@ import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
@@ -2211,6 +2214,59 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         throw new HostNotFoundException( "Host by name '" + hostname + "' not found." );
+    }
+
+
+    @Override
+    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
+    {
+        ContainerHost containerHost = findContainerById( reverseProxyConfig.getContainerId() );
+
+        if ( containerHost == null )
+        {
+            throw new PeerException( "Container host not found." );
+        }
+
+        final NetworkResource networkResource =
+                getReservedNetworkResources().findByEnvironmentId( containerHost.getEnvironmentId().getId() );
+
+        if ( networkResource == null )
+        {
+            throw new PeerException( "Network resources not found." );
+        }
+
+        final HostInterface netInterface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+        if ( netInterface == null )
+        {
+            throw new PeerException( "Container network interface is null." );
+        }
+
+        ResourceHost resourceHost = getResourceHostByContainerId( containerHost.getId() );
+
+        try
+        {
+            String sslPath = "/etc/nginx/ssl.pem";
+            if ( !StringUtils.isEmpty( reverseProxyConfig.getSslCert() ) )
+            {
+                sslPath = String.format( "/etc/ssl/certs/%s.pem", reverseProxyConfig.getDomainName() );
+                containerHost.execute( new RequestBuilder(
+                        String.format( "echo '%s' > %s", reverseProxyConfig.getSslCert(), sslPath ) ) );
+            }
+            resourceHost.execute( new RequestBuilder( "subutai proxy del " + networkResource.getVlan() + " -d" ) );
+            resourceHost.execute( new RequestBuilder(
+                    String.format( "subutai proxy add %d -d \"*.%s\" -f /mnt/lib/lxc/%s/rootfs/%s",
+                            networkResource.getVlan(), reverseProxyConfig.getDomainName(), containerHost.getHostname(),
+                            sslPath ) ) );
+
+            resourceHost.execute( new RequestBuilder( "subutai proxy add " + networkResource.getVlan() + " -h " +
+                    netInterface.getIp() ) );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error on adding reverse proxy." );
+        }
     }
 
 
