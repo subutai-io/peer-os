@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,7 @@ public class QuotaManagerImpl implements QuotaManager
     private String defaultQuota;
     private DaoManager daoManager;
     private QuotaDataService quotaDataService;
+    private ObjectMapper mapper = new ObjectMapper();
 
 
     public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer, DaoManager daoManager )
@@ -282,13 +284,14 @@ public class QuotaManagerImpl implements QuotaManager
 
             try
             {
+                QuotaOutput quotaOutput = mapper.readValue( result.getStdOut(), QuotaOutput.class );
                 ResourceValue resourceValue =
-                        CommonResourceValueParser.parse( result.getStdOut(), containerResourceType );
+                        CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
+
 
                 ContainerResource containerResource =
                         ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-                //todo: should be implemented threshold in agent
-                containerQuota.add( new Quota( containerResource, 0 ) );
+                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
             }
             catch ( Exception e )
             {
@@ -306,25 +309,19 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
-
         for ( Quota quota : containerQuota.getAll() )
         {
-            executeOnContainersResourceHost( containerId,
-                    commands.getWriteQuotaCommand( containerId.getHostName(), quota.getResource() ) );
-
             final Integer threshold = quota.getThreshold();
-            if ( threshold != null && threshold >= 0 && threshold <= 100 )
+            if ( threshold != null && threshold >= 0 && threshold <= 100 && quota.getResource() != null )
             {
                 executeOnContainersResourceHost( containerId,
-                        commands.getWriteQuotaThresholdCommand( containerId.getHostName(),
-                                quota.getResource().getContainerResourceType(), threshold ) );
+                        commands.getWriteQuotaCommand( containerId.getHostName(), quota.getResource(), threshold ) );
             }
             else
             {
-                LOGGER.warn( "Invalid quota threshold.", quota );
+                LOGGER.warn( "Invalid quota.", quota );
             }
         }
-
     }
 
 
