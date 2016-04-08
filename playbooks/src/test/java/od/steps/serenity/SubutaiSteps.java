@@ -683,6 +683,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonQuickInstall() throws FindFailed {
         screen.click(pluginsPage.sikuliButtonQuickInstall);
+        waitABit(50000);
     }
 
     @Step
