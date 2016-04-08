@@ -12,8 +12,8 @@ And the user clicks on the button: Login
 When the user clicks on the menu item: Bazaar
 Then the user search plugin: 'AppScale'
 When the user clicks on Launch button
-When the user clicks on the title manage
 When the user clicks on the buton: Quick install
+When the user clicks on the title manage
 Then the user should observe button: Console
 
 Scenario: may be will use
