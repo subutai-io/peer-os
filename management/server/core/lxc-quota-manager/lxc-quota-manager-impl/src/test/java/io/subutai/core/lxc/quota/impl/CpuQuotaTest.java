@@ -9,9 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 
-import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.resource.CpuResource;
-import io.subutai.common.resource.NumericValueResource;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -107,7 +107,7 @@ public class AuthorizationInterceptor implements Interceptor
             }
         }
 
-        Set<String> roles = new HashSet<String>( Arrays.asList( rolesAr ) );
+        Set<String> roles = new HashSet<>( Arrays.asList( rolesAr ) );
         AccessControlContext acc = AccessController.getContext();
         Subject subject = Subject.getSubject( acc );
         if ( subject == null )
@@ -136,7 +136,7 @@ public class AuthorizationInterceptor implements Interceptor
         StringBuilder sb = new StringBuilder();
         for ( Principal principal : principals )
         {
-            sb.append( principal.getName() + " " );
+            sb.append( principal.getName() ).append( " " );
         }
         return sb.toString();
     }

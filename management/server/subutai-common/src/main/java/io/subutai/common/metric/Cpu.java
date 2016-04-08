@@ -83,11 +83,6 @@ public class Cpu
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "CPU{" );
-        sb.append( "model='" ).append( model ).append( '\'' );
-        sb.append( ", idle=" ).append( idle );
-        sb.append( ", coreCount=" ).append( coreCount );
-        sb.append( '}' );
-        return sb.toString();
+        return "CPU{" + "model='" + model + '\'' + ", idle=" + idle + ", coreCount=" + coreCount + '}';
     }
 }

@@ -22,6 +22,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.util.DateTimeParam;
@@ -135,11 +136,9 @@ public interface RestService
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
 
-
-    @GET
-    @Path( "control/{p2pHash}/{count}/distance/" )
+    @POST
+    @Path( "reverseProxy" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getP2PSwarmDistances( @PathParam( "p2pHash" ) final String p2pHash,
-                                   @PathParam( "count" ) final Integer count );
+    Response addReverseProxy( ReverseProxyConfig reverseProxyConfig );
 }

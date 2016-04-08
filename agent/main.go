@@ -238,21 +238,11 @@ func main() {
 
 		Name: "quota", Usage: "set quotas for Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"}},
+			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
+			cli.StringFlag{Name: "t", Usage: "set alert threshold"}},
 		Action: func(c *cli.Context) {
-			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"))
-		},
-		Subcommands: []cli.Command{{
-			Name:  "threshold",
-			Usage: "add alert threshold",
-			Flags: []cli.Flag{
-				cli.StringFlag{Name: "name", Usage: "container name"},
-				cli.StringFlag{Name: "type", Usage: "resource type"},
-				cli.StringFlag{Name: "set", Usage: "set value for threshold"}},
-			Action: func(c *cli.Context) {
-				lib.QuotaThreshold(c.String("name"), c.String("type"), c.String("set"))
-			},
-		}}}, {
+			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("t"))
+		}}, {
 
 		Name: "register", Usage: "register Subutai container",
 		Action: func(c *cli.Context) {

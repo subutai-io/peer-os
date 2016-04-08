@@ -28,7 +28,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistances;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -271,8 +271,6 @@ public interface Peer
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
 
-    PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
-
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
@@ -288,4 +286,6 @@ public interface Peer
     void addSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
+
+    void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
 }

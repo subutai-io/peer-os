@@ -2,7 +2,6 @@ package io.subutai.common.task;
 
 
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
 
 
 public class QuotaRequest implements TaskRequest
@@ -35,12 +34,8 @@ public class QuotaRequest implements TaskRequest
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "QuotaRequest{" );
-        sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
-        sb.append( ", hostname='" ).append( hostname ).append( '\'' );
-        sb.append( ", size=" ).append( size );
-        sb.append( '}' );
-        return sb.toString();
+        return "QuotaRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
+                + ", size=" + size + '}';
     }
 
 

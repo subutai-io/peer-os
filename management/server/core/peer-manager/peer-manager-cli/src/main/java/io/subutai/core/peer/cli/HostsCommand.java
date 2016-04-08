@@ -1,24 +1,20 @@
 package io.subutai.core.peer.cli;
 
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
+
 
 //todo move to local peer
 @Command( scope = "peer", name = "hosts" )
 public class HostsCommand extends SubutaiShellCommandSupport
 {
-    DateFormat fmt = new SimpleDateFormat( "dd.MM.yy HH:mm:ss.SS" );
     private PeerManager peerManager;
 
 
@@ -47,7 +43,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
     }
 
 
-    protected void print( Host host, String padding ) throws PeerException
+    protected void print( Host host, String padding )
     {
         String connectionState = String.format( "%s ", host.isConnected() ? " CONNECTED" : " DISCONNECTED" );
         if ( host instanceof ContainerHost )
@@ -56,7 +52,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
             connectionState += c.getState();
         }
 
-        System.out
-                .println( String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), connectionState ) );
+        System.out.println(
+                String.format( "%s+--%s %s %s", padding, host.getHostname(), host.getId(), connectionState ) );
     }
 }

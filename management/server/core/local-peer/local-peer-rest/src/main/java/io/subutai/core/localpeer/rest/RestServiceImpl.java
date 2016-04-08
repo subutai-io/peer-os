@@ -22,6 +22,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -352,14 +353,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getP2PSwarmDistances( final String p2pHash, final Integer count )
+    public Response addReverseProxy( final ReverseProxyConfig reverseProxyConfig )
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ) );
-            Preconditions.checkNotNull( count );
-
-            return Response.ok( localPeer.getP2PSwarmDistances( p2pHash, count ) ).build();
+            Preconditions.checkNotNull( reverseProxyConfig );
+            localPeer.addReverseProxy( reverseProxyConfig );
+            return Response.ok().build();
         }
         catch ( Exception e )
         {

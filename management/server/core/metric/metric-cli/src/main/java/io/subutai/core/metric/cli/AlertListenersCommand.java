@@ -3,7 +3,6 @@ package io.subutai.core.metric.cli;
 
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;

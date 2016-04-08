@@ -14,7 +14,7 @@ public class CommandBatch
 {
     public enum Type
     {
-        STANDARD, CHAIN, JSON;
+        STANDARD, CHAIN, JSON
     }
 
 

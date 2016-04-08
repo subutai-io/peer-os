@@ -2,7 +2,6 @@ package io.subutai.core.systemmanager.api;
 
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.SystemConfiguration;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.peer.HostNotFoundException;

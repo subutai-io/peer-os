@@ -37,7 +37,7 @@ type templ struct {
 
 func templId(t templ, arch string, kurjun *http.Client) string {
 	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&type=text"
-	if len(t.branch) == 0 {
+	if len(t.branch) == 0 || t.name != "management" {
 		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&type=text"
 	}
 	response, err := kurjun.Get(url)
@@ -177,7 +177,7 @@ func LxcImport(name, version, token string) {
 
 	log.Info("Version: " + t.version + ", branch: " + t.branch)
 
-	if t.branch == "" {
+	if t.branch == "" || t.name != "management" {
 		t.file = t.name + "-subutai-template_" + t.version + "_" + config.Template.Arch + ".tar.gz"
 	} else {
 		t.file = t.name + "-subutai-template_" + t.version + "-" + t.branch + "_" + config.Template.Arch + ".tar.gz"

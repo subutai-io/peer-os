@@ -6,5 +6,5 @@ package io.subutai.common.peer;
  */
 public enum HostType
 {
-    MANAGEMENT_HOST, RESOURCE_HOST, CONTAINER_HOST;
+    MANAGEMENT_HOST, RESOURCE_HOST, CONTAINER_HOST
 }

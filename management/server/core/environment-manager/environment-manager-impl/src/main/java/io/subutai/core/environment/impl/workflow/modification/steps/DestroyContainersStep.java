@@ -9,7 +9,7 @@ import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.ContainerDestroyTask;
-import io.subutai.core.environment.impl.workflow.util.TaskUtil;
+import io.subutai.common.util.TaskUtil;
 
 
 /**

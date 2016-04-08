@@ -25,7 +25,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistances;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
@@ -359,31 +359,6 @@ public class PeerWebClient
     }
 
 
-    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
-    {
-        String path = String.format( "/control/%s/%d/distance", p2pHash, maxAddress );
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-
-        Response response;
-
-        try
-        {
-            response = client.get();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error on getting p2p swarm distances: %s", e.getMessage() ) );
-        }
-
-        return checkResponse( response, PingDistances.class );
-    }
-
-
     public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
     {
 
@@ -549,5 +524,29 @@ public class PeerWebClient
         {
             throw new PeerException( response.readEntity( String.class ) );
         }
+    }
+
+
+    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
+    {
+        String path = "/reverseProxy";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.accept( MediaType.APPLICATION_JSON );
+        client.type( MediaType.APPLICATION_JSON );
+        Response response;
+
+        try
+        {
+            response = client.post( reverseProxyConfig );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
+        }
+
+        checkResponse( response );
     }
 }

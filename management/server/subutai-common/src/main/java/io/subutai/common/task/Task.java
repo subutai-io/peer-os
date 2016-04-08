@@ -16,7 +16,7 @@ public interface Task<R extends TaskRequest, T extends TaskResponse>
 
     enum State
     {
-        PENDING, RUNNING, SUCCESS, FAILURE;
+        PENDING, RUNNING, SUCCESS, FAILURE
 
     }
 

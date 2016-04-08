@@ -5,8 +5,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +43,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
     }
 
 
-    public static RegistrationManager getRegistrationManager() throws NamingException
+    public static RegistrationManager getRegistrationManager()
     {
         return ServiceLocator.getServiceNoCache( RegistrationManager.class );
     }
@@ -96,9 +94,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
         if ( commandResult != null && commandResult.hasSucceeded() )
         {
-            // why stdErr()?
             StringTokenizer st = new StringTokenizer( getStdOut(), LINE_DELIMITER );
-
 
             while ( st.hasMoreTokens() )
             {
@@ -121,6 +117,7 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
             LOG.error( "Agent ID not found in output of subutai clone command." );
             throw new CommandException( "Agent ID not found in output of subutai clone command." );
         }
+
         return new CloneResponse( request.getResourceHostId(), request.getHostname(), request.getContainerName(),
                 request.getTemplateName(), request.getTemplateArch(), request.getIp(), containerId, elapsedTime );
     }

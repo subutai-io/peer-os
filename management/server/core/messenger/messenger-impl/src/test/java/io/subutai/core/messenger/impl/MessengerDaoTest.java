@@ -89,8 +89,8 @@ public class MessengerDaoTest
     @Test
     public void testGetEnvelopes() throws Exception
     {
-        when( messageDataService.getTargetPeers() ).thenReturn( Lists.newArrayList( TARGET_PEER_ID.toString() ) );
-        when( messageDataService.getMessages( eq( TARGET_PEER_ID.toString() ), anyInt(), anyInt() ) )
+        when( messageDataService.getTargetPeers() ).thenReturn( Lists.newArrayList( TARGET_PEER_ID ) );
+        when( messageDataService.getMessages( eq( TARGET_PEER_ID ), anyInt(), anyInt() ) )
                 .thenReturn( Lists.newArrayList( messageEntity ) );
 
         Set<Envelope> envelopeSet = messengerDao.getEnvelopes();

@@ -29,7 +29,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
 import io.subutai.common.host.ResourceHostInfo;
@@ -296,7 +295,7 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    protected SecurityManager getSecurityManager() throws NamingException
+    protected SecurityManager getSecurityManager()
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
     }
@@ -356,29 +355,6 @@ public class CommandProcessor implements RestProcessor
         {
             LOG.error( "Error processing response", e );
         }
-    }
-
-
-    protected ResourceHostInfo getTargetHost( String hostId ) throws HostDisconnectedException
-    {
-        ResourceHostInfo targetHost;
-
-        try
-        {
-            targetHost = hostRegistry.getResourceHostInfoById( hostId );
-        }
-        catch ( HostDisconnectedException e )
-        {
-            ContainerHostInfo containerHostInfo = hostRegistry.getContainerHostInfoById( hostId );
-            if ( containerHostInfo.getState() != ContainerHostState.RUNNING )
-            {
-                throw new HostDisconnectedException(
-                        String.format( "Container state is %s", containerHostInfo.getState() ) );
-            }
-            targetHost = hostRegistry.getResourceHostByContainerHost( containerHostInfo );
-        }
-
-        return targetHost;
     }
 
 
