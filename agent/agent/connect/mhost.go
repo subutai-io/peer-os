@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
 
@@ -30,19 +31,6 @@ func Instance() *mhost {
 		instance.Url = config.Management.RestToken
 	}
 	return instance
-}
-
-func (m *mhost) GetToken() string {
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr, Timeout: time.Second * 5}
-	resp, err := client.Get("https://" + m.Ipv4 + ":" + m.Port + m.Url + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
-	if log.Check(log.WarnLevel, "Getting security token", err) {
-		return ""
-	}
-	defer resp.Body.Close()
-
-	token, _ := ioutil.ReadAll(resp.Body)
-	return string(token)
 }
 
 func (m *mhost) GetKey() *Key {
@@ -70,7 +58,7 @@ func (m *mhost) GetKey() *Key {
 
 func (m *mhost) URL() string {
 	url := "https://" + m.Ipv4 + ":" + m.Port + config.Management.RestPublicKey + "?sptoken="
-	token := m.GetToken()
+	token := gpg.GetToken()
 	if len(token) == 168 {
 		return url + token
 	}
