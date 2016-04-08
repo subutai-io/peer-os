@@ -382,7 +382,7 @@ public class DefSubutaiStepsThen {
 
     @Then("the user fills out Quick Install")
     public void user_fills_quick_install() throws FindFailed {
-        subutaiSteps.inputEnvironmentName("AppScaleEnvi");
+        subutaiSteps.inputAppScaleEnvironmentName("AppScaleEnvi");
         subutaiSteps.inputDomain("test.ai");
         subutaiSteps.clickOnButtonInstall();
     }

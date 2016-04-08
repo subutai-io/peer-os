@@ -170,6 +170,11 @@ public class SubutaiSteps extends ScenarioSteps {
         pluginsPage.fieldDomain.type(name);
     }
 
+    @Step
+    public void inputAppScaleEnvironmentName(String appScaleEnvi) {
+        pluginsPage.fieldDomain.type(appScaleEnvi);
+    }
+
     //endregion
 
     //region ACTION: Click
