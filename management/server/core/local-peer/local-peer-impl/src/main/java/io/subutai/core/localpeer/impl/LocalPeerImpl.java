@@ -2255,7 +2255,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             resourceHost.execute( new RequestBuilder( "subutai proxy del " + networkResource.getVlan() + " -d" ) );
             resourceHost.execute( new RequestBuilder(
-                    String.format( "subutai proxy add %d -d \"*.%s\" -f /mnt/lib/lxc/%s/rootfs/%s",
+                    String.format( "subutai proxy add %d -d \"*.%s\" -f /mnt/lib/lxc/%s/rootfs%s",
                             networkResource.getVlan(), reverseProxyConfig.getDomainName(), containerHost.getHostname(),
                             sslPath ) ) );
 

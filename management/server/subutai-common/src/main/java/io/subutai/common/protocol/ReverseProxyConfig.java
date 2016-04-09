@@ -9,6 +9,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class ReverseProxyConfig
 {
+    @JsonProperty( "environmentId" )
+    private String environmentId;
     @JsonProperty( "containerId" )
     private String containerId;
     @JsonProperty( "domainName" )
@@ -17,13 +19,21 @@ public class ReverseProxyConfig
     private String sslCert;
 
 
-    public ReverseProxyConfig( @JsonProperty( "containerId" ) final String containerId,
+    public ReverseProxyConfig( @JsonProperty( "environmentId" ) final String environmentId,
+                               @JsonProperty( "containerId" ) final String containerId,
                                @JsonProperty( "domainName" ) final String domainName,
                                @JsonProperty( "sslCert" ) final String sslCert )
     {
+        this.environmentId = environmentId;
         this.containerId = containerId;
         this.domainName = domainName;
         this.sslCert = sslCert;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
     }
 
 

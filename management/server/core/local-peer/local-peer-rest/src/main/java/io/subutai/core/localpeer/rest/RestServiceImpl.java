@@ -22,7 +22,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
@@ -343,23 +342,6 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
 
             return Response.ok( localPeer.getResourceLimits( peerId ) ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response addReverseProxy( final ReverseProxyConfig reverseProxyConfig )
-    {
-        try
-        {
-            Preconditions.checkNotNull( reverseProxyConfig );
-            localPeer.addReverseProxy( reverseProxyConfig );
-            return Response.ok().build();
         }
         catch ( Exception e )
         {

@@ -23,6 +23,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.WebClientBuilder;
 
@@ -232,6 +233,7 @@ public class EnvironmentWebClient
         checkResponse( response );
     }
 
+
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
         String path =
@@ -423,6 +425,31 @@ public class EnvironmentWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error configuring hosts in environment: " + e.getMessage() );
+        }
+
+        checkResponse( response );
+    }
+
+
+    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
+    {
+        String path = String.format( "/%s/container/%s/reverseProxy", reverseProxyConfig.getEnvironmentId(),
+                reverseProxyConfig.getContainerId() );
+
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+        client.accept( MediaType.APPLICATION_JSON );
+        client.type( MediaType.APPLICATION_JSON );
+        Response response;
+
+        try
+        {
+            response = client.post( reverseProxyConfig );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
         }
 
         checkResponse( response );
