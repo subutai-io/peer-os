@@ -80,11 +80,19 @@ public class AppScaleProcessor implements StateLinkProccessor
             {
                 processLinks.add( stateLink );
 
+                update( stateLink, "INSTALLING" );
+
                 try
                 {
                     appScaleManager.installCluster( config );
 
-                    update( stateLink );
+                    update( stateLink, "INSTALLED" );
+                }
+                catch ( Exception e )
+                {
+                    log.error( "Error to install AppScale cluster: ", e );
+
+                    update( stateLink, "FAILED" );
                 }
                 finally
                 {
@@ -95,16 +103,21 @@ public class AppScaleProcessor implements StateLinkProccessor
     }
 
 
-    private void update( String link )
+    private void update( String link, String state )
     {
+        log.debug( "Sending state: {}", state );
+
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
-            Response res = client.post( null );
+            byte[] cborData = JsonUtil.toCbor( state );
+
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+            Response res = client.post( encryptedData );
 
             log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
-
         }
         catch ( Exception e )
         {

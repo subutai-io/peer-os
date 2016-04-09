@@ -16,6 +16,7 @@ public class AppScaleConfigDto
 {
     private String clusterName = "";
 
+
     private String zookeeperName;
     private String cassandraName;
     private String appengine;
@@ -38,7 +39,10 @@ public class AppScaleConfigDto
     private String scaleOption;
 
     // <containerName, containerIP>
+
     private HashMap<String, String> containerAddresses = new HashMap<>();
+
+    private String state = "";
 
 
     public HashMap<String, String> getContainerAddresses()
@@ -248,6 +252,18 @@ public class AppScaleConfigDto
     public void setDomainName ( String domainName )
     {
         this.domainName = domainName;
+    }
+
+
+    public String getState()
+    {
+        return state;
+    }
+
+
+    public void setState( String state )
+    {
+        this.state = state;
     }
 
 

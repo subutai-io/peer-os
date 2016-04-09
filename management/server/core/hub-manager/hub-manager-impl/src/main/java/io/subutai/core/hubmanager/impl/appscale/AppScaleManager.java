@@ -50,8 +50,6 @@ public class AppScaleManager
 
         ContainerHost controllerHost = getContainerHost( config.getClusterName() );
 
-        log.debug( "controllerHost: {}", controllerHost );
-
         execute( controllerHost, Commands.getCreateLogDir() );
 
         appscaleInitCluster( controllerHost, config );
