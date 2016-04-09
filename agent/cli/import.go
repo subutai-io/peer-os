@@ -99,6 +99,7 @@ func download(t templ, kurjun *http.Client) bool {
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 	log.Check(log.FatalLevel, "Creating file "+t.file, err)
 	defer out.Close()
+	log.Info("Downloading " + t.name)
 	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/get?id=" + t.id)
 	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/get?id="+t.id, err)
 	defer response.Body.Close()
