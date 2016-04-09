@@ -40,7 +40,7 @@ public class SystemConfProcessor implements StateLinkProccessor
 
 
     @Override
-    public void proccessStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
     {
         for ( String link : stateLinks )
         {

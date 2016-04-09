@@ -92,7 +92,7 @@ public class HeartbeatProcessor implements Runnable
                     {
                         try
                         {
-                            proccessor.proccessStateLinks( result );
+                            proccessor.processStateLinks( result );
                         }
                         catch ( HubPluginException e )
                         {
