@@ -210,7 +210,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.inputNewUserPassword(password);
         subutaiSteps.inputNewUserConfirmPassword(confirmpassword);
         subutaiSteps.clickOnButtonChooseAll();
-        subutaiSteps.clickOnButtonSave();
+        subutaiSteps.clickOnButtonSaveUser();
     }
 
     @Then("the user should observe a new user")
@@ -345,6 +345,7 @@ public class DefSubutaiStepsThen {
         subutaiSteps.inputOperationName("ls_operation");
         subutaiSteps.inputOperation("ls");
         subutaiSteps.clickOnButtonSave();
+        subutaiSteps.clickOnButtonOk();
     }
 
     @Then("the user should execute the ls opeartion")

@@ -45,6 +45,7 @@ public class PluginsPage extends PageObject {
     public String sikuliButtonAddOperation = "src/test/resources/imgs/buttons/buttonAddOperation.png";
     public String sikuliButtonExecute = "src/test/resources/imgs/buttons/buttonExecute.png";
     public String sikuliButtonUninstall = "src/test/resources/imgs/buttons/buttonUninstall.png";
+    public String sikuliButtonSave = "src/test/resources/imgs/buttons/buttonSave.png";
 
 
     //endregion

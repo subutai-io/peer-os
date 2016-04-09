@@ -171,8 +171,8 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void inputAppScaleEnvironmentName(String appScaleEnvi) {
-        pluginsPage.fieldDomain.type(appScaleEnvi);
+    public void inputAppScaleEnvironmentName(String name) {
+        pluginsPage.fieldEnvironmentName.type(name);
     }
 
     //endregion
@@ -381,7 +381,7 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnButtonOk() throws FindFailed {
+    public void clickOnButtonOkPGP() throws FindFailed {
         screen.click(pgpPlugin.sikuliButtonOk);
         screen.wait(pgpPlugin.sikuliMessageKeyPairSuccessfullyGenerated, 60000);
         screen.click(pgpPlugin.sikuliButtonOk);
@@ -526,7 +526,7 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void clickOnButtonSave() throws FindFailed {
+    public void clickOnButtonSaveUser() throws FindFailed {
         screen.click(userManagementPage.sikuliButtonSaveUser);
     }
 
@@ -688,7 +688,6 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonQuickInstall() throws FindFailed {
         screen.click(pluginsPage.sikuliButtonQuickInstall);
-        waitABit(50000);
     }
 
     @Step
@@ -699,6 +698,17 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonInstall() throws FindFailed {
         screen.click(pluginsPage.sikuliButtonInstall);
+        waitABit(50000);
+    }
+
+    @Step
+    public void clickOnButtonOk() throws FindFailed {
+        screen.click(commonPage.sikuliButtonOk);
+    }
+
+    @Step
+    public void clickOnButtonSave() throws FindFailed {
+        screen.click(pluginsPage.sikuliButtonSave);
     }
     //endregion
 

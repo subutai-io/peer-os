@@ -9,7 +9,10 @@ Scenario: the user should create an Environment
 Given the first user is on the Home page of Subutai
 And the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
-
+When the user clicks on the menu item: Environment
+And the user clicks on the menu item: Environments
+And the user should find template: Master
+And the user creates environment using template: Master
 
 Scenario: the user should install and work with Generic plugin
 When the user clicks on the menu item: Bazaar
