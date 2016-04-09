@@ -127,6 +127,9 @@ public class HostUtil
         public abstract String name();
 
 
+        /**
+         * Returns result of task execution or null if task failed or null result was returned
+         */
         public final R getResult()
         {
             return result;
