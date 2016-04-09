@@ -762,7 +762,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
     {
-        new PeerWebClient( peerInfo, provider ).addReverseProxy( reverseProxyConfig );
+        new EnvironmentWebClient( peerInfo, provider ).addReverseProxy( reverseProxyConfig );
     }
 
 

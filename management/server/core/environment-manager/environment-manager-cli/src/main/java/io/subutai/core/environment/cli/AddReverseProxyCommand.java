@@ -1,4 +1,4 @@
-package io.subutai.core.localpeer.cli;
+package io.subutai.core.environment.cli;
 
 
 import java.io.FileReader;
@@ -11,46 +11,54 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
+import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-@Command( scope = "localpeer", name = "add-reverse-proxy" )
+@Command( scope = "environment", name = "add-reverse-proxy" )
 public class AddReverseProxyCommand extends SubutaiShellCommandSupport
 {
 
-    private LocalPeer localPeer;
+    private EnvironmentManager environmentManager;
 
-    @Argument( index = 0, name = "container-id", multiValued = false, required = true, description = "Container ID" )
+    @Argument( index = 0, name = "environment-id", multiValued = false, required = true, description = "Environment "
+            + "ID" )
+    private String environmentId;
+
+    @Argument( index = 1, name = "container-id", multiValued = false, required = true, description = "Container ID" )
     private String containerId;
 
-    @Argument( index = 1, name = "domain-name", multiValued = false, required = true, description = "Domain name" )
+    @Argument( index = 2, name = "domain-name", multiValued = false, required = true, description = "Domain name" )
     private String domainName;
 
-    @Argument( index = 2, name = "cert-path", multiValued = false, required = false, description = "Path to SSL pem "
+    @Argument( index = 3, name = "cert-path", multiValued = false, required = false, description = "Path to SSL pem "
             + "file" )
     private String certPath;
 
 
-    public AddReverseProxyCommand( final LocalPeer localPeer )
+    public AddReverseProxyCommand( final EnvironmentManager environmentManager )
     {
-        this.localPeer = localPeer;
+        this.environmentManager = environmentManager;
     }
 
 
     @Override
     protected Object doExecute() throws Exception
     {
+        final Environment environment = environmentManager.loadEnvironment( environmentId );
+
         String sslCert = "";
         if ( !StringUtils.isEmpty( certPath ) )
         {
             sslCert = readFile( certPath, Charset.defaultCharset() );
         }
-        final ReverseProxyConfig config = new ReverseProxyConfig( containerId, domainName, sslCert );
-        localPeer.addReverseProxy( config );
+        final ReverseProxyConfig config = new ReverseProxyConfig( environmentId, containerId, domainName, sslCert );
+        environmentManager.addReverseProxy( environment, config );
         return null;
     }
 

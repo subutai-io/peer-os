@@ -525,28 +525,4 @@ public class PeerWebClient
             throw new PeerException( response.readEntity( String.class ) );
         }
     }
-
-
-    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
-    {
-        String path = "/reverseProxy";
-
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.accept( MediaType.APPLICATION_JSON );
-        client.type( MediaType.APPLICATION_JSON );
-        Response response;
-
-        try
-        {
-            response = client.post( reverseProxyConfig );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
-        }
-
-        checkResponse( response );
-    }
 }
