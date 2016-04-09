@@ -39,6 +39,8 @@ import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
+import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
+import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
@@ -152,7 +154,13 @@ public class IntegrationImpl implements Integration
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
-            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
+            AppScaleManager appScaleManager = new AppScaleManager( peerManager );
+
+            AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, appScaleManager );
+
+            heartbeatProcessor.addProccessor( appScaleProcessor );
+
+//            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
             resourceHostConfExecutorService
                     .scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
@@ -196,8 +204,8 @@ public class IntegrationImpl implements Integration
     public void sendHeartbeat() throws HubPluginException
     {
         heartbeatProcessor.sendHeartbeat();
-        resourceHostConfProcessor.sendResourceHostConf();
-        containerEventProcessor.process();
+//        resourceHostConfProcessor.sendResourceHostConf();
+//        containerEventProcessor.process();
     }
 
 
