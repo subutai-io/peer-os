@@ -172,6 +172,8 @@ public class EnvironmentAdapter
 
             peerJson.put( "name", ch.getContainerName() );
 
+            peerJson.put( "hostname", ch.getHostname() );
+
             peerJson.put( "state", ch.getState().toString() );
 
             peerJson.put( "template", ch.getTemplateName() );
