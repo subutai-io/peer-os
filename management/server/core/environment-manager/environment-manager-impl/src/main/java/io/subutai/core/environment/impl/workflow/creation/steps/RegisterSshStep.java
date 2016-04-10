@@ -42,9 +42,14 @@ public class RegisterSshStep
 
         Set<String> userKeys = environment.getSshKeys();
 
-        // We have to exchange SSH keys even if there is a one peer only in an environment.
-        // B/c some plugins (e.g. AppScale) uses passwordless SSH inside a container.
-        exchangeSshKeys( userKeys );
+        if ( hosts.size() > 1 )
+        {
+            exchangeSshKeys( userKeys );
+        }
+        else if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
+        {
+            appendSshKeys( userKeys );
+        }
     }
 
 
