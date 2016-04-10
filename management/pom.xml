@@ -33,6 +33,10 @@
 
   <developers>
     <developer>
+      <id>daliev</id>
+      <name>Dilshat Aliev</name>
+    </developer>
+    <developer>
       <id>akarasulu</id>
       <name>Alex Karasulu</name>
     </developer>
@@ -58,6 +62,12 @@
     <repository>
       <id>MavenCentral</id>
       <name>Maven repository</name>
+      <url>http://central.maven.org/maven2/</url>
+    </repository>
+
+    <repository>
+      <id>MavenCentral2</id>
+      <name>Maven repository 2</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
 

@@ -92,6 +92,7 @@ To build the project, you need to have the following tools:
   sudo add-apt-repository ppa:webupd8team/java
   sudo apt-get update
   sudo apt-get install oracle-java8-installer
+  sudo apt-get install oracle-java8-unlimited-jce-policy
   ```
 
   ###### Setting JAVA_HOME
