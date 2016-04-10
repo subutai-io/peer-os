@@ -12,9 +12,9 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.common.util.PeerUtil;
 
 
 public class RegisterSshStep
@@ -42,14 +42,9 @@ public class RegisterSshStep
 
         Set<String> userKeys = environment.getSshKeys();
 
-        if ( hosts.size() > 1 )
-        {
-            exchangeSshKeys( userKeys );
-        }
-        else if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
-        {
-            appendSshKeys( userKeys );
-        }
+        // We have to exchange SSH keys even if there is a one peer only in an environment.
+        // B/c some plugins (e.g. AppScale) uses passwordless SSH inside a container.
+        exchangeSshKeys( userKeys );
     }
 
 
