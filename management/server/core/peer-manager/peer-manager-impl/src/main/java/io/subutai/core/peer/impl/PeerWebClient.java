@@ -12,24 +12,21 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Containers;
-import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistances;
+import io.subutai.common.protocol.ReverseProxyConfig;
+import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -39,19 +36,20 @@ import io.subutai.common.util.DateTimeParam;
 
 /**
  * Peer REST client
- *
- * TODO throw exception if http code is not 2XX
  */
 public class PeerWebClient
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerWebClient.class );
 
-    private Object provider;
-    private PeerInfo peerInfo;
+    private final Object provider;
+    private final PeerInfo peerInfo;
 
 
     public PeerWebClient( final PeerInfo peerInfo, final Object provider )
     {
+        Preconditions.checkNotNull( peerInfo );
+        Preconditions.checkNotNull( provider );
+
         this.peerInfo = peerInfo;
         this.provider = provider;
     }
@@ -66,50 +64,18 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
+        Response response;
         try
         {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( PeerInfo.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting peer info", e );
+            throw new PeerException( String.format( "Error getting peer info: %s", e.getMessage() ) );
         }
-    }
 
-
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
-    {
-        String path = String.format( "/container/%s/usage/%d", containerId.getId(), pid );
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        try
-        {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( ProcessResourceUsage.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on obtaining process resource usage", e );
-        }
+        return checkResponse( response, PeerInfo.class );
     }
 
 
@@ -117,28 +83,24 @@ public class PeerWebClient
     {
         String path = "/pek";
 
-
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            final Response response = client.post( environmentId );
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( PublicKeyContainer.class );
-            }
+            response = client.post( environmentId );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on creating peer environment key", e );
+            throw new PeerException( String.format( "Error creating peer environment key: %s", e.getMessage() ) );
         }
+
+        return checkResponse( response, PublicKeyContainer.class );
     }
 
 
@@ -146,24 +108,24 @@ public class PeerWebClient
     {
         String path = "/pek";
 
-
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            final Response response = client.put( publicKeyContainer );
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            response = client.put( publicKeyContainer );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on updating  peer environment key", e );
+            throw new PeerException( String.format( "Error updating peer environment key: %s", e.getMessage() ) );
         }
+
+        checkResponse( response );
     }
 
 
@@ -175,115 +137,99 @@ public class PeerWebClient
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( HostInterfaces.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting interfaces", e );
+            throw new PeerException( String.format( "Error getting interfaces: %s", e.getMessage() ) );
         }
+
+        return checkResponse( response, HostInterfaces.class );
     }
 
 
     public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret key" );
-        Preconditions.checkArgument( ttlSeconds > 0, "Invalid time-to-live" );
-
-
         String path = "/p2presetkey";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            final Response response = client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            response = client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error resetting P2P secret key", e );
+            throw new PeerException( String.format( "Error resetting P2P secret key: %s", e.getMessage() ) );
         }
+
+        checkResponse( response );
     }
 
 
     public void joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding remote peer %s to p2p swarm %s ", peerInfo.getId(), config.getHash() ) );
-
         String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
 
+        Response response;
+
         try
         {
-            final Response response = client.post( config );
-
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            response = client.post( config );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error joining P2P swarm", e );
+            throw new PeerException( String.format( "Error joining P2P swarm: %s", e.getMessage() ) );
         }
+
+        checkResponse( response );
     }
 
 
     public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
-        LOG.debug( String.format( "Adding/updating remote peer %s to p2p swarm %s ", peerInfo.getId(),
-                config.getHash() ) );
-
         String path = "/p2ptunnel";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
 
+        Response response;
+
         try
         {
-            final Response response = client.put( config );
-
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            response = client.put( config );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error joining/updating P2P swarm", e );
+            throw new PeerException( String.format( "Error joining/updating P2P swarm: %s", e.getMessage() ) );
         }
+
+        checkResponse( response );
     }
 
 
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {
-        LOG.debug( String.format( "Cleaning up environment: %s", environmentId.getId() ) );
-
         String path = String.format( "/cleanup/%s", environmentId.getId() );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
@@ -291,19 +237,19 @@ public class PeerWebClient
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
+        Response response;
+
         try
         {
-            final Response response = client.delete();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            response = client.delete();
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error cleaning up environment.", e );
+            throw new PeerException( String.format( "Error cleaning up environment: %s", e.getMessage() ) );
         }
+
+        checkResponse( response );
     }
 
 
@@ -312,26 +258,23 @@ public class PeerWebClient
         String path = "/resources";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
+        Response response;
+
         try
         {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( ResourceHostMetrics.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error getting rh metrics", e );
+            throw new PeerException( String.format( "Error getting rh metrics: %s", e.getMessage() ) );
         }
+
+        return checkResponse( response, ResourceHostMetrics.class );
     }
 
 
@@ -340,6 +283,7 @@ public class PeerWebClient
         String path = "/alert";
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
 
@@ -353,7 +297,8 @@ public class PeerWebClient
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on alert", e );
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on alert: %s", e.getMessage() ) );
         }
     }
 
@@ -361,197 +306,158 @@ public class PeerWebClient
     public HistoricalMetrics getHistoricalMetrics( final String hostName, final Date startTime, final Date endTime )
             throws PeerException
     {
+        final DateTimeParam startParam = new DateTimeParam( startTime );
+        final DateTimeParam endParam = new DateTimeParam( endTime );
+
+        String path = String.format( "/hmetrics/%s/%s/%s/%s/%s", hostName, startParam.getDateString(),
+                startParam.getTimeString(), endParam.getDateString(), endParam.getTimeString() );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            final DateTimeParam startParam = new DateTimeParam( startTime );
-            final DateTimeParam endParam = new DateTimeParam( endTime );
-            String path = String.format( "/hmetrics/%s/%s/%s/%s/%s", hostName, startParam.getDateString(),
-                    startParam.getTimeString(), endParam.getDateString(), endParam.getTimeString() );
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( HistoricalMetrics.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on retrieving historical metrics from remote peer", e );
+            LOG.error( e.getMessage(), e );
+            throw new PeerException(
+                    String.format( "Error on retrieving historical metrics from remote peer: %s", e.getMessage() ) );
         }
+
+        return checkResponse( response, HistoricalMetrics.class );
     }
 
 
     public PeerResources getResourceLimits( final String peerId ) throws PeerException
     {
+        String path = String.format( "/limits/%s", peerId );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
+
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            String path = String.format( "/limits/%s", peerId );
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( PeerResources.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on retrieving peer limits.", e );
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on retrieving peer limits: %s", e.getMessage() ) );
         }
-    }
 
-
-    public PingDistances getP2PSwarmDistances( final String p2pHash, final Integer maxAddress ) throws PeerException
-    {
-        Preconditions.checkNotNull( p2pHash );
-        Preconditions.checkNotNull( maxAddress );
-        try
-        {
-            String path = String.format( "/control/%s/%d/distance", p2pHash, maxAddress );
-
-            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( PingDistances.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new PeerException( "Error on getting p2p swarm distances.", e );
-        }
+        return checkResponse( response, PeerResources.class );
     }
 
 
     public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
     {
-        Preconditions.checkNotNull( p2pIps );
-        Preconditions.checkNotNull( environmentId );
+
         String path = String.format( "/tunnels/%s", environmentId );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 60000, 1 );
+
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.TEXT_PLAIN );
-        final Response response = client.post( p2pIps );
-        if ( response.getStatus() == 500 )
+
+        Response response;
+
+        try
         {
-            throw new PeerException( response.readEntity( String.class ) );
+            response = client.post( p2pIps );
         }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error setting up tunnels: %s", e.getMessage() ) );
+        }
+
+        checkResponse( response );
     }
 
 
     public void addPeerEnvironmentPubKey( final String keyId, final String pubKeyRing ) throws PeerException
     {
-        Preconditions.checkNotNull( keyId );
-        Preconditions.checkNotNull( pubKeyRing );
+
         String path = String.format( "/pek/add/%s", keyId );
 
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
-        final Response response = client.post( pubKeyRing );
-        if ( response.getStatus() == 500 )
-        {
-            throw new PeerException( response.readEntity( String.class ) );
-        }
-    }
-
-
-    public HostId getResourceHosIdByContainerId( final ContainerId containerId ) throws PeerException
-    {
-        String path = String.format( "/container/%s/rhId", containerId.getId() );
-        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( HostId.class );
-            }
+            response = client.post( pubKeyRing );
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on obtaining resource host id by container id", e );
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error adding PEK: %s", e.getMessage() ) );
         }
+
+        checkResponse( response );
     }
 
 
     public Containers getEnvironmentContainers( final EnvironmentId environmentId ) throws PeerException
     {
         String path = String.format( "/containers/%s", environmentId.getId() );
+
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
         try
         {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( Containers.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error on obtaining environment containers.", e );
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on obtaining environment containers: %s", e.getMessage() ) );
         }
+
+        return checkResponse( response, Containers.class );
     }
 
 
     public UsedNetworkResources getUsedNetResources() throws PeerException
     {
         String path = "/netresources";
+
         WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
         client.accept( MediaType.APPLICATION_JSON );
 
+        Response response;
+
         try
         {
-            final Response response = client.get();
-            if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( UsedNetworkResources.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
-            throw new PeerException( "Error obtaining reserved network resources", e );
+            LOG.error( e.getMessage(), e );
+            throw new PeerException(
+                    String.format( "Error obtaining reserved network resources: %s", e.getMessage() ) );
         }
+
+        return checkResponse( response, UsedNetworkResources.class );
     }
 
 
@@ -563,11 +469,84 @@ public class PeerWebClient
 
         client.type( MediaType.APPLICATION_JSON );
 
-        final Response response = client.post( networkResource );
+        Response response;
 
-        if ( response.getStatus() == 500 )
+        try
+        {
+            response = client.post( networkResource );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error reserving network resources: %s", e.getMessage() ) );
+        }
+
+        checkResponse( response );
+    }
+
+
+    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
+    {
+        String path = String.format( "/template/%s/get", templateName );
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.accept( MediaType.APPLICATION_JSON );
+
+        Response response;
+
+        try
+        {
+            response = client.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error obtaining template : %s", e.getMessage() ) );
+        }
+
+        return checkResponse( response, TemplateKurjun.class );
+    }
+
+
+    protected <T> T checkResponse( Response response, Class<T> clazz ) throws PeerException
+    {
+
+        checkResponse( response );
+
+        return response.readEntity( clazz );
+    }
+
+
+    protected void checkResponse( Response response ) throws PeerException
+    {
+        if ( response != null && response.getStatus() == 500 )
         {
             throw new PeerException( response.readEntity( String.class ) );
         }
+    }
+
+
+    public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
+    {
+        String path = "/reverseProxy";
+
+        WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+        client.accept( MediaType.APPLICATION_JSON );
+        client.type( MediaType.APPLICATION_JSON );
+        Response response;
+
+        try
+        {
+            response = client.post( reverseProxyConfig );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
+        }
+
+        checkResponse( response );
     }
 }

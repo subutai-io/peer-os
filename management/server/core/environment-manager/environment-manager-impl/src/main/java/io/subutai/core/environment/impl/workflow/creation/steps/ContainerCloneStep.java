@@ -2,6 +2,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
+import com.google.common.collect.Lists;
+
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
@@ -17,6 +20,7 @@ import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
@@ -28,8 +32,8 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.PeerUtil;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerNodeGroupsTask;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -43,10 +47,6 @@ import io.subutai.core.peer.api.PeerManager;
 
 /**
  * Container creation step
- *
- * todo calculate new IP addresses not based on last index but subtracting used container IPs from container subnet
- *
- * see SetupP2PStep for calculation example
  */
 public class ContainerCloneStep
 {
@@ -83,13 +83,21 @@ public class ContainerCloneStep
 
         SubnetUtils cidr = new SubnetUtils( environment.getSubnetCidr() );
 
+        List<String> addresses = Lists.newArrayList( cidr.getInfo().getAllAddresses() );
+
+        //remove gw IP
+        addresses.remove( cidr.getInfo().getLowAddress() );
+
+        //remove already used container IPs
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            addresses.remove( containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() );
+        }
+
         //obtain available ip address count
-        int totalAvailableIpCount = cidr.getInfo().getAddressCount() - 1;//one ip is for gateway
+        int totalAvailableIpCount = addresses.size();
 
-        //subtract already used ip range
-        totalAvailableIpCount -= environment.getLastUsedIpIndex();
-
-        //obtain used ip address count
+        //obtain requested ip address count
         int requestedContainerCount = 0;
 
         for ( Set<Node> nodes : placement.values() )
@@ -107,7 +115,7 @@ public class ContainerCloneStep
 
         PeerUtil<CreateEnvironmentContainerResponseCollector> cloneUtil = new PeerUtil<>();
 
-        int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
+        int currentOffset = 0;
 
         //submit parallel environment part creation tasks across peers
         for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
@@ -116,11 +124,10 @@ public class ContainerCloneStep
 
             cloneUtil.addPeerTask( new PeerUtil.PeerTask<>( peer,
                     new CreatePeerNodeGroupsTask( peer, peerManager.getLocalPeer(), environment,
-                            currentLastUsedIpIndex + 1, peerPlacement.getValue() ) ) );
+                            addresses.subList( currentOffset, currentOffset + peerPlacement.getValue().size() ),
+                            peerPlacement.getValue() ) ) );
 
-            currentLastUsedIpIndex += peerPlacement.getValue().size();
-
-            environment.setLastUsedIpIndex( currentLastUsedIpIndex );
+            currentOffset += peerPlacement.getValue().size();
         }
 
         PeerUtil.PeerTaskResults<CreateEnvironmentContainerResponseCollector> cloneResults =
@@ -203,10 +210,9 @@ public class ContainerCloneStep
                 new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(),
                         cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
                         ContainerHostState.RUNNING );
-        return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
-                cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
-                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(),
-                cloneResponse.getContainerName() );
+        return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateName(),
+                cloneResponse.getTemplateArch(), node.getSshGroupId(), node.getHostsGroupId(), defaultDomain,
+                node.getType(), node.getHostId(), cloneResponse.getContainerName() );
     }
 
 

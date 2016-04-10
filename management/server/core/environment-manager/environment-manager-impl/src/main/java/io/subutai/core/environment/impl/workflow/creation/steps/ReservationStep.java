@@ -19,7 +19,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
-import io.subutai.core.environment.impl.workflow.PeerUtil;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -102,7 +102,7 @@ public class ReservationStep
         }
 
         //calculate free container subnet
-        final String freeContainerSubnet = P2PUtil.findFreeContainerSubnet( allContainerSubnets );
+        final String freeContainerSubnet = P2PUtil.generateContainerSubnet( allContainerSubnets );
 
         if ( freeContainerSubnet == null )
         {
@@ -110,7 +110,7 @@ public class ReservationStep
         }
 
         //calculate free p2p subnet
-        final String freeP2pSubnet = P2PUtil.findFreeP2PSubnet( allP2pSubnets );
+        final String freeP2pSubnet = P2PUtil.generateP2PSubnet( allP2pSubnets );
 
         if ( freeP2pSubnet == null )
         {

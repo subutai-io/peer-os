@@ -1,7 +1,12 @@
 package io.subutai.common.util;
 
 
+import java.util.Random;
 import java.util.Set;
+
+import com.google.common.base.Preconditions;
+
+import io.subutai.common.protocol.Tunnels;
 
 
 /**
@@ -10,59 +15,6 @@ import java.util.Set;
 public abstract class P2PUtil
 {
     public static String P2P_SUBNET_MASK = "255.255.255.0";
-    public static final String P2P_INTERFACE_IP_PATTERN = "^10\\..*";
-
-
-    public static String findFreeP2PSubnet( final Set<String> excludedNetworks )
-    {
-        String result = null;
-        int i = 11;
-        int j = 0;
-
-        while ( result == null && i < 200 )
-        {
-            String s = String.format( "10.%d.%d.0", i, j );
-            if ( !excludedNetworks.contains( s ) )
-            {
-                result = s;
-            }
-
-            j++;
-            if ( j > 254 )
-            {
-                i++;
-                j = 0;
-            }
-        }
-
-        return result;
-    }
-
-
-    public static String findFreeContainerSubnet( final Set<String> excludedNetworks )
-    {
-        String result = null;
-        int i = 168;
-        int j = 1;
-
-        while ( result == null && i < 255 )
-        {
-            String s = String.format( "192.%d.%d.0", i, j );
-            if ( !excludedNetworks.contains( s ) )
-            {
-                result = s;
-            }
-
-            j++;
-            if ( j > 254 )
-            {
-                i++;
-                j = 0;
-            }
-        }
-
-        return result;
-    }
 
 
     public static String generateHash( final String envId )
@@ -74,5 +26,74 @@ public abstract class P2PUtil
     public static String generateInterfaceName( final int vlan )
     {
         return String.format( "p2p-%d", vlan );
+    }
+
+
+    public static String generateContainerSubnet( final Set<String> excludedIPs )
+    {
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        String ip;
+
+        do
+        {
+            ip = String.format( "172.%d.%d.0", generateIntInRange( 16, 31 ), generateIntInRange( 0, 254 ) );
+            currentIteration++;
+        }
+        while ( excludedIPs.contains( ip ) && currentIteration < maxIterations );
+
+        return ip;
+    }
+
+
+    public static String generateP2PSubnet( final Set<String> excludedIPs )
+    {
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        String ip;
+
+        do
+        {
+            ip = String.format( "10.%d.%d.0", generateIntInRange( 11, 254 ), generateIntInRange( 0, 254 ) );
+            currentIteration++;
+        }
+        while ( excludedIPs.contains( ip ) && currentIteration < maxIterations );
+
+        return ip;
+    }
+
+
+    public static String generateTunnelName( Tunnels tunnels )
+    {
+        int maxIterations = 10000;
+        int currentIteration = 0;
+        String name;
+
+
+        do
+        {
+            int n = generateIntInRange( 10000, 99999 );
+            name = String.format( "tunnel-%d", n );
+            currentIteration++;
+        }
+        while ( tunnels.findByName( name ) != null && currentIteration < maxIterations );
+
+        if ( tunnels.findByName( name ) != null )
+        {
+            return null;
+        }
+
+        return name;
+    }
+
+
+    protected static int generateIntInRange( int from, int to )
+    {
+        Preconditions.checkArgument( from < to );
+        Preconditions.checkArgument( to < Integer.MAX_VALUE );
+
+        Random rnd = new Random();
+
+        return from + rnd.nextInt( to + 1 - from );
     }
 }

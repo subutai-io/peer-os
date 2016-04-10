@@ -76,7 +76,6 @@ public class SystemSettings
     }
 
 
-
     public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
     {
         String[] validated = validateGlobalKurjunUrls( urls );
@@ -292,7 +291,7 @@ public class SystemSettings
 
     public static String getPublicUrl()
     {
-        return PROPERTIES.getString( "publicURL", DEFAULT_PUBLIC_URL );
+        return PROPERTIES.getString( "publicURL", DEFAULT_PUBLIC_URL ).toLowerCase();
     }
 
 
@@ -311,7 +310,7 @@ public class SystemSettings
     public static void setPublicUrl( String publicUrl ) throws ConfigurationException
     {
         validatePublicUrl( publicUrl );
-        saveProperty( "publicURL", publicUrl );
+        saveProperty( "publicURL", publicUrl.toLowerCase() );
     }
 
 

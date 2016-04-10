@@ -1,7 +1,5 @@
 package io.subutai.core.bazaar.rest;
 
-import io.subutai.core.hubmanager.api.HubPluginException;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;

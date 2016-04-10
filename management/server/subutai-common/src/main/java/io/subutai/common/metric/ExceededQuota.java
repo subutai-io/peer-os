@@ -1,6 +1,8 @@
 package io.subutai.common.metric;
 
 
+import java.math.BigDecimal;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
@@ -32,26 +34,42 @@ public class ExceededQuota
     @JsonProperty( "resourceType" )
     protected final ContainerResourceType containerResourceType;
     @JsonProperty( "currentValue" )
-    protected final ResourceValue currentValue;
+    protected final NumericValueResource currentValue;
     @JsonProperty( "quotaValue" )
     protected final ResourceValue quotaValue;
+    @JsonProperty( "rhMetrics" )
+    protected ResourceHostMetric resourceHostMetric;
 
 
     public ExceededQuota( @JsonProperty( "hostId" ) final HostId hostId,
                           @JsonProperty( "resourceType" ) final ContainerResourceType containerResourceType,
-                          @JsonProperty( "currentValue" ) final ResourceValue currentValue,
-                          @JsonProperty( "quotaValue" ) final ResourceValue quotaValue )
+                          @JsonProperty( "currentValue" ) final NumericValueResource currentValue,
+                          @JsonProperty( "quotaValue" ) final ResourceValue quotaValue,
+                          @JsonProperty( "rhMetrics" ) final ResourceHostMetric resourceHostMetric )
     {
         this.hostId = hostId;
         this.containerResourceType = containerResourceType;
         this.currentValue = currentValue;
         this.quotaValue = quotaValue;
+        this.resourceHostMetric = resourceHostMetric;
     }
 
 
     public HostId getHostId()
     {
         return hostId;
+    }
+
+
+    public ResourceHostMetric getResourceHostMetric()
+    {
+        return resourceHostMetric;
+    }
+
+
+    public void setResourceHostMetric( final ResourceHostMetric resourceHostMetric )
+    {
+        this.resourceHostMetric = resourceHostMetric;
     }
 
 
@@ -88,10 +106,7 @@ public class ExceededQuota
                     break;
             }
 
-            if ( result != null )
-            {
-                return ( T ) result;
-            }
+            return ( T ) result;
         }
         catch ( Exception e )
         {
@@ -104,7 +119,18 @@ public class ExceededQuota
 
     public double getPercentage()
     {
-        return ( ( ByteValueResource ) currentValue.getValue() ).doubleValue();
+        return currentValue.getValue().doubleValue();
+    }
+
+
+    public BigDecimal getUsedValue()
+    {
+        if ( quotaValue instanceof NumericValueResource )
+        {
+            return ( ( NumericValueResource ) quotaValue ).getValue().multiply( currentValue.getValue() )
+                                                          .multiply( new BigDecimal( 0.01 ) );
+        }
+        throw new UnsupportedOperationException( "Used value unsupported." );
     }
 
 
@@ -160,12 +186,7 @@ public class ExceededQuota
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ResourceAlert{" );
-        sb.append( "hostId=" ).append( hostId );
-        sb.append( ", resourceType=" ).append( containerResourceType );
-        sb.append( ", currentValue=" ).append( currentValue );
-        sb.append( ", quotaValue=" ).append( quotaValue );
-        sb.append( '}' );
-        return sb.toString();
+        return "ResourceAlert{" + "hostId=" + hostId + ", resourceType=" + containerResourceType + ", currentValue="
+                + currentValue + ", quotaValue=" + quotaValue + '}';
     }
 }

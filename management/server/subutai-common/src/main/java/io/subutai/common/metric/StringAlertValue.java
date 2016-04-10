@@ -31,9 +31,6 @@ public class StringAlertValue implements AlertValue
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "StringAlertValue{" );
-        sb.append( "value='" ).append( value ).append( '\'' );
-        sb.append( '}' );
-        return sb.toString();
+        return "StringAlertValue{" + "value='" + value + '\'' + '}';
     }
 }

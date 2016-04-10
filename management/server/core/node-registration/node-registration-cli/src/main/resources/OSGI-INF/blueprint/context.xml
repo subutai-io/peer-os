@@ -8,13 +8,6 @@
     </command>
   </command-bundle>
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="node/deploy">
-      <action class="io.subutai.core.registration.cli.DeployRequest">
-        <argument ref="nodeRegistration" />
-      </action>
-    </command>
-  </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="node/reject">

@@ -58,10 +58,6 @@ public class Disk
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "Disk{" );
-        sb.append( "total=" ).append( total );
-        sb.append( ", used=" ).append( used );
-        sb.append( '}' );
-        return sb.toString();
+        return "Disk{" + "total=" + total + ", used=" + used + '}';
     }
 }

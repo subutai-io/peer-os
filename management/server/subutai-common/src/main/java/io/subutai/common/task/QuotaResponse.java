@@ -48,12 +48,7 @@ public class QuotaResponse implements TaskResponse
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "QuotaResponse{" );
-        sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
-        sb.append( ", hostname='" ).append( hostname ).append( '\'' );
-        sb.append( ", succeeded=" ).append( succeeded );
-        sb.append( ", elapsedTime=" ).append( elapsedTime );
-        sb.append( '}' );
-        return sb.toString();
+        return "QuotaResponse{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
+                + ", succeeded=" + succeeded + ", elapsedTime=" + elapsedTime + '}';
     }
 }

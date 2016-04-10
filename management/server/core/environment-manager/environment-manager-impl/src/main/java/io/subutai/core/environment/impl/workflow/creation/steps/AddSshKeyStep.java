@@ -1,29 +1,24 @@
 package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.Host;
-import io.subutai.common.settings.Common;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.common.util.PeerUtil;
 
 
-//todo move logic to Peer
 public class AddSshKeyStep
 {
     private final String sshKey;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
-    protected CommandUtil commandUtil = new CommandUtil();
 
 
     public AddSshKeyStep( final String sshKey, final EnvironmentImpl environment,
@@ -35,45 +30,52 @@ public class AddSshKeyStep
     }
 
 
-    public void execute() throws EnvironmentManagerException
+    public void execute() throws EnvironmentManagerException, PeerException
     {
 
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
 
-            Set<Host> hosts = Sets.newHashSet();
-            hosts.addAll( environment.getContainerHosts() );
+            PeerUtil<Object> keyUtil = new PeerUtil<>();
 
-            Map<Host, CommandResult> results =
-                    commandUtil.executeParallelSilent( getAppendSshKeyCommand( sshKey ), hosts );
+            Set<Peer> peers = environment.getPeers();
 
-            for ( Host succeededHost : results.keySet() )
+            for ( final Peer peer : peers )
             {
-                trackerOperation.addLog( String.format( "SSH key added to host %s", succeededHost.getHostname() ) );
+                keyUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+                {
+                    @Override
+                    public Object call() throws Exception
+                    {
+                        peer.addSshKey( environment.getEnvironmentId(), sshKey );
+
+                        return null;
+                    }
+                } ) );
             }
 
-            hosts.removeAll( results.keySet() );
+            PeerUtil.PeerTaskResults<Object> keyResults = keyUtil.executeParallel();
 
-            for ( Host failedHost : hosts )
+            for ( PeerUtil.PeerTaskResult keyResult : keyResults.getPeerTaskResults() )
             {
-                trackerOperation
-                        .addLog( String.format( "SSH key addition failed on host %s", failedHost.getHostname() ) );
+                if ( keyResult.hasSucceeded() )
+                {
+                    trackerOperation
+                            .addLog( String.format( "SSH key added on peer %s", keyResult.getPeer().getName() ) );
+                }
+                else
+                {
+                    trackerOperation.addLog( String.format( "SSH key addition failed on peer %s. Reason: %s",
+                            keyResult.getPeer().getName(), keyResult.getFailureReason() ) );
+                }
             }
 
-            if ( !hosts.isEmpty() )
+            if ( keyResults.hasFailures() )
             {
-                throw new EnvironmentManagerException( "Failed to add SSH key to all hosts" );
+                throw new EnvironmentManagerException( "Failed to add SSH key on all peers" );
             }
 
             environment.addSshKey( sshKey );
         }
-    }
-
-
-    public RequestBuilder getAppendSshKeyCommand( String key )
-    {
-        return new RequestBuilder( String.format(
-                "mkdir -p '%1$s' && " + "echo '%3$s' >> '%2$s' && " + "chmod 700 -R '%1$s' && "
-                        + "sort -u '%2$s' -o '%2$s'", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, key ) );
     }
 }

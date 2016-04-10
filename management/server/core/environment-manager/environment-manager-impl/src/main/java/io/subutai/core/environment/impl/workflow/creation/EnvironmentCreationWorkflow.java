@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.creation;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -24,8 +21,6 @@ import io.subutai.core.security.api.SecurityManager;
 
 public class EnvironmentCreationWorkflow extends Workflow<EnvironmentCreationWorkflow.EnvironmentCreationPhase>
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( EnvironmentCreationWorkflow.class );
-
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
     private EnvironmentImpl environment;

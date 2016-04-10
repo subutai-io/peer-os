@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl.request;
 
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +44,9 @@ public class RequestNotifier implements Runnable
     }
 
 
-    protected PeerManager getPeerManager() throws MessageException
+    protected PeerManager getPeerManager()
     {
-        try
-        {
-            return ServiceLocator.getServiceNoCache( PeerManager.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new MessageException( e );
-        }
+        return ServiceLocator.getServiceNoCache( PeerManager.class );
     }
 
 

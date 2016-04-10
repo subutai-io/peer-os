@@ -36,7 +36,6 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.hostregistry.api.HostRegistryException;
 
 
 /**
@@ -231,7 +230,7 @@ public class HostRegistryImpl implements HostRegistry
     }
 
 
-    public void init() throws HostRegistryException
+    public void init()
     {
         hosts = CacheBuilder.newBuilder().
                 expireAfterAccess( HOST_EXPIRATION_SEC, TimeUnit.SECONDS ).

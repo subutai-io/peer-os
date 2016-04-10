@@ -51,6 +51,7 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
@@ -916,10 +917,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             environmentDestructionWorkflow.join();
 
-            if ( environmentDestructionWorkflow.getError() != null )
+            if ( environmentDestructionWorkflow.isFailed() )
             {
                 throw new EnvironmentDestructionException(
-                        exceptionUtil.getRootCause( environmentDestructionWorkflow.getError() ) );
+                        exceptionUtil.getRootCause( environmentDestructionWorkflow.getFailedException() ) );
             }
         }
     }
@@ -1000,10 +1001,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             containerDestructionWorkflow.join();
 
-            if ( containerDestructionWorkflow.getError() != null )
+            if ( containerDestructionWorkflow.isFailed() )
             {
                 throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( containerDestructionWorkflow.getError() ) );
+                        exceptionUtil.getRootCause( containerDestructionWorkflow.getFailedException() ) );
             }
         }
     }
@@ -1830,6 +1831,24 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.error( "Error on stop monitoring", e );
             throw new EnvironmentManagerException( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
+            throws EnvironmentModificationException
+    {
+        try
+        {
+            ContainerHost containerHost = environment.getContainerHostById( reverseProxyConfig.getContainerId() );
+            Peer peer = peerManager.getPeer( containerHost.getPeerId() );
+            peer.addReverseProxy( reverseProxyConfig );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new EnvironmentModificationException( "Error on adding reverse proxy." );
         }
     }
 

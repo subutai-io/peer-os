@@ -57,12 +57,4 @@ public class KeyStoreToolTest
         assertNotNull( bks.resolveJce( "BKS" ) );
         assertNull( bks.resolveJce( "jce" ) );
     }
-
-
-    @Test
-    public void testEnumMsCapiStoreType()
-    {
-        MsCapiStoreType personal = MsCapiStoreType.PERSONAL;
-        assertNotNull( personal.jce() );
-    }
 }

@@ -7,7 +7,7 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.ContainerResource;
+import io.subutai.common.quota.Quota;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
@@ -45,11 +45,11 @@ public class GetContainerQuotaCommand extends SubutaiShellCommandSupport
         }
         else
         {
-            final ContainerQuota quota = targetContainer.getAvailableQuota();
-            for ( ContainerResource resource : quota.getAllResources() )
+            final ContainerQuota containerQuota = targetContainer.getQuota();
+            for ( Quota quota : containerQuota.getAll() )
             {
-                System.out.println(
-                        String.format( "%s\t%s", resource.getContainerResourceType(), resource.getPrintValue() ) );
+                System.out.println( String.format( "%s\t%s", quota.getResource().getContainerResourceType(),
+                        quota.getResource().getPrintValue() ) );
             }
         }
         return null;

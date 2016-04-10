@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -17,8 +14,6 @@ import io.subutai.core.environment.impl.workflow.modification.steps.P2PSecretKey
 public class P2PSecretKeyModificationWorkflow
         extends Workflow<P2PSecretKeyModificationWorkflow.P2PSecretKeyModificationPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( P2PSecretKeyModificationWorkflow.class );
-
     private EnvironmentImpl environment;
     private final String p2pSecretKey;
     private final long p2pSecretKeyTtlSeconds;
@@ -55,7 +50,7 @@ public class P2PSecretKeyModificationWorkflow
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         return P2PSecretKeyModificationPhase.REPLACE_KEY;
     }
@@ -72,7 +67,7 @@ public class P2PSecretKeyModificationWorkflow
                     new P2PCredentials( environment.getP2PHash(), p2pSecretKey, p2pSecretKeyTtlSeconds ),
                     operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return P2PSecretKeyModificationPhase.FINALIZE;
         }
@@ -87,11 +82,9 @@ public class P2PSecretKeyModificationWorkflow
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing P2P secret key modification" );
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         operationTracker.addLogDone( "P2P secret key is modified" );
 
@@ -103,16 +96,18 @@ public class P2PSecretKeyModificationWorkflow
     @Override
     public void fail( final String message, final Throwable e )
     {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( message );
+
         super.fail( message, e );
-        saveFailState();
     }
 
 
-    private void saveFailState()
+    protected void saveEnvironment()
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.update( environment );
-        operationTracker.addLogFailed( getFailedReason() );
-        LOG.error( "Error modifying P2P secret key", getFailedException() );
     }
 }

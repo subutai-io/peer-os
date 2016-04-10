@@ -111,7 +111,6 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "Container id %s", containerHost.getId() ) );
             System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
             System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
-            System.out.println( String.format( "NodeGroup name %s", containerHost.getNodeGroupName() ) );
             System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
             System.out.println( String.format( "IP %s",
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );

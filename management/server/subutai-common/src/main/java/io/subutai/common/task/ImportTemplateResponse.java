@@ -39,11 +39,7 @@ public class ImportTemplateResponse implements TaskResponse
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ImportTemplateResponse{" );
-        sb.append( "resourceHostId='" ).append( resourceHostId ).append( '\'' );
-        sb.append( ", templateName='" ).append( templateName ).append( '\'' );
-        sb.append( ", elapsedTime=" ).append( elapsedTime );
-        sb.append( '}' );
-        return sb.toString();
+        return "ImportTemplateResponse{" + "resourceHostId='" + resourceHostId + '\'' + ", templateName='"
+                + templateName + '\'' + ", elapsedTime=" + elapsedTime + '}';
     }
 }

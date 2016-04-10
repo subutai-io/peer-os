@@ -51,9 +51,6 @@ public class RequestBuilder
     //environment variables
     private Map<String, String> envVars;
 
-    //PID for terminate_request
-    private int pid;
-
 
     private int isDaemon = 0;
 
@@ -199,21 +196,6 @@ public class RequestBuilder
     }
 
 
-    /**
-     * Sets PID of process to terminate. This is actual only for command with type TERMINATE_REQUEST
-     *
-     * @param pid - pid of process to terminate
-     */
-    public RequestBuilder withPid( int pid )
-    {
-        Preconditions.checkArgument( pid > 0, "PID is less then or equal to 0" );
-
-        this.pid = pid;
-
-        return this;
-    }
-
-
     public RequestBuilder daemon()
     {
         this.isDaemon = 1;
@@ -225,7 +207,7 @@ public class RequestBuilder
     public Request build( String id )
     {
         return new RequestImpl( type, id, cwd, command, cmdArgs, envVars, outputRedirection, errRedirection, runAs,
-                timeout, isDaemon, pid );
+                timeout, isDaemon );
     }
 
 
@@ -243,10 +225,6 @@ public class RequestBuilder
 
         final RequestBuilder that = ( RequestBuilder ) o;
 
-        if ( pid != that.pid )
-        {
-            return false;
-        }
         if ( cmdArgs != null ? !cmdArgs.equals( that.cmdArgs ) : that.cmdArgs != null )
         {
             return false;
@@ -296,7 +274,6 @@ public class RequestBuilder
         result = 31 * result + ( runAs != null ? runAs.hashCode() : 0 );
         result = 31 * result + ( cmdArgs != null ? cmdArgs.hashCode() : 0 );
         result = 31 * result + ( envVars != null ? envVars.hashCode() : 0 );
-        result = 31 * result + pid;
         return result;
     }
 
@@ -315,16 +292,15 @@ public class RequestBuilder
         private String runAs;
         private Integer timeout;
         private Integer isDaemon;
-        private Integer pid;
 
 
         public RequestImpl( final RequestType type, final String id, final String workingDirectory,
                             final String command, final List<String> args, final Map<String, String> environment,
                             final OutputRedirection stdOut, final OutputRedirection stdErr, final String runAs,
-                            final Integer timeout, final Integer isDaemon, final int pid )
+                            final Integer timeout, final Integer isDaemon )
         {
             this( type, id, UUID.randomUUID(), workingDirectory, command, args, environment, stdOut, stdErr, runAs,
-                    timeout, isDaemon, pid );
+                    timeout, isDaemon );
         }
 
 
@@ -332,7 +308,7 @@ public class RequestBuilder
                             final String workingDirectory, final String command, final List<String> args,
                             final Map<String, String> environment, final OutputRedirection stdOut,
                             final OutputRedirection stdErr, final String runAs, final Integer timeout,
-                            final Integer isDaemon, final int pid )
+                            final Integer isDaemon )
         {
             this.type = type;
             this.id = id;
@@ -346,7 +322,6 @@ public class RequestBuilder
             this.runAs = runAs;
             this.timeout = timeout;
             this.isDaemon = isDaemon;
-            this.pid = pid;
         }
 
 
@@ -431,13 +406,6 @@ public class RequestBuilder
         public Integer isDaemon()
         {
             return isDaemon;
-        }
-
-
-        @Override
-        public Integer getPid()
-        {
-            return pid;
         }
 
 

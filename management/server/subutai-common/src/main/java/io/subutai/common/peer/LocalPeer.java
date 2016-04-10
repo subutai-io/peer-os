@@ -22,7 +22,7 @@ public interface LocalPeer extends Peer
     /**
      * Returns external IP of mgmt host
      */
-    String getExternalIp() throws PeerException;
+    String getExternalIp();
 
 
     /**
@@ -147,7 +147,7 @@ public interface LocalPeer extends Peer
 
     TemplateKurjun getTemplateByName( String templateName );
 
-    ContainerHost findContainerById( ContainerId containerId );
+    ContainerHost findContainerById( String containerId );
 
     int setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
 

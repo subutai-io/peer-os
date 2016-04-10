@@ -5,5 +5,5 @@ package io.subutai.common.security.crypto.key;
  * 
  */
 public enum EncryptionType {
-	ENCRYPTED(), UNENCRYPTED();
+	ENCRYPTED(), UNENCRYPTED()
 }

@@ -26,8 +26,6 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
 
     EnvironmentId getEnvironmentId();
 
-    String getNodeGroupName();
-
     void dispose() throws PeerException;
 
     void start() throws PeerException;
@@ -77,7 +75,6 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
      *
      * @return quota value
      */
-    ContainerQuota getAvailableQuota() throws PeerException;
 
     /**
      * Returns current quota values
@@ -91,5 +88,5 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
      */
     void setQuota( ContainerQuota containerQuota ) throws PeerException;
 
-    public HostId getResourceHostId() throws PeerException;
+    public HostId getResourceHostId();
 }

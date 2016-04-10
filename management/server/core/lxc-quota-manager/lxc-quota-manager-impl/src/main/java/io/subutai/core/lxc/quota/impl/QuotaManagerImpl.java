@@ -13,6 +13,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.ContainerResource;
 import io.subutai.common.quota.ContainerResourceFactory;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.CpuResource;
@@ -48,7 +50,6 @@ import io.subutai.common.resource.ResourceValueParser;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.lxc.quota.impl.dao.QuotaDataService;
-import io.subutai.core.lxc.quota.impl.entity.QuotaEntity;
 import io.subutai.core.lxc.quota.impl.parser.CommonResourceValueParser;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -68,6 +69,7 @@ public class QuotaManagerImpl implements QuotaManager
     private String defaultQuota;
     private DaoManager daoManager;
     private QuotaDataService quotaDataService;
+    private ObjectMapper mapper = new ObjectMapper();
 
 
     public QuotaManagerImpl( PeerManager peerManager, LocalPeer localPeer, DaoManager daoManager )
@@ -114,28 +116,28 @@ public class QuotaManagerImpl implements QuotaManager
                 final ContainerQuota quota = new ContainerQuota();
 
                 ResourceValueParser quotaParser = getResourceValueParser( ContainerResourceType.RAM );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.RAM, quotaParser.parse( quotas[0] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.RAM, quotaParser.parse( quotas[0] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.CPU );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.CPU, quotaParser.parse( quotas[1] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.CPU, quotaParser.parse( quotas[1] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.OPT );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.OPT, quotaParser.parse( quotas[2] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.OPT, quotaParser.parse( quotas[2] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.HOME );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.HOME, quotaParser.parse( quotas[3] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.HOME, quotaParser.parse( quotas[3] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.VAR );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.VAR, quotaParser.parse( quotas[4] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.VAR, quotaParser.parse( quotas[4] ) ), 0 ) );
 
                 quotaParser = getResourceValueParser( ContainerResourceType.ROOTFS );
-                quota.addResource( ContainerResourceFactory
-                        .createContainerResource( ContainerResourceType.ROOTFS, quotaParser.parse( quotas[5] ) ) );
+                quota.add( new Quota( ContainerResourceFactory
+                        .createContainerResource( ContainerResourceType.ROOTFS, quotaParser.parse( quotas[5] ) ), 0 ) );
 
                 containerQuotas.put( containerSize, quota );
 
@@ -282,12 +284,14 @@ public class QuotaManagerImpl implements QuotaManager
 
             try
             {
+                QuotaOutput quotaOutput = mapper.readValue( result.getStdOut(), QuotaOutput.class );
                 ResourceValue resourceValue =
-                        CommonResourceValueParser.parse( result.getStdOut(), containerResourceType );
+                        CommonResourceValueParser.parse( quotaOutput.getQuota(), containerResourceType );
+
 
                 ContainerResource containerResource =
                         ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-                containerQuota.addResource( containerResource );
+                containerQuota.add( new Quota( containerResource, quotaOutput.getThreshold() ) );
             }
             catch ( Exception e )
             {
@@ -305,57 +309,26 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
-
-        for ( ContainerResource containerResource : containerQuota.getAllResources() )
+        for ( Quota quota : containerQuota.getAll() )
         {
-            executeOnContainersResourceHost( containerId,
-                    commands.getWriteQuotaCommand( containerId.getHostName(), containerResource ) );
+            final Integer threshold = quota.getThreshold();
+            if ( threshold != null && threshold >= 0 && threshold <= 100 && quota.getResource() != null )
+            {
+                executeOnContainersResourceHost( containerId,
+                        commands.getWriteQuotaCommand( containerId.getHostName(), quota.getResource(), threshold ) );
+            }
+            else
+            {
+                LOGGER.warn( "Invalid quota.", quota );
+            }
         }
-
-        QuotaEntity entity = new QuotaEntity( containerId.getPeerId().getId(), containerId.getEnvironmentId().getId(),
-                containerId.getId(), containerQuota.getCpu().getResource().getValue(),
-                containerQuota.getRam().getResource().getValue(), containerQuota.getRootfs().getResource().getValue(),
-                containerQuota.getHome().getResource().getValue(), containerQuota.getOpt().getResource().getValue(),
-                containerQuota.getVar().getResource().getValue() );
-
-        quotaDataService.saveOrUpdate( entity );
     }
 
 
     @Override
     public void removeQuota( final ContainerId containerId )
     {
-        quotaDataService.remove( containerId.getId() );
-    }
-
-
-    @Override
-    public ContainerQuota getAvailableQuota( final ContainerId containerId ) throws QuotaException
-    {
-        Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
-
-        ContainerQuota containerQuota = new ContainerQuota();
-        for ( ContainerResourceType containerResourceType : ContainerResourceType.values() )
-        {
-            CommandResult result = executeOnContainersResourceHost( containerId,
-                    commands.getReadAvailableQuotaCommand( containerId.getHostName(), containerResourceType ) );
-
-            try
-            {
-                ResourceValue resourceValue =
-                        CommonResourceValueParser.parse( result.getStdOut(), containerResourceType );
-
-                ContainerResource containerResource =
-                        ContainerResourceFactory.createContainerResource( containerResourceType, resourceValue );
-                containerQuota.addResource( containerResource );
-            }
-            catch ( Exception e )
-            {
-                LOGGER.error( e.getMessage(), e );
-            }
-        }
-
-        return containerQuota;
+        //no-op
     }
 
 

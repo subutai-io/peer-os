@@ -6,9 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.security.crypto.certificate.AccessMethodType;
-import io.subutai.common.security.crypto.certificate.CertificateData;
-
 import static org.junit.Assert.assertNotNull;
 
 
@@ -42,16 +39,5 @@ public class CertificateDataTest
         assertNotNull( certificateData.getOrganizationName() );
         assertNotNull( certificateData.getOrganizationUnit() );
         assertNotNull( certificateData.getState() );
-    }
-
-
-    @Test
-    public void testEnumAccessMethodType()
-    {
-        AccessMethodType ocsp = AccessMethodType.OCSP;
-        ocsp.friendly();
-        ocsp.oid();
-        ocsp.resolveOid( "OCSP" );
-        ocsp.resolveOid( "1.3.6.1.5.5.7.48.1" );
     }
 }

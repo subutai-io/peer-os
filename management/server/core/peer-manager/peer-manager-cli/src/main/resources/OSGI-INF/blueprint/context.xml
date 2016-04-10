@@ -65,14 +65,6 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/distances">
-      <action class="io.subutai.core.peer.cli.GetP2PSwarmDistancesCommand">
-        <property name="peerManager" ref="peerManager" />
-      </action>
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="peer/set-public-url">
       <action class="io.subutai.core.peer.cli.SetPublicUrlCommand">
         <argument ref="peerManager" />

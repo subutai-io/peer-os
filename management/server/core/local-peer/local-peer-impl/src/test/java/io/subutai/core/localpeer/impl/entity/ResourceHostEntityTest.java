@@ -4,8 +4,6 @@ package io.subutai.core.localpeer.impl.entity;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.junit.Before;
@@ -53,15 +51,10 @@ public class ResourceHostEntityTest
     private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_HOST_ID = UUID.randomUUID().toString();
     private static final String CONTAINER_HOST_NAME = "hostname";
-    private static final String TEMPLATE_NAME = "master";
-    private static final String ENV_ID = "123";
-    private static final int VLAN = 100;
-    private static final int TIMEOUT = 120;
     private static final String HOSTNAME = "hostname";
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1/24";
-    private static final String MAC = "mac";
     private static final String CONTAINER_STATUS_STARTED =
             "NAME                               STATE    HWADDR             IP" + "            Interface\n" +
                     "---------------------------------\n"
@@ -72,8 +65,6 @@ public class ResourceHostEntityTest
                     + "qwer                               STOPPED  00:16:3e:83:2c:2e  192.168.22.5  eth0";
     @Mock
     ContainerHostEntity containerHost;
-    @Mock
-    ExecutorService singleThreadExecutorService;
     @Mock
     Monitor monitor;
     @Mock
@@ -122,13 +113,11 @@ public class ResourceHostEntityTest
         //        resourceHostEntity.setMonitor( monitor );
         resourceHostEntity.setRegistry( registry );
         resourceHostEntity.setPeer( peer );
-        resourceHostEntity.singleThreadExecutorService = singleThreadExecutorService;
         resourceHostEntity.commandUtil = commandUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
         when( containerHost.getHostname() ).thenReturn( CONTAINER_HOST_NAME );
         when( commandUtil.execute( any( RequestBuilder.class ), eq( resourceHostEntity ) ) )
                 .thenReturn( commandResult );
-        when( singleThreadExecutorService.submit( any( Callable.class ) ) ).thenReturn( future );
     }
 
 
@@ -137,18 +126,6 @@ public class ResourceHostEntityTest
     {
         resourceHostEntity.init();
         resourceHostEntity.dispose();
-
-        verify( singleThreadExecutorService ).shutdown();
-        verify( singleThreadExecutorService ).shutdown();
-    }
-
-
-    @Test
-    public void testQueueSequentialTask() throws Exception
-    {
-        resourceHostEntity.queueSequentialTask( callable );
-
-        verify( singleThreadExecutorService ).submit( callable );
     }
 
 
@@ -310,10 +287,7 @@ public class ResourceHostEntityTest
 
         resourceHostEntity.destroyContainerHost( containerHost );
 
-        verify( future ).get();
-
-        doThrow( new ExecutionException( null ) ).when( future ).get();
-
+        verify( commandUtil, atLeastOnce() ).execute( any( RequestBuilder.class ), eq( resourceHostEntity ) );
 
         resourceHostEntity.destroyContainerHost( containerHost );
     }
@@ -357,48 +331,6 @@ public class ResourceHostEntityTest
         ContainerHost containerHost1 = resourceHostEntity.getContainerHostById( CONTAINER_HOST_ID );
 
         assertEquals( containerHost, containerHost1 );
-    }
-
-
-    @Test( expected = ResourceHostException.class )
-    public void testCreateContainer() throws Exception
-    {
-
-
-        try
-        {
-            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
-            fail( "Expected HostNotFoundException" );
-        }
-        catch ( ResourceHostException e )
-        {
-        }
-
-
-        when( registry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
-        resourceHostEntity.addContainerHost( containerHost );
-
-
-        try
-        {
-            resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
-            fail( "Expected HostNotFoundException" );
-        }
-        catch ( ResourceHostException e )
-        {
-        }
-
-        resourceHostEntity.removeContainerHost( containerHost );
-
-
-        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
-
-        verify( future ).get();
-
-        doThrow( new ExecutionException( null ) ).when( future ).get();
-
-
-        resourceHostEntity.createContainer( TEMPLATE_NAME, HOSTNAME, quota, IP, VLAN, TIMEOUT, ENV_ID );
     }
 }
 

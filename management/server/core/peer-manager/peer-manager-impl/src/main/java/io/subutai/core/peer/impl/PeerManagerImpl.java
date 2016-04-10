@@ -12,14 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.time.DateUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInterface;
@@ -47,7 +43,6 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
-import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.objects.TokenType;
@@ -101,15 +96,20 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService localIpSetter;
 
-    private String controlNetwork;
-    private long controlNetworkTtl = 0;
-    private PingDistances distances;
-
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
                             MessageResponseListener messageResponseListener, SecurityManager securityManager,
                             TemplateManager templateManager, IdentityManager identityManager, Object provider )
     {
+        Preconditions.checkNotNull( messenger );
+        Preconditions.checkNotNull( localPeer );
+        Preconditions.checkNotNull( daoManager );
+        Preconditions.checkNotNull( messageResponseListener );
+        Preconditions.checkNotNull( securityManager );
+        Preconditions.checkNotNull( templateManager );
+        Preconditions.checkNotNull( identityManager );
+        Preconditions.checkNotNull( provider );
+
         this.messenger = messenger;
         this.localPeer = localPeer;
         this.daoManager = daoManager;
@@ -121,12 +121,10 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         commandResponseListener = new CommandResponseListener();
         localPeer.addRequestListener( commandResponseListener );
         registrationClient = new RegistrationClientImpl( provider );
-        localIpSetter = Executors.newSingleThreadScheduledExecutor();
-        localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 1, 1, TimeUnit.SECONDS );
     }
 
 
-    public void init() throws PeerException
+    public void init()
     {
         try
         {
@@ -153,6 +151,9 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 Peer peer = constructPeerPojo( peerData );
                 addPeerToRegistry( peer );
             }
+
+            localIpSetter = Executors.newSingleThreadScheduledExecutor();
+            localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 1, 1, TimeUnit.SECONDS );
         }
         catch ( Exception e )
         {
@@ -288,7 +289,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    protected void addPeerToRegistry( final Peer peer ) throws PeerException
+    protected void addPeerToRegistry( final Peer peer )
     {
         Preconditions.checkNotNull( peer, "Peer could not be null." );
 
@@ -357,7 +358,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    //TODO:Remove x509 cert from keystore
     private void unregister( final RegistrationData registrationData ) throws PeerException
     {
 
@@ -367,12 +367,17 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             throw new PeerException( "Could not unregister peer." );
         }
 
-        //*********Remove Security Relationship  ****************************
-        securityManager.getKeyManager().removePublicKeyRing( registrationData.getPeerInfo().getId() );
-        //*******************************************************************
-
         try
         {
+            //*********Remove Security Relationship  ****************************
+            securityManager.getKeyManager().removePublicKeyRing( registrationData.getPeerInfo().getId() );
+            //*******************************************************************
+
+            securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(),
+                    registrationData.getPeerInfo().getId() );
+
+            securityManager.getHttpContextManager().reloadKeyStore();
+
             templateManager.removeRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             SystemSettings.getSecurePortX1() ) ) );
@@ -468,7 +473,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     {
         try
         {
-            PeerInfo p = getRemotePeerInfo( registrationData.getPeerInfo().getPublicUrl() );
+            getRemotePeerInfo( registrationData.getPeerInfo().getPublicUrl() );
         }
         catch ( PeerException e )
         {
@@ -614,8 +619,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 }
                 break;
             case UNREGISTERED:
-                String ip =
-                        securityManager.getKeyStoreManager().exportCertificate( SystemSettings.getSecurePortX2(), "" );
                 try
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
@@ -738,6 +741,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         }
 
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
         try
         {
             RegistrationData response = buildRegistrationData( keyPhrase, RegistrationStatus.APPROVED );
@@ -749,6 +753,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
+
             securityManager.getKeyManager().getRemoteHostPublicKey( request.getPeerInfo() );
         }
         catch ( Exception e )
@@ -824,7 +829,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 {
                     r.add( new RegistrationData( peer.getPeerInfo(), RegistrationStatus.APPROVED ) );
                 }
-                catch ( PeerException e )
+                catch ( Exception e )
                 {
                     LOG.warn( String.format( "Could not get peer info from %s. %s", peer.getId(), e.getMessage() ) );
                 }
@@ -879,7 +884,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             }
         }
 
-        return new PeerGroupResources( resources, getP2PSwarmDistances() );
+        return new PeerGroupResources( resources );
     }
 
 
@@ -1025,66 +1030,38 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
 
     @Override
-    public PingDistances getP2PSwarmDistances()
-    {
-        if ( distances != null )
-        {
-            return distances;
-        }
-
-        distances = new PingDistances();
-
-        final List<Peer> peers = getPeers();
-        ExecutorService pool = Executors.newFixedThreadPool( peers.size() );
-        ExecutorCompletionService<PingDistances> completionService = new ExecutorCompletionService<>( pool );
-        for ( Peer peer : peers )
-        {
-            completionService.submit( new P2PSwarmDistanceTask( peer ) );
-        }
-
-        pool.shutdown();
-
-        for ( int i = 0; i < peers.size(); i++ )
-        {
-            try
-            {
-                final Future<PingDistances> f = completionService.take();
-                PingDistances r = f.get();
-                distances.addAll( r.getAll() );
-            }
-            catch ( ExecutionException | InterruptedException e )
-            {
-                LOG.warn( "Could not get distances : " + e.getMessage() );
-            }
-        }
-        return distances;
-    }
-
-
-    @Override
     public void setPublicUrl( final String peerId, final String publicUrl, final int securePort ) throws PeerException
     {
-        Preconditions.checkNotNull( peerId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( publicUrl ) );
+        Preconditions.checkArgument( securePort > 0 );
 
         PeerData peerData = peerDataService.find( peerId );
+
         if ( peerData == null )
         {
             throw new PeerException( "Peer not found." );
         }
+
         try
         {
+
             PeerInfo peerInfo = fromJson( peerData.getInfo(), PeerInfo.class );
-            peerInfo.setPublicUrl( publicUrl );
+
+            peerInfo.setPublicUrl( publicUrl.toLowerCase() );
             peerInfo.setPublicSecurePort( securePort );
             peerData.setInfo( toJson( peerInfo ) );
+
             peerDataService.saveOrUpdate( peerData );
+
             Peer peer = constructPeerPojo( peerData );
             addPeerToRegistry( peer );
+
             //update settings
             if ( getLocalPeer().getId().equalsIgnoreCase( peerId ) )
             {
-                SystemSettings.setPublicUrl( publicUrl );
-                SystemSettings.setPublicSecurePort( securePort );
+                SystemSettings.setPublicUrl( peerInfo.getPublicUrl() );
+                SystemSettings.setPublicSecurePort( peerInfo.getPublicSecurePort() );
             }
         }
         catch ( Exception e )
@@ -1100,7 +1077,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         try
         {
             if ( localPeer.getPeerInfo().getPublicSecurePort() != SystemSettings.getPublicSecurePort() || !localPeer
-                    .getPeerInfo().getPublicUrl().equalsIgnoreCase( SystemSettings.getPublicUrl() ) )
+                    .getPeerInfo().getPublicUrl().equals( SystemSettings.getPublicUrl() ) )
             {
                 //modify local peer info
                 localPeer.getPeerInfo().setPublicUrl( SystemSettings.getPublicUrl() );
@@ -1115,25 +1092,6 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         catch ( Exception e )
         {
             LOG.error( "Error updating local peer info", e );
-        }
-    }
-
-
-    private class P2PSwarmDistanceTask implements Callable<PingDistances>
-    {
-        private Peer peer;
-
-
-        public P2PSwarmDistanceTask( final Peer peer )
-        {
-            this.peer = peer;
-        }
-
-
-        @Override
-        public PingDistances call() throws Exception
-        {
-            return peer.getP2PSwarmDistances( getLocalPeer().getId(), getMaxOrder() );
         }
     }
 
@@ -1156,6 +1114,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             {
                 if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
                 {
+                    //local peer ip is default, obtain lan ip from MH and set it as local peer ip
                     HostInterface externalInterface =
                             localPeer.getManagementHost().getInterfaceByName( SystemSettings.getExternalIpInterface() );
 
@@ -1171,7 +1130,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
                     //update db
                     PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-                    peerData.setInfo( toJson(  localPeer.getPeerInfo() ) );
+                    peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
                     updatePeerData( peerData );
 
                     //modify settings
@@ -1181,6 +1140,24 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 }
                 else
                 {
+                    if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( SystemSettings.getPublicUrl() )
+                            && !SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
+                    {
+                        //probably config file was overwritten by deb installation
+                        //restore public url setting
+                        SystemSettings.setPublicUrl( localPeer.getPeerInfo().getPublicUrl() );
+                    }
+
+                    if ( SystemSettings.DEFAULT_PUBLIC_SECURE_PORT == SystemSettings.getPublicSecurePort()
+                            && SystemSettings.DEFAULT_PUBLIC_SECURE_PORT != localPeer.getPeerInfo()
+                                                                                     .getPublicSecurePort() )
+                    {
+
+                        //probably config file was overwritten by deb installation
+                        //restore public secure port setting
+                        SystemSettings.setPublicSecurePort( localPeer.getPeerInfo().getPublicSecurePort() );
+                    }
+
                     localIpSetter.shutdown();
                 }
             }
