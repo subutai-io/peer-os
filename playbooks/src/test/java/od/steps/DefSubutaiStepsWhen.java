@@ -125,6 +125,18 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.waitFor(5000);
     }
 
+    @When("the user creates environment with 3 containers using template: Master")
+    public void user_creates_environment_with_3_containers() throws FindFailed {
+        subutaiSteps.clickOnIconTemplateMaster();
+        subutaiSteps.clickOnIconTemplateMaster();
+        subutaiSteps.clickOnIconTemplateMaster();
+        subutaiSteps.clickOnButtonApply();
+        subutaiSteps.inputEnvironmentName("Test Envi Master 3");
+        subutaiSteps.clickOnButtonBuild();
+        subutaiSteps.clickOnButtonCloseBuildPopup();
+        subutaiSteps.waitFor(5000);
+    }
+
     @When("the user clicks on the upper menu item: Register Peer")
     public void user_click_on_upper_menu_item() throws FindFailed {
         subutaiSteps.clickOnUpperMenuItemRegisterPeer();
@@ -300,5 +312,27 @@ public class DefSubutaiStepsWhen {
     @When("the user clicks on the buton: Quick install")
     public void user_clicks_button_quick_install() throws FindFailed {
         subutaiSteps.clickOnButtonQuickInstall();
+    }
+
+    @When("the user should do container: check")
+    public void user_check_container() throws FindFailed {
+        subutaiSteps.clickOnButtonCheck();
+    }
+
+    @When("the user should do container: stop")
+    public void user_stop_container() throws FindFailed {
+        subutaiSteps.clickOnButtonStop();
+    }
+
+    @When("the user should do container: start")
+    public void user_start_container() throws FindFailed {
+        subutaiSteps.clickOnButtonStart();
+    }
+
+    @When("the user removes one container")
+    public void user_removes_container() throws FindFailed {
+        subutaiSteps.clickOnButtonRemove();
+        subutaiSteps.clickOnButtonDestroy();
+        subutaiSteps.clickOnButtonOk();
     }
 }

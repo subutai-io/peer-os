@@ -387,4 +387,14 @@ public class DefSubutaiStepsThen {
         subutaiSteps.inputDomain("test.ai");
         subutaiSteps.clickOnButtonInstall();
     }
+
+    @Then("the user should observe 3 containers")
+    public void user_observe_three_containers(){
+        subutaiSteps.userShouldObserveThreeContainers();
+    }
+
+    @Then("the user should observe 2 containers")
+    public void user_observe_2_containers(){
+        subutaiSteps.userShouldObserveTwoContainers();
+    }
 }

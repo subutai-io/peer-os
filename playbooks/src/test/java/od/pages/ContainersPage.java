@@ -12,6 +12,14 @@ public class ContainersPage extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
+    public String sikuliButtonCheck = "src/test/resources/imgs/buttons/buttonCheck.png";
+    public String sikuliButtonStop = "src/test/resources/imgs/buttons/buttonStop.png";
+    public String sikuliButtonStart = "src/test/resources/imgs/buttons/buttonStart.png";
+    public String sikuliButtonRemove = "src/test/resources/imgs/buttons/buttonDestroyContainer.png";
+    public String sikuliButtonDestroy = "src/test/resources/imgs/buttons/buttonDestroy.png";
+
+
+
     //endregion
 
     //region WEB ELEMENTS: Checkboxes
@@ -23,6 +31,12 @@ public class ContainersPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Tables
+
+    @FindBy(xpath = "*//span[contains(text(),\"3\")]")
+    public WebElementFacade containersThree;
+
+    @FindBy(xpath = "*//span[contains(text(),\"3\")]")
+    public WebElementFacade containersTwo;
 
     //endregion
 

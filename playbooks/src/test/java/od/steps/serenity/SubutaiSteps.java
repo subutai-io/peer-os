@@ -710,6 +710,32 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnButtonSave() throws FindFailed {
         screen.click(pluginsPage.sikuliButtonSave);
     }
+
+    @Step
+    public void clickOnButtonCheck() throws FindFailed {
+        screen.click(containersPage.sikuliButtonCheck);
+    }
+
+    @Step
+    public void clickOnButtonStop() throws FindFailed {
+        screen.click(containersPage.sikuliButtonStop);
+    }
+
+    @Step
+    public void clickOnButtonRemove() throws FindFailed {
+        screen.click(containersPage.sikuliButtonRemove);
+    }
+
+    @Step
+    public void clickOnButtonDestroy() throws FindFailed {
+        screen.click(containersPage.sikuliButtonDestroy);
+    }
+
+    @Step
+    public void clickOnButtonStart() throws FindFailed {
+        screen.click(containersPage.sikuliButtonStart);
+        waitABit(4000);
+    }
     //endregion
 
     //region Action: Drag And Drop
@@ -1061,6 +1087,17 @@ public class SubutaiSteps extends ScenarioSteps {
     public void userShouldObserveButtonConsole() {
         assertThat(pluginsPage.buttonConsole.isVisible(), is(true));
     }
+
+    @Step
+    public void userShouldObserveThreeContainers() {
+        assertThat(containersPage.containersThree.isVisible(), is(true));
+    }
+
+    @Step
+    public void userShouldObserveTwoContainers() {
+        assertThat(containersPage.containersTwo.isVisible(), is(true));
+    }
+
     //endregion
 
 
