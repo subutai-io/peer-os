@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,8 +13,6 @@ import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +21,6 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ReservedNetworkResources;
