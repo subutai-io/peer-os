@@ -15,19 +15,19 @@ public class ReverseProxyConfig
     private String containerId;
     @JsonProperty( "domainName" )
     private String domainName;
-    @JsonProperty( "sslCert" )
-    private String sslCert;
+    @JsonProperty( "sslCertPath" )
+    private String sslCertPath;
 
 
     public ReverseProxyConfig( @JsonProperty( "environmentId" ) final String environmentId,
                                @JsonProperty( "containerId" ) final String containerId,
                                @JsonProperty( "domainName" ) final String domainName,
-                               @JsonProperty( "sslCert" ) final String sslCert )
+                               @JsonProperty( "sslCertPath" ) final String sslCertPath )
     {
         this.environmentId = environmentId;
         this.containerId = containerId;
         this.domainName = domainName;
-        this.sslCert = sslCert;
+        this.sslCertPath = sslCertPath;
     }
 
 
@@ -49,8 +49,8 @@ public class ReverseProxyConfig
     }
 
 
-    public String getSslCert()
+    public String getSslCertPath()
     {
-        return sslCert;
+        return sslCertPath;
     }
 }

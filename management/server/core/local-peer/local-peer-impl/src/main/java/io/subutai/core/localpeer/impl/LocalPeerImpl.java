@@ -52,6 +52,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
@@ -2237,30 +2238,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         final HostInterface netInterface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
-        if ( netInterface == null )
+        if ( netInterface instanceof NullHostInterface )
         {
             throw new PeerException( "Container network interface is null." );
         }
 
-        ResourceHost resourceHost = getResourceHostByContainerId( containerHost.getId() );
-
         try
         {
-            String sslPath = "/etc/nginx/ssl.pem";
-            if ( !StringUtils.isEmpty( reverseProxyConfig.getSslCert() ) )
-            {
-                sslPath = String.format( "/etc/ssl/certs/%s.pem", reverseProxyConfig.getDomainName() );
-                containerHost.execute( new RequestBuilder(
-                        String.format( "echo '%s' > %s", reverseProxyConfig.getSslCert(), sslPath ) ) );
-            }
-            resourceHost.execute( new RequestBuilder( "subutai proxy del " + networkResource.getVlan() + " -d" ) );
-            resourceHost.execute( new RequestBuilder(
-                    String.format( "subutai proxy add %d -d \"*.%s\" -f /mnt/lib/lxc/%s/rootfs%s",
-                            networkResource.getVlan(), reverseProxyConfig.getDomainName(), containerHost.getHostname(),
-                            sslPath ) ) );
-
-            resourceHost.execute( new RequestBuilder( "subutai proxy add " + networkResource.getVlan() + " -h " +
-                    netInterface.getIp() ) );
+            getNetworkManager().removeVlanDomain( networkResource.getVlan() );
+            getNetworkManager()
+                    .setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(), netInterface.getIp(),
+                            reverseProxyConfig.getSslCertPath() );
         }
         catch ( Exception e )
         {
