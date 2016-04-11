@@ -364,4 +364,9 @@ public class DefSubutaiStepsWhen {
     public void user_click_change_password() throws FindFailed {
         subutaiSteps.clickOnTitleChangePassword();
     }
+
+    @When("the user clicks on the button: share")
+    public void user_clicks_on_button_share() throws FindFailed {
+        subutaiSteps.clickOnButtonShare();
+    }
 }

@@ -86,6 +86,7 @@ public class EnvironmentsPage extends PageObject {
     //region SIKULI IMAGES: Icons
 
     public String sikuliIconDeleteEnvironment = "src/test/resources/imgs/icons/iconDeleteEnvironment.png";
+    public String sikuliIconShare = "src/test/resources/imgs/icons/iconShare.png";
 
     //endregion
 

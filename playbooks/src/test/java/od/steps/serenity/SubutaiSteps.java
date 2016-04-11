@@ -790,6 +790,11 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnIconTest() throws FindFailed {
         screen.click(commonPage.sikuliIconTest);
     }
+
+    @Step
+    public void clickOnButtonShare() throws FindFailed {
+        screen.click(environmentsPage.sikuliIconShare);
+    }
     //endregion
 
     //region Action: Drag And Drop
