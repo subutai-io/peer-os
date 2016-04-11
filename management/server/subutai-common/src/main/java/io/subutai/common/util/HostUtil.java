@@ -38,7 +38,7 @@ public class HostUtil
     }
 
 
-    public void execute( Host host, Set<Task> tasks )
+    public Results execute( Host host, Set<Task> tasks )
     {
         Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No tasks" );
@@ -63,6 +63,56 @@ public class HostUtil
                 //ignore
             }
         }
+
+        return new Results( tasks );
+    }
+
+
+    public void dispose()
+    {
+        tasks.clear();
+
+        for ( ExecutorService executorService : taskExecutors.values() )
+        {
+            executorService.shutdownNow();
+        }
+    }
+
+
+    public static class Results
+    {
+        private final Set<Task> tasks;
+        private boolean hasFailures = false;
+
+
+        protected Results( final Set<Task> tasks )
+        {
+            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
+
+            this.tasks = tasks;
+
+            for ( Task task : tasks )
+            {
+                if ( task.getTaskState() != Task.TaskState.SUCCEEDED )
+                {
+                    hasFailures = true;
+
+                    break;
+                }
+            }
+        }
+
+
+        public boolean hasFailures()
+        {
+            return hasFailures;
+        }
+
+
+        public Set<Task> getTasks()
+        {
+            return tasks;
+        }
     }
 
 
@@ -86,7 +136,10 @@ public class HostUtil
         private TaskState taskState = TaskState.NEW;
 
 
-        private void setHost( Host host ) {this.host = host;}
+        private void setHost( Host host )
+        {
+            this.host = host;
+        }
 
 
         private void setSubmitTimestamp( long submitTimestamp )
