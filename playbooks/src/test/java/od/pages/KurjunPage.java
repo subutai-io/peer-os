@@ -12,6 +12,11 @@ public class KurjunPage extends PageObject {
 
     //region WEB ELEMENTS: Buttons
 
+    public String sikuliButtonAddTemplate = "src/test/resources/imgs/buttons/buttonAddTemplate.png";
+    public String sikuliButtonBrowse = "src/test/resources/imgs/buttons/buttonBrowse.png";
+
+
+
     @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
     public WebElementFacade buttonUploadFile;
 

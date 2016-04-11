@@ -125,6 +125,14 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.waitFor(5000);
     }
 
+    @When("the user grows environment using template: Master")
+    public void user_grows_environment_using_template_master() throws FindFailed, FileNotFoundException {
+        subutaiSteps.clickOnIconTemplateMaster();
+        subutaiSteps.clickOnButtonApply();
+        subutaiSteps.clickOnButtonNext();
+        subutaiSteps.clickOnButtonCloseBuildPopup();
+    }
+
     @When("the user creates environment with 3 containers using template: Master")
     public void user_creates_environment_with_3_containers() throws FindFailed {
         subutaiSteps.clickOnIconTemplateMaster();
@@ -264,6 +272,12 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.inputTemplateNameInSearchField("Master");
     }
 
+    @When("the user should find template: AppScale")
+    public void user_finds_template_appscale(){
+        subutaiSteps.inputTemplateNameInSearchField("Appscale");
+        subutaiSteps.waitABit(3000);
+    }
+
     @When("the user should install plugin")
     public void user_install_plugin() throws FindFailed {
         subutaiSteps.clickOnMenuButtonInstall();
@@ -335,4 +349,15 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnButtonDestroy();
         subutaiSteps.clickOnButtonOk();
     }
+
+    @When("the user click on the button: Add Template")
+    public void user_click_add_template() throws FindFailed {
+        subutaiSteps.clickOnButtonAddTemplate();
+    }
+
+    @When("the user clicks on icon edit")
+    public void user_clicks_on_icon_edit() throws FindFailed {
+        subutaiSteps.clickOnButtonEdit();
+    }
+
 }

@@ -136,6 +136,8 @@ public class CommonPages extends PageObject {
     public String sikuliButtonPeerRegistrationOnline = "src/test/resources/imgs/buttons/buttonRegisterPeerOnline.png";
     public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
     public String sikuliButtonGoToHUBWhite = "src/test/resources/imgs/buttons/buttonGoToHubWhite.png";
+    public String sikuliButtonOpen = "src/test/resources/imgs/buttons/buttonOpen.png";
+    public String sikuliButtonAdd = "src/test/resources/imgs/buttons/buttonAdd.png";
 
 //    public String sikuliTest = returnAbsoluteFilePath.GetPath("src/test/resources/imgs/menuItems/menuItemEnvironment.png");
 

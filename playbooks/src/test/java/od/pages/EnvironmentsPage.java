@@ -42,6 +42,8 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliButtonDelete = "src/test/resources/imgs/buttons/buttonDelete.png";
     public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
     public String sikuliButtonAdvanced = "src/test/resources/imgs/buttons/buttonAdvanced.png";
+    public String sikuliButtonEdit = "src/test/resources/imgs/buttons/buttonEdit.png";
+    public String sikuliButtonNext = "src/test/resources/imgs/buttons/buttonNext.png";
 
     @FindBy(xpath = "*//div[@class=\"b-toggle b-toggle_cloud\"]")
     public WebElementFacade buttonModes;

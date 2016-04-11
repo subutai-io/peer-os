@@ -736,6 +736,36 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(containersPage.sikuliButtonStart);
         waitABit(4000);
     }
+
+    @Step
+    public void clickOnButtonAddTemplate() throws FindFailed {
+        screen.click(kurjunPage.sikuliButtonAddTemplate);
+    }
+
+    @Step
+    public void clickOnButtonBrowse() throws FindFailed {
+        screen.click(kurjunPage.sikuliButtonBrowse);
+    }
+    @Step
+    public void clickOnButtonOpen() throws FindFailed {
+        screen.click(commonPage.sikuliButtonOpen);
+    }
+
+    @Step
+    public void clickOnButtonAdd() throws FindFailed {
+        screen.click(commonPage.sikuliButtonAdd);
+        waitABit(200000);
+    }
+
+    @Step
+    public void clickOnButtonEdit() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonEdit);
+    }
+
+    @Step
+    public void clickOnButtonNext() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonNext);
+    }
     //endregion
 
     //region Action: Drag And Drop

@@ -397,4 +397,12 @@ public class DefSubutaiStepsThen {
     public void user_observe_2_containers(){
         subutaiSteps.userShouldObserveTwoContainers();
     }
+
+    @Then("the user uploads template")
+    public void user_upload_template() throws FindFailed {
+        subutaiSteps.clickOnButtonBrowse();
+        subutaiSteps.clickOnButtonOpen();
+        subutaiSteps.clickOnButtonAdd();
+        subutaiSteps.clickOnButtonOk();
+    }
 }
