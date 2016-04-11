@@ -1609,26 +1609,35 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
         String pairId = String.format( "%s_%s", getId(), envLink.getUniqueIdentifier() );
-        buildPeerEnvRelation( envLink );
 
-        final PGPSecretKeyRing peerSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( null );
+        PGPPublicKeyRing envPubkey = keyManager.getPublicKeyRing( pairId );
         try
         {
-            KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
+            if ( envPubkey == null )
+            {
+                buildPeerEnvRelation( envLink );
 
-            //******Create PEK *****************************************************************
-            PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
-            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+                final PGPSecretKeyRing peerSecKeyRing = keyManager.getSecretKeyRing( null );
+                KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
 
-            //***************Save Keys *********************************************************
-            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
-            keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
+                //******Create PEK *****************************************************************
+                PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
+                PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
 
-            pubRing =
-                    securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+                //***************Save Keys *********************************************************
+                keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
+                keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
-            return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
-                    encTool.armorByteArrayToString( pubRing.getEncoded() ) );
+                pubRing = keyManager.setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+
+                return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
+                        encTool.armorByteArrayToString( pubRing.getEncoded() ) );
+            }
+            else
+            {
+                return new PublicKeyContainer( getId(), envPubkey.getPublicKey().getFingerprint(),
+                        encTool.armorByteArrayToString( envPubkey.getEncoded() ) );
+            }
         }
         catch ( Exception e )
         {
@@ -1683,7 +1692,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
         // Build relation between LocalPeer => RemotePeer => Environment
-        // for message encryption/decryption mechanism described in relation trais
+        // for message encryption/decryption mechanism described in relation traits
         String[] ids = keyId.split( "_" );
         if ( ids.length == 2 )
         {
