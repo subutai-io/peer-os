@@ -9,15 +9,15 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>node-registration</artifactId>
-  <name>Subutai Node Registration Bundle Parent</name>
-  <description>Subutai Node Registration Bundle Parent</description>
+  <artifactId>host-registration</artifactId>
+  <name>Subutai Host Registration Bundle Parent</name>
+  <description>Subutai Host Registration Bundle Parent</description>
   <packaging>pom</packaging>
   <modules>
-    <module>node-registration-api</module>
-    <module>node-registration-impl</module>
-    <module>node-registration-cli</module>
-    <module>node-registration-rest</module>
+    <module>host-registration-api</module>
+    <module>host-registration-impl</module>
+    <module>host-registration-cli</module>
+    <module>host-registration-rest</module>
   </modules>
 
 </project>
