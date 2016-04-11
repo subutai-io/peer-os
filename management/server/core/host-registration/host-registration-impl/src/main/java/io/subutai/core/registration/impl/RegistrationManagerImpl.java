@@ -1,32 +1,26 @@
 package io.subutai.core.registration.impl;
 
 
-import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
-import io.subutai.core.registration.api.exception.NodeRegistrationException;
+import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
@@ -35,7 +29,6 @@ import io.subutai.core.registration.impl.dao.RequestDataService;
 import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
@@ -63,13 +56,13 @@ public class RegistrationManagerImpl implements RegistrationManager
     }
 
 
-    public RequestDataService getRequestDataService()
+    protected RequestDataService getRequestDataService()
     {
         return requestDataService;
     }
 
 
-    public void setRequestDataService( final RequestDataService requestDataService )
+    protected void setRequestDataService( final RequestDataService requestDataService )
     {
         Preconditions.checkNotNull( requestDataService, "RequestDataService shouldn't be null." );
 
@@ -80,9 +73,11 @@ public class RegistrationManagerImpl implements RegistrationManager
     @Override
     public List<RequestedHost> getRequests()
     {
-        List<RequestedHost> temp = Lists.newArrayList();
-        temp.addAll( requestDataService.getAll() );
-        return temp;
+        List<RequestedHost> requests = Lists.newArrayList();
+
+        requests.addAll( requestDataService.getAll() );
+
+        return requests;
     }
 
 
@@ -94,7 +89,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public synchronized void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
+    public synchronized void queueRequest( final RequestedHost requestedHost ) throws HostRegistrationException
     {
         try
         {
@@ -105,16 +100,10 @@ public class RegistrationManagerImpl implements RegistrationManager
             else
             {
                 RequestedHostImpl registrationRequest = new RequestedHostImpl( requestedHost );
+
                 registrationRequest.setStatus( RegistrationStatus.REQUESTED );
-                try
-                {
-                    requestDataService.update( registrationRequest );
-                }
-                catch ( Exception ex )
-                {
-                    throw new NodeRegistrationException( "Failed adding resource host registration request to queue",
-                            ex );
-                }
+
+                requestDataService.update( registrationRequest );
 
                 checkManagement( registrationRequest );
             }
@@ -123,43 +112,31 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             LOG.error( "Error queueing agent registration request", e );
 
-            throw e;
+            throw new HostRegistrationException( e );
         }
     }
 
 
-    //todo review the logic in part concerning rest callback to agent
     @Override
-    public void rejectRequest( final String requestId ) throws UnsupportedEncodingException
+    public void rejectRequest( final String requestId ) throws HostRegistrationException
     {
         try
         {
             RequestedHostImpl registrationRequest = requestDataService.find( requestId );
             registrationRequest.setStatus( RegistrationStatus.REJECTED );
             requestDataService.update( registrationRequest );
-
-            WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
-
-            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-            KeyManager keyManager = securityManager.getKeyManager();
-
-            String message = RegistrationStatus.REJECTED.name();
-            PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
-            byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
-            String encoded = new String( encodedArray, "UTF-8" );
-            client.query( "Message", encoded ).delete();
         }
         catch ( Exception e )
         {
             LOG.error( "Error rejecting agent registration request", e );
 
-            throw e;
+            throw new HostRegistrationException( e );
         }
     }
 
 
     @Override
-    public void approveRequest( final String requestId )
+    public void approveRequest( final String requestId ) throws HostRegistrationException
     {
         try
         {
@@ -188,13 +165,13 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             LOG.error( "Error approving agent registration request", e );
 
-            throw e;
+            throw new HostRegistrationException( e );
         }
     }
 
 
     @Override
-    public void removeRequest( final String requestId ) throws HostNotFoundException
+    public void removeRequest( final String requestId ) throws HostRegistrationException
     {
         try
         {
@@ -215,13 +192,13 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             LOG.error( "Error removing agent registration request", e );
 
-            throw e;
+            throw new HostRegistrationException( e );
         }
     }
 
 
     @Override
-    public ContainerToken generateContainerTTLToken( final Long ttl )
+    public ContainerToken generateContainerTTLToken( final Long ttl ) throws HostRegistrationException
     {
         ContainerTokenImpl token =
                 new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
@@ -234,7 +211,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             LOG.error( "Error persisting container token", e );
 
-            throw e;
+            throw new HostRegistrationException( e );
         }
 
         return token;
@@ -243,19 +220,19 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     @Override
     public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
-            throws NodeRegistrationException
+            throws HostRegistrationException
     {
         try
         {
             ContainerTokenImpl containerToken = containerTokenDataService.find( token );
             if ( containerToken == null )
             {
-                throw new NodeRegistrationException( "Couldn't verify container token" );
+                throw new HostRegistrationException( "Couldn't verify container token" );
             }
 
             if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
             {
-                throw new NodeRegistrationException( "Container token expired" );
+                throw new HostRegistrationException( "Container token expired" );
             }
             try
             {
@@ -263,14 +240,19 @@ public class RegistrationManagerImpl implements RegistrationManager
             }
             catch ( Exception ex )
             {
-                throw new NodeRegistrationException( "Failed to store container pubkey", ex );
+                throw new HostRegistrationException( "Failed to store container pubkey", ex );
             }
             return containerToken;
+        }
+        catch ( HostRegistrationException e )
+        {
+            throw e;
         }
         catch ( Exception e )
         {
             LOG.error( "Error verifying token", e );
-            throw e;
+
+            throw new HostRegistrationException( e );
         }
     }
 

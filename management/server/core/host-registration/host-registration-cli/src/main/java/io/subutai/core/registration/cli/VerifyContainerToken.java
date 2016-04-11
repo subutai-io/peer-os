@@ -6,7 +6,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.registration.api.RegistrationManager;
-import io.subutai.core.registration.api.exception.NodeRegistrationException;
+import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
@@ -41,7 +41,7 @@ public class VerifyContainerToken extends SubutaiShellCommandSupport
             System.out.println( String.format( "Container id: %s", containerToken.getHostId() ) );
             System.out.println( String.format( "Token       : %s", containerToken.getToken() ) );
         }
-        catch ( NodeRegistrationException ex )
+        catch ( HostRegistrationException ex )
         {
             System.out.println( "Token verification failed." );
         }

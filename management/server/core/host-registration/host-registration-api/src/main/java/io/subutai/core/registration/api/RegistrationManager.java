@@ -1,11 +1,9 @@
 package io.subutai.core.registration.api;
 
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.core.registration.api.exception.NodeRegistrationException;
+import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
 
@@ -16,16 +14,16 @@ public interface RegistrationManager
 
     public RequestedHost getRequest( String requestId );
 
-    public void queueRequest( RequestedHost requestedHost ) throws NodeRegistrationException;
+    public void queueRequest( RequestedHost requestedHost ) throws HostRegistrationException;
 
-    public void rejectRequest( String requestId ) throws UnsupportedEncodingException;
+    public void rejectRequest( String requestId ) throws HostRegistrationException;
 
-    public void approveRequest( String requestId );
+    public void approveRequest( String requestId ) throws HostRegistrationException;
 
-    public void removeRequest( String requestId ) throws HostNotFoundException;
+    public void removeRequest( String requestId ) throws HostRegistrationException;
 
-    public ContainerToken generateContainerTTLToken( Long ttl );
+    public ContainerToken generateContainerTTLToken( Long ttl ) throws HostRegistrationException;
 
     public ContainerToken verifyToken( String token, String containerHostId, String publicKey )
-            throws NodeRegistrationException;
+            throws HostRegistrationException;
 }
