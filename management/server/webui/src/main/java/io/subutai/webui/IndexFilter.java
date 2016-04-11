@@ -10,19 +10,24 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.common.base.Strings;
+
+import io.subutai.common.util.ServiceLocator;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 
 
 public class IndexFilter implements Filter
 {
-    private FilterConfig filterConfig;
 
 
     @Override
     public void init( final FilterConfig filterConfig ) throws ServletException
     {
-        this.filterConfig = filterConfig;
     }
 
 
@@ -37,7 +42,27 @@ public class IndexFilter implements Filter
             if ( url.equals( "" ) || url.equals( "/" ) )
             {
                 RequestDispatcher view = servletRequest.getRequestDispatcher( "index.html" );
-                view.forward( servletRequest, servletResponse );
+                HttpServletResponse response = ( HttpServletResponse ) servletResponse;
+                try
+                {
+                    IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+                    if ( identityManager != null )
+                    {
+                        User user = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+                        if ( Strings.isNullOrEmpty( user.getFingerprint() ) )
+                        {
+                            throw new RuntimeException( "No Peer owner is set yet..." );
+                        }
+                        Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+                        response.addCookie( fingerprint );
+                    }
+                }
+                catch ( Exception ex )
+                {
+                    Cookie fingerprint = new Cookie( "su_fingerprint", "no owner" );
+                    response.addCookie( fingerprint );
+                }
+                view.forward( servletRequest, response );
             }
             if ( !( url.startsWith( "/rest" ) || url.startsWith( "/subutai" ) ||
                     url.startsWith( "/fav" ) || url.startsWith( "/plugin" ) ||
