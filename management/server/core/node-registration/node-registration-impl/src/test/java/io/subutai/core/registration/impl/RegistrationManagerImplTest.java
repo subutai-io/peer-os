@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.impl.dao.ContainerTokenDataService;
@@ -25,6 +27,7 @@ import io.subutai.core.security.api.crypto.KeyManager;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +51,10 @@ public class RegistrationManagerImplTest
     SecurityManager securityManager;
     @Mock
     NetworkManager networkManager;
+    @Mock
+    ServiceLocator serviceLocator;
+    @Mock
+    LocalPeer localPeer;
 
     RegistrationManagerImpl registrationManager;
 
@@ -59,6 +66,7 @@ public class RegistrationManagerImplTest
     {
         registrationManager = new RegistrationManagerImpl( securityManager, daoManager );
         registrationManager.setRequestDataService( requestDataService );
+        registrationManager.serviceLocator = serviceLocator;
 
         RequestedHostImpl host1 = mock( RequestedHostImpl.class );
         RequestedHostImpl host2 = mock( RequestedHostImpl.class );
@@ -75,6 +83,7 @@ public class RegistrationManagerImplTest
         when( host1.getId() ).thenReturn( "This is id" );
         when( securityManager.getEncryptionTool() ).thenReturn( encryptionTool );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
+        doReturn( localPeer ).when( serviceLocator ).getService( LocalPeer.class );
     }
 
 

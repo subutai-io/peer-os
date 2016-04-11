@@ -1,6 +1,7 @@
 package io.subutai.core.registration.impl;
 
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
@@ -17,9 +18,12 @@ import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.exception.NodeRegistrationException;
@@ -42,6 +46,7 @@ public class RegistrationManagerImpl implements RegistrationManager
     private RequestDataService requestDataService;
     private ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
+    protected ServiceLocator serviceLocator = new ServiceLocator();
 
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
@@ -91,77 +96,181 @@ public class RegistrationManagerImpl implements RegistrationManager
     @Override
     public synchronized void queueRequest( final RequestedHost requestedHost ) throws NodeRegistrationException
     {
-        if ( requestDataService.find( requestedHost.getId() ) != null )
+        try
         {
-            LOG.info( "Already requested registration" );
-        }
-        else
-        {
-            RequestedHostImpl registrationRequest = new RequestedHostImpl( requestedHost );
-            registrationRequest.setStatus( RegistrationStatus.REQUESTED );
-            try
+            if ( requestDataService.find( requestedHost.getId() ) != null )
             {
-                requestDataService.update( registrationRequest );
+                LOG.info( "Already requested registration" );
             }
-            catch ( Exception ex )
+            else
             {
-                throw new NodeRegistrationException( "Failed adding resource host registration request to queue", ex );
-            }
+                RequestedHostImpl registrationRequest = new RequestedHostImpl( requestedHost );
+                registrationRequest.setStatus( RegistrationStatus.REQUESTED );
+                try
+                {
+                    requestDataService.update( registrationRequest );
+                }
+                catch ( Exception ex )
+                {
+                    throw new NodeRegistrationException( "Failed adding resource host registration request to queue",
+                            ex );
+                }
 
-            checkManagement( registrationRequest );
+                checkManagement( registrationRequest );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error queueing agent registration request", e );
+
+            throw e;
         }
     }
 
 
+    //todo review the logic in part concerning rest callback to agent
     @Override
-    public void rejectRequest( final String requestId )
+    public void rejectRequest( final String requestId ) throws UnsupportedEncodingException
     {
-        RequestedHostImpl registrationRequest = requestDataService.find( requestId );
-        registrationRequest.setStatus( RegistrationStatus.REJECTED );
-        requestDataService.update( registrationRequest );
-
-        WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
-
-        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-        KeyManager keyManager = securityManager.getKeyManager();
-
-        String message = RegistrationStatus.REJECTED.name();
-        PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
-        byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
-        String encoded = message;
         try
         {
-            encoded = new String( encodedArray, "UTF-8" );
+            RequestedHostImpl registrationRequest = requestDataService.find( requestId );
+            registrationRequest.setStatus( RegistrationStatus.REJECTED );
+            requestDataService.update( registrationRequest );
+
+            WebClient client = RestUtil.createWebClient( registrationRequest.getRestHook() );
+
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+            KeyManager keyManager = securityManager.getKeyManager();
+
+            String message = RegistrationStatus.REJECTED.name();
+            PGPPublicKey publicKey = keyManager.getPublicKey( registrationRequest.getId() );
+            byte[] encodedArray = encryptionTool.encrypt( message.getBytes(), publicKey, true );
+            String encoded = new String( encodedArray, "UTF-8" );
+            client.query( "Message", encoded ).delete();
         }
         catch ( Exception e )
         {
-            LOG.error( "Error approving new connections request", e );
+            LOG.error( "Error rejecting agent registration request", e );
+
+            throw e;
         }
-        client.query( "Message", encoded ).delete();
     }
 
 
     @Override
     public void approveRequest( final String requestId )
     {
-        RequestedHostImpl registrationRequest = requestDataService.find( requestId );
-
-        if ( registrationRequest == null || !RegistrationStatus.REQUESTED.equals( registrationRequest.getStatus() ) )
+        try
         {
-            return;
+            RequestedHostImpl registrationRequest = requestDataService.find( requestId );
+
+            if ( registrationRequest == null || !RegistrationStatus.REQUESTED
+                    .equals( registrationRequest.getStatus() ) )
+            {
+                return;
+            }
+
+            registrationRequest.setStatus( RegistrationStatus.APPROVED );
+
+            requestDataService.update( registrationRequest );
+
+            importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
+
+            importHostSslCert( registrationRequest.getId(), registrationRequest.getCert() );
+
+            for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
+            {
+                importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error approving agent registration request", e );
+
+            throw e;
+        }
+    }
+
+
+    @Override
+    public void removeRequest( final String requestId ) throws HostNotFoundException
+    {
+        try
+        {
+            RequestedHost requestedHost = requestDataService.find( requestId );
+
+            if ( requestedHost == null )
+            {
+                return;
+            }
+
+            requestDataService.remove( requestedHost.getId() );
+
+            LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+
+            localPeer.removeResourceHost( requestedHost.getId() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error removing agent registration request", e );
+
+            throw e;
+        }
+    }
+
+
+    @Override
+    public ContainerToken generateContainerTTLToken( final Long ttl )
+    {
+        ContainerTokenImpl token =
+                new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
+                        ttl );
+        try
+        {
+            containerTokenDataService.persist( token );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error persisting container token", e );
+
+            throw e;
         }
 
-        registrationRequest.setStatus( RegistrationStatus.APPROVED );
+        return token;
+    }
 
-        requestDataService.update( registrationRequest );
 
-        importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
-
-        importHostSslCert( registrationRequest.getId(), registrationRequest.getCert() );
-
-        for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
+    @Override
+    public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
+            throws NodeRegistrationException
+    {
+        try
         {
-            importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
+            ContainerTokenImpl containerToken = containerTokenDataService.find( token );
+            if ( containerToken == null )
+            {
+                throw new NodeRegistrationException( "Couldn't verify container token" );
+            }
+
+            if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
+            {
+                throw new NodeRegistrationException( "Container token expired" );
+            }
+            try
+            {
+                securityManager.getKeyManager().savePublicKeyRing( containerHostId, ( short ) 2, publicKey );
+            }
+            catch ( Exception ex )
+            {
+                throw new NodeRegistrationException( "Failed to store container pubkey", ex );
+            }
+            return containerToken;
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error verifying token", e );
+            throw e;
         }
     }
 
@@ -177,59 +286,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         KeyManager keyManager = securityManager.getKeyManager();
         keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
-    }
-
-
-    @Override
-    public void removeRequest( final String requestId )
-    {
-        requestDataService.remove( requestId );
-    }
-
-
-    @Override
-    public ContainerToken generateContainerTTLToken( final Long ttl )
-    {
-        ContainerTokenImpl token =
-                new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
-                        ttl );
-        try
-        {
-            containerTokenDataService.persist( token );
-        }
-        catch ( Exception ex )
-        {
-            LOG.error( "Error persisting container token", ex );
-        }
-
-        return token;
-    }
-
-
-    @Override
-    public ContainerToken verifyToken( final String token, String containerHostId, String publicKey )
-            throws NodeRegistrationException
-    {
-
-        ContainerTokenImpl containerToken = containerTokenDataService.find( token );
-        if ( containerToken == null )
-        {
-            throw new NodeRegistrationException( "Couldn't verify container token" );
-        }
-
-        if ( containerToken.getDateCreated().getTime() + containerToken.getTtl() < System.currentTimeMillis() )
-        {
-            throw new NodeRegistrationException( "Container token expired" );
-        }
-        try
-        {
-            securityManager.getKeyManager().savePublicKeyRing( containerHostId, ( short ) 2, publicKey );
-        }
-        catch ( Exception ex )
-        {
-            throw new NodeRegistrationException( "Failed to store container pubkey", ex );
-        }
-        return containerToken;
     }
 
 

@@ -1056,6 +1056,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    public void removeResourceHost( String rhId ) throws HostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+
+        ResourceHost resourceHost = getResourceHostById( rhId );
+
+        resourceHosts.remove( resourceHost );
+
+        resourceHostDataService.remove( resourceHost.getId() );
+    }
+
+
     @Override
     public CommandResult execute( final RequestBuilder requestBuilder, final Host host ) throws CommandException
     {
