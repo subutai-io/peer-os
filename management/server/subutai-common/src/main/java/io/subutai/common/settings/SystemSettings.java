@@ -18,6 +18,7 @@ public class SystemSettings
     public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_MGMT_INTERFACE = "mng-net";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
+    public static final int DEFAULT_PUBLIC_PORT = ChannelSettings.SECURE_PORT_X1;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
     public static final String DEFAULT_LOCAL_KURJUN_REPO = "http://localhost:8081/kurjun";
@@ -26,12 +27,10 @@ public class SystemSettings
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
 
-
     static
     {
         loadProperties();
     }
-
 
     public static void loadProperties()
     {
