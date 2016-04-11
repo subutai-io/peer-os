@@ -11,6 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import io.subutai.core.registration.api.service.ContainerToken;
 
 
@@ -40,6 +43,11 @@ public class ContainerTokenImpl implements ContainerToken, Serializable
 
     public ContainerTokenImpl( final String token, final Timestamp dateCreated, final Long ttl )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
+        Preconditions.checkNotNull( dateCreated );
+        Preconditions.checkNotNull( ttl );
+        Preconditions.checkArgument( ttl > 0 );
+
         this.token = token;
         this.hostId = "";
         this.dateCreated = dateCreated;

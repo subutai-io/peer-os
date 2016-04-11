@@ -34,7 +34,7 @@ public class HostUtil
     private Map<String, ExecutorService> taskExecutors = Maps.newConcurrentMap();
 
 
-    public Set getTasks()
+    public Set<Task> getTasks()
     {
         return Collections.unmodifiableSet( tasks );
     }
@@ -93,8 +93,8 @@ public class HostUtil
         final Set<Results> resultsSet = Sets.newHashSet();
 
         ExecutorService tasksExecutor = Executors.newCachedThreadPool();
-        CompletionService<Object> completionService = new ExecutorCompletionService<>( tasksExecutor );
-        List<Future<Object>> taskFutures = Lists.newArrayList();
+        CompletionService<Boolean> completionService = new ExecutorCompletionService<>( tasksExecutor );
+        Map<Future<Boolean>, Set<Task>> taskFutures = Maps.newHashMap();
 
         for ( Map.Entry<Host, Set<Task>> hostTasks : hostsTasks.entrySet() )
         {
@@ -102,27 +102,51 @@ public class HostUtil
 
             final Set<Task> tasks = hostTasks.getValue();
 
-            taskFutures.add( completionService.submit( new Runnable()
+            taskFutures.put( completionService.submit( new Callable<Boolean>()
             {
                 @Override
-                public void run()
+                public Boolean call()
                 {
-                    resultsSet.add( executeUntilFirstFailure( host, tasks ) );
+                    Results results = executeUntilFirstFailure( host, tasks );
+
+                    resultsSet.add( results );
+
+                    return !results.hasFailures();
                 }
-            }, null ) );
+            } ), tasks );
         }
 
         tasksExecutor.shutdown();
 
-        for ( Future future : taskFutures )
+        boolean skip = false;
+
+        for ( Future<Boolean> future : taskFutures.keySet() )
         {
-            try
+            Set<Task> tasks = taskFutures.get( future );
+
+            Host host = tasks.iterator().next().getHost();
+
+            if ( skip )
             {
-                future.get();
+                resultsSet.add( new Results( host, tasks ) );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Error in #executeUntilFirstFailure", e );
+                try
+                {
+                    if ( !future.get() )
+                    {
+                        skip = true;
+                    }
+                }
+                catch ( Exception e )
+                {
+                    resultsSet.add( new Results( host, tasks ) );
+
+                    skip = true;
+
+                    LOG.error( "Error in #executeUntilFirstFailure", e );
+                }
             }
         }
 
@@ -159,7 +183,7 @@ public class HostUtil
             }
         }
 
-        return new Results( tasks );
+        return new Results( host, tasks );
     }
 
 
@@ -189,7 +213,7 @@ public class HostUtil
             }
         }
 
-        return new Results( tasks );
+        return new Results( host, tasks );
     }
 
 
@@ -206,14 +230,17 @@ public class HostUtil
 
     public static class Results
     {
+        private final Host host;
         private final Set<Task> tasks;
         private boolean hasFailures = false;
 
 
-        Results( final Set<Task> tasks )
+        Results( Host host, final Set<Task> tasks )
         {
+            Preconditions.checkNotNull( host );
             Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
 
+            this.host = host;
             this.tasks = tasks;
 
             for ( Task task : tasks )
@@ -228,6 +255,12 @@ public class HostUtil
         }
 
 
+        public Host getHost()
+        {
+            return host;
+        }
+
+
         public boolean hasFailures()
         {
             return hasFailures;
@@ -237,6 +270,31 @@ public class HostUtil
         public Set<Task> getTasks()
         {
             return tasks;
+        }
+
+
+        @Override
+        public boolean equals( final Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+
+            final Results results = ( Results ) o;
+
+            return host.equals( results.host );
+        }
+
+
+        @Override
+        public int hashCode()
+        {
+            return host.hashCode();
         }
     }
 

@@ -15,7 +15,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerTemplatePrepareTask;
+import io.subutai.core.environment.impl.workflow.creation.steps.helpers.PeerImportTemplateTask;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -50,29 +50,21 @@ public class PrepareTemplatesStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
 
             templateUtil.addPeerTask( new PeerUtil.PeerTask<>( peer,
-                    new CreatePeerTemplatePrepareTask( peer, peerPlacement.getValue() ) ) );
+                    new PeerImportTemplateTask( peer, peerPlacement.getValue(), operationTracker ) ) );
         }
 
         PeerUtil.PeerTaskResults<PrepareTemplatesResponse> templateResults = templateUtil.executeParallel();
 
-        //collect results
         boolean succeeded = true;
 
         for ( PeerUtil.PeerTaskResult<PrepareTemplatesResponse> templateResult : templateResults.getPeerTaskResults() )
         {
-            PrepareTemplatesResponse prepareTemplatesResponse = templateResult.getResult();
-
-            succeeded &= prepareTemplatesResponse.hasSucceeded();
-
-            for ( String message : prepareTemplatesResponse.getMessages() )
-            {
-                operationTracker.addLog( message );
-            }
+            succeeded &= templateResult.getResult().hasSucceeded();
         }
 
         if ( !succeeded )
         {
-            throw new EnvironmentCreationException( "There were errors during preparation templates." );
+            throw new EnvironmentCreationException( "Failed to import templates on all peers" );
         }
     }
 }

@@ -55,7 +55,6 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -96,8 +95,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Transient
     protected ResourceHostCommands resourceHostCommands = new ResourceHostCommands();
 
-    @Transient
-    protected TemplateManager registry;
 
     @Transient
     protected HostRegistry hostRegistry;
@@ -276,7 +273,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( CommandException e )
         {
             LOG.error( e.getMessage(), e );
-            throw new ResourceHostException( "Error fetching container state", e );
+            throw new ResourceHostException(
+                    String.format( "Error fetching container %s state: %s", containerHost.getHostname(),
+                            e.getMessage() ), e );
         }
 
         String stdOut = result.getStdOut();
@@ -325,7 +324,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( "Error on starting container", e );
+            throw new ResourceHostException(
+                    String.format( "Error on starting container %s: %s", containerHost.getHostname(), e.getMessage() ),
+                    e );
         }
 
         waitContainerStart( containerHost );
@@ -378,7 +379,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( "Error stopping container", e );
+            throw new ResourceHostException(
+                    String.format( "Error stopping container %s: %s", containerHost.getHostname(), e.getMessage() ),
+                    e );
         }
     }
 
@@ -405,7 +408,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( "Error destroying container", e );
+            throw new ResourceHostException(
+                    String.format( "Error destroying container %s: %s", containerHost.getHostname(), e.getMessage() ),
+                    e );
         }
 
         removeContainerHost( containerHost );
@@ -507,12 +512,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void setRegistry( final TemplateManager registry )
-    {
-        this.registry = registry;
-    }
-
-
     public void setHostRegistry( final HostRegistry hostRegistry )
     {
         this.hostRegistry = hostRegistry;
@@ -543,7 +542,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( CommandException e )
         {
-            throw new ResourceHostException( String.format( "Could not cleanup resource host '%s'.", hostname ) );
+            throw new ResourceHostException(
+                    String.format( "Could not cleanup resource host %s: %s", hostname, e.getMessage() ) );
         }
 
         Set<ContainerHost> containerHosts = getContainerHostsByEnvironmentId( environmentId.getId() );
@@ -572,7 +572,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             catch ( Exception e )
             {
-                throw new ResourceHostException( "Error fetching # of cpu cores", e );
+                throw new ResourceHostException( String.format( "Error fetching # of cpu cores: %s", e.getMessage() ),
+                        e );
             }
         }
 
@@ -589,7 +590,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( "Failed to get P2P connections", e );
+            throw new ResourceHostException( String.format( "Failed to get P2P connections: %s", e.getMessage() ), e );
         }
     }
 
@@ -611,7 +612,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( "Failed to join P2P swarm", e );
+            throw new ResourceHostException( String.format( "Failed to join P2P swarm: %s", e.getMessage() ), e );
         }
     }
 
@@ -629,7 +630,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( "Failed to reset P2P connection secret key", e );
+            throw new ResourceHostException(
+                    String.format( "Failed to reset P2P connection secret key: %s", e.getMessage() ), e );
         }
     }
 
@@ -643,7 +645,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( "Failed to get tunnels", e );
+            throw new ResourceHostException( String.format( "Failed to get tunnels: %s", e.getMessage() ), e );
         }
     }
 
@@ -658,7 +660,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
         catch ( NetworkManagerException e )
         {
-            throw new ResourceHostException( "Failed to create tunnel", e );
+            throw new ResourceHostException( String.format( "Failed to create tunnel: %s", e.getMessage() ), e );
         }
     }
 
@@ -668,12 +670,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand(templateName), this );
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( templateName ), this );
         }
         catch ( Exception e )
         {
-            throw new ResourceHostException( String.format( "Error importing template %s", templateName ), e );
+            throw new ResourceHostException(
+                    String.format( "Error importing template %s: %s", templateName, e.getMessage() ), e );
         }
     }
 

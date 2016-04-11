@@ -271,8 +271,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         for ( ResourceHost resourceHost : resourceHosts )
         {
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
+
             final ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHost;
-            resourceHostEntity.setRegistry( templateRegistry );
+
             resourceHostEntity.setHostRegistry( hostRegistry );
         }
     }
@@ -2299,6 +2300,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
 
         return serviceLocator.getService( NetworkManager.class );
+    }
+
+
+    public Set<HostUtil.Task> getTasks()
+    {
+        return hostUtil.getTasks();
     }
 
 
