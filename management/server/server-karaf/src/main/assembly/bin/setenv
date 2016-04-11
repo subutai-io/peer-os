@@ -64,4 +64,4 @@ export MALLOC_ARENA_MAX=4
 
 #export JMX_ENABLED=true
 #export JMX_PORT=10099
-#export JMX_HOST=192.168.0.102
+#export JMX_HOST={IP of RH}
