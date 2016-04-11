@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,10 +23,9 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -39,7 +39,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.exception.DaoException;
@@ -98,12 +98,12 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.task.ImportTemplateRequest;
 import io.subutai.common.task.QuotaRequest;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskCallbackHandler;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -114,7 +114,7 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CloneTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
-import io.subutai.core.localpeer.impl.container.ImportTask;
+import io.subutai.core.localpeer.impl.container.ImportTemplateTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
 import io.subutai.core.localpeer.impl.container.QuotaTask;
 import io.subutai.core.localpeer.impl.dao.NetworkResourceDaoImpl;
@@ -166,6 +166,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private TaskManagerImpl taskManager;
     private NetworkResourceDaoImpl networkResourceDao;
     LocalPeerCommands localPeerCommands = new LocalPeerCommands();
+    HostUtil hostUtil = new HostUtil();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
@@ -260,6 +261,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ( ( Disposable ) resourceHost ).dispose();
         }
+
+        hostUtil.dispose();
     }
 
 
@@ -585,22 +588,36 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request )
-            throws PeerException
+    public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
-        final PrepareTemplatesResponseCollector prepareTemplatesResponse =
-                new PrepareTemplatesResponseCollector( getId() );
-        for ( String resourceHostId : request.getTemplates().keySet() )
+        PrepareTemplatesResponse response = new PrepareTemplatesResponse();
+
+        Map<Host, Set<HostUtil.Task>> allImportTasks = Maps.newHashMap();
+
+        for ( final String resourceHostId : request.getTemplates().keySet() )
         {
-            for ( String templateName : request.getTemplates().get( resourceHostId ) )
+            final ResourceHost resourceHost = getResourceHostById( resourceHostId );
+
+            Set<HostUtil.Task> importTasks = Sets.newHashSet();
+
+            for ( final String templateName : request.getTemplates().get( resourceHostId ) )
             {
-                ImportTask task = new ImportTask( new ImportTemplateRequest( resourceHostId, templateName ) );
-                prepareTemplatesResponse.addTask( taskManager.schedule( task, prepareTemplatesResponse ) );
+                HostUtil.Task<Object> imporTask = new ImportTemplateTask( templateName, resourceHost );
+
+                importTasks.add( imporTask );
             }
+
+            allImportTasks.put( resourceHost, importTasks );
         }
 
-        prepareTemplatesResponse.waitResponsesWhileSucceeded();
-        return prepareTemplatesResponse;
+        Set<HostUtil.Results> allResults = hostUtil.executeUntilFirstFailure( allImportTasks );
+
+        for ( HostUtil.Results results : allResults )
+        {
+            response.addResults( results );
+        }
+
+        return response;
     }
 
 
@@ -718,9 +735,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         ResourceHost resourceHost = getResourceHostById( resourceHostId );
 
-        resourceHost.addContainerHost( containerHostEntity );
-
         signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+
+        resourceHost.addContainerHost( containerHostEntity );
 
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
 
@@ -1830,7 +1847,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-
         executorService.shutdown();
 
         try
@@ -2075,6 +2091,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         executorService.shutdown();
+
+        try
+        {
+            executorService.awaitTermination( 30, TimeUnit.SECONDS );
+        }
+        catch ( InterruptedException e )
+        {
+            //ignore
+        }
 
         //remove reservation
         try

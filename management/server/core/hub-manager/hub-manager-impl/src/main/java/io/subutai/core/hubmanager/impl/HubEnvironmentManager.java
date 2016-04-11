@@ -32,7 +32,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
-import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
@@ -49,7 +49,6 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.task.ImportTemplateResponse;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -294,24 +293,22 @@ public class HubEnvironmentManager
         }
 
         ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
-        CompletionService<PrepareTemplatesResponseCollector> taskCompletionService =
-                getCompletionService( taskExecutor );
+        CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
 
         taskCompletionService.submit( new CreatePeerTemplatePrepareTask( localPeer, nodes ) );
         taskExecutor.shutdown();
 
         try
         {
-            Future<PrepareTemplatesResponseCollector> futures = taskCompletionService.take();
-            final PrepareTemplatesResponseCollector prepareTemplatesResponse = futures.get();
+            Future<PrepareTemplatesResponse> futures = taskCompletionService.take();
+            final PrepareTemplatesResponse prepareTemplatesResponse = futures.get();
 
             if ( !prepareTemplatesResponse.hasSucceeded() )
             {
-                for ( ImportTemplateResponse templateResponse : prepareTemplatesResponse.getResponses() )
+                for ( String templateResponse : prepareTemplatesResponse.getMessages() )
                 {
                     String msg =
-                            "Error during preparation template: " + templateResponse.getTemplateName() + " Peer ID: "
-                                    + localPeer.getId();
+                            "Error during preparation template: " + templateResponse + " Peer ID: " + localPeer.getId();
                     sendLogToHub( peerDto, msg, null, EnvironmentPeerLogDto.LogEvent.SUBUTAI,
                             EnvironmentPeerLogDto.LogType.ERROR, null );
                     LOG.error( msg );
@@ -585,7 +582,7 @@ public class HubEnvironmentManager
     }
 
 
-    protected CompletionService<PrepareTemplatesResponseCollector> getCompletionService( Executor executor )
+    protected CompletionService<PrepareTemplatesResponse> getCompletionService( Executor executor )
     {
         return new ExecutorCompletionService<>( executor );
     }

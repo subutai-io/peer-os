@@ -299,7 +299,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         synchronized ( containersHosts )
         {
-            return containersHosts == null ? Sets.<ContainerHost>newHashSet() : Sets.newConcurrentHashSet( containersHosts );
+            return containersHosts == null ? Sets.<ContainerHost>newHashSet() :
+                   Sets.newConcurrentHashSet( containersHosts );
         }
     }
 
@@ -658,6 +659,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( "Failed to create tunnel", e );
+        }
+    }
+
+
+    @Override
+    public void importTemplate( final String templateName ) throws ResourceHostException
+    {
+        try
+        {
+
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand(templateName), this );
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceHostException( String.format( "Error importing template %s", templateName ), e );
         }
     }
 

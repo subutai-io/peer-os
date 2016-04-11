@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,7 +25,7 @@ import io.subutai.common.peer.Host;
 
 public class HostUtil
 {
-    public static final int MAX_EXECUTOR_SIZE = 20;
+    private static final int MAX_EXECUTOR_SIZE = 20;
 
     private static final Logger LOG = LoggerFactory.getLogger( HostUtil.class );
 
@@ -35,6 +37,129 @@ public class HostUtil
     public Set getTasks()
     {
         return Collections.unmodifiableSet( tasks );
+    }
+
+
+    public Set<Results> execute( Map<Host, Set<Task>> hostsTasks )
+    {
+        Preconditions.checkNotNull( hostsTasks, "Invalid hosts tasks map" );
+        Preconditions.checkArgument( !hostsTasks.isEmpty(), "No tasks in hosts tasks map" );
+
+        final Set<Results> resultsSet = Sets.newHashSet();
+
+        ExecutorService tasksExecutor = Executors.newCachedThreadPool();
+        CompletionService<Object> completionService = new ExecutorCompletionService<>( tasksExecutor );
+        List<Future<Object>> taskFutures = Lists.newArrayList();
+
+        for ( Map.Entry<Host, Set<Task>> hostTasks : hostsTasks.entrySet() )
+        {
+            final Host host = hostTasks.getKey();
+
+            final Set<Task> tasks = hostTasks.getValue();
+
+            taskFutures.add( completionService.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    resultsSet.add( execute( host, tasks ) );
+                }
+            }, null ) );
+        }
+
+        tasksExecutor.shutdown();
+
+        for ( Future future : taskFutures )
+        {
+            try
+            {
+                future.get();
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error in #execute", e );
+            }
+        }
+
+        return resultsSet;
+    }
+
+
+    public Set<Results> executeUntilFirstFailure( Map<Host, Set<Task>> hostsTasks )
+    {
+        Preconditions.checkNotNull( hostsTasks, "Invalid hosts tasks map" );
+        Preconditions.checkArgument( !hostsTasks.isEmpty(), "No tasks in hosts tasks map" );
+
+        final Set<Results> resultsSet = Sets.newHashSet();
+
+        ExecutorService tasksExecutor = Executors.newCachedThreadPool();
+        CompletionService<Object> completionService = new ExecutorCompletionService<>( tasksExecutor );
+        List<Future<Object>> taskFutures = Lists.newArrayList();
+
+        for ( Map.Entry<Host, Set<Task>> hostTasks : hostsTasks.entrySet() )
+        {
+            final Host host = hostTasks.getKey();
+
+            final Set<Task> tasks = hostTasks.getValue();
+
+            taskFutures.add( completionService.submit( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    resultsSet.add( executeUntilFirstFailure( host, tasks ) );
+                }
+            }, null ) );
+        }
+
+        tasksExecutor.shutdown();
+
+        for ( Future future : taskFutures )
+        {
+            try
+            {
+                future.get();
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error in #executeUntilFirstFailure", e );
+            }
+        }
+
+        return resultsSet;
+    }
+
+
+    public Results executeUntilFirstFailure( Host host, Set<Task> tasks )
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No tasks" );
+
+        this.tasks.addAll( tasks );
+
+        List<Future<Boolean>> futures = Lists.newArrayList();
+
+        for ( Task task : tasks )
+        {
+            futures.add( submitTask( host, task ) );
+        }
+
+        for ( Future<Boolean> future : futures )
+        {
+            try
+            {
+                if ( !future.get() )
+                {
+                    break;
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error in #executeUntilFirstFailure", e );
+            }
+        }
+
+        return new Results( tasks );
     }
 
 
@@ -60,7 +185,7 @@ public class HostUtil
             }
             catch ( Exception e )
             {
-                //ignore
+                LOG.error( "Error in #execute", e );
             }
         }
 
@@ -85,7 +210,7 @@ public class HostUtil
         private boolean hasFailures = false;
 
 
-        protected Results( final Set<Task> tasks )
+        Results( final Set<Task> tasks )
         {
             Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
 
@@ -119,7 +244,7 @@ public class HostUtil
     public abstract static class Task<R> implements Callable<R>
     {
 
-        public static enum TaskState
+        public enum TaskState
         {
             NEW, RUNNING, SUCCEEDED, FAILED
         }
@@ -129,11 +254,11 @@ public class HostUtil
 
         private Host host;
 
-        private R result;
+        private volatile R result;
 
-        private Exception exception;
+        private volatile Exception exception;
 
-        private TaskState taskState = TaskState.NEW;
+        private volatile TaskState taskState = TaskState.NEW;
 
 
         private void setHost( Host host )
@@ -235,7 +360,7 @@ public class HostUtil
     }
 
 
-    protected ExecutorService getTaskExecutor( Host host, Task task )
+    private ExecutorService getTaskExecutor( Host host, Task task )
     {
         String executorId = host.getId() + "-" + task.getClass().getName();
 
@@ -254,7 +379,7 @@ public class HostUtil
     }
 
 
-    protected <R> Future submitTask( Host host, final Task<R> task )
+    private <R> Future<Boolean> submitTask( Host host, final Task<R> task )
     {
         ExecutorService taskExecutor = getTaskExecutor( host, task );
 
@@ -262,15 +387,17 @@ public class HostUtil
         task.setSubmitTimestamp( System.currentTimeMillis() );
         task.setTaskState( Task.TaskState.RUNNING );
 
-        return taskExecutor.submit( new Callable<Object>()
+        return taskExecutor.submit( new Callable<Boolean>()
         {
             @Override
-            public R call() throws Exception
+            public Boolean call() throws Exception
             {
                 try
                 {
                     task.setResult( task.call() );
                     task.setTaskState( Task.TaskState.SUCCEEDED );
+
+                    return true;
                 }
                 catch ( Exception e )
                 {
@@ -278,12 +405,14 @@ public class HostUtil
 
                     task.setException( e );
                     task.setTaskState( Task.TaskState.FAILED );
+
+                    return false;
                 }
-
-                //remove completed task
-                tasks.remove( task );
-
-                return null;
+                finally
+                {
+                    //remove completed task
+                    tasks.remove( task );
+                }
             }
         } );
     }
