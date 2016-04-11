@@ -22,14 +22,9 @@ type update struct {
 	timestamp int
 }
 
-func getBody(url string) (response *http.Response) {
-	response, err := config.CheckKurjun().Get(url)
-	log.Check(log.FatalLevel, "Getting response from "+url, err)
-	return
-}
-
-func getList() (list []map[string]interface{}) {
-	resp := getBody(config.Management.Kurjun + "/file/list")
+func getList(kurjun *http.Client) (list []map[string]interface{}) {
+	resp, err := kurjun.Get(config.Cdn.Kurjun + "/file/list")
+	log.Check(log.FatalLevel, "GET: "+config.Cdn.Kurjun+"/file/list", err)
 	defer resp.Body.Close()
 	jsonlist, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
@@ -45,6 +40,7 @@ func Update(name string, check bool) {
 		}
 		defer unlockSubutai()
 
+		kurjun := config.CheckKurjun()
 		var lcl int
 		var rmt update
 		var date int64
@@ -62,7 +58,7 @@ func Update(name string, check bool) {
 			}
 		}
 
-		for _, v := range getList() {
+		for _, v := range getList(kurjun) {
 			item := v["name"].(string)
 			if strings.HasPrefix(item, "subutai") && strings.HasSuffix(item, ".snap") {
 				if version := strings.Split(strings.Trim(item, "subutai_ _amd64.snap"), "-"); len(version) > 1 {
@@ -91,7 +87,8 @@ func Update(name string, check bool) {
 		file, err := os.Create("/tmp/" + rmt.name)
 		log.Check(log.FatalLevel, "Creating update file", err)
 		defer file.Close()
-		resp := getBody(config.Management.Kurjun + "/file/get?id=" + rmt.id)
+		resp, err := kurjun.Get(config.Cdn.Kurjun + "/file/get?id=" + rmt.id)
+		log.Check(log.FatalLevel, "GET: "+config.Cdn.Kurjun+"/file/get?id="+rmt.id, err)
 		defer resp.Body.Close()
 		_, err = io.Copy(file, resp.Body)
 		log.Check(log.FatalLevel, "Writing response to file", err)

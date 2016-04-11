@@ -7,5 +7,5 @@ package io.subutai.common.security.crypto.key;
 public enum KeyType 
 {
 	SYMMETRIC, 
-	ASYMMETRIC;
+	ASYMMETRIC
 }

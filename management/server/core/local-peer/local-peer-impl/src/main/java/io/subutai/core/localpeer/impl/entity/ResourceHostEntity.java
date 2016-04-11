@@ -3,15 +3,9 @@ package io.subutai.core.localpeer.impl.entity;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.NamingException;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
@@ -35,7 +29,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -43,6 +37,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.ContainerHost;
@@ -54,26 +49,21 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.common.security.objects.PermissionObject;
-import io.subutai.common.settings.Common;
-import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.kurjun.api.TemplateManager;
-import io.subutai.core.localpeer.impl.container.CreateContainerTask;
-import io.subutai.core.localpeer.impl.container.DestroyContainerTask;
-import io.subutai.core.localpeer.impl.tasks.SetupTunnelsTask;
+import io.subutai.core.localpeer.impl.ResourceHostCommands;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 
 
 /**
- * Resource host implementation. TODO review all methods to see which ones must be run sequentially like setupTunnels
+ * Resource host implementation.
  */
 @Entity
 @Table( name = "r_host" )
@@ -100,12 +90,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @JsonIgnore
     protected Set<HostInterface> netInterfaces = new HashSet<>();
 
-    @Transient
-    protected ExecutorService singleThreadExecutorService;
-
 
     @Transient
     protected CommandUtil commandUtil = new CommandUtil();
+
+    @Transient
+    protected ResourceHostCommands resourceHostCommands = new ResourceHostCommands();
 
     @Transient
     protected TemplateManager registry;
@@ -127,11 +117,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void init()
     {
         super.init();
-
-        if ( singleThreadExecutorService == null )
-        {
-            singleThreadExecutorService = Executors.newSingleThreadExecutor();
-        }
     }
 
 
@@ -191,15 +176,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public <T> Future<T> queueSequentialTask( Callable<T> callable )
-    {
-        return singleThreadExecutorService.submit( callable );
-    }
-
-
     public void dispose()
     {
-        singleThreadExecutorService.shutdown();
     }
 
 
@@ -210,35 +188,67 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException
+    //this method must be executed sequentially since other parallel executions can setup the same tunnel
+    public synchronized void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException
     {
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( networkResource, "Invalid networkResource" );
 
-        //need to execute sequentially since other parallel executions can setup the same tunnel
-        Future<Boolean> future = queueSequentialTask( new SetupTunnelsTask( this, p2pIps, networkResource ) );
 
-        try
+        Tunnels tunnels = getTunnels();
+
+        //setup tunnel to each local and remote RH
+        for ( RhP2pIp rhP2pIp : p2pIps.getP2pIps() )
         {
-            future.get();
-        }
-        catch ( Exception e )
-        {
-            throw new ResourceHostException( "Error setting up tunnels", e.getCause() );
+            //skip self
+            if ( getId().equalsIgnoreCase( rhP2pIp.getRhId() ) )
+            {
+                continue;
+            }
+
+            //skip if own IP
+            boolean ownIp = !( getHostInterfaces().findByIp( rhP2pIp.getP2pIp() ) instanceof NullHostInterface );
+            if ( ownIp )
+            {
+                continue;
+            }
+
+            //check p2p connections in case heartbeat hasn't arrived yet with new p2p interface
+            P2PConnections p2PConnections = getP2PConnections();
+            //skip if exists
+            if ( p2PConnections.findByIp( rhP2pIp.getP2pIp() ) != null )
+            {
+                continue;
+            }
+
+            //see if tunnel exists
+            Tunnel tunnel = tunnels.findByIp( rhP2pIp.getP2pIp() );
+
+            //create new tunnel
+            if ( tunnel == null )
+            {
+                String tunnelName = P2PUtil.generateTunnelName( tunnels );
+
+                if ( tunnelName == null )
+                {
+                    throw new ResourceHostException( "Free tunnel name not found" );
+                }
+
+                Tunnel newTunnel = new Tunnel( tunnelName, rhP2pIp.getP2pIp(), networkResource.getVlan(),
+                        networkResource.getVni() );
+
+                createTunnel( newTunnel );
+
+                //add to avoid duplication in the next iteration
+                tunnels.addTunnel( newTunnel );
+            }
         }
     }
 
 
     protected NetworkManager getNetworkManager() throws ResourceHostException
     {
-        try
-        {
-            return ServiceLocator.getServiceNoCache( NetworkManager.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new ResourceHostException( e );
-        }
+        return ServiceLocator.getServiceNoCache( NetworkManager.class );
     }
 
 
@@ -258,12 +268,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
 
-        RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "subutai list -i %s", containerHost.getHostname() ) );
         CommandResult result;
         try
         {
-            result = commandUtil.execute( requestBuilder, this );
+            result = commandUtil
+                    .execute( resourceHostCommands.getListContainerInfoCommand( containerHost.getHostname() ), this );
         }
         catch ( CommandException e )
         {
@@ -291,7 +300,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         synchronized ( containersHosts )
         {
-            return Sets.newConcurrentHashSet( containersHosts );
+            return containersHosts == null ? Sets.<ContainerHost>newHashSet() : Sets.newConcurrentHashSet( containersHosts );
         }
     }
 
@@ -310,12 +319,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
-        RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "subutai start %s", containerHost.getHostname() ) ).withTimeout( 1 )
-                                                                                                      .daemon();
         try
         {
-            commandUtil.execute( requestBuilder, this );
+            commandUtil.execute( resourceHostCommands.getStartContainerCommand( containerHost.getHostname() ), this );
         }
         catch ( CommandException e )
         {
@@ -366,12 +372,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
-        RequestBuilder requestBuilder =
-                new RequestBuilder( String.format( "subutai stop %s", containerHost.getHostname() ) )
-                        .withTimeout( 120 );
         try
         {
-            commandUtil.execute( requestBuilder, this );
+            commandUtil.execute( resourceHostCommands.getStopContainerCommand( containerHost.getHostname() ), this );
         }
         catch ( CommandException e )
         {
@@ -396,13 +399,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                     String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
         }
 
-        Future future = queueSequentialTask( new DestroyContainerTask( this, containerHost.getHostname() ) );
-
         try
         {
-            future.get();
+            commandUtil.execute( resourceHostCommands.getDestroyContainerCommand( containerHost.getHostname() ), this );
         }
-        catch ( ExecutionException | InterruptedException e )
+        catch ( CommandException e )
         {
             throw new ResourceHostException( "Error destroying container", e );
         }
@@ -439,8 +440,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             synchronized ( containersHosts )
             {
                 containersHosts.remove( containerHost );
-                ( ( ContainerHostEntity ) containerHost ).setParent( null );
             }
+            ( ( ContainerHostEntity ) containerHost ).setParent( null );
         }
     }
 
@@ -506,53 +507,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    @Override
-    public ContainerHostInfo createContainer( final String templateName, final String hostname,
-                                              final ContainerQuota quota, final String ip, final int vlan,
-                                              final int timeout, final String environmentId )
-            throws ResourceHostException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
-                "Invalid vlan id" );
-        Preconditions.checkArgument( timeout > 0, "Invalid timeout" );
-
-        TemplateKurjun template = registry.getTemplate( templateName );
-        if ( template == null )
-        {
-            throw new ResourceHostException( String.format( "Template %s is not registered", templateName ) );
-        }
-
-        try
-        {
-            getContainerHostByName( hostname );
-            throw new ResourceHostException( String.format( "Container with name %s already exists", hostname ) );
-        }
-        catch ( HostNotFoundException e )
-        {
-            //ignore
-            LOG.info( String.format( "Container host '%s' does not exists, creating new one.", hostname ) );
-        }
-
-        Future<ContainerHostInfo> containerHostFuture = queueSequentialTask(
-                new CreateContainerTask( hostRegistry, this, template, hostname, quota, ip, vlan, timeout,
-                        environmentId ) );
-
-        try
-        {
-            final ContainerHostInfo result = containerHostFuture.get();
-            return result;
-        }
-        catch ( ExecutionException | InterruptedException e )
-        {
-            throw new ResourceHostException( "Error creating container", e );
-        }
-    }
-
-
     public void setRegistry( final TemplateManager registry )
     {
         this.registry = registry;
@@ -585,7 +539,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            commandUtil.execute( new RequestBuilder( String.format( "subutai cleanup %d", vlan ) ), this );
+            commandUtil.execute( resourceHostCommands.getCleanupEnvironmentCommand( vlan ), this );
         }
         catch ( CommandException e )
         {
@@ -593,6 +547,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         Set<ContainerHost> containerHosts = getContainerHostsByEnvironmentId( environmentId.getId() );
+
         if ( containerHosts.size() > 0 )
         {
             for ( ContainerHost containerHost : containerHosts )
@@ -610,7 +565,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         {
             try
             {
-                CommandResult commandResult = commandUtil.execute( new RequestBuilder( "nproc" ), this );
+                CommandResult commandResult =
+                        commandUtil.execute( resourceHostCommands.getFetchCpuCoresNumberCommand(), this );
 
                 numberOfCpuCores = Integer.parseInt( commandResult.getStdOut().trim() );
             }
@@ -729,8 +685,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 if ( "management".equals( info.getHostname() ) )
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getHostname(), "management", info.getArch().name(),
-                            "management", null, null, ContainerSize.SMALL, info.getState() );
+                            info.getHostInterfaces(), info.getContainerName(), "management", info.getArch().name(),
+                            "management", null, null, ContainerSize.SMALL );
                     addContainerHost( containerHost );
                 }
                 else

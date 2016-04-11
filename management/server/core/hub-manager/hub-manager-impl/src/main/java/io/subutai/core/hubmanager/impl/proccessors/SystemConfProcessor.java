@@ -40,7 +40,7 @@ public class SystemConfProcessor implements StateLinkProccessor
 
 
     @Override
-    public void proccessStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
     {
         for ( String link : stateLinks )
         {
@@ -73,13 +73,13 @@ public class SystemConfProcessor implements StateLinkProccessor
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                return result;
+                return null;
             }
 
             if ( r.getStatus() != HttpStatus.SC_OK )
             {
                 LOG.error( r.readEntity( String.class ) );
-                return result;
+                return null;
             }
 
             byte[] encryptedContent = configManager.readContent( r );

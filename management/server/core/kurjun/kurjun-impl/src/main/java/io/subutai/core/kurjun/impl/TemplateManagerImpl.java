@@ -53,7 +53,6 @@ import ai.subut.kurjun.snap.SnapMetadataParserModule;
 import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.SharedTemplate;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.settings.Common;
@@ -424,7 +423,7 @@ public class TemplateManagerImpl implements TemplateManager
                 return ips.get( 0 ).getHostAddress();
             }
         }
-        catch ( PeerException | SocketException | IndexOutOfBoundsException ex )
+        catch ( SocketException | IndexOutOfBoundsException ex )
         {
             LOGGER.error( "Cannot get external ip. Returning null.", ex );
             return null;

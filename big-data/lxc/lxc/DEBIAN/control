@@ -1,9 +1,0 @@
-Package: ksks-lxc
-Priority: optional
-Section: devel
-Installed-Size: 681000
-Maintainer: kiskis
-Architecture: all
-Version: 1.0.9
-Depends: lxc
-Description: This is an LXC package of kiskis distribution.

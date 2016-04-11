@@ -50,10 +50,6 @@ public class Ram
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "RAM{" );
-        sb.append( "total=" ).append( total );
-        sb.append( ", free=" ).append( free );
-        sb.append( '}' );
-        return sb.toString();
+        return "RAM{" + "total=" + total + ", free=" + free + '}';
     }
 }

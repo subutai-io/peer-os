@@ -129,7 +129,8 @@ public class RestServiceImpl implements RestService
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                             convertContainersToContainerJson( environment.getContainerHosts() ),
-                            environment.getRelationDeclaration() );
+                            environment.getRelationDeclaration(), environment.getClass().getName() );
+
             environmentDtos.add( environmentDto );
         }
 
@@ -390,18 +391,24 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            String path = null;
             DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
-            if ( attr == null || attr.getDataHandler().getContent() == null )
+
+            try
             {
-                throw new Exception( "Error, cannot read an attachment", null );
+                attr.getDataHandler().getContent();
+                File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+                file.createNewFile();
+                attr.transferTo( file );
+
+                path = System.getProperty( "java.io.tmpdir" ) + "/" + environmentId;
+            }
+            catch ( Exception e )
+            {
+                // path
             }
 
-            File file = new File( System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
-            file.createNewFile();
-            attr.transferTo( file );
-
-            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy,
-                    System.getProperty( "java.io.tmpdir" ) + "/" + environmentId );
+            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy, path);
         }
         catch ( Exception e )
         {
@@ -781,7 +788,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( environmentManager.setupContainerSsh( containerId, environmentId ) ).build();
+            return Response.ok( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ).build();
         }
         catch ( Exception e )
         {
@@ -838,6 +845,7 @@ public class RestServiceImpl implements RestService
     private Set<ContainerDto> convertContainersToContainerJson( Set<EnvironmentContainerHost> containerHosts )
     {
         Set<ContainerDto> containerDtos = Sets.newHashSet();
+
         for ( EnvironmentContainerHost containerHost : containerHosts )
         {
             try
@@ -847,16 +855,20 @@ public class RestServiceImpl implements RestService
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), containerHost.getResourceHostId().getId() ) );
+                        containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
+                        containerHost.getClass().getName() )
+                 );
             }
             catch ( Exception e )
             {
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), "UNKNOWN" ) );
+                        containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName() )
+                );
             }
         }
+
         return containerDtos;
     }
 

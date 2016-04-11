@@ -5,10 +5,26 @@
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
-	<div class="b-popup__body">
-		<div class="b-logs-view" data-ng-bind-html="trackerPopupCtrl.logText">
-		</div>
+
+	<script>
+		$('.js-scrollbar').perfectScrollbar({
+			"wheelPropagation": true,
+			"swipePropagation": false
+		});
+	</script>
+	<div class="b-popup__body js-scrollbar b-popup-logs">
+		<table class="b-main-table b-main-table_none-border g-margin-bottom-half">
+			<tr ng-repeat="(key, log) in trackerCtrl.currentLog">
+				<td>{{ log.date }}</td>
+				<td class="b-main-table__mini-icon" style="text-align: center;">
+					<i class="fa fa-check g-text-green" ng-if="log.state != 'FAILED'"></i>
+					<i class="fa fa-times g-text-red" ng-if="log.state == 'FAILED'"></i>
+				</td>
+				<td>{{ log.log }}</td>
+			</tr>
+		</table>
 	</div>
+
 	<div class="b-popup__footer">
 		<button class="b-btn b-btn_green g-right" ng-click="closeThisDialog()">
 			OK

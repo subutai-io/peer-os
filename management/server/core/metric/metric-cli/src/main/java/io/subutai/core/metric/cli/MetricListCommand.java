@@ -1,8 +1,6 @@
 package io.subutai.core.metric.cli;
 
 
-import java.util.Collection;
-
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;

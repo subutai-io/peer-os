@@ -57,33 +57,6 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupTunnelCommand( String tunnelName, String tunnelIp, String tunnelType )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
-                .withCmdArgs( Lists.newArrayList( "-c", tunnelName, tunnelIp, tunnelType ) );
-    }
-
-
-    public RequestBuilder getListTunnelsCommand()
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-l" ) );
-    }
-
-
-    public RequestBuilder getSetupVniVlanMappingCommand( String tunnelName, long vni, int vLanId, String environmentId )
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
-                Lists.newArrayList( "-m", tunnelName, String.valueOf( vni ), String.valueOf( vLanId ),
-                        environmentId ) );
-    }
-
-
-    public RequestBuilder getListVniVlanMappingsCommand()
-    {
-        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs( Lists.newArrayList( "-v" ) );
-    }
-
-
     public RequestBuilder getGetVlanDomainCommand( int vLanId )
     {
         return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
@@ -104,6 +77,19 @@ public class Commands
     {
         List<String> args = Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain, "-p",
                 domainLoadBalanceStrategy.getValue() );
+        if ( !Strings.isNullOrEmpty( sslCertPath ) )
+        {
+            args.add( "-f" );
+            args.add( sslCertPath );
+        }
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING ).withCmdArgs( args );
+    }
+
+
+    public RequestBuilder getSetVlanDomainCommand( final int vLanId, final String domain, final String host,
+                                                   final String sslCertPath )
+    {
+        List<String> args = Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain, "-h", host );
         if ( !Strings.isNullOrEmpty( sslCertPath ) )
         {
             args.add( "-f" );
@@ -137,11 +123,5 @@ public class Commands
     public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
     {
         return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
-    }
-
-
-    public RequestBuilder getPingDistanceCommand( final String ip )
-    {
-        return new RequestBuilder( "ping -c 10 -i 0.2 -w 3 " + ip );
     }
 }

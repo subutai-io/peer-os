@@ -1,20 +1,23 @@
 package io.subutai.core.tracker.rest.ui;
 
 
-import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.subutai.common.tracker.TrackerOperationView;
-import io.subutai.core.tracker.api.Tracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.Response;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import io.subutai.common.tracker.TrackerOperationView;
+import io.subutai.core.tracker.api.Tracker;
 
 
 public class RestServiceImpl implements RestService
@@ -86,5 +89,47 @@ public class RestServiceImpl implements RestService
     public Response getTrackerOperationSources()
     {
         return Response.ok().entity( GSON.toJson( tracker.getTrackerOperationSources() ) ).build();
+    }
+
+    @Override
+    public Response getNotification()
+    {
+        try
+        {
+            return Response.ok( GSON.toJson( tracker.getNotifications() ) ).build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( GSON.toJson( e ) ).build();
+        }
+    }
+
+    @Override
+    public Response clearAllNotifications()
+    {
+        try
+        {
+            tracker.setOperationsViewStates( false );
+            return Response.ok().build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( e ).build();
+        }
+    }
+
+    @Override
+    public Response clearNotification(String source, String uuid)
+    {
+        try
+        {
+            UUID poUUID = UUID.fromString( uuid );
+            tracker.setOperationViewState( source, poUUID, false );
+            return Response.ok().build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( e ).build();
+        }
     }
 }

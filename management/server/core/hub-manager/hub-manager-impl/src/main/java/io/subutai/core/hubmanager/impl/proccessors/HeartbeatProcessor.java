@@ -47,11 +47,7 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            LOG.debug( "Sending heartbeat..." );
-
             sendHeartbeat();
-
-            LOG.debug( "Heartbeat sent successfully" );
         }
         catch ( Exception e )
         {
@@ -90,13 +86,13 @@ public class HeartbeatProcessor implements Runnable
 
                     LOG.debug( "State links from HUB: " + response.getStateLinks().toString() );
 
-                    result.addAll( new HashSet<String>( response.getStateLinks() ) );
+                    result.addAll( new HashSet<>( response.getStateLinks() ) );
 
                     for ( final StateLinkProccessor proccessor : proccessors )
                     {
                         try
                         {
-                            proccessor.proccessStateLinks( result );
+                            proccessor.processStateLinks( result );
                         }
                         catch ( HubPluginException e )
                         {

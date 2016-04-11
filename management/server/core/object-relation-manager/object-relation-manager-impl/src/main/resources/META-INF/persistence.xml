@@ -14,7 +14,7 @@
     <class>io.subutai.core.object.relation.impl.model.RelationChallengeImpl</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=TRACE" />
+      <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO, SQL=INFO" />
       <property name="openjpa.ConnectionFactoryProperties" value="PrintParameters=true" />
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported" />
       <property name="openjpa.jdbc.DBDictionary" value="derby" />

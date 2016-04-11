@@ -4,9 +4,6 @@ package io.subutai.core.environment.impl.workflow.modification;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -18,21 +15,16 @@ import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneSt
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
-import io.subutai.core.environment.impl.workflow.modification.steps.ContainerDestroyStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.DestroyContainersStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
 
 public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentModifyWorkflow.class );
-
-    private final TemplateManager templateRegistry;
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
     private final Topology topology;
@@ -40,7 +32,6 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
-    private boolean forceMetadataRemoval;
     private final SecurityManager securityManager;
 
 
@@ -61,15 +52,13 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     }
 
 
-    public EnvironmentModifyWorkflow( String defaultDomain, TemplateManager templateRegistry, PeerManager peerManager,
-                                      SecurityManager securityManager, EnvironmentImpl environment, Topology topology,
-                                      List<String> removedContainers, TrackerOperation operationTracker,
-                                      EnvironmentManagerImpl environmentManager, boolean forceMetadataRemoval )
+    public EnvironmentModifyWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
+                                      EnvironmentImpl environment, Topology topology, List<String> removedContainers,
+                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
     {
 
         super( EnvironmentGrowingPhase.INIT );
 
-        this.templateRegistry = templateRegistry;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
         this.environment = environment;
@@ -78,9 +67,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         this.defaultDomain = defaultDomain;
         this.environmentManager = environmentManager;
         this.removedContainers = new ArrayList<>();
-        this.forceMetadataRemoval = false;
         this.removedContainers = removedContainers;
-        this.forceMetadataRemoval = forceMetadataRemoval;
     }
 
 
@@ -93,7 +80,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
     }
@@ -105,10 +92,9 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
         try
         {
-            new ContainerDestroyStep( environment, environmentManager, removedContainers, forceMetadataRemoval,
-                    operationTracker ).execute();
+            new DestroyContainersStep( environment, environmentManager, removedContainers, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             if ( topology == null )
             {
@@ -134,7 +120,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new PEKGenerationStep( topology, environment, peerManager, securityManager, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.RESERVE_NET;
         }
@@ -155,7 +141,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new ReservationStep( topology, environment, peerManager, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.SETUP_P2P;
         }
@@ -176,7 +162,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new SetupP2PStep( topology, environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.PREPARE_TEMPLATES;
         }
@@ -197,7 +183,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.CLONE_CONTAINERS;
         }
@@ -218,7 +204,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
             new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
                     operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.CONFIGURE_HOSTS;
         }
@@ -239,7 +225,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new RegisterHostsStep( environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.CONFIGURE_SSH;
         }
@@ -260,7 +246,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         {
             new RegisterSshStep( environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentGrowingPhase.FINALIZE;
         }
@@ -275,11 +261,9 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing environment growth" );
-
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         operationTracker.addLogDone( "Environment is grown" );
 
@@ -291,16 +275,18 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
     @Override
     public void fail( final String message, final Throwable e )
     {
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( message );
+
         super.fail( message, e );
-        saveFailState();
     }
 
 
-    private void saveFailState()
+    protected void saveEnvironment()
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.update( environment );
-        operationTracker.addLogFailed( getFailedReason() );
-        LOG.error( "Error modifying environment", getFailedException() );
     }
 }

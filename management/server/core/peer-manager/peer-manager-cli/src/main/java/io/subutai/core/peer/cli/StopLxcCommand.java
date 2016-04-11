@@ -9,7 +9,7 @@ import io.subutai.core.peer.api.PeerManager;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
-
+//todo move to local peer
 @Command( scope = "peer", name = "stop-container" )
 public class StopLxcCommand extends SubutaiShellCommandSupport
 {

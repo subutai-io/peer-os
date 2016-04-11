@@ -18,15 +18,20 @@ public class EnvironmentDto
     private Boolean revoke;
     private Set<ContainerDto> containers;
 
+    // Where environment created: subutai, hub
+    private String dataSource;
+
 
     public EnvironmentDto( final String id, final String name, final EnvironmentStatus status,
-                           final Set<ContainerDto> containers, String relationDeclaration )
+                           final Set<ContainerDto> containers, String relationDeclaration, String className )
     {
         this.id = id;
         this.name = name;
         this.status = status;
         this.containers = containers;
         this.relationDeclaration = relationDeclaration;
+
+        dataSource = className.contains( "ProxyEnvironment" ) ? "hub" : "subutai";
     }
 
 
@@ -99,5 +104,11 @@ public class EnvironmentDto
     public void setRelationDeclaration( final String relationDeclaration )
     {
         this.relationDeclaration = relationDeclaration;
+    }
+
+
+    public String getDataSource()
+    {
+        return dataSource;
     }
 }

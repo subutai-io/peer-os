@@ -28,7 +28,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = "v4.0.0-RC6" + TIMESTAMP
+	app.Version = "v4.0.0-RC7" + TIMESTAMP
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
@@ -105,8 +105,10 @@ func main() {
 		}}, {
 
 		Name: "export", Usage: "export Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "v", Usage: "template version"}},
 		Action: func(c *cli.Context) {
-			lib.LxcExport(c.Args().Get(0))
+			lib.LxcExport(c.Args().Get(0), c.String("v"))
 		}}, {
 
 		Name: "import", Usage: "import Subutai template",
@@ -236,9 +238,10 @@ func main() {
 
 		Name: "quota", Usage: "set quotas for Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"}},
+			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
+			cli.StringFlag{Name: "t", Usage: "set alert threshold"}},
 		Action: func(c *cli.Context) {
-			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"))
+			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("t"))
 		}}, {
 
 		Name: "register", Usage: "register Subutai container",

@@ -43,7 +43,7 @@ public class KurjunEntity implements Kurjun
     private String authID;
 
     @Column( name = "owner_message")
-    private String signedMessage;
+    private byte[] signedMessage;
 
     @Column( name = "token")
     private String token;
@@ -125,18 +125,6 @@ public class KurjunEntity implements Kurjun
     }
 
 
-    public String getSignedMessage()
-    {
-        return signedMessage;
-    }
-
-
-    public void setSignedMessage( final String signedMessage )
-    {
-        this.signedMessage = signedMessage;
-    }
-
-
     public String getToken()
     {
         return token;
@@ -146,5 +134,18 @@ public class KurjunEntity implements Kurjun
     public void setToken( final String token )
     {
         this.token = token;
+    }
+
+
+    @Override
+    public byte[] getSignedMessage()
+    {
+        return signedMessage;
+    }
+
+
+    public void setSignedMessage( final byte[] signedMessage )
+    {
+        this.signedMessage = signedMessage;
     }
 }

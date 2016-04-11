@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.destruction;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -16,19 +13,12 @@ import io.subutai.core.object.relation.api.RelationManager;
 
 
 
-//todo use native fail for failing the workflow
 public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ContainerDestructionWorkflow.class );
-
     private final EnvironmentManagerImpl environmentManager;
     private EnvironmentImpl environment;
     private final ContainerHost containerHost;
     private final TrackerOperation operationTracker;
-
-    private Throwable error;
-
-    private boolean skippedDestruction;
 
 
     public static enum ContainerDestructionPhase
@@ -59,7 +49,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         return ContainerDestructionPhase.VALIDATE;
     }
@@ -71,11 +61,9 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
         if ( environment.getContainerHosts().size() <= 1 )
         {
-            operationTracker.addLog( "Environment has 0 or 1 container. Please, destroy environment instead" );
+            fail( "Environment has 0 or 1 container. Please, destroy environment instead" );
 
-            skippedDestruction = true;
-
-            return ContainerDestructionPhase.FINALIZE;
+            return null;
         }
         else
         {
@@ -94,13 +82,13 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
             RelationManager relationManager = environmentManager.getRelationManager();
             relationManager.removeRelation( containerHost );
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return ContainerDestructionPhase.FINALIZE;
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -109,34 +97,33 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing container destruction" );
 
         environment.setStatus( EnvironmentStatus.HEALTHY );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
-        operationTracker.addLogDone( skippedDestruction ? "Container is not destroyed" : "Container is destroyed" );
+        operationTracker.addLogDone( "Container is destroyed" );
 
         //this is a must have call
         stop();
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( message );
+
+        super.fail( message, e );
     }
 
 
-    public void setError( final Throwable error )
+    protected void saveEnvironment()
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.update( environment );
-
-        this.error = error;
-        LOG.error( "Error destroying container", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
     }
 }

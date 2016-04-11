@@ -105,12 +105,11 @@ func connectionMonitor() {
 }
 
 func heartbeat() bool {
-	if time.Since(lastHeartbeatTime) < time.Second*3 {
-		return false
-	}
-	lastHeartbeatTime = time.Now()
 	mutex.Lock()
 	defer mutex.Unlock()
+	if len(lastHeartbeat) > 0 && time.Since(lastHeartbeatTime) < time.Second*5 {
+		return false
+	}
 
 	pool = container.GetActiveContainers(false)
 	beat := Heartbeat{
@@ -126,6 +125,7 @@ func heartbeat() bool {
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
 
+	lastHeartbeatTime = time.Now()
 	if string(jbeat) == string(lastHeartbeat) {
 		return true
 	}
@@ -192,26 +192,24 @@ func execute(rsp executer.EncRequest) {
 	}
 
 	for sOut != nil {
-		select {
-		case elem, ok := <-sOut:
-			if ok {
-				resp := executer.Response{ResponseOpts: elem}
-				jsonR, err := json.Marshal(resp)
-				log.Check(log.WarnLevel, "Marshal response", err)
-				if rsp.HostId == fingerprint {
-					payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
-				} else {
-					payload = gpg.EncryptWrapperNoDefaultKeyring(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
-				}
-				message, err := json.Marshal(map[string]string{
-					"hostId":   elem.Id,
-					"response": payload,
-				})
-				log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
-				go response(message)
+		elem, ok := <-sOut
+		if ok {
+			resp := executer.Response{ResponseOpts: elem}
+			jsonR, err := json.Marshal(resp)
+			log.Check(log.WarnLevel, "Marshal response", err)
+			if rsp.HostId == fingerprint {
+				payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
 			} else {
-				sOut = nil
+				payload = gpg.EncryptWrapperNoDefaultKeyring(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
 			}
+			message, err := json.Marshal(map[string]string{
+				"hostId":   elem.Id,
+				"response": payload,
+			})
+			log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
+			go response(message)
+		} else {
+			sOut = nil
 		}
 	}
 	go heartbeat()

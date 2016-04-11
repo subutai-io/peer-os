@@ -20,6 +20,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
@@ -207,7 +208,7 @@ public interface EnvironmentManager
      *
      * @return port for ssh connection
      */
-    int setupContainerSsh( String containerHostId, String environmentId )
+    int setupSshTunnelForContainer( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )
@@ -237,4 +238,7 @@ public interface EnvironmentManager
 
     void stopMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )
             throws EnvironmentManagerException;
+
+    void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
+            throws EnvironmentModificationException;
 }

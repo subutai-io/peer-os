@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
->
-
-  <cm:property-placeholder persistent-id="subutaisystem" update-strategy="reload" />
+    >
 
   <reference id="templateManager" availability="mandatory"
              interface="io.subutai.core.kurjun.api.TemplateManager" />
@@ -12,19 +9,15 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
+  <reference id="integration"
+             interface="io.subutai.core.hubmanager.api.Integration" />
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl" destroy-method="dispose">
     <property name="templateManager" ref="templateManager" />
     <property name="identityManager" ref="identityManager" />
     <property name="peerManager" ref="peerManager" />
-
-    <argument value="${globalKurjunUrls}" />
-    <argument value="${securePortX1}" />
-    <argument value="${securePortX2}" />
-    <argument value="${securePortX3}" />
-    <argument value="${localKurjunUrls}" />
-
+    <argument ref="integration" />
   </bean>
 
   <service ref="systemManagerImpl"

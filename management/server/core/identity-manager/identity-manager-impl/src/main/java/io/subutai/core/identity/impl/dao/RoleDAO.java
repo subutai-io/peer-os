@@ -8,7 +8,6 @@ import javax.persistence.EntityManager;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.impl.model.RoleEntity;
 

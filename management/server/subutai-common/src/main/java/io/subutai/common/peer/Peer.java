@@ -20,7 +20,6 @@ import io.subutai.common.environment.PrepareTemplatesResponseCollector;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
@@ -29,7 +28,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistances;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -63,7 +62,7 @@ public interface Peer extends RelationLink
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo() throws PeerException;
+    public PeerInfo getPeerInfo();
 
     /**
      * Creates environment container group on the peer
@@ -219,19 +218,11 @@ public interface Peer extends RelationLink
 
 
     /**
-     * Sets up tunnels on the local peer to the specified remote peers todo use EnvironmentId instead of string
+     * Sets up tunnels on the local peer to the specified remote peers
+     *
+     * todo use EnvironmentId instead of string
      */
     public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
-
-
-    /**
-     * Gets containerHost by Id specified
-     *
-     * @return - containerHost
-     *
-     * todo use ContainerId instead of string
-     */
-    public HostInfo getContainerHostInfoById( String containerHostId ) throws PeerException;
 
 
     /* **************************************************************
@@ -266,9 +257,6 @@ public interface Peer extends RelationLink
 
     void joinOrUpdateP2PSwarm( P2PConfig config ) throws PeerException;
 
-    @Deprecated
-    public void createP2PSwarm( final P2PConfig config ) throws PeerException;
-
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
 
@@ -278,8 +266,6 @@ public interface Peer extends RelationLink
     //todo use PeerId instead of string
     PeerResources getResourceLimits( String peerId ) throws PeerException;
 
-    ContainerQuota getAvailableQuota( ContainerId containerId ) throws PeerException;
-
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
 
     void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
@@ -287,8 +273,6 @@ public interface Peer extends RelationLink
     void alert( AlertEvent alert ) throws PeerException;
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
-
-    PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
@@ -300,6 +284,11 @@ public interface Peer extends RelationLink
 
     void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
 
+    void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+
+    void addSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 
+    void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
 }

@@ -16,8 +16,8 @@ public class SSLManager
 	private static final Logger LOGGER = LoggerFactory.getLogger( SSLManager.class );
 
 	private KeyStore     keyStore = null;
-	private KeyStore     trustStore = null;;
-	private KeyStoreData keyStoreData = null;
+	private KeyStore     trustStore = null;
+    private KeyStoreData keyStoreData = null;
 	private KeyStoreData trustStoreData = null;
 	
 	public SSLManager(KeyStore keyStore,KeyStoreData keyStoreData,KeyStore trustStore,KeyStoreData trustStoreData)

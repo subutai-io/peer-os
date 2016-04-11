@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.dao.DaoManager;
 
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 

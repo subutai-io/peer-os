@@ -13,76 +13,46 @@ import io.subutai.common.resource.ContainerResourceType;
 
 
 /**
- * Container resource class
+ * Container quota class
  */
 public class ContainerQuota
 {
     @JsonProperty
-    private Map<ContainerResourceType, ContainerResource> resources = new HashMap<>();
+    private Map<ContainerResourceType, Quota> resources = new HashMap<>();
 
 
-    public ContainerQuota( ContainerResource resource )
+    public ContainerQuota( Quota quota )
     {
-        addResource( resource );
+        add( quota );
     }
 
 
-    public ContainerQuota( ContainerResource... resources )
+    public ContainerQuota( Quota... quotas )
     {
-        for ( int i = 0; i < resources.length; i++ )
+        for ( int i = 0; i < quotas.length; i++ )
         {
-            addResource( resources[i] );
+            add( quotas[i] );
         }
     }
 
 
-    public void addResource( ContainerResource containerResource )
+    public void add( Quota quota )
     {
-        Preconditions.checkNotNull( containerResource );
-        Preconditions.checkNotNull( containerResource.getContainerResourceType() );
-        Preconditions.checkNotNull( containerResource.getResource() );
+        Preconditions.checkNotNull( quota );
+        Preconditions.checkNotNull( quota.getResource() );
+        Preconditions.checkNotNull( quota.getResource().getContainerResourceType() );
 
-        resources.put( containerResource.getContainerResourceType(), containerResource );
+        resources.put( quota.getResource().getContainerResourceType(), quota );
     }
 
 
-    public ContainerCpuResource getCpu()
+    public Quota get( ContainerResourceType containerResourceType )
     {
-        return ( ContainerCpuResource ) resources.get( ContainerResourceType.CPU );
+        return resources.get( containerResourceType );
     }
 
 
-    public ContainerRamResource getRam()
-    {
-        return ( ContainerRamResource ) resources.get( ContainerResourceType.RAM );
-    }
-
-
-    public ContainerHomeResource getHome()
-    {
-        return ( ContainerHomeResource ) resources.get( ContainerResourceType.HOME );
-    }
-
-
-    public ContainerOptResource getOpt()
-    {
-        return ( ContainerOptResource ) resources.get( ContainerResourceType.OPT );
-    }
-
-
-    public ContainerVarResource getVar()
-    {
-        return ( ContainerVarResource ) resources.get( ContainerResourceType.VAR );
-    }
-
-
-    public ContainerRootfsResource getRootfs()
-    {
-        return ( ContainerRootfsResource ) resources.get( ContainerResourceType.ROOTFS );
-    }
-
-
-    public Collection<ContainerResource> getAllResources()
+    public Collection<Quota> getAll()
     {
         return resources.values();
     }
@@ -91,9 +61,6 @@ public class ContainerQuota
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "ContainerQuota{" );
-        sb.append( "resources=" ).append( resources );
-        sb.append( '}' );
-        return sb.toString();
+        return "ContainerQuota{" + "resources=" + resources + '}';
     }
 }

@@ -155,7 +155,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	//installed environment table options
 	function initDataTable() {
-		console.log('checker');
 		vm.dtInstance = {};
 		vm.dtOptionsInstallTable = DTOptionsBuilder
 			.newOptions()
@@ -281,10 +280,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function getContainersSortedByQuota(containers) {
+
 		var sortedContainers = containers.length > 0 ? {} : null;
+
 		for (var index = 0; index < containers.length; index++) {
+
+			var container = containers[index];
+			var remoteProxyContainer = !container.local && container.dataSource == "hub";
+
+			// We don't show on UI containers created by Hub, located on other peers.
+			// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
+			if ( remoteProxyContainer )
+			{
+				continue;
+			}
+
 			var quotaSize = containers[index].type;
 			var templateName = containers[index].templateName;
+
 			if (!sortedContainers[quotaSize]) {
 				sortedContainers[quotaSize] = {};
 				sortedContainers[quotaSize].quantity = 1;
@@ -345,8 +358,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 					environmentService.destroyEnvironment(environmentId).success(function (data) {
 						//SweetAlert.swal("Destroyed!", "Your environment has been destroyed.", "success");
 						loadEnvironments();
+						$rootScope.notificationsUpdate = 'destroyEnvironment';
 					}).error(function (data) {
-						SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
+						$timeout(function() {
+							SweetAlert.swal("ERROR!", "Your environment is safe :). Error: " + data.ERROR, "error");
+							$rootScope.notificationsUpdate = 'destroyEnvironmentError';
+						}, 2000);
 					});
 					loadEnvironments();
 				}
@@ -608,7 +625,6 @@ function initScrollbar() {
 }
 
 function getDateFromString(string) {
-	// var logTextTime = string.split(':');
 	var dateString = string.split(' ');
 	var temp = dateString[0].split('.');
 	var result = [temp[2], temp[1], temp[0]].join('-') + " " + dateString[1];

@@ -4,7 +4,6 @@ package io.subutai.core.network.api;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
-import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnels;
 
 
@@ -29,8 +28,6 @@ public interface NetworkManager
     public void resetSwarmSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
-
-    PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     /**
      * Returns all p2p connections running on the specified host
@@ -73,6 +70,9 @@ public interface NetworkManager
      */
     public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                String sslCertPath ) throws NetworkManagerException;
+
+    void setVlanDomain( int vLanId, String domain, String host, String sslCertPath )
+            throws NetworkManagerException;
 
     /**
      * Checks if IP is in vlan reverse proxy domain

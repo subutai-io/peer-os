@@ -22,6 +22,7 @@ function SettingsKurjunSrv($http) {
         signedMsg: signedMsg,
         updateConfigUrls: updateConfigUrls,
         updateConfigQuotas: updateConfigQuotas,
+        deleteUrl: deleteUrl,
         getUrlsListUrl: function () {
             return URLS_LIST_URL
         }
@@ -40,6 +41,10 @@ function SettingsKurjunSrv($http) {
             {
                 withCredentials: true, headers: {'Content-Type': 'application/json'}
             });
+    }
+
+    function deleteUrl(userId) {
+        return $http.delete(BASE_URL + userId);
     }
 
     function addUrl(postData) {
@@ -71,7 +76,7 @@ function SettingsKurjunSrv($http) {
 
 
     function signedMsg(id, signedMsg) {
-        var postData = "signedMsg=" + signedMsg + "&id=" + id;
+        var postData = "signedMsg=" + btoa(signedMsg) + "&id=" + id;
         return $http.post(
             SIGNED_MESSAGE_URL,
             postData,

@@ -30,31 +30,28 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
     private Host proxyContainer;
 
+    private final boolean local;
 
-    ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager )
+
+    ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
     {
-        super(
-                "hub",
-                json.get( "peerId" ).asText(),
-                json.get( "hostName" ).asText(),
+        super( "hub", json.get( "peerId" ).asText(),
+                new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
+                        json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
+                        ContainerHostState.RUNNING ), json.get( "templateName" ).asText(), HostArchitecture.AMD64, 0, 0,
+                json.get( "domainName" ).asText(), parseSize( json ), json.get( "hostId" ).asText(),
+                json.get( "name" ).asText() );
 
-                new ContainerHostInfoModel(
-                        json.get( "id" ).asText(),
-                        json.get( "hostName" ).asText(),
-                        initHostInterfaces( json ),
-                        HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING
-                ),
-
-                json.get( "templateName" ).asText(),
-                HostArchitecture.AMD64, 0, 0,
-                json.get( "domainName" ).asText(),
-                parseSize( json ),
-                json.get( "hostId" ).asText(),
-                json.get( "name" ).asText()
-        );
+        local = localContainerIds.contains( getId() );
 
         setEnvironmentManager( environmentManager );
+    }
+
+
+    @Override
+    public boolean isLocal()
+    {
+        return local;
     }
 
 
@@ -83,6 +80,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     void setProxyContainer( Host proxyContainer )
     {
         this.proxyContainer = proxyContainer;
+
+        LOG.debug( "Set proxy: container={}, proxy={}", getId(), proxyContainer.getId() );
     }
 
 
@@ -91,7 +90,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     {
         Host host = this;
 
-        // If this is a remote host a command is sent via a proxyContainer b/c the remote host is not directly accessible from current peer.
+        // If this is a remote host then the command is sent via a proxyContainer
+        // b/c the remote host is not directly accessible from the current peer.
         if ( proxyContainer != null )
         {
             requestBuilder = wrapForProxy( requestBuilder );
@@ -99,7 +99,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
             host = proxyContainer;
         }
 
-        return getPeer().execute( requestBuilder, host );
+        return host.getPeer().execute( requestBuilder, host );
     }
 
 
@@ -117,5 +117,4 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         return new RequestBuilder( command );
     }
-
 }

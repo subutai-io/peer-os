@@ -13,8 +13,6 @@ import io.subutai.common.task.CloneResponse;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.host.ContainerHostInfoModel;
 
-import static junit.framework.TestCase.assertEquals;
-
 
 @RunWith( MockitoJUnitRunner.class )
 @Ignore

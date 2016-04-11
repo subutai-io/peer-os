@@ -15,10 +15,10 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>blueprint-authz</module>
     <module>identity-manager-api</module>
     <module>identity-manager-impl</module>
     <module>identity-manager-rest</module>
     <module>identity-manager-rest-ui</module>
+    <module>blueprint-auth</module>
   </modules>
 </project>

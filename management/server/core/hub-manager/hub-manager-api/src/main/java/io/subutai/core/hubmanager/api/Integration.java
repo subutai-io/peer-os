@@ -4,6 +4,7 @@ package io.subutai.core.hubmanager.api;
 import java.util.Map;
 
 import io.subutai.core.hubmanager.api.model.Config;
+import io.subutai.hub.share.dto.SystemConfDto;
 
 
 public interface Integration
@@ -31,4 +32,6 @@ public interface Integration
     Config getHubConfiguration();
 
     String getChecksum();
+
+    void sendSystemConfiguration( SystemConfDto dto );
 }

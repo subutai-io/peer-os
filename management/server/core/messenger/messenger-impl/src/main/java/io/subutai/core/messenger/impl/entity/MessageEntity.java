@@ -69,10 +69,10 @@ public class MessageEntity implements Message
     {
         Preconditions.checkNotNull( envelope, "Envelope is null" );
         this.id = envelope.getMessage().getId().toString();
-        this.sourcePeerId = envelope.getMessage().getSourcePeerId().toString();
+        this.sourcePeerId = envelope.getMessage().getSourcePeerId();
         this.payloadString = envelope.getMessage().getPayload();
         this.sender = envelope.getMessage().getSender();
-        this.targetPeerId = envelope.getTargetPeerId().toString();
+        this.targetPeerId = envelope.getTargetPeerId();
         this.recipient = envelope.getRecipient();
         this.timeToLive = envelope.getTimeToLive();
         this.isSent = envelope.isSent();

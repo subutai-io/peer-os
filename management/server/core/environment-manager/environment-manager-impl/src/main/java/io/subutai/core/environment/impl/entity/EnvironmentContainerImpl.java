@@ -92,10 +92,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonProperty( "containerName" )
     private String containerName;
 
-    @Column( name = "node_group_name", nullable = false )
-    @JsonIgnore
-    private String nodeGroupName;
-
     @Column( name = "creator_peer_id", nullable = false )
     @JsonIgnore
     private String creatorPeerId;
@@ -168,14 +164,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public EnvironmentContainerImpl( final String creatorPeerId, final String peerId, final String nodeGroupName,
+    public EnvironmentContainerImpl( final String creatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateName,
                                      final HostArchitecture templateArch, int sshGroupId, int hostsGroupId,
                                      String domainName, ContainerSize containerSize, String resourceHostId,
                                      final String containerName )
     {
         Preconditions.checkNotNull( peerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
         Preconditions.checkNotNull( templateName );
@@ -187,7 +182,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostname = hostInfo.getHostname();
         this.containerName = containerName;
         this.hostArchitecture = hostInfo.getArch();
-        this.nodeGroupName = nodeGroupName;
         this.templateName = templateName;
         this.templateArch = templateArch;
         this.sshGroupId = sshGroupId;
@@ -196,34 +190,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.containerSize = containerSize;
         this.resourceHostId = resourceHostId;
         setHostInterfaces( hostInfo.getHostInterfaces() );
-    }
-
-
-    public EnvironmentContainerImpl( final String hostId, final String hostname, final String containerName,
-                                     final HostArchitecture hostArchitecture, final HostInterfaces hostInterfaces,
-                                     final String localPeerId, final String peerId, final String nodeGroupName,
-                                     final String templateName, final HostArchitecture templateArch, int sshGroupId,
-                                     int hostsGroupId, String domainName, ContainerSize containerSize )
-    {
-        Preconditions.checkNotNull( peerId );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( nodeGroupName ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
-        Preconditions.checkNotNull( containerSize );
-
-        this.hostId = hostId;
-        this.hostname = hostname;
-        this.creatorPeerId = localPeerId;
-        this.peerId = peerId;
-        this.containerName = containerName;
-        this.hostArchitecture = hostArchitecture;
-        this.nodeGroupName = nodeGroupName;
-        this.templateName = templateName;
-        this.templateArch = templateArch;
-        this.sshGroupId = sshGroupId;
-        this.hostsGroupId = hostsGroupId;
-        this.domainName = domainName;
-        this.containerSize = containerSize;
-        setHostInterfaces( hostInterfaces );
     }
 
 
@@ -244,7 +210,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public HostId getResourceHostId() throws PeerException
+    public HostId getResourceHostId()
     {
         return new HostId( resourceHostId );
     }
@@ -261,13 +227,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public EnvironmentId getEnvironmentId()
     {
         return environment.getEnvironmentId();
-    }
-
-
-    @Override
-    public String getNodeGroupName()
-    {
-        return this.nodeGroupName;
     }
 
 
@@ -407,11 +366,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     private void validateTrustChain() throws CommandException
     {
-        if ( environmentManager instanceof EnvironmentManagerImpl )
+        if ( environmentManager != null )
         {
             logger.warn( "Trust chain validation is on..." );
             // TODO call relationManager validation here instead
-            EnvironmentManagerImpl envImpl = ( EnvironmentManagerImpl ) environmentManager;
+            EnvironmentManagerImpl envImpl = environmentManager;
             if ( SystemSettings.getKeyTrustCheckState() )
             {
                 IdentityManager identityManager = envImpl.getIdentityManager();
@@ -541,13 +500,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerQuota getAvailableQuota() throws PeerException
-    {
-        return getPeer().getAvailableQuota( this.getContainerId() );
-    }
-
-
-    @Override
     public ContainerQuota getQuota() throws PeerException
     {
         return getPeer().getQuota( this.getContainerId() );
@@ -654,12 +606,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         String envId = environment != null ? environment.getId() : null;
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
-                          .add( "nodeGroupName", nodeGroupName ).add( "creatorPeerId", creatorPeerId )
-                          .add( "templateName", templateName ).add( "environmentId", envId )
-                          .add( "sshGroupId", sshGroupId ).add( "hostsGroupId", hostsGroupId )
-                          .add( "domainName", domainName ).add( "tags", tags ).add( "templateArch", templateArch )
-                          .add( "hostArchitecture", hostArchitecture ).add( "resourceHostId", resourceHostId )
-                          .toString();
+                          .add( "creatorPeerId", creatorPeerId ).add( "templateName", templateName )
+                          .add( "environmentId", envId ).add( "sshGroupId", sshGroupId )
+                          .add( "hostsGroupId", hostsGroupId ).add( "domainName", domainName ).add( "tags", tags )
+                          .add( "templateArch", templateArch ).add( "hostArchitecture", hostArchitecture )
+                          .add( "resourceHostId", resourceHostId ).toString();
     }
 
 

@@ -101,18 +101,17 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "subnet" )
     private String subnetCidr;
 
-    @Column( name = "last_used_ip_idx" )
-    @JsonIgnore
-    private int lastUsedIpIndex;
-
     @Column( name = "vni" )
     @JsonIgnore
     private Long vni;
 
-
     @Column( name = "p2p_subnet" )
     @JsonIgnore
     private String p2pSubnet;
+
+    @Column( name = "p2p_key" )
+    @JsonIgnore
+    private String p2pKey;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
@@ -176,7 +175,6 @@ public class EnvironmentImpl implements Environment, Serializable
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
-        this.lastUsedIpIndex = 0;//0 is reserved for gateway
         this.userId = userId;
         this.peerId = peerId;
     }
@@ -388,13 +386,11 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Set<EnvironmentContainerHost> containerHosts;
 
-        if ( containers == null )
+        synchronized ( this.containers )
         {
-            containerHosts = Sets.newHashSet();
-        }
-        else
-        {
-            containerHosts = Sets.newConcurrentHashSet( containers );
+            containerHosts =
+                    CollectionUtil.isCollectionEmpty( this.containers ) ? Sets.<EnvironmentContainerHost>newHashSet() :
+                    Sets.newConcurrentHashSet( this.containers );
         }
 
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) && environmentManager != null )
@@ -569,18 +565,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public int getLastUsedIpIndex()
-    {
-        return lastUsedIpIndex;
-    }
-
-
-    public void setLastUsedIpIndex( int lastUsedIpIndex )
-    {
-        this.lastUsedIpIndex = lastUsedIpIndex;
-    }
-
-
     @Override
     public String getP2pSubnet()
     {
@@ -626,6 +610,18 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getP2PHash()
     {
         return P2PUtil.generateHash( environmentId );
+    }
+
+
+    public String getP2pKey()
+    {
+        return p2pKey;
+    }
+
+
+    public void setP2pKey( final String p2pKey )
+    {
+        this.p2pKey = p2pKey;
     }
 
 
@@ -678,9 +674,9 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
                 + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
-                + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\''
-                + ", containers=" + containers + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='"
-                + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
+                + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers
+                + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId="
+                + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
     }
 
 
