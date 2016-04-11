@@ -6,8 +6,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
-import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.common.util.TaskUtil;
+import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
 
 public class ContainerDestroyTask extends TaskUtil.Task<Object>

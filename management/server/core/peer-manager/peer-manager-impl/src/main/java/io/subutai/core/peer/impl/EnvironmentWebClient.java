@@ -52,6 +52,7 @@ public class EnvironmentWebClient
 
     void startContainer( ContainerId containerId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -61,7 +62,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.post(null);
+            response = client.post(null);
         }
         catch ( Exception e )
         {
@@ -75,6 +76,7 @@ public class EnvironmentWebClient
 
     void stopContainer( ContainerId containerId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -83,7 +85,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.post( null );
+            response = client.post( null );
         }
         catch ( Exception e )
         {
@@ -97,6 +99,7 @@ public class EnvironmentWebClient
 
     public void destroyContainer( ContainerId containerId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -105,7 +108,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.post( null );
+            response = client.post( null );
         }
         catch ( Exception e )
         {
@@ -119,6 +122,7 @@ public class EnvironmentWebClient
 
     public ContainerHostState getState( ContainerId containerId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -128,7 +132,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -142,6 +146,7 @@ public class EnvironmentWebClient
 
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -152,7 +157,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -166,17 +171,16 @@ public class EnvironmentWebClient
 
     public Set<Integer> getCpuSet( final ContainerId containerId ) throws PeerException
     {
+        Response response;
+        String path = String.format( "/%s/container/%s/quota/cpuset", containerId.getEnvironmentId().getId(),
+            containerId.getId() );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/%s/container/%s/quota/cpuset", containerId.getEnvironmentId().getId(),
-                    containerId.getId() );
-
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -192,6 +196,7 @@ public class EnvironmentWebClient
 
     public void setCpuSet( final ContainerId containerId, final Set<Integer> cpuSet ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -202,7 +207,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            client.post( cpuSet );
+            response = client.post( cpuSet );
         }
         catch ( Exception e )
         {
@@ -216,6 +221,7 @@ public class EnvironmentWebClient
 
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -226,7 +232,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -239,9 +245,9 @@ public class EnvironmentWebClient
 
 
     public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota )
-
             throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -252,7 +258,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.post( containerQuota );
+            response = client.post( containerQuota );
         }
         catch ( Exception e )
         {
@@ -266,6 +272,7 @@ public class EnvironmentWebClient
 
     public HostId getResourceHostIdByContainerId( final ContainerId containerId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -275,7 +282,7 @@ public class EnvironmentWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {

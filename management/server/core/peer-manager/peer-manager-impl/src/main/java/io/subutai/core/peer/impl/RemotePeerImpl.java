@@ -66,8 +66,6 @@ import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
-import io.subutai.common.settings.SecuritySettings;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
@@ -100,7 +98,6 @@ public class RemotePeerImpl implements RemotePeer
     private final Object provider;
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
-    private String localPeerId;
     private RelationManager relationManager;
     private LocalPeer localPeer;
     private PeerWebClient peerWebClient;
@@ -130,7 +127,7 @@ public class RemotePeerImpl implements RemotePeer
         this.provider = provider;
 
         this.peerWebClient = new PeerWebClient( provider, peerInfo, this );
-        this.environmentWebClient = new EnvironmentWebClient( provider, this );
+        this.environmentWebClient = new EnvironmentWebClient( peerInfo, provider, this );
     }
 
 
@@ -232,7 +229,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        environmentWebClient.startContainer( peerInfo, containerId );
+        environmentWebClient.startContainer( containerId );
     }
 
 
@@ -243,7 +240,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        environmentWebClient.stopContainer( peerInfo, containerId );
+        environmentWebClient.stopContainer( containerId );
     }
 
 
@@ -295,7 +292,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        return environmentWebClient.getState( peerInfo, containerId );
+        return environmentWebClient.getState( containerId );
     }
 
 
@@ -314,7 +311,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerHost, "Container host is null" );
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
 
-        return environmentWebClient.getCpuSet( peerInfo, containerHost.getContainerId() );
+        return environmentWebClient.getCpuSet( containerHost.getContainerId() );
     }
 
 
@@ -326,7 +323,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
 
-        environmentWebClient.setCpuSet( peerInfo, containerHost.getContainerId(), cpuSet );
+        environmentWebClient.setCpuSet( containerHost.getContainerId(), cpuSet );
     }
 
 
@@ -336,7 +333,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
-        return environmentWebClient.generateSshKeysForEnvironment( peerInfo, environmentId );
+        return environmentWebClient.generateSshKeysForEnvironment( environmentId );
     }
 
 
@@ -382,7 +379,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( hostAddresses, "Invalid HostAdresses" );
         Preconditions.checkArgument( !hostAddresses.isEmpty(), "No host addresses" );
 
-        environmentWebClient.configureHostsInEnvironment( peerInfo, environmentId, hostAddresses );
+        environmentWebClient.configureHostsInEnvironment( environmentId, hostAddresses );
     }
 
 
@@ -392,7 +389,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerId, "Container id is null" );
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
 
-        return environmentWebClient.getQuota( peerInfo, containerId );
+        return environmentWebClient.getQuota( containerId );
     }
 
 
@@ -403,7 +400,7 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( containerId.getPeerId().getId().equals( peerInfo.getId() ) );
         Preconditions.checkNotNull( containerQuota, "Container quota is null" );
 
-        new EnvironmentWebClient( peerInfo, provider ).setQuota( containerId, containerQuota );
+        environmentWebClient.setQuota( containerId, containerQuota );
     }
 
 

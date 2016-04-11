@@ -18,7 +18,6 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.naming.NamingException;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -931,10 +930,6 @@ public class IdentityManagerImpl implements IdentityManager
             identityDataService.updateUserDelegate( delegatedUser );
             LOGGER.debug( encryptedMessage );
             LOGGER.debug( delegatedUser.getId() );
-        }
-        catch ( NamingException e )
-        {
-            LOGGER.error( "Relation Manager service is unavailable", e );
         }
         catch ( UnsupportedEncodingException e )
         {

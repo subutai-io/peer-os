@@ -25,7 +25,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
@@ -61,6 +60,7 @@ public class PeerWebClient
 
     public PeerInfo getInfo() throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -71,7 +71,7 @@ public class PeerWebClient
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
 
-            Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -85,6 +85,7 @@ public class PeerWebClient
 
     public PublicKeyContainer createEnvironmentKeyPair( final RelationLinkDto envLink ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -95,7 +96,7 @@ public class PeerWebClient
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
 
-            Response response = client.post( envLink );
+            response = client.post( envLink );
         }
         catch ( Exception e )
         {
@@ -109,6 +110,7 @@ public class PeerWebClient
 
     public void updateEnvironmentPubKey( PublicKeyContainer publicKeyContainer ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -118,7 +120,7 @@ public class PeerWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.put( publicKeyContainer );
+            response = client.put( publicKeyContainer );
         }
         catch ( Exception e )
         {
@@ -132,6 +134,7 @@ public class PeerWebClient
 
     public HostInterfaces getInterfaces() throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -141,7 +144,7 @@ public class PeerWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -156,6 +159,7 @@ public class PeerWebClient
     public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
             throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -165,7 +169,7 @@ public class PeerWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
+            response = client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
         }
         catch ( Exception e )
         {
@@ -179,6 +183,7 @@ public class PeerWebClient
 
     public void joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -187,7 +192,7 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
-            Response response = client.post( config );
+            response = client.post( config );
         }
         catch ( Exception e )
         {
@@ -201,6 +206,7 @@ public class PeerWebClient
 
     public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -209,7 +215,7 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
-            final Response response = client.put( config );
+            response = client.put( config );
         }
         catch ( Exception e )
         {
@@ -223,6 +229,7 @@ public class PeerWebClient
 
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -232,7 +239,7 @@ public class PeerWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.delete();
+            response = client.delete();
         }
         catch ( Exception e )
         {
@@ -246,6 +253,7 @@ public class PeerWebClient
 
     public ResourceHostMetrics getResourceHostMetrics() throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -254,7 +262,7 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -293,6 +301,7 @@ public class PeerWebClient
     public HistoricalMetrics getHistoricalMetrics( final String hostName, final Date startTime, final Date endTime )
             throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -305,7 +314,7 @@ public class PeerWebClient
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
 
-            final Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {
@@ -320,6 +329,7 @@ public class PeerWebClient
 
     public PeerResources getResourceLimits( final String peerId ) throws PeerException
     {
+        Response response;
         try
         {
             remotePeer.checkRelation();
@@ -328,7 +338,7 @@ public class PeerWebClient
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            final Response response = client.get();
+            response = client.get();
         }
         catch ( Exception e )
         {

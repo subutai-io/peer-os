@@ -9,9 +9,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.task.CloneResponse;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.host.ContainerHostInfoModel;
+import io.subutai.common.task.CloneResponse;
 
 
 @RunWith( MockitoJUnitRunner.class )

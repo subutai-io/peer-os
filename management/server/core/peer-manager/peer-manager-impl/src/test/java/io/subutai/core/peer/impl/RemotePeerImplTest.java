@@ -142,7 +142,6 @@ public class RemotePeerImplTest
         headers.put( HEADER_NAME, HEADER_VALUE );
         remotePeer = spy( new RemotePeerImpl( localPeer.getId(), securityManager, peerInfo, messenger,
                 commandResponseListener, messageResponseListener, null, peerManager ) );
-        remotePeer.restUtil = restUtil;
         remotePeer.jsonUtil = jsonUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );
