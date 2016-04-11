@@ -338,6 +338,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			vm.isApplyingChanges = false;
 
 			getLogById(data, true);
+			initScrollbar();
 			$rootScope.notificationsUpdate = 'modifyEnvironment';
 		}).error(function (data) {
 			vm.currentEnvironment.modifyStatus = 'error';

@@ -284,6 +284,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				vm.newEnvID = data;
 
 				getLogById(data, true);
+				initScrollbar();
 				$scope.$emit('reloadEnvironmentsList');
 
 				$rootScope.notificationsUpdate = 'modifyEnvironmentAdv';
