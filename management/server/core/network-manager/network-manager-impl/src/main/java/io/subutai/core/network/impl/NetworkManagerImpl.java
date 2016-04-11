@@ -203,6 +203,21 @@ public class NetworkManagerImpl implements NetworkManager
                 commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
     }
 
+    @Override
+    public void setVlanDomain( final int vLanId, final String domain,
+                               final String host, final String sslCertPath )
+            throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
+        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+        Preconditions.checkNotNull( host, "Invalid host" );
+
+        execute( getManagementHost(),
+                commands.getSetVlanDomainCommand( vLanId, domain, host, sslCertPath ) );
+    }
+
 
     @Override
     public boolean isIpInVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException

@@ -20,6 +20,7 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
 
 
@@ -111,4 +112,10 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     Response configureHostsInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
                                           HostAddresses hostAddresses );
+
+    @POST
+    @Path( "{environmentId}/container/{containerId}/reverseProxy" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response addReverseProxy( ReverseProxyConfig reverseProxyConfig );
 }

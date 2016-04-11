@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.RhP2pIp;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
@@ -42,7 +43,8 @@ public class EnvironmentAdapter
     private final HubAdapter hubAdapter;
 
 
-    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager, HubAdapter hubAdapter )
+    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager,
+                               HubAdapter hubAdapter )
     {
         this.environmentManager = environmentManager;
 
@@ -107,9 +109,11 @@ public class EnvironmentAdapter
         {
             for ( ContainerHost ch : rh.getContainerHosts() )
             {
-                String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
+                final HostInterfaces hostInterfaces = ch.getHostInterfaces();
+                String ip = hostInterfaces.findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
 
-                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip, ch.getContainerSize() );
+                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip,
+                        ch.getContainerSize() );
             }
         }
     }

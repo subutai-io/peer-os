@@ -20,6 +20,7 @@ import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
 
 
@@ -312,6 +313,23 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
 
             return localPeer.getResourceHostIdByContainerId( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response addReverseProxy( final ReverseProxyConfig reverseProxyConfig )
+    {
+        try
+        {
+            Preconditions.checkNotNull( reverseProxyConfig );
+            localPeer.addReverseProxy( reverseProxyConfig );
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
