@@ -14,7 +14,6 @@ target
 git.properties
 
 # Package Files #
-*.jar
 *.war
 *.ear
 /server/server-karaf/nb-configuration.xml
