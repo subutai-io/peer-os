@@ -44,6 +44,7 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliButtonAdvanced = "src/test/resources/imgs/buttons/buttonAdvanced.png";
     public String sikuliButtonEdit = "src/test/resources/imgs/buttons/buttonEdit.png";
     public String sikuliButtonNext = "src/test/resources/imgs/buttons/buttonNext.png";
+    public String sikuliButtonAddUserTest = "src/test/resources/imgs/buttons/buttonAddUserTest.png";
 
     @FindBy(xpath = "*//div[@class=\"b-toggle b-toggle_cloud\"]")
     public WebElementFacade buttonModes;
@@ -156,6 +157,7 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliResourceHost1 = "src/test/resources/imgs/elements/resourceHost1.png";
     public String sikuliPeerRH1 = "src/test/resources/imgs/elements/peerRH1.png";
     public String sikuliPeerRH2 = "src/test/resources/imgs/elements/peerRH2.png";
+    public String sikuliCheckBoxDeleteInShareEnvi = "src/test/resources/imgs/elements/checkBoxDeleteInShareEnvi.png";
 
     //endregion
 }

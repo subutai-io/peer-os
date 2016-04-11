@@ -424,4 +424,9 @@ public class DefSubutaiStepsThen {
     public void user_click_on_test_icon() throws FindFailed {
         subutaiSteps.clickOnIconTest();
     }
+
+    @Then("the user clicks on the button: OK")
+    public void user_click_on_button_ok() throws FindFailed {
+        subutaiSteps.clickOnButtonOk();
+    }
 }

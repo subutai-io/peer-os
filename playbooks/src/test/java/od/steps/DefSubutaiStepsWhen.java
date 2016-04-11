@@ -369,4 +369,29 @@ public class DefSubutaiStepsWhen {
     public void user_clicks_on_button_share() throws FindFailed {
         subutaiSteps.clickOnButtonShare();
     }
+
+    @When("the user shares the environment with user: test")
+    public void user_share_envi_with_user_test() throws FindFailed {
+        subutaiSteps.clickOnAddTheUserTest();
+    }
+
+    @When("the user removes the delete role from the user")
+    public void user_removes_delete_role_from_user() throws FindFailed {
+        subutaiSteps.clickOnCheckBoxDeleteRoleFromUser();
+    }
+
+    @When("the user clicks on the button: Save")
+    public void user_clicks_on_button_save() throws FindFailed {
+        subutaiSteps.clickOnButtonSave();
+    }
+
+    @When("the user clicks on the icon: delete")
+    public void user_clicks_icon_delete() throws FindFailed {
+        subutaiSteps.clickOnIconDeleteEnvironment();
+    }
+
+    @When("the user clicks on the button: delete")
+    public void user_clicks_on_button_delete() throws FindFailed {
+        subutaiSteps.clickOnButtonDelete();
+    }
 }

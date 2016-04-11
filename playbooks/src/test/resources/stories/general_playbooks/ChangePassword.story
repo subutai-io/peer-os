@@ -31,5 +31,5 @@ And the user clicks on the button: Login
 When the user clicks on the menu item: User Identity
 And the user clicks on the menu item: User management
 
-Scenario: the user delete himself
+Scenario: the user delete a user
 Then the user should delete a new user

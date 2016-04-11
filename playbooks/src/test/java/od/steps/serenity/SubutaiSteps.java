@@ -795,6 +795,16 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnButtonShare() throws FindFailed {
         screen.click(environmentsPage.sikuliIconShare);
     }
+
+    @Step
+    public void clickOnAddTheUserTest() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonAddUserTest);
+    }
+
+    @Step
+    public void clickOnCheckBoxDeleteRoleFromUser() throws FindFailed {
+        screen.click(environmentsPage.sikuliCheckBoxDeleteInShareEnvi);
+    }
     //endregion
 
     //region Action: Drag And Drop
