@@ -168,6 +168,8 @@ public class CommonPages extends PageObject {
     //region WEB ELEMENTS: Icons
 
     public String sikuliIconNotifications = "src/test/resources/imgs/icons/iconNotification.png";
+    public String sikuliIconAdmin = "src/test/resources/imgs/icons/iconAdmin.png";
+    public String sikuliIconTest = "src/test/resources/imgs/icons/iconTest.png";
 
     //endregion
 

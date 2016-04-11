@@ -175,6 +175,20 @@ public class SubutaiSteps extends ScenarioSteps {
         pluginsPage.fieldEnvironmentName.type(name);
     }
 
+    @Step
+    public void inputOldPassword(String oldpass) {
+        accountSettingsPage.fieldOldPassword.type(oldpass);
+    }
+
+    @Step
+    public void inputNepPassword(String password) {
+        accountSettingsPage.fieldNewPassword.type(password);
+    }
+
+    @Step
+    public void inputConfirmPassword(String confpass) {
+        accountSettingsPage.fieldConfirmPassword.type(confpass);
+    }
     //endregion
 
     //region ACTION: Click
@@ -754,7 +768,7 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonAdd() throws FindFailed {
         screen.click(commonPage.sikuliButtonAdd);
-        waitABit(200000);
+        waitABit(8000);
     }
 
     @Step
@@ -765,6 +779,16 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonNext() throws FindFailed {
         screen.click(environmentsPage.sikuliButtonNext);
+    }
+
+    @Step
+    public void clickOniconAdmin() throws FindFailed {
+        screen.click(commonPage.sikuliIconAdmin);
+    }
+
+    @Step
+    public void clickOnIconTest() throws FindFailed {
+        screen.click(commonPage.sikuliIconTest);
     }
     //endregion
 

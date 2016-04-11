@@ -213,6 +213,15 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnButtonSaveUser();
     }
 
+    @Then("the user should change password: '$oldpass', '$newpass', '$confpass'")
+    public void change_password(String oldpass, String password, String confpass) throws FindFailed {
+        subutaiSteps.inputOldPassword(oldpass);
+        subutaiSteps.inputNepPassword(password);
+        subutaiSteps.inputConfirmPassword(confpass);
+        subutaiSteps.clickOnButtonSave();
+        subutaiSteps.clickOnButtonOk();
+    }
+
     @Then("the user should observe a new user")
     public void user_observe_a_new_user(){
         subutaiSteps.userShouldObserveANewUsersEmail();
@@ -404,5 +413,15 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnButtonOpen();
         subutaiSteps.clickOnButtonAdd();
         subutaiSteps.clickOnButtonOk();
+    }
+
+    @Then("the user should click on admin icon")
+    public void user_click_on_admin_icon() throws FindFailed {
+        subutaiSteps.waitABit(5000);
+        subutaiSteps.clickOniconAdmin();
+    }
+    @Then("the user should click on test icon")
+    public void user_click_on_test_icon() throws FindFailed {
+        subutaiSteps.clickOnIconTest();
     }
 }

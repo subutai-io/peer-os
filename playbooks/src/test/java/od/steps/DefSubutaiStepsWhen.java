@@ -272,9 +272,9 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.inputTemplateNameInSearchField("Master");
     }
 
-    @When("the user should find template: AppScale")
+    @When("the user should find template: Cassandra")
     public void user_finds_template_appscale(){
-        subutaiSteps.inputTemplateNameInSearchField("Appscale");
+        subutaiSteps.inputTemplateNameInSearchField("Cassandra");
         subutaiSteps.waitABit(3000);
     }
 
@@ -360,4 +360,8 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.clickOnButtonEdit();
     }
 
+    @When("the user should click on title: Change password")
+    public void user_click_change_password() throws FindFailed {
+        subutaiSteps.clickOnTitleChangePassword();
+    }
 }

@@ -15,4 +15,4 @@ And the user click on the button: Add Template
 Then the user uploads template
 When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Environments
-And the user should find template: AppScale
+And the user should find template: Cassandra
