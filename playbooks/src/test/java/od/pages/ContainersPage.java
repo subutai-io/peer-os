@@ -35,7 +35,7 @@ public class ContainersPage extends PageObject {
     @FindBy(xpath = "*//span[contains(text(),\"3\")]")
     public WebElementFacade containersThree;
 
-    @FindBy(xpath = "*//span[contains(text(),\"3\")]")
+    @FindBy(xpath = "*//span[contains(text(),\"2\")]")
     public WebElementFacade containersTwo;
 
     //endregion

@@ -17,7 +17,7 @@ And the user creates environment using template: Master
 And the user clicks on icon edit
 And the user should find template: Master
 And the user grows environment using template: Master
-Then the user should observe 2 containers
+And the user should wait a few seconds
 
 Scenario: the user should remove an Environment
 Then the user destroys created environment

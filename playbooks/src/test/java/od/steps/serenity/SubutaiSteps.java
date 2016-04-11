@@ -821,7 +821,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void userShouldWaitAFewSeconds() {
-        waitABit(4000);
+        waitABit(3000);
     }
     //endregion
 
