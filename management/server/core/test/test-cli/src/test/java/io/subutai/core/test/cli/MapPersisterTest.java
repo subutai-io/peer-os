@@ -4,6 +4,7 @@ package io.subutai.core.test.cli;
 import java.util.Map;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
@@ -21,6 +22,7 @@ public class MapPersisterTest
     }
 
 
+    @Ignore
     @Test
     public void testSerializeMap() throws Exception
     {
@@ -41,6 +43,7 @@ public class MapPersisterTest
     }
 
 
+    @Ignore
     @Test
     public void testSerializeMapOfMaps() throws Exception
     {
