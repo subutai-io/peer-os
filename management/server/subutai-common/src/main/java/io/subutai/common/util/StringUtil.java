@@ -123,11 +123,5 @@ public class StringUtil
     }
 
 
-    public static String convertMillisToHHMMSS( long millis )
-    {
-        TimeZone tz = TimeZone.getTimeZone( "UTC" );
-        SimpleDateFormat df = new SimpleDateFormat( "HH:mm:ss" );
-        df.setTimeZone( tz );
-        return df.format( new Date( millis ) );
-    }
+
 }

@@ -50,7 +50,7 @@ public class PeerUtil<T>
         Preconditions
                 .checkArgument( !CollectionUtil.isCollectionEmpty( peerTasks ), "No peer task found for execution" );
 
-        Set<PeerTaskResult<T>> results = executeParallel( peerTasks );
+        Set<PeerTaskResult<T>> results = executeParallel( peerTasks, false );
 
         peerTasks.clear();
 
@@ -58,7 +58,25 @@ public class PeerUtil<T>
     }
 
 
-    protected Set<PeerTaskResult<T>> executeParallel( Set<PeerTask<T>> peerTasks )
+    /**
+     * Executes added tasks in parallel. Fails fast if any execution failed
+     *
+     * @return set of {@code PeerTaskResult}
+     */
+    public PeerTaskResults<T> executeParallelFailFast()
+    {
+        Preconditions
+                .checkArgument( !CollectionUtil.isCollectionEmpty( peerTasks ), "No peer task found for execution" );
+
+        Set<PeerTaskResult<T>> results = executeParallel( peerTasks, true );
+
+        peerTasks.clear();
+
+        return new PeerTaskResults<>( results );
+    }
+
+
+    protected Set<PeerTaskResult<T>> executeParallel( Set<PeerTask<T>> peerTasks, boolean failFast )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerTasks ) );
 
@@ -90,6 +108,11 @@ public class PeerUtil<T>
                 LOG.error( "Error executing task on peer {}", targetPeer.getName(), e );
 
                 peerTaskResults.add( new PeerTaskResult<T>( targetPeer, e ) );
+
+                if ( failFast )
+                {
+                    break;
+                }
             }
         }
 

@@ -8,6 +8,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.task.Task;
+import io.subutai.common.util.HostUtil;
 
 
 /**
@@ -97,6 +98,7 @@ public interface LocalPeer extends Peer
 
     public Set<RequestListener> getRequestListeners();
 
+    public void removeResourceHost( String rhId ) throws HostNotFoundException;
 
     /**
      * Returns domain assigned to vni if any
@@ -156,6 +158,8 @@ public interface LocalPeer extends Peer
     Host findHostByName( String hostname ) throws HostNotFoundException;
 
     List<Task> getTaskList();
+
+    Set<HostUtil.Task> getTasks();
 
     public void exchangeMhKeysWithRH() throws Exception;
 

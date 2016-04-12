@@ -236,6 +236,10 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 		addNewNotification($rootScope.notifications);
 	});
 
+	setInterval(function() {
+		getNotificationsFromServer();
+	}, 15000);
+
 	function addNewNotification(notification) {
 		var notifications = localStorage.getItem('notifications');
 		if (

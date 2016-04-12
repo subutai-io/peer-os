@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.0-RC7-SNAPSHOT</version>
+  <version>4.0.0-RC8-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -56,6 +56,17 @@
     </developerConnection>
     <tag>HEAD</tag>
   </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
   <repositories>
 
@@ -210,22 +221,22 @@
       <!--Node Registration-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-api</artifactId>
+        <artifactId>host-registration-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-impl</artifactId>
+        <artifactId>host-registration-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-cli</artifactId>
+        <artifactId>host-registration-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-rest</artifactId>
+        <artifactId>host-registration-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

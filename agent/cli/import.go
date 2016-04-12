@@ -36,14 +36,17 @@ type templ struct {
 }
 
 func templId(t templ, arch string, kurjun *http.Client) string {
-	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&type=text"
-	if len(t.branch) == 0 || t.name != "management" {
+	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&type=text"
+	if t.name == "management" && len(t.branch) != 0 {
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&type=text"
+	} else if t.name == "management" {
 		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&type=text"
 	}
 	response, err := kurjun.Get(url)
 	log.Debug("Retrieving id, get: " + url)
-	if err == nil && response.StatusCode == 204 {
-		log.Warn("Cannot get template with specified version, trying without version")
+
+	if err == nil && response.StatusCode == 204 && t.name == "management" {
+		log.Warn("Cannot get management with specified version, trying without version")
 		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name + "&type=text")
 	}
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
@@ -86,6 +89,7 @@ func checkLocal(t templ) bool {
 				if response == "y" {
 					return true
 				}
+				return false
 			}
 			if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
 				return true
@@ -96,13 +100,16 @@ func checkLocal(t templ) bool {
 }
 
 func download(t templ, kurjun *http.Client) bool {
+	if len(t.id) == 0 {
+		return false
+	}
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 	log.Check(log.FatalLevel, "Creating file "+t.file, err)
 	defer out.Close()
+	log.Info("Downloading " + t.name)
 	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/get?id=" + t.id)
 	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/get?id="+t.id, err)
 	defer response.Body.Close()
-
 	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 	bar.Start()
 	rd := bar.NewProxyReader(response.Body)
@@ -139,16 +146,16 @@ func LxcImport(name, version, token string) {
 		return
 	}
 
-	if container.IsContainer(name) {
-		log.Info(name + " instance exist")
-		return
-	}
-
 	log.Info("Importing " + name)
 	for !lockSubutai(name + ".import") {
 		time.Sleep(time.Second * 1)
 	}
 	defer unlockSubutai()
+
+	if container.IsContainer(name) {
+		log.Info(name + " instance exist")
+		return
+	}
 
 	var t templ
 

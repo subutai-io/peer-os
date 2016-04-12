@@ -111,7 +111,6 @@ public class ResourceHostEntityTest
         resourceHostEntity = new ResourceHostEntity( PEER_ID, hostInfo );
         resourceHostEntity.setHostRegistry( hostRegistry );
         //        resourceHostEntity.setMonitor( monitor );
-        resourceHostEntity.setRegistry( registry );
         resourceHostEntity.setPeer( peer );
         resourceHostEntity.commandUtil = commandUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_HOST_ID );
