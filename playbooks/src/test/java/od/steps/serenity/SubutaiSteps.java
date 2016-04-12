@@ -1231,6 +1231,7 @@ public class SubutaiSteps extends ScenarioSteps {
         System.out.println(executeShellCommand.executeCommand(file));
     }
 
+
     @Step
     public void clickOnButtonRegister() throws FindFailed {
         screen.click(commonPage.sikuliButtonRegister);
