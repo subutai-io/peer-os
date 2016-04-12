@@ -20,7 +20,7 @@
 			<tbody>
 			<tr ng-repeat="file in kurjunCtrl.files">
 				<td>{{ file.name }}</td>
-				<td>{{ file.size }}</td>
+				<td>{{ kurjunCtrl.formatSize(file.size) }}</td>
 				<td>
 					<a href
 					   class="b-icon b-icon_share"

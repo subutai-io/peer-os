@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +38,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.exception.DaoException;
@@ -100,12 +101,12 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.task.ImportTemplateRequest;
 import io.subutai.common.task.QuotaRequest;
 import io.subutai.common.task.Task;
 import io.subutai.common.task.TaskCallbackHandler;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -118,7 +119,7 @@ import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CloneTask;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainerGroupRequestListener;
-import io.subutai.core.localpeer.impl.container.ImportTask;
+import io.subutai.core.localpeer.impl.container.ImportTemplateTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
 import io.subutai.core.localpeer.impl.container.QuotaTask;
 import io.subutai.core.localpeer.impl.dao.NetworkResourceDaoImpl;
@@ -178,6 +179,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private TaskManagerImpl taskManager;
     private NetworkResourceDaoImpl networkResourceDao;
     LocalPeerCommands localPeerCommands = new LocalPeerCommands();
+    HostUtil hostUtil = new HostUtil();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
@@ -284,6 +286,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ( ( Disposable ) resourceHost ).dispose();
         }
+
+        hostUtil.dispose();
     }
 
 
@@ -292,8 +296,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         for ( ResourceHost resourceHost : resourceHosts )
         {
             ( ( AbstractSubutaiHost ) resourceHost ).setPeer( this );
+
             final ResourceHostEntity resourceHostEntity = ( ResourceHostEntity ) resourceHost;
-            resourceHostEntity.setRegistry( templateRegistry );
+
             resourceHostEntity.setHostRegistry( hostRegistry );
         }
     }
@@ -609,22 +614,29 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request )
-            throws PeerException
+    public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
-        final PrepareTemplatesResponseCollector prepareTemplatesResponse =
-                new PrepareTemplatesResponseCollector( getId() );
-        for ( String resourceHostId : request.getTemplates().keySet() )
+        PrepareTemplatesResponse response = new PrepareTemplatesResponse();
+
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
+
+        for ( final String resourceHostId : request.getTemplates().keySet() )
         {
-            for ( String templateName : request.getTemplates().get( resourceHostId ) )
+            final ResourceHost resourceHost = getResourceHostById( resourceHostId );
+
+            for ( final String templateName : request.getTemplates().get( resourceHostId ) )
             {
-                ImportTask task = new ImportTask( new ImportTemplateRequest( resourceHostId, templateName ) );
-                prepareTemplatesResponse.addTask( taskManager.schedule( task, prepareTemplatesResponse ) );
+                HostUtil.Task<Object> importTask = new ImportTemplateTask( templateName, resourceHost );
+
+                tasks.addTask( resourceHost, importTask );
             }
         }
 
-        prepareTemplatesResponse.waitResponsesWhileSucceeded();
-        return prepareTemplatesResponse;
+        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+
+        response.addResults( results );
+
+        return response;
     }
 
 
@@ -742,9 +754,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         ResourceHost resourceHost = getResourceHostById( resourceHostId );
 
-        resourceHost.addContainerHost( containerHostEntity );
-
         signContainerKeyWithPEK( containerHostEntity.getId(), containerHostEntity.getEnvironmentId() );
+
+        resourceHost.addContainerHost( containerHostEntity );
 
         resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
 
@@ -1077,6 +1089,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( host, "Resource host could not be null." );
 
         resourceHosts.add( host );
+    }
+
+
+    public void removeResourceHost( String rhId ) throws HostNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+
+        ResourceHost resourceHost = getResourceHostById( rhId );
+
+        resourceHosts.remove( resourceHost );
+
+        resourceHostDataService.remove( resourceHost.getId() );
     }
 
 
@@ -1930,7 +1954,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-
         executorService.shutdown();
 
         try
@@ -2176,6 +2199,15 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         executorService.shutdown();
 
+        try
+        {
+            executorService.awaitTermination( 30, TimeUnit.SECONDS );
+        }
+        catch ( InterruptedException e )
+        {
+            //ignore
+        }
+
         //remove reservation
         try
         {
@@ -2374,6 +2406,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
 
         return serviceLocator.getService( NetworkManager.class );
+    }
+
+
+    public Set<HostUtil.Task> getTasks()
+    {
+        return hostUtil.getAllTasks();
     }
 
 

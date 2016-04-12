@@ -16,7 +16,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -278,7 +278,7 @@ public interface Peer extends RelationLink
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 
-    PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
+    PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
     SshPublicKeys generateSshKeyForEnvironment( EnvironmentId environmentId ) throws PeerException;
 

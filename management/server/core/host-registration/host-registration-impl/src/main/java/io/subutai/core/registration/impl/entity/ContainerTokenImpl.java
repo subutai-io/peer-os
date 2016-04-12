@@ -1,0 +1,120 @@
+package io.subutai.core.registration.impl.entity;
+
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import io.subutai.core.registration.api.service.ContainerToken;
+
+
+@Entity
+@Table( name = "node_containers_token" )
+@Access( AccessType.FIELD )
+public class ContainerTokenImpl implements ContainerToken, Serializable
+{
+    @Id
+    @Column( name = "container_token" )
+    private String token;
+
+    @Column( name = "container_host_id" )
+    private String hostId;
+
+    @Column( name = "date_created" )
+    private Timestamp dateCreated;
+
+    @Column( name = "ttl" )
+    private Long ttl;
+
+
+    public ContainerTokenImpl()
+    {
+    }
+
+
+    public ContainerTokenImpl( final String token, final Timestamp dateCreated, final Long ttl )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( token ) );
+        Preconditions.checkNotNull( dateCreated );
+        Preconditions.checkNotNull( ttl );
+        Preconditions.checkArgument( ttl > 0 );
+
+        this.token = token;
+        this.hostId = "";
+        this.dateCreated = dateCreated;
+        this.ttl = ttl;
+    }
+
+
+    @Override
+    public String getHostId()
+    {
+        return hostId;
+    }
+
+
+    @Override
+    public String getToken()
+    {
+        return token;
+    }
+
+
+    @Override
+    public Timestamp getDateCreated()
+    {
+        return dateCreated;
+    }
+
+
+    @Override
+    public Long getTtl()
+    {
+        return ttl;
+    }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof ContainerTokenImpl ) )
+        {
+            return false;
+        }
+
+        final ContainerTokenImpl that = ( ContainerTokenImpl ) o;
+
+        return token.equals( that.token );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return token.hashCode();
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "ContainerTokenImpl{" +
+                "token='" + token + '\'' +
+                ", dateCreated=" + dateCreated +
+                ", ttl=" + ttl +
+                '}';
+    }
+}

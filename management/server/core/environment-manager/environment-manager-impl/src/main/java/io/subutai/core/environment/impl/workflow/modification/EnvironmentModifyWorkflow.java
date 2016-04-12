@@ -177,7 +177,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
     public EnvironmentGrowingPhase PREPARE_TEMPLATES()
     {
-        operationTracker.addLog( "Cloning containers" );
+        operationTracker.addLog( "Preparing templates" );
 
         try
         {

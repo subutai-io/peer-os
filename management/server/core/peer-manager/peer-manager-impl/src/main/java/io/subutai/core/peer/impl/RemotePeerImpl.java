@@ -31,7 +31,7 @@ import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
 import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -592,8 +592,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request )
-            throws PeerException
+    public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
 
@@ -602,10 +601,9 @@ public class RemotePeerImpl implements RemotePeer
         Map<String, String> headers = Maps.newHashMap();
         //************************************************************************
 
-        PrepareTemplatesResponseCollector response =
-                sendRequest( request, RecipientType.PREPARE_TEMPLATE_REQUEST.name(),
-                        Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT, PrepareTemplatesResponseCollector.class,
-                        Timeouts.CREATE_CONTAINER_RESPONSE_TIMEOUT, headers );
+        PrepareTemplatesResponse response = sendRequest( request, RecipientType.PREPARE_TEMPLATE_REQUEST.name(),
+                Timeouts.PREPARE_TEMPLATES_REQUEST_TIMEOUT, PrepareTemplatesResponse.class,
+                Timeouts.PREPARE_TEMPLATES_RESPONSE_TIMEOUT, headers );
 
         if ( response != null )
         {
