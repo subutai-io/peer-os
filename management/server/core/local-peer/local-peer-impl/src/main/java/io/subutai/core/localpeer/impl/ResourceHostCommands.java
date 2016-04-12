@@ -4,9 +4,9 @@ package io.subutai.core.localpeer.impl;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.Timeouts;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.Quota;
+import io.subutai.common.settings.Common;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
 
@@ -52,7 +52,7 @@ public class ResourceHostCommands
     public RequestBuilder getImportTemplateCommand( final String templateName )
     {
         return new RequestBuilder( String.format( "subutai import %s", templateName ) )
-                .withTimeout( Timeouts.PREPARE_TEMPLATES_RESPONSE_TIMEOUT );
+                .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
 
@@ -61,7 +61,7 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( "subutai clone" ).withCmdArgs(
                 Lists.newArrayList( templateName, hostName, "-i", String.format( "\"%s %d\"", ip, vlan ), "-e",
-                        environmentId, "-t", token ) ).withTimeout( Timeouts.CREATE_CONTAINER_REQUEST_TIMEOUT );
+                        environmentId, "-t", token ) ).withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
 

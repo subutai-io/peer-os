@@ -53,6 +53,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -72,8 +73,6 @@ import io.subutai.core.registration.api.RegistrationManager;
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, Disposable
 {
-    private static final int CONNECT_TIMEOUT = 300;
-
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "(RUNNING|STOPPED|FROZEN)" );
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
@@ -353,7 +352,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         //wait container connection
         long ts = System.currentTimeMillis();
-        while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !containerHost.isConnected() )
+        while ( System.currentTimeMillis() - ts < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 && !containerHost
+                .isConnected() )
         {
             try
             {
