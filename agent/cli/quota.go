@@ -34,7 +34,7 @@ func LxcQuota(name, res, size, threshold string) {
 	case "cpu":
 		quota = strconv.Itoa(container.QuotaCPU(name, size))
 	}
-	fmt.Println(`{"quota":` + quota + `, "threshold":` + alert + `}`)
+	fmt.Println(`{"quota":"` + quota + `", "threshold":` + alert + `}`)
 
 }
 

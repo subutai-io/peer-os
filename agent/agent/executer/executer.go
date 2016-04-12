@@ -60,6 +60,8 @@ type ResponseOptions struct {
 	ExitCode       string `json:"exitCode,omitempty"`
 }
 
+// ExecHost executes request inside Resource host
+// and sends output as response.
 func ExecHost(req RequestOptions, out_c chan<- ResponseOptions) {
 	cmd := buildCmd(&req)
 	if cmd == nil {
@@ -203,6 +205,8 @@ func genericResponse(req RequestOptions) ResponseOptions {
 	}
 }
 
+// AttachContainer executes request inside Container host
+// and sends output as response.
 func AttachContainer(name string, req RequestOptions, out_c chan<- ResponseOptions) {
 	lxc_c, _ := lxc.NewContainer(name, config.Agent.LxcPrefix)
 
