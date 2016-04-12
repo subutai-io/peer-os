@@ -19,7 +19,7 @@ public class PrepareTemplatesResponse
     {
         Preconditions.checkNotNull( results );
 
-        for ( HostUtil.Task task : results.getTasks() )
+        for ( HostUtil.Task task : results.getTasks().getTasks() )
         {
             if ( task.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
             {
@@ -27,11 +27,17 @@ public class PrepareTemplatesResponse
                         .format( "Task (%s) succeeded on host %s [%d sec]", task.name(), task.getHost().getId(),
                                 task.getDuration() / 1000 ) );
             }
-            else
+            else if ( task.getTaskState() == HostUtil.Task.TaskState.FAILED )
             {
                 this.messages.add( String
                         .format( "Task (%s) failed on host %s [%s]", task.name(), task.getHost().getId(),
                                 task.getFailureReason() ) );
+            }
+            else
+            {
+                this.messages.add( String
+                        .format( "Task (%s) is %s on host %s [%d sec]", task.name(), task.getTaskState(),
+                                task.getHost().getId(), task.getDuration() / 1000 ) );
             }
         }
 

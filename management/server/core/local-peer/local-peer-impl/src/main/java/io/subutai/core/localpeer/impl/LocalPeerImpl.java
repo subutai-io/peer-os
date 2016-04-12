@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
@@ -593,30 +592,23 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         PrepareTemplatesResponse response = new PrepareTemplatesResponse();
 
-        Map<Host, Set<HostUtil.Task>> allImportTasks = Maps.newHashMap();
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
 
         for ( final String resourceHostId : request.getTemplates().keySet() )
         {
             final ResourceHost resourceHost = getResourceHostById( resourceHostId );
 
-            Set<HostUtil.Task> importTasks = Sets.newHashSet();
-
             for ( final String templateName : request.getTemplates().get( resourceHostId ) )
             {
-                HostUtil.Task<Object> imporTask = new ImportTemplateTask( templateName, resourceHost );
+                HostUtil.Task<Object> importTask = new ImportTemplateTask( templateName, resourceHost );
 
-                importTasks.add( imporTask );
+                tasks.addTask( resourceHost, importTask );
             }
-
-            allImportTasks.put( resourceHost, importTasks );
         }
 
-        Set<HostUtil.Results> allResults = hostUtil.executeUntilFirstFailure( allImportTasks );
+        HostUtil.Results results = hostUtil.executeNWaitFirstFailure( tasks );
 
-        for ( HostUtil.Results results : allResults )
-        {
-            response.addResults( results );
-        }
+        response.addResults( results );
 
         return response;
     }
@@ -2305,7 +2297,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     public Set<HostUtil.Task> getTasks()
     {
-        return hostUtil.getTasks();
+        return hostUtil.getAllTasks();
     }
 
 

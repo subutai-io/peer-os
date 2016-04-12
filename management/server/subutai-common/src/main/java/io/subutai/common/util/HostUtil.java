@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -25,55 +23,47 @@ import io.subutai.common.peer.Host;
 
 public class HostUtil
 {
-    private static final int MAX_EXECUTOR_SIZE = 20;
+    private static final int MAX_EXECUTOR_SIZE = 10;
 
     private static final Logger LOG = LoggerFactory.getLogger( HostUtil.class );
 
-    private final Set<Task> tasks = Sets.newConcurrentHashSet();
+    private final Set<Task> allTasks = Sets.newConcurrentHashSet();
 
     private Map<String, ExecutorService> taskExecutors = Maps.newConcurrentMap();
 
 
-    public Set<Task> getTasks()
+    public Set<Task> getAllTasks()
     {
-        return Collections.unmodifiableSet( tasks );
+        return Collections.unmodifiableSet( allTasks );
     }
 
 
-    public Set<Results> execute( Map<Host, Set<Task>> hostsTasks )
+    public Results executeNWait( Tasks tasks )
     {
-        Preconditions.checkNotNull( hostsTasks, "Invalid hosts tasks map" );
-        Preconditions.checkArgument( !hostsTasks.isEmpty(), "No tasks in hosts tasks map" );
+        Preconditions.checkNotNull( tasks, "Invalid allTasks" );
+        Preconditions.checkArgument( !tasks.isEmpty(), "No allTasks" );
 
-        final Set<Results> resultsSet = Sets.newHashSet();
+        Results results = new Results( tasks );
 
-        ExecutorService tasksExecutor = Executors.newCachedThreadPool();
-        CompletionService<Object> completionService = new ExecutorCompletionService<>( tasksExecutor );
-        List<Future<Object>> taskFutures = Lists.newArrayList();
+        List<Future<Boolean>> taskFutures = Lists.newArrayList();
 
-        for ( Map.Entry<Host, Set<Task>> hostTasks : hostsTasks.entrySet() )
+        for ( Map.Entry<Host, Set<Task>> hostTasksEntry : tasks.getHostTasks().entrySet() )
         {
-            final Host host = hostTasks.getKey();
+            Host host = hostTasksEntry.getKey();
 
-            final Set<Task> tasks = hostTasks.getValue();
+            Set<Task> hostTasks = hostTasksEntry.getValue();
 
-            taskFutures.add( completionService.submit( new Runnable()
+            for ( Task hostTask : hostTasks )
             {
-                @Override
-                public void run()
-                {
-                    resultsSet.add( execute( host, tasks ) );
-                }
-            }, null ) );
+                taskFutures.add( submitTask( host, hostTask ) );
+            }
         }
 
-        tasksExecutor.shutdown();
-
-        for ( Future future : taskFutures )
+        for ( Future<Boolean> taskFuture : taskFutures )
         {
             try
             {
-                future.get();
+                taskFuture.get();
             }
             catch ( Exception e )
             {
@@ -81,220 +71,133 @@ public class HostUtil
             }
         }
 
-        return resultsSet;
+        return results;
     }
 
 
-    public Set<Results> executeUntilFirstFailure( Map<Host, Set<Task>> hostsTasks )
+    public Results executeNWaitFirstFailure( Tasks tasks )
     {
-        Preconditions.checkNotNull( hostsTasks, "Invalid hosts tasks map" );
-        Preconditions.checkArgument( !hostsTasks.isEmpty(), "No tasks in hosts tasks map" );
+        Preconditions.checkNotNull( tasks, "Invalid allTasks" );
+        Preconditions.checkArgument( !tasks.isEmpty(), "No allTasks" );
 
-        final Set<Results> resultsSet = Sets.newHashSet();
+        Results results = new Results( tasks );
 
-        ExecutorService tasksExecutor = Executors.newCachedThreadPool();
-        CompletionService<Boolean> completionService = new ExecutorCompletionService<>( tasksExecutor );
-        Map<Future<Boolean>, Set<Task>> taskFutures = Maps.newHashMap();
+        List<Future<Boolean>> taskFutures = Lists.newArrayList();
 
-        for ( Map.Entry<Host, Set<Task>> hostTasks : hostsTasks.entrySet() )
+        for ( Map.Entry<Host, Set<Task>> hostTasksEntry : tasks.getHostTasks().entrySet() )
         {
-            final Host host = hostTasks.getKey();
+            Host host = hostTasksEntry.getKey();
 
-            final Set<Task> tasks = hostTasks.getValue();
+            Set<Task> hostTasks = hostTasksEntry.getValue();
 
-            taskFutures.put( completionService.submit( new Callable<Boolean>()
+            for ( Task hostTask : hostTasks )
             {
-                @Override
-                public Boolean call()
-                {
-                    Results results = executeUntilFirstFailure( host, tasks );
-
-                    resultsSet.add( results );
-
-                    return !results.hasFailures();
-                }
-            } ), tasks );
-        }
-
-        tasksExecutor.shutdown();
-
-        boolean skip = false;
-
-        for ( Future<Boolean> future : taskFutures.keySet() )
-        {
-            Set<Task> tasks = taskFutures.get( future );
-
-            Host host = tasks.iterator().next().getHost();
-
-            if ( skip )
-            {
-                resultsSet.add( new Results( host, tasks ) );
-            }
-            else
-            {
-                try
-                {
-                    if ( !future.get() )
-                    {
-                        skip = true;
-                    }
-                }
-                catch ( Exception e )
-                {
-                    resultsSet.add( new Results( host, tasks ) );
-
-                    skip = true;
-
-                    LOG.error( "Error in #executeUntilFirstFailure", e );
-                }
+                taskFutures.add( submitTask( host, hostTask ) );
             }
         }
 
-        return resultsSet;
-    }
-
-
-    public Results executeUntilFirstFailure( Host host, Set<Task> tasks )
-    {
-        Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No tasks" );
-
-        this.tasks.addAll( tasks );
-
-        List<Future<Boolean>> futures = Lists.newArrayList();
-
-        for ( Task task : tasks )
-        {
-            futures.add( submitTask( host, task ) );
-        }
-
-        for ( Future<Boolean> future : futures )
+        for ( Future<Boolean> taskFuture : taskFutures )
         {
             try
             {
-                if ( !future.get() )
+                if ( !taskFuture.get() )
                 {
                     break;
                 }
             }
             catch ( Exception e )
             {
-                LOG.error( "Error in #executeUntilFirstFailure", e );
-            }
-        }
-
-        return new Results( host, tasks );
-    }
-
-
-    public Results execute( Host host, Set<Task> tasks )
-    {
-        Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No tasks" );
-
-        this.tasks.addAll( tasks );
-
-        List<Future> futures = Lists.newArrayList();
-
-        for ( Task task : tasks )
-        {
-            futures.add( submitTask( host, task ) );
-        }
-
-        for ( Future future : futures )
-        {
-            try
-            {
-                future.get();
-            }
-            catch ( Exception e )
-            {
                 LOG.error( "Error in #execute", e );
             }
         }
 
-        return new Results( host, tasks );
+        return results;
     }
 
 
-    public void dispose()
+    public static class Tasks
     {
-        tasks.clear();
+        private Map<Host, Set<Task>> hostTasks = Maps.newHashMap();
 
-        for ( ExecutorService executorService : taskExecutors.values() )
+
+        public void addTask( Host host, Task task )
         {
-            executorService.shutdownNow();
+            Preconditions.checkNotNull( host );
+            Preconditions.checkNotNull( task );
+
+            Set<Task> tasks = hostTasks.get( host );
+
+            if ( tasks == null )
+            {
+                tasks = Sets.newHashSet();
+
+                hostTasks.put( host, tasks );
+            }
+
+            tasks.add( task );
+        }
+
+
+        Map<Host, Set<Task>> getHostTasks()
+        {
+            return hostTasks;
+        }
+
+
+        public Set<Task> getTasks()
+        {
+            Set<Task> allTasks = Sets.newHashSet();
+
+            for ( Set<Task> tasks : hostTasks.values() )
+            {
+                allTasks.addAll( tasks );
+            }
+
+            return allTasks;
+        }
+
+
+        public boolean isEmpty()
+        {
+            return hostTasks.isEmpty();
         }
     }
 
 
     public static class Results
     {
-        private final Host host;
-        private final Set<Task> tasks;
-        private boolean hasFailures = false;
+        private final Tasks tasks;
 
 
-        Results( Host host, final Set<Task> tasks )
+        Results( Tasks tasks )
         {
-            Preconditions.checkNotNull( host );
-            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
+            Preconditions.checkNotNull( tasks );
+            Preconditions.checkArgument( !tasks.isEmpty() );
 
-            this.host = host;
             this.tasks = tasks;
-
-            for ( Task task : tasks )
-            {
-                if ( task.getTaskState() != Task.TaskState.SUCCEEDED )
-                {
-                    hasFailures = true;
-
-                    break;
-                }
-            }
-        }
-
-
-        public Host getHost()
-        {
-            return host;
         }
 
 
         public boolean hasFailures()
         {
-            return hasFailures;
+            for ( Set<Task> hostTasks : tasks.getHostTasks().values() )
+            {
+                for ( Task task : hostTasks )
+                {
+                    if ( task.getTaskState() == Task.TaskState.FAILED )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
 
-        public Set<Task> getTasks()
+        public Tasks getTasks()
         {
             return tasks;
-        }
-
-
-        @Override
-        public boolean equals( final Object o )
-        {
-            if ( this == o )
-            {
-                return true;
-            }
-            if ( o == null || getClass() != o.getClass() )
-            {
-                return false;
-            }
-
-            final Results results = ( Results ) o;
-
-            return host.equals( results.host );
-        }
-
-
-        @Override
-        public int hashCode()
-        {
-            return host.hashCode();
         }
     }
 
@@ -352,7 +255,7 @@ public class HostUtil
         /**
          * Maximum instances of this task that can be run in parallel on a given host.
          *
-         * A value less than or equal to 0 indicates unlimited number of parallel tasks
+         * A value less than or equal to 0 indicates unlimited number of parallel allTasks
          */
         public abstract int maxParallelTasks();
 
@@ -442,7 +345,9 @@ public class HostUtil
         ExecutorService taskExecutor = getTaskExecutor( host, task );
 
         task.setHost( host );
+
         task.setSubmitTimestamp( System.currentTimeMillis() );
+
         task.setTaskState( Task.TaskState.RUNNING );
 
         return taskExecutor.submit( new Callable<Boolean>()
@@ -453,6 +358,7 @@ public class HostUtil
                 try
                 {
                     task.setResult( task.call() );
+
                     task.setTaskState( Task.TaskState.SUCCEEDED );
 
                     return true;
@@ -462,6 +368,7 @@ public class HostUtil
                     LOG.error( "Error executing task {}", task.name(), e );
 
                     task.setException( e );
+
                     task.setTaskState( Task.TaskState.FAILED );
 
                     return false;
@@ -469,9 +376,20 @@ public class HostUtil
                 finally
                 {
                     //remove completed task
-                    tasks.remove( task );
+                    allTasks.remove( task );
                 }
             }
         } );
+    }
+
+
+    public void dispose()
+    {
+        allTasks.clear();
+
+        for ( ExecutorService executorService : taskExecutors.values() )
+        {
+            executorService.shutdownNow();
+        }
     }
 }
