@@ -58,8 +58,8 @@ public class HostUtil
 
     protected Results executeParallel( Tasks tasks, boolean failFast )
     {
-        Preconditions.checkNotNull( tasks, "Invalid allTasks" );
-        Preconditions.checkArgument( !tasks.isEmpty(), "No allTasks" );
+        Preconditions.checkNotNull( tasks, "Invalid tasks" );
+        Preconditions.checkArgument( !tasks.isEmpty(), "No tasks" );
 
         Results results = new Results( tasks );
 
@@ -95,6 +95,31 @@ public class HostUtil
         }
 
         return results;
+    }
+
+
+    public Map<Task, Future<Boolean>> submit( final Tasks tasks )
+    {
+        Preconditions.checkNotNull( tasks, "Invalid tasks" );
+        Preconditions.checkArgument( !tasks.isEmpty(), "No tasks" );
+
+        this.allTasks.addAll( tasks.getTasks() );
+
+        Map<Task, Future<Boolean>> taskFutures = Maps.newHashMap();
+
+        for ( Map.Entry<Host, Set<Task>> hostTasksEntry : tasks.getHostsTasks().entrySet() )
+        {
+            Host host = hostTasksEntry.getKey();
+
+            Set<Task> hostTasks = hostTasksEntry.getValue();
+
+            for ( Task hostTask : hostTasks )
+            {
+                taskFutures.put( hostTask, submitTask( host, hostTask ) );
+            }
+        }
+
+        return taskFutures;
     }
 
 

@@ -198,11 +198,11 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public ContainerToken generateContainerTTLToken( final Long ttl ) throws HostRegistrationException
+    public ContainerToken generateContainerTTLToken( final Long ttlInMs ) throws HostRegistrationException
     {
         ContainerTokenImpl token =
                 new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
-                        ttl );
+                        ttlInMs );
         try
         {
             containerTokenDataService.persist( token );

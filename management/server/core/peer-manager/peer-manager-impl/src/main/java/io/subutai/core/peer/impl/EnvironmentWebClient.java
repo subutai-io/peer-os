@@ -4,6 +4,7 @@ package io.subutai.core.peer.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -461,15 +462,33 @@ public class EnvironmentWebClient
 
         checkResponse( response );
 
-        return response.readEntity( clazz );
+        try
+        {
+            return response.readEntity( clazz );
+        }
+        catch ( ResponseProcessingException e )
+        {
+            throw new PeerException( "Error parsing response", e );
+        }
     }
 
 
     protected void checkResponse( Response response ) throws PeerException
     {
-        if ( response != null && response.getStatus() == 500 )
+        try
         {
-            throw new PeerException( response.readEntity( String.class ) );
+            if ( response == null )
+            {
+                throw new PeerException( "No response to parse" );
+            }
+            else if ( response.getStatus() == 500 )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+        }
+        catch ( ResponseProcessingException e )
+        {
+            throw new PeerException( "Error parsing response", e );
         }
     }
 }

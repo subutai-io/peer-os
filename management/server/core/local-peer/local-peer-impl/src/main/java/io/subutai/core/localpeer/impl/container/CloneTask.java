@@ -33,13 +33,15 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
     private final int vlan;
     private final int executorSize;
+    private final String environmentId;
 
 
-    public CloneTask( CloneRequest request, int vlan, int executorSize )
+    public CloneTask( CloneRequest request, int vlan, int executorSize, String environmentId )
     {
         super( request );
         this.vlan = vlan;
         this.executorSize = executorSize;
+        this.environmentId = environmentId;
     }
 
 
@@ -55,9 +57,9 @@ public class CloneTask extends AbstractTask<CloneRequest, CloneResponse>
 
         Command cloneAction = new Command( "clone",
                 Lists.newArrayList( request.getTemplateName(), request.getHostname(), "-i",
-                        String.format( "\"%s %d\"", request.getIp(), this.vlan ), "-e", request.getEnvironmentId(),
-                        "-t", getRegistrationManager().generateContainerTTLToken( ( CLONE_TIMEOUT + 10 ) * 1000L )
-                                                      .getToken() ) );
+                        String.format( "\"%s %d\"", request.getIp(), this.vlan ), "-e", environmentId, "-t",
+                        getRegistrationManager().generateContainerTTLToken( ( CLONE_TIMEOUT + 10 ) * 1000L )
+                                                .getToken() ) );
 
         result.addCommand( cloneAction );
 
