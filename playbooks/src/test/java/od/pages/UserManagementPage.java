@@ -77,6 +77,9 @@ public class UserManagementPage extends PageObject {
     @FindBy(xpath = "*//select[@class=\"b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm ng-pristine ng-untouched ng-valid\"]")
     public WebElementFacade selectorTrustedLevel;
 
+    @FindBy(xpath = "*//li[contains(text(),\"iManagement\")]")
+    public WebElementFacade selectorIManagement;
+
     //endregion
 
     //region WEB ELEMENTS: Images

@@ -43,6 +43,7 @@ Given the user enters login and password: 'admin', 'secret'
 And the user clicks on the button: Login
 When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Environments
+And the user should wait a few seconds
 Then the user destroys created environment
 When the user clicks on the menu item: User Identity
 And the user clicks on the menu item: User management

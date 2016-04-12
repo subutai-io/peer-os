@@ -394,4 +394,19 @@ public class DefSubutaiStepsWhen {
     public void user_clicks_on_button_delete() throws FindFailed {
         subutaiSteps.clickOnButtonDelete();
     }
+
+    @When("the user clicks on the button: Add role")
+    public void user_clicks_on_button_add_role() throws FindFailed {
+        subutaiSteps.clickOnButtonAddRole();
+    }
+
+    @When("the user input the role name: '$role'")
+    public void user_input_role_name(String role){
+        subutaiSteps.inputTheRoleName(role);
+    }
+
+    @When("the user click on icon add role: idenity-management")
+    public void user_click_icon_add_idenity_management() throws FindFailed {
+        subutaiSteps.clickOnIconAddIdentityManagement();
+    }
 }

@@ -189,6 +189,16 @@ public class SubutaiSteps extends ScenarioSteps {
     public void inputConfirmPassword(String confpass) {
         accountSettingsPage.fieldConfirmPassword.type(confpass);
     }
+
+    @Step
+    public void inputTheRoleName(String role) {
+        roleManagementPage.fieldRoleName.type(role);
+    }
+
+    @Step
+    public void inputNameInSearchField(String iManagement) {
+        commonPage.fieldSearch.type(iManagement);
+    }
     //endregion
 
     //region ACTION: Click
@@ -805,6 +815,16 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnCheckBoxDeleteRoleFromUser() throws FindFailed {
         screen.click(environmentsPage.sikuliCheckBoxDeleteInShareEnvi);
     }
+
+    @Step
+    public void clickOnIconAddIdentityManagement() throws FindFailed {
+        screen.click(roleManagementPage.sikuliIconAddIdentityManagement);
+    }
+
+    @Step
+    public void clickOnIconDeleteRole() throws FindFailed {
+        screen.click(roleManagementPage.sikuliIconDeleteRole);
+    }
     //endregion
 
     //region Action: Drag And Drop
@@ -1167,6 +1187,10 @@ public class SubutaiSteps extends ScenarioSteps {
         assertThat(containersPage.containersTwo.isVisible(), is(true));
     }
 
+    @Step
+    public void userShouldObserveIManagement() {
+        assertThat(roleManagementPage.roleIManagement.isVisible(), is(true));
+    }
     //endregion
 
 
@@ -1258,5 +1282,10 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void clickOnButtonGoToHUBWhite() throws FindFailed {
         screen.click(commonPage.sikuliButtonGoToHUBWhite);
+    }
+
+    @Step
+    public void clickOnButtonAddRole() throws FindFailed {
+        screen.click(roleManagementPage.sikuliButtonAddRole);
     }
 }

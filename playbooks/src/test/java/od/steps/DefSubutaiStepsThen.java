@@ -429,4 +429,17 @@ public class DefSubutaiStepsThen {
     public void user_click_on_button_ok() throws FindFailed {
         subutaiSteps.clickOnButtonOk();
     }
+
+    @Then("the user should observe role: iManagement")
+    public void user_observe_role_imanagement(){
+        subutaiSteps.userShouldObserveIManagement();
+    }
+
+    @Then("the user should delete the role: iManagement")
+    public void user_delete_role_imanagement() throws FindFailed {
+        subutaiSteps.inputNameInSearchField("iManagement");
+        subutaiSteps.clickOnIconDeleteRole();
+        subutaiSteps.clickOnButtonDelete();
+        subutaiSteps.clickOnButtonOk();
+    }
 }
