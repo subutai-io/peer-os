@@ -46,7 +46,6 @@ import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
@@ -97,10 +96,6 @@ import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
-import io.subutai.common.task.CloneResponse;
-import io.subutai.common.task.QuotaRequest;
-import io.subutai.common.task.Task;
-import io.subutai.common.task.TaskCallbackHandler;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
@@ -115,7 +110,6 @@ import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainersRequestListener;
 import io.subutai.core.localpeer.impl.container.ImportTemplateTask;
 import io.subutai.core.localpeer.impl.container.PrepareTemplateRequestListener;
-import io.subutai.core.localpeer.impl.container.QuotaTask;
 import io.subutai.core.localpeer.impl.container.SetQuotaTask;
 import io.subutai.core.localpeer.impl.dao.NetworkResourceDaoImpl;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
@@ -163,7 +157,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private SecurityManager securityManager;
     protected ServiceLocator serviceLocator = new ServiceLocator();
     protected volatile boolean initialized = false;
-    private TaskManagerImpl taskManager;
     private NetworkResourceDaoImpl networkResourceDao;
     LocalPeerCommands localPeerCommands = new LocalPeerCommands();
     HostUtil hostUtil = new HostUtil();
@@ -211,8 +204,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
 
             setResourceHostTransientFields( getResourceHosts() );
-
-            taskManager = new TaskManagerImpl( this );
 
             this.networkResourceDao = new NetworkResourceDaoImpl( daoManager.getEntityManagerFactory() );
         }
@@ -675,73 +666,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         hostUtil.submit( quotaTasks );
 
         return new CreateEnvironmentContainersResponse( cloneResults );
-    }
-
-
-    private TaskCallbackHandler<CloneRequest, CloneResponse> getCloneSuccessHandler( final LocalPeer localPeer,
-                                                                                     final
-                                                                                     CreateEnvironmentContainersRequest requestGroup )
-    {
-        return new TaskCallbackHandler<CloneRequest, CloneResponse>()
-        {
-            @Override
-            public void handle( Task task, CloneRequest request, CloneResponse response ) throws Exception
-            {
-
-                Preconditions.checkNotNull( response, "Task response could not be null" );
-
-
-                try
-                {
-                    QuotaTask quotaTask = new QuotaTask( quotaManager,
-                            new QuotaRequest( request.getResourceHostId(), request.getHostname(),
-                                    request.getContainerSize() ) );
-
-                    taskManager.schedule( quotaTask, null );
-
-                    final HostInterfaces interfaces = new HostInterfaces();
-                    interfaces.addHostInterface(
-                            new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, response.getIp() ) );
-                    final String hostId = response.getContainerId();
-                    final String localPeerId = localPeer.getId();
-                    final HostArchitecture arch = request.getTemplateArch();
-                    final String hostname = request.getHostname();
-                    ContainerHostEntity containerHostEntity =
-                            new ContainerHostEntity( localPeerId, hostId, hostname, arch, interfaces,
-                                    request.getContainerName(), request.getTemplateName(), arch.name(),
-                                    requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
-                                    requestGroup.getInitiatorPeerId(), request.getContainerSize() );
-
-                    registerContainer( request.getResourceHostId(), containerHostEntity );
-
-                    //wait for container
-                    boolean isRunning = false;
-                    long waitStart = System.currentTimeMillis();
-                    while ( !isRunning
-                            && System.currentTimeMillis() - waitStart < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 )
-                    {
-                        try
-                        {
-                            isRunning = hostRegistry.getContainerHostInfoById( hostId ).getState()
-                                    == ContainerHostState.RUNNING;
-                        }
-                        catch ( HostDisconnectedException e )
-                        {
-                            //ignore
-                        }
-                        if ( !isRunning )
-                        {
-                            Thread.sleep( 100 );
-                        }
-                    }
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error on registering container.", e );
-                    throw new PeerException( "Error on registering container.", e );
-                }
-            }
-        };
     }
 
 
@@ -2322,20 +2246,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public Set<HostUtil.Task> getTasks()
     {
         return hostUtil.getAllTasks();
-    }
-
-
-    @Override
-    public List<Task> getTaskList()
-    {
-        return taskManager.getAllTasks();
-    }
-
-
-    @Override
-    public Task getTask( final Integer id )
-    {
-        return taskManager.getTask( id );
     }
 
 
