@@ -93,14 +93,6 @@ func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) s
 	return string(output)
 }
 
-func ImportMHKeyNoDefaultKeyring(cont string) {
-	pub := config.Agent.LxcPrefix + cont + "/public.pub"
-	gpg_C := "gpg --no-default-keyring --keyring " + pub + " --import epub.key"
-	command := exec.Command("/bin/bash", "-c", gpg_C)
-	status, err := command.CombinedOutput()
-	log.Check(log.WarnLevel, "Importing Management Host Key "+string(status), err)
-}
-
 func GenerateGPGKeys(email string) {
 	os.MkdirAll("/root/.gnupg/", 0700)
 	conf, err := os.Create("/root/.gnupg/defaults")
