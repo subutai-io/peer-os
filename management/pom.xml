@@ -221,22 +221,22 @@
       <!--Node Registration-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-api</artifactId>
+        <artifactId>host-registration-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-impl</artifactId>
+        <artifactId>host-registration-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-cli</artifactId>
+        <artifactId>host-registration-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-rest</artifactId>
+        <artifactId>host-registration-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

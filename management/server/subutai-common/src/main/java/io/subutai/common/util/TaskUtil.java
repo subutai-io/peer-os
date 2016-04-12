@@ -34,11 +34,14 @@ public class TaskUtil<T>
     }
 
 
+    /**
+     * Executes tasks in parallel.
+     */
     public TaskResults<T> executeParallel()
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No task found for execution" );
 
-        Set<TaskResult<T>> results = executeParallel( tasks );
+        Set<TaskResult<T>> results = executeParallel( tasks, false );
 
         tasks.clear();
 
@@ -46,7 +49,22 @@ public class TaskUtil<T>
     }
 
 
-    protected Set<TaskResult<T>> executeParallel( Set<Task<T>> tasks )
+    /**
+     * Executes tasks in parallel. Fails fast if any execution failed
+     */
+    public TaskResults<T> executeParallelFailFast()
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No task found for execution" );
+
+        Set<TaskResult<T>> results = executeParallel( tasks, true );
+
+        tasks.clear();
+
+        return new TaskResults<>( results );
+    }
+
+
+    protected Set<TaskResult<T>> executeParallel( Set<Task<T>> tasks, boolean failFast )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ) );
 
@@ -75,6 +93,11 @@ public class TaskUtil<T>
                 LOG.error( "Error executing task ", e );
 
                 taskResults.add( new TaskResult<>( futureEntry.getKey(), e ) );
+
+                if ( failFast )
+                {
+                    break;
+                }
             }
         }
 

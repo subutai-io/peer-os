@@ -83,4 +83,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     Tunnels getTunnels() throws ResourceHostException;
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
+
+    void importTemplate( String templateName ) throws ResourceHostException;
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.util.StringUtil;
+import io.subutai.common.util.DateUtil;
 
 
 public class CreateEnvironmentContainerResponseCollector extends AbstractResponseCollector<CloneRequest, CloneResponse>
@@ -20,7 +20,7 @@ public class CreateEnvironmentContainerResponseCollector extends AbstractRespons
     public void onSuccess( final CloneRequest request, final CloneResponse response )
     {
         final String message = String.format( "Cloning %s succeeded on %s. [%s]", request.getContainerName(),
-                request.getResourceHostId(), StringUtil.convertMillisToHHMMSS( response.getElapsedTime() ) );
+                request.getResourceHostId(), DateUtil.convertMillisToHHMMSS( response.getElapsedTime() ) );
         addResponse( response, message );
     }
 

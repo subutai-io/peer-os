@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.peer.Peer;
 
 
-public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesResponseCollector>
+public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesResponse>
 {
     private static final Logger LOG = LoggerFactory.getLogger( CreatePeerTemplatePrepareTask.class );
 
@@ -32,7 +32,7 @@ public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesR
 
 
     @Override
-    public PrepareTemplatesResponseCollector call() throws Exception
+    public PrepareTemplatesResponse call() throws Exception
     {
         Map<String, Set<String>> rhTemplates = new HashMap<>();
         for ( Node node : nodes )
@@ -46,6 +46,6 @@ public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesR
             templates.add( node.getTemplateName() );
         }
 
-        return peer.prepareTemplates(new PrepareTemplatesRequest( rhTemplates ) );
+        return peer.prepareTemplates( new PrepareTemplatesRequest( rhTemplates ) );
     }
 }

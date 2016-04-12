@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.impl;
 
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.Timeouts;
 
 
 public class ResourceHostCommands
@@ -39,5 +40,12 @@ public class ResourceHostCommands
     public RequestBuilder getFetchCpuCoresNumberCommand()
     {
         return new RequestBuilder( "nproc" );
+    }
+
+
+    public RequestBuilder getImportTemplateCommand( final String templateName )
+    {
+        return new RequestBuilder( String.format( "subutai import %s", templateName ) )
+                .withTimeout( Timeouts.PREPARE_TEMPLATES_RESPONSE_TIMEOUT );
     }
 }
