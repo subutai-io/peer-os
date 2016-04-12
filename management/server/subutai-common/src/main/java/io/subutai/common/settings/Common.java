@@ -15,6 +15,11 @@ public class Common
     public static final int WAIT_CONTAINER_CONNECTION_SEC = 30;
     public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 30;
     public static final int MIN_COMMAND_TIMEOUT_SEC = 1;
+
+    public static final int CLONE_TIMEOUT_SEC = 60 * 5; // 5 min
+
+    public static final int TEMPLATE_DOWNLOAD_TIMEOUT_SEC = 60 * 60 * 5; // 5 hour
+
     public static final int MAX_COMMAND_TIMEOUT_SEC = 100 * 60 * 60; // 100 hours
     public static final int DEFAULT_AGENT_RESPONSE_CHUNK_INTERVAL = 30; // 30 sec
     public static final int INACTIVE_COMMAND_DROP_TIMEOUT_SEC = 24 * 60 * 60; // 24 hours

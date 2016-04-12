@@ -15,17 +15,13 @@ public class CloneRequest implements TaskRequest
     private final String hostname;
     private final String containerName;
     private final String ip;
-    private final String environmentId;
-    private final String initiatorPeerId;
-    private final String ownerId;
     private final String templateName;
     private final HostArchitecture templateArch;
     private final ContainerSize containerSize;
 
 
     public CloneRequest( final String resourceHostId, final String hostname, final String containerName,
-                         final String ip, final String environmentId, final String initiatorPeerId,
-                         final String ownerId, final String templateName, HostArchitecture templateArch,
+                         final String ip, final String templateName, HostArchitecture templateArch,
                          final ContainerSize containerSize )
     {
         Preconditions.checkNotNull( resourceHostId );
@@ -37,9 +33,6 @@ public class CloneRequest implements TaskRequest
         this.hostname = hostname;
         this.containerName = containerName;
         this.ip = ip;
-        this.environmentId = environmentId;
-        this.initiatorPeerId = initiatorPeerId;
-        this.ownerId = ownerId;
         this.templateName = templateName;
         this.templateArch = templateArch;
         this.containerSize = containerSize;
@@ -70,24 +63,6 @@ public class CloneRequest implements TaskRequest
     }
 
 
-    public String getEnvironmentId()
-    {
-        return environmentId;
-    }
-
-
-    public String getInitiatorPeerId()
-    {
-        return initiatorPeerId;
-    }
-
-
-    public String getOwnerId()
-    {
-        return ownerId;
-    }
-
-
     public String getTemplateName()
     {
         return templateName;
@@ -110,9 +85,7 @@ public class CloneRequest implements TaskRequest
     public String toString()
     {
         return "CloneRequest{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
-                + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", environmentId='"
-                + environmentId + '\'' + ", initiatorPeerId='" + initiatorPeerId + '\'' + ", ownerId='" + ownerId + '\''
-                + ", templateName='" + templateName + '\'' + ", templateArch=" + templateArch + ", containerSize="
-                + containerSize + '}';
+                + ", containerName='" + containerName + '\'' + ", ip='" + ip + '\'' + ", templateName='" + templateName
+                + '\'' + ", templateArch=" + templateArch + ", containerSize=" + containerSize + '}';
     }
 }

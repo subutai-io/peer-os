@@ -100,6 +100,7 @@ public interface LocalPeer extends Peer
 
     public void removeResourceHost( String rhId ) throws HostNotFoundException;
 
+
     /**
      * Returns domain assigned to vni if any
      *

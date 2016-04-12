@@ -2,7 +2,6 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -28,8 +27,8 @@ import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -330,8 +329,9 @@ public class HubEnvironmentManager
     public EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
             throws EnvironmentCreationException
     {
-        CreateEnvironmentContainerGroupRequest containerGroupRequest =
-                new CreateEnvironmentContainerGroupRequest( peerDto.getEnvironmentInfo().getId() );
+        CreateEnvironmentContainersRequest containerGroupRequest =
+                new CreateEnvironmentContainersRequest( peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
+                        peerDto.getOwnerId() );
 
         Set<EnvironmentNodeDto> failedNodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
@@ -344,18 +344,17 @@ public class HubEnvironmentManager
                 nodeDto.setState( ContainerStateDto.UNKNOWN );
                 CloneRequest cloneRequest =
                         new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                                nodeDto.getIp(), peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
-                                peerDto.getOwnerId(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
+                                nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
 
                 containerGroupRequest.addRequest( cloneRequest );
             }
         }
 
-        final CreateEnvironmentContainerResponseCollector containerCollector;
+        final CreateEnvironmentContainersResponse containerCollector;
         try
         {
-            containerCollector = peerManager.getLocalPeer().createEnvironmentContainerGroup( containerGroupRequest );
-            List<CloneResponse> cloneResponseList = containerCollector.getResponses();
+            containerCollector = peerManager.getLocalPeer().createEnvironmentContainers( containerGroupRequest );
+            Set<CloneResponse> cloneResponseList = containerCollector.getResponses();
             for ( CloneResponse cloneResponse : cloneResponseList )
             {
                 for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
