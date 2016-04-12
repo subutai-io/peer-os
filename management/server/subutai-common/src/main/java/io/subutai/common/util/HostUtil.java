@@ -38,53 +38,36 @@ public class HostUtil
     }
 
 
-    public Results executeNWait( Tasks tasks )
+    /**
+     * Executes tasks in parallel
+     */
+    public Results execute( Tasks tasks )
     {
-        Preconditions.checkNotNull( tasks, "Invalid allTasks" );
-        Preconditions.checkArgument( !tasks.isEmpty(), "No allTasks" );
-
-        Results results = new Results( tasks );
-
-        List<Future<Boolean>> taskFutures = Lists.newArrayList();
-
-        for ( Map.Entry<Host, Set<Task>> hostTasksEntry : tasks.getHostTasks().entrySet() )
-        {
-            Host host = hostTasksEntry.getKey();
-
-            Set<Task> hostTasks = hostTasksEntry.getValue();
-
-            for ( Task hostTask : hostTasks )
-            {
-                taskFutures.add( submitTask( host, hostTask ) );
-            }
-        }
-
-        for ( Future<Boolean> taskFuture : taskFutures )
-        {
-            try
-            {
-                taskFuture.get();
-            }
-            catch ( Exception e )
-            {
-                LOG.error( "Error in #execute", e );
-            }
-        }
-
-        return results;
+        return executeParallel( tasks, false );
     }
 
 
-    public Results executeNWaitFirstFailure( Tasks tasks )
+    /**
+     * Executes tasks in parallel. Fails fast if any execution failed
+     */
+    public Results executeFailFast( Tasks tasks )
+    {
+        return executeParallel( tasks, true );
+    }
+
+
+    protected Results executeParallel( Tasks tasks, boolean failFast )
     {
         Preconditions.checkNotNull( tasks, "Invalid allTasks" );
         Preconditions.checkArgument( !tasks.isEmpty(), "No allTasks" );
 
         Results results = new Results( tasks );
 
+        this.allTasks.addAll( tasks.getTasks() );
+
         List<Future<Boolean>> taskFutures = Lists.newArrayList();
 
-        for ( Map.Entry<Host, Set<Task>> hostTasksEntry : tasks.getHostTasks().entrySet() )
+        for ( Map.Entry<Host, Set<Task>> hostTasksEntry : tasks.getHostsTasks().entrySet() )
         {
             Host host = hostTasksEntry.getKey();
 
@@ -100,7 +83,7 @@ public class HostUtil
         {
             try
             {
-                if ( !taskFuture.get() )
+                if ( !taskFuture.get() && failFast )
                 {
                     break;
                 }
@@ -117,7 +100,7 @@ public class HostUtil
 
     public static class Tasks
     {
-        private Map<Host, Set<Task>> hostTasks = Maps.newHashMap();
+        private Map<Host, Set<Task>> hostsTasks = Maps.newHashMap();
 
 
         public void addTask( Host host, Task task )
@@ -125,41 +108,41 @@ public class HostUtil
             Preconditions.checkNotNull( host );
             Preconditions.checkNotNull( task );
 
-            Set<Task> tasks = hostTasks.get( host );
+            Set<Task> tasks = hostsTasks.get( host );
 
             if ( tasks == null )
             {
                 tasks = Sets.newHashSet();
 
-                hostTasks.put( host, tasks );
+                hostsTasks.put( host, tasks );
             }
 
             tasks.add( task );
         }
 
 
-        Map<Host, Set<Task>> getHostTasks()
+        Map<Host, Set<Task>> getHostsTasks()
         {
-            return hostTasks;
+            return hostsTasks;
         }
 
 
         public Set<Task> getTasks()
         {
-            Set<Task> allTasks = Sets.newHashSet();
+            Set<Task> tasks = Sets.newHashSet();
 
-            for ( Set<Task> tasks : hostTasks.values() )
+            for ( Set<Task> hostTasks : hostsTasks.values() )
             {
-                allTasks.addAll( tasks );
+                tasks.addAll( hostTasks );
             }
 
-            return allTasks;
+            return tasks;
         }
 
 
         public boolean isEmpty()
         {
-            return hostTasks.isEmpty();
+            return hostsTasks.isEmpty();
         }
     }
 
@@ -180,7 +163,7 @@ public class HostUtil
 
         public boolean hasFailures()
         {
-            for ( Set<Task> hostTasks : tasks.getHostTasks().values() )
+            for ( Set<Task> hostTasks : tasks.getHostsTasks().values() )
             {
                 for ( Task task : hostTasks )
                 {
@@ -299,6 +282,12 @@ public class HostUtil
         public final long getDuration()
         {
             return System.currentTimeMillis() - submitTimestamp;
+        }
+
+
+        public final String getDurationFormatted()
+        {
+            return DateUtil.convertMillisToHHMMSS( getDuration() );
         }
 
 

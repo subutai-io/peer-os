@@ -26,8 +26,8 @@ public class TaskListCommand extends SubutaiShellCommandSupport
     {
         for ( HostUtil.Task task : localPeer.getTasks() )
         {
-            System.out.format( "%s on %s. Duration: %d sec. State: %s. Result: %s%n", task.name(),
-                    task.getHost().getHostname(), task.getDuration() / 1000, task.getTaskState(),
+            System.out.format( "%s on %s. Duration: %s. State: %s. Result: %s%n", task.name(),
+                    task.getHost().getHostname(), task.getDurationFormatted(), task.getTaskState(),
                     task.getResult() == null ? task.getFailureReason() : task.getResult() );
         }
 

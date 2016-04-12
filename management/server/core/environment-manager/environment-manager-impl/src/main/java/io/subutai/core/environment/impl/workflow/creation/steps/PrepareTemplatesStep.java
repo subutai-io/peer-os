@@ -53,7 +53,7 @@ public class PrepareTemplatesStep
                     new PeerImportTemplateTask( peer, peerPlacement.getValue(), operationTracker ) ) );
         }
 
-        PeerUtil.PeerTaskResults<PrepareTemplatesResponse> templateResults = templateUtil.executeParallel();
+        PeerUtil.PeerTaskResults<PrepareTemplatesResponse> templateResults = templateUtil.executeParallelFailFast();
 
         boolean succeeded = true;
 

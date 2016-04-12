@@ -24,8 +24,8 @@ public class PrepareTemplatesResponse
             if ( task.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
             {
                 this.messages.add( String
-                        .format( "Task (%s) succeeded on host %s [%d sec]", task.name(), task.getHost().getId(),
-                                task.getDuration() / 1000 ) );
+                        .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getId(),
+                                task.getDurationFormatted() ) );
             }
             else if ( task.getTaskState() == HostUtil.Task.TaskState.FAILED )
             {
@@ -35,9 +35,8 @@ public class PrepareTemplatesResponse
             }
             else
             {
-                this.messages.add( String
-                        .format( "Task (%s) is %s on host %s [%d sec]", task.name(), task.getTaskState(),
-                                task.getHost().getId(), task.getDuration() / 1000 ) );
+                this.messages.add( String.format( "Task (%s) is %s on host %s [%s]", task.name(), task.getTaskState(),
+                        task.getHost().getId(), task.getDurationFormatted() ) );
             }
         }
 

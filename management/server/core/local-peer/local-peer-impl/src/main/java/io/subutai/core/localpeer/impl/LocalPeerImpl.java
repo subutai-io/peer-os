@@ -606,7 +606,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        HostUtil.Results results = hostUtil.executeNWaitFirstFailure( tasks );
+        HostUtil.Results results = hostUtil.executeFailFast( tasks );
 
         response.addResults( results );
 

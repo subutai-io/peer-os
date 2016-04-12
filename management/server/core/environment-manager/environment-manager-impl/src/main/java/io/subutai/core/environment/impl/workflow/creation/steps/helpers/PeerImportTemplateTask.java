@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.jms.IllegalStateException;
+
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Node;
@@ -63,6 +65,9 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
         else
         {
             trackerOperation.addLog( String.format( "Template import failed on peer %s", peer.getName() ) );
+
+            //throw to let caller fail-fast
+            throw new IllegalStateException( String.format( "Template import failed on peer %s", peer.getName() ) );
         }
 
         return response;
