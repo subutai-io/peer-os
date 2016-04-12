@@ -262,6 +262,16 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.waitFor(5000);
     }
 
+    @When("the user creates environment using template: Apache")
+    public void user_creates_environment_using_template_apache() throws FindFailed, FileNotFoundException {
+        subutaiSteps.clickOnIconTemplateApache();
+        subutaiSteps.clickOnButtonApply();
+        subutaiSteps.inputEnvironmentName("Test Environment Apache");
+        subutaiSteps.clickOnButtonBuild();
+        subutaiSteps.clickOnButtonCloseBuildPopup();
+        subutaiSteps.waitFor(5000);
+    }
+
     @When("the user clicks on templates")
     public void user_clicks_on_templates() throws FindFailed {
         subutaiSteps.clickOnTitleTemplates();
@@ -273,9 +283,14 @@ public class DefSubutaiStepsWhen {
     }
 
     @When("the user should find template: Cassandra")
-    public void user_finds_template_appscale(){
+    public void user_finds_template_casandra(){
         subutaiSteps.inputTemplateNameInSearchField("Cassandra");
         subutaiSteps.waitABit(3000);
+    }
+
+    @When("the user should find template: Apache")
+    public void user_finds_template_apache(){
+        subutaiSteps.inputTemplateNameInSearchField("Apache");
     }
 
     @When("the user should install plugin")
@@ -408,5 +423,15 @@ public class DefSubutaiStepsWhen {
     @When("the user click on icon add role: idenity-management")
     public void user_click_icon_add_idenity_management() throws FindFailed {
         subutaiSteps.clickOnIconAddIdentityManagement();
+    }
+
+    @When("the user clicks on the button: Configure")
+    public void user_clicks_button_configure() throws FindFailed {
+        subutaiSteps.clickOnButtonConfigure();
+    }
+
+    @When("the user clicks on the checkbox: Add domain")
+    public void user_clicks_add_domain() throws FindFailed {
+        subutaiSteps.clickOnCheckboxAddDomain();
     }
 }

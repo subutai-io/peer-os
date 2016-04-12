@@ -442,4 +442,16 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnButtonDelete();
         subutaiSteps.clickOnButtonOk();
     }
+
+    @Then("the user set domain")
+    public void user_set_domain() throws FindFailed {
+        subutaiSteps.inputSetDomainName("test.qa");
+        subutaiSteps.clickOnButtonSave();
+        subutaiSteps.clickOnButtonOk();
+    }
+
+    @Then("the user should observe header apache")
+    public void user_observe_header_apache(){
+        subutaiSteps.userShouldObserveHeaderApache();
+    }
 }

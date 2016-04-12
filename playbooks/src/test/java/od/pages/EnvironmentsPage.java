@@ -17,6 +17,9 @@ public class EnvironmentsPage extends PageObject {
     @FindBy(id = "js-search")
     public WebElementFacade fieldSearch;
 
+    @FindBy(ngModel = "domain.name")
+    public WebElementFacade fieldDomainName;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
@@ -45,6 +48,7 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliButtonEdit = "src/test/resources/imgs/buttons/buttonEdit.png";
     public String sikuliButtonNext = "src/test/resources/imgs/buttons/buttonNext.png";
     public String sikuliButtonAddUserTest = "src/test/resources/imgs/buttons/buttonAddUserTest.png";
+    public String sikuliButtonConfigure = "src/test/resources/imgs/buttons/buttonConfigure.png";
 
     @FindBy(xpath = "*//div[@class=\"b-toggle b-toggle_cloud\"]")
     public WebElementFacade buttonModes;
@@ -117,7 +121,7 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliTemplateWebdemo = "src/test/resources/imgs/templates/templateWebdemo.png";
     public String sikuliTemplateCasandra = "src/test/resources/imgs/templates/templateCasandra.png";
     public String sikuliTemplateMaster = "src/test/resources/imgs/templates/templateMaster.png";
-
+    public String sikuliTemplateApache = "src/test/resources/imgs/templates/templateApache.png";
     //endregion
 
     //region WEB ELEMENTS: Headers
@@ -127,6 +131,9 @@ public class EnvironmentsPage extends PageObject {
 
     @FindBy(xpath = "*//li[contains(text(),\"Peers\")]")
     public WebElementFacade titlePeers;
+
+    @FindBy(xpath = "*//span[@class=\"floating_element\"]")
+    public WebElementFacade headerApache;
 
     //endregion
 
@@ -158,6 +165,6 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliPeerRH1 = "src/test/resources/imgs/elements/peerRH1.png";
     public String sikuliPeerRH2 = "src/test/resources/imgs/elements/peerRH2.png";
     public String sikuliCheckBoxDeleteInShareEnvi = "src/test/resources/imgs/elements/checkBoxDeleteInShareEnvi.png";
-
+    public String sikuliCheckBoxAddDomain = "src/test/resources/imgs/elements/checkBoxAddDomain.png";
     //endregion
 }

@@ -58,6 +58,12 @@ public class SubutaiSteps extends ScenarioSteps {
         loginPage.open();
     }
 
+    @Step
+    public void open_domain_test() throws FileNotFoundException {
+        loginPage.setDefaultBaseUrl(String.format(ReaderFromFile.readDataFromFile("src/test/resources/parameters/test")));
+        loginPage.open();
+    }
+
     //endregion
 
     //region ACTION: Type
@@ -198,6 +204,11 @@ public class SubutaiSteps extends ScenarioSteps {
     @Step
     public void inputNameInSearchField(String iManagement) {
         commonPage.fieldSearch.type(iManagement);
+    }
+
+    @Step
+    public void inputSetDomainName(String s) {
+        environmentsPage.fieldDomainName.type(s);
     }
     //endregion
 
@@ -825,6 +836,21 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnIconDeleteRole() throws FindFailed {
         screen.click(roleManagementPage.sikuliIconDeleteRole);
     }
+
+    @Step
+    public void clickOnIconTemplateApache() throws FindFailed {
+        screen.click(environmentsPage.sikuliTemplateApache);
+    }
+
+    @Step
+    public void clickOnButtonConfigure() throws FindFailed {
+        screen.click(environmentsPage.sikuliButtonConfigure);
+    }
+
+    @Step
+    public void clickOnCheckboxAddDomain() throws FindFailed {
+        screen.click(environmentsPage.sikuliCheckBoxAddDomain);
+    }
     //endregion
 
     //region Action: Drag And Drop
@@ -1191,6 +1217,11 @@ public class SubutaiSteps extends ScenarioSteps {
     public void userShouldObserveIManagement() {
         assertThat(roleManagementPage.roleIManagement.isVisible(), is(true));
     }
+
+    @Step
+    public void userShouldObserveHeaderApache() {
+        assertThat(environmentsPage.headerApache.isVisible(), is(true));
+    }
     //endregion
 
 
@@ -1230,8 +1261,6 @@ public class SubutaiSteps extends ScenarioSteps {
         ExecuteShellCommand executeShellCommand = new ExecuteShellCommand();
         System.out.println(executeShellCommand.executeCommand(file));
     }
-
-
     @Step
     public void clickOnButtonRegister() throws FindFailed {
         screen.click(commonPage.sikuliButtonRegister);
