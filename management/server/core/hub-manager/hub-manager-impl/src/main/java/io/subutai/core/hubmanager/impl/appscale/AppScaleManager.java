@@ -60,9 +60,9 @@ public class AppScaleManager
 
         addKeyPairSH( controllerHost );
 
-        createRunSH ( controllerHost );
-
         int envContainersCount = config.getContainerAddresses().size();
+
+        createRunSH ( controllerHost, envContainersCount );
 
         String runShell = Commands.getRunShell() + " " + envContainersCount;
 
@@ -136,14 +136,14 @@ public class AppScaleManager
     }
 
 
-    private void createRunSH( ContainerHost containerHost )
+    private void createRunSH( ContainerHost containerHost, int envContainersCount )
     {
 
         try
         {
             containerHost.execute ( new RequestBuilder ( "rm /root/run.sh " ) );
             containerHost.execute ( new RequestBuilder ( "touch /root/run.sh" ) );
-            containerHost.execute ( new RequestBuilder ( "echo '" + returnRunSH() + "' > /root/run.sh" ) );
+            containerHost.execute ( new RequestBuilder ( "echo '" + returnRunSH( envContainersCount ) + "' > /root/run.sh" ) );
             containerHost.execute ( new RequestBuilder ( "chmod +x /root/run.sh" ) );
         }
         catch ( CommandException ex )
@@ -153,16 +153,22 @@ public class AppScaleManager
     }
 
 
-    private String returnRunSH ()
+    private String returnRunSH ( int envContainersCount )
     {
         String sh = "#!/usr/bin/expect -f\n" + "set timeout -1\n" + "set num $argv\n"
-                + "spawn /root/appscale-tools/bin/appscale up\n" + "\n"
-//                + "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
-//                + "    expect \"Are you sure you want to continue connecting (yes/no)?\"\n" + "    send -- \"yes\\n\"\n"
-//                + "    expect \" password:\"\n" + "    send -- \"a\\n\"\n" + "}\n" + "\n"
-                + "expect \"Enter your desired admin e-mail address:\"\n" + "send -- \"a@a.com\\n\"\n"
-                + "expect \"Enter new password:\"\n" + "send -- \"aaaaaa\\n\"\n" + "expect \"Confirm password:\"\n"
-                + "send -- \"aaaaaa\\n\"\n" + "\n" + "expect EOD";
+                + "spawn /root/appscale-tools/bin/appscale up\n" + "\n";
+
+        if ( envContainersCount == 1 )
+        {
+            // This works for environment with one container only. With several containers it fails.
+            sh += "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
+                + "    expect \"Are you sure you want to continue connecting (yes/no)?\"\n" + "    send -- \"yes\\n\"\n"
+                + "    expect \" password:\"\n" + "    send -- \"a\\n\"\n" + "}\n" + "\n";
+        }
+
+        sh += "expect \"Enter your desired admin e-mail address:\"\n" + "send -- \"a@a.com\\n\"\n"
+            + "expect \"Enter new password:\"\n" + "send -- \"aaaaaa\\n\"\n" + "expect \"Confirm password:\"\n"
+            + "send -- \"aaaaaa\\n\"\n" + "\n" + "expect EOD";
 
         return sh;
     }
