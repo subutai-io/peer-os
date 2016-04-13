@@ -398,6 +398,7 @@ public class DefSubutaiStepsWhen {
     @When("the user clicks on the button: Save")
     public void user_clicks_on_button_save() throws FindFailed {
         subutaiSteps.clickOnButtonSave();
+        subutaiSteps.waitABit(10000);
     }
 
     @When("the user clicks on the icon: delete")

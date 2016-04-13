@@ -101,7 +101,9 @@ function choice_stories(){
 
 function run_tests(){
      mvn clean
+     recordmydesktop -o /home/d0m0v0y/base/playbooks/src/test/resources/video/playbook.ogv -x 70 -y 30 --no-sound &
      mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
+     pkill recordmydesktop &
      mvn serenity:aggregate
 }
 

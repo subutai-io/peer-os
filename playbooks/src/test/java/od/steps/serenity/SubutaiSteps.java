@@ -60,7 +60,7 @@ public class SubutaiSteps extends ScenarioSteps {
 
     @Step
     public void open_domain_test() throws FileNotFoundException {
-        loginPage.setDefaultBaseUrl(String.format(ReaderFromFile.readDataFromFile("src/test/resources/parameters/test")));
+        loginPage.setDefaultBaseUrl(String.format("http://%s/", ReaderFromFile.readDataFromFile("src/test/resources/parameters/test")));
         loginPage.open();
     }
 
