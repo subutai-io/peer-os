@@ -16,11 +16,20 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
-//import PK gpg2 --import pubkey.key
-func ImportPk(file string) string {
-	command := exec.Command("/bin/bash", "-c", "gpg --import "+file)
+const (
+	tmpfile = "epub.key"
+)
+
+//ImportPk import PK gpg2 --import pubkey.key
+func ImportPk(k string) string {
+	err := ioutil.WriteFile(tmpfile, []byte(k), 0644)
+	log.Check(log.WarnLevel, "Writing Pubkey to temp file", err)
+
+	command := exec.Command("gpg", "--import", tmpfile)
 	out, err := command.CombinedOutput()
 	log.Check(log.WarnLevel, "Importing MH public key", err)
+
+	os.Remove(tmpfile)
 	return string(out)
 }
 
