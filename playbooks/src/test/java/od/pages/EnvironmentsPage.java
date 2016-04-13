@@ -98,7 +98,7 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliIconSettingsFirstCont = "src/test/resources/imgs/icons/iconSettingsCont1.png";
     public String sikuliIconSettingsSecondCont = "src/test/resources/imgs/icons/iconSettingsCont2.png";
     public String sikuliIconSettingsThirdContCass = "src/test/resources/imgs/icons/iconSettingsCont3Cass.png";
-
+    public String sikuliIconSettingsCassandra = "src/test/resources/imgs/icons/iconSettingsCassandra.png";
     //endregion
 
     //region SIKULI IMAGES: Titles

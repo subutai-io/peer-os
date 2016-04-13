@@ -455,6 +455,14 @@ public class DefSubutaiStepsThen {
         subutaiSteps.userShouldObserveHeaderApache();
     }
 
+    @Then("the user chooses the medium size of template cassandra")
+    public void user_choose_the_medium_size_of_cont_cassandra() throws FindFailed {
+        subutaiSteps.clickOnIconSettingsCont();
+        subutaiSteps.clickOnPickerSmall();
+        subutaiSteps.clickOnPickerMedium();
+        subutaiSteps.clickOnButtonSave();
+    }
+
     @Then("the user chooses the medium size of first template cassandra")
     public void user_choose_the_medium_size_of_first_cont_cassandra() throws FindFailed {
         subutaiSteps.clickOnIconSettingsFirstCont();

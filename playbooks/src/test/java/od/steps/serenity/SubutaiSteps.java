@@ -876,6 +876,11 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnPickerMedium() throws FindFailed {
         screen.click(environmentsPage.sikuliPickerMedium);
     }
+
+    @Step
+    public void clickOnIconSettingsCont() throws FindFailed {
+        screen.click(environmentsPage.sikuliIconSettingsCassandra);
+    }
     //endregion
 
     //region Action: Drag And Drop
@@ -1343,4 +1348,5 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnButtonAddRole() throws FindFailed {
         screen.click(roleManagementPage.sikuliButtonAddRole);
     }
+
 }
