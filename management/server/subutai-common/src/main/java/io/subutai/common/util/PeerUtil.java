@@ -102,7 +102,7 @@ public class PeerUtil<T>
         int totalTasks = peerFutures.size();
 
         futuresLoop:
-        while ( !Thread.interrupted() && doneTasks < totalTasks )
+        while ( !Thread.interrupted() && doneTasks < totalTasks && !peerFutures.isEmpty() )
         {
             Iterator<Map.Entry<Peer, Future<T>>> mapIterator = peerFutures.entrySet().iterator();
 
