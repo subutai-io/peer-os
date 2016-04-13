@@ -170,7 +170,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private IdentityManager identityManager;
     private RelationManager relationManager;
 
-    private TaskManagerImpl taskManager;
     protected volatile boolean initialized = false;
     private NetworkResourceDaoImpl networkResourceDao;
     LocalPeerCommands localPeerCommands = new LocalPeerCommands();
