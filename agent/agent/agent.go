@@ -86,7 +86,7 @@ func connectionMonitor() {
 		hostname, _ = os.Hostname()
 		if fingerprint == "" || config.Management.GpgUser == "" {
 			fingerprint = gpg.GetFingerprint(hostname + "@subutai.io")
-			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
+			connect.Connect(config.Agent.GpgUser, config.Management.Secret)
 		} else {
 			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
 			if err == nil && resp.StatusCode == http.StatusOK {
@@ -94,7 +94,7 @@ func connectionMonitor() {
 				log.Debug("Connection monitor check - success")
 			} else {
 				log.Debug("Connection monitor check - failed")
-				connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
+				connect.Connect(config.Agent.GpgUser, config.Management.Secret)
 				lastHeartbeat = []byte{}
 				go heartbeat()
 			}
@@ -169,7 +169,7 @@ func execute(rsp executer.EncRequest) {
 		pub = config.Agent.LxcPrefix + contName + "/public.pub"
 		keyring = config.Agent.LxcPrefix + contName + "/secret.sec"
 		log.Info("Getting public keyring", "keyring", keyring)
-		md = gpg.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
+		md = gpg.DecryptWrapper(rsp.Request, keyring, pub)
 	}
 	if log.Check(log.WarnLevel, "Decrypting request", json.Unmarshal([]byte(md), &req.Request)) {
 		return
@@ -192,7 +192,7 @@ func execute(rsp executer.EncRequest) {
 			if rsp.HostId == fingerprint {
 				payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
 			} else {
-				payload = gpg.EncryptWrapperNoDefaultKeyring(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
+				payload = gpg.EncryptWrapper(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
 			}
 			message, err := json.Marshal(map[string]string{
 				"hostId":   elem.Id,
