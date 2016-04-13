@@ -82,6 +82,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
 
             RelationManager relationManager = environmentManager.getRelationManager();
             relationManager.removeRelation( containerHost );
+
             saveEnvironment();
 
             return ContainerDestructionPhase.FINALIZE;

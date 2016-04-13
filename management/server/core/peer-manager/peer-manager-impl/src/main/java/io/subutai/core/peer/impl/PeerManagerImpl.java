@@ -179,6 +179,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         this.relationManager = relationManager;
     }
 
+
     public RelationManager getRelationManager()
     {
         return relationManager;
@@ -1149,7 +1150,12 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         {
             try
             {
-                if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
+                if ( localPeer.getPeerInfo() == null )
+                {
+                    //local peer info not initialized yet
+                    return;
+                }
+                else if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
                 {
                     //local peer ip is default, obtain lan ip from MH and set it as local peer ip
                     HostInterface externalInterface =
