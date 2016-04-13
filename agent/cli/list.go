@@ -12,7 +12,7 @@ import (
 	"text/tabwriter"
 )
 
-func printHeader(w io.Writer, c, t, r, i, a, f, p bool) {
+func printHeader(w io.Writer, c, t, i, a, p bool) {
 	var header, line string
 	if i {
 		header = "NAME\tSTATE\tIP\tInterface"
@@ -39,10 +39,10 @@ func printHeader(w io.Writer, c, t, r, i, a, f, p bool) {
 	fmt.Fprintln(w, line)
 }
 
-func printList(list []string, c, t, r, i, a, f, p bool) {
+func printList(list []string, c, t, i, a, p bool) {
 	w := new(tabwriter.Writer)
 	w.Init(os.Stdout, 0, 8, 1, '\t', 0)
-	printHeader(w, c, t, r, i, a, f, p)
+	printHeader(w, c, t, i, a, p)
 	for _, item := range list {
 		fmt.Fprintln(w, item)
 	}
@@ -51,7 +51,7 @@ func printList(list []string, c, t, r, i, a, f, p bool) {
 
 // LxcList list the containers
 // defined and active containers in order
-func LxcList(name string, c, t, r, i, a, f, p bool) {
+func LxcList(name string, c, t, i, a, p bool) {
 	list := []string{}
 	if i {
 		if name == "" {
@@ -82,7 +82,7 @@ func LxcList(name string, c, t, r, i, a, f, p bool) {
 	if a {
 		list = addAncestors(list)
 	}
-	printList(list, c, t, r, i, a, f, p)
+	printList(list, c, t, i, a, p)
 
 }
 func addParent(list []string) []string {

@@ -123,13 +123,11 @@ func main() {
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "c", Usage: "containers only"},
 			cli.BoolFlag{Name: "t", Usage: "templates only"},
-			cli.BoolFlag{Name: "r", Usage: "registered only"},
 			cli.BoolFlag{Name: "i", Usage: "detailed container info"},
 			cli.BoolFlag{Name: "a", Usage: "with ancestors"},
-			cli.BoolFlag{Name: "f", Usage: "fancy mode"},
 			cli.BoolFlag{Name: "p", Usage: "with parent"}},
 		Action: func(c *cli.Context) {
-			lib.LxcList(c.Args().Get(0), c.Bool("c"), c.Bool("t"), c.Bool("r"), c.Bool("i"), c.Bool("a"), c.Bool("f"), c.Bool("p"))
+			lib.LxcList(c.Args().Get(0), c.Bool("c"), c.Bool("t"), c.Bool("i"), c.Bool("a"), c.Bool("p"))
 		}}, {
 
 		Name: "management_network", Usage: "configure management network",
