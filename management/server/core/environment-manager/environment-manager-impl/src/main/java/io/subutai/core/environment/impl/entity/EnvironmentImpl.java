@@ -419,6 +419,11 @@ public class EnvironmentImpl implements Environment, Serializable
             }
         }
 
+        for ( EnvironmentContainerHost environmentContainerHost : containerHosts )
+        {
+            environmentContainerHost.setEnvironment( this );
+        }
+
         return containerHosts;
     }
 
