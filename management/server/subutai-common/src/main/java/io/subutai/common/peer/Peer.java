@@ -12,8 +12,8 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Containers;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -69,8 +69,8 @@ public interface Peer extends RelationLink
      *
      * @param request - container creation request
      */
-    public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
-            final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
+    public CreateEnvironmentContainersResponse createEnvironmentContainers(
+            final CreateEnvironmentContainersRequest request ) throws PeerException;
 
 
     /**
