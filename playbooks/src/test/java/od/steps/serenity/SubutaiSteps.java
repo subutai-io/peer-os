@@ -851,6 +851,31 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnCheckboxAddDomain() throws FindFailed {
         screen.click(environmentsPage.sikuliCheckBoxAddDomain);
     }
+
+    @Step
+    public void clickOnIconSettingsFirstCont() throws FindFailed {
+        screen.click(environmentsPage.sikuliIconSettingsFirstCont);
+    }
+
+    @Step
+    public void clickOnIconSettingsSecondCont() throws FindFailed {
+        screen.click(environmentsPage.sikuliIconSettingsSecondCont);
+    }
+
+    @Step
+    public void clickOnIconSettingsThirdContCass() throws FindFailed {
+        screen.click(environmentsPage.sikuliIconSettingsThirdContCass);
+    }
+
+    @Step
+    public void clickOnPickerSmall() throws FindFailed {
+        screen.click(environmentsPage.sikuliPickerSmall);
+    }
+
+    @Step
+    public void clickOnPickerMedium() throws FindFailed {
+        screen.click(environmentsPage.sikuliPickerMedium);
+    }
     //endregion
 
     //region Action: Drag And Drop

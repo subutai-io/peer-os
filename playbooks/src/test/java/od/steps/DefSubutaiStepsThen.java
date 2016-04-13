@@ -324,7 +324,7 @@ public class DefSubutaiStepsThen {
     @Then("the user should create an environment")
     public void user_create_an_environment() throws FindFailed {
         subutaiSteps.clickOnButtonApply();
-        subutaiSteps.inputEnvironmentName("Cross peer environment");
+        subutaiSteps.inputEnvironmentName("Test environment");
         subutaiSteps.clickOnButtonBuild();
         subutaiSteps.clickOnButtonCloseBuildPopup();
         subutaiSteps.waitFor(5000);
@@ -453,5 +453,28 @@ public class DefSubutaiStepsThen {
     @Then("the user should observe header apache")
     public void user_observe_header_apache(){
         subutaiSteps.userShouldObserveHeaderApache();
+    }
+
+    @Then("the user chooses the medium size of first template cassandra")
+    public void user_choose_the_medium_size_of_first_cont_cassandra() throws FindFailed {
+        subutaiSteps.clickOnIconSettingsFirstCont();
+        subutaiSteps.clickOnPickerSmall();
+        subutaiSteps.clickOnPickerMedium();
+        subutaiSteps.clickOnButtonSave();
+    }
+    @Then("the user chooses the medium size of second template cassandra")
+    public void user_choose_the_medium_size_of_second_cont_cassandra() throws FindFailed {
+        subutaiSteps.clickOnIconSettingsSecondCont();
+        subutaiSteps.clickOnPickerSmall();
+        subutaiSteps.clickOnPickerMedium();
+        subutaiSteps.clickOnButtonSave();
+    }
+
+    @Then("the user chooses the medium size of third template cassandra")
+    public void user_choose_the_medium_size_of_third_cont_cassandra() throws FindFailed {
+        subutaiSteps.clickOnIconSettingsThirdContCass();
+        subutaiSteps.clickOnPickerSmall();
+        subutaiSteps.clickOnPickerMedium();
+        subutaiSteps.clickOnButtonSave();
     }
 }

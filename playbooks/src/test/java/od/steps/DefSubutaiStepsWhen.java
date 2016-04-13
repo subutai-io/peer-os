@@ -252,16 +252,6 @@ public class DefSubutaiStepsWhen {
         subutaiSteps.userShouldWaitAFewSeconds();
     }
 
-    @When("the user creates environment using template: Casandra")
-    public void user_creates_environment_using_template_casandra() throws FindFailed, FileNotFoundException {
-        subutaiSteps.clickOnIconTemplateCasandra();
-        subutaiSteps.clickOnButtonApply();
-        subutaiSteps.inputEnvironmentName("Test Environment Casandra");
-        subutaiSteps.clickOnButtonBuild();
-        subutaiSteps.clickOnButtonCloseBuildPopup();
-        subutaiSteps.waitFor(5000);
-    }
-
     @When("the user creates environment using template: Apache")
     public void user_creates_environment_using_template_apache() throws FindFailed, FileNotFoundException {
         subutaiSteps.clickOnIconTemplateApache();
@@ -285,7 +275,6 @@ public class DefSubutaiStepsWhen {
     @When("the user should find template: Cassandra")
     public void user_finds_template_casandra(){
         subutaiSteps.inputTemplateNameInSearchField("Cassandra");
-        subutaiSteps.waitABit(3000);
     }
 
     @When("the user should find template: Apache")
@@ -296,6 +285,7 @@ public class DefSubutaiStepsWhen {
     @When("the user should install plugin")
     public void user_install_plugin() throws FindFailed {
         subutaiSteps.clickOnMenuButtonInstall();
+        subutaiSteps.waitABit(5000);
     }
 
     @When("the user clicks on Launch button")
@@ -434,5 +424,10 @@ public class DefSubutaiStepsWhen {
     @When("the user clicks on the checkbox: Add domain")
     public void user_clicks_add_domain() throws FindFailed {
         subutaiSteps.clickOnCheckboxAddDomain();
+    }
+
+    @When("the user clicks on temaplate: Cassandra")
+    public void user_clicks_template_cassandra() throws FindFailed {
+        subutaiSteps.clickOnIconTemplateCasandra();
     }
 }

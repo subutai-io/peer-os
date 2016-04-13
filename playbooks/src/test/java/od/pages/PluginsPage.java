@@ -8,9 +8,6 @@ public class PluginsPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
-    @FindBy(xpath = "*//input[@placeholder=\"Enter cluster name\"]")
-    public WebElementFacade fieldClusterName;
-
     @FindBy(xpath = "*//input[@ng-model=\"genericCtrl.newProfile\"]")
     public WebElementFacade fieldProfile;
 
@@ -28,6 +25,9 @@ public class PluginsPage extends PageObject {
 
     @FindBy(xpath = "*//input[@ng-model=\"value.domain\"]")
     public WebElementFacade fieldDomain;
+
+    @FindBy(ngModel = "cassandraCtrl.cassandraInstall.name")
+    public WebElementFacade fieldClusterName;
 
     //endregion
 

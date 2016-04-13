@@ -74,6 +74,9 @@ public class EnvironmentsPage extends PageObject {
     //endregion
 
     //region WEB ELEMENTS: Pickers
+    public String sikuliPickerSmall = "src/test/resources/imgs/elements/pickerSmall.png";
+    public String sikuliPickerMedium = "src/test/resources/imgs/elements/pickerMedium.png";
+
 
     //endregion
 
@@ -92,6 +95,9 @@ public class EnvironmentsPage extends PageObject {
 
     public String sikuliIconDeleteEnvironment = "src/test/resources/imgs/icons/iconDeleteEnvironment.png";
     public String sikuliIconShare = "src/test/resources/imgs/icons/iconShare.png";
+    public String sikuliIconSettingsFirstCont = "src/test/resources/imgs/icons/iconSettingsCont1.png";
+    public String sikuliIconSettingsSecondCont = "src/test/resources/imgs/icons/iconSettingsCont2.png";
+    public String sikuliIconSettingsThirdContCass = "src/test/resources/imgs/icons/iconSettingsCont3Cass.png";
 
     //endregion
 
@@ -119,7 +125,7 @@ public class EnvironmentsPage extends PageObject {
     public String sikuliTemplateMongo = "src/test/resources/imgs/templates/templateMongo.png";
     public String sikuliTemplateMySite = "src/test/resources/imgs/templates/templateMySite.png";
     public String sikuliTemplateWebdemo = "src/test/resources/imgs/templates/templateWebdemo.png";
-    public String sikuliTemplateCasandra = "src/test/resources/imgs/templates/templateCasandra.png";
+    public String sikuliTemplateCasandra = "src/test/resources/imgs/templates/templateCassandra.png";
     public String sikuliTemplateMaster = "src/test/resources/imgs/templates/templateMaster.png";
     public String sikuliTemplateApache = "src/test/resources/imgs/templates/templateApache.png";
     //endregion
