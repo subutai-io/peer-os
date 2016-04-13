@@ -92,7 +92,11 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.Ownership;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
@@ -105,6 +109,8 @@ import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainersRequestListener;
@@ -122,6 +128,11 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -156,6 +167,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     protected PeerInfo peerInfo;
     private SecurityManager securityManager;
     protected ServiceLocator serviceLocator = new ServiceLocator();
+    private IdentityManager identityManager;
+    private RelationManager relationManager;
+
     protected volatile boolean initialized = false;
     private NetworkResourceDaoImpl networkResourceDao;
     LocalPeerCommands localPeerCommands = new LocalPeerCommands();
@@ -173,6 +187,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
+    }
+
+
+    public void setIdentityManager( final IdentityManager identityManager )
+    {
+        this.identityManager = identityManager;
+    }
+
+
+    public void setRelationManager( final RelationManager relationManager )
+    {
+        this.relationManager = relationManager;
     }
 
 
@@ -695,7 +721,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private void signContainerKeyWithPEK( String containerId, EnvironmentId envId ) throws PeerException
     {
-        String pairId = String.format( "%s-%s", getId(), envId.getId() );
+        String pairId = String.format( "%s_%s", getId(), envId.getId() );
         final PGPSecretKeyRing pekSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( pairId );
 
         PGPPublicKeyRing containerPub = securityManager.getKeyManager().getPublicKeyRing( containerId );
@@ -1173,6 +1199,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 Set<ResourceHost> a = Sets.newHashSet();
                 a.add( host );
                 setResourceHostTransientFields( a );
+                buildAdminHostRelation( host );
                 LOG.debug( String.format( "Resource host %s registered.", resourceHostInfo.getHostname() ) );
             }
             if ( host.updateHostInfo( resourceHostInfo ) )
@@ -1188,7 +1215,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     if ( managementLxc instanceof ContainerHostEntity )
                     {
                         managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
-
+                        buildAdminHostRelation( managementHost );
                         //todo save flag that exchange happened to db
                         exchangeMhKeysWithRH();
                     }
@@ -1198,6 +1225,37 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     //ignore
                 }
             }
+        }
+    }
+
+
+    private void buildAdminHostRelation( Host host )
+    {
+        // Build relation between Admin and management/resource host.
+
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+        if ( peerOwner != null )
+        {
+            // Simply pass key value object as map
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+            relationTraits.put( "bandwidthControl", "true" );
+
+            if ( "management".equalsIgnoreCase( host.getHostname() ) )
+            {
+                relationTraits.put( "managementSupervisor", "true" );
+            }
+            else
+            {
+                relationTraits.put( "resourceSupervisor", "true" );
+                relationTraits.put( "containerManagement", "true" );
+            }
+
+            RelationMeta relationMeta = new RelationMeta( peerOwner, peerOwner, host, peerOwner.getSecurityKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
         }
     }
 
@@ -1516,37 +1574,72 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId envId ) throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
-        Preconditions.checkNotNull( envId );
+        Preconditions.checkNotNull( envLink );
         //TODO don't generate PEK if already exists, return the existing one!!!
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
-        String pairId = String.format( "%s-%s", getId(), envId.getId() );
-        final PGPSecretKeyRing peerSecKeyRing = securityManager.getKeyManager().getSecretKeyRing( null );
+        String pairId = String.format( "%s_%s", getId(), envLink.getUniqueIdentifier() );
+
+        PGPPublicKeyRing envPubkey = keyManager.getPublicKeyRing( pairId );
         try
         {
-            KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
+            if ( envPubkey == null )
+            {
+                buildPeerEnvRelation( envLink );
 
-            //******Create PEK *****************************************************************
-            PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
-            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+                final PGPSecretKeyRing peerSecKeyRing = keyManager.getSecretKeyRing( null );
+                KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
 
-            //***************Save Keys *********************************************************
-            keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
-            keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
+                //******Create PEK *****************************************************************
+                PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
+                PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
 
-            pubRing =
-                    securityManager.getKeyManager().setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+                //***************Save Keys *********************************************************
+                keyManager.saveSecretKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), secRing );
+                keyManager.savePublicKeyRing( pairId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
 
-            return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
-                    encTool.armorByteArrayToString( pubRing.getEncoded() ) );
+                pubRing = keyManager.setKeyTrust( peerSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
+
+                return new PublicKeyContainer( getId(), pubRing.getPublicKey().getFingerprint(),
+                        encTool.armorByteArrayToString( pubRing.getEncoded() ) );
+            }
+            else
+            {
+                return new PublicKeyContainer( getId(), envPubkey.getPublicKey().getFingerprint(),
+                        encTool.armorByteArrayToString( envPubkey.getEncoded() ) );
+            }
         }
         catch ( Exception e )
         {
             String errMsg = String.format( "Error creating PEK: %s", e.getMessage() );
             LOG.error( errMsg );
             throw new PeerException( errMsg, e );
+        }
+    }
+
+
+    private void buildPeerEnvRelation( final RelationLink envLink )
+    {
+
+        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment.
+
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+        if ( peerOwner != null )
+        {
+            // Simply pass key value object as map
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+            relationTraits.put( "hostEnvironment", "true" );
+            relationTraits.put( "containerLimit", "unlimited" );
+            relationTraits.put( "bandwidthLimit", "unlimited" );
+
+            RelationMeta relationMeta = new RelationMeta( peerOwner, this, envLink, this.getKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
         }
     }
 
@@ -1569,6 +1662,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( pubRing );
 
         securityManager.getKeyManager().savePublicKeyRing( keyId, SecurityKeyType.PeerEnvironmentKey.getId(), pubRing );
+
+        // Build relation between LocalPeer => RemotePeer => Environment
+        // for message encryption/decryption mechanism described in relation traits
+        String[] ids = keyId.split( "_" );
+        if ( ids.length == 2 )
+        {
+            String envId = ids[1];
+            RelationLink envLink = relationManager.getRelationLink( envId );
+            RelationLink peerLink = relationManager.getRelationLink( ids[0] );
+
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+            relationTraits.put( "encryptMessage", "true" );
+            relationTraits.put( "decryptMessage", "true" );
+
+            RelationMeta relationMeta = new RelationMeta( this, peerLink, envLink, this.getKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
     }
 
 
@@ -2285,6 +2399,41 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public int hashCode()
     {
         return getId().hashCode();
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.PeerManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getId();
     }
 }
 

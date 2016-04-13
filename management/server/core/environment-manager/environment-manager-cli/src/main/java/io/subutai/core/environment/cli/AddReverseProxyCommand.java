@@ -1,7 +1,6 @@
 package io.subutai.core.environment.cli;
 
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -12,9 +11,6 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.network.NetworkResourceImpl;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;

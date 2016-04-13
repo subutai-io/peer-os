@@ -6,7 +6,6 @@ import java.util.Date;
 
 import javax.ws.rs.core.Response;
 
-
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.peer.Host;

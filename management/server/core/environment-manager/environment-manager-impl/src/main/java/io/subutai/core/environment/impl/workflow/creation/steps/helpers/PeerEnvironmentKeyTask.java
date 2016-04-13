@@ -12,7 +12,9 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.core.security.api.crypto.KeyManager;
+
 
 public class PeerEnvironmentKeyTask implements Callable<Peer>
 {
@@ -40,17 +42,18 @@ public class PeerEnvironmentKeyTask implements Callable<Peer>
     @Override
     public Peer call() throws Exception
     {
-        PublicKeyContainer publicKeyContainer = peer.createPeerEnvironmentKeyPair( environment.getEnvironmentId() );
+        RelationLinkDto relationLinkDto = new RelationLinkDto( environment );
+        PublicKeyContainer publicKeyContainer = peer.createPeerEnvironmentKeyPair( relationLinkDto );
 
         PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
 
         PGPPublicKeyRing signedPEK = keyManager.setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
         peer.updatePeerEnvironmentPubKey( environment.getEnvironmentId(), signedPEK );
-        peer.addPeerEnvironmentPubKey( localPeer.getId() + "-" + environment.getEnvironmentId().getId(),
-                localPeerSignedPEK );
+        peer.addPeerEnvironmentPubKey( localPeer.getId() + "_" + environment.getEnvironmentId().getId(),
+                localPeerSignedPEK   );
 
-        localPeer.addPeerEnvironmentPubKey( peer.getId() + "-" + environment.getEnvironmentId().getId(), signedPEK );
+        localPeer.addPeerEnvironmentPubKey( peer.getId() + "_" + environment.getEnvironmentId().getId(), signedPEK );
 
         return peer;
     }

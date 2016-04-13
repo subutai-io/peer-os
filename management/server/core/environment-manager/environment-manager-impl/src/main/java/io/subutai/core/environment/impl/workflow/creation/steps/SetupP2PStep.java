@@ -16,12 +16,12 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.P2PUtil;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupP2PConnectionTask;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTunnelTask;
-import io.subutai.common.util.PeerUtil;
 
 
 /**

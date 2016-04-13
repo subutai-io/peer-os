@@ -1,6 +1,10 @@
 package io.subutai.core.object.relation.api.model;
 
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
 import io.subutai.common.security.objects.Ownership;
 
 
@@ -18,6 +22,8 @@ public class RelationInfoMeta
     //Permission, role
     private int ownershipLevel = Ownership.ALL.getLevel();
 
+    private Map<String, String> relationTraits = Maps.newHashMap();
+
 
     public RelationInfoMeta()
     {
@@ -32,6 +38,18 @@ public class RelationInfoMeta
         this.updatePermission = updatePermission;
         this.deletePermission = deletePermission;
         this.ownershipLevel = ownershipLevel;
+    }
+
+
+    public Map<String, String> getRelationTraits()
+    {
+        return relationTraits;
+    }
+
+
+    public void setRelationTraits( final Map<String, String> relationTraits )
+    {
+        this.relationTraits = relationTraits;
     }
 
 

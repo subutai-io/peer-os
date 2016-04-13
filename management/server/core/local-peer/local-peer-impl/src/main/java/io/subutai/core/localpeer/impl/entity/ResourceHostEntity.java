@@ -53,6 +53,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -828,5 +829,40 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.ResourceManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getId();
     }
 }

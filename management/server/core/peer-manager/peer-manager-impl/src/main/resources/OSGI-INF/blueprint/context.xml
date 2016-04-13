@@ -4,7 +4,7 @@
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0"
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
-    >
+>
 
   <!-- ***************************************************************** -->
   <authz:enable />
@@ -42,6 +42,8 @@
 
   <reference id="templateRegistry" interface="io.subutai.core.kurjun.api.TemplateManager" />
 
+  <reference id="relationManager" interface="io.subutai.core.object.relation.api.RelationManager" />
+
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
         destroy-method="dispose" scope="singleton" activation="eager">
     <argument ref="messenger" />
@@ -59,6 +61,7 @@
     <argument ref="templateRegistry" />
     <argument ref="identityManager" />
     <argument ref="jsonProvider" />
+    <property name="relationManager" ref="relationManager"/>
   </bean>
 
   <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />

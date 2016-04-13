@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-
 import io.subutai.common.resource.CpuResource;
 
 import static org.junit.Assert.assertEquals;

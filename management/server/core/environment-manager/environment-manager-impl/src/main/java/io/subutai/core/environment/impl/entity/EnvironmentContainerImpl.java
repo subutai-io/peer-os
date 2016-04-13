@@ -656,4 +656,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         return PermissionObject.EnvironmentManagement.getName();
     }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getId();
+    }
 }

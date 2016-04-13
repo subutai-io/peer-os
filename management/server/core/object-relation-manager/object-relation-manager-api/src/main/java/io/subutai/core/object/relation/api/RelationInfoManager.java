@@ -2,6 +2,7 @@ package io.subutai.core.object.relation.api;
 
 
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
@@ -11,51 +12,63 @@ import io.subutai.core.object.relation.api.model.RelationMeta;
  */
 public interface RelationInfoManager
 {
-    boolean ownerHasReadPermissions( RelationMeta relationMeta );
+    void checkRelationValidity( final RelationLink source, final RelationLink targetObject,
+                                          final RelationInfoMeta relationInfoMeta, final String encodedToken )
+            throws RelationVerificationException;
 
-    boolean ownerHasWritePermissions( RelationMeta relationMeta );
-
-    boolean ownerHasDeletePermissions( RelationMeta relationMeta );
-
-    boolean ownerHasUpdatePermissions( RelationMeta relationMeta );
-
-    boolean groupHasReadPermissions( RelationMeta relationMeta );
-
+    /**
+     * Used to check group write permissions
+     *
+     * @deprecated use {@link #checkRelationValidity(RelationLink, RelationLink, RelationInfoMeta, String)} ()} instead.
+     */
+    @Deprecated
     boolean groupHasWritePermissions( RelationMeta relationMeta );
 
-    boolean groupHasDeletePermissions( RelationMeta relationMeta );
-
-    boolean groupHasUpdatePermissions( RelationMeta relationMeta );
-
+    /**
+     * Used to check all read permissions
+     *
+     * @deprecated use {@link #checkRelationValidity(RelationLink, RelationLink, RelationInfoMeta, String)} ()} instead.
+     */
+    @Deprecated
     boolean allHasReadPermissions( RelationMeta relationMeta );
 
-    boolean allHasWritePermissions( RelationMeta relationMeta );
-
-    boolean allHasDeletePermissions( RelationMeta relationMeta );
-
-    boolean allHasUpdatePermissions( RelationMeta relationMeta );
-
-    boolean ownerHasReadPermissions( RelationLink relationLink );
-
-    boolean ownerHasWritePermissions( RelationLink relationLink );
-
-    boolean ownerHasDeletePermissions( RelationLink relationLink );
-
-    boolean ownerHasUpdatePermissions( RelationLink relationLink );
-
-    boolean groupHasReadPermissions( RelationLink relationLink );
-
-    boolean groupHasWritePermissions( RelationLink relationLink );
-
-    boolean groupHasDeletePermissions( RelationLink relationLink );
-
+    /**
+     * Used to check group update permissions
+     *
+     * @deprecated use {@link #checkRelationValidity(RelationLink, RelationLink, RelationInfoMeta, String)} ()} instead.
+     */
+    @Deprecated
     boolean groupHasUpdatePermissions( RelationLink relationLink );
 
+    /**
+     * Used to check all read permissions
+     *
+     * @deprecated use {@link #checkRelationValidity(RelationLink, RelationLink, RelationInfoMeta, String)} ()} instead.
+     */
+    @Deprecated
     boolean allHasReadPermissions( RelationLink relationLink );
 
+    /**
+     * Used to check all write permissions
+     *
+     * @deprecated use {@link #checkRelationValidity(RelationLink, RelationLink, RelationInfoMeta, String)} ()} instead.
+     */
+    @Deprecated
     boolean allHasWritePermissions( RelationLink relationLink );
 
+    /**
+     * Used to check all delete permissions
+     *
+     * @deprecated use {@link #checkRelationValidity(RelationLink, RelationLink, RelationInfoMeta, String)} ()} instead.
+     */
+    @Deprecated
     boolean allHasDeletePermissions( RelationLink relationLink );
 
+    /**
+     * Used to check all update permissions
+     *
+     * @deprecated use {@link #checkRelationValidity(RelationLink, RelationLink, RelationInfoMeta, String)} ()} instead.
+     */
+    @Deprecated
     boolean allHasUpdatePermissions( RelationLink relationLink );
 }
