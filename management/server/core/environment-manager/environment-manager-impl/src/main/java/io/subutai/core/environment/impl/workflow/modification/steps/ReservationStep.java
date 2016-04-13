@@ -16,9 +16,9 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.entity.PeerConfImpl;
-import io.subutai.common.util.PeerUtil;
 import io.subutai.core.peer.api.PeerManager;
 
 

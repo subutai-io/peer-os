@@ -8,15 +8,16 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.collect.Maps;
+
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ResourceHostInfo;
-
-import com.google.common.collect.Maps;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;

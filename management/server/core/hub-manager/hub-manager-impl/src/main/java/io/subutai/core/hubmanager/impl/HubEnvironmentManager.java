@@ -45,6 +45,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
@@ -182,11 +183,10 @@ public class HubEnvironmentManager
     }
 
 
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
-
         io.subutai.common.security.PublicKeyContainer publicKeyContainer =
-                peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environmentId );
+                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
         PublicKeyContainer keyContainer = new PublicKeyContainer();
         keyContainer.setKey( publicKeyContainer.getKey() );

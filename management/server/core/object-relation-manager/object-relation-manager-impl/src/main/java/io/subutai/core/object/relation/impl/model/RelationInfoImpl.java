@@ -1,13 +1,20 @@
 package io.subutai.core.object.relation.impl.model;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import io.subutai.common.security.objects.Ownership;
@@ -45,6 +52,13 @@ public class RelationInfoImpl implements RelationInfo
     @Column( name = "ownership_level" )
     private int ownershipLevel = Ownership.ALL.getLevel();
 
+    @ElementCollection( fetch = FetchType.EAGER )
+    @CollectionTable( name = "relation_traits" )
+    @MapKeyColumn( name = "trait_key" )
+    @Column( name = "trait_value" )
+//    @CollectionTable( name = "relation_traits", joinColumns = @JoinColumn( name = "relation_info_id" ) )
+    private Map<String, String> relationTraits = new HashMap<String, String>(); // maps from attribute name to value
+
 
     public RelationInfoImpl()
     {
@@ -58,6 +72,10 @@ public class RelationInfoImpl implements RelationInfo
         this.updatePermission = relationInfoMeta.isUpdatePermission();
         this.deletePermission = relationInfoMeta.isDeletePermission();
         this.ownershipLevel = relationInfoMeta.getOwnershipLevel();
+        if ( relationInfoMeta.getRelationTraits() != null )
+        {
+            this.relationTraits.putAll( relationInfoMeta.getRelationTraits() );
+        }
     }
 
 
@@ -72,6 +90,19 @@ public class RelationInfoImpl implements RelationInfo
     public int getOwnershipLevel()
     {
         return ownershipLevel;
+    }
+
+
+    @Override
+    public Map<String, String> getRelationTraits()
+    {
+        return relationTraits;
+    }
+
+
+    public void setRelationTraits( final Map<String, String> relationTraits )
+    {
+        this.relationTraits = relationTraits;
     }
 
 

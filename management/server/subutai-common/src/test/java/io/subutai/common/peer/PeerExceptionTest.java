@@ -6,8 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.peer.PeerException;
-
 
 @RunWith( MockitoJUnitRunner.class )
 public class PeerExceptionTest

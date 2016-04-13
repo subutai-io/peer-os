@@ -21,6 +21,7 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ReservedNetworkResources;
@@ -30,6 +31,8 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
@@ -165,16 +168,20 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private void infoExchange( EnvironmentPeerDto peerDto )
     {
+        EnvironmentInfoDto environmentInfoDto = peerDto.getEnvironmentInfo();
         String exchangeURL =
-                String.format( "/rest/v1/environments/%s/exchange-info", peerDto.getEnvironmentInfo().getId() );
+                String.format( "/rest/v1/environments/%s/exchange-info", environmentInfoDto.getId() );
 
-        EnvironmentId environmentId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
+        EnvironmentId environmentId = new EnvironmentId( environmentInfoDto.getId() );
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( exchangeURL, configManager.getHubIp() );
 
+            // TODO identify for future do we need envKeyId (or do we need keyId for {@link RelationLinkDto})
+            RelationLinkDto envLink = new RelationLinkDto( environmentInfoDto.getId(), Environment.class.getSimpleName(),
+                    PermissionObject.EnvironmentManagement.getName(), "" );
             peerDto = hubEnvironmentManager.getReservedNetworkResource( peerDto );
-            peerDto.setPublicKey( hubEnvironmentManager.createPeerEnvironmentKeyPair( environmentId ) );
+            peerDto.setPublicKey( hubEnvironmentManager.createPeerEnvironmentKeyPair( envLink ) );
 
             byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );

@@ -133,12 +133,17 @@ public class RegistrationManager
 
             WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
+            LOG.info( JsonUtil.toJson( registrationData ) );
+            LOG.info( registrationData.getOwnerFingerprint() );
+            LOG.error( registrationData.getOwnerFingerprint() );
+
             byte[] cborData = JsonUtil.toCbor( registrationData );
 
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
             LOG.info( "Registering Peer. Sending RegistrationDTO to Hub..." );
 
+            client.header( "fingerprint", PGPKeyHelper.getFingerprint( configManager.getPeerPublicKey() ) );
             Response r = client.post( encryptedData );
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )

@@ -8,8 +8,6 @@ import org.junit.Test;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.subutai.core.messenger.impl.MessageImpl;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

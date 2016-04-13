@@ -711,4 +711,11 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         return PermissionObject.EnvironmentManagement.getName();
     }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getEnvironmentId().getId();
+    }
 }
