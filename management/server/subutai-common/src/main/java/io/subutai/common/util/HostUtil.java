@@ -226,24 +226,27 @@ public class HostUtil
 
         public boolean hasFailures()
         {
-            for ( Set<Task> hostTasks : tasks.getHostsTasks().values() )
-            {
-                for ( Task task : hostTasks )
-                {
-                    if ( task.getTaskState() == Task.TaskState.FAILED )
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return getFirstFailedTask() != null;
         }
 
 
         public Tasks getTasks()
         {
             return tasks;
+        }
+
+
+        public Task getFirstFailedTask()
+        {
+            for ( Task task : tasks.getTasks() )
+            {
+                if ( task.getTaskState() == Task.TaskState.FAILED )
+                {
+                    return task;
+                }
+            }
+
+            return null;
         }
     }
 

@@ -19,13 +19,13 @@ import io.subutai.common.util.NumUtil;
 public class UsedNetworkResources
 {
     @JsonProperty( "vnis" )
-    Set<Long> vnis = Sets.newHashSet();
+    Set<Long> vnis = Sets.newConcurrentHashSet();
     @JsonProperty( "p2pSubnets" )
-    Set<String> p2pSubnets = Sets.newHashSet();
+    Set<String> p2pSubnets = Sets.newConcurrentHashSet();
     @JsonProperty( "containerSubnets" )
-    Set<String> containerSubnets = Sets.newHashSet();
+    Set<String> containerSubnets = Sets.newConcurrentHashSet();
     @JsonProperty( "vlans" )
-    Set<Integer> vlans = Sets.newHashSet();
+    Set<Integer> vlans = Sets.newConcurrentHashSet();
 
 
     public UsedNetworkResources( @JsonProperty( "vnis" ) final Set<Long> vnis,
