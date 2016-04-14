@@ -8,11 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 
@@ -74,7 +69,6 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
@@ -118,6 +112,11 @@ import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.NetworkResourceEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
+import io.subutai.core.localpeer.impl.tasks.CleanupEnvironmentTask;
+import io.subutai.core.localpeer.impl.tasks.JoinP2PSwarmTask;
+import io.subutai.core.localpeer.impl.tasks.ResetP2PSwarmSecretTask;
+import io.subutai.core.localpeer.impl.tasks.TunnelsTask;
+import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
@@ -1804,7 +1803,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION BEGIN --------------------
 
 
-    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
@@ -1822,48 +1820,34 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         Set<ResourceHost> resourceHosts = getResourceHosts();
-        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
-        ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
 
-        int taskCount = 0;
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
+
         for ( final ResourceHost resourceHost : resourceHosts )
         {
             //setup tunnel only if this RH participates in the swarm
             if ( p2pIps.findByRhId( resourceHost.getId() ) != null )
             {
-                taskCount++;
-                completionService.submit( new Callable<Object>()
-                {
-                    @Override
-                    public Object call() throws Exception
-                    {
-                        resourceHost.setupTunnels( p2pIps, networkResource );
-
-                        return null;
-                    }
-                } );
+                tasks.addTask( resourceHost, new TunnelsTask( resourceHost, p2pIps, networkResource ) );
             }
         }
 
-        executorService.shutdown();
+        HostUtil.Results results = hostUtil.executeFailFast( tasks );
 
-        try
+        if ( results.hasFailures() )
         {
-            for ( int i = 0; i < taskCount; i++ )
-            {
-                completionService.take().get();
-            }
-        }
-        catch ( Exception e )
-        {
-            String errMsg = String.format( "Error setting up tunnels: %s", e.getMessage() );
+            HostUtil.Task task = results.getFirstFailedTask();
+
+            String errMsg = String.format( "Error setting up tunnels on host %s: %s", task.getHost().getId(),
+                    task.getFailureReason() );
+
             LOG.error( errMsg );
-            throw new PeerException( errMsg, e );
+
+            throw new PeerException( errMsg, task.getException() );
         }
     }
 
 
-    //todo use HostUtil instead of ExecutorService
     @Override
     public void resetSwarmSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
@@ -1871,44 +1855,31 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
         Set<ResourceHost> resourceHosts = getResourceHosts();
-        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
-        ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
+
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
 
         for ( final ResourceHost resourceHost : resourceHosts )
         {
-            completionService.submit( new Callable<Object>()
-            {
-                @Override
-                public Object call() throws Exception
-                {
-
-                    resourceHost.resetSwarmSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
-                            p2PCredentials.getP2pTtlSeconds() );
-
-                    return null;
-                }
-            } );
+            tasks.addTask( resourceHost, new ResetP2PSwarmSecretTask( resourceHost, p2PCredentials.getP2pHash(),
+                    p2PCredentials.getP2pSecretKey(), p2PCredentials.getP2pTtlSeconds() ) );
         }
 
-        executorService.shutdown();
+        HostUtil.Results results = hostUtil.executeFailFast( tasks );
 
-        try
+        if ( results.hasFailures() )
         {
-            for ( final ResourceHost ignored : resourceHosts )
-            {
-                completionService.take().get();
-            }
-        }
-        catch ( Exception e )
-        {
-            String errMsg = String.format( "Error resetting P2P secret key: %s", e.getMessage() );
+            HostUtil.Task task = results.getFirstFailedTask();
+
+            String errMsg = String.format( "Error resetting P2P secret key on host %s: %s", task.getHost().getId(),
+                    task.getFailureReason() );
+
             LOG.error( errMsg );
-            throw new PeerException( errMsg, e );
+
+            throw new PeerException( errMsg, task.getException() );
         }
     }
 
 
-    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Update" )
     @Override
@@ -1916,133 +1887,96 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        LOG.debug( String.format( "Joining P2P swarm: %s", config.getHash() ) );
+        NetworkResource reservedNetworkResource =
+                getReservedNetworkResources().findByEnvironmentId( config.getEnvironmentId() );
 
-        try
+        if ( reservedNetworkResource == null )
         {
-            NetworkResource reservedNetworkResource =
-                    getReservedNetworkResources().findByEnvironmentId( config.getEnvironmentId() );
-
-            if ( reservedNetworkResource == null )
-            {
-                throw new PeerException(
-                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
-            }
-
-            final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
-
-            ExecutorService executorService = Executors.newFixedThreadPool( config.getRhP2pIps().size() );
-            ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
-
-            for ( final RhP2pIp rhP2pIp : config.getRhP2pIps() )
-            {
-                final ResourceHost resourceHost = getResourceHostById( rhP2pIp.getRhId() );
-
-                completionService.submit( new Callable<Object>()
-                {
-                    @Override
-                    public P2PConnection call() throws Exception
-                    {
-
-                        resourceHost.joinP2PSwarm( rhP2pIp.getP2pIp(), p2pInterface, config.getHash(),
-                                config.getSecretKey(), config.getSecretKeyTtlSec() );
-
-
-                        return null;
-                    }
-                } );
-            }
-
-            executorService.shutdown();
-
-            for ( RhP2pIp ignored : config.getRhP2pIps() )
-            {
-                completionService.take().get();
-            }
+            throw new PeerException(
+                    String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
         }
-        catch ( Exception e )
+
+        final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
+
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
+
+        for ( final RhP2pIp rhP2pIp : config.getRhP2pIps() )
         {
-            String errMsg = String.format( "Failed to join P2P swarm: %s", e.getMessage() );
+            final ResourceHost resourceHost = getResourceHostById( rhP2pIp.getRhId() );
+
+            tasks.addTask( resourceHost,
+                    new JoinP2PSwarmTask( resourceHost, rhP2pIp.getP2pIp(), p2pInterface, config.getHash(),
+                            config.getSecretKey(), config.getSecretKeyTtlSec() ) );
+        }
+
+        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+
+        if ( results.hasFailures() )
+        {
+            HostUtil.Task task = results.getFirstFailedTask();
+
+            String errMsg = String.format( "Error joining P2P swarm on host %s: %s", task.getHost().getId(),
+                    task.getFailureReason() );
+
             LOG.error( errMsg );
-            throw new PeerException( errMsg, e );
+
+            throw new PeerException( errMsg, task.getException() );
         }
     }
 
 
-    //todo use HostUtil instead of ExecutorService
     @Override
     public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
         Preconditions.checkNotNull( config, "Invalid p2p config" );
 
-        LOG.debug( String.format( "Joining/updating P2P swarm: %s", config.getHash() ) );
+        NetworkResource reservedNetworkResource =
+                getReservedNetworkResources().findByEnvironmentId( config.getEnvironmentId() );
 
-        try
+        if ( reservedNetworkResource == null )
         {
-            NetworkResource reservedNetworkResource =
-                    getReservedNetworkResources().findByEnvironmentId( config.getEnvironmentId() );
+            throw new PeerException(
+                    String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
+        }
 
-            if ( reservedNetworkResource == null )
+        final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
+
+        Set<ResourceHost> resourceHosts = getResourceHosts();
+
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
+
+        for ( final ResourceHost resourceHost : resourceHosts )
+        {
+            final RhP2pIp rhP2pIp = config.findByRhId( resourceHost.getId() );
+
+            if ( rhP2pIp != null )
             {
-                throw new PeerException(
-                        String.format( "Reserved vni not found for environment %s", config.getEnvironmentId() ) );
+                //try to join RH (updates if already participating)
+                tasks.addTask( resourceHost,
+                        new JoinP2PSwarmTask( resourceHost, rhP2pIp.getP2pIp(), p2pInterface, config.getHash(),
+                                config.getSecretKey(), config.getSecretKeyTtlSec() ) );
             }
-
-            final String p2pInterface = P2PUtil.generateInterfaceName( reservedNetworkResource.getVlan() );
-
-            Set<ResourceHost> resourceHosts = getResourceHosts();
-            ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
-            ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
-
-            for ( final ResourceHost resourceHost : resourceHosts )
+            else
             {
-                final RhP2pIp rhP2pIp = config.findByRhId( resourceHost.getId() );
-
-                if ( rhP2pIp != null )
-                {
-                    //try to join RH (updates if already participating)
-                    completionService.submit( new Callable<Object>()
-                    {
-                        @Override
-                        public P2PConnection call() throws Exception
-                        {
-
-                            resourceHost.joinP2PSwarm( rhP2pIp.getP2pIp(), p2pInterface, config.getHash(),
-                                    config.getSecretKey(), config.getSecretKeyTtlSec() );
-
-
-                            return null;
-                        }
-                    } );
-                }
-                else
-                {
-                    //try to update missing RH in case it participates in the swarm
-                    completionService.submit( new Callable<Object>()
-                    {
-                        @Override
-                        public Object call() throws Exception
-                        {
-                            resourceHost.resetSwarmSecretKey( config.getHash(), config.getSecretKey(),
-                                    config.getSecretKeyTtlSec() );
-                            return null;
-                        }
-                    } );
-                }
-            }
-
-            executorService.shutdown();
-
-            for ( ResourceHost ignored : resourceHosts )
-            {
-                completionService.take().get();
+                //try to update missing RH in case it participates in the swarm
+                tasks.addTask( resourceHost,
+                        new ResetP2PSwarmSecretTask( resourceHost, config.getHash(), config.getSecretKey(),
+                                config.getSecretKeyTtlSec() ) );
             }
         }
-        catch ( Exception e )
+
+        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+
+        if ( results.hasFailures() )
         {
-            String errMsg = String.format( "Failed to join/update P2P swarm: %s", e.getMessage() );
+            HostUtil.Task task = results.getFirstFailedTask();
+
+            String errMsg = String.format( "Error joining/updating P2P swarm on host %s: %s", task.getHost().getId(),
+                    task.getFailureReason() );
+
             LOG.error( errMsg );
-            throw new PeerException( errMsg, e );
+
+            throw new PeerException( errMsg, task.getException() );
         }
     }
 
@@ -2050,7 +1984,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION END --------------------
 
 
-    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
@@ -2069,38 +2002,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Set<ResourceHost> resourceHosts = getResourceHosts();
 
-        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
 
-        for ( final ResourceHost resourceHost : getResourceHosts() )
+        for ( final ResourceHost resourceHost : resourceHosts )
         {
-            executorService.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        resourceHost.cleanup( environmentId, reservedNetworkResource.getVlan() );
-                    }
-                    catch ( ResourceHostException e )
-                    {
-                        LOG.error( "Failed to cleanup environment {} on RH {}", environmentId.getId(),
-                                resourceHost.getId(), e );
-                    }
-                }
-            } );
+            tasks.addTask( resourceHost, new CleanupEnvironmentTask( resourceHost, reservedNetworkResource ) );
         }
 
-        executorService.shutdown();
-
-        try
-        {
-            executorService.awaitTermination( 30, TimeUnit.SECONDS );
-        }
-        catch ( InterruptedException e )
-        {
-            //ignore
-        }
+        hostUtil.submit( tasks );
 
         //remove reservation
         try
@@ -2113,11 +2022,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //remove PEK
+        //todo review this part with Security team
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
 
             keyManager.removeKeyData( environmentId.getId() );
+
             keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
         }
         catch ( Exception e )
