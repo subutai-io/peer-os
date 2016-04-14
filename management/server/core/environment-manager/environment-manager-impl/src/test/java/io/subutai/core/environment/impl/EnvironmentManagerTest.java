@@ -8,6 +8,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import org.apache.commons.net.nntp.Threadable;
+import org.apache.servicemix.beanflow.Workflow;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
@@ -112,5 +115,70 @@ public class EnvironmentManagerTest
         Environment environment1 = environmentManager.createEnvironment( topology, true );
 
         assertEquals( environment1, environment );
+    }
+
+
+    @Test
+    public void testWorkflow() throws Exception
+    {
+        TestWorkflow testWorkflow = new TestWorkflow();
+
+        Thread.sleep( 10);
+        testWorkflow.stop();
+
+        if(testWorkflow.isFailed()){
+
+            System.out.printf( testWorkflow.getFailedReason() );
+        }
+
+    }
+
+
+    public static class TestWorkflow extends Workflow<TestWorkflow.Phase>
+    {
+        public TestWorkflow()
+        {
+            super( Phase.INIT );
+        }
+
+
+        public enum Phase
+        {
+            INIT,
+            DOIT,
+            FINALIZE
+        }
+
+
+        public Phase INIT()
+        {
+            System.out.println( "INIT" );
+
+            return Phase.DOIT;
+        }
+
+
+        public Phase DOIT()
+        {
+            try
+            {
+                Thread.sleep( 10 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+            System.out.println( "DOIT" );
+
+            return Phase.FINALIZE;
+        }
+
+
+        public void FINALIZE()
+        {
+            System.out.println( "FINALIZE" );
+
+            fail( "OOPS" );
+        }
     }
 }
