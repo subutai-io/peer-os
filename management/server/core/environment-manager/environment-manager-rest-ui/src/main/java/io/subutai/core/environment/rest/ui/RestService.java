@@ -132,11 +132,6 @@ public interface RestService
 
     /** Containers **************************************************** */
 
-    @GET
-    @Path( "containers/{containerId}" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    Response getContainerEnvironmentId( @PathParam( "containerId" ) String containerId );
-
     @DELETE
     @Path( "containers/{containerId}" )
     Response destroyContainer( @PathParam( "containerId" ) String containerId );
