@@ -117,7 +117,10 @@ public class RepoUrlStore
         try ( FileDb fileDb = new FileDb( repoFile ) )
         {
             Map<String, RepoUrl> map = fileDb.get( mapName );
-
+            if ( map == null )
+            {
+                return Sets.newConcurrentHashSet();
+            }
             return Sets.newConcurrentHashSet( map.values() );
         }
     }

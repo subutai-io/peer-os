@@ -162,7 +162,7 @@ public class AptManagerImpl implements AptManager
 
         for ( String s : SystemSettings.getGlobalKurjunUrls() )
         {
-            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalApt( new URL( s ) ) );
+            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalApt( new URL( s ),"all" ) );
         }
     }
 

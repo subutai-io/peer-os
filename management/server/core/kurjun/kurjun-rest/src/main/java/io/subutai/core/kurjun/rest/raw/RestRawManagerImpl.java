@@ -148,6 +148,10 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
     public Response upload( String repository, Attachment attachment )
     {
         File temp = null;
+        if ( repository == null )
+        {
+            repository = "raw";
+        }
         try
         {
             String filename = attachment.getContentDisposition().getParameter( "filename" );
