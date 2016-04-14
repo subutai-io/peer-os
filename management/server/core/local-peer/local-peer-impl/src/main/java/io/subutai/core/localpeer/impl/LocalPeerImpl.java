@@ -118,6 +118,7 @@ import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.NetworkResourceEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
+import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
