@@ -151,6 +151,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			}			
 		} else {
 			vm.loginPatern = '(?=^.{4,}$)(^(?!(admin|sys|token)).*)';
+			vm.user2Add = {};
 		}
 
 		ngDialog.open({
