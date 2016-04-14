@@ -39,6 +39,19 @@ public class HostUtil
     }
 
 
+    public void cancelAll()
+    {
+        for ( ExecutorService executorService : taskExecutors.values() )
+        {
+            executorService.shutdownNow();
+        }
+
+        taskExecutors.clear();
+
+        allTasks.clear();
+    }
+
+
     /**
      * Executes tasks in parallel
      */
