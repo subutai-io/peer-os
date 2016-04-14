@@ -3,6 +3,8 @@ package io.subutai.hub.share.dto.product;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -38,6 +40,14 @@ public class ProductsDto
                 e.printStackTrace();
             }
         }
+        Collections.sort( productsDto, new Comparator<ProductDto>()
+        {
+            @Override
+            public int compare( final ProductDto o1, final ProductDto o2 )
+            {
+                return o1.getName().compareTo( o2.getName() );
+            }
+        });
     }
 
 

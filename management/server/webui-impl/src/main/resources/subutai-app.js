@@ -284,21 +284,27 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 		});
 	}
 
-	if (localStorage.getItem ("bazaarMD5") === null) {
-		localStorage.setItem ("bazaarMD5", getBazaarChecksum());
-		bazaarUpdate = true;
-	} else {
-		if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
-			bazaarUpdate = true;
-		}
-	}
 
-   	function getBazaarChecksum() {
-		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
-			return data;
-		});
-		return "";
-	}
+    function checkSum() {
+        console.log ("finally");
+        $http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
+            if (localStorage.getItem ("bazaarMD5") === null) {
+                console.log ("no checksum stored, storing generated checksum - " + data);
+                localStorage.setItem ("bazaarMD5", data);
+                bazaarUpdate = true;
+            }
+            else {
+                console.log ("there is checksum");
+                if (localStorage.getItem ("bazaarMD5") !== data) {
+                    console.log ("cache checksum - " + localStorage.getItem ("bazaarMD5") + " and generated checksum - " + data + " do not match");
+                    localStorage.setItem ("bazaarMD5", data);
+                    bazaarUpdate = true;
+                }
+            }
+        });
+    }
+    checkSum();
+
 }
 
 
