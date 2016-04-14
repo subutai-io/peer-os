@@ -1577,7 +1577,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
         Preconditions.checkNotNull( envLink );
-        //TODO don't generate PEK if already exists, return the existing one!!!
+
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encTool = securityManager.getEncryptionTool();
         String pairId = String.format( "%s_%s", getId(), envLink.getUniqueIdentifier() );
@@ -1768,6 +1768,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    //todo use HostUtil instead of ExecutorService
     @Override
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
@@ -1861,7 +1862,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return usedNetworkResources;
     }
 
+    //----------- P2P SECTION BEGIN --------------------
 
+
+    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
@@ -1920,7 +1924,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //----------- P2P SECTION BEGIN --------------------
+    //todo use HostUtil instead of ExecutorService
     @Override
     public void resetSwarmSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
@@ -1965,6 +1969,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Update" )
     @Override
@@ -2025,6 +2030,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    //todo use HostUtil instead of ExecutorService
     @Override
     public void joinOrUpdateP2PSwarm( final P2PConfig config ) throws PeerException
     {
@@ -2105,6 +2111,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION END --------------------
 
 
+    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
