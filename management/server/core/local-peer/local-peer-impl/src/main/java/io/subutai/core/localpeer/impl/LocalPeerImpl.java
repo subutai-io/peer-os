@@ -2221,6 +2221,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public void cancelAllTasks()
+    {
+        hostUtil.cancelAll();
+    }
+
+
+    @Override
     public String getExternalIp()
     {
         return getPeerInfo().getIp();
