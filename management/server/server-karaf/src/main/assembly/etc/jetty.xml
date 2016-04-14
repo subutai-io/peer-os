@@ -64,6 +64,8 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
     </Arg>
   </Call>
 
+
+ <!--
   <Call name="addConnector">
     <Arg>
       <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
@@ -80,6 +82,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
       </New>
     </Arg>
   </Call>
+  -->
 
   <!-- =========================================================== -->
   <!-- Mutual SSL  Peer and Environment Management -->
