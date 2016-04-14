@@ -103,7 +103,7 @@ public class MessageContentUtil
                 status = 1;
             }
         }
-        else if ( inPort == SystemSettings.getSecurePortX3() )
+        else if ( inPort == SystemSettings.getSecurePortX3())
         {
             if ( basePath.startsWith( "/rest/kurjun" )  || basePath.startsWith( "/kurjun/rest" ) )
             {
@@ -118,11 +118,11 @@ public class MessageContentUtil
         {
             if ( basePath.startsWith( "/rest/kurjun" ) )
             {
-                status = 1;
+                status = 0;
             }
             else
             {
-                status = 2;
+                status = 1;
             }
         }
         else

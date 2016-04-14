@@ -35,6 +35,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
       <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
         <Set name="host"><Property name="jetty.host" /></Set>
         <Set name="port">8333</Set>
+        <Set name="Host">127.0.0.1</Set>
         <Set name="maxIdleTime">300000</Set>
         <Set name="Acceptors">2</Set>
         <Set name="statsOn">false</Set>
