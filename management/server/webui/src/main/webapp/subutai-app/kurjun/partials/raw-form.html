@@ -5,7 +5,7 @@
             <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
         </a>
     </div>
-    <form ng-submit="kurjunCtrl.proceedApt(kurjunCtrl.currentTemplate); processing=true">
+    <form ng-submit="kurjunCtrl.proceedRaw(kurjunCtrl.currentTemplate); processing=true">
         <div class="b-popup__body">
 
             <div class="popup-body-box">
@@ -20,7 +20,6 @@
                     <input id="js-uploadBtn"
                            type="file"
                            class="upload"
-                           accept=".deb,.gz"
                            ng-hide="true"
                            ngf-select
                            ng-model="kurjunCtrl.currentTemplate.file"
