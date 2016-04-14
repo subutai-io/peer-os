@@ -33,11 +33,6 @@ public class PrepareTemplatesResponse
                         .format( "Task (%s) failed on host %s [%s]", task.name(), task.getHost().getId(),
                                 task.getFailureReason() ) );
             }
-            else
-            {
-                this.messages.add( String.format( "Task (%s) is %s on host %s [%s]", task.name(), task.getTaskState(),
-                        task.getHost().getId(), task.getDurationFormatted() ) );
-            }
         }
 
         this.hasSucceeded = !results.hasFailures();

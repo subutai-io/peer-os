@@ -14,10 +14,29 @@ public interface RelationManager
 {
     String getContext();
 
+    /**
+     * Method for constructing relation parameters
+     * @deprecated use Challenge {@link io.subutai.core.object.relation.api.model.RelationChallenge} approach instead.
+     */
+    @Deprecated
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;
 
+    /**
+     * Method for constructing relation parameters
+     * @deprecated use {@link #buildRelation(RelationInfoMeta, RelationMeta)} ()} instead.
+     */
+    @Deprecated
     RelationInfo createTrustRelationship( RelationInfoMeta relationInfoMeta );
 
+    String getRelationChallenge( long ttl ) throws RelationVerificationException;
+
+    Relation buildRelation(RelationInfoMeta relationInfoMeta, RelationMeta relationMeta);
+
+    /**
+     * Method for building trust relation between objects
+     * @deprecated use {@link #buildRelation(RelationInfoMeta, RelationMeta)} ()} instead.
+     */
+    @Deprecated
     Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
 
     Relation getRelation( RelationMeta relationMeta );
@@ -26,8 +45,6 @@ public interface RelationManager
 
     RelationInfoManager getRelationInfoManager();
 
-    RelationLink getRelationLink( RelationLink relationLink );
-
     List<Relation> getRelationsByObject( RelationLink objectRelationLink );
 
     List<Relation> getRelationsBySource( final RelationLink sourceRelationLink );
@@ -35,4 +52,10 @@ public interface RelationManager
     List<Relation> getRelationsByTarget( final RelationLink targetRelationLink );
 
     void removeRelation( long relationId );
+
+    void removeRelation( RelationMeta relationMeta );
+
+    void removeRelation( RelationLink link );
+
+    RelationLink getRelationLink(String uniqueId);
 }

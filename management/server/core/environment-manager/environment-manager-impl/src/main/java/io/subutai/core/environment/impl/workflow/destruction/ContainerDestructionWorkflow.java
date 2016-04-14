@@ -9,6 +9,8 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
+import io.subutai.core.object.relation.api.RelationManager;
+
 
 
 public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
@@ -77,6 +79,9 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
         try
         {
             new DestroyContainerStep( environmentManager, environment, containerHost ).execute();
+
+            RelationManager relationManager = environmentManager.getRelationManager();
+            relationManager.removeRelation( containerHost );
 
             saveEnvironment();
 

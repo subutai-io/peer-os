@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 
 import static junit.framework.TestCase.assertEquals;

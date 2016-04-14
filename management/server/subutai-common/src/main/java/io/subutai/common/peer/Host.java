@@ -9,12 +9,13 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
+import io.subutai.common.security.relation.RelationLink;
 
 
 /**
  * Base Host interface.
  */
-public interface Host extends HostInfo, Serializable
+public interface Host extends HostInfo, Serializable, RelationLink
 {
     /**
      * Returns reference to parent peer

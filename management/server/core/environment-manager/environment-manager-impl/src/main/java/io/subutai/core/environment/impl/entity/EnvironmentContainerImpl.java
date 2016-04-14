@@ -152,6 +152,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonIgnore
     private ContainerId containerId;
 
+    //workaround for JPA problem setting parent environment field
+    @Transient
+    private Environment parent;
+
 
     protected EnvironmentContainerImpl()
     {
@@ -206,6 +210,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         Preconditions.checkNotNull( environment );
 
         this.environment = environment;
+        this.parent = environment;
     }
 
 
@@ -226,7 +231,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public EnvironmentId getEnvironmentId()
     {
-        return environment.getEnvironmentId();
+        return parent.getEnvironmentId();
     }
 
 
@@ -257,7 +262,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         try
         {
-            environmentManager.destroyContainer( environment.getId(), this.getId(), false );
+            environmentManager.destroyContainer( parent.getId(), this.getId(), false );
         }
         catch ( EnvironmentNotFoundException | EnvironmentModificationException e )
         {
@@ -382,7 +387,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                 if ( activeUser != null )
                 {
                     RelationMeta relationMeta =
-                            new RelationMeta( userDelegate, userDelegate, environment, environment.getId() );
+                            new RelationMeta( userDelegate, userDelegate, parent, parent.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 
@@ -603,7 +608,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Override
     public String toString()
     {
-        String envId = environment != null ? environment.getId() : null;
+        String envId = parent != null ? parent.getId() : null;
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "creatorPeerId", creatorPeerId ).add( "templateName", templateName )
@@ -650,5 +655,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public String getContext()
     {
         return PermissionObject.EnvironmentManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getId();
     }
 }

@@ -3,6 +3,9 @@ package io.subutai.core.bazaar.impl;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.bazaar.api.Bazaar;
 import io.subutai.core.bazaar.api.dao.ConfigDataService;
@@ -10,8 +13,6 @@ import io.subutai.core.bazaar.api.model.Plugin;
 import io.subutai.core.bazaar.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class BazaarImpl implements Bazaar

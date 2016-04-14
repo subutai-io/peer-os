@@ -13,6 +13,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.PeerEnvironmentKeyTask;
@@ -55,8 +56,9 @@ public class PEKGenerationStep
         PGPPublicKeyRing localPeerSignedPEK;
         try
         {
+            RelationLinkDto envLink = new RelationLinkDto( environment );
             PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( environment.getEnvironmentId() );
+                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
             PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
 

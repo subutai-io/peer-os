@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl.entity;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,13 +52,18 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
+import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.registration.api.RegistrationManager;
 
 
 /**
@@ -68,12 +74,12 @@ import io.subutai.core.network.api.NetworkManagerException;
 @Access( AccessType.FIELD )
 public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceHost, Disposable
 {
-    private static final int CONNECT_TIMEOUT = 300;
-
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostEntity.class );
     private static final Pattern LXC_STATE_PATTERN = Pattern.compile( "(RUNNING|STOPPED|FROZEN)" );
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
+    private static final Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
+
 
     @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER,
             targetEntity = ContainerHostEntity.class, orphanRemoval = true )
@@ -95,9 +101,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Transient
     protected ResourceHostCommands resourceHostCommands = new ResourceHostCommands();
 
-
-    @Transient
-    protected HostRegistry hostRegistry;
 
     @Transient
     protected int numberOfCpuCores = -1;
@@ -135,7 +138,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    public void setSavedHostInterfaces( HostInterfaces hostInterfaces )
+    protected void setSavedHostInterfaces( HostInterfaces hostInterfaces )
     {
         Preconditions.checkNotNull( hostInterfaces );
 
@@ -161,7 +164,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            return hostRegistry.getResourceHostInfoById( getId() ).getContainers();
+            return getHostRegistry().getResourceHostInfoById( getId() ).getContainers();
         }
         catch ( HostDisconnectedException e )
         {
@@ -174,13 +177,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void dispose()
     {
-    }
-
-
-    public void setHostname( String hostname )
-    {
-        Preconditions.checkNotNull( hostname );
-        this.hostname = hostname;
     }
 
 
@@ -242,9 +238,27 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    protected NetworkManager getNetworkManager() throws ResourceHostException
+    protected NetworkManager getNetworkManager()
     {
         return ServiceLocator.getServiceNoCache( NetworkManager.class );
+    }
+
+
+    protected RegistrationManager getRegistrationManager()
+    {
+        return ServiceLocator.getServiceNoCache( RegistrationManager.class );
+    }
+
+
+    protected QuotaManager getQuotaManager()
+    {
+        return ServiceLocator.getServiceNoCache( QuotaManager.class );
+    }
+
+
+    protected HostRegistry getHostRegistry()
+    {
+        return ServiceLocator.getServiceNoCache( HostRegistry.class );
     }
 
 
@@ -339,7 +353,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         //wait container connection
         long ts = System.currentTimeMillis();
-        while ( System.currentTimeMillis() - ts < CONNECT_TIMEOUT * 1000 && !containerHost.isConnected() )
+        while ( System.currentTimeMillis() - ts < Common.WAIT_CONTAINER_CONNECTION_SEC * 1000 && !containerHost
+                .isConnected() )
         {
             try
             {
@@ -414,6 +429,36 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         removeContainerHost( containerHost );
+    }
+
+
+    @Override
+    public void setContainerQuota( final ContainerHost containerHost, final ContainerSize containerSize )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+
+        try
+        {
+            getContainerHostById( containerHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            throw new ResourceHostException(
+                    String.format( CONTAINER_EXCEPTION_MSG_FORMAT, containerHost.getHostname() ), e );
+        }
+
+        ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerSize );
+
+        try
+        {
+            commandUtil.execute( resourceHostCommands.getSetQuotaCommand( containerHost.getHostname(), quota ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error setting quota %s to container %s: %s", containerSize,
+                    containerHost.getHostname(), e.getMessage() ), e );
+        }
     }
 
 
@@ -509,12 +554,6 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
         }
         return result;
-    }
-
-
-    public void setHostRegistry( final HostRegistry hostRegistry )
-    {
-        this.hostRegistry = hostRegistry;
     }
 
 
@@ -681,6 +720,56 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public String cloneContainer( final String templateName, final String hostname, final String ip, final int vlan,
+                                  final String environmentId ) throws ResourceHostException
+    {
+        try
+        {
+            //generate registration token for container for 30 min
+            String token = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
+
+            CommandResult result = commandUtil.execute( resourceHostCommands
+                    .getCloneContainerCommand( templateName, hostname, ip, vlan, environmentId, token ), this );
+
+            //parse ID from output
+
+            StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
+
+            String containerId = null;
+
+            while ( st.hasMoreTokens() )
+            {
+
+                final String nextToken = st.nextToken();
+
+                Matcher m = CLONE_OUTPUT_PATTERN.matcher( nextToken );
+
+                if ( m.find() && m.groupCount() == 1 )
+                {
+                    containerId = m.group( 1 );
+                    break;
+                }
+            }
+
+
+            if ( Strings.isNullOrEmpty( containerId ) )
+            {
+                LOG.error( "Container ID not found in output of subutai clone command" );
+
+                throw new CommandException( "Container ID not found in output of subutai clone command" );
+            }
+
+            return containerId;
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceHostException(
+                    String.format( "Error cloning container %s: %s", hostname, e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
         super.updateHostInfo( hostInfo );
@@ -740,5 +829,40 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );
+    }
+
+
+    @Override
+    public String getLinkId()
+    {
+        return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+    }
+
+
+    @Override
+    public String getUniqueIdentifier()
+    {
+        return getId();
+    }
+
+
+    @Override
+    public String getClassPath()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+
+    @Override
+    public String getContext()
+    {
+        return PermissionObject.ResourceManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getId();
     }
 }
