@@ -87,7 +87,148 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			VARS_MODAL_ERROR( SweetAlert, 'Error on getting peers: ' + error );
 		});
 	}
-	getPeers();
+	//getPeers();
+
+	vm.peerIds = {
+		"2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7": {
+			"id": "2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7",
+			"name": "Peer 2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7 on 192.168.1.101 ",
+			"resourceHosts": [
+				{
+					"id": "9A0D6FD4AE227C281E2BB1176598FD4E2EF7FEFD",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				}
+			],
+			"isOnline": true,
+			"isLocal": true
+		},
+		"test1": {
+			"id": "2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7",
+			"name": "Peer 2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7 on 192.168.1.101 ",
+			"resourceHosts": [
+				{
+					"id": "9A0D6FD4AE227C281E2BB1176598FD4E2EF7FEFD",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				}
+			],
+			"isOnline": true,
+			"isLocal": true
+		},
+		"test2": {
+			"id": "2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7",
+			"name": "Peer 2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7 on 192.168.1.101 ",
+			"resourceHosts": [
+				{
+					"id": "rh1",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				},
+				{
+					"id": "rh2",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				},
+				{
+					"id": "rh3",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				},
+				{
+					"id": "rh4",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				},
+				{
+					"id": "rh5",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				},
+			],
+			"isOnline": true,
+			"isLocal": true
+		},
+		"test3": {
+			"id": "2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7",
+			"name": "Peer 2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7 on 192.168.1.101 ",
+			"resourceHosts": [
+				{
+					"id": "12",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				}
+			],
+			"isOnline": true,
+			"isLocal": true
+		},
+		"test4": {
+			"id": "2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7",
+			"name": "Peer 2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7 on 192.168.1.101 ",
+			"resourceHosts": [
+				{
+					"id": "122",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				}
+			],
+			"isOnline": true,
+			"isLocal": true
+		},
+		"test5": {
+			"id": "2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7",
+			"name": "Peer 2E3D65BAA49EF285F7AF6DE4B47CF439A55840E7 on 192.168.1.101 ",
+			"resourceHosts": [
+				{
+					"id": "33",
+					"cpu": " Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz",
+					"cpuAvailable": "1.7666666666666657",
+					"memory": "6.258335744E9",
+					"memoryAvailable": "3.3442816E9",
+					"hdd": "1.073741824E11",
+					"hddAvailable": "1.06307248128E11"
+				}
+			],
+			"isOnline": true,
+			"isLocal": true
+		},
+	};
 
 
 	clearWorkspace();
@@ -669,8 +810,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 		paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
-			width: '100%',
-			height: '100%',
+			width: '2000px',
+			height: '2000px',
 			model: graph,
 			gridSize: 1
 		});
