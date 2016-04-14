@@ -151,7 +151,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			}			
 		} else {
 			vm.loginPatern = '(?=^.{4,}$)(^(?!(admin|sys|token)).*)';
-			vm.user2Add = {};
+			vm.user2Add = {"trustLevel": 2};
 		}
 
 		ngDialog.open({
