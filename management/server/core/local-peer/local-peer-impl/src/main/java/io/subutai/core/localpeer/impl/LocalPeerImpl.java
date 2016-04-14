@@ -118,6 +118,7 @@ import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.NetworkResourceEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
+import io.subutai.core.localpeer.impl.tasks.TunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.metric.api.Monitor;
@@ -1805,7 +1806,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION BEGIN --------------------
 
 
-    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
@@ -1823,43 +1823,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         Set<ResourceHost> resourceHosts = getResourceHosts();
-        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
-        ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
 
-        int taskCount = 0;
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
+
         for ( final ResourceHost resourceHost : resourceHosts )
         {
             //setup tunnel only if this RH participates in the swarm
             if ( p2pIps.findByRhId( resourceHost.getId() ) != null )
             {
-                taskCount++;
-                completionService.submit( new Callable<Object>()
-                {
-                    @Override
-                    public Object call() throws Exception
-                    {
-                        resourceHost.setupTunnels( p2pIps, networkResource );
-
-                        return null;
-                    }
-                } );
+                tasks.addTask( resourceHost, new TunnelsTask( resourceHost, p2pIps, networkResource ) );
             }
         }
 
-        executorService.shutdown();
+        HostUtil.Results results = hostUtil.executeFailFast( tasks );
 
-        try
+        if ( results.hasFailures() )
         {
-            for ( int i = 0; i < taskCount; i++ )
-            {
-                completionService.take().get();
-            }
-        }
-        catch ( Exception e )
-        {
-            String errMsg = String.format( "Error setting up tunnels: %s", e.getMessage() );
+            HostUtil.Task task = results.getFirstFailedTask();
+
+            String errMsg = String.format( "Error setting up tunnels on host %s: %s", task.getHost().getId(),
+                    task.getFailureReason() );
+
             LOG.error( errMsg );
-            throw new PeerException( errMsg, e );
+
+            throw new PeerException( errMsg, task.getException() );
         }
     }
 
