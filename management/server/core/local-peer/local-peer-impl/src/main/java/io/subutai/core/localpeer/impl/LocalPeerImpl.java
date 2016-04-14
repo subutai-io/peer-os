@@ -13,8 +13,6 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.security.PermitAll;
 
@@ -77,13 +75,10 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PConnection;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.protocol.Tunnel;
-import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.HistoricalMetrics;
@@ -147,10 +142,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 {
     private static final Logger LOG = LoggerFactory.getLogger( LocalPeerImpl.class );
 
-    private static final String GATEWAY_INTERFACE_NAME_REGEX = "^gw-(\\d+)$";
-    private static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
-    private static final String P2P_INTERFACE_NAME_REGEX = "^p2p-(\\d+)$";
-    private static final Pattern P2P_INTERFACE_NAME_PATTERN = Pattern.compile( P2P_INTERFACE_NAME_REGEX );
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
@@ -1768,86 +1759,35 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //todo use HostUtil instead of ExecutorService
     @Override
     public UsedNetworkResources getUsedNetworkResources() throws PeerException
     {
         final UsedNetworkResources usedNetworkResources = new UsedNetworkResources();
 
         Set<ResourceHost> resourceHosts = getResourceHosts();
-        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
-        ExecutorCompletionService<Object> completionService = new ExecutorCompletionService<>( executorService );
+
+        HostUtil.Tasks hostTasks = new HostUtil.Tasks();
 
         for ( final ResourceHost resourceHost : resourceHosts )
         {
-            completionService.submit( new Callable<Object>()
-            {
-                @Override
-                public Object call() throws Exception
-                {
-
-                    //tunnels
-                    Tunnels tunnels = resourceHost.getTunnels();
-                    for ( Tunnel tunnel : tunnels.getTunnels() )
-                    {
-                        usedNetworkResources.addVni( tunnel.getVni() );
-                        usedNetworkResources.addVlan( tunnel.getVlan() );
-                        usedNetworkResources.addP2pSubnet( tunnel.getTunnelIp() );
-                    }
-
-                    //p2p connections
-                    P2PConnections p2PConnections = resourceHost.getP2PConnections();
-                    for ( P2PConnection p2PConnection : p2PConnections.getConnections() )
-                    {
-                        usedNetworkResources.addP2pSubnet( p2PConnection.getIp() );
-                    }
-
-                    for ( HostInterface iface : resourceHost.getHostInterfaces().getAll() )
-                    {
-                        //container subnet
-                        Matcher matcher = GATEWAY_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
-                        if ( matcher.find() )
-                        {
-                            usedNetworkResources.addContainerSubnet( iface.getIp() );
-                            usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
-                        }
-
-                        //p2p subnet
-                        matcher = P2P_INTERFACE_NAME_PATTERN.matcher( iface.getName().trim() );
-                        if ( matcher.find() )
-                        {
-                            usedNetworkResources.addP2pSubnet( iface.getIp() );
-                            usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
-                        }
-
-                        //add LAN subnet to prevent collisions
-                        if ( iface.getName().equalsIgnoreCase( SystemSettings.getExternalIpInterface() ) )
-                        {
-                            usedNetworkResources.addContainerSubnet( iface.getIp() );
-                            usedNetworkResources.addP2pSubnet( iface.getIp() );
-                        }
-                    }
-
-                    return null;
-                }
-            } );
+            hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
         }
 
-        executorService.shutdown();
+        HostUtil.Results results = hostUtil.executeFailFast( hostTasks );
 
-        try
+        if ( results.hasFailures() )
         {
-            for ( final ResourceHost ignored : resourceHosts )
-            {
-                completionService.take().get();
-            }
-        }
-        catch ( Exception e )
-        {
-            String errMsg = String.format( "Error gathering reserved net resources: %s", e.getMessage() );
+            HostUtil.Task task = results.getFirstFailedTask();
+
+            String errMsg =
+                    String.format( "Error gathering reserved net resources on host %s: %s", task.getHost().getId(),
+                            task.getFailureReason() );
+
             LOG.error( errMsg );
-            throw new PeerException( errMsg, e );
+
+            throw new PeerException( errMsg, task.getException() );
         }
+
 
         //add reserved ones too
         for ( NetworkResource networkResource : getReservedNetworkResources().getNetworkResources() )
@@ -1857,7 +1797,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             usedNetworkResources.addContainerSubnet( networkResource.getContainerSubnet() );
             usedNetworkResources.addP2pSubnet( networkResource.getP2pSubnet() );
         }
-
 
         return usedNetworkResources;
     }
