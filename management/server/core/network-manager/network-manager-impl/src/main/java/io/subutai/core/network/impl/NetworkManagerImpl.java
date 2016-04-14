@@ -13,13 +13,10 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConnection;
 import io.subutai.common.protocol.P2PConnections;
-import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
@@ -51,8 +48,8 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public void createP2PSwarm( final Host host, final String interfaceName, final String localIp, final String p2pHash,
-                                final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
+    public void joinP2PSwarm( final Host host, final String interfaceName, final String localIp, final String p2pHash,
+                              final String secretKey, final long secretKeyTtlSec ) throws NetworkManagerException
     {
         Preconditions.checkNotNull( host, "Invalid host" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
@@ -63,24 +60,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
 
 
-        execute( host, commands.getCreateP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
-                getUnixTimestampOffset( secretKeyTtlSec ) ) );
-    }
-
-
-    @Override
-    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
-                              final long secretKeyTtlSec )
-            throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host, "Invalid host" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid P2P hash" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret key" );
-        Preconditions.checkArgument( secretKeyTtlSec > 0, "Invalid time-to-live" );
-
-
-        execute( host, commands.getJoinP2PSwarmCommand( interfaceName, p2pHash, secretKey,
+        execute( host, commands.getJoinP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ) ) );
     }
 
@@ -126,36 +106,6 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     //------------------ P2P SECTION END --------------------------------
-
-
-    @Override
-    public PingDistance getPingDistance( final Host host, final String sourceHostIp, final String targetHostIp )
-            throws NetworkManagerException
-    {
-        Preconditions.checkNotNull( host, "Invalid host" );
-
-
-        CommandResult result = execute( host, commands.getPingDistanceCommand( targetHostIp ) );
-
-        StringTokenizer st = new StringTokenizer( result.getStdOut(), LINE_DELIMITER );
-
-        PingDistance distance = new PingDistance( sourceHostIp, targetHostIp, null, null, null, null );
-        Pattern p = Pattern.compile( "^rtt.*(\\d+\\.\\d+)/(\\d+\\.\\d+)/(\\d+\\.\\d+)/(\\d+\\.\\d+).*" );
-
-        while ( st.hasMoreTokens() )
-        {
-            String nextToken = st.nextToken();
-            Matcher m = p.matcher( nextToken );
-
-            if ( m.find() && m.groupCount() == 4 )
-            {
-                distance = new PingDistance( sourceHostIp, targetHostIp, new Double( m.group( 1 ) ),
-                        new Double( m.group( 2 ) ), new Double( m.group( 3 ) ), new Double( m.group( 4 ) ) );
-                break;
-            }
-        }
-        return distance;
-    }
 
 
     @Override
@@ -253,6 +203,21 @@ public class NetworkManagerImpl implements NetworkManager
                 commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
     }
 
+    @Override
+    public void setVlanDomain( final int vLanId, final String domain,
+                               final String host, final String sslCertPath )
+            throws NetworkManagerException
+    {
+        Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
+                "Invalid vlan" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
+        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
+        Preconditions.checkNotNull( host, "Invalid host" );
+
+        execute( getManagementHost(),
+                commands.getSetVlanDomainCommand( vLanId, domain, host, sslCertPath ) );
+    }
+
 
     @Override
     public boolean isIpInVlanDomain( final String hostIp, final int vLanId ) throws NetworkManagerException
@@ -338,33 +303,6 @@ public class NetworkManagerImpl implements NetworkManager
         try
         {
             return peerManager.getLocalPeer().getManagementHost();
-        }
-        catch ( PeerException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-    }
-
-
-    protected ResourceHost getResourceHost( final String containerName ) throws NetworkManagerException
-    {
-        try
-        {
-            ContainerHost containerHost = getContainerHost( containerName );
-            return peerManager.getLocalPeer().getResourceHostByContainerName( containerHost.getHostname() );
-        }
-        catch ( PeerException e )
-        {
-            throw new NetworkManagerException( e );
-        }
-    }
-
-
-    protected ContainerHost getContainerHost( final String containerName ) throws NetworkManagerException
-    {
-        try
-        {
-            return peerManager.getLocalPeer().getContainerHostByName( containerName );
         }
         catch ( PeerException e )
         {

@@ -31,8 +31,11 @@ public interface SystemManager
 
     AdvancedSettings getAdvancedSettings();
 
-    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls ) throws ConfigurationException;
+    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls )
+            throws ConfigurationException;
 
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
+
+    void sendSystemConfigToHub() throws ConfigurationException;
 }

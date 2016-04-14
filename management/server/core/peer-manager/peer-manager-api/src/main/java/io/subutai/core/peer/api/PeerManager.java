@@ -9,7 +9,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
-import io.subutai.common.protocol.PingDistances;
 import io.subutai.common.resource.PeerGroupResources;
 
 
@@ -72,8 +71,6 @@ public interface PeerManager
     void setPolicy( String peerId, PeerPolicy peerPolicy ) throws PeerException;
 
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
-
-    PingDistances getP2PSwarmDistances();
 
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
 }

@@ -1,9 +1,6 @@
 package io.subutai.core.environment.impl.workflow.destruction;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.servicemix.beanflow.Workflow;
 
 import io.subutai.common.environment.EnvironmentStatus;
@@ -11,19 +8,14 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
+import io.subutai.core.object.relation.api.RelationManager;
 
 
-//todo use native fail for failing the workflow
 public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentDestructionWorkflow.class );
-
     private final EnvironmentManagerImpl environmentManager;
     private EnvironmentImpl environment;
     private final TrackerOperation operationTracker;
-
-    private Throwable error;
 
 
     public enum EnvironmentDestructionPhase
@@ -54,7 +46,7 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
-        environment = environmentManager.update( environment );
+        saveEnvironment();
 
         return EnvironmentDestructionPhase.CLEANUP_ENVIRONMENT;
     }
@@ -68,13 +60,13 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         {
             new CleanupEnvironmentStep( environment, operationTracker ).execute();
 
-            environment = environmentManager.update( environment );
+            saveEnvironment();
 
             return EnvironmentDestructionPhase.FINALIZE;
         }
         catch ( Exception e )
         {
-            setError( e );
+            fail( e.getMessage(), e );
 
             return null;
         }
@@ -83,9 +75,11 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
 
     public void FINALIZE()
     {
-        LOG.info( "Finalizing environment destruction" );
 
         environmentManager.remove( environment );
+
+        RelationManager relationManager = environmentManager.getRelationManager();
+        relationManager.removeRelation( environment );
 
         operationTracker.addLogDone( "Environment is destroyed" );
 
@@ -94,20 +88,21 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     }
 
 
-    public Throwable getError()
+    @Override
+    public void fail( final String message, final Throwable e )
     {
-        return error;
+        environment.setStatus( EnvironmentStatus.UNHEALTHY );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( message );
+
+        super.fail( message, e );
     }
 
 
-    public void setError( final Throwable error )
+    protected void saveEnvironment()
     {
-        environment.setStatus( EnvironmentStatus.UNHEALTHY );
         environment = environmentManager.update( environment );
-        this.error = error;
-        LOG.error( "Error destroying environment", error );
-        operationTracker.addLogFailed( error.getMessage() );
-        //stop the workflow
-        stop();
     }
 }

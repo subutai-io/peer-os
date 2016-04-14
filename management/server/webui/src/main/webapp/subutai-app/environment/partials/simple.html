@@ -112,8 +112,10 @@
 			</div>
 			<div class="b-cloud-space__table">
 				<table datatable="ng"
+				ng-init="environmentViewCtrl.initDataTable()" 
 				dt-options="environmentViewCtrl.dtOptionsInstallTable"
-				dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable"
+				dt-column-defs="environmentViewCtrl.dtColumnDefsInstallTable" 
+				dt-instance="environmentViewCtrl.dtInstance" 
 				class="row-border hover subt_table-containers-table">
 					<thead>
 						<tr>
@@ -126,7 +128,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat = "environment in environmentViewCtrl.environments">
+						<tr ng-if="environmentViewCtrl.environments.length > 0" ng-repeat = "(key, environment) in environmentViewCtrl.environments">
 							<td>
 								<div class="b-status-icon b-status-icon_{{ environment.status }}"
 									tooltips
@@ -138,6 +140,7 @@
 								<span tooltips
 									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
+									env-data-source="{{ environment.dataSource }}"
 								>
 									{{ environment.name }}
 								</span>
@@ -152,7 +155,7 @@
 									  tooltips
 									  tooltip-template="{{value.tooltip}}">
 									{{value.quantity}}
-                            	</span>
+								</span>
 							</td>
 							<td class="b-main-table__controls">
 								<a href
@@ -162,8 +165,18 @@
 									ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
 									ng-show = "environment.status === 'HEALTHY'">
 								</a>
-								<a href class="b-icon b-icon_edit" ng-click="environmentSimpleViewCtrl.editEnvironment(environment)" style = "visibility: visible"></a>
-								<a href class="b-icon b-icon_remove" ng-click="environmentViewCtrl.destroyEnvironment(environment.id)"></a>
+								<a href 
+									class="b-icon b-icon_edit" 
+									tooltips
+									tooltip-template='Edit' 
+									ng-click="environmentSimpleViewCtrl.editEnvironment(environment)" style = "visibility: visible">
+								</a>
+								<a href 
+									class="b-icon b-icon_remove" 
+									tooltips
+									tooltip-template='Destroy' 
+									ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)">
+								</a>
 							</td>
 						</tr>
 					</tbody>

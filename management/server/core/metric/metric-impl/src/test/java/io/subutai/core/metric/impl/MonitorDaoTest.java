@@ -147,7 +147,7 @@ public class MonitorDaoTest
     @Test
     public void testSubscriber() throws Exception
     {
-        Subscriber subscriber = new Subscriber( ENVIRONMENT_ID.toString(), SUBSCRIBER_ID );
+        Subscriber subscriber = new Subscriber( ENVIRONMENT_ID, SUBSCRIBER_ID );
 
         assertEquals( ENVIRONMENT_ID, subscriber.getEnvironmentId() );
         assertEquals( SUBSCRIBER_ID, subscriber.getSubscriberId() );
@@ -159,14 +159,14 @@ public class MonitorDaoTest
     {
         SubscriberPK subscriberPK = new SubscriberPK();
         subscriberPK.setSubscriberId( SUBSCRIBER_ID );
-        subscriberPK.setEnvironmentId( ENVIRONMENT_ID.toString() );
+        subscriberPK.setEnvironmentId( ENVIRONMENT_ID );
 
         assertEquals( ENVIRONMENT_ID, subscriberPK.getEnvironmentId() );
         assertEquals( SUBSCRIBER_ID, subscriberPK.getSubscriberId() );
 
         SubscriberPK subscriberPK2 = new SubscriberPK();
         subscriberPK2.setSubscriberId( SUBSCRIBER_ID );
-        subscriberPK2.setEnvironmentId( ENVIRONMENT_ID.toString() );
+        subscriberPK2.setEnvironmentId( ENVIRONMENT_ID );
 
         assertEquals( subscriberPK2, subscriberPK );
     }

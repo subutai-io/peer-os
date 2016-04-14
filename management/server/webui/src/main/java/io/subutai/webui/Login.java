@@ -3,7 +3,6 @@ package io.subutai.webui;
 
 import java.io.IOException;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -66,7 +65,7 @@ public class Login extends HttpServlet
                     response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
                 }
             }
-            catch ( NamingException e )
+            catch ( Exception e )
             {
                 request.setAttribute( "error", "karaf exceptions !!!" );
                 response.getWriter().write( "Error, karaf exceptions !!!" );

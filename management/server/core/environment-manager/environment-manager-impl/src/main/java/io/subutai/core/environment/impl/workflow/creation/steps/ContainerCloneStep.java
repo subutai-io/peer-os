@@ -2,48 +2,45 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.net.util.SubnetUtils;
 
-import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import com.google.common.collect.Lists;
+
+import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.tracker.OperationMessage;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.common.util.ExceptionUtil;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerNodeGroupsTask;
+import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerEnvironmentContainersTask;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
 import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -60,7 +57,6 @@ public class ContainerCloneStep
     private final IdentityManager identityManager;
     private final TrackerOperation operationTracker;
     private final String localPeerId;
-    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
     private PeerManager peerManager;
 
 
@@ -86,14 +82,23 @@ public class ContainerCloneStep
 
         SubnetUtils cidr = new SubnetUtils( environment.getSubnetCidr() );
 
+        List<String> addresses = Lists.newArrayList( cidr.getInfo().getAllAddresses() );
+
+        //remove gw IP
+        addresses.remove( cidr.getInfo().getLowAddress() );
+
+        //remove already used container IPs
+        for ( ContainerHost containerHost : environment.getContainerHosts() )
+        {
+            addresses.remove( containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() );
+        }
+
         //obtain available ip address count
-        int totalAvailableIpCount = cidr.getInfo().getAddressCount() - 1;//one ip is for gateway
+        int totalAvailableIpCount = addresses.size();
 
-        //subtract already used ip range
-        totalAvailableIpCount -= environment.getLastUsedIpIndex();
-
-        //obtain used ip address count
+        //obtain requested ip address count
         int requestedContainerCount = 0;
+
         for ( Set<Node> nodes : placement.values() )
         {
             requestedContainerCount += nodes.size();
@@ -107,46 +112,34 @@ public class ContainerCloneStep
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( placement.size() );
+        PeerUtil<CreateEnvironmentContainersResponse> cloneUtil = new PeerUtil<>();
 
-        CompletionService<CreateEnvironmentContainerResponseCollector> taskCompletionService =
-                getCompletionService( taskExecutor );
-
-        int currentLastUsedIpIndex = environment.getLastUsedIpIndex();
-
+        int currentOffset = 0;
 
         //submit parallel environment part creation tasks across peers
         for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
         {
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
-            LOGGER.debug( String.format( "Scheduling node group task on peer %s", peer.getId() ) );
 
-            taskCompletionService.submit( new CreatePeerNodeGroupsTask( peer, peerManager.getLocalPeer(), environment,
-                    currentLastUsedIpIndex + 1, peerPlacement.getValue() ) );
+            cloneUtil.addPeerTask( new PeerUtil.PeerTask<>( peer,
+                    new CreatePeerEnvironmentContainersTask( peer, peerManager.getLocalPeer(), environment,
+                            addresses.subList( currentOffset, currentOffset + peerPlacement.getValue().size() ),
+                            peerPlacement.getValue(), operationTracker ) ) );
 
-            currentLastUsedIpIndex += peerPlacement.getValue().size();
-
-            environment.setLastUsedIpIndex( currentLastUsedIpIndex );
+            currentOffset += peerPlacement.getValue().size();
         }
 
-        taskExecutor.shutdown();
+        PeerUtil.PeerTaskResults<CreateEnvironmentContainersResponse> cloneResults = cloneUtil.executeParallel();
 
         //collect results
         boolean succeeded = true;
-        for ( int i = 0; i < placement.size(); i++ )
+
+        for ( PeerUtil.PeerTaskResult<CreateEnvironmentContainersResponse> cloneResult : cloneResults
+                .getPeerTaskResults() )
         {
-            try
-            {
-                Future<CreateEnvironmentContainerResponseCollector> futures = taskCompletionService.take();
-                CreateEnvironmentContainerResponseCollector response = futures.get();
-                addLogs( response );
-                succeeded &= processResponse( placement.get( response.getPeerId() ), response );
-            }
-            catch ( Exception e )
-            {
-                LOGGER.error( e.getMessage(), e );
-                succeeded = false;
-            }
+            CreateEnvironmentContainersResponse response = cloneResult.getResult();
+            String peerId = cloneResult.getPeer().getId();
+            succeeded &= processResponse( placement.get( peerId ), response, peerId );
         }
 
         if ( !succeeded )
@@ -156,31 +149,27 @@ public class ContainerCloneStep
     }
 
 
-    protected boolean processResponse( final Set<Node> nodes,
-                                       final CreateEnvironmentContainerResponseCollector responses )
+    protected boolean processResponse( final Set<Node> nodes, final CreateEnvironmentContainersResponse responses,
+                                       final String peerId )
     {
         final Set<EnvironmentContainerImpl> containers = new HashSet<>();
 
         boolean result = true;
+
         for ( Node node : nodes )
         {
             CloneResponse response = responses.findByHostname( node.getHostname() );
+
             if ( response != null )
             {
-                try
-                {
-                    EnvironmentContainerImpl c = buildContainerEntity( responses.getPeerId(), node, response );
-                    containers.add( c );
-                }
-                catch ( Exception e )
-                {
-                    LOGGER.warn( "Error on building container from clone response: " + response, e );
-                    result = false;
-                }
+                EnvironmentContainerImpl c = buildContainerEntity( peerId, node, response );
+
+                containers.add( c );
             }
             else
             {
                 LOGGER.warn( "Scheduled container not found: " + node.toString() );
+
                 result = false;
             }
         }
@@ -188,18 +177,11 @@ public class ContainerCloneStep
         if ( !containers.isEmpty() )
         {
             environment.addContainers( containers );
+
             buildRelationChain( environment, containers );
         }
+
         return result;
-    }
-
-
-    private void addLogs( final CreateEnvironmentContainerResponseCollector result )
-    {
-        for ( OperationMessage message : result.getOperationMessages() )
-        {
-            operationTracker.addLog( message.getValue() );
-        }
     }
 
 
@@ -211,11 +193,12 @@ public class ContainerCloneStep
         interfaces.addHostInterface(
                 new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
         final ContainerHostInfoModel infoModel =
-                new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(), interfaces,
-                        cloneResponse.getTemplateArch(), ContainerHostState.RUNNING );
-        return new EnvironmentContainerImpl( localPeerId, peerId, cloneResponse.getHostname(), infoModel,
-                cloneResponse.getTemplateName(), cloneResponse.getTemplateArch(), node.getSshGroupId(),
-                node.getHostsGroupId(), defaultDomain, node.getType(), node.getHostId(), node.getName() );
+                new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(),
+                        cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
+                        ContainerHostState.RUNNING );
+        return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateName(),
+                cloneResponse.getTemplateArch(), node.getSshGroupId(), node.getHostsGroupId(), defaultDomain,
+                node.getType(), node.getHostId(), cloneResponse.getContainerName() );
     }
 
 
@@ -228,30 +211,20 @@ public class ContainerCloneStep
             for ( final EnvironmentContainerImpl container : containers )
             {
                 //TODO create environment <-> container ownership
-
-                RelationMeta relationMeta = new RelationMeta();
-                relationMeta.setSource( delegatedUser );
-                relationMeta.setTarget( environment );
-                relationMeta.setObject( container );
-
                 RelationInfoMeta relationInfoMeta =
                         new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
-                RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
+                Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+                relationTraits.put( "containerLimit", "unlimited" );
+                relationTraits.put( "bandwidthLimit", "unlimited" );
 
-                Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
-
-                relationManager.saveRelation( relation );
-            }
+                RelationMeta relationMeta = new RelationMeta( delegatedUser, environment, container, "" );
+                Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+                relation.setRelationStatus( RelationStatus.VERIFIED );
+                relationManager.saveRelation( relation );            }
         }
         catch ( Exception ex )
         {
             LOGGER.error( "Error building relation", ex );
         }
-    }
-
-
-    protected CompletionService<CreateEnvironmentContainerResponseCollector> getCompletionService( Executor executor )
-    {
-        return new ExecutorCompletionService<>( executor );
     }
 }

@@ -97,8 +97,8 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 
     private void handleEnvironmentMessage( final String peerId, final String environmentId, final Message message )
     {
-        String sourceId = peerManager.getLocalPeer().getId() + "-" + environmentId;
-        String targetId = peerId + "-" + environmentId;
+        String targetId = peerId + "_" + environmentId;
+        String sourceId = peerManager.getLocalPeer().getId() + "_" + environmentId;
 
         MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
     }

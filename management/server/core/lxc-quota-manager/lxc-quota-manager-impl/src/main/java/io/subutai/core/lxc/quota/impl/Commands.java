@@ -23,20 +23,12 @@ public class Commands
     }
 
 
-    public RequestBuilder getWriteQuotaCommand( String containerHostname,
-                                                ContainerResource resourceValue )
+    public RequestBuilder getWriteQuotaCommand( final String containerHostname, final ContainerResource resourceValue,
+                                                final Integer threshold )
     {
         return new RequestBuilder( QUOTA_BINDING ).withCmdArgs(
                 Lists.newArrayList( containerHostname, resourceValue.getContainerResourceType().getKey(), "-s",
-                        resourceValue.getWriteValue() ) );
-    }
-
-
-    public RequestBuilder getReadAvailableQuotaCommand( final String containerName,
-                                                        final ContainerResourceType containerResourceType )
-    {
-        return new RequestBuilder( QUOTA_BINDING )
-                .withCmdArgs( Lists.newArrayList( containerName, containerResourceType.getKey(), "-m" ) );
+                        resourceValue.getWriteValue(), "-t", threshold.toString() ) );
     }
 
 

@@ -8,13 +8,10 @@ import org.junit.Test;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.subutai.core.messenger.impl.MessageImpl;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doThrow;
 
 
 /**
@@ -155,7 +152,7 @@ public class MessageImplTest
     public void testToString() throws Exception
     {
 
-        assertThat( message.toString(), containsString( SOURCE_PEER_ID.toString() ) );
+        assertThat( message.toString(), containsString( SOURCE_PEER_ID ) );
         message.setSender( SENDER );
         assertThat( message.toString(), containsString( SENDER ) );
     }

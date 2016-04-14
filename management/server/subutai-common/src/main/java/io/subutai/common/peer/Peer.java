@@ -12,36 +12,36 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Containers;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponseCollector;
+import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.PingDistances;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationLinkDto;
 
 
 /**
  * Peer interface
  */
-public interface Peer
+public interface Peer extends RelationLink
 {
 
     /**
@@ -62,15 +62,15 @@ public interface Peer
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo() throws PeerException;
+    public PeerInfo getPeerInfo();
 
     /**
      * Creates environment container group on the peer
      *
      * @param request - container creation request
      */
-    public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
-            final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
+    public CreateEnvironmentContainersResponse createEnvironmentContainers(
+            final CreateEnvironmentContainersRequest request ) throws PeerException;
 
 
     /**
@@ -218,25 +218,18 @@ public interface Peer
 
 
     /**
-     * Sets up tunnels on the local peer to the specified remote peers todo use EnvironmentId instead of string
+     * Sets up tunnels on the local peer to the specified remote peers
+     *
+     * todo use EnvironmentId instead of string
      */
     public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
-
-
-    /**
-     * Gets containerHost by Id specified
-     *
-     * @return - containerHost
-     *
-     * todo use ContainerId instead of string
-     */
-    public HostInfo getContainerHostInfoById( String containerHostId ) throws PeerException;
 
 
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto )
+            throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -258,24 +251,11 @@ public interface Peer
 
 
     /**
-     * Sets up p2p connection on each RH.
-     *
-     * The p2p swarm must exists and have at least one participant already with explicit IP because this method will use
-     * dynamic IP acquisition for RHs. If P2P connection already exists on RH, its secret key gets reset with new secret
-     * key and ttl from  @param config. To setup initial p2p connection with explicit IP, use
-     * Peer#createP2PSwarm
-     *
-     * @return - P2P IP of RH with MH
+     * Sets up p2p connections on specified RHs.
      */
-    P2PConnections joinP2PSwarm( P2PConfig config ) throws PeerException;
+    void joinP2PSwarm( P2PConfig config ) throws PeerException;
 
-
-    /**
-     * Sets up initial P2P connection in swarm on MH. P2P IP must be present!
-     *
-     * This method throws PeerException if initial P2P connection with the specified hash is already setup.
-     */
-    public void createP2PSwarm( final P2PConfig config ) throws PeerException;
+    void joinOrUpdateP2PSwarm( P2PConfig config ) throws PeerException;
 
 
     void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException;
@@ -286,8 +266,6 @@ public interface Peer
     //todo use PeerId instead of string
     PeerResources getResourceLimits( String peerId ) throws PeerException;
 
-    ContainerQuota getAvailableQuota( ContainerId containerId ) throws PeerException;
-
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
 
     void setQuota( ContainerId containerId, ContainerQuota quota ) throws PeerException;
@@ -296,17 +274,21 @@ public interface Peer
 
     HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
 
-    PingDistances getP2PSwarmDistances( String p2pHash, Integer maxAddress ) throws PeerException;
-
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
     HostId getResourceHostIdByContainerId( ContainerId id ) throws PeerException;
 
-    PrepareTemplatesResponseCollector prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
+    PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
     SshPublicKeys generateSshKeyForEnvironment( EnvironmentId environmentId ) throws PeerException;
 
     void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
 
+    void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+
+    void addSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
+
+    void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
 }

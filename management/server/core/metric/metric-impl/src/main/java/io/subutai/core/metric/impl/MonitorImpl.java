@@ -218,7 +218,7 @@ public class MonitorImpl implements Monitor, HostListener
             else
             {
                 LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
-                        commandResult.getStdErr() ) );
+                        commandResult != null ? commandResult.getStdErr() : "" ) );
             }
         }
         catch ( IOException | CommandException e )
@@ -285,6 +285,8 @@ public class MonitorImpl implements Monitor, HostListener
         }
         else
         {
+            //todo metrics for remote container must be obtained from its peer or add Container.getMetrics method
+            // which will delegate to its peer
             commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
         }
 
@@ -363,26 +365,32 @@ public class MonitorImpl implements Monitor, HostListener
 
         for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
-
-            try
-            {
-                ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
-                HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
-                resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
-                ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
-                if ( m != null )
-                {
-                    resourceHostMetric.updateMetrics( m );
-                    resourceHostMetric.setConnected( true );
-                    result.addMetric( resourceHostMetric );
-                }
-            }
-            catch ( Exception ignore )
-            {
-            }
+            final ResourceHostMetric m = getResourceHostMetric( resourceHost );
+            result.addMetric( m );
         }
 
         return result;
+    }
+
+
+    private ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
+    {
+        ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+        try
+        {
+            HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
+            resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
+            ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
+            if ( m != null )
+            {
+                resourceHostMetric.updateMetrics( m );
+                resourceHostMetric.setConnected( true );
+            }
+        }
+        catch ( Exception ignore )
+        {
+        }
+        return resourceHostMetric;
     }
 
 
@@ -467,7 +475,6 @@ public class MonitorImpl implements Monitor, HostListener
         @Override
         public void run()
         {
-            LOG.debug( "Background task runner started..." );
             try
             {
                 deliverAlerts();
@@ -476,9 +483,8 @@ public class MonitorImpl implements Monitor, HostListener
             }
             catch ( Exception e )
             {
-                LOG.warn( "Background task execution faild: " + e.getMessage() );
+                LOG.warn( "Background task execution failed: " + e.getMessage() );
             }
-            LOG.debug( "Background task runner finished." );
         }
     }
 
@@ -490,6 +496,17 @@ public class MonitorImpl implements Monitor, HostListener
         {
             for ( QuotaAlertValue quotaAlertValue : alerts )
             {
+                final ResourceHostMetric metrics;
+                try
+                {
+                    metrics = getResourceHostMetric(
+                            peerManager.getLocalPeer().getResourceHostById( resourceHostInfo.getId() ) );
+                    quotaAlertValue.getValue().setResourceHostMetric( metrics );
+                }
+                catch ( PeerException e )
+                {
+                    LOG.warn( e.getMessage() );
+                }
                 queueAlertResource( new QuotaAlert( quotaAlertValue, System.currentTimeMillis() ) );
             }
         }

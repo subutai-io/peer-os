@@ -1,8 +1,10 @@
 package io.subutai.core.bazaar.rest;
 
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.bazaar.api.Bazaar;
@@ -11,6 +13,7 @@ import io.subutai.core.hubmanager.api.HubPluginException;
 public class RestServiceImpl implements RestService
 {
 	private Bazaar bazaar;
+	private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class );
 
 	@Override
 	public Response listProducts ()
@@ -64,7 +67,7 @@ public class RestServiceImpl implements RestService
 	@Override
 	public Response getListMD5 ()
 	{
-		return Response.status( Response.Status.OK ).entity( bazaar.getChecksum () ).build();
+		return Response.status( Response.Status.OK ).entity( JsonUtil.toJson( bazaar.getChecksum() ) ).build();
 	}
 
 	public void setBazaar (final Bazaar bazaar)

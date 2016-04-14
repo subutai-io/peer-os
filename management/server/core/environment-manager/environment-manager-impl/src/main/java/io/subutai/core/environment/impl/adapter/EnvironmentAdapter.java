@@ -12,11 +12,16 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.RhP2pIp;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
+import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -38,7 +43,8 @@ public class EnvironmentAdapter
     private final HubAdapter hubAdapter;
 
 
-    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager, HubAdapter hubAdapter )
+    public EnvironmentAdapter( EnvironmentManagerImpl environmentManager, PeerManager peerManager,
+                               HubAdapter hubAdapter )
     {
         this.environmentManager = environmentManager;
 
@@ -83,7 +89,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager ) );
+                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
@@ -103,9 +109,11 @@ public class EnvironmentAdapter
         {
             for ( ContainerHost ch : rh.getContainerHosts() )
             {
-                String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
+                final HostInterfaces hostInterfaces = ch.getHostInterfaces();
+                String ip = hostInterfaces.findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
 
-                log.debug( "Local container: hostname={}, id={}, ip={}", ch.getHostname(), ch.getId(), ip );
+                log.debug( "Local container: hostname={}, id={}, ip={}, size={}", ch.getHostname(), ch.getId(), ip,
+                        ch.getContainerSize() );
             }
         }
     }
@@ -130,7 +138,7 @@ public class EnvironmentAdapter
 
     public void removeEnvironment( EnvironmentImpl env )
     {
-        hubAdapter.removeEnvironment( env.getEnvironmentId().getId() );
+        hubAdapter.removeEnvironment( env.getId() );
     }
 
 
@@ -158,7 +166,7 @@ public class EnvironmentAdapter
     }
 
 
-    private void environmentContainersToJson( EnvironmentImpl env, ObjectNode json )
+    private void environmentContainersToJson( EnvironmentImpl env, ObjectNode json ) throws PeerException
     {
         ArrayNode contNode = json.putArray( "containers" );
 
@@ -168,6 +176,8 @@ public class EnvironmentAdapter
 
             peerJson.put( "name", ch.getContainerName() );
 
+            peerJson.put( "hostname", ch.getHostname() );
+
             peerJson.put( "state", ch.getState().toString() );
 
             peerJson.put( "template", ch.getTemplateName() );
@@ -175,6 +185,8 @@ public class EnvironmentAdapter
             peerJson.put( "size", ch.getContainerSize().toString() );
 
             peerJson.put( "peerId", ch.getPeer().getId() );
+
+            peerJson.put( "rhId", ch.getResourceHostId().getId() );
 
             String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
@@ -190,7 +202,14 @@ public class EnvironmentAdapter
         ObjectNode json = JsonUtil.createNode( "id", env.getEnvironmentId().getId() );
 
         json.put( "name", env.getName() );
+
         json.put( "status", env.getStatus().toString() );
+
+        json.put( "p2pHash", P2PUtil.generateHash( env.getEnvironmentId().getId() ) );
+
+        json.put( "p2pTtl", Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
+
+        json.put( "p2pKey", env.getP2pKey() );
 
         return json;
     }
@@ -206,7 +225,24 @@ public class EnvironmentAdapter
 
             peerJson.put( "online", peer.isOnline() );
 
+            putPeerResourceHostsJson( peerJson, env.getPeerConf( peer.getId() ) );
+
             peers.add( peerJson );
+        }
+    }
+
+
+    private void putPeerResourceHostsJson( ObjectNode peerJson, PeerConf peerConf )
+    {
+        ArrayNode rhs = peerJson.putArray( "resourceHosts" );
+
+        for ( RhP2pIp rh : peerConf.getRhP2pIps() )
+        {
+            ObjectNode rhJson = JsonUtil.createNode( "id", rh.getRhId() );
+
+            rhJson.put( "p2pIp", rh.getP2pIp() );
+
+            rhs.add( rhJson );
         }
     }
 }

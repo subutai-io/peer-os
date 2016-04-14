@@ -37,6 +37,9 @@ public class RelationLinkImpl implements RelationLink
     @Column( name = "context" )
     private String context = "";
 
+    @Column(name = "key_id")
+    private String keyId;
+
 
     public RelationLinkImpl()
     {
@@ -59,6 +62,7 @@ public class RelationLinkImpl implements RelationLink
         this.classPath = relationLink.getClassPath();
         this.linkId = relationLink.getLinkId();
         this.context = relationLink.getContext();
+        this.keyId = relationLink.getKeyId();
     }
 
 
@@ -111,6 +115,13 @@ public class RelationLinkImpl implements RelationLink
     public void setClassPath( final String classPath )
     {
         this.classPath = classPath;
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return keyId;
     }
 
 

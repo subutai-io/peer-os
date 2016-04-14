@@ -1,23 +1,25 @@
 package io.subutai.common.security.crypto.ssl;
 
-import io.subutai.common.security.crypto.keystore.KeyStoreData;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.security.KeyStore;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.subutai.common.security.crypto.keystore.KeyStoreData;
 
 public class SSLManager
 {
 	private static final Logger LOGGER = LoggerFactory.getLogger( SSLManager.class );
 
 	private KeyStore     keyStore = null;
-	private KeyStore     trustStore = null;;
-	private KeyStoreData keyStoreData = null;
+	private KeyStore     trustStore = null;
+    private KeyStoreData keyStoreData = null;
 	private KeyStoreData trustStoreData = null;
 	
 	public SSLManager(KeyStore keyStore,KeyStoreData keyStoreData,KeyStore trustStore,KeyStoreData trustStoreData)

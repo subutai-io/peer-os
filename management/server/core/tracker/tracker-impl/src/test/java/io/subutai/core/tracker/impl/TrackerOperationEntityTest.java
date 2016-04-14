@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import io.subutai.core.tracker.impl.entity.TrackerOperationEntity;
 
 import static junit.framework.TestCase.assertEquals;
@@ -24,7 +25,7 @@ public class TrackerOperationEntityTest
     @Before
     public void setUp() throws Exception
     {
-        trackerOperationEntity = new TrackerOperationEntity( SOURCE, ID, TIMESTAMP, INFO );
+        trackerOperationEntity = new TrackerOperationEntity( SOURCE, ID, TIMESTAMP, INFO, 1 );
     }
 
 
@@ -38,14 +39,14 @@ public class TrackerOperationEntityTest
     @Test
     public void testEquals() throws Exception
     {
-        assertEquals( new TrackerOperationEntity( SOURCE, ID, TIMESTAMP, INFO ), trackerOperationEntity );
+        assertEquals( new TrackerOperationEntity( SOURCE, ID, TIMESTAMP, INFO, 1 ), trackerOperationEntity );
     }
 
 
     @Test
     public void testHashCode() throws Exception
     {
-        assertEquals( new TrackerOperationEntity( SOURCE, ID, TIMESTAMP, INFO ).hashCode(),
+        assertEquals( new TrackerOperationEntity( SOURCE, ID, TIMESTAMP, INFO, 1 ).hashCode(),
                 trackerOperationEntity.hashCode() );
     }
 }

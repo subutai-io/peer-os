@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,14 +87,7 @@ public class MessengerImpl implements Messenger, MessageProcessor
 
     protected PeerManager getPeerManager()
     {
-        try
-        {
-            return ServiceLocator.getServiceNoCache( PeerManager.class );
-        }
-        catch ( NamingException e )
-        {
-            throw new RuntimeException( "Failed to obtain PeerManager service", e );
-        }
+        return ServiceLocator.getServiceNoCache( PeerManager.class );
     }
 
 

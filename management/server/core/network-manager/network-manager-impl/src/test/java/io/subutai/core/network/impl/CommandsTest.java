@@ -33,35 +33,7 @@ public class CommandsTest
     @Test
     public void testGetSetupP2PConnectionCommand() throws Exception
     {
-        assertNotNull( commands.getCreateP2PSwarmCommand( INTERFACE_NAME, LOCAL_IP, COMMUNITY_NAME, SECRET_KEY,
+        assertNotNull( commands.getJoinP2PSwarmCommand( INTERFACE_NAME, LOCAL_IP, COMMUNITY_NAME, SECRET_KEY,
                 Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
-    }
-
-
-    @Test
-    public void testGetSetupTunnelCommand() throws Exception
-    {
-        assertNotNull( commands.getSetupTunnelCommand( TUNNEL_NAME, TUNNEL_IP, TUNNEL_TYPE ) );
-    }
-
-
-    @Test
-    public void testGetListTunnelsCommand() throws Exception
-    {
-        assertNotNull( commands.getListTunnelsCommand() );
-    }
-
-
-    @Test
-    public void testGetSetupVniVlanMappingCommand() throws Exception
-    {
-        assertNotNull( commands.getSetupVniVlanMappingCommand( TUNNEL_NAME, VNI, VLAN_ID, ENVIRONMENT_ID ) );
-    }
-
-
-    @Test
-    public void testGetListVniVlanMappingsCommand() throws Exception
-    {
-        assertNotNull( commands.getListVniVlanMappingsCommand() );
     }
 }

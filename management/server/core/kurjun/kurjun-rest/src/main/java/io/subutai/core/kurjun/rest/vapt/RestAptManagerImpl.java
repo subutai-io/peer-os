@@ -219,12 +219,8 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
 
     private String makePackageFilename( PackageMetadata metadata )
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append( metadata.getPackage() ).append( "_" );
-        sb.append( metadata.getVersion() ).append( "_" );
-        sb.append( metadata.getArchitecture().toString() );
-        sb.append( ".deb" );
-        return sb.toString();
+        return metadata.getPackage() + "_" + metadata.getVersion() + "_" + metadata.getArchitecture().toString()
+                + ".deb";
     }
 
 

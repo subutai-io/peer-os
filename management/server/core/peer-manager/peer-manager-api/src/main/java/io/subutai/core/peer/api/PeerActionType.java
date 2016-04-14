@@ -6,5 +6,5 @@ package io.subutai.core.peer.api;
  */
 public enum PeerActionType
 {
-    REGISTER, UNREGISTER;
+    REGISTER, UNREGISTER
 }

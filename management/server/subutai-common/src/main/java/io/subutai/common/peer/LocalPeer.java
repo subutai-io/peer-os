@@ -7,7 +7,7 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.task.Task;
+import io.subutai.common.util.HostUtil;
 
 
 /**
@@ -16,13 +16,11 @@ import io.subutai.common.task.Task;
 public interface LocalPeer extends Peer
 {
 
-    Task getTask( Integer id );
-
 
     /**
      * Returns external IP of mgmt host
      */
-    String getExternalIp() throws PeerException;
+    String getExternalIp();
 
 
     /**
@@ -97,6 +95,8 @@ public interface LocalPeer extends Peer
 
     public Set<RequestListener> getRequestListeners();
 
+    public void removeResourceHost( String rhId ) throws HostNotFoundException;
+
 
     /**
      * Returns domain assigned to vni if any
@@ -147,15 +147,15 @@ public interface LocalPeer extends Peer
 
     TemplateKurjun getTemplateByName( String templateName );
 
-    ContainerHost findContainerById( ContainerId containerId );
+    ContainerHost findContainerById( String containerId );
 
-    int setupContainerSsh( String containerHostId, int sshIdleTimeout ) throws PeerException;
+    int setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
 
     List<ContainerHost> getPeerContainers( String peerId );
 
     Host findHostByName( String hostname ) throws HostNotFoundException;
 
-    List<Task> getTaskList();
+    Set<HostUtil.Task> getTasks();
 
     public void exchangeMhKeysWithRH() throws Exception;
 

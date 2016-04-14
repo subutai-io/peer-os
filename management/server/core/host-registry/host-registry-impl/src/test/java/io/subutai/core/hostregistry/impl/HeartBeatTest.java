@@ -1,22 +1,18 @@
 package io.subutai.core.hostregistry.impl;
 
 
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.metric.QuotaAlert;
-import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.host.ResourceHostInfo;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 
@@ -63,7 +59,6 @@ public class HeartBeatTest
     @Before
     public void setUp() throws Exception
     {
-//        System.out.println(INFO_JSON);
         heartBeat = JsonUtil.fromJson( INFO_JSON, HeartBeat.class );
     }
 
@@ -77,13 +72,4 @@ public class HeartBeatTest
         assertFalse( resourceHostInfo.getContainers().isEmpty() );
     }
 
-//    @Test
-//    public void testAlert() throws Exception
-//    {
-//        final Set<QuotaAlertValue> alerts = heartBeat.getAlerts();
-//
-//        assertNotNull( alerts );
-//        QuotaAlertValue q = alerts.iterator().next();
-//        assertEquals( ContainerResourceType.CPU, q.getValue().getContainerResourceType() );
-//    }
 }

@@ -20,7 +20,6 @@ import (
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/cli"
 	"github.com/subutai-io/base/agent/config"
-	// cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
@@ -36,8 +35,8 @@ type Heartbeat struct {
 	Arch       string                `json:"arch"`
 	Instance   string                `json:"instance"`
 	Interfaces []utils.Iface         `json:"interfaces,omitempty"`
-	Containers []container.Container `json:"containers"`
-	Alert      []alert.Load          `json:"alert, omitempty"`
+	Containers []container.Container `json:"containers,omitempty"`
+	Alert      []alert.Load          `json:"alert,omitempty"`
 }
 
 var (
@@ -59,7 +58,6 @@ func initAgent() {
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
 	client = tlsConfig()
-	connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
 }
 
 func Start(c *cli.Context) {
@@ -86,20 +84,20 @@ func Start(c *cli.Context) {
 func connectionMonitor() {
 	for {
 		hostname, _ = os.Hostname()
-		if fingerprint == "" {
+		if fingerprint == "" || config.Management.GpgUser == "" {
 			fingerprint = gpg.GetFingerprint(hostname + "@subutai.io")
-			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
-			continue
-		}
-		resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
-		if err == nil && resp.StatusCode == http.StatusOK {
-			resp.Body.Close()
-			log.Debug("Connection monitor check - success")
+			connect.Connect(config.Agent.GpgUser, config.Management.Secret)
 		} else {
-			log.Debug("Connection monitor check - failed")
-			connect.Connect(config.Management.Host, config.Management.Port, config.Agent.GpgUser, config.Management.Secret)
-			lastHeartbeat = []byte{}
-			go heartbeat()
+			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
+			if err == nil && resp.StatusCode == http.StatusOK {
+				resp.Body.Close()
+				log.Debug("Connection monitor check - success")
+			} else {
+				log.Debug("Connection monitor check - failed")
+				connect.Connect(config.Agent.GpgUser, config.Management.Secret)
+				lastHeartbeat = []byte{}
+				go heartbeat()
+			}
 		}
 
 		time.Sleep(time.Second * 10)
@@ -107,12 +105,11 @@ func connectionMonitor() {
 }
 
 func heartbeat() bool {
-	if time.Since(lastHeartbeatTime) < time.Second*3 {
-		return false
-	}
-	lastHeartbeatTime = time.Now()
 	mutex.Lock()
 	defer mutex.Unlock()
+	if len(lastHeartbeat) > 0 && time.Since(lastHeartbeatTime) < time.Second*5 {
+		return false
+	}
 
 	pool = container.GetActiveContainers(false)
 	beat := Heartbeat{
@@ -128,6 +125,7 @@ func heartbeat() bool {
 	res := Response{Beat: beat}
 	jbeat, _ := json.Marshal(&res)
 
+	lastHeartbeatTime = time.Now()
 	if string(jbeat) == string(lastHeartbeat) {
 		return true
 	}
@@ -154,7 +152,6 @@ func heartbeat() bool {
 func execute(rsp executer.EncRequest) {
 	var req executer.Request
 	var md, contName, pub, keyring, payload string
-	var err error
 
 	if rsp.HostId == fingerprint {
 		md = gpg.DecryptWrapper(rsp.Request)
@@ -172,18 +169,11 @@ func execute(rsp executer.EncRequest) {
 		pub = config.Agent.LxcPrefix + contName + "/public.pub"
 		keyring = config.Agent.LxcPrefix + contName + "/secret.sec"
 		log.Info("Getting public keyring", "keyring", keyring)
-		md = gpg.DecryptNoDefaultKeyring(rsp.Request, keyring, pub)
+		md = gpg.DecryptWrapper(rsp.Request, keyring, pub)
 	}
-	i := strings.Index(md, "{")
-	j := strings.LastIndex(md, "}") + 1
-	if i > j && i > 0 {
-		log.Warn("Error getting JSON request")
+	if log.Check(log.WarnLevel, "Decrypting request", json.Unmarshal([]byte(md), &req.Request)) {
 		return
 	}
-	request := md[i:j]
-
-	err = json.Unmarshal([]byte(request), &req.Request)
-	log.Check(log.WarnLevel, "Decrypting request", err)
 
 	//create channels for stdout and stderr
 	sOut := make(chan executer.ResponseOptions)
@@ -194,26 +184,24 @@ func execute(rsp executer.EncRequest) {
 	}
 
 	for sOut != nil {
-		select {
-		case elem, ok := <-sOut:
-			if ok {
-				resp := executer.Response{ResponseOpts: elem}
-				jsonR, err := json.Marshal(resp)
-				log.Check(log.WarnLevel, "Marshal response", err)
-				if rsp.HostId == fingerprint {
-					payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
-				} else {
-					payload = gpg.EncryptWrapperNoDefaultKeyring(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
-				}
-				message, err := json.Marshal(map[string]string{
-					"hostId":   elem.Id,
-					"response": payload,
-				})
-				log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
-				go response(message)
+		elem, ok := <-sOut
+		if ok {
+			resp := executer.Response{ResponseOpts: elem}
+			jsonR, err := json.Marshal(resp)
+			log.Check(log.WarnLevel, "Marshal response", err)
+			if rsp.HostId == fingerprint {
+				payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
 			} else {
-				sOut = nil
+				payload = gpg.EncryptWrapper(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
 			}
+			message, err := json.Marshal(map[string]string{
+				"hostId":   elem.Id,
+				"response": payload,
+			})
+			log.Check(log.WarnLevel, "Marshal response json "+elem.CommandId, err)
+			go response(message)
+		} else {
+			sOut = nil
 		}
 	}
 	go heartbeat()

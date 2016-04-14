@@ -457,6 +457,7 @@ input[type=checkbox] {
 }
 .b-main-table__mini-icon {
 	width: 20px;
+	/*text-align: center!important;*/
 }
 
 .b-main-table__tags {
@@ -3191,7 +3192,7 @@ td.b-main-table__status-col {
 .b-notification-count {
 	position: absolute;
 	top: 0;
-	right: -2px;
+	left: 12px;
 	border: 1px solid #ccceee;
 	border-radius: 50px;
 	font-size: 10px;
@@ -3258,6 +3259,12 @@ td.b-main-table__status-col {
     z-index: 999;
     box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
 }
+
+.b-hub-status-dropdown {
+	max-height: 500px;
+	position: relative;
+}
+
 .b-hub-status__dropdown:before {
     content: "";
     position: absolute;
@@ -3309,15 +3316,26 @@ td.b-main-table__status-col {
 	color: #04346E;
 }
 
-.b-hub-status__dropdown .list .b-notification__error {
+.b-hub-status__dropdown .list .b-notification__error,
+.b-hub-status__dropdown .list .b-notification__FAILED {
 	border-left: 3px solid #C1272D;
+}
+
+.b-hub-status__dropdown .list .b-notification__SUCCEEDED {
+	border-left: 3px solid rgb(11, 85, 255);
+}
+
+.b-hub-status__dropdown .list .b-notification__RUNNING {
+	border-left: 3px solid #22b573;
 }
 
 .b-hub-status__dropdown .list li:last-child {
     border-bottom: none;
 }
-.b-hub-status__dropdown .list li a {
+.b-hub-status__dropdown .list li a,
+.b-hub-status__dropdown .list li span {
     text-decoration: none;
+	word-wrap: break-word;
 }
 
 .b-hub-status__dropdown .list li .date {
@@ -3599,4 +3617,127 @@ select.b-search-input {
 
 .js-accordion_open {
     height: auto !important;
+}
+
+.b-popup-logs {
+	max-height: 500px;
+	position: relative;
+}
+
+.b-search-field-right {
+	float: right;
+	padding: 5px 0 20px 0;
+}
+
+/* SSH button for Environment containers */
+
+.b-workspace__content.containers-list {
+    padding: 15px 15px 56px;
+}
+
+.ssh-button {
+    width: 110px;
+}
+
+.ssh-key-button_block {
+    float: left;
+    height: 29px;
+}
+
+.ssh-key-button_block .ssh-key-button {
+    width: 13px;
+    height: 13px;
+}
+
+svg.ssh-key-button {
+    margin: 8px 7px 0 0;
+}
+
+.ssh-key-button_title {
+    float: right;
+    height: 29px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.ssh-info_block {
+    height: 30px;
+    float: right;
+}
+
+span.ssh-info-button
+{
+    margin-left: 10px;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 50%;
+    border: 2px solid #cbcbcb;
+    font-weight: bold;
+    color: #cbcbcb;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.ssh-info-button .ssh-plugin-info-tooltip {
+    cursor: default;
+    width: 150px;
+    display:none;
+    height: 80px;
+    position: absolute;
+    margin: 15px 0 0 -75px;
+    border: 1px solid #B8B8B8;
+    background-color: #FFFFFF;
+    border-radius: 8px 8px 5px 5px;
+    padding: 8px;
+    font-weight: normal;
+    color: #3d3d3d;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+.ssh-info-button .ssh-plugin-info-tooltip:after {
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    content: '';
+    width: 0;
+    height: 0;
+    border-bottom: solid 8px #FFFFFF;
+    border-left: solid 8px transparent;
+    border-right: solid 8px transparent;
+}
+
+.ssh-info-button .ssh-plugin-info-tooltip:before
+{
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    content: '';
+    width: 0;
+    height: 0;
+    border-bottom: solid 8px black;
+    border-left: solid 8px transparent;
+    border-right: solid 8px transparent;
+}
+
+.b-btn_blue:disabled {
+    background-color: #a0e0f3;
+    border-color: #a0e0f3;
+    color: #fff;
+}
+.b-btn_blue {
+    background-color: #61cbeb;
+    border-color: #61cbeb;
+    color: #fff;
 }

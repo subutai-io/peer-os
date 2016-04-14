@@ -4,7 +4,6 @@ package io.subutai.core.network.api;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
-import io.subutai.common.protocol.PingDistance;
 import io.subutai.common.protocol.Tunnels;
 
 
@@ -12,19 +11,11 @@ public interface NetworkManager
 {
 
     /**
-     * Sets up an P2P connection on specified host with explicit IP. Usually used to setup new swarm with this peer as
-     * the first member
+     * Sets up an P2P connection on specified host with explicit IP.
      */
-    public void createP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
-                                long secretKeyTtlSec ) throws NetworkManagerException;
+    public void joinP2PSwarm( Host host, String interfaceName, String localIp, String p2pHash, String secretKey,
+                              long secretKeyTtlSec ) throws NetworkManagerException;
 
-    /**
-     * Sets up an P2P connection on specified host with dynamically acquired IP. Usually used to connect peer to
-     * existing swarm
-     */
-    public void joinP2PSwarm( final Host host, final String interfaceName, final String p2pHash, final String secretKey,
-                              final long secretKeyTtlSec )
-            throws NetworkManagerException;
 
     /**
      * Resets a secret key for a given P2P network
@@ -37,8 +28,6 @@ public interface NetworkManager
     public void resetSwarmSecretKey( Host host, String p2pHash, String newSecretKey, long ttlSeconds )
             throws NetworkManagerException;
 
-
-    PingDistance getPingDistance( Host host, String sourceHostIp, String targetHostIp ) throws NetworkManagerException;
 
     /**
      * Returns all p2p connections running on the specified host
@@ -81,6 +70,9 @@ public interface NetworkManager
      */
     public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                String sslCertPath ) throws NetworkManagerException;
+
+    void setVlanDomain( int vLanId, String domain, String host, String sslCertPath )
+            throws NetworkManagerException;
 
     /**
      * Checks if IP is in vlan reverse proxy domain

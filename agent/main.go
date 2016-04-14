@@ -28,7 +28,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = "v4.0.0-RC6" + TIMESTAMP
+	app.Version = "4.0.0-RC8-SNAPSHOT" + TIMESTAMP
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
@@ -105,8 +105,10 @@ func main() {
 		}}, {
 
 		Name: "export", Usage: "export Subutai container",
+		Flags: []cli.Flag{
+			cli.StringFlag{Name: "v", Usage: "template version"}},
 		Action: func(c *cli.Context) {
-			lib.LxcExport(c.Args().Get(0))
+			lib.LxcExport(c.Args().Get(0), c.String("v"))
 		}}, {
 
 		Name: "import", Usage: "import Subutai template",
@@ -121,31 +123,38 @@ func main() {
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "c", Usage: "containers only"},
 			cli.BoolFlag{Name: "t", Usage: "templates only"},
-			cli.BoolFlag{Name: "r", Usage: "registered only"},
-			cli.BoolFlag{Name: "i", Usage: "info ???? only"},
+			cli.BoolFlag{Name: "i", Usage: "detailed container info"},
 			cli.BoolFlag{Name: "a", Usage: "with ancestors"},
-			cli.BoolFlag{Name: "f", Usage: "fancy mode"},
 			cli.BoolFlag{Name: "p", Usage: "with parent"}},
 		Action: func(c *cli.Context) {
-			lib.LxcList(c.Args().Get(0), c.Bool("c"), c.Bool("t"), c.Bool("r"), c.Bool("i"), c.Bool("a"), c.Bool("f"), c.Bool("p"))
+			lib.LxcList(c.Args().Get(0), c.Bool("c"), c.Bool("t"), c.Bool("i"), c.Bool("a"), c.Bool("p"))
 		}}, {
 
 		Name: "management_network", Usage: "configure management network",
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "listtunnel, l", Usage: "-l"},
 			cli.StringFlag{Name: "createtunnel, c", Usage: "-c TUNNELPORTNAME TUNNELIPADDRESS TUNNELTYPE"},
-			cli.StringFlag{Name: "removetunnel, r", Usage: "-r tunnerPortName"},
 
 			cli.BoolFlag{Name: "listvnimap, v", Usage: "-v"},
 			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
-			cli.StringFlag{Name: "reservvni, E", Usage: "-E vni, vlanid, envid"},
-			cli.StringFlag{Name: "removevni, M", Usage: "-M TUNNELPORTNAME VNI VLANID"},
-
-			cli.StringFlag{Name: "deletegateway, D", Usage: "-D VLANID"},
-			cli.StringFlag{Name: "creategateway, T", Usage: "-T VLANIP/SUBNET VLANID"},
-			cli.StringFlag{Name: "vniop, Z", Usage: "-Z [deleteall] | [list]"}},
+		},
 
 		Subcommands: []cli.Command{{
+			Name:  "tunnel",
+			Usage: "tunnels operation",
+			Flags: []cli.Flag{
+				cli.StringFlag{Name: "create", Usage: "create tunnel (tunnel -c)"},
+				cli.StringFlag{Name: "delete", Usage: "delete tunnel (tunnel -d)"},
+				cli.BoolFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
+
+				cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
+				cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
+				cli.StringFlag{Name: "vni", Usage: "vni"},
+			},
+			Action: func(c *cli.Context) {
+				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
+			}}, {
+
 			Name:  "p2p",
 			Usage: "p2p network operation",
 			Flags: []cli.Flag{
@@ -227,9 +236,10 @@ func main() {
 
 		Name: "quota", Usage: "set quotas for Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"}},
+			cli.StringFlag{Name: "s", Usage: "set quota for the specified resource type"},
+			cli.StringFlag{Name: "t", Usage: "set alert threshold"}},
 		Action: func(c *cli.Context) {
-			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"))
+			lib.LxcQuota(c.Args().Get(0), c.Args().Get(1), c.String("s"), c.String("t"))
 		}}, {
 
 		Name: "register", Usage: "register Subutai container",

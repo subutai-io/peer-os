@@ -13,8 +13,14 @@ import io.subutai.common.resource.ContainerResourceType;
 /**
  * Container HDD resource class
  */
-public abstract class ContainerDiskResource extends ContainerResource<ByteValueResource>
+public class ContainerDiskResource extends ContainerResource<ByteValueResource>
 {
+    public ContainerDiskResource( final ByteValueResource value )
+    {
+        super( ContainerResourceType.ROOTFS, value );
+    }
+
+
     public ContainerDiskResource( final ContainerResourceType type, final ByteValueResource value )
     {
         super( type, value );
@@ -42,6 +48,7 @@ public abstract class ContainerDiskResource extends ContainerResource<ByteValueR
     {
         return String.format( "%s%s", resource.convert( ByteUnit.GB ), ByteUnit.GB.getAcronym() );
     }
+
 
     @JsonIgnore
     public double doubleValue( ByteUnit unit )

@@ -98,8 +98,8 @@ func SetApt(name string) {
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/apt/sources.list", repo, 0644))
 
 	// kurjun := []byte("deb [arch=amd64,all] http://" + config.Management.Host + ":8330/rest/kurjun/vapt trusty main contrib\n" +
-	// 	"deb [arch=amd64,all] http://" + config.Management.Cdn + ":8330/kurjun/rest/deb trusty main contrib\n")
-	kurjun := []byte("deb [arch=amd64,all] http://" + config.Management.Cdn + ":8330/kurjun/rest/deb trusty main contrib\n")
+	// 	"deb [arch=amd64,all] http://" + config.Cdn.Url + ":8330/kurjun/rest/deb trusty main contrib\n")
+	kurjun := []byte("deb [arch=amd64,all] http://" + config.Cdn.Url + ":8080/kurjun/rest/deb trusty main contrib\n")
 	log.Check(log.DebugLevel, "Writing apt source kurjun list",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/apt/sources.list.d/subutai-repo.list", kurjun, 0644))
 }
@@ -124,9 +124,8 @@ func Start(name string) {
 		log.Check(log.WarnLevel, "Creating .start file to "+name, err)
 		defer f.Close()
 	}
-	// err = c.Start()
-	// log.Check(log.FatalLevel, "Starting container "+name, err)
 }
+
 func Stop(name string) {
 	c, err := lxc.NewContainer(name, config.Agent.LxcPrefix)
 	log.Check(log.FatalLevel, "Looking for container "+name, err)

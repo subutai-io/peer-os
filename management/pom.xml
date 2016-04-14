@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.0-RC7-SNAPSHOT</version>
+  <version>4.0.0-RC8-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -33,6 +33,10 @@
 
   <developers>
     <developer>
+      <id>daliev</id>
+      <name>Dilshat Aliev</name>
+    </developer>
+    <developer>
       <id>akarasulu</id>
       <name>Alex Karasulu</name>
     </developer>
@@ -53,11 +57,28 @@
     <tag>HEAD</tag>
   </scm>
 
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
   <repositories>
 
     <repository>
       <id>MavenCentral</id>
       <name>Maven repository</name>
+      <url>http://central.maven.org/maven2/</url>
+    </repository>
+
+    <repository>
+      <id>MavenCentral2</id>
+      <name>Maven repository 2</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
 
@@ -128,10 +149,16 @@
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- blueprint-authz -->
 
+      <!--<dependency>-->
+        <!--<groupId>org.apache.aries.blueprint</groupId>-->
+        <!--<artifactId>org.apache.aries.blueprint.authz</artifactId>-->
+        <!--<version>1.0.1-CUSTOM</version>-->
+      <!--</dependency>-->
+
       <dependency>
-        <groupId>org.apache.aries.blueprint</groupId>
-        <artifactId>org.apache.aries.blueprint.authz</artifactId>
-        <version>1.0.1-CUSTOM</version>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>blueprint-auth</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <!-- subutai-common -->
@@ -189,27 +216,32 @@
         <artifactId>object-relation-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>object-relation-manager-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!--Node Registration-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-api</artifactId>
+        <artifactId>host-registration-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-impl</artifactId>
+        <artifactId>host-registration-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-cli</artifactId>
+        <artifactId>host-registration-cli</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>node-registration-rest</artifactId>
+        <artifactId>host-registration-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
 

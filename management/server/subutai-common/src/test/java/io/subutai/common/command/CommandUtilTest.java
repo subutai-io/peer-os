@@ -34,6 +34,7 @@ public class CommandUtilTest
     @Mock
     Response response;
 
+
     @Before
     public void setUp() throws Exception
     {
@@ -84,13 +85,5 @@ public class CommandUtilTest
         when( host.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
 
         commandUtil.executeSequential( requestBuilder, mySet );
-    }
-
-
-    @Test
-    public void testExecuteParallel() throws Exception
-    {
-        when( host.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
-        commandUtil.executeParallel( requestBuilder, mySet );
     }
 }

@@ -97,7 +97,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				vm.notRegistered = false;*/
 				BazaarSrv.getHubPlugins().success (function (data) {
 					vm.plugins = data.productsDto;
-					console.log (data);
 					if (vm.plugins === undefined || vm.plugins === "") {
 						vm.plugins = [];
 					}
@@ -106,10 +105,8 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					}
 					BazaarSrv.getInstalledHubPlugins().success (function (data) {
 						vm.installedHubPlugins = data;
-						console.log (vm.installedHubPlugins);
 						BazaarSrv.getRefOldPlugins().success(function(data) {
 							vm.refOldPlugins = data;
-							console.log (vm.refOldPlugins);
 							for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 								for (var j = 0; j < vm.refOldPlugins.length; ++j) {
 									if (vm.refOldPlugins[j].name === vm.installedHubPlugins[i].name) {
@@ -187,8 +184,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 	}
 //	getHubPlugins();
 	vm.plugins = JSON.parse (localStorage.getItem ("bazaarProducts"));
-	console.log (bazaarUpdate);
-	console.log (vm.plugins);
 	if (bazaarUpdate === true || vm.plugins === null) {
 		getHubPlugins();
 	}
@@ -196,10 +191,8 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 		LOADING_SCREEN();
 		BazaarSrv.getInstalledHubPlugins().success (function (data) {
 			vm.installedHubPlugins = data;
-			console.log (vm.installedHubPlugins);
 			BazaarSrv.getRefOldPlugins().success(function(data) {
 				vm.refOldPlugins = data;
-				console.log (vm.refOldPlugins);
 				for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 					for (var j = 0; j < vm.refOldPlugins.length; ++j) {
 						if (vm.refOldPlugins[j].name === vm.installedHubPlugins[i].name) {

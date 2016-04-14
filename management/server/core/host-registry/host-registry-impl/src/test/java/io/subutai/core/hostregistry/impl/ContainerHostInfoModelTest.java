@@ -7,14 +7,14 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.Maps;
+
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.host.ContainerHostInfo;
-
-import com.google.common.collect.Maps;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -73,7 +73,7 @@ public class ContainerHostInfoModelTest
 
         assertThat( toString, containsString( HOSTNAME ) );
         assertThat( toString, containsString( IP ) );
-        assertThat( toString, containsString( ID.toString() ) );
+        assertThat( toString, containsString( ID ) );
         assertThat( toString, containsString( CONTAINER_STATUS.name() ) );
         assertThat( toString, containsString( ARCH.name() ) );
     }

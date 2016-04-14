@@ -8,13 +8,12 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.security.relation.RelationLink;
 
 
 /**
  * Container host interface.
  */
-public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
+public interface ContainerHost extends Host, ContainerHostInfo
 {
     ContainerSize getContainerSize();
 
@@ -25,8 +24,6 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
     String getOwnerId();
 
     EnvironmentId getEnvironmentId();
-
-    String getNodeGroupName();
 
     void dispose() throws PeerException;
 
@@ -77,7 +74,6 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
      *
      * @return quota value
      */
-    ContainerQuota getAvailableQuota() throws PeerException;
 
     /**
      * Returns current quota values
@@ -91,7 +87,5 @@ public interface ContainerHost extends Host, ContainerHostInfo, RelationLink
      */
     void setQuota( ContainerQuota containerQuota ) throws PeerException;
 
-    public HostId getResourceHostId() throws PeerException;
-
-    public String getContainerName();
+    public HostId getResourceHostId();
 }

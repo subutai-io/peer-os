@@ -9,11 +9,16 @@ function trackerSrv($http) {
 	var BASE_URL = SERVER_URL + 'rest/ui/tracker/';
 	var OPERATIONS_URL = BASE_URL + 'operations/';
 	var SOURCES_URL = OPERATIONS_URL + 'sources';
+	var NOTIFICATIONS_URL = BASE_URL + 'notifications';
 
 	var trackerSrv = {
 		getModules: getModules,
 		getOperations: getOperations,
 		getOperation: getOperation,
+
+		getNotifications: getNotifications,
+		deleteNotification: deleteNotification,
+		deleteAllNotifications: deleteAllNotifications,
 
 		getBaseUrl : function() { return BASE_URL; }
 	};
@@ -33,5 +38,17 @@ function trackerSrv($http) {
 		var $url = OPERATIONS_URL + module + '/' + id;
 		return $http.get($url, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}	
+
+	function getNotifications() {
+		return $http.get(NOTIFICATIONS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function deleteNotification(source, uuid) {
+		return $http.delete(NOTIFICATIONS_URL + source + '/' + uuid);
+	}
+
+	function deleteAllNotifications() {
+		return $http.delete(NOTIFICATIONS_URL);
+	}
 
 }

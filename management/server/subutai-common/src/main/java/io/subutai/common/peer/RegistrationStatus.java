@@ -6,5 +6,5 @@ package io.subutai.common.peer;
  */
 public enum RegistrationStatus
 {
-    REQUESTED, CANCELLED, APPROVED, REJECTED, WAIT, UNREGISTERED;
+    REQUESTED, CANCELLED, APPROVED, REJECTED, WAIT, UNREGISTERED
 }

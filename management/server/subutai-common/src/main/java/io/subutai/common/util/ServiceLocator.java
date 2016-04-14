@@ -28,10 +28,8 @@ public class ServiceLocator
      * @param clazz Service Interface class to look up for
      *
      * @return service reference
-     *
-     * @throws NamingException thrown if service is not found
      */
-    public static <T> T getServiceNoCache( Class<T> clazz ) throws NamingException
+    public static <T> T getServiceNoCache( Class<T> clazz )
     {
         Preconditions.checkNotNull( clazz, "Class is null" );
 
@@ -76,11 +74,9 @@ public class ServiceLocator
      * @param clazz - Service Interface class to look up for
      *
      * @return - service reference
-     *
-     * @throws NamingException - thrown if service is not found
      */
 
-    public <T> T getService( Class<T> clazz ) throws NamingException
+    public <T> T getService( Class<T> clazz )
     {
         return getServiceNoCache( clazz );
     }

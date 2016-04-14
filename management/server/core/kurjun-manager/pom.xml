@@ -5,11 +5,10 @@
   <parent>
     <artifactId>mgmt-server-core-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC7-SNAPSHOT</version>
+    <version>4.0.0-RC8-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.subutai</groupId>
   <artifactId>kurjun-manager</artifactId>
   <description>Subutai Kurjun Manager Parent</description>
   <packaging>pom</packaging>

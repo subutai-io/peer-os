@@ -61,4 +61,10 @@ public class TemplateAccess implements RelationLink
         return PermissionObject.TemplateManagement.getName();
     }
 
+
+    @Override
+    public String getKeyId()
+    {
+        return templateId.getOwnerFprint();
+    }
 }

@@ -8,15 +8,16 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.common.collect.Maps;
+
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ResourceHostInfo;
-
-import com.google.common.collect.Maps;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -100,11 +101,11 @@ public class ResourceHostInfoModelTest
 
         assertThat( toString, containsString( HOST_HOSTNAME ) );
         assertThat( toString, containsString( HOST_IP ) );
-        assertThat( toString, containsString( HOST_ID.toString() ) );
+        assertThat( toString, containsString( HOST_ID ) );
         assertThat( toString, containsString( HOST_MAC_ADDRESS ) );
         assertThat( toString, containsString( CONTAINER_HOSTNAME ) );
         assertThat( toString, containsString( CONTAINER_IP ) );
-        assertThat( toString, containsString( CONTAINER_ID.toString() ) );
+        assertThat( toString, containsString( CONTAINER_ID ) );
         assertThat( toString, containsString( CONTAINER_STATUS.name() ) );
         assertThat( toString, containsString( ARCH.name() ) );
     }

@@ -1,9 +1,6 @@
 package io.subutai.core.security.impl.model;
 
 
-import io.subutai.core.security.api.crypto.EncryptionTool;
-
-
 /**
  * KeyRing Data for ManagementHost
  */

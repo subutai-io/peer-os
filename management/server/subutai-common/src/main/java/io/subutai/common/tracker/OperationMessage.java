@@ -5,7 +5,7 @@ public class OperationMessage
 {
     public enum Type
     {
-        SUCCEEDED, FAILED;
+        SUCCEEDED, FAILED
     }
 
 
@@ -43,11 +43,7 @@ public class OperationMessage
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer( "OperationMessage{" );
-        sb.append( "value='" ).append( value ).append( '\'' );
-        sb.append( ", description='" ).append( description ).append( '\'' );
-        sb.append( ", type=" ).append( type );
-        sb.append( '}' );
-        return sb.toString();
+        return "OperationMessage{" + "value='" + value + '\'' + ", description='" + description + '\'' + ", type="
+                + type + '}';
     }
 }

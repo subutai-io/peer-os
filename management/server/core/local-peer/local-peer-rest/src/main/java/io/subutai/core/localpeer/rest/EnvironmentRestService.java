@@ -20,30 +20,29 @@ import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
-
-//TODO make all methods consistent about parameters
 
 
 public interface EnvironmentRestService
 {
-    @GET
+    @POST
     @Path( "{environmentId}/container/{id}/start" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     void startContainer( @PathParam( "id" ) ContainerId containerId );
 
     @POST
-    @Path( "{environmentId}/container/stop" )
+    @Path( "{environmentId}/container/{id}/stop" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    void stopContainer( ContainerId containerId );
+    void stopContainer( @PathParam( "id" ) ContainerId containerId );
 
     @POST
-    @Path( "{environmentId}/container/destroy" )
+    @Path( "{environmentId}/container/{id}/destroy" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
-    void destroyContainer( ContainerId containerId );
+    void destroyContainer( @PathParam( "id" ) ContainerId containerId );
 
 
     @GET
@@ -84,12 +83,6 @@ public interface EnvironmentRestService
     Response setQuota( @PathParam( "containerId" ) ContainerId containerId, ContainerQuota containerQuota );
 
     @GET
-    @Path( "{environmentId}/container/{containerId}/quota/available" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getAvailableQuota( @PathParam( "containerId" ) ContainerId containerId );
-
-    @GET
     @Path( "{environmentId}/container/{containerId}/rhId" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
@@ -107,8 +100,22 @@ public interface EnvironmentRestService
     SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
 
     @POST
+    @Path( "{environmentId}/containers/sshkey/add" )
+    void addSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId, String sshPublicKey );
+
+    @POST
+    @Path( "{environmentId}/containers/sshkey/remove" )
+    void removeSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId, String sshPublicKey );
+
+    @POST
     @Path( "{environmentId}/containers/hosts" )
     @Consumes( MediaType.APPLICATION_JSON )
     Response configureHostsInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
                                           HostAddresses hostAddresses );
+
+    @POST
+    @Path( "{environmentId}/container/{containerId}/reverseProxy" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response addReverseProxy( ReverseProxyConfig reverseProxyConfig );
 }

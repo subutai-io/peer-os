@@ -30,9 +30,9 @@ public interface Kurjun
 
     public void setAuthID( final String authID );
 
-    public String getSignedMessage();
+    public byte[] getSignedMessage();
 
-    public void setSignedMessage( final String signedMessage );
+    public void setSignedMessage( final byte[] signedMessage );
 
     public String getToken();
 

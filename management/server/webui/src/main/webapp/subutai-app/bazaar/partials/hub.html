@@ -1,4 +1,11 @@
+
+<div class="b-search-field-right">
+	<input type="text" class="b-search-input" ng-model="searchPlugin.name" id="js-search">
+</div>
+<div class="clear"></div>
+
 <div class="b-main-table-border">
+
 	<table class="b-main-table b-main-table_with-header">
 		<tr>
 			<th></th>
@@ -10,10 +17,10 @@
 		<td colspan="6" class="b-main-table__empty-item" ng-show="bazaarCtrl.plugins.length ===0">
 			No data available in table
 		</td>
-		<tr ng-repeat="plugin in bazaarCtrl.plugins" id = "{{ plugin.id }}">
+		<tr ng-repeat="plugin in bazaarCtrl.plugins | filter:searchPlugin" id = "{{ plugin.id }}">
 			<td>
 				<img src = "{{ plugin.img }}" 
-					style = "height: 60px; width: 60px" 
+					style = "width: 60px" 
 					ng-show = "plugin.metadata.length !== 0 && plugin.name !== 'Big data' && plugin.name !== 'Plugin-common'"/>
 			</td>
 			<td>{{ plugin.name }}</td>

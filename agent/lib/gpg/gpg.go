@@ -4,21 +4,32 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/log"
 )
 
-//import PK gpg2 --import pubkey.key
-func ImportPk(file string) string {
-	command := exec.Command("/bin/bash", "-c", "gpg --import "+file)
+const (
+	tmpfile = "epub.key"
+)
+
+//ImportPk import PK gpg2 --import pubkey.key
+func ImportPk(k string) string {
+	err := ioutil.WriteFile(tmpfile, []byte(k), 0644)
+	log.Check(log.WarnLevel, "Writing Pubkey to temp file", err)
+
+	command := exec.Command("gpg", "--import", tmpfile)
 	out, err := command.CombinedOutput()
 	log.Check(log.WarnLevel, "Importing MH public key", err)
+
+	os.Remove(tmpfile)
 	return string(out)
 }
 
@@ -33,44 +44,37 @@ func GetPk(name string) string {
 	stdout, err := exec.Command("/bin/bash", "-c", "gpg --export -a "+name).Output()
 	log.Check(log.WarnLevel, "Getting public key", err)
 	if len(stdout) == 0 {
-		GenerateGPGKeys(name)
+		log.Warn("GPG key for RH not found. Creating new.")
+		GenerateKey(name)
 	}
 	return string(stdout)
 }
 
-func DecryptNoDefaultKeyring(message, keyring, pub string) string {
-	gpg_d := "gpg --passphrase " + config.Agent.GpgPassword + " --no-tty --no-default-keyring --keyring " + pub + " --secret-keyring " + keyring
-	command := exec.Command("/bin/bash", "-c", gpg_d)
-
+func DecryptWrapper(args ...string) string {
+	gpg := "gpg --passphrase " + config.Agent.GpgPassword + " --no-tty"
+	if len(args) == 3 {
+		gpg = gpg + " --no-default-keyring --keyring " + args[2] + " --secret-keyring " + args[1]
+	}
+	command := exec.Command("/bin/bash", "-c", gpg)
 	stdin, err := command.StdinPipe()
 	log.Check(log.WarnLevel, "Opening Stdin Pipe", err)
-	stdin.Write([]byte(message))
+	stdin.Write([]byte(args[0]))
 	stdin.Close()
 
 	output, err := command.Output()
-	log.Check(log.WarnLevel, "Executing command "+gpg_d, err)
+	log.Check(log.WarnLevel, "Executing command "+gpg, err)
 
 	return string(output)
 }
 
-func DecryptWrapper(message string) string {
-	command := exec.Command("/bin/bash", "-c", "gpg --passphrase "+config.Agent.GpgPassword+" --no-tty")
-
-	stdin, err := command.StdinPipe()
-	stdin.Write([]byte(message))
-	stdin.Close()
-
-	output, err := command.Output()
-	log.Check(log.WarnLevel, "Decrypting message ", err)
-
-	return string(output)
-}
-
-func EncryptWrapper(user string, recipient string, message string) string {
-	gpg_C := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --armor -u " + user + " -r " + recipient + " --sign --encrypt --no-tty"
-	command := exec.Command("/bin/bash", "-c", gpg_C)
+func EncryptWrapper(args ...string) string {
+	gpg := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always --armor -u " + args[0] + " -r " + args[1] + " --sign --encrypt --no-tty"
+	if len(args) == 5 {
+		gpg = gpg + " --no-default-keyring --keyring " + args[3] + " --secret-keyring " + args[4]
+	}
+	command := exec.Command("/bin/bash", "-c", gpg)
 	stdin, _ := command.StdinPipe()
-	stdin.Write([]byte(message))
+	stdin.Write([]byte(args[2]))
 	stdin.Close()
 
 	output, err := command.Output()
@@ -80,63 +84,60 @@ func EncryptWrapper(user string, recipient string, message string) string {
 
 	return string(output)
 }
-func EncryptWrapperNoDefaultKeyring(user, recipient, message, pub, sec string) string {
-	gpg_C := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always  --no-default-keyring --keyring " + pub + " --secret-keyring " + sec + " --armor -u " + user + "@subutai.io -r " + recipient + " --sign --encrypt --no-tty"
-	command := exec.Command("/bin/bash", "-c", gpg_C)
-	stdin, _ := command.StdinPipe()
-	stdin.Write([]byte(message))
-	stdin.Close()
 
-	output, err := command.Output()
-	log.Check(log.WarnLevel, "Encrypting message", err)
-	return string(output)
-}
-
-func ImportMHKeyNoDefaultKeyring(cont string) {
-	pub := config.Agent.LxcPrefix + cont + "/public.pub"
-	gpg_C := "gpg --no-default-keyring --keyring " + pub + " --import epub.key"
-	command := exec.Command("/bin/bash", "-c", gpg_C)
-	status, err := command.CombinedOutput()
-	log.Check(log.WarnLevel, "Importing Management Host Key "+string(status), err)
-}
-
-func GenerateGPGKeys(email string) {
-	os.MkdirAll("/root/.gnupg/", 0700)
-	conf, _ := os.Create("/root/.gnupg/defaults")
+func GenerateKey(name string) {
+	path := config.Agent.LxcPrefix + name
+	email := name + "@subutai.io"
+	pass := "12345678"
+	if !container.IsContainer(name) {
+		os.MkdirAll("/root/.gnupg/", 0700)
+		path = "/root/.gnupg"
+		email = name
+		pass = config.Agent.GpgPassword
+	}
+	// err := ioutil.WriteFile(config.Agent.LxcPrefix+c+"/defaults", ident, 0644)
+	conf, err := os.Create(path + "/defaults")
 	defer conf.Close()
 	conf.WriteString("%echo Generating default keys\n")
 	conf.WriteString("Key-Type: RSA\n")
 	conf.WriteString("Key-Length: 2048\n")
-	conf.WriteString("Name-Real: Subutai Host\n")
-	conf.WriteString("Name-Comment: Subutai Host GPG key\n")
+	conf.WriteString("Name-Real: " + name + "\n")
+	conf.WriteString("Name-Comment: " + name + " GPG key\n")
 	conf.WriteString("Name-Email: " + email + "\n")
 	conf.WriteString("Expire-Date: 0\n")
-	conf.WriteString("Passphrase: " + config.Agent.GpgPassword + "\n")
-	conf.WriteString("%pubring /root/.gnupg/public.pub\n")
-	conf.WriteString("%secring /root/.gnupg/secret.sec\n")
+	conf.WriteString("Passphrase: " + pass + "\n")
+	conf.WriteString("%pubring " + path + "/public.pub\n")
+	conf.WriteString("%secring " + path + "/secret.sec\n")
 	conf.WriteString("%commit\n")
 	conf.WriteString("%echo Done\n")
 
-	// exec.Command("rngd", "-f", "-r", "/dev/urandom").Run()
-	exec.Command("gpg", "--batch", "--gen-key", "/root/.gnupg/defaults").Run()
-	exec.Command("gpg", "--allow-secret-key-import", "--import", "/root/.gnupg/secret.sec").Run()
-	exec.Command("gpg", "--import", "/root/.gnupg/public.pub").Run()
+	log.Check(log.FatalLevel, "Writing default key ident", err)
+
+	log.Check(log.FatalLevel, "Generating key",
+		exec.Command("gpg", "--batch", "--gen-key", path+"/defaults").Run())
+	if !container.IsContainer(name) {
+		log.Check(log.FatalLevel, "Importing secret key",
+			exec.Command("gpg", "--allow-secret-key-import", "--import", "/root/.gnupg/secret.sec").Run())
+		log.Check(log.FatalLevel, "Importing public key",
+			exec.Command("gpg", "--import", "/root/.gnupg/public.pub").Run())
+	}
 }
 
-func GetFingerprint(email string) (fingerprint string) {
+func GetFingerprint(email string) string {
 	var out []byte
+	var err error
 	if email == config.Agent.GpgUser {
-		out, _ = exec.Command("gpg", "--fingerprint", email).Output()
+		out, err = exec.Command("gpg", "--fingerprint", email).Output()
 	} else {
-		out, _ = exec.Command("gpg", "--fingerprint", "--keyring", config.Agent.LxcPrefix+email+"/public.pub", email).Output()
+		out, err = exec.Command("gpg", "--fingerprint", "--keyring", config.Agent.LxcPrefix+email+"/public.pub", email).Output()
 	}
+	log.Check(log.WarnLevel, "Getting fingerptring for "+email, err)
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), "fingerprint") {
 			fp := strings.Split(scanner.Text(), "=")
 			if len(fp) > 1 {
-				fingerprint = strings.Replace(fp[1], " ", "", -1)
-				return fingerprint
+				return strings.Replace(fp[1], " ", "", -1)
 			}
 		}
 	}
@@ -160,29 +161,6 @@ func GetToken() string {
 	}
 
 	return string(token)
-}
-
-func GenerateKey(c string) {
-	// err := ioutil.WriteFile(config.Agent.LxcPrefix+c+"/defaults", ident, 0644)
-	conf, err := os.Create(config.Agent.LxcPrefix + c + "/defaults")
-	defer conf.Close()
-	conf.WriteString("%echo Generating default keys\n")
-	conf.WriteString("Key-Type: RSA\n")
-	conf.WriteString("Key-Length: 2048\n")
-	conf.WriteString("Name-Real: " + c + "\n")
-	conf.WriteString("Name-Comment: " + c + " GPG key\n")
-	conf.WriteString("Name-Email: " + c + "@subutai.io\n")
-	conf.WriteString("Expire-Date: 0\n")
-	conf.WriteString("Passphrase: 12345678\n")
-	conf.WriteString("%pubring " + config.Agent.LxcPrefix + c + "/public.pub\n")
-	conf.WriteString("%secring " + config.Agent.LxcPrefix + c + "/secret.sec\n")
-	conf.WriteString("%commit\n")
-	conf.WriteString("%echo Done\n")
-
-	log.Check(log.FatalLevel, "Writing default key ident", err)
-
-	err = exec.Command("gpg", "--batch", "--gen-key", config.Agent.LxcPrefix+c+"/defaults").Run()
-	log.Check(log.FatalLevel, "Generating key", err)
 }
 
 func getMngKey(c string) {

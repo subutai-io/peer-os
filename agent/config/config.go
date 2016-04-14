@@ -29,41 +29,36 @@ type managementConfig struct {
 	Port          string
 	Login         string
 	Secret        string
-	Kurjun        string
 	GpgUser       string
-	Version       string
 	Password      string
 	RestToken     string
 	RestVerify    string
 	RestPublicKey string
 }
-type brokerConfig struct {
-	Url               string
-	Port              string
-	Password          string
-	ResponseTopic     string
-	ExecuteTimeout    string
-	BroadcastTopic    string
-	HeartbeatTopic    string
-	ExecuteResponce   string
-	ExecuteTerminated string
-}
+
 type influxdbConfig struct {
 	Server string
 	Db     string
 	User   string
 	Pass   string
 }
+type cdnConfig struct {
+	Allowinsecure bool
+	Url           string
+	Sslport       string
+	Kurjun        string
+}
 type templateConfig struct {
+	Branch  string
 	Version string
 	Arch    string
 }
 type configFile struct {
 	Agent      agentConfig
 	Management managementConfig
-	Broker     brokerConfig
-	Template   templateConfig
 	Influxdb   influxdbConfig
+	Cdn        cdnConfig
+	Template   templateConfig
 }
 
 const defaultConfig = `
@@ -76,7 +71,6 @@ const defaultConfig = `
 	lxcPrefix = /mnt/lib/lxc/
 
 	[management]
-	version = stable
 	gpgUser =
 	port = 8443
 	host = 10.10.10.1
@@ -86,18 +80,11 @@ const defaultConfig = `
 	restToken = /rest/v1/identity/gettoken
 	restPublicKey = /rest/v1/registration/public-key
 	restVerify = /rest/v1/registration/verify/container-token
-    cdn = cdn.subut.ai
 
-	[broker]
-	port = 8883
-	password = client
-	url = ssl://10.10.10.1
-	responseTopic = RESPONSE_TOPIC
-	executeTimeout = EXECUTE_TIMEOUT
-	BroadcastTopic = BROADCAST_TOPIC
-	heartbeatTopic = HEARTBEAT_TOPIC
-	executeResponce = EXECUTE_RESPONSE
-	executeTerminated = EXECUTE_TERMINATED
+    [cdn]
+    url = cdn.subut.ai
+    sslport = 8338
+    allowinsecure = false
 
 	[influxdb]
 	server = 10.10.10.1
@@ -107,6 +94,7 @@ const defaultConfig = `
 
 	[template]
 	version = 4.0.0
+	branch = stable
 	arch = amd64
 `
 
@@ -116,10 +104,10 @@ var (
 	Agent agentConfig
 	// Management describes configuration options that used for accessing Subutai Management server
 	Management managementConfig
-	// Broker describes configuration options that used for interaction with MQTT broker
-	Broker brokerConfig
 	// Influxdb describes configuration options for InluxDB server
 	Influxdb influxdbConfig
+	// CDN url and port
+	Cdn cdnConfig
 	// Template describes template configuration options
 	Template templateConfig
 )
@@ -145,10 +133,10 @@ func init() {
 	config.Agent.GpgUser = name + "@subutai.io"
 
 	Agent = config.Agent
-	Broker = config.Broker
 	Influxdb = config.Influxdb
 	Template = config.Template
 	Management = config.Management
+	Cdn = config.Cdn
 }
 
 func InitAgentDebug() {
@@ -158,14 +146,16 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() (client *http.Client) {
-	_, err := net.DialTimeout("tcp", Management.Host+":8338", time.Duration(3)*time.Second)
-	if !log.Check(log.InfoLevel, "Trying local Kurjun", err) {
-		Management.Kurjun = "https://" + Management.Host + ":8338/rest/kurjun"
-		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-		client = &http.Client{Transport: tr}
+	_, err := net.DialTimeout("tcp", Management.Host+":"+Cdn.Sslport, time.Duration(2)*time.Second)
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client = &http.Client{Transport: tr}
+	if !log.Check(log.InfoLevel, "Trying local repo", err) {
+		Cdn.Kurjun = "https://" + Management.Host + ":" + Cdn.Sslport + "/rest/kurjun"
 	} else {
-		Management.Kurjun = "https://" + Management.Cdn + ":8338/kurjun/rest"
-		client = &http.Client{}
+		Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
+		if !Cdn.Allowinsecure {
+			client = &http.Client{}
+		}
 	}
 	return
 }

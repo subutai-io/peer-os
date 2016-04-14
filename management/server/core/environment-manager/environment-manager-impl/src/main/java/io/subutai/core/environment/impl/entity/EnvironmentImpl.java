@@ -22,7 +22,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
 
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -86,10 +85,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "environmentId" )
     protected String environmentId;
 
-    @Version
-    @JsonIgnore
-    private Long version;
-
     @Column( name = "peer_id", nullable = false )
     @JsonProperty( "peerId" )
     private String peerId;
@@ -106,18 +101,17 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "subnet" )
     private String subnetCidr;
 
-    @Column( name = "last_used_ip_idx" )
-    @JsonIgnore
-    private int lastUsedIpIndex;
-
     @Column( name = "vni" )
     @JsonIgnore
     private Long vni;
 
-
     @Column( name = "p2p_subnet" )
     @JsonIgnore
     private String p2pSubnet;
+
+    @Column( name = "p2p_key" )
+    @JsonIgnore
+    private String p2pKey;
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = EnvironmentContainerImpl.class,
             cascade = CascadeType.ALL, orphanRemoval = true )
@@ -125,7 +119,7 @@ public class EnvironmentImpl implements Environment, Serializable
     private Set<EnvironmentContainerHost> containers = Sets.newHashSet();
 
     @OneToMany( mappedBy = "environment", fetch = FetchType.EAGER, targetEntity = PeerConfImpl.class,
-            cascade = CascadeType.ALL, orphanRemoval = false )
+            cascade = CascadeType.ALL, orphanRemoval = true )
     @JsonIgnore
     private Set<PeerConf> peerConfs = Sets.newHashSet();
 
@@ -181,7 +175,6 @@ public class EnvironmentImpl implements Environment, Serializable
         this.environmentId = UUID.randomUUID().toString();
         this.creationTimestamp = System.currentTimeMillis();
         this.status = EnvironmentStatus.EMPTY;
-        this.lastUsedIpIndex = 0;//0 is reserved for gateway
         this.userId = userId;
         this.peerId = peerId;
     }
@@ -311,18 +304,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public Long getVersion()
-    {
-        return version;
-    }
-
-
-    public void setVersion( final Long version )
-    {
-        this.version = version;
-    }
-
-
     @Override
     public EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException
     {
@@ -405,13 +386,11 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Set<EnvironmentContainerHost> containerHosts;
 
-        if ( containers == null )
+        synchronized ( this.containers )
         {
-            containerHosts = Sets.newHashSet();
-        }
-        else
-        {
-            containerHosts = Sets.newConcurrentHashSet( containers );
+            containerHosts =
+                    CollectionUtil.isCollectionEmpty( this.containers ) ? Sets.<EnvironmentContainerHost>newHashSet() :
+                    Sets.newConcurrentHashSet( this.containers );
         }
 
         if ( !CollectionUtil.isCollectionEmpty( containerHosts ) && environmentManager != null )
@@ -438,6 +417,11 @@ public class EnvironmentImpl implements Environment, Serializable
                     }
                 }
             }
+        }
+
+        for ( EnvironmentContainerHost environmentContainerHost : containerHosts )
+        {
+            environmentContainerHost.setEnvironment( this );
         }
 
         return containerHosts;
@@ -487,7 +471,10 @@ public class EnvironmentImpl implements Environment, Serializable
     {
         Preconditions.checkNotNull( container );
 
-        containers.remove( container );
+        synchronized ( this.containers )
+        {
+            this.containers.remove( container );
+        }
     }
 
 
@@ -583,18 +570,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    public int getLastUsedIpIndex()
-    {
-        return lastUsedIpIndex;
-    }
-
-
-    public void setLastUsedIpIndex( int lastUsedIpIndex )
-    {
-        this.lastUsedIpIndex = lastUsedIpIndex;
-    }
-
-
     @Override
     public String getP2pSubnet()
     {
@@ -614,7 +589,7 @@ public class EnvironmentImpl implements Environment, Serializable
         P2pIps result = new P2pIps();
         for ( PeerConf peerConf : getPeerConfs() )
         {
-            result.addP2pIps( peerConf.getP2pIps() );
+            result.addP2pIps( peerConf.getRhP2pIps() );
         }
         return result;
     }
@@ -640,6 +615,18 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getP2PHash()
     {
         return P2PUtil.generateHash( environmentId );
+    }
+
+
+    public String getP2pKey()
+    {
+        return p2pKey;
+    }
+
+
+    public void setP2pKey( final String p2pKey )
+    {
+        this.p2pKey = p2pKey;
     }
 
 
@@ -690,12 +677,11 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public String toString()
     {
-        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", version=" + version + ", peerId='"
-                + peerId + '\'' + ", name='" + name + '\'' + ", creationTimestamp=" + creationTimestamp
-                + ", subnetCidr='" + subnetCidr + '\'' + ", lastUsedIpIndex=" + lastUsedIpIndex + ", vni=" + vni
-                + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers + ", peerConfs=" + peerConfs
-                + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId=" + userId + ", alertHandlers="
-                + alertHandlers + ", envId=" + envId + '}';
+        return "EnvironmentImpl{" + "environmentId='" + environmentId + '\'' + ", peerId='" + peerId + '\'' + ", name='"
+                + name + '\'' + ", creationTimestamp=" + creationTimestamp + ", subnetCidr='" + subnetCidr + '\''
+                + ", vni=" + vni + ", tunnelNetwork='" + p2pSubnet + '\'' + ", containers=" + containers
+                + ", peerConfs=" + peerConfs + ", status=" + status + ", sshKeys='" + sshKeys + '\'' + ", userId="
+                + userId + ", alertHandlers=" + alertHandlers + ", envId=" + envId + '}';
     }
 
 
@@ -724,5 +710,12 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getContext()
     {
         return PermissionObject.EnvironmentManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getEnvironmentId().getId();
     }
 }

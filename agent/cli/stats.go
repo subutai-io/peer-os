@@ -176,7 +176,7 @@ func diskLoad(h string) (disktotal, diskused interface{}) {
 }
 
 func cpuQuotaUsage(h string) int {
-	cpuCurLoad, err := queryDB("SELECT non_negative_derivative(mean(value), 1s) FROM lxc_cpu WHERE time > now() - 1m and lxc =~ /^" + h + "$/ GROUP BY time(10s), type fill(none)")
+	cpuCurLoad, err := queryDB("SELECT non_negative_derivative(mean(value), 1s) FROM lxc_cpu WHERE time > now() - 1m and hostname =~ /^" + h + "$/ GROUP BY time(10s), type fill(none)")
 	if err != nil {
 		log.Error("No data received for container cpu load")
 	}

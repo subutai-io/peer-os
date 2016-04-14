@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.util.JsonUtil;
@@ -41,7 +40,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     @Override
     public Boolean call()
     {
-        WebClient client = null;
+        WebClient client;
         try
         {
             client = getWebClient( targetPeer.getPeerInfo() );
@@ -65,7 +64,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
             }
             return true;
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
         }

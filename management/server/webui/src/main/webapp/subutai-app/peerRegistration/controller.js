@@ -22,8 +22,8 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	vm.approvePeerRequestForm = approvePeerRequestForm;
 	vm.unregisterPeer = unregisterPeer;
 	vm.cancelPeerRequest = cancelPeerRequest;
-	vm.addPeer = addPeer;	
-	vm.approvePeerRequest = approvePeerRequest;	
+	vm.addPeer = addPeer;
+	vm.approvePeerRequest = approvePeerRequest;
 
 	vm.dtInstance = {};
 	vm.users = {};
@@ -53,7 +53,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	function statusHTML(data, type, full, meta) {
 		var status = data.registrationData.status;
 		var statusText = data.registrationData.status;
-		
+
 		if( data.registrationData.status == "APPROVED" )
 		{
 			if(data.isOnline == false)

@@ -21,20 +21,26 @@ var app = angular.module('subutai-app', [
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
 
+	.factory('trackerSrv', trackerSrv)
+
     .run(startup);
 
-CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog'];
+CurrentUserCtrl.$inject = ['$location', '$scope', '$rootScope', '$http', 'SweetAlert', 'ngDialog', 'trackerSrv'];
 routesConf.$inject = ['$httpProvider', '$stateProvider', '$urlRouterProvider', '$ocLazyLoadProvider'];
 startup.$inject = ['$rootScope', '$state', '$location', '$http', 'SweetAlert', 'ngDialog'];
 
-function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog) {
+function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDialog, trackerSrv) {
     var vm = this;
     vm.currentUser = localStorage.getItem('currentUser');
     vm.hubStatus = false;
     vm.userId = "";
+    vm.userEmail = "";
     vm.notifications = [];
     vm.notificationsCount = 0;
     vm.notificationNew = false;
+	vm.notificationsLogs = [];
+	vm.currentLogTitle = '';
+	vm.currentLog = [];
     vm.currentUserRoles = [];
     $rootScope.notifications = {};
     vm.hubRegisterError = false;
@@ -51,8 +57,10 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		}).success(function (data) {
+
 			vm.hubStatus = data.isRegisteredToHub;
 			vm.userId = data.ownerId;
+			vm.userEmail = data.ownerEmail;
 
 			if (vm.hubStatus != "true" && vm.hubStatus != true) {
 				vm.hubStatus = false;
@@ -83,6 +91,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.hubUnregister = hubUnregister;
     vm.hubHeartbeat = hubHeartbeat;
     vm.clearLogs = clearLogs;
+	vm.viewLogs = viewLogs;
 
 
     function hubPopupLoadScreen(show) {
@@ -177,59 +186,125 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         }
     });
 
-    //localStorage.removeItem('notifications');
-    $rootScope.$watch('notifications', function () {
+	function getNotificationsFromServer() {
+		vm.notificationsLogs = [];
+		trackerSrv.getNotifications().success(function(data) {
+			for(var i = 0; i < data.length; i++) {
+				var log = data[i];
+				var notification = {
+					"message": log.description,
+					"date": moment(log.timestamp).format('HH:mm:ss'),
+					"type": log.state,
+					"logId": log.id
+				};
+				addNewNotification(notification);
+				vm.notificationsLogs[log.id] = log;
+			}
+		}).error(function(error) {
+			console.log(error);
+		});
+	}
+	getNotificationsFromServer();
 
-        var notifications = localStorage.getItem('notifications');
-        console.log(notifications);
-        if (
-            notifications == null ||
-            notifications == undefined ||
-            notifications == 'null' ||
-            notifications.length <= 0
-        ) {
-            notifications = [];
-            localStorage.setItem('notifications', notifications);
-        } else {
-            notifications = JSON.parse(notifications);
-            vm.notificationsCount = notifications.length;
-        }
+	$rootScope.$watch('notificationsUpdate', function () {
+		getNotificationsFromServer();
+	});
 
-        if ($rootScope.notifications.message) {
-            if (!localStorage.getItem('notifications').includes(JSON.stringify($rootScope.notifications.message))) {
-                notifications.push($rootScope.notifications);
-                vm.notificationsCount++;
-                localStorage.setItem('notifications', JSON.stringify(notifications));
-            }
-            vm.notificationNew = true;
-        }
-        vm.notifications = notifications;
-    });
+	function viewLogs(logId) {
+		vm.currentLog = [];
+		vm.currentLogTitle = '';
 
-    function clearLogs() {
-        vm.notifications = [];
-        vm.notificationsCount = 0;
-        localStorage.removeItem('notifications');
-    }
+		if(vm.notificationsLogs[logId].log.length > 0) {
+			var logsArray = vm.notificationsLogs[logId].log.split(/(?:\r\n|\r|\n)/g);
+			vm.currentLogTitle = vm.notificationsLogs[logId].description;
+			var logs = [];
+			for(var i = 0; i < logsArray.length; i++) {
+				var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
+				currentLog.date = moment(currentLog.date).format('HH:mm:ss');
+				logs.push(currentLog);
+			}
+			vm.currentLog = logs;
 
-
-	if (localStorage.getItem ("bazaarMD5") === null) {
-		localStorage.setItem ("bazaarMD5", getBazaarChecksum());
-		bazaarUpdate = true;
-	} else {
-		if (localStorage.getItem ("bazaarMD5") !== getBazaarChecksum()) {
-			bazaarUpdate = true;
+			ngDialog.open({
+				template: 'subutai-app/common/popups/logsPopup.html',
+				scope: $scope
+			});
 		}
 	}
 
-   	function getBazaarChecksum() {
-   		console.log ("Getting checksum");
-		$http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
-			console.log (data);
-			return data;
-		});
-		return "";
+	$rootScope.$watch('notifications', function () {
+		addNewNotification($rootScope.notifications);
+	});
+
+	setInterval(function() {
+		getNotificationsFromServer();
+	}, 15000);
+
+	function addNewNotification(notification) {
+		var notifications = localStorage.getItem('notifications');
+		if (
+			notifications == null ||
+			notifications == undefined ||
+			notifications == 'null' ||
+			notifications.length <= 0
+		) {
+			notifications = [];
+			localStorage.setItem('notifications', notifications);
+		} else {
+			notifications = JSON.parse(notifications);
+			vm.notificationsCount = notifications.length;
+		}
+
+		if (notification.message) {
+			if (!localStorage.getItem('notifications').includes(JSON.stringify(notification.message))) {
+				notifications.push(notification);
+				vm.notificationsCount++;
+				localStorage.setItem('notifications', JSON.stringify(notifications));
+			} else {
+				for(var i = 0; i < notifications.length; i++) {
+					if(notifications[i].message == notification.message && notification.type !== undefined) {
+						notifications[i].type = notification.type;
+						break;
+					}
+				}
+			}
+			vm.notificationNew = true;
+		}
+		vm.notifications = notifications;
 	}
+
+	function clearLogs() {
+		vm.notifications = [];
+		vm.notificationsCount = 0;
+		localStorage.removeItem('notifications');
+
+		trackerSrv.deleteAllNotifications().success(function(data) {
+		}).error(function(error) {
+			console.log(error);
+		});
+	}
+
+
+    function checkSum() {
+        console.log ("finally");
+        $http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
+            if (localStorage.getItem ("bazaarMD5") === null) {
+                console.log ("no checksum stored, storing generated checksum - " + data);
+                localStorage.setItem ("bazaarMD5", data);
+                bazaarUpdate = true;
+            }
+            else {
+                console.log ("there is checksum");
+                if (localStorage.getItem ("bazaarMD5") !== data) {
+                    console.log ("cache checksum - " + localStorage.getItem ("bazaarMD5") + " and generated checksum - " + data + " do not match");
+                    localStorage.setItem ("bazaarMD5", data);
+                    bazaarUpdate = true;
+                }
+            }
+        });
+    }
+    checkSum();
+
 }
 
 
@@ -261,6 +336,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
     });
 
     //$locationProvider.html5Mode(true);
+    $urlRouterProvider.when('', '/');
 
     $stateProvider
         .state('login', {
@@ -331,17 +407,6 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
-		.state('main', {
-			url: '',
-			templateUrl: '',
-			data: {
-				bodyClass: '',
-				layout: 'default'
-			},
-			controller: function ($location ) {
-				$location.path('/');
-			}
-		})
         .state('environments', {
             url: '/environments/{activeTab}',
             templateUrl: 'subutai-app/environment/partials/view.html',
@@ -653,7 +718,8 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             name: 'subutai.settings-kurjun',
                             files: [
                                 'subutai-app/settingsKurjun/settingsKurjun.js',
-                                'subutai-app/settingsKurjun/controller.js'
+                                'subutai-app/settingsKurjun/controller.js',
+								'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
@@ -845,41 +911,6 @@ function getCookie(cname) {
 function removeCookie(name) {
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
-
-app.directive('dropdownMenu', function () {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attr) {
-            function colEqualHeight() {
-                if ($('.b-nav').height() > $('.b-workspace').height()) {
-                    $('.b-workspace').height($('.b-nav').height());
-                } else if ($('.b-nav').height() < $('.b-workspace').height()) {
-                    $('.b-nav').height($('.b-workspace').height());
-                }
-            }
-
-            //colEqualHeight();
-
-            $('.b-nav-menu-link').on('click', function () {
-                $('.b-nav-menu__sub').slideUp(300);
-                if ($(this).next('.b-nav-menu__sub').length > 0) {
-                    if ($(this).parent().hasClass('b-nav-menu_active')) {
-                        $(this).parent().removeClass('b-nav-menu_active');
-                        $(this).next('.b-nav-menu__sub').slideUp(300);
-                    } else {
-                        $('.b-nav-menu_active').removeClass('b-nav-menu_active')
-                        $(this).parent().addClass('b-nav-menu_active');
-                        $(this).next('.b-nav-menu__sub').slideDown(300);
-                    }
-                    return false;
-                } else {
-                    $('.b-nav-menu__sub').slideUp(300);
-                    $('.b-nav-menu_active').removeClass('b-nav-menu_active');
-                }
-            });
-        }
-    }
-});
 
 app.directive('checkbox-list-dropdown', function () {
     return {

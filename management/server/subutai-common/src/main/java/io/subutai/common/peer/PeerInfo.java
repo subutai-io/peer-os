@@ -114,7 +114,7 @@ public class PeerInfo implements Serializable
         catch ( MalformedURLException e )
         {
             // assume this is IP or domain name
-            final String u = String.format( "https://%s:%s/", publicUrl, SystemSettings.getSecurePortX1() );
+            final String u = String.format( "https://%s:%s/", publicUrl, SystemSettings.DEFAULT_PUBLIC_PORT );
             try
             {
                 URL url = new URL( u );

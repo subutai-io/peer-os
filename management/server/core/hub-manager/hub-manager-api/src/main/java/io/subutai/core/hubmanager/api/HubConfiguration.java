@@ -91,4 +91,18 @@ public class HubConfiguration implements Config
     {
         return peerId;
     }
+
+
+    @Override
+    public String getOwnerEmail()
+    {
+        return null;
+    }
+
+
+    @Override
+    public void setOwnerEmail( final String ownerEmail )
+    {
+
+    }
 }

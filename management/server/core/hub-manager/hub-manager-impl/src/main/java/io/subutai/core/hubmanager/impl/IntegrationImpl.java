@@ -39,6 +39,8 @@ import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
+import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
+import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
@@ -48,12 +50,14 @@ import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.VehsProccessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PeerDto;
+import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -148,8 +152,17 @@ public class IntegrationImpl implements Integration
             StateLinkProccessor hubEnvironmentProccessor =
                     new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor, environmentUserHelper );
 
+            StateLinkProccessor vehsProccessor =
+                    new VehsProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
+                            environmentUserHelper );
+
+            heartbeatProcessor.addProccessor( vehsProccessor );
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
+
+            AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
+
+            heartbeatProcessor.addProccessor( appScaleProcessor );
 
             hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
@@ -174,7 +187,7 @@ public class IntegrationImpl implements Integration
                     LOG.info( "Starting sumchecker" );
                     generateChecksum();
                 }
-            }, 1, 3600000, TimeUnit.MILLISECONDS );
+            }, 1, 600000, TimeUnit.MILLISECONDS );
         }
         catch ( Exception e )
         {
@@ -515,5 +528,44 @@ public class IntegrationImpl implements Integration
     public String getChecksum()
     {
         return this.checksum;
+    }
+
+
+    @Override
+    public void sendSystemConfiguration( final SystemConfDto dto )
+    {
+        if ( getRegistrationState() )
+        {
+            try
+            {
+                String path = "/rest/v1/system-changes";
+                WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+                byte[] cborData = JsonUtil.toCbor( dto );
+
+                byte[] encryptedData = configManager.getMessenger().produce( cborData );
+
+                LOG.info( "Sending Configuration of SS to Hub..." );
+
+                Response r = client.post( encryptedData );
+
+                if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+                {
+                    LOG.info( "SS configuration sent successfully." );
+                }
+                else
+                {
+                    LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
+//                    throw new HubPluginException(
+//                            "Could not send SS configuration to Hub: " + r.readEntity( String.class ) );
+                }
+            }
+            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
+                    NoSuchAlgorithmException e )
+            {
+                LOG.error( "Could not send SS configuration to Hub", e );
+//                throw new HubPluginException( e.toString(), e );
+            }
+        }
     }
 }

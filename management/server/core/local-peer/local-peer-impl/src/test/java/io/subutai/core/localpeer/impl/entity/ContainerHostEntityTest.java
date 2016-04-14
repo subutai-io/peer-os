@@ -37,29 +37,21 @@ import static org.mockito.Mockito.when;
 public class ContainerHostEntityTest
 {
     private static final ContainerHostState CONTAINER_HOST_STATE = ContainerHostState.RUNNING;
-    private static final String ENVIRONMENT_ID = UUID.randomUUID().toString();
-    private static final String PEER_ID = UUID.randomUUID().toString();
     private static final String HOST_ID = UUID.randomUUID().toString();
     private static final String HOSTNAME = "hostname";
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1";
-    private static final String MAC = "mac";
     private static final String TAG = "tag";
-    private static final String GATEWAY_IP = "127.0.0.1";
     private static final int PID = 123;
-    private static final int RAM_QUOTA = 2048;
-    private static final int CPU_QUOTA = 100;
     private static final Set<Integer> CPU_SET = Sets.newHashSet( 1, 3, 5 );
     private static final String TEMPLATE_NAME = "master";
     private static final String TEMP_ARCH = "amd64";
 
-    //    @Mock
-    //    DataService dataService;
+
     @Mock
     LocalPeer localPeer;
-    //    @Mock
-    //    ContainerGroup containerGroup;
+
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
@@ -91,22 +83,6 @@ public class ContainerHostEntityTest
         when( anHostInterface.getIp() ).thenReturn( IP );
         //        when( anHostInterface.getMac() ).thenReturn( MAC );
         when( hostRegistry.getHostInfoById( anyString() ) ).thenReturn( containerHostInfo );
-
-        //        containerHostEntity =
-        //                new ContainerHostEntity( PEER_ID.toString(), containerHostInfo, TEMPLATE_NAME, TEMP_ARCH );
-        //        containerHostEntity.setLocalPeer( localPeer );
-        //        containerHostEntity.setDataService( dataService );
-        //        containerHostEntity.setParent( resourceHost );
-        //        when( localPeer.findContainerGroupByContainerId( HOST_ID ) ).thenReturn( containerGroup );
-        //        when( containerGroup.getEnvironmentId() ).thenReturn( ENVIRONMENT_ID );
-        //        when( resourceHost.getPeer() ).thenReturn( peer );
-    }
-
-
-    @Test( expected = UnsupportedOperationException.class )
-    public void testGetNodeGroupName() throws Exception
-    {
-        containerHostEntity.getNodeGroupName();
     }
 
 
@@ -129,31 +105,6 @@ public class ContainerHostEntityTest
     {
         containerHostEntity.getTemplate();
     }
-
-
-    //    @Test
-    //    public void testGetEnvironmentId() throws Exception
-    //    {
-    //        assertEquals( ENVIRONMENT_ID.toString(), containerHostEntity.getEnvironmentId() );
-    //    }
-
-
-    //    @Test
-    //    public void testAddTag() throws Exception
-    //    {
-    //        containerHostEntity.addTag( TAG );
-    //
-    //        verify( dataService ).update( containerHostEntity );
-    //    }
-    //
-    //
-    //    @Test
-    //    public void testRemoveTag() throws Exception
-    //    {
-    //        containerHostEntity.removeTag( TAG );
-    //
-    //        verify( dataService ).update( containerHostEntity );
-    //    }
 
 
     @Test

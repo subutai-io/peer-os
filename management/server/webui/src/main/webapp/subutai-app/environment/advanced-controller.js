@@ -111,12 +111,13 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			});		
 	}
 
-	function checkLastLog(status, date) {
-		if(date === undefined || date === null) date = false;
+	function checkLastLog(status, log) {
+		if(log === undefined || log === null) log = false;
 		var lastLog = vm.logMessages[vm.logMessages.length - 1];
 
-		if(date) {
-			lastLog.time = getDateFromString(date);
+		if(log) {
+			var logObj = JSON.parse(log.substring(0, log.length - 1));
+			lastLog.time = moment(logObj.date).format('HH:mm:ss');
 		} else {
 			lastLog.time = moment().format('HH:mm:ss');
 		}
@@ -155,26 +156,23 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						var logCheck = logs[i].replace(/ /g,'');
 						if(logCheck.length > 0) {
 
-							var logTextTime = logs[i].split(':');
-							var logTime = getDateFromString(logs[i]);
+							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+							var logTime = moment(logObj.date).format('HH:mm:ss');
 
 							var logStatus = 'success';
 							var logClasses = ['fa-check', 'g-text-green'];
+
 							if(i+1 == logs.length) {
 								logTime = '';
 								logStatus = 'in-progress';
 								logClasses = ['fa-spinner', 'fa-pulse'];
 							}
 
-							var logsTextString = logTextTime[3];
-							if(logTextTime[4] !== undefined) {
-								logsTextString += logTextTime[4] + logTextTime[5];
-							}
 							var  currentLog = {
 								"time": logTime,
 								"status": logStatus,
 								"classes": logClasses,
-								"text": logsTextString
+								"text": logObj.log
 							};
 							result.push(currentLog);
 
@@ -191,25 +189,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				} else {
 					if(data.state == 'FAILED') {
 						checkLastLog(false);
-						$rootScope.notifications = {
-							"message": "Error on building environment", 
-							"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-							"type": "error"
-						};
 					} else {
 						//SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
-
-						if(vm.editingEnv) {
-							$rootScope.notifications = {
-								"message": "Environment has been changed successfully", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						} else {
-							$rootScope.notifications = {
-								"message": "Environment has been created", 
-								"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-							};
-						}
 
 						if(prevLogs) {
 							var logs = data.log.split(/(?:\r\n|\r|\n)/g);
@@ -230,6 +211,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 						vm.editingEnv = false;
 
 					}
+
+					$rootScope.notificationsUpdate = 'getLogByIdAdv';
 					$scope.$emit('reloadEnvironmentsList');
 					clearWorkspace();
 				}
@@ -267,7 +250,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 				//var logId = getLogsFromTracker(vm.environment2BuildName);
 				getLogById(data, true);
+				initScrollbar();
 
+				$rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuild';
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -275,12 +260,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error.ERROR );
 				}
 				checkLastLog(false);
-
-				$rootScope.notifications = {
-					"message": "Error on creating environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
-					"type": "error"
-				};
+				$rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuildError';
 			});
 		vm.environment2BuildName = '';
 	}
@@ -304,8 +284,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				vm.newEnvID = data;
 
 				getLogById(data, true);
+				initScrollbar();
 				$scope.$emit('reloadEnvironmentsList');
 
+				$rootScope.notificationsUpdate = 'modifyEnvironmentAdv';
 			}).error(function(error){
 				if(error && error.ERROR === undefined) {
 					VARS_MODAL_ERROR( SweetAlert, 'Error: ' + error );
@@ -315,10 +297,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				checkLastLog(false);
 				$scope.$emit('reloadEnvironmentsList');
 
-				$rootScope.notifications = {
-					"message": "Error on changing environment. " + error, 
-					"date": moment().format('MMMM Do YYYY, HH:mm:ss')
-				};
+				$rootScope.notificationsUpdate = 'modifyEnvironmentAdvError';
 			});
 	}
 
@@ -678,12 +657,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function initJointJs() {
 
-		document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
-			if(vm.editingEnv && vm.editingEnv.id == e.detail) {
-				clearWorkspace();
-				vm.editingEnv = false;
-			}
-		}, false);
+		setTimeout(function (){
+			document.getElementById('js-environment-creation').addEventListener('destroyEnvironment', function (e) {
+				if(vm.editingEnv && vm.editingEnv.id == e.detail) {
+					clearWorkspace();
+					vm.editingEnv = false;
+				}
+			}, false);
+		}, 1000);
 
 		var paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
@@ -734,10 +715,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			cellView.model.set('position', cellView.prevPos);
 		});
 
-		$('.js-scrollbar').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
+		initScrollbar();
 	}
 
 	vm.buildStep = 'confirm';
@@ -997,8 +975,13 @@ function startDrag( event ) {
 	ghostImage.className = 'b-cloud-item b-hidden-object';
 	ghostImage.id = 'js-ghost-image';
 	ghostImage.style.backgroundImage = "url('" + containerImage.attr('src') + "')";
+
 	document.body.appendChild(ghostImage);
-	event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+	if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+		event.dataTransfer.setDragImage(ghostImage, 0, 0);
+	} else {
+		event.dataTransfer.setDragImage(document.createElement("span"), 0, 0);
+	}
 
 	event.dataTransfer.setData( "template", $(event.target).data('template') );
 	event.dataTransfer.setData( "img", containerImage.attr('src') );
@@ -1012,12 +995,13 @@ function dragOver( event ) {
 }
 
 function endtDrag( event ) {
+	event.preventDefault();
 	document.getElementById('js-ghost-image').remove();
 }
 
 var containerCounter = 1;
 function drop(event) {
-	event.preventDefault();
+	//event.preventDefault();
 
 	var template = event.dataTransfer.getData("template");
 	var img = event.dataTransfer.getData("img");

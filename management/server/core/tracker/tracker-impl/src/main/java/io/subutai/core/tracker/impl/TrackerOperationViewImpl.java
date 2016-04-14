@@ -4,11 +4,11 @@ package io.subutai.core.tracker.impl;
 import java.util.Date;
 import java.util.UUID;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.tracker.TrackerOperationView;
-
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -38,6 +38,8 @@ public class TrackerOperationViewImpl implements TrackerOperationView
      */
     private final Date createDate;
 
+    private final long timestamp;
+
 
     public TrackerOperationViewImpl( TrackerOperation po )
     {
@@ -48,6 +50,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         log = po.getLog();
         state = po.getState();
         createDate = po.createDate();
+        timestamp = po.createDate().getTime();
     }
 
 
@@ -80,6 +83,10 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         return state;
     }
 
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
 
     @Override
     public int hashCode()

@@ -4,8 +4,7 @@ package io.subutai.core.localpeer.cli;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.task.Task;
-import io.subutai.common.util.StringUtil;
+import io.subutai.common.util.HostUtil;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
@@ -25,15 +24,13 @@ public class TaskListCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        for ( Task task : localPeer.getTaskList() )
+        for ( HostUtil.Task task : localPeer.getTasks() )
         {
-            final String s = task.getCommandBatch().toString();
-            System.out.println(
-                    String.format( "%d\t%s\t%d\t%s\t%s\t%s...", task.getId(), task.getRequest().getResourceHostId(),
-                            task.getTimeout(), task.getState(),
-                            StringUtil.convertMillisToHHMMSS( task.getElapsedTime() ),
-                            s.substring( 0, Math.min( 50, s.length() ) ) ) );
+            System.out.format( "%s on %s. Duration: %s. State: %s. Result: %s%n", task.name(),
+                    task.getHost().getHostname(), task.getDurationFormatted(), task.getTaskState(),
+                    task.getResult() == null ? task.getFailureReason() : task.getResult() );
         }
+
         return null;
     }
 }

@@ -9,7 +9,7 @@ SettingsKurjunCtrl.$inject = ['$scope', 'SettingsKurjunSrv', 'SweetAlert', 'DTOp
 function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuilder, DTColumnBuilder, $resource, $compile, ngDialog) {
     var vm = this;
     vm.config = {globalKurjunUrls: [""]};
-    vm.activeTab = "urls";
+    vm.activeTab = "urlsList";
     vm.uid = '';
     vm.currentUrl = '';
     vm.currentType = '';
@@ -36,6 +36,7 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     vm.autoSign = autoSign;
     vm.addUrl = addUrl;
     vm.updateUrl = updateUrl;
+    vm.deleteUrl = deleteUrl;
 
     function getConfig() {
         SettingsKurjunSrv.getConfig().success(function (data) {
@@ -70,7 +71,8 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         DTColumnBuilder.newColumn('url').withTitle('URL'),
         DTColumnBuilder.newColumn('type').withTitle('Type').renderWith(getUrlType),
         DTColumnBuilder.newColumn('state').withTitle('State').renderWith(getState),
-        DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionApprove)
+        DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionApprove),
+        DTColumnBuilder.newColumn(null).withTitle('').notSortable().renderWith(actionDelete)
     ];
 
     function createdRow(row, data, dataIndex) {
@@ -97,6 +99,47 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
         }
 
         return result;
+    }
+
+    function actionDelete(data, type, full, meta) {
+        vm.urlList[data.id] = data;
+        var result = '<span ></span>';
+        if (data.state == false) {
+            return '<a href class="b-icon b-icon_remove" ng-click="settingsKurjunCtrl.deleteUrl(' + data.id + ')"></a>';
+        }
+
+        return result;
+
+
+        // return '<a href class="b-icon b-icon_remove" ng-click="settingsKurjunCtrl.deleteUrl(' + data.id + ')"></a>';
+    }
+
+
+    function deleteUrl(urlId) {
+        var previousWindowKeyDown = window.onkeydown;
+        SweetAlert.swal({
+                title: "Are you sure?",
+                text: "You will not be able to recover this user!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#ff3f3c",
+                confirmButtonText: "Delete",
+                cancelButtonText: "Cancel",
+                closeOnConfirm: false,
+                closeOnCancel: true,
+                showLoaderOnConfirm: true
+            },
+            function (isConfirm) {
+                window.onkeydown = previousWindowKeyDown;
+                if (isConfirm) {
+                    SettingsKurjunSrv.deleteUrl(urlId).success(function (data) {
+                        SweetAlert.swal("Deleted!", "URL has been deleted.", "success");
+                        vm.dtInstance.reloadData(null, false);
+                    }).error(function (data) {
+                        SweetAlert.swal("ERROR!", "Url is safe :). Error: " + data, "error");
+                    });
+                }
+            });
     }
 
 
@@ -245,13 +288,13 @@ function SettingsKurjunCtrl($scope, SettingsKurjunSrv, SweetAlert, DTOptionsBuil
     }
 
     function checkIfExists(urlObject) {
-        
-        for (var i = 0; i<= vm.urls.length; ++i){
-            if (urlObject.url == vm.urls[i]){
+
+        for (var i = 0; i <= vm.urls.length; ++i) {
+            if (urlObject.url == vm.urls[i]) {
                 return true;
             }
         }
-        
+
         return false;
 
         // var arr = [];

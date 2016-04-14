@@ -21,11 +21,14 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.jcajce.JcaPGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.io.IOUtils;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -39,6 +42,13 @@ public class PGPEncryptionUtilTest
     private static final String MESSAGE = "hello";
     private static final String PUBLIC_KEYRING = "dummy.pkr";
     private static final String SECRET_KEYRING = "dummy.skr";
+
+    private static final String PLUGIN_PUBLIC_KEY = "public.asc";
+    private static final String PLUGIN_PUBLIC_KEY_ID = "8DD661979B15E409";
+    private static final String PLUGIN_PUBLIC_KEY_FINGERPRINT = "FC1F3E708FD85E7431FA996D8DD661979B15E409";
+    private static final String PLUGIN_PRIVATE_KEY = "private.asc";
+    private static final String PLUGIN_PRIVATE_KEY_ID = "8dd661979b15e409";
+    private static final String PLUGIN_PRIVATE_KEY_FINGERPRINT = "FC1F3E708FD85E7431FA996D8DD661979B15E409";
 
     private static final String SECRET_PWD = "12345678";
     private static final String PUBLIC_KEY_ID = "e2451337c277dbf1";
@@ -237,17 +247,15 @@ public class PGPEncryptionUtilTest
     @Test
     public void testMessageSigning() throws Exception
     {
-        KeyPair second = PGPEncryptionUtil.generateKeyPair( "second@key.com", "second", false );
-
-        InputStream secondSecretStream = new ByteArrayInputStream( second.getSecKeyring() );
-        InputStream secondPublicStream = new ByteArrayInputStream( second.getPubKeyring() );
+        InputStream secondSecretStream = findFile( PLUGIN_PRIVATE_KEY );
+        InputStream secondPublicStream = findFile( PLUGIN_PUBLIC_KEY );
 
         PGPSecretKeyRingCollection secretKeyRingCollection =
                 new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secondSecretStream ),
                         new JcaKeyFingerprintCalculator() );
 
         PGPSecretKeyRing secretKeyRing =
-                secretKeyRingCollection.getSecretKeyRing( new BigInteger( second.getPrimaryKeyId(), 16 ).longValue() );
+                secretKeyRingCollection.getSecretKeyRing( new BigInteger( PLUGIN_PRIVATE_KEY_ID, 16 ).longValue() );
 
         PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
 
@@ -257,14 +265,14 @@ public class PGPEncryptionUtilTest
 
 
         PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
-                .getPublicKeyRing( new BigInteger( second.getSubKeyId(), 16 ).longValue() );
+                .getPublicKeyRing( new BigInteger( PLUGIN_PUBLIC_KEY_ID, 16 ).longValue() );
 
 
         byte[] encryptedMessage =
                 PGPEncryptionUtil.encrypt( "Time is the most luxurious thing we have.".getBytes(), pgpKeyring.getPublicKey(), true );
 
         byte[] signedMessageArmor =
-                PGPEncryptionUtil.clearSign( encryptedMessage, secondSecretKey, "second".toCharArray(), "" );
+                PGPEncryptionUtil.clearSign( encryptedMessage, secondSecretKey, "123".toCharArray(), "" );
 
         String signedMessage = new String( signedMessageArmor, "UTF-8" );
 
@@ -281,8 +289,80 @@ public class PGPEncryptionUtilTest
         }
 
         byte[] extracted = PGPEncryptionUtil.extractContentFromClearSign( signedMessage.getBytes() );
-        byte[] decrypted = PGPEncryptionUtil.decrypt( extracted, secretKeyRing, "second" );
+        byte[] decrypted = PGPEncryptionUtil.decrypt( extracted, secretKeyRing, "123" );
         logger.info( "Decrypted message \n" + new String( decrypted, "UTF-8" ) );
+
+        assertEquals( true, result );
+    }
+
+
+    @Test
+    public void testClearSign() throws Exception
+    {
+        InputStream secondSecretStream = findFile( PLUGIN_PRIVATE_KEY );
+        InputStream secondPublicStream = findFile( PLUGIN_PUBLIC_KEY );
+
+        PGPSecretKeyRingCollection secretKeyRingCollection =
+                new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secondSecretStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        PGPSecretKeyRing secretKeyRing =
+                secretKeyRingCollection.getSecretKeyRing( new BigInteger( PLUGIN_PRIVATE_KEY_ID, 16 ).longValue() );
+
+        PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
+
+        PGPPublicKeyRingCollection secondPublicKeyRingCollection =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+
+        PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
+                .getPublicKeyRing( new BigInteger( PLUGIN_PUBLIC_KEY_ID, 16 ).longValue() );
+
+        byte[] signedMessageArmor =
+                PGPEncryptionUtil.clearSign( IOUtils.toString( findFile( "message.txt" ) ).getBytes(), secondSecretKey, "123".toCharArray(), "" );
+
+        String signedMessage = new String( signedMessageArmor, "UTF-8" );
+
+        logger.info( "\n" + signedMessage );
+
+        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage.getBytes(), pgpKeyring );
+        if ( result )
+        {
+            logger.info( "signature verified." );
+        }
+        else
+        {
+            logger.info( "signature verification failed." );
+        }
+
+        assertEquals( true, result );
+    }
+
+    @Test
+    public void testVerifyClearSign() throws Exception
+    {
+        InputStream secondPublicStream = findFile( PLUGIN_PUBLIC_KEY );
+        PGPPublicKeyRingCollection secondPublicKeyRingCollection =
+                new PGPPublicKeyRingCollection( PGPUtil.getDecoderStream( secondPublicStream ),
+                        new JcaKeyFingerprintCalculator() );
+
+        PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
+                .getPublicKeyRing( new BigInteger( PLUGIN_PUBLIC_KEY_ID, 16 ).longValue() );
+
+        String signedMessage = IOUtils.toString( findFile( "signedMessage.txt" ) );
+
+        logger.info( "\n" + signedMessage );
+
+        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage.getBytes(), pgpKeyring );
+        if ( result )
+        {
+            logger.info( "signature verified." );
+        }
+        else
+        {
+            logger.info( "signature verification failed." );
+        }
 
         assertEquals( true, result );
     }
@@ -291,6 +371,36 @@ public class PGPEncryptionUtilTest
     @Test
     public void testExtractingContentFromClearSign()
     {
+        PGPPublicKey key = null;
+        try
+        {
+            InputStream in = findFile( PLUGIN_PRIVATE_KEY );
+            in = org.bouncycastle.openpgp.PGPUtil.getDecoderStream( in );
+
+            JcaPGPPublicKeyRingCollection pgpPub = new JcaPGPPublicKeyRingCollection( in );
+            in.close();
+
+
+            Iterator<PGPPublicKeyRing> rIt = pgpPub.getKeyRings();
+            while ( key == null && rIt.hasNext() )
+            {
+                PGPPublicKeyRing kRing = rIt.next();
+                Iterator<PGPPublicKey> kIt = kRing.getPublicKeys();
+                while ( key == null && kIt.hasNext() )
+                {
+                    PGPPublicKey k = kIt.next();
+
+                    if ( k.isEncryptionKey() )
+                    {
+                        key = k;
+                    }
+                }
+            }
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
         String clearSign =
                 "-----BEGIN PGP SIGNED MESSAGE-----\n" + "Hash: SHA256\n" + "\n" + "-----BEGIN PGP MESSAGE-----\n"
                         + "Version: BCPG v1.52\n" + "\n"

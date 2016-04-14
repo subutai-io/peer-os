@@ -5,7 +5,7 @@
   <parent>
     <artifactId>hub-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC7-SNAPSHOT</version>
+    <version>4.0.0-RC8-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,6 +18,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-hub-share</artifactId>
     </dependency>
   </dependencies>
 

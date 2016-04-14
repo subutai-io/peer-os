@@ -19,6 +19,7 @@ func init() {
 	format.FullTimestamp = true
 	format.TimestampFormat = "2006-01-02 15:04:05"
 	logrus.SetFormatter(format)
+	logrus.SetOutput(os.Stdout)
 	logrus.SetLevel(logrus.InfoLevel)
 }
 
@@ -28,10 +29,13 @@ func Check(level logrus.Level, msg string, err error) bool {
 	if err != nil {
 		switch level {
 		case logrus.PanicLevel:
+			logrus.SetOutput(os.Stderr)
 			logrus.Panic(msg, ", ", err)
 		case logrus.FatalLevel:
+			logrus.SetOutput(os.Stderr)
 			logrus.Fatal(msg, ", ", err)
 		case logrus.ErrorLevel:
+			logrus.SetOutput(os.Stderr)
 			logrus.Error(msg, ", ", err)
 			os.Exit(1)
 		case logrus.WarnLevel:
@@ -54,16 +58,19 @@ func Level(level logrus.Level) {
 
 // Panic stops process after showing panic message. Highest error level
 func Panic(msg ...string) {
+	logrus.SetOutput(os.Stderr)
 	logrus.Panic(msg)
 }
 
 // Fatal stops process after showing fatal message.
 func Fatal(msg ...string) {
+	logrus.SetOutput(os.Stderr)
 	logrus.Fatal(msg)
 }
 
 // Error stops process after showing error message.
 func Error(msg ...string) {
+	logrus.SetOutput(os.Stderr)
 	logrus.Error(msg)
 	os.Exit(1)
 }

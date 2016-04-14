@@ -32,6 +32,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 	vm.shareTemplate = shareTemplate;
 	vm.checkRepositoryStatus = checkRepositoryStatus;
 	vm.setDefaultRepository = setDefaultRepository;
+	vm.formatSize = formatSize;
 
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
@@ -63,6 +64,17 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 
 	function getTemplates() {
 		LOADING_SCREEN();
+		/*kurjunSrv.getRepositories().success(function (repositories) {
+			vm.repositories = repositories;
+
+			kurjunSrv.getTemplates().success(function (data) {
+				vm.templates = data;
+				LOADING_SCREEN('none');
+			}).error(function (error){
+				LOADING_SCREEN('none');
+			});
+		});*/
+
 		kurjunSrv.getTemplates().success(function (data) {
 			vm.templates = data;
 			LOADING_SCREEN('none');
@@ -387,6 +399,17 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 			cfpLoadingBar.complete();
 		}, 500);
 	});
+
+	function formatSize(size) {
+		var value = ((size / 1024) / 1024).toFixed(2);
+		if(value < 1) {
+			value = (size / 1024).toFixed(2).toString() + ' Kb';
+		} else {
+			value = value.toString() + ' Mb';
+		}
+		return value;
+	}
+
 }
 
 function fileModel($parse) {
