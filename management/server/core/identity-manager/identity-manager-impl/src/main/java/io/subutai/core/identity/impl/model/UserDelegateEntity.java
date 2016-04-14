@@ -118,6 +118,13 @@ public class UserDelegateEntity implements UserDelegate
 
 
     @Override
+    public String getKeyId()
+    {
+        return getId();
+    }
+
+
+    @Override
     public boolean equals( final Object o )
     {
         if ( this == o )

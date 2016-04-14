@@ -8,8 +8,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import io.subutai.common.test.SystemOutRedirectTest;
+
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.test.SystemOutRedirectTest;
 import io.subutai.core.peer.api.PeerManager;
 
 import static junit.framework.TestCase.assertTrue;

@@ -2,6 +2,7 @@ package io.subutai.common.util;
 
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,8 @@ public class HostUtil
 
     /**
      * Executes tasks in parallel. Fails fast if any execution failed
+     *
+     * Returns results of tasks completed so far
      */
     public Results executeFailFast( Tasks tasks )
     {
@@ -58,8 +61,8 @@ public class HostUtil
 
     protected Results executeParallel( Tasks tasks, boolean failFast )
     {
-        Preconditions.checkNotNull( tasks, "Invalid allTasks" );
-        Preconditions.checkArgument( !tasks.isEmpty(), "No allTasks" );
+        Preconditions.checkNotNull( tasks, "Invalid tasks" );
+        Preconditions.checkArgument( !tasks.isEmpty(), "No tasks" );
 
         Results results = new Results( tasks );
 
@@ -79,22 +82,82 @@ public class HostUtil
             }
         }
 
-        for ( Future<Boolean> taskFuture : taskFutures )
+        int doneTasks = 0;
+
+        int totalTasks = taskFutures.size();
+
+        futuresLoop:
+        while ( !Thread.interrupted() && doneTasks < totalTasks && !taskFutures.isEmpty() )
         {
-            try
+
+            Iterator<Future<Boolean>> listIterator = taskFutures.iterator();
+
+            while ( listIterator.hasNext() )
             {
-                if ( !taskFuture.get() && failFast )
+
+                Future<Boolean> taskFuture = listIterator.next();
+
+                try
                 {
-                    break;
+                    if ( taskFuture.isDone() )
+                    {
+                        doneTasks++;
+
+                        listIterator.remove();
+
+                        if ( !taskFuture.get() && failFast )
+                        {
+                            break futuresLoop;
+                        }
+                    }
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error in #execute", e );
+
+                    if ( failFast )
+                    {
+                        break futuresLoop;
+                    }
                 }
             }
-            catch ( Exception e )
+
+            try
             {
-                LOG.error( "Error in #execute", e );
+                Thread.sleep( 100 );
+            }
+            catch ( InterruptedException e )
+            {
+                break;
             }
         }
 
         return results;
+    }
+
+
+    public Map<Task, Future<Boolean>> submit( final Tasks tasks )
+    {
+        Preconditions.checkNotNull( tasks, "Invalid tasks" );
+        Preconditions.checkArgument( !tasks.isEmpty(), "No tasks" );
+
+        this.allTasks.addAll( tasks.getTasks() );
+
+        Map<Task, Future<Boolean>> taskFutures = Maps.newHashMap();
+
+        for ( Map.Entry<Host, Set<Task>> hostTasksEntry : tasks.getHostsTasks().entrySet() )
+        {
+            Host host = hostTasksEntry.getKey();
+
+            Set<Task> hostTasks = hostTasksEntry.getValue();
+
+            for ( Task hostTask : hostTasks )
+            {
+                taskFutures.put( hostTask, submitTask( host, hostTask ) );
+            }
+        }
+
+        return taskFutures;
     }
 
 

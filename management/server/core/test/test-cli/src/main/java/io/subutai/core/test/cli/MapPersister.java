@@ -3,12 +3,10 @@ package io.subutai.core.test.cli;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Map;
-import java.util.Objects;
 
 
 /**

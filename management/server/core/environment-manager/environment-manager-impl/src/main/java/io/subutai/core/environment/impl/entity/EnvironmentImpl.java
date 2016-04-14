@@ -419,6 +419,11 @@ public class EnvironmentImpl implements Environment, Serializable
             }
         }
 
+        for ( EnvironmentContainerHost environmentContainerHost : containerHosts )
+        {
+            environmentContainerHost.setEnvironment( this );
+        }
+
         return containerHosts;
     }
 
@@ -705,5 +710,12 @@ public class EnvironmentImpl implements Environment, Serializable
     public String getContext()
     {
         return PermissionObject.EnvironmentManagement.getName();
+    }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getEnvironmentId().getId();
     }
 }

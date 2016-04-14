@@ -40,4 +40,10 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response listEnvironments();
+
+    @Path( "/{environmentId}" )
+    @GET
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getEnvironment( @PathParam( "environmentId" ) String environmentId );
 }

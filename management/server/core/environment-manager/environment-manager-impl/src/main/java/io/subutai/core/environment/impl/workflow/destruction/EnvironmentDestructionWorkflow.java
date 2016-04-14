@@ -8,6 +8,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
+import io.subutai.core.object.relation.api.RelationManager;
 
 
 public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
@@ -76,6 +77,9 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
     {
 
         environmentManager.remove( environment );
+
+        RelationManager relationManager = environmentManager.getRelationManager();
+        relationManager.removeRelation( environment );
 
         operationTracker.addLogDone( "Environment is destroyed" );
 

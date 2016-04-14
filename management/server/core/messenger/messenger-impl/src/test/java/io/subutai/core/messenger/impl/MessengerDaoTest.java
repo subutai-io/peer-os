@@ -14,14 +14,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.core.messenger.impl.Envelope;
-import io.subutai.core.messenger.impl.MessageImpl;
-import io.subutai.core.messenger.impl.MessengerDao;
-import io.subutai.core.messenger.impl.dao.MessageDataService;
-import io.subutai.core.messenger.impl.entity.MessageEntity;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import io.subutai.core.messenger.impl.dao.MessageDataService;
+import io.subutai.core.messenger.impl.entity.MessageEntity;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.anyInt;

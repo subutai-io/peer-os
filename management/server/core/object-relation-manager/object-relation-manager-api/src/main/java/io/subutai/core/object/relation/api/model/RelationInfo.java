@@ -1,6 +1,9 @@
 package io.subutai.core.object.relation.api.model;
 
 
+import java.util.Map;
+
+
 public interface RelationInfo
 {
     long getId();
@@ -14,4 +17,6 @@ public interface RelationInfo
     boolean isUpdatePermission();
 
     boolean isDeletePermission();
+
+    Map<String, String> getRelationTraits();
 }

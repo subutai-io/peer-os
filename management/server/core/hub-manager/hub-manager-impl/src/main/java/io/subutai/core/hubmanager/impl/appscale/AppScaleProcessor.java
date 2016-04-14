@@ -25,7 +25,7 @@ public class AppScaleProcessor implements StateLinkProccessor
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newFixedThreadPool( 3 );
 
     private final Set<String> processLinks = Sets.newConcurrentHashSet();
 

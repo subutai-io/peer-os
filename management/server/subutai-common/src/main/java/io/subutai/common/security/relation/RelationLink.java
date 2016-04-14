@@ -13,4 +13,6 @@ public interface RelationLink extends Serializable
     String getClassPath();
 
     String getContext();
+
+    String getKeyId();
 }

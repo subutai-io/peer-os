@@ -55,6 +55,11 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
@@ -95,6 +100,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     private String localPeerId;
     private RegistrationClient registrationClient;
     protected ScheduledExecutorService localIpSetter;
+    private RelationManager relationManager;
 
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
@@ -165,6 +171,18 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     public void destroy()
     {
         commandResponseListener.dispose();
+    }
+
+
+    public void setRelationManager( final RelationManager relationManager )
+    {
+        this.relationManager = relationManager;
+    }
+
+
+    public RelationManager getRelationManager()
+    {
+        return relationManager;
     }
 
 
@@ -348,8 +366,22 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                 return localPeer;
             }
 
-            return new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
-                    messageResponseListener, provider );
+            RemotePeerImpl remotePeer =
+                    new RemotePeerImpl( localPeerId, securityManager, peerInfo, messenger, commandResponseListener,
+                            messageResponseListener, provider, this );
+
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
+            relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
+            relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
+
+            User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+            RelationMeta relationMeta = new RelationMeta( peerOwner, localPeer, remotePeer, localPeer.getKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+
+            return remotePeer;
         }
         catch ( Exception e )
         {
@@ -386,6 +418,12 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         {
             throw new PeerException( "Could not unregister peer.", e );
         }
+
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+        Peer remotePeer = getPeer( registrationData.getPeerInfo().getId() );
+        RelationMeta relationMeta = new RelationMeta( peerOwner, localPeer, remotePeer, localPeer.getKeyId() );
+        relationManager.removeRelation( relationMeta );
+
         removePeerData( registrationData.getPeerInfo().getId() );
         removePeer( registrationData.getPeerInfo().getId() );
     }
@@ -1112,7 +1150,12 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         {
             try
             {
-                if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
+                if ( localPeer.getPeerInfo() == null )
+                {
+                    //local peer info not initialized yet
+                    return;
+                }
+                else if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
                 {
                     //local peer ip is default, obtain lan ip from MH and set it as local peer ip
                     HostInterface externalInterface =

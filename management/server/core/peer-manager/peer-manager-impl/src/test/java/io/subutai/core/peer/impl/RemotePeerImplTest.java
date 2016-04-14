@@ -126,6 +126,8 @@ public class RemotePeerImplTest
     private SecurityManager securityManager;
     @Mock
     private EnvironmentId envId;
+    @Mock
+    private PeerManagerImpl peerManager;
 
 
     @Before
@@ -139,7 +141,7 @@ public class RemotePeerImplTest
         headers = Maps.newHashMap();
         headers.put( HEADER_NAME, HEADER_VALUE );
         remotePeer = spy( new RemotePeerImpl( localPeer.getId(), securityManager, peerInfo, messenger,
-                commandResponseListener, messageResponseListener, null ) );
+                commandResponseListener, messageResponseListener, null, peerManager ) );
         remotePeer.jsonUtil = jsonUtil;
         when( containerHost.getId() ).thenReturn( CONTAINER_ID );
         when( containerHost.getContainerId() ).thenReturn( containerId );

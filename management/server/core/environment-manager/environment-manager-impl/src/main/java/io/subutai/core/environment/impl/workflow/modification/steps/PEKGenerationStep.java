@@ -10,8 +10,8 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.common.util.PeerUtil;
+import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.PeerEnvironmentKeyTask;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -97,6 +97,6 @@ public class PEKGenerationStep
     public PGPPublicKeyRing getLocalPeerPek()
     {
         return securityManager.getKeyManager().getPublicKeyRing(
-                peerManager.getLocalPeer().getId() + "-" + environment.getEnvironmentId().getId() );
+                peerManager.getLocalPeer().getId() + "_" + environment.getEnvironmentId().getId() );
     }
 }

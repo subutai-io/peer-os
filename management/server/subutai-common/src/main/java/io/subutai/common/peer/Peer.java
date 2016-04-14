@@ -12,8 +12,8 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Containers;
-import io.subutai.common.environment.CreateEnvironmentContainerGroupRequest;
-import io.subutai.common.environment.CreateEnvironmentContainerResponseCollector;
+import io.subutai.common.environment.CreateEnvironmentContainersRequest;
+import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
@@ -34,12 +34,14 @@ import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationLinkDto;
 
 
 /**
  * Peer interface
  */
-public interface Peer
+public interface Peer extends RelationLink
 {
 
     /**
@@ -67,8 +69,8 @@ public interface Peer
      *
      * @param request - container creation request
      */
-    public CreateEnvironmentContainerResponseCollector createEnvironmentContainerGroup(
-            final CreateEnvironmentContainerGroupRequest request ) throws PeerException;
+    public CreateEnvironmentContainersResponse createEnvironmentContainers(
+            final CreateEnvironmentContainersRequest request ) throws PeerException;
 
 
     /**
@@ -226,7 +228,8 @@ public interface Peer
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( EnvironmentId environmentId ) throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto )
+            throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;

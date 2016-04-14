@@ -1,13 +1,17 @@
 package io.subutai.core.object.relation.impl;
 
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.object.relation.api.RelationManager;
 import io.subutai.core.object.relation.api.RelationVerificationException;
@@ -17,10 +21,11 @@ import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.object.relation.impl.dao.RelationDataService;
+import io.subutai.core.object.relation.impl.model.RelationChallengeImpl;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.object.relation.impl.model.RelationInfoImpl;
-import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.KeyManager;
 
 
 public class RelationManagerImpl implements RelationManager
@@ -40,7 +45,7 @@ public class RelationManagerImpl implements RelationManager
     {
         relationDataService = new RelationDataService( daoManager );
         trustMessageManager = new RelationMessageManagerImpl( securityManager );
-        relationInfoManager = new RelationInfoManagerImpl( relationDataService, identityManager );
+        relationInfoManager = new RelationInfoManagerImpl( relationDataService, identityManager, securityManager );
     }
 
 
@@ -82,10 +87,8 @@ public class RelationManagerImpl implements RelationManager
             }
 
             // Verification check have to be applied to verify that stored data is the same as the one being supported
-            Relation storedRelation = relationDataService
-                    .findBySourceTargetObject( ( RelationLinkImpl ) relation.getSource(),
-                            ( RelationLinkImpl ) relation.getTarget(),
-                            ( RelationLinkImpl ) relation.getTrustedObject() );
+            Relation storedRelation = relationDataService.findBySourceTargetObject( relation.getSource(),
+                            relation.getTarget(), relation.getTrustedObject() );
 
             if ( storedRelation == null )
             {
@@ -99,7 +102,7 @@ public class RelationManagerImpl implements RelationManager
 
             if ( storedRelation.getRelationStatus() != relation.getRelationStatus() )
             {
-                throw new RelationVerificationException( "Relations status property differs" );
+                throw new RelationVerificationException( "Relations' status property differs" );
             }
 
             storedRelation.setRelationStatus( RelationStatus.VERIFIED );
@@ -123,29 +126,61 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public Relation buildTrustRelation( final RelationInfo relationInfo, final RelationMeta relationMeta )
+    public Relation buildRelation( final RelationInfoMeta relationInfoMeta, final RelationMeta relationMeta )
     {
-        RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSource() );
-        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTarget() );
-        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObject() );
-
-        //TODO try to pass interface as is
-        RelationImpl relation =
-                new RelationImpl( source, target, object, ( RelationInfoImpl ) relationInfo, relationMeta.getKeyId() );
+        RelationInfoImpl relationInfo = new RelationInfoImpl( relationInfoMeta );
+        RelationImpl relation = new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(),
+                relationMeta.getObject(), relationInfo, relationMeta.getKeyId() );
 
         saveRelation( relation );
 
-        return relationDataService.findBySourceTargetObject( source, target, object );
+        return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
+                relationMeta.getObject() );
+    }
+
+
+    @Override
+    public String getRelationChallenge( final long ttl ) throws RelationVerificationException
+    {
+        RelationChallengeImpl relationToken = new RelationChallengeImpl( ttl );
+        relationDataService.save( relationToken );
+
+        String content = JsonUtil.toJson( relationToken );
+        securityManager.getKeyManager().getPublicKey( null );
+        try
+        {
+            KeyManager keyManager = securityManager.getKeyManager();
+            byte[] encBytes = PGPEncryptionUtil.encrypt( content.getBytes(), keyManager.getPublicKey( null ), true );
+            return "\n" + new String( encBytes, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException | PGPException e )
+        {
+            logger.error( "Error encrypting message for relation challenge", e );
+            throw new RelationVerificationException( "Error encrypting message for relation challenge", e );
+        }
+    }
+
+
+    @Override
+    public Relation buildTrustRelation( final RelationInfo relationInfo, final RelationMeta relationMeta )
+    {
+        //TODO try to pass interface as is
+        RelationImpl relation =
+                new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(), relationMeta.getObject(),
+                        ( RelationInfoImpl ) relationInfo, relationMeta.getKeyId() );
+
+        saveRelation( relation );
+
+        return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
+                relationMeta.getObject() );
     }
 
 
     @Override
     public Relation getRelation( final RelationMeta relationMeta )
     {
-        RelationLinkImpl source = new RelationLinkImpl( relationMeta.getSource() );
-        RelationLinkImpl target = new RelationLinkImpl( relationMeta.getTarget() );
-        RelationLinkImpl object = new RelationLinkImpl( relationMeta.getObject() );
-        return relationDataService.findBySourceTargetObject( source, target, object );
+        return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
+                relationMeta.getObject());
     }
 
 
@@ -168,33 +203,23 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public RelationLink getRelationLink( final RelationLink relationLink )
-    {
-        return relationDataService.findRelationLink( relationLink );
-    }
-
-
-    @Override
     public List<Relation> getRelationsByObject( final RelationLink objectRelationLink )
     {
-        RelationLinkImpl object = new RelationLinkImpl( objectRelationLink );
-        return relationDataService.findByObject( object );
+        return relationDataService.findByObject( objectRelationLink );
     }
 
 
     @Override
     public List<Relation> getRelationsBySource( final RelationLink sourceRelationLink )
     {
-        RelationLinkImpl source = new RelationLinkImpl( sourceRelationLink );
-        return relationDataService.findBySource( source );
+        return relationDataService.findBySource( sourceRelationLink );
     }
 
 
     @Override
     public List<Relation> getRelationsByTarget( final RelationLink targetRelationLink )
     {
-        RelationLinkImpl target = new RelationLinkImpl( targetRelationLink );
-        return relationDataService.findByTarget( target );
+        return relationDataService.findByTarget( targetRelationLink );
     }
 
 
@@ -202,5 +227,29 @@ public class RelationManagerImpl implements RelationManager
     public void removeRelation( final long relationId )
     {
         relationDataService.remove( relationId );
+    }
+
+
+    @Override
+    public void removeRelation( final RelationMeta relationMeta )
+    {
+        Relation relation = relationDataService
+                .findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
+                        relationMeta.getObject() );
+        removeRelation( relation.getId() );
+    }
+
+
+    @Override
+    public void removeRelation( final RelationLink link )
+    {
+        relationDataService.removeAllRelationLinks( link );
+    }
+
+
+    @Override
+    public RelationLink getRelationLink( final String uniqueId )
+    {
+        return relationDataService.getRelationLinkByUniqueId( uniqueId );
     }
 }

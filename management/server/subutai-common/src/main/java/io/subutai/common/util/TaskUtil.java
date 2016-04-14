@@ -1,6 +1,7 @@
 package io.subutai.common.util;
 
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -51,6 +52,8 @@ public class TaskUtil<T>
 
     /**
      * Executes tasks in parallel. Fails fast if any execution failed
+     *
+     * Returns results of tasks completed so far
      */
     public TaskResults<T> executeParallelFailFast()
     {
@@ -82,22 +85,56 @@ public class TaskUtil<T>
 
         taskExecutor.shutdown();
 
-        for ( Map.Entry<Task<T>, Future<T>> futureEntry : taskFutures.entrySet() )
+        int doneTasks = 0;
+
+        int totalTasks = taskFutures.size();
+
+        futuresLoop:
+        while ( !Thread.interrupted() && doneTasks < totalTasks && !taskFutures.isEmpty() )
         {
+
+            Iterator<Map.Entry<Task<T>, Future<T>>> mapIterator = taskFutures.entrySet().iterator();
+
+            while ( mapIterator.hasNext() )
+            {
+
+                Map.Entry<Task<T>, Future<T>> futureEntry = mapIterator.next();
+
+                Task<T> task = futureEntry.getKey();
+
+                Future<T> future = futureEntry.getValue();
+
+                try
+                {
+                    if ( future.isDone() )
+                    {
+                        doneTasks++;
+
+                        mapIterator.remove();
+
+                        taskResults.add( new TaskResult<>( task, future.get() ) );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error executing task ", e );
+
+                    taskResults.add( new TaskResult<>( task, e ) );
+
+                    if ( failFast )
+                    {
+                        break futuresLoop;
+                    }
+                }
+            }
+
             try
             {
-                taskResults.add( new TaskResult<>( futureEntry.getKey(), futureEntry.getValue().get() ) );
+                Thread.sleep( 100 );
             }
-            catch ( Exception e )
+            catch ( InterruptedException e )
             {
-                LOG.error( "Error executing task ", e );
-
-                taskResults.add( new TaskResult<>( futureEntry.getKey(), e ) );
-
-                if ( failFast )
-                {
-                    break;
-                }
+                break;
             }
         }
 

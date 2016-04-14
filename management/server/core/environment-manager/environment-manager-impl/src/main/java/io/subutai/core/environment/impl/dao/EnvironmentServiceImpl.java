@@ -31,7 +31,7 @@ public class EnvironmentServiceImpl implements EnvironmentService
     @Override
     public List<EnvironmentImpl> getAll()
     {
-        return em.createQuery( "select e from EnvironmentImpl e left join fetch e.containers", EnvironmentImpl.class )
+        return em.createQuery( "select e from EnvironmentImpl e", EnvironmentImpl.class )
                  .getResultList();
     }
 

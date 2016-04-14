@@ -335,4 +335,11 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     {
         return PermissionObject.PeerManagement.getName();
     }
+
+
+    @Override
+    public String getKeyId()
+    {
+        return getId();
+    }
 }

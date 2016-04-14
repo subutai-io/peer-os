@@ -8,8 +8,8 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.tracker.TrackerOperation;
-import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.common.util.PeerUtil;
+import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
 public class P2PSecretKeyResetStep

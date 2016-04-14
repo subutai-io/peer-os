@@ -3,7 +3,6 @@ package io.subutai.webui;
 
 import java.io.IOException;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
