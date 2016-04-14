@@ -60,6 +60,7 @@ public class ServerBusListener extends AbstractFeature
             bus.getInInterceptors().add( new ClientInInterceptor( channelManagerImpl, peerManager ) );
 
             //*****************************************
+            /*
             if ( bus.getId().equalsIgnoreCase( "cxfBusTemplateManager" ) )
             {
                 bus.setProperty( AsyncHTTPConduit.USE_ASYNC, Boolean.FALSE );
@@ -73,7 +74,7 @@ public class ServerBusListener extends AbstractFeature
             {
                 bus.setProperty( AsyncHTTPConduit.USE_ASYNC, Boolean.FALSE );
             }
-
+            */
             //***************************************************************
 
             //***************************************************************
