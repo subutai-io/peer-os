@@ -12,7 +12,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 
@@ -118,6 +117,7 @@ import io.subutai.core.localpeer.impl.entity.AbstractSubutaiHost;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.NetworkResourceEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
+import io.subutai.core.localpeer.impl.tasks.CleanupEnvironmentTask;
 import io.subutai.core.localpeer.impl.tasks.TunnelsTask;
 import io.subutai.core.localpeer.impl.tasks.UsedHostNetResourcesTask;
 import io.subutai.core.lxc.quota.api.QuotaManager;
@@ -2038,7 +2038,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION END --------------------
 
 
-    //todo use HostUtil instead of ExecutorService
     //TODO this is for basic environment via hub
     //    @RolesAllowed( "Environment-Management|Delete" )
     @Override
@@ -2057,38 +2056,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         Set<ResourceHost> resourceHosts = getResourceHosts();
 
-        ExecutorService executorService = Executors.newFixedThreadPool( resourceHosts.size() );
+        HostUtil.Tasks tasks = new HostUtil.Tasks();
 
-        for ( final ResourceHost resourceHost : getResourceHosts() )
+        for ( final ResourceHost resourceHost : resourceHosts )
         {
-            executorService.submit( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        resourceHost.cleanup( environmentId, reservedNetworkResource.getVlan() );
-                    }
-                    catch ( ResourceHostException e )
-                    {
-                        LOG.error( "Failed to cleanup environment {} on RH {}", environmentId.getId(),
-                                resourceHost.getId(), e );
-                    }
-                }
-            } );
+            tasks.addTask( resourceHost, new CleanupEnvironmentTask( resourceHost, reservedNetworkResource ) );
         }
 
-        executorService.shutdown();
-
-        try
-        {
-            executorService.awaitTermination( 30, TimeUnit.SECONDS );
-        }
-        catch ( InterruptedException e )
-        {
-            //ignore
-        }
+        hostUtil.submit( tasks );
 
         //remove reservation
         try
@@ -2101,11 +2076,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //remove PEK
+        //todo review this part with Security team
         try
         {
             KeyManager keyManager = securityManager.getKeyManager();
 
             keyManager.removeKeyData( environmentId.getId() );
+
             keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
         }
         catch ( Exception e )

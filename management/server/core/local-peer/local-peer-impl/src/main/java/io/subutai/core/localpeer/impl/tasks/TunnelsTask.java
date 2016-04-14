@@ -38,7 +38,7 @@ public class TunnelsTask extends HostUtil.Task<Object>
     @Override
     public String name()
     {
-        return "Setup tunnels";
+        return String.format( "Setup tunnels for environment %s", networkResource.getEnvironmentId() );
     }
 
 
