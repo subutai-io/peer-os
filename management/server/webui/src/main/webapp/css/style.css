@@ -2827,11 +2827,13 @@ td.b-main-table__status-col {
 .b-cloud-space-work {
 	height: 100%;
 	position: relative;
+	font-size: 0;
 }
 
 .b-cloud-space-work svg {
 	position: relative;
 	z-index: 2;
+	font-size: 14px;
 }
 
 .b-cloud-create-buttons {

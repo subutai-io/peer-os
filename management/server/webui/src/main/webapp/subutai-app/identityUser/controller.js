@@ -64,6 +64,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	vm.colSelectUserRole = colSelectUserRole;
 	vm.selectAll = selectAll;
 	vm.unselectAll = unselectAll;
+	vm.loginPatern = '(?=^.{4,}$)(^(?!(admin|sys|token)).*)';
 
 	vm.trustedLevels = trustedLevels;
 
@@ -139,6 +140,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 		if(userId) {
 			vm.user2Add = vm.users[userId];
 			vm.editUser = true;
+			vm.loginPatern = '';
 			vm.currentUserRoles = angular.copy(vm.user2Add.roles);
 			vm.user2Add.password = '';
 			//vm.user2Add.confirm_password = angular.copy(vm.user2Add.password);
@@ -147,6 +149,8 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			for(var i = 0; i < vm.currentUserRoles.length; i++) {
 				vm.user2Add.roles.push(vm.currentUserRoles[i].id);
 			}			
+		} else {
+			vm.loginPatern = '(?=^.{4,}$)(^(?!(admin|sys|token)).*)';
 		}
 
 		ngDialog.open({

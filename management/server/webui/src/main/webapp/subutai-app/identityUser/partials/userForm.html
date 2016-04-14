@@ -14,7 +14,7 @@
 					placeholder="Username"
 					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					ng-model="identityUserCtrl.user2Add.userName" 
-					pattern="(?=^.{4,}$)(^(?!(admin|sys|token)).*)" 
+					pattern="{{ identityUserCtrl.loginPatern }}" 
 					title="Min length 4. Can't start with sys, admin and token" 
 					required 
 					tabindex=1 
