@@ -336,15 +336,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             final EnvironmentCreationWorkflow environmentCreationWorkflow =
                     getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
 
-            //start environment creation workflow
-            executor.execute( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    environmentCreationWorkflow.start();
-                }
-            } );
 
             //notify environment event listeners
             environmentCreationWorkflow.onStop( new Runnable()
@@ -426,15 +417,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             final EnvironmentCreationWorkflow environmentCreationWorkflow =
                     getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
 
-            //start environment creation workflow
-            executor.execute( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    environmentCreationWorkflow.start();
-                }
-            } );
 
             //notify environment event listeners
             environmentCreationWorkflow.onStop( new Runnable()
@@ -531,15 +513,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentGrowingWorkflow environmentGrowingWorkflow =
                 getEnvironmentGrowingWorkflow( environment, topology, operationTracker );
 
-        //start environment growing workflow
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                environmentGrowingWorkflow.start();
-            }
-        } );
 
         //notify environment event listeners
         environmentGrowingWorkflow.onStop( new Runnable()
@@ -642,15 +615,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
                 getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers );
 
-        //start environment growing workflow
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                environmentModifyWorkflow.start();
-            }
-        } );
 
         //notify environment event listeners
         environmentModifyWorkflow.onStop( new Runnable()
@@ -713,14 +677,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final SshKeyAdditionWorkflow sshKeyAdditionWorkflow = getSshKeyAdditionWorkflow( environment, sshKey, op );
 
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                sshKeyAdditionWorkflow.start();
-            }
-        } );
 
         //wait
         if ( !async )
@@ -756,14 +712,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final SshKeyRemovalWorkflow sshKeyRemovalWorkflow = getSshKeyRemovalWorkflow( environment, sshKey, op );
 
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                sshKeyRemovalWorkflow.start();
-            }
-        } );
 
         //wait
         if ( !async )
@@ -801,14 +749,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final P2PSecretKeyModificationWorkflow p2PSecretKeyModificationWorkflow =
                 getP2PSecretKeyModificationWorkflow( environment, newP2pSecretKey, p2pSecretKeyTtlSec, op );
 
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                p2PSecretKeyModificationWorkflow.start();
-            }
-        } );
 
         //wait
         if ( !async )
@@ -886,14 +826,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
                 getEnvironmentDestructionWorkflow( this, environment, operationTracker );
 
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                environmentDestructionWorkflow.start();
-            }
-        } );
 
         environmentDestructionWorkflow.onStop( new Runnable()
         {
@@ -986,14 +918,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( this, environment, environmentContainer, operationTracker );
 
-        executor.execute( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                containerDestructionWorkflow.start();
-            }
-        } );
 
         //wait
         if ( !async )
@@ -1352,8 +1276,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         setEnvironmentTransientFields( environment );
 
-        notifyOnEnvironmentCreated( environment );
-
         return environment;
     }
 
@@ -1393,17 +1315,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void setContainersTransientFields( final Environment environment )
     {
-        //        User activeUser = identityManager.getActiveUser();
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
         for ( ContainerHost containerHost : containers )
         {
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
             environmentContainer.setEnvironmentManager( this );
-
-            //            String peerId = environmentContainer.getPeerId();
         }
-        // remove containers which doesn't have trust relation
     }
 
 

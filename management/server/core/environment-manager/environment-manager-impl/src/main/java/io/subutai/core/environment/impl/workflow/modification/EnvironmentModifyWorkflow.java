@@ -9,6 +9,7 @@ import org.apache.servicemix.beanflow.Workflow;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
@@ -96,7 +97,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
             saveEnvironment();
 
-            if ( topology == null )
+            if ( topology == null || CollectionUtil.isCollectionEmpty( topology.getAllPeers() ) )
             {
                 return EnvironmentGrowingPhase.FINALIZE;
             }
