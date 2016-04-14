@@ -187,7 +187,7 @@ public class IntegrationImpl implements Integration
                     LOG.info( "Starting sumchecker" );
                     generateChecksum();
                 }
-            }, 1, 3600000, TimeUnit.MILLISECONDS );
+            }, 1, 600000, TimeUnit.MILLISECONDS );
         }
         catch ( Exception e )
         {

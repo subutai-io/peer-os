@@ -8,7 +8,7 @@ public interface RestService
 {
 	@GET
 	@Path( "products/checksum" )
-	@Produces( { MediaType.TEXT_PLAIN } )
+	@Produces( { MediaType.APPLICATION_JSON } )
 	public Response getListMD5 ();
 
 
