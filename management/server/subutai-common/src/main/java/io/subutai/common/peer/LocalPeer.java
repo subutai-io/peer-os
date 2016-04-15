@@ -157,6 +157,8 @@ public interface LocalPeer extends Peer
 
     Set<HostUtil.Task> getTasks();
 
+    void cancelAllTasks();
+
     public void exchangeMhKeysWithRH() throws Exception;
 
     void setPeerInfo( PeerInfo peerInfo );

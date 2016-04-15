@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerSize;
 
 
@@ -35,6 +36,8 @@ public class ContainerDto
     private String hostId;
     @JsonProperty( "local" )
     private boolean local;
+    @JsonProperty( "state" )
+    private ContainerHostState state;
 
     // Where environment of container created: subutai, hub
     @JsonProperty( "dataSource" )
@@ -48,7 +51,8 @@ public class ContainerDto
                          @JsonProperty( "type" ) final ContainerSize type, @JsonProperty( "arch" ) final String arch,
                          @JsonProperty( "tags" ) final Set<String> tags, @JsonProperty( "peerId" ) final String peerId,
                          @JsonProperty( "hostId" ) final String hostId, @JsonProperty( "local" ) boolean local,
-                         @JsonProperty( "dataSource" ) String dataSource )
+                         @JsonProperty( "dataSource" ) String dataSource,
+                         @JsonProperty( "state" ) ContainerHostState state )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -63,6 +67,7 @@ public class ContainerDto
         this.local = local;
 
         this.dataSource = dataSource;
+        this.state = state;
     }
 
 
@@ -201,5 +206,11 @@ public class ContainerDto
     public String getDataSource()
     {
         return dataSource;
+    }
+
+
+    public ContainerHostState getState()
+    {
+        return state;
     }
 }

@@ -9,6 +9,14 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="task/cancel-all">
+      <action class="io.subutai.core.localpeer.cli.TaskCancelAllCommand">
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="localpeer/check-update-management">
       <action class="io.subutai.core.localpeer.cli.CheckUpdateManagementCommand">
         <argument ref="localPeer" />
