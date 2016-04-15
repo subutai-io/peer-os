@@ -146,11 +146,11 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() (client *http.Client) {
-	_, err := net.DialTimeout("tcp", Management.Host+":8339", time.Duration(2)*time.Second)
+	_, err := net.DialTimeout("tcp", Management.Host+":"+Cdn.Sslport, time.Duration(2)*time.Second)
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client = &http.Client{Transport: tr}
 	if !log.Check(log.InfoLevel, "Trying local repo", err) {
-		Cdn.Kurjun = "https://" + Management.Host + ":8339/rest/kurjun"
+		Cdn.Kurjun = "https://" + Management.Host + ":" + Cdn.Sslport + "/rest/kurjun"
 	} else {
 		Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
 		if !Cdn.Allowinsecure {
