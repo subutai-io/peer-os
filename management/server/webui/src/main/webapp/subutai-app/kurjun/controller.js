@@ -227,7 +227,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 				});
 				break;
 			case 'raw':
-				kurjunSrv.uploadFile(template.file).then(function (response) {
+				kurjunSrv.addFile(template.file).then(function (response) {
 					template.file.result = response.data;
 					$timeout(function () {
 						LOADING_SCREEN('none');

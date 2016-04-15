@@ -33,6 +33,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 		isUploadAllowed: isUploadAllowed,
 		getShared: getShared,
 		getRawFiles: getRawFiles,
+		addFile:addFile,
 		uploadFile: uploadFile
 	};
 
@@ -75,9 +76,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 		});
 	}
 
-	function uploadFile(file) {
-		// setUrlsValues();
-		//@todo repository=
+	function addFile(file) {
 		return uploadFile(file, LOCAL_RAW_URL + 'upload');
 	}
 
@@ -88,7 +87,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function addApt(file) {
-		setUrlsValues();
 		return uploadApt(file, LOCAL_DEB_URL + 'upload');
 	}
 
@@ -129,12 +127,10 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 
 	function getShared(templateId) {
 		// TODO: doesn't work properly
-		setUrlsValues();
 		return $http.get (BASE_URL + "shared/users/" + templateId);
 	}
 
 	function uploadTemplate(file, url) {
-		setUrlsValues();
 		return Upload.upload({
 			url: url,
 			data: {package: file},
@@ -144,7 +140,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function uploadApt(file, url) {
-		setUrlsValues();
 		return Upload.upload({
 			url: url,
 			data: {file: file},
@@ -154,7 +149,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function uploadFile(file, url) {
-		setUrlsValues();
 		return Upload.upload({
 			url: url,
 			data: {file: file},
