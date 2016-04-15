@@ -175,7 +175,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 	function proceedTemplate(template) {
 		switch (vm.activeTab) {
 			case 'templates':
-				kurjunSrv.addTemplate(template.repository, template.file).then(function (response) {
+				kurjunSrv.addTemplate(template.file).then(function (response) {
 					$timeout(function () {
 						template.file.result = response.data;
 						LOADING_SCREEN('none');

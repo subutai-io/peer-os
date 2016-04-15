@@ -81,7 +81,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 		return uploadFile(file, LOCAL_RAW_URL + 'upload');
 	}
 
-	function addTemplate(repository, file) {
+	function addTemplate(file) {
 		//setUrlsValues();
 		//@todo repository=
 		return uploadTemplate(file, LOCAL_TEMPLATE_URL + 'upload');
