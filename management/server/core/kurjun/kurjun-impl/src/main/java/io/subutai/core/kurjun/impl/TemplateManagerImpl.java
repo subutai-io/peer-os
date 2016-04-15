@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.security.PermitAll;
 
@@ -84,6 +85,8 @@ public class TemplateManagerImpl implements TemplateManager
 
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
+    private static Map<String, String> templatesInSync = new ConcurrentHashMap();
+
 
     public TemplateManagerImpl( LocalPeer localPeer )
     {
@@ -93,6 +96,7 @@ public class TemplateManagerImpl implements TemplateManager
 
     public void init()
     {
+
         injector = bootstrapDI();
 
         _local();
@@ -192,6 +196,26 @@ public class TemplateManagerImpl implements TemplateManager
 
         DefaultTemplate m = new DefaultTemplate();
         m.setId( templateOwner, md5 );
+        TemplateId tid = new TemplateId( templateOwner, Hex.encodeHexString( md5 ) );
+
+        //check if download is already in progress
+        //if yes, sleep while download is in progress
+        while ( templatesInSync.get( tid.get() ) != null )
+        {
+            try
+            {
+                LOGGER.debug( "Template {} download is in progress. Putting thread to sleep", tid.get() );
+
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+        }
+
+        //place to map that this template is being downloaded
+        templatesInSync.put( tid.get(), tid.get() );
 
         InputStream is = unifiedRepository.getPackageStream( m );
 
@@ -199,8 +223,14 @@ public class TemplateManagerImpl implements TemplateManager
         {
             QuotaManagerFactory quotaManagerFactory = injector.getInstance( QuotaManagerFactory.class );
             TransferQuotaManager qm = quotaManagerFactory.createTransferQuotaManager( new KurjunContext( repository ) );
+            //remove from map after template is downloaded and cached
+            templatesInSync.remove( String.valueOf( m.getId() ) );
+
             return qm.createManagedStream( is );
         }
+
+        templatesInSync.remove( tid.get() );
+
         return null;
     }
 
