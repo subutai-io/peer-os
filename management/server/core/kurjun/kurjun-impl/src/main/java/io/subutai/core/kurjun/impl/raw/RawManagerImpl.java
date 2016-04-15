@@ -7,10 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.codec.binary.Hex;
 
 import com.google.inject.Injector;
 
@@ -60,6 +64,8 @@ public class RawManagerImpl implements RawManager
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
     private Injector injector;
+
+    private static Map<String, String> rawInSync = new ConcurrentHashMap();
 
 
     public RawManagerImpl()
@@ -262,7 +268,29 @@ public class RawManagerImpl implements RawManager
     @Override
     public InputStream getFile( final String repository, final byte[] md5 ) throws IOException
     {
-        return null;
+        RawMetadata rawMetadata = new RawMetadata();
+        rawMetadata.setMd5Sum( md5 );
+        rawMetadata.setFingerprint( repository );
+
+        while ( rawInSync.get( Hex.encodeHexString( md5 ) ) != null )
+        {
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+        }
+
+        rawInSync.put( Hex.encodeHexString( md5 ), Hex.encodeHexString( md5 ) );
+
+        InputStream inputStream = unifiedRepository.getPackageStream( rawMetadata );
+
+        rawInSync.remove( Hex.encodeHexString( md5 ) );
+
+        return inputStream;
     }
 
 
