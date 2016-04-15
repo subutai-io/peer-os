@@ -193,9 +193,15 @@ public class TemplateManagerImpl implements TemplateManager
             throws IOException
     {
 
+        if ( templateOwner == null || md5 == null || md5.length == 0 )
+        {
+            LOGGER.error( "Incorrect params provided: templateOwner: {}, md5: {}", templateOwner, md5 );
+            return null;
+        }
 
         DefaultTemplate m = new DefaultTemplate();
         m.setId( templateOwner, md5 );
+
         TemplateId tid = new TemplateId( templateOwner, Hex.encodeHexString( md5 ) );
 
         //check if download is already in progress
@@ -217,7 +223,19 @@ public class TemplateManagerImpl implements TemplateManager
         //place to map that this template is being downloaded
         templatesInSync.put( tid.get(), tid.get() );
 
-        InputStream is = unifiedRepository.getPackageStream( m );
+        InputStream is;
+
+        try
+        {
+            is = unifiedRepository.getPackageStream( m );
+        }
+        catch ( Exception ex )
+        {
+            //release in case if exception happened
+            ex.printStackTrace();
+            templatesInSync.remove( tid.get() );
+            return null;
+        }
 
         if ( is != null )
         {
