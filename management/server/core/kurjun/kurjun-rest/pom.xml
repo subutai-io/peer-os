@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>kurjun</artifactId>
-    <version>4.0.0-RC8</version>
+    <version>4.0.0-RC9-SNAPSHOT</version>
   </parent>
   <artifactId>kurjun-rest</artifactId>
   <name>Subutai Kurjun REST</name>
