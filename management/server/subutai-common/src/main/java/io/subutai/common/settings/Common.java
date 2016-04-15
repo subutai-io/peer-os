@@ -8,7 +8,7 @@ public class Common
 {
     public static final String GATEWAY_INTERFACE_NAME_REGEX = "^gw-(\\d+)$";
     public static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
-    public static final String P2P_INTERFACE_NAME_REGEX = "^p2p-(\\d+)$";
+    public static final String P2P_INTERFACE_NAME_REGEX = "^p2p(\\d+)$";
     public static final Pattern P2P_INTERFACE_NAME_PATTERN = Pattern.compile( P2P_INTERFACE_NAME_REGEX );
     public static final String SUBUTAI_HTTP_HEADER = "sbt-hdr";
     public static final String KARAF_ETC = System.getProperty( "karaf.etc" );
