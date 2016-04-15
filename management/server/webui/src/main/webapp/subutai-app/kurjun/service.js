@@ -13,7 +13,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	var DEB_URL = BASE_URL + "deb/";
 	var RAW_URL = BASE_URL + "file/";
 
-	var LOCAL_BASE_URL = SERVER_URL + "rest/kurjun/"
+	var LOCAL_BASE_URL = SERVER_URL + "rest/kurjun/";
 	var LOCAL_TEMPLATE_URL = LOCAL_BASE_URL + "template/";
 	var LOCAL_DEB_URL = LOCAL_BASE_URL + "deb/";
 	var LOCAL_RAW_URL = LOCAL_BASE_URL + "file/";
@@ -76,7 +76,8 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function uploadFile(file) {
-		setUrlsValues();
+		// setUrlsValues();
+		//@todo repository=
 		return uploadFile(file, LOCAL_RAW_URL + 'upload');
 	}
 

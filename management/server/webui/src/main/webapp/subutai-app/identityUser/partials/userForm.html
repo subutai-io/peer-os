@@ -14,8 +14,9 @@
 					placeholder="Username"
 					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					ng-model="identityUserCtrl.user2Add.userName" 
-					pattern="(?=^.{4,}$)(^(?!(admin|sys|token)).*)" 
+					pattern="{{ identityUserCtrl.loginPatern }}" 
 					title="Min length 4. Can't start with sys, admin and token" 
+					autocomplete="off" 
 					required 
 					tabindex=1 
 					ng-readonly="identityUserCtrl.editUser">
@@ -25,6 +26,7 @@
 					placeholder="Full name"
 					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm"
 					ng-model="identityUserCtrl.user2Add.fullName"
+					autocomplete="off" 
 					tabindex=2 
 					required>
 
@@ -45,6 +47,7 @@
 					placeholder="email@mail.com"
 					class="b-popup-body-input b-popup-body-input_full b-popup-body-input_margin-bttm" 
 					ng-model="identityUserCtrl.user2Add.email"
+					autocomplete="off" 
 					tabindex=4 
 					required>
 
@@ -57,6 +60,7 @@
 					pattern="(?=^.{4,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[a-z]).*$" 
 					title="Min length 4. Chars and numbers" 
 					tabindex=5 
+					autocomplete="off" 
 					ng-required="!identityUserCtrl.editUser">
 
 				<label class="b-popup-body-label b-popup-body-label_block">Confirm password:</label>
@@ -67,6 +71,7 @@
 					pw-check="js-password"
 					name="confirm_password"
 					tabindex=6 
+					autocomplete="off" 
 					ng-required="identityUserCtrl.user2Add.password.length > 0">
 				<span class="b-form-hint b-form-hint_red" ng-show="identityUserCtrl.addUserForm.confirm_password.$error.pwmatch">Passwords don't match.</span>
 

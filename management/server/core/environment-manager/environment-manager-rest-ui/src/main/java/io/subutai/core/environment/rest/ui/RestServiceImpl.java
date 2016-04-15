@@ -484,27 +484,6 @@ public class RestServiceImpl implements RestService
     /** Containers **************************************************** */
 
     @Override
-    public Response getContainerEnvironmentId( final String containerId )
-    {
-        if ( Strings.isNullOrEmpty( containerId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
-        }
-
-
-        Environment environment = findEnvironmentByContainerId( containerId );
-
-        if ( environment != null )
-        {
-            return Response.ok( environment.getId() ).build();
-        }
-
-        return Response.status( Response.Status.NOT_FOUND ).build();
-    }
-
-
-    @Override
     public Response destroyContainer( final String containerId )
     {
         if ( Strings.isNullOrEmpty( containerId ) )
