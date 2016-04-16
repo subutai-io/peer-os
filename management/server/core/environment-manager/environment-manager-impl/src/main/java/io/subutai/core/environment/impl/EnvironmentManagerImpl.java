@@ -270,6 +270,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
+        environmentAdapter.uploadEnvironments( environments );
+
         environments.addAll( environmentAdapter.getEnvironments() );
 
         return environments;
