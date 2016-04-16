@@ -139,6 +139,15 @@ public interface EnvironmentManager
     void destroyContainer( String environmentId, String containerId, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
+    /**
+     * Cancels active workflow for the specified environment
+     *
+     * @param environmentId id of environment
+     *
+     * @throws EnvironmentManagerException if exception is thrown during cancellation or if an active workflow not found
+     * for the given environment
+     */
+    void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException;
 
     /**
      * Returns environment by id

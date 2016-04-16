@@ -33,7 +33,7 @@ public abstract class CancellableWorkflow<T> extends Workflow<T>
 
 
     /**
-     * Cancels the ongoing environment operation.
+     * Cancels the ongoing environment workflow.
      *
      * After this call the environment state becomes unpredictable.
      *

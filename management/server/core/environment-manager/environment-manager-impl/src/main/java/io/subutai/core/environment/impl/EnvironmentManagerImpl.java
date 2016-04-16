@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -73,6 +74,7 @@ import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.EnvironmentCreationWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
@@ -117,6 +119,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
+    private final Map<String, CancellableWorkflow> activeWorkflows = Maps.newConcurrentMap();
 
     private EnvironmentAdapter environmentAdapter;
     private EnvironmentService environmentService;
@@ -156,6 +159,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         executor.shutdown();
         backgroundTasksExecutorService.shutdown();
+
+        for ( CancellableWorkflow cancellableWorkflow : activeWorkflows.values() )
+        {
+            cancellableWorkflow.cancel();
+        }
     }
 
 
@@ -289,6 +297,39 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    private void registerActiveWorkflow( Environment environment, CancellableWorkflow newWorkflow )
+    {
+        Preconditions.checkNotNull( environment );
+        Preconditions.checkNotNull( newWorkflow );
+
+        CancellableWorkflow checkWorkflow = activeWorkflows.get( environment.getId() );
+
+        if ( checkWorkflow != null )
+        {
+            throw new IllegalStateException( String.format( "There is already an active workflow %s for environment %s",
+                    checkWorkflow.getClass().getSimpleName(), environment.getId() ) );
+        }
+
+        activeWorkflows.put( environment.getId(), newWorkflow );
+    }
+
+
+    private CancellableWorkflow getActiveWorkflow( Environment environment )
+    {
+        Preconditions.checkNotNull( environment );
+
+        return activeWorkflows.get( environment.getId() );
+    }
+
+
+    private void removeActiveWorkflow( String environmentId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+
+        activeWorkflows.remove( environmentId );
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     @Override
     public Environment createEnvironment( final Topology topology, final boolean async )
@@ -324,50 +365,44 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
+        //create empty environment
+        final EnvironmentImpl environment = createEmptyEnvironment( topology );
+        // TODO add additional step for receiving trust message
 
-        try
+
+        //launch environment creation workflow
+        final EnvironmentCreationWorkflow environmentCreationWorkflow =
+                getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
+
+        registerActiveWorkflow( environment, environmentCreationWorkflow );
+
+        //notify environment event listeners
+        environmentCreationWorkflow.onStop( new Runnable()
         {
-            //create empty environment
-            final EnvironmentImpl environment = createEmptyEnvironment( topology );
-            // TODO add additional step for receiving trust message
-
-
-            //launch environment creation workflow
-            final EnvironmentCreationWorkflow environmentCreationWorkflow =
-                    getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
-
-
-            //notify environment event listeners
-            environmentCreationWorkflow.onStop( new Runnable()
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
 
-                    notifyOnEnvironmentCreated( environment );
-                }
-            } );
+                notifyOnEnvironmentCreated( environment );
 
-            //wait
-            if ( !async )
-            {
-                environmentCreationWorkflow.join();
-
-                if ( environmentCreationWorkflow.isFailed() )
-                {
-                    throw new EnvironmentCreationException(
-                            exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
-                }
+                removeActiveWorkflow( environment.getId() );
             }
+        } );
 
-            //return created environment
-            return environment;
-        }
-        catch ( EnvironmentCreationException e )
+        //wait
+        if ( !async )
         {
-            operationTracker.addLogFailed( e.getMessage() );
-            throw new EnvironmentCreationException( e );
+            environmentCreationWorkflow.join();
+
+            if ( environmentCreationWorkflow.isFailed() )
+            {
+                throw new EnvironmentCreationException(
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
+            }
         }
+
+        //return created environment
+        return environment;
     }
 
 
@@ -406,49 +441,45 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        try
+        //create empty environment
+        final EnvironmentImpl environment = createEmptyEnvironment( topology );
+
+        // TODO add additional step for receiving trust message
+
+        //launch environment creation workflow
+        final EnvironmentCreationWorkflow environmentCreationWorkflow =
+                getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
+
+
+        registerActiveWorkflow( environment, environmentCreationWorkflow );
+
+        //notify environment event listeners
+        environmentCreationWorkflow.onStop( new Runnable()
         {
-            //create empty environment
-            final EnvironmentImpl environment = createEmptyEnvironment( topology );
-
-            // TODO add additional step for receiving trust message
-
-            //launch environment creation workflow
-            final EnvironmentCreationWorkflow environmentCreationWorkflow =
-                    getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
-
-
-            //notify environment event listeners
-            environmentCreationWorkflow.onStop( new Runnable()
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
 
-                    notifyOnEnvironmentCreated( environment );
-                }
-            } );
+                notifyOnEnvironmentCreated( environment );
 
-            //wait
-            if ( !async )
-            {
-                environmentCreationWorkflow.join();
-
-                if ( environmentCreationWorkflow.isFailed() )
-                {
-                    throw new EnvironmentCreationException(
-                            exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
-                }
+                removeActiveWorkflow( environment.getId() );
             }
+        } );
 
-            //return created environment
-            return operationTracker.getId();
-        }
-        catch ( EnvironmentCreationException e )
+        //wait
+        if ( !async )
         {
-            operationTracker.addLogFailed( e.getMessage() );
-            throw new EnvironmentCreationException( e );
+            environmentCreationWorkflow.join();
+
+            if ( environmentCreationWorkflow.isFailed() )
+            {
+                throw new EnvironmentCreationException(
+                        exceptionUtil.getRootCause( environmentCreationWorkflow.getFailedException() ) );
+            }
         }
+
+        //return created environment
+        return operationTracker.getId();
     }
 
 
@@ -513,6 +544,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentGrowingWorkflow environmentGrowingWorkflow =
                 getEnvironmentGrowingWorkflow( environment, topology, operationTracker );
 
+        registerActiveWorkflow( environment, environmentGrowingWorkflow );
 
         //notify environment event listeners
         environmentGrowingWorkflow.onStop( new Runnable()
@@ -523,8 +555,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 try
                 {
                     Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+
                     newContainers.removeAll( oldContainers );
+
                     notifyOnEnvironmentGrown( loadEnvironment( environment.getId() ), newContainers );
+
+                    removeActiveWorkflow( environment.getId() );
                 }
                 catch ( EnvironmentNotFoundException e )
                 {
@@ -574,8 +610,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 String.format( "Modifying environment %s", environmentId ) );
 
         Set<Peer> allPeers = new HashSet<>();
-        final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
-
 
         try
         {
@@ -610,11 +644,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
+        final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
         //launch environment growing workflow
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
                 getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers );
 
+        registerActiveWorkflow( environment, environmentModifyWorkflow );
 
         //notify environment event listeners
         environmentModifyWorkflow.onStop( new Runnable()
@@ -625,8 +661,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 try
                 {
                     Set<EnvironmentContainerHost> newContainers = Sets.newHashSet( environment.getContainerHosts() );
+
                     newContainers.removeAll( oldContainers );
+
                     notifyOnEnvironmentGrown( loadEnvironment( environment.getId() ), newContainers );
+
+                    removeActiveWorkflow( environment.getId() );
                 }
                 catch ( EnvironmentNotFoundException e )
                 {
@@ -688,6 +728,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
                 getSshKeyAdditionWorkflow( environment, sshKey, operationTracker );
 
+        registerActiveWorkflow( environment, sshKeyAdditionWorkflow );
+
+        sshKeyAdditionWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
+
 
         //wait
         if ( !async )
@@ -730,8 +781,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     String.format( "Environment status is %s", environment.getStatus() ) );
         }
 
-        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow = getSshKeyRemovalWorkflow( environment, sshKey, operationTracker );
+        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
+                getSshKeyRemovalWorkflow( environment, sshKey, operationTracker );
 
+        registerActiveWorkflow( environment, sshKeyRemovalWorkflow );
+
+        sshKeyRemovalWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
 
         //wait
         if ( !async )
@@ -776,8 +838,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final P2PSecretKeyModificationWorkflow p2PSecretKeyModificationWorkflow =
-                getP2PSecretKeyModificationWorkflow( environment, newP2pSecretKey, p2pSecretKeyTtlSec, operationTracker );
+                getP2PSecretKeyModificationWorkflow( environment, newP2pSecretKey, p2pSecretKeyTtlSec,
+                        operationTracker );
 
+        registerActiveWorkflow( environment, p2PSecretKeyModificationWorkflow );
+
+        p2PSecretKeyModificationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
 
         //wait
         if ( !async )
@@ -793,32 +866,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected P2PSecretKeyModificationWorkflow getP2PSecretKeyModificationWorkflow( final EnvironmentImpl environment,
-                                                                                    final String p2pSecretKey,
-                                                                                    final long p2pSecretKeyTtlSec,
-                                                                                    final TrackerOperation
-                                                                                            operationTracker )
-    {
-        return new P2PSecretKeyModificationWorkflow( environment, p2pSecretKey, p2pSecretKeyTtlSec, operationTracker,
-                this );
-    }
-
-
-    protected SshKeyAdditionWorkflow getSshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
-
-                                                                final TrackerOperation operationTracker )
-    {
-        return new SshKeyAdditionWorkflow( environment, sshKey, operationTracker, this );
-    }
-
-
-    protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
-                                                              final TrackerOperation operationTracker )
-    {
-        return new SshKeyRemovalWorkflow( environment, sshKey, operationTracker, this );
-    }
-
-
     @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyEnvironment( final String environmentId, final boolean async )
@@ -826,7 +873,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         // If environment from Hub, send destroy request to Hub
         if ( environment instanceof ProxyEnvironment )
@@ -855,6 +902,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
                 getEnvironmentDestructionWorkflow( this, environment, operationTracker );
 
+        registerActiveWorkflow( environment, environmentDestructionWorkflow );
 
         environmentDestructionWorkflow.onStop( new Runnable()
         {
@@ -869,6 +917,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 {
                     notifyOnEnvironmentDestroyed( environmentId );
                 }
+
+                removeActiveWorkflow( environment.getId() );
             }
         } );
 
@@ -947,6 +997,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final ContainerDestructionWorkflow containerDestructionWorkflow =
                 getContainerDestructionWorkflow( this, environment, environmentContainer, operationTracker );
 
+        registerActiveWorkflow( environment, containerDestructionWorkflow );
+
+        containerDestructionWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
 
         //wait
         if ( !async )
@@ -962,11 +1022,32 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected ContainerDestructionWorkflow getContainerDestructionWorkflow(
-            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-            final ContainerHost containerHost, final TrackerOperation operationTracker )
+    @Override
+    public void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException
     {
-        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, operationTracker );
+        CancellableWorkflow activeWorkflow = activeWorkflows.get( environmentId );
+
+        if ( activeWorkflow != null )
+        {
+            try
+            {
+                activeWorkflow.cancel();
+
+                removeActiveWorkflow( environmentId );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+
+                throw new EnvironmentManagerException(
+                        String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
+            }
+        }
+        else
+        {
+            throw new EnvironmentManagerException(
+                    String.format( "Active workflow for environment %s not found", environmentId ) );
+        }
     }
 
 
@@ -1271,20 +1352,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @PermitAll
-    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
-                                                                          final Topology topology, final String sshKey,
-                                                                          final TrackerOperation operationTracker )
-    {
-        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( environment ) )
-        {
-            throw new AccessControlException( "You don't have enough permissions to create environment" );
-        }
-        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, peerManager, securityManager,
-                environment, topology, sshKey, operationTracker );
-    }
-
-
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
@@ -1380,6 +1447,54 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             environmentContainer.setEnvironmentManager( this );
         }
+    }
+
+
+    protected P2PSecretKeyModificationWorkflow getP2PSecretKeyModificationWorkflow( final EnvironmentImpl environment,
+                                                                                    final String p2pSecretKey,
+                                                                                    final long p2pSecretKeyTtlSec,
+                                                                                    final TrackerOperation
+                                                                                            operationTracker )
+    {
+        return new P2PSecretKeyModificationWorkflow( environment, p2pSecretKey, p2pSecretKeyTtlSec, operationTracker,
+                this );
+    }
+
+
+    protected SshKeyAdditionWorkflow getSshKeyAdditionWorkflow( final EnvironmentImpl environment, final String sshKey,
+
+                                                                final TrackerOperation operationTracker )
+    {
+        return new SshKeyAdditionWorkflow( environment, sshKey, operationTracker, this );
+    }
+
+
+    protected SshKeyRemovalWorkflow getSshKeyRemovalWorkflow( final EnvironmentImpl environment, final String sshKey,
+                                                              final TrackerOperation operationTracker )
+    {
+        return new SshKeyRemovalWorkflow( environment, sshKey, operationTracker, this );
+    }
+
+
+    protected ContainerDestructionWorkflow getContainerDestructionWorkflow(
+            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
+            final ContainerHost containerHost, final TrackerOperation operationTracker )
+    {
+        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, operationTracker );
+    }
+
+
+    @PermitAll
+    protected EnvironmentCreationWorkflow getEnvironmentCreationWorkflow( final EnvironmentImpl environment,
+                                                                          final Topology topology, final String sshKey,
+                                                                          final TrackerOperation operationTracker )
+    {
+        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( environment ) )
+        {
+            throw new AccessControlException( "You don't have enough permissions to create environment" );
+        }
+        return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, peerManager, securityManager,
+                environment, topology, sshKey, operationTracker );
     }
 
 
