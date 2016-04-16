@@ -13,7 +13,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 /**
  * Cancels any active environment workflow
  */
-@Command( scope = "environment", name = "cancel-workflow", description = "Cancels any active environment workflow" )
+@Command( scope = "environment", name = "cancel-workflow", description = "Cancels active environment workflow" )
 public class CancelWorkflowCommand extends SubutaiShellCommandSupport
 {
     @Argument( name = "envId", description = "Environment id",

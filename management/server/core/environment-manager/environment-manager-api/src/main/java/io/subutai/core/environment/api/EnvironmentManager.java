@@ -3,6 +3,7 @@ package io.subutai.core.environment.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -148,6 +149,8 @@ public interface EnvironmentManager
      * for the given environment
      */
     void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException;
+
+    Map<String, CancellableWorkflow> getActiveWorkflows();
 
     /**
      * Returns environment by id

@@ -6,7 +6,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.workflow.CancellableWorkflow;
+import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
