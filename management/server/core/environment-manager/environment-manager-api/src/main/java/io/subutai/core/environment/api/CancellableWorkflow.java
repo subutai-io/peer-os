@@ -3,6 +3,7 @@ package io.subutai.core.environment.api;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.servicemix.beanflow.Workflow;
 
@@ -46,6 +47,15 @@ public abstract class CancellableWorkflow<T> extends Workflow<T>
 
         //interrupt main thread
         this.executor.shutdownNow();
+
+        try
+        {
+            this.executor.awaitTermination( 5, TimeUnit.SECONDS );
+        }
+        catch ( InterruptedException e )
+        {
+            //ignore
+        }
 
         //call cancellation handler
         onCancellation();
