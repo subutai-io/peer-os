@@ -4,14 +4,13 @@ package io.subutai.core.environment.impl.workflow.modification;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.servicemix.beanflow.Workflow;
-
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
@@ -24,7 +23,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
 
-public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
+public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
     private final PeerManager peerManager;
     private EnvironmentImpl environment;
@@ -37,7 +36,7 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
 
 
     //environment creation phases
-    public static enum EnvironmentGrowingPhase
+    public enum EnvironmentGrowingPhase
     {
         INIT,
         DESTROY_CONTAINERS,
@@ -283,6 +282,17 @@ public class EnvironmentModifyWorkflow extends Workflow<EnvironmentModifyWorkflo
         operationTracker.addLogFailed( message );
 
         super.fail( message, e );
+    }
+
+
+    @Override
+    public void onCancellation()
+    {
+        environment.setStatus( EnvironmentStatus.CANCELLED );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( "Environment modification was cancelled" );
     }
 
 
