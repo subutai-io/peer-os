@@ -1,19 +1,18 @@
 package io.subutai.core.environment.impl.workflow.destruction;
 
 
-import org.apache.servicemix.beanflow.Workflow;
-
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
 import io.subutai.core.object.relation.api.RelationManager;
 
 
-
-public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
+public class ContainerDestructionWorkflow
+        extends CancellableWorkflow<ContainerDestructionWorkflow.ContainerDestructionPhase>
 {
     private final EnvironmentManagerImpl environmentManager;
     private EnvironmentImpl environment;
@@ -21,7 +20,7 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
     private final TrackerOperation operationTracker;
 
 
-    public static enum ContainerDestructionPhase
+    public enum ContainerDestructionPhase
     {
         INIT, VALIDATE, DESTROY_CONTAINER, FINALIZE
     }
@@ -120,6 +119,17 @@ public class ContainerDestructionWorkflow extends Workflow<ContainerDestructionW
         operationTracker.addLogFailed( message );
 
         super.fail( message, e );
+    }
+
+
+    @Override
+    public void onCancellation()
+    {
+        environment.setStatus( EnvironmentStatus.CANCELLED );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( "Container destruction was cancelled" );
     }
 
 

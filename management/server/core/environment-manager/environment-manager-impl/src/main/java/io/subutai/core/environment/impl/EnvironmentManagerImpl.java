@@ -497,7 +497,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
 
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
         {
             operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
 
@@ -509,7 +510,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
         //launch environment growing workflow
-
         final EnvironmentGrowingWorkflow environmentGrowingWorkflow =
                 getEnvironmentGrowingWorkflow( environment, topology, operationTracker );
 
@@ -601,7 +601,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
         {
             operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
 
@@ -611,7 +612,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
         //launch environment growing workflow
-
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
                 getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers );
 
@@ -672,10 +672,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
 
-        final SshKeyAdditionWorkflow sshKeyAdditionWorkflow = getSshKeyAdditionWorkflow( environment, sshKey, op );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
+                getSshKeyAdditionWorkflow( environment, sshKey, operationTracker );
 
 
         //wait
@@ -707,10 +718,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
 
-        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow = getSshKeyRemovalWorkflow( environment, sshKey, op );
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        final SshKeyRemovalWorkflow sshKeyRemovalWorkflow = getSshKeyRemovalWorkflow( environment, sshKey, operationTracker );
 
 
         //wait
@@ -743,11 +763,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation op = tracker.createTrackerOperation( MODULE_NAME,
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Resetting p2p secret key for environment %s ", environmentId ) );
 
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
         final P2PSecretKeyModificationWorkflow p2PSecretKeyModificationWorkflow =
-                getP2PSecretKeyModificationWorkflow( environment, newP2pSecretKey, p2pSecretKeyTtlSec, op );
+                getP2PSecretKeyModificationWorkflow( environment, newP2pSecretKey, p2pSecretKeyTtlSec, operationTracker );
 
 
         //wait
@@ -1036,8 +1065,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         boolean assign = !Strings.isNullOrEmpty( domain );
+
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Modifying environment %s domain", environmentId ) );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
         try
         {
             if ( assign )
@@ -1137,6 +1176,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         ContainerHost containerHost = environment.getContainerHostById( containerHostId );
+
         if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( containerHost ) )
         {
             throw new EnvironmentSecurityException(
@@ -1145,6 +1185,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHostId ) );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
         try
         {
             if ( add )
@@ -1192,6 +1241,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting up ssh tunnel for container %s ", containerHostId ) );
+
+        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                || environment.getStatus() == EnvironmentStatus.CANCELLED )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentModificationException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
 
         try
         {

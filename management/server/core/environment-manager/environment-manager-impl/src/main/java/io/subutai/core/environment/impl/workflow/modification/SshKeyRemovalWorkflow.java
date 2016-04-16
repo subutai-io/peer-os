@@ -1,16 +1,15 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import org.apache.servicemix.beanflow.Workflow;
-
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.steps.RemoveSshKeyStep;
 
 
-public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKeyAdditionPhase>
+public class SshKeyRemovalWorkflow extends CancellableWorkflow<SshKeyRemovalWorkflow.SshKeyAdditionPhase>
 {
     private EnvironmentImpl environment;
     private final String sshKey;
@@ -97,6 +96,17 @@ public class SshKeyRemovalWorkflow extends Workflow<SshKeyRemovalWorkflow.SshKey
         operationTracker.addLogFailed( message );
 
         super.fail( message, e );
+    }
+
+
+    @Override
+    public void onCancellation()
+    {
+        environment.setStatus( EnvironmentStatus.CANCELLED );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( "Ssh key removal was cancelled" );
     }
 
 

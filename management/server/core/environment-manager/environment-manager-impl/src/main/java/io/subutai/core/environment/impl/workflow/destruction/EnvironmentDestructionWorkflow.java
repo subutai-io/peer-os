@@ -1,17 +1,17 @@
 package io.subutai.core.environment.impl.workflow.destruction;
 
 
-import org.apache.servicemix.beanflow.Workflow;
-
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.steps.CleanupEnvironmentStep;
 import io.subutai.core.object.relation.api.RelationManager;
 
 
-public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
+public class EnvironmentDestructionWorkflow
+        extends CancellableWorkflow<EnvironmentDestructionWorkflow.EnvironmentDestructionPhase>
 {
     private final EnvironmentManagerImpl environmentManager;
     private EnvironmentImpl environment;
@@ -98,6 +98,17 @@ public class EnvironmentDestructionWorkflow extends Workflow<EnvironmentDestruct
         operationTracker.addLogFailed( message );
 
         super.fail( message, e );
+    }
+
+
+    @Override
+    public void onCancellation()
+    {
+        environment.setStatus( EnvironmentStatus.CANCELLED );
+
+        saveEnvironment();
+
+        operationTracker.addLogFailed( "Environment destruction was cancelled" );
     }
 
 
