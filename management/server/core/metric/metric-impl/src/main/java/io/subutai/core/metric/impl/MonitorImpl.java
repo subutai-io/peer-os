@@ -288,8 +288,6 @@ public class MonitorImpl implements Monitor, HostListener
         }
         else
         {
-            //todo metrics for remote container must be obtained from its peer or add Container.getMetrics method
-            // which will delegate to its peer
             commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
         }
 

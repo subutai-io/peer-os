@@ -144,11 +144,19 @@ public class EnvironmentAdapter
 
 
     /**
-     * The method is called each time when SS gets environment list. This is only when we can upload all environments to Hub.
-     * Otherwise there is no way to get all environments on SS side. The intend for all of this: to show on Hub side SS environments created
-     * before SS registered to Hub.
+     * The method is called each time when SS gets environment list. This is only when we can upload all environments to
+     * Hub. Otherwise there is no way to get all environments on SS side. The intend for all of this: to show on Hub
+     * side SS environments created before SS registered to Hub.
      *
-     * This implementation of the requirement is not a proper way but more workaround. In future there should be some refactoring for this.
+     * This implementation of the requirement is not a proper way but more workaround. In future there should be some
+     * refactoring for this.
+     *
+     * TODO:
+     *
+     * this method will slow execution of io.subutai.core.environment.impl.EnvironmentManagerImpl#getEnvironments()
+     *
+     * To handle it properly, this module should receive Peer registration event with Hub and upload all already
+     * existing environments at that moment
      */
     public void uploadEnvironments( Set<Environment> envs )
     {
