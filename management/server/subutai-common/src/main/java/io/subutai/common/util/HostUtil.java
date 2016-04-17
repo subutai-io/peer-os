@@ -34,7 +34,7 @@ public class HostUtil
 
     private Map<String, ExecutorService> taskExecutors = Maps.newConcurrentMap();
 
-    private final Map<String, Set<EnvironmentFuture>> environmentTasksFuturesMap = Maps.newConcurrentMap();
+    private final Map<String, Set<EnvironmentTaskFuture>> environmentTasksFuturesMap = Maps.newConcurrentMap();
 
 
     public Set<Task> getAllTasks()
@@ -47,13 +47,15 @@ public class HostUtil
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        Set<EnvironmentFuture> environmentFutures = environmentTasksFuturesMap.get( environmentId );
+        Set<EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
 
-        if ( !CollectionUtil.isCollectionEmpty( environmentFutures ) )
+        if ( !CollectionUtil.isCollectionEmpty( environmentTaskFutures ) )
         {
-            for ( EnvironmentFuture environmentFuture : environmentFutures )
+            for ( EnvironmentTaskFuture environmentTaskFuture : environmentTaskFutures )
             {
-                environmentFuture.getFuture().cancel( true );
+                environmentTaskFuture.getTask().setTaskState( Task.TaskState.CANCELLED );
+
+                environmentTaskFuture.getFuture().cancel( true );
             }
         }
     }
@@ -298,7 +300,7 @@ public class HostUtil
 
         public enum TaskState
         {
-            NEW, RUNNING, SUCCEEDED, FAILED
+            NEW, RUNNING, SUCCEEDED, CANCELLED, FAILED
         }
 
 
@@ -327,7 +329,10 @@ public class HostUtil
 
         private void setTaskState( final TaskState taskState )
         {
-            this.taskState = taskState;
+            if ( this.taskState != TaskState.CANCELLED )
+            {
+                this.taskState = taskState;
+            }
         }
 
 
@@ -462,11 +467,18 @@ public class HostUtil
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( "Error executing task {}", task.name(), e );
-
                     task.setException( e );
 
-                    task.setTaskState( Task.TaskState.FAILED );
+                    if ( task.getTaskState() == Task.TaskState.CANCELLED )
+                    {
+                        LOG.warn( "Task {} was cancelled", task.name() );
+                    }
+                    else
+                    {
+                        LOG.error( "Error executing task {}", task.name(), e );
+
+                        task.setTaskState( Task.TaskState.FAILED );
+                    }
 
                     return false;
                 }
@@ -479,7 +491,7 @@ public class HostUtil
                     {
                         synchronized ( environmentTasksFuturesMap )
                         {
-                            Set<EnvironmentFuture> environmentTaskFutures =
+                            Set<EnvironmentTaskFuture> environmentTaskFutures =
                                     environmentTasksFuturesMap.get( environmentId );
 
                             if ( environmentTaskFutures != null )
@@ -497,7 +509,7 @@ public class HostUtil
             //add task future to map
             synchronized ( environmentTasksFuturesMap )
             {
-                Set<EnvironmentFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
+                Set<EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
 
                 if ( environmentTaskFutures == null )
                 {
@@ -506,7 +518,7 @@ public class HostUtil
                     environmentTasksFuturesMap.put( environmentId, environmentTaskFutures );
                 }
 
-                environmentTaskFutures.add( new EnvironmentFuture( taskFuture, environmentId ) );
+                environmentTaskFutures.add( new EnvironmentTaskFuture( task, taskFuture, environmentId ) );
             }
         }
 
@@ -514,16 +526,24 @@ public class HostUtil
     }
 
 
-    private static class EnvironmentFuture
+    private static class EnvironmentTaskFuture
     {
+        private final Task task;
         private final Future future;
         private final String environmentId;
 
 
-        public EnvironmentFuture( final Future future, final String environmentId )
+        public EnvironmentTaskFuture( final Task task, final Future future, final String environmentId )
         {
+            this.task = task;
             this.future = future;
             this.environmentId = environmentId;
+        }
+
+
+        public Task getTask()
+        {
+            return task;
         }
 
 
