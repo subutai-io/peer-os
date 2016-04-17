@@ -1,7 +1,6 @@
 package io.subutai.core.executor.impl;
 
 
-import java.io.PrintStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
@@ -25,10 +24,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -101,14 +97,6 @@ public class CommandProcessTest
 
         verify( semaphore ).acquire();
         assertNotNull( result );
-
-
-        InterruptedException exception = mock( InterruptedException.class );
-        doThrow( exception ).when( semaphore ).acquire();
-
-        commandProcess.waitResult();
-
-        verify( exception ).printStackTrace( any( PrintStream.class ) );
     }
 
 

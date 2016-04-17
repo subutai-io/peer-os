@@ -157,8 +157,7 @@ public class PeerWebClient
     }
 
 
-    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
-            throws PeerException
+    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
         Response response;
         try
@@ -170,7 +169,7 @@ public class PeerWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            response = client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
+            response = client.post( p2PCredentials );
         }
         catch ( Exception e )
         {
