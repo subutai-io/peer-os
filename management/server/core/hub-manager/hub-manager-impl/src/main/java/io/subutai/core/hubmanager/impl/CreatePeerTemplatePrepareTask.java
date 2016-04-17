@@ -20,12 +20,14 @@ public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesR
 {
     private static final Logger LOG = LoggerFactory.getLogger( CreatePeerTemplatePrepareTask.class );
 
+    private final String environmentId;
     private final Peer peer;
     private final Set<Node> nodes;
 
 
-    public CreatePeerTemplatePrepareTask( final Peer peer, final Set<Node> nodes )
+    public CreatePeerTemplatePrepareTask( final String environmentId, final Peer peer, final Set<Node> nodes )
     {
+        this.environmentId = environmentId;
         this.peer = peer;
         this.nodes = nodes;
     }
@@ -46,6 +48,6 @@ public class CreatePeerTemplatePrepareTask implements Callable<PrepareTemplatesR
             templates.add( node.getTemplateName() );
         }
 
-        return peer.prepareTemplates( new PrepareTemplatesRequest( rhTemplates ) );
+        return peer.prepareTemplates( new PrepareTemplatesRequest( environmentId, rhTemplates ) );
     }
 }

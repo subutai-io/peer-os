@@ -7,6 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.Topology;
@@ -25,14 +26,17 @@ import io.subutai.core.peer.api.PeerManager;
 public class PrepareTemplatesStep
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( PrepareTemplatesStep.class );
+
+    private final Environment environment;
     private final Topology topology;
-    private PeerManager peerManager;
-    private TrackerOperation operationTracker;
+    private final PeerManager peerManager;
+    private final TrackerOperation operationTracker;
 
 
-    public PrepareTemplatesStep( final PeerManager peerManager, final Topology topology,
+    public PrepareTemplatesStep( final Environment environment, final PeerManager peerManager, final Topology topology,
                                  final TrackerOperation operationTracker )
     {
+        this.environment = environment;
         this.topology = topology;
         this.peerManager = peerManager;
         this.operationTracker = operationTracker;
@@ -50,7 +54,8 @@ public class PrepareTemplatesStep
             Peer peer = peerManager.getPeer( peerPlacement.getKey() );
 
             templateUtil.addPeerTask( new PeerUtil.PeerTask<>( peer,
-                    new PeerImportTemplateTask( peer, peerPlacement.getValue(), operationTracker ) ) );
+                    new PeerImportTemplateTask( environment.getId(), peer, peerPlacement.getValue(),
+                            operationTracker ) ) );
         }
 
         PeerUtil.PeerTaskResults<PrepareTemplatesResponse> templateResults = templateUtil.executeParallelFailFast();

@@ -610,7 +610,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+        HostUtil.Results results = hostUtil.executeFailFast( tasks, request.getEnvironmentId() );
 
         response.addResults( results );
 
@@ -647,7 +647,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             cloneTasks.addTask( resourceHost, task );
         }
 
-        HostUtil.Results cloneResults = hostUtil.execute( cloneTasks );
+        HostUtil.Results cloneResults = hostUtil.execute( cloneTasks, reservedNetworkResource.getEnvironmentId() );
 
         //register succeeded containers
         HostUtil.Tasks quotaTasks = new HostUtil.Tasks();
@@ -679,7 +679,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //set quotas to succeeded containers asynchronously
-        hostUtil.submit( quotaTasks );
+        hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
 
         return new CreateEnvironmentContainersResponse( cloneResults );
     }
@@ -1772,7 +1772,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             hostTasks.addTask( resourceHost, new UsedHostNetResourcesTask( resourceHost, usedNetworkResources ) );
         }
 
-        HostUtil.Results results = hostUtil.executeFailFast( hostTasks );
+        HostUtil.Results results = hostUtil.executeFailFast( hostTasks, null );
 
         if ( results.hasFailures() )
         {
@@ -1811,9 +1811,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        final NetworkResource networkResource = getReservedNetworkResources().findByEnvironmentId( environmentId );
+        final NetworkResource reservedNetworkResource =
+                getReservedNetworkResources().findByEnvironmentId( environmentId );
 
-        if ( networkResource == null )
+        if ( reservedNetworkResource == null )
         {
             throw new PeerException(
                     String.format( "No reserved network resources found for environment %s", environmentId ) );
@@ -1828,11 +1829,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             //setup tunnel only if this RH participates in the swarm
             if ( p2pIps.findByRhId( resourceHost.getId() ) != null )
             {
-                tasks.addTask( resourceHost, new TunnelsTask( resourceHost, p2pIps, networkResource ) );
+                tasks.addTask( resourceHost, new TunnelsTask( resourceHost, p2pIps, reservedNetworkResource ) );
             }
         }
 
-        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+        HostUtil.Results results = hostUtil.executeFailFast( tasks, reservedNetworkResource.getEnvironmentId() );
 
         if ( results.hasFailures() )
         {
@@ -1864,7 +1865,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     p2PCredentials.getP2pSecretKey(), p2PCredentials.getP2pTtlSeconds() ) );
         }
 
-        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+        HostUtil.Results results = hostUtil.executeFailFast( tasks, p2PCredentials.getEnvironmentId() );
 
         if ( results.hasFailures() )
         {
@@ -1909,7 +1910,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                             config.getSecretKey(), config.getSecretKeyTtlSec() ) );
         }
 
-        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+        HostUtil.Results results = hostUtil.executeFailFast( tasks, reservedNetworkResource.getEnvironmentId() );
 
         if ( results.hasFailures() )
         {
@@ -1965,7 +1966,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        HostUtil.Results results = hostUtil.executeFailFast( tasks );
+        HostUtil.Results results = hostUtil.executeFailFast( tasks, reservedNetworkResource.getEnvironmentId() );
 
         if ( results.hasFailures() )
         {
@@ -2000,6 +2001,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
+        //interrupt active environment operations
+        hostUtil.cancelEnvironmentTasks( environmentId.getId() );
+
+        //send cleanup command to RHs
         Set<ResourceHost> resourceHosts = getResourceHosts();
 
         HostUtil.Tasks tasks = new HostUtil.Tasks();
@@ -2009,7 +2014,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             tasks.addTask( resourceHost, new CleanupEnvironmentTask( resourceHost, reservedNetworkResource ) );
         }
 
-        hostUtil.submit( tasks );
+        hostUtil.submit( tasks, reservedNetworkResource.getEnvironmentId() );
 
         //remove reservation
         try

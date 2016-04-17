@@ -10,6 +10,8 @@ import com.google.common.base.Strings;
 public class P2PCredentials
 {
     @JsonProperty
+    private String environmentId;
+    @JsonProperty
     private String p2pHash;
     @JsonProperty
     private String p2pSecretKey;
@@ -17,12 +19,15 @@ public class P2PCredentials
     private long p2pTtlSeconds;
 
 
-    public P2PCredentials( final String p2pHash, final String p2pSecretKey, final long p2pTtlSeconds )
+    public P2PCredentials( final String environmentId, final String p2pHash, final String p2pSecretKey,
+                           final long p2pTtlSeconds )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pSecretKey ), "Invalid p2p secret key" );
         Preconditions.checkArgument( p2pTtlSeconds > 0, "Invalid time-to-live" );
 
+        this.environmentId = environmentId;
         this.p2pHash = p2pHash;
         this.p2pSecretKey = p2pSecretKey;
         this.p2pTtlSeconds = p2pTtlSeconds;
@@ -44,5 +49,11 @@ public class P2PCredentials
     public long getP2pTtlSeconds()
     {
         return p2pTtlSeconds;
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
     }
 }

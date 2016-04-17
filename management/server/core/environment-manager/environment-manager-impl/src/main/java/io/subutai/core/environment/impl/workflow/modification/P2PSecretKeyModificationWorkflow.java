@@ -4,9 +4,9 @@ package io.subutai.core.environment.impl.workflow.modification;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.steps.P2PSecretKeyResetStep;
 
 
@@ -63,8 +63,8 @@ public class P2PSecretKeyModificationWorkflow
         try
         {
             new P2PSecretKeyResetStep( environment,
-                    new P2PCredentials( environment.getP2PHash(), p2pSecretKey, p2pSecretKeyTtlSeconds ),
-                    operationTracker ).execute();
+                    new P2PCredentials( environment.getId(), environment.getP2PHash(), p2pSecretKey,
+                            p2pSecretKeyTtlSeconds ), operationTracker ).execute();
 
             saveEnvironment();
 
@@ -104,6 +104,7 @@ public class P2PSecretKeyModificationWorkflow
         super.fail( message, e );
     }
 
+
     @Override
     public void onCancellation()
     {
@@ -113,6 +114,7 @@ public class P2PSecretKeyModificationWorkflow
 
         operationTracker.addLogFailed( "P2P secret key modification was cancelled" );
     }
+
 
     protected void saveEnvironment()
     {

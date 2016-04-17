@@ -4,9 +4,9 @@ package io.subutai.core.environment.impl.workflow.modification;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
@@ -145,7 +145,7 @@ public class EnvironmentGrowingWorkflow extends CancellableWorkflow<EnvironmentG
 
         try
         {
-            new PrepareTemplatesStep( peerManager, topology, operationTracker ).execute();
+            new PrepareTemplatesStep( environment, peerManager, topology, operationTracker ).execute();
 
             saveEnvironment();
 

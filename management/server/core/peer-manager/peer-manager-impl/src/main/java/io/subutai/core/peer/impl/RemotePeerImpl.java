@@ -136,9 +136,9 @@ public class RemotePeerImpl implements RemotePeer
         RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
 
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-        relationInfoMeta.getRelationTraits().put("receiveHeartbeats", "allow");
-        relationInfoMeta.getRelationTraits().put("sendHeartbeats", "allow");
-        relationInfoMeta.getRelationTraits().put("hostTemplates", "allow");
+        relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
+        relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
+        relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
 
         relationInfoManager.checkRelationValidity( localPeer, this, relationInfoMeta, null );
     }
@@ -707,8 +707,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
-        peerWebClient.resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
-                        p2PCredentials.getP2pTtlSeconds() );
+        peerWebClient.resetP2PSecretKey( p2PCredentials );
     }
 
 
