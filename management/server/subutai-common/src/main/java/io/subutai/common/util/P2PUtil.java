@@ -25,7 +25,7 @@ public abstract class P2PUtil
 
     public static String generateInterfaceName( final int vlan )
     {
-        return String.format( "p2p-%d", vlan );
+        return String.format( "p2p%d", vlan );
     }
 
 

@@ -23,7 +23,7 @@ public interface RestAptManager
     String ID = "id";
     String NAME_PARAM = "name";
     String VERSION_PARAM = "version";
-    String PACKAGE_FILE_PART_NAME = "package";
+    String PACKAGE_FILE_PART_NAME = "file";
 
 
     @GET

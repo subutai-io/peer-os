@@ -1,6 +1,7 @@
 package io.subutai.common.util;
 
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -50,7 +51,7 @@ public class PeerUtil<T>
         Preconditions
                 .checkArgument( !CollectionUtil.isCollectionEmpty( peerTasks ), "No peer task found for execution" );
 
-        Set<PeerTaskResult<T>> results = executeParallel( peerTasks );
+        Set<PeerTaskResult<T>> results = executeParallel( peerTasks, false );
 
         peerTasks.clear();
 
@@ -58,7 +59,27 @@ public class PeerUtil<T>
     }
 
 
-    protected Set<PeerTaskResult<T>> executeParallel( Set<PeerTask<T>> peerTasks )
+    /**
+     * Executes added tasks in parallel. Fails fast if any execution failed.
+     *
+     * Returns results of tasks completed so far
+     *
+     * @return set of {@code PeerTaskResult}
+     */
+    public PeerTaskResults<T> executeParallelFailFast()
+    {
+        Preconditions
+                .checkArgument( !CollectionUtil.isCollectionEmpty( peerTasks ), "No peer task found for execution" );
+
+        Set<PeerTaskResult<T>> results = executeParallel( peerTasks, true );
+
+        peerTasks.clear();
+
+        return new PeerTaskResults<>( results );
+    }
+
+
+    protected Set<PeerTaskResult<T>> executeParallel( Set<PeerTask<T>> peerTasks, boolean failFast )
     {
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( peerTasks ) );
 
@@ -76,20 +97,54 @@ public class PeerUtil<T>
 
         taskExecutor.shutdown();
 
-        for ( Map.Entry<Peer, Future<T>> peerFutureEntry : peerFutures.entrySet() )
+        int doneTasks = 0;
+
+        int totalTasks = peerFutures.size();
+
+        futuresLoop:
+        while ( !Thread.interrupted() && doneTasks < totalTasks && !peerFutures.isEmpty() )
         {
-            Future<T> peerFuture = peerFutureEntry.getValue();
-            Peer targetPeer = peerFutureEntry.getKey();
+            Iterator<Map.Entry<Peer, Future<T>>> mapIterator = peerFutures.entrySet().iterator();
+
+            while ( mapIterator.hasNext() )
+            {
+                Map.Entry<Peer, Future<T>> peerFutureEntry = mapIterator.next();
+
+                Future<T> peerFuture = peerFutureEntry.getValue();
+
+                Peer targetPeer = peerFutureEntry.getKey();
+
+                try
+                {
+                    if ( peerFuture.isDone() )
+                    {
+                        doneTasks++;
+
+                        mapIterator.remove();
+
+                        peerTaskResults.add( new PeerTaskResult<>( targetPeer, peerFuture.get() ) );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error executing task on peer {}", targetPeer.getName(), e );
+
+                    peerTaskResults.add( new PeerTaskResult<T>( targetPeer, e ) );
+
+                    if ( failFast )
+                    {
+                        break futuresLoop;
+                    }
+                }
+            }
 
             try
             {
-                peerTaskResults.add( new PeerTaskResult<>( targetPeer, peerFuture.get() ) );
+                Thread.sleep( 100 );
             }
-            catch ( Exception e )
+            catch ( InterruptedException e )
             {
-                LOG.error( "Error executing task on peer {}", targetPeer.getName(), e );
-
-                peerTaskResults.add( new PeerTaskResult<T>( targetPeer, e ) );
+                break;
             }
         }
 

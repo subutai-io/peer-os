@@ -6,8 +6,6 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.subutai.common.peer.Payload;
-
 import static junit.framework.TestCase.assertEquals;
 
 

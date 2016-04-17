@@ -1,12 +1,9 @@
 package io.subutai.common.util;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 
 import com.google.common.collect.Lists;
 
@@ -123,11 +120,5 @@ public class StringUtil
     }
 
 
-    public static String convertMillisToHHMMSS( long millis )
-    {
-        TimeZone tz = TimeZone.getTimeZone( "UTC" );
-        SimpleDateFormat df = new SimpleDateFormat( "HH:mm:ss" );
-        df.setTimeZone( tz );
-        return df.format( new Date( millis ) );
-    }
+
 }

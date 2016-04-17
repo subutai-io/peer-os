@@ -83,4 +83,16 @@ public interface ResourceHost extends Host, ResourceHostInfo
     Tunnels getTunnels() throws ResourceHostException;
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
+
+    void importTemplate( String templateName ) throws ResourceHostException;
+
+    /**
+     * Clones container based on the specified arguments
+     *
+     * @return ID of container
+     */
+    String cloneContainer( String templateName, String hostname, String ip, int vlan, String environmentId )
+            throws ResourceHostException;
+
+    void setContainerQuota( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
 }

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>od</groupId>
     <artifactId>subutai</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>Serenity project using JBehave and WebDriver for Subutai </name>

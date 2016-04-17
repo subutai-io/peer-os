@@ -14,10 +14,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -88,6 +90,8 @@ public class AptManagerImpl implements AptManager
     private RepositoryFactory repositoryFactory;
     private UnifiedRepository unifiedRepository;
     private LocalRepository localAptRepository;
+
+    private static Map<String, String> debsInSync = new ConcurrentHashMap();
 
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
@@ -162,7 +166,7 @@ public class AptManagerImpl implements AptManager
 
         for ( String s : SystemSettings.getGlobalKurjunUrls() )
         {
-            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalApt( new URL( s ) ) );
+            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalApt( new URL( s ), "all" ) );
         }
     }
 
@@ -242,7 +246,29 @@ public class AptManagerImpl implements AptManager
     public InputStream getPackageByFilename( String filename ) throws IllegalArgumentException
     {
         SerializableMetadata meta = getPackageInfoByFilename( filename );
-        return ( meta != null ) ? unifiedRepository.getPackageStream( meta ) : null;
+        while ( debsInSync.get( filename ) != null )
+        {
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        debsInSync.put( filename, filename );
+
+        if ( meta != null )
+        {
+            debsInSync.remove( filename );
+            return unifiedRepository.getPackageStream( meta );
+        }
+        else
+        {
+            debsInSync.remove( filename );
+            return null;
+        }
     }
 
 

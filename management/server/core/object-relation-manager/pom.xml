@@ -5,7 +5,7 @@
   <parent>
     <artifactId>mgmt-server-core-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC7-SNAPSHOT</version>
+    <version>4.0.0-RC9-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -16,6 +16,7 @@
   <modules>
     <module>object-relation-manager-api</module>
     <module>object-relation-manager-impl</module>
+    <module>object-relation-manager-rest</module>
   </modules>
 
 </project>

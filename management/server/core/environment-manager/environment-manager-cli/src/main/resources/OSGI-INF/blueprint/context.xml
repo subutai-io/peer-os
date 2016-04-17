@@ -56,6 +56,22 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/list-workflows">
+      <action class="io.subutai.core.environment.cli.ListWorkflowsCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/cancel-workflow">
+      <action class="io.subutai.core.environment.cli.CancelWorkflowCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="environment/alert-handlers">
       <action class="io.subutai.core.environment.cli.MonitoringListCommand">
         <argument ref="environmentManager" />
@@ -95,4 +111,11 @@
     </command>
   </command-bundle>
 
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/add-reverse-proxy">
+      <action class="io.subutai.core.environment.cli.AddReverseProxyCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
 </blueprint>

@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC7-SNAPSHOT</version>
+    <version>4.0.0-RC9-SNAPSHOT</version>
   </parent>
 
   <artifactId>subutai-application</artifactId>
@@ -122,26 +122,26 @@
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-    <!-- node-registration -->
+    <!-- host-registration -->
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>node-registration-api</artifactId>
+      <artifactId>host-registration-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>node-registration-impl</artifactId>
+      <artifactId>host-registration-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>node-registration-rest</artifactId>
+      <artifactId>host-registration-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>node-registration-cli</artifactId>
+      <artifactId>host-registration-cli</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -536,6 +536,10 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>object-relation-manager-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>object-relation-manager-rest</artifactId>
     </dependency>
 
     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

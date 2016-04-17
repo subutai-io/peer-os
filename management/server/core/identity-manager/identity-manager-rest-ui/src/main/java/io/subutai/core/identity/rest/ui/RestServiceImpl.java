@@ -11,9 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.identity.rest.ui.entity.KeyDataDto;
-import io.subutai.core.identity.rest.ui.entity.PermissionDto;
-import io.subutai.core.identity.rest.ui.entity.UserTokenDto;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +27,13 @@ import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.core.identity.rest.ui.entity.KeyDataDto;
+import io.subutai.core.identity.rest.ui.entity.PermissionDto;
+import io.subutai.core.identity.rest.ui.entity.UserTokenDto;
+import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.model.SecurityKey;
 
 

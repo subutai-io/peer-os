@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0-RC7-SNAPSHOT</version>
+    <version>4.0.0-RC9-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -32,7 +32,7 @@
     <module>cli-controller</module>
     <module>key-server</module>
     <module>security-manager</module>
-    <module>node-registration</module>
+    <module>host-registration</module>
     <module>hub-adapter</module>
     <module>environment-manager</module>
     <module>test</module>

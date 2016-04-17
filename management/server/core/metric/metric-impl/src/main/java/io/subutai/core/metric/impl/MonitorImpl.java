@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import io.subutai.common.peer.*;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,15 +41,6 @@ import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.Host;
-import io.subutai.common.peer.HostNotFoundException;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -282,6 +274,17 @@ public class MonitorImpl implements Monitor, HostListener
         {
             commandResult =
                     peerManager.getLocalPeer().getResourceHostById( host.getId() ).execute( historicalMetricCommand );
+        }
+        else if ( host instanceof EnvironmentContainerHost )
+        {
+            try
+            {
+                commandResult = peerManager.getPeer( host.getPeerId() ).execute( historicalMetricCommand, host );
+            }
+            catch (PeerException e)
+            {
+                throw new HostNotFoundException( e.getMessage() );
+            }
         }
         else
         {

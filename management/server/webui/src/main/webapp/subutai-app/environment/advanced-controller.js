@@ -6,6 +6,7 @@ angular.module('subutai.environment.adv-controller', [])
 AdvancedEnvironmentCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'SweetAlert', 'ngDialog'];
 
 var graph = new joint.dia.Graph;
+var paper;
 var GRID_SIZE = 60;
 var GRID_SPACING = 5;
 
@@ -87,7 +88,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		});
 	}
 	getPeers();
-
 
 	clearWorkspace();
 
@@ -284,6 +284,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				vm.newEnvID = data;
 
 				getLogById(data, true);
+				initScrollbar();
 				$scope.$emit('reloadEnvironmentsList');
 
 				$rootScope.notificationsUpdate = 'modifyEnvironmentAdv';
@@ -665,10 +666,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}, false);
 		}, 1000);
 
-		var paper = new joint.dia.Paper({
+		paper = new joint.dia.Paper({
 			el: $('#js-environment-creation'),
-			width: '100%',
-			height: '100%',
+			width: '2000px',
+			height: '2000px',
 			model: graph,
 			gridSize: 1
 		});

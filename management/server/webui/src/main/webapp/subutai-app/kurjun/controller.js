@@ -32,6 +32,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 	vm.shareTemplate = shareTemplate;
 	vm.checkRepositoryStatus = checkRepositoryStatus;
 	vm.setDefaultRepository = setDefaultRepository;
+	vm.formatSize = formatSize;
 
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
@@ -160,6 +161,12 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 					scope: $scope
 				});
 				break;
+			case 'raw':
+				vm.currentTemplate = {file: null};
+				ngDialog.open({
+					template: 'subutai-app/kurjun/partials/raw-form.html',
+					scope: $scope
+				});
 			default:
 				break;
 		}
@@ -168,7 +175,7 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 	function proceedTemplate(template) {
 		switch (vm.activeTab) {
 			case 'templates':
-				kurjunSrv.addTemplate(template.repository, template.file).then(function (response) {
+				kurjunSrv.addTemplate(template.file).then(function (response) {
 					$timeout(function () {
 						template.file.result = response.data;
 						LOADING_SCREEN('none');
@@ -219,6 +226,30 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 					}
 				});
 				break;
+			case 'raw':
+				kurjunSrv.addFile(template.file).then(function (response) {
+					template.file.result = response.data;
+					$timeout(function () {
+						LOADING_SCREEN('none');
+						SweetAlert.swal("Success!", "You have successfully uploaded File", "success");
+					}, 2000);
+				}, function (response) {
+					if (response.status > 0) {
+						$timeout(function () {
+							ngDialog.closeAll();
+							LOADING_SCREEN('none');
+							SweetAlert.swal("ERROR!", response.data, "error");
+						}, 2000);
+					}
+				}, function (event) {
+					template.file.progress = Math.min(100, parseInt(100.0 * event.loaded / event.total));
+					if (template.file.progress == 100) {
+						$timeout(function () {
+							ngDialog.closeAll();
+							LOADING_SCREEN();
+						}, 1000);
+					}
+				});
 			default:
 				break;
 		}
@@ -398,6 +429,17 @@ function KurjunCtrl($scope, $rootScope, kurjunSrv, SettingsKurjunSrv, identitySr
 			cfpLoadingBar.complete();
 		}, 500);
 	});
+
+	function formatSize(size) {
+		var value = ((size / 1024) / 1024).toFixed(2);
+		if(value < 1) {
+			value = (size / 1024).toFixed(2).toString() + ' Kb';
+		} else {
+			value = value.toString() + ' Mb';
+		}
+		return value;
+	}
+
 }
 
 function fileModel($parse) {

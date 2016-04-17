@@ -7,7 +7,7 @@ import java.util.Set;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.task.Task;
+import io.subutai.common.util.HostUtil;
 
 
 /**
@@ -15,8 +15,6 @@ import io.subutai.common.task.Task;
  */
 public interface LocalPeer extends Peer
 {
-
-    Task getTask( Integer id );
 
 
     /**
@@ -97,6 +95,8 @@ public interface LocalPeer extends Peer
 
     public Set<RequestListener> getRequestListeners();
 
+    public void removeResourceHost( String rhId ) throws HostNotFoundException;
+
 
     /**
      * Returns domain assigned to vni if any
@@ -155,7 +155,9 @@ public interface LocalPeer extends Peer
 
     Host findHostByName( String hostname ) throws HostNotFoundException;
 
-    List<Task> getTaskList();
+    Set<HostUtil.Task> getTasks();
+
+    void cancelAllTasks();
 
     public void exchangeMhKeysWithRH() throws Exception;
 

@@ -1685,6 +1685,7 @@ td.b-main-table__status-col {
     /*border-radius: 5px;*/
     font-size: 14px;
     margin-bottom: 10px;
+	word-wrap: break-word;
 }
 
 .b-form_border_tabs,
@@ -2827,11 +2828,13 @@ td.b-main-table__status-col {
 .b-cloud-space-work {
 	height: 100%;
 	position: relative;
+	font-size: 0;
 }
 
 .b-cloud-space-work svg {
 	position: relative;
 	z-index: 2;
+	font-size: 14px;
 }
 
 .b-cloud-create-buttons {
