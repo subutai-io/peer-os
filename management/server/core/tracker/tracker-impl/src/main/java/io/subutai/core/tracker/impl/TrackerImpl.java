@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ public class TrackerImpl implements Tracker
     protected TrackerOperationDataService dataService;
     private DaoManager daoManager;
     private IdentityManager identityManager;
+    private final ScheduledExecutorService purger = Executors.newSingleThreadScheduledExecutor();
 
 
     /**
@@ -56,8 +60,10 @@ public class TrackerImpl implements Tracker
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
 
         // @todo add enums instead of values (check for admin)
-        if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+        if ( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+        {
             return dataService.getTrackerOperation( source, operationTrackId );
+        }
 
 
         return dataService.getTrackerUserOperation( source, operationTrackId, identityManager.getActiveUser().getId() );
@@ -104,7 +110,7 @@ public class TrackerImpl implements Tracker
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
 
-        TrackerOperationImpl po = new TrackerOperationImpl( source.toLowerCase(), description, this );
+        TrackerOperationImpl po = new TrackerOperationImpl( source.toUpperCase(), description, this );
         if ( saveTrackerOperation( source, po ) )
         {
             return po;
@@ -135,15 +141,16 @@ public class TrackerImpl implements Tracker
         try
         {
             // @todo add enums instead of values (check for admin)
-            if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+            if ( identityManager.getActiveUser().getType() == 2
+                    && identityManager.getActiveUser().getTrustLevel() == 3 )
             {
                 list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
             }
             else
             {
-                list = dataService.getRecentUserOperations( source, fromDate, toDate, limit, identityManager.getActiveUser().getId() );
+                list = dataService.getRecentUserOperations( source, fromDate, toDate, limit,
+                        identityManager.getActiveUser().getId() );
             }
-
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
@@ -187,7 +194,7 @@ public class TrackerImpl implements Tracker
         long startedTs = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
-            TrackerOperationView po = getTrackerOperation( source.toLowerCase(), operationTrackId );
+            TrackerOperationView po = getTrackerOperation( source.toUpperCase(), operationTrackId );
             if ( po != null )
             {
                 //print log if anything new is appended to it
@@ -228,11 +235,13 @@ public class TrackerImpl implements Tracker
         dataService.setOperationViewState( source, operationId, viewed );
     }
 
+
     @Override
     public void setOperationsViewStates( boolean viewed ) throws SQLException
     {
         dataService.setOperationsViewState( viewed, identityManager.getActiveUser().getId() );
     }
+
 
     @Override
     public List<TrackerOperationView> getNotifications() throws SQLException
@@ -241,10 +250,31 @@ public class TrackerImpl implements Tracker
     }
 
 
-
     public void init()
     {
         dataService = new TrackerOperationDataService( daoManager.getEntityManagerFactory() );
+
+        purger.scheduleAtFixedRate( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    dataService.deleteOldTrackerOperations( 30L );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error purging old operations", e );
+                }
+            }
+        }, 1, 1, TimeUnit.DAYS );
+    }
+
+
+    public void dispose()
+    {
+        purger.shutdown();
     }
 
 
@@ -252,6 +282,7 @@ public class TrackerImpl implements Tracker
     {
         this.daoManager = daoManager;
     }
+
 
     public void setIdentityManager( final IdentityManager identityManager )
     {

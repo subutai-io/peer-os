@@ -50,7 +50,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         log = po.getLog();
         state = po.getState();
         createDate = po.createDate();
-        source = po.getSource();
+        source = po.getSource().toUpperCase();
     }
 
 
