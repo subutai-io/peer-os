@@ -84,6 +84,12 @@ public class TrackerOperationImpl implements TrackerOperation
     }
 
 
+    public String getSource()
+    {
+        return source;
+    }
+
+
     public Date createDate()
     {
         return ( Date ) createDate.clone();

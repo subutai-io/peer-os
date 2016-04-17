@@ -38,6 +38,8 @@ public class TrackerOperationViewImpl implements TrackerOperationView
      */
     private final Date createDate;
 
+    private final String source;
+
 
     public TrackerOperationViewImpl( TrackerOperation po )
     {
@@ -48,6 +50,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         log = po.getLog();
         state = po.getState();
         createDate = po.createDate();
+        source = po.getSource();
     }
 
 
@@ -78,6 +81,12 @@ public class TrackerOperationViewImpl implements TrackerOperationView
     public OperationState getState()
     {
         return state;
+    }
+
+
+    public String getSource()
+    {
+        return source;
     }
 
 
