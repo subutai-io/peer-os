@@ -268,7 +268,7 @@ public class TrackerImpl implements Tracker
                     LOG.error( "Error purging old operations", e );
                 }
             }
-        }, 1, 1, TimeUnit.DAYS );
+        }, 0, 1, TimeUnit.DAYS );
     }
 
 
