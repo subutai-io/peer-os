@@ -145,8 +145,7 @@ public interface EnvironmentManager
      *
      * @param environmentId id of environment
      *
-     * @throws EnvironmentManagerException if exception is thrown during cancellation or if an active workflow not found
-     * for the given environment
+     * @throws EnvironmentManagerException if exception is thrown during cancellation
      */
     void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException;
 

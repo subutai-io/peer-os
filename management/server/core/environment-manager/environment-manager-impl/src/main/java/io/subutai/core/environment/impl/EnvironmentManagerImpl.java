@@ -1046,11 +1046,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                         String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
             }
         }
-        else
-        {
-            throw new EnvironmentManagerException(
-                    String.format( "Active workflow for environment %s not found", environmentId ) );
-        }
     }
 
 
