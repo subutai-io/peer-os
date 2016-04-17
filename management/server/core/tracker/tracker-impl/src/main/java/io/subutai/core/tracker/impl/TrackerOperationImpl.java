@@ -14,7 +14,7 @@ import io.subutai.common.util.UUIDUtil;
 
 
 /**
- * This is an implementation of ProductOperation
+ * This is an implementation of TrackerOperation
  */
 public class TrackerOperationImpl implements TrackerOperation
 {
