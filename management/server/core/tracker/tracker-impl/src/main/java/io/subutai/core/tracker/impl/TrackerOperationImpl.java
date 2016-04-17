@@ -116,6 +116,12 @@ public class TrackerOperationImpl implements TrackerOperation
 
     private void addLog( String logString, OperationState state )
     {
+        //ignore all messages after operation was marked as complete
+        if ( this.state != OperationState.RUNNING )
+        {
+            return;
+        }
+
         if ( !Strings.isNullOrEmpty( logString ) )
         {
 
@@ -124,8 +130,7 @@ public class TrackerOperationImpl implements TrackerOperation
                 log.append( "\n" );
             }
             log.append( String.format( "{\"date\" : %s, \"log\" : \"%s\", \"state\" : \"%s\"},",
-                    new Timestamp(System.currentTimeMillis()).getTime(),
-                    logString, state ) );
+                    new Timestamp( System.currentTimeMillis() ).getTime(), logString, state ) );
         }
         this.state = state;
         tracker.saveTrackerOperation( source, this );
