@@ -165,6 +165,7 @@ public class TrackerOperationImplTest
         when( poi.getState() ).thenReturn( OperationState.RUNNING );
         when( poi.getLog() ).thenReturn( DUMMY_LOG );
         when( poi.createDate() ).thenReturn( new Date() );
+        when( poi.getSource() ).thenReturn( SOURCE );
 
         TrackerOperationViewImpl povi = new TrackerOperationViewImpl( poi );
 
