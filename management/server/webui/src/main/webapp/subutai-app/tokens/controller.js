@@ -89,7 +89,7 @@ function TokensCtrl(identitySrv, $scope, DTOptionsBuilder, DTColumnBuilder, $res
 	}
 
 	function viewTokenButton(data, type, full, meta) {
-		return '<a href class="b-btn b-btn_green" ng-click="tokensCtrl.viewToken(\'' + data.secret + '\')">Show token</a>';
+		return '<a href class="b-btn b-btn_green" style="min-width: 100px;" ng-click="tokensCtrl.viewToken(\'' + data.secret + '\')">Show token</a>';
 	}
 
 	function actionDelete(data, type, full, meta) {
