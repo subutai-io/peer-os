@@ -1013,6 +1013,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
+        securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(), rhId );
+        securityManager.getHttpContextManager().reloadKeyStore();
+
+        KeyManager keyManager = securityManager.getKeyManager();
+        keyManager.removeKeyData( rhId );
+
+        for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
+        {
+            keyManager.removeKeyData( containerHost.getKeyId() );
+        }
+
         resourceHosts.remove( resourceHost );
 
         resourceHostDataService.remove( resourceHost.getId() );
@@ -2033,7 +2044,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             keyManager.removeKeyData( environmentId.getId() );
 
-            keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
+            keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
+
+            Containers containers = getEnvironmentContainers( environmentId );
+            for ( final ContainerHostInfo containerHostInfo : containers.getContainers() )
+            {
+                keyManager.removeKeyData(containerHostInfo.getId());
+            }
         }
         catch ( Exception e )
         {
