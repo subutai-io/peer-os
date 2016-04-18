@@ -1986,10 +1986,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //interrupt active environment operations
-        hostUtil.cancelEnvironmentTasks( environmentId.getId() );
+        boolean hasActiveTasks = hostUtil.cancelEnvironmentTasks( environmentId.getId() );
 
-        //await clone commands on agent to complete, best attempt
-        TaskUtil.sleep( 10 * 1000 ); // 10 sec
+        if ( hasActiveTasks )
+        {
+            //await clone commands on agent to complete, best attempt
+            TaskUtil.sleep( 10 * 1000 ); // 10 sec
+        }
 
         //send cleanup command to RHs
         Set<ResourceHost> resourceHosts = getResourceHosts();
