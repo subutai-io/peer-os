@@ -568,6 +568,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 	function installPlugin (plugin) {
 		plugin.installButton.options.callback = function (instance) {
 			var arr = plugin.dependencies.slice();
+			var names = [];
 			for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 				for (var j = 0; j < plugin.dependencies.length; ++j) {
 					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
@@ -576,12 +577,52 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					}
 				}
 			}
-			console.log (plugin.dependencies, arr);
+			var nameCollector = function (a, start) {
+			    if (start) {
+			        for (var i = 0; i < a.length; ++i) {
+                        for (var j = 0; j < vm.plugins.length; ++j) {
+                            if (a[i] === vm.plugins[j].id) {
+                                console.log ("pushing " + vm.plugins[j].name);
+                                nameCollector (vm.plugins[j].dependencies, false);
+                                names.push (vm.plugins[j].name);
+                                break;
+                            }
+                        }
+                    }
+			    }
+			    else {
+                    var arr = a.slice();
+                    for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                        for (var j = 0; j < a.length; ++j) {
+                            if (vm.installedHubPlugins[i].uid === a[j] && vm.installedHubPlugins[i].restore === false) {
+                                var index = arr.indexOf (a[j]);
+                                arr.splice (index, 1);
+                            }
+                        }
+                    }
+                    for (var i = 0; i < arr.length; ++i) {
+                        for (var j = 0; j < vm.plugins.length; ++j) {
+                            if (arr[i] === vm.plugins[j].id) {
+                                console.log ("pushing " + vm.plugins[j].name);
+                                nameCollector (vm.plugins[j].dependencies, false);
+                                names.push (vm.plugins[j].name);
+                                break;
+                            }
+                        }
+                    }
+                }
+			}
+			nameCollector (arr, true);
+			console.log (names);
 			if (arr.length > 0) {
+			    var notification_text = "It seems that there are dependencies that need to be installed. Are you sure you want to continue?\n\nPlugins to be installed: " + names[0];
+			    for (var i = 1; i < names.length; ++i) {
+			        notification_text += ", " + names[i];
+			    }
 				var previousWindowKeyDown = window.onkeydown;
 				SweetAlert.swal({
 					title: "Additional dependencies",
-					text: "It seems that there are dependencies that need to be installed. Are you sure you want to continue?",
+					text: notification_text,
 					type: "warning",
 					showCancelButton: true,
 					confirmButtonColor: "#ff3f3c",
@@ -632,6 +673,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 												callback();
 											});
 										}
+										break;
 									}
 								}
 							}
