@@ -2006,15 +2006,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         hostUtil.submit( tasks, reservedNetworkResource.getEnvironmentId() );
 
-        //remove reservation
-        try
-        {
-            networkResourceDao.delete( ( NetworkResourceEntity ) reservedNetworkResource );
-        }
-        catch ( DaoException e )
-        {
-            LOG.error( "Failed to delete network reservation for environment {}", environmentId.getId(), e );
-        }
 
         //remove PEK
         //todo review this part with Security team
@@ -2029,6 +2020,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( Exception e )
         {
             LOG.error( "Failed to delete PEK for environment {}", environmentId.getId(), e );
+        }
+
+        //remove reservation
+        try
+        {
+            networkResourceDao.delete( ( NetworkResourceEntity ) reservedNetworkResource );
+        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Failed to delete network reservation for environment {}", environmentId.getId(), e );
         }
     }
 
