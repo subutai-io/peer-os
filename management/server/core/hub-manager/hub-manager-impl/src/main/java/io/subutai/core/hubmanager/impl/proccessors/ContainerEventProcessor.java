@@ -102,7 +102,7 @@ public class ContainerEventProcessor implements Runnable
 
         ContainerEventDto.Type type = ContainerEventDto.Type.valueOf( ch.getState().name() );
 
-        ContainerEventDto dto = new ContainerEventDto( ch.getId(), type );
+        ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), type );
 
         Response res = doRequest( dto );
 
