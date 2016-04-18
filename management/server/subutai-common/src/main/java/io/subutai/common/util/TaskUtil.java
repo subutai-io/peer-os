@@ -237,4 +237,18 @@ public class TaskUtil<T>
             return taskResults;
         }
     }
+
+
+    public static void sleep( long millis )
+    {
+
+        try
+        {
+            Thread.sleep( millis );
+        }
+        catch ( InterruptedException e )
+        {
+            //ignore
+        }
+    }
 }

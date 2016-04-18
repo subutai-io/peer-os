@@ -43,13 +43,15 @@ public class HostUtil
     }
 
 
-    public void cancelEnvironmentTasks( String environmentId )
+    public boolean cancelEnvironmentTasks( String environmentId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         Set<EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
 
-        if ( !CollectionUtil.isCollectionEmpty( environmentTaskFutures ) )
+        boolean hasActiveTasks = !CollectionUtil.isCollectionEmpty( environmentTaskFutures );
+
+        if ( hasActiveTasks )
         {
             for ( EnvironmentTaskFuture environmentTaskFuture : environmentTaskFutures )
             {
@@ -58,6 +60,8 @@ public class HostUtil
                 environmentTaskFuture.getFuture().cancel( true );
             }
         }
+
+        return hasActiveTasks;
     }
 
 

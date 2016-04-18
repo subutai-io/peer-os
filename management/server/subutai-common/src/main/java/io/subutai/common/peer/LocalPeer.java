@@ -147,8 +147,6 @@ public interface LocalPeer extends Peer
 
     TemplateKurjun getTemplateByName( String templateName );
 
-    ContainerHost findContainerById( String containerId );
-
     int setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
 
     List<ContainerHost> getPeerContainers( String peerId );

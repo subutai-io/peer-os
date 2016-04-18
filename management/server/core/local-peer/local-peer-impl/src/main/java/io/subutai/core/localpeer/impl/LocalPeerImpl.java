@@ -94,6 +94,7 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -678,8 +679,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
-        //set quotas to succeeded containers asynchronously
-        hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+        if ( !quotaTasks.isEmpty() )
+        {
+            //set quotas to succeeded containers asynchronously
+            hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+        }
 
         return new CreateEnvironmentContainersResponse( cloneResults );
     }
@@ -736,26 +740,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
         }
         return result;
-    }
-
-
-    @Override
-    public ContainerHost findContainerById( final String containerId )
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            try
-            {
-                return resourceHost.getContainerHostById( containerId );
-            }
-            catch ( HostNotFoundException ignore )
-            {
-                // ignore
-            }
-        }
-        return null;
     }
 
 
@@ -2002,7 +1986,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //interrupt active environment operations
-        hostUtil.cancelEnvironmentTasks( environmentId.getId() );
+        boolean hasActiveTasks = hostUtil.cancelEnvironmentTasks( environmentId.getId() );
+
+        if ( hasActiveTasks )
+        {
+            //await clone commands on agent to complete, best attempt
+            TaskUtil.sleep( 10 * 1000 ); // 10 sec
+        }
 
         //send cleanup command to RHs
         Set<ResourceHost> resourceHosts = getResourceHosts();
@@ -2016,15 +2006,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         hostUtil.submit( tasks, reservedNetworkResource.getEnvironmentId() );
 
-        //remove reservation
-        try
-        {
-            networkResourceDao.delete( ( NetworkResourceEntity ) reservedNetworkResource );
-        }
-        catch ( DaoException e )
-        {
-            LOG.error( "Failed to delete network reservation for environment {}", environmentId.getId(), e );
-        }
 
         //remove PEK
         //todo review this part with Security team
@@ -2039,6 +2020,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( Exception e )
         {
             LOG.error( "Failed to delete PEK for environment {}", environmentId.getId(), e );
+        }
+
+        //remove reservation
+        try
+        {
+            networkResourceDao.delete( ( NetworkResourceEntity ) reservedNetworkResource );
+        }
+        catch ( DaoException e )
+        {
+            LOG.error( "Failed to delete network reservation for environment {}", environmentId.getId(), e );
         }
     }
 
@@ -2175,7 +2166,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
     {
-        ContainerHost containerHost = findContainerById( reverseProxyConfig.getContainerId() );
+        ContainerHost containerHost = getContainerHostById( reverseProxyConfig.getContainerId() );
 
         if ( containerHost == null )
         {
