@@ -11,6 +11,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.IntegrationImpl;
@@ -28,6 +29,7 @@ public class ContainerEventProcessor implements Runnable
     private ConfigManager configManager;
 
     private PeerManager peerManager;
+
 
     public ContainerEventProcessor( IntegrationImpl integration, ConfigManager configManager, PeerManager peerManager )
     {
@@ -74,11 +76,12 @@ public class ContainerEventProcessor implements Runnable
 
     private void sendContainerStates( ResourceHost rh ) throws Exception
     {
-        log.info( "ResourceHost: id={}, hostname={}, containers={}", rh.getId(), rh.getHostname(), rh.getContainerHosts().size() );
+        log.info( "ResourceHost: id={}, hostname={}, containers={}", rh.getId(), rh.getHostname(),
+                rh.getContainerHosts().size() );
 
         for ( ContainerHost ch : rh.getContainerHosts() )
         {
-            if ( !"management".equals( ch.getContainerName() ) )
+            if ( !Common.MANAGEMENT_HOSTNAME.equals( ch.getContainerName() ) )
             {
                 sendContainerState( ch );
             }
@@ -88,13 +91,13 @@ public class ContainerEventProcessor implements Runnable
 
     private void sendContainerState( ContainerHost ch ) throws Exception
     {
-        log.info( "- ContainerHost: id={}, name={}, environmentId={}, state={}", ch.getId(), ch.getContainerName(), ch.getEnvironmentId(),
-                ch.getState() );
+        log.info( "- ContainerHost: id={}, name={}, environmentId={}, state={}", ch.getId(), ch.getContainerName(),
+                ch.getEnvironmentId(), ch.getState() );
 
         // For now Hub needs RUNNING only
         if ( ch.getState() != ContainerHostState.RUNNING )
         {
-           return;
+            return;
         }
 
         ContainerEventDto.Type type = ContainerEventDto.Type.valueOf( ch.getState().name() );
@@ -119,5 +122,4 @@ public class ContainerEventProcessor implements Runnable
 
         return client.post( encryptedData );
     }
-
 }

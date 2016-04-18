@@ -39,8 +39,6 @@ public class AbstractSubutaiHostTest
     private static final HostArchitecture ARCH = HostArchitecture.AMD64;
     private static final String INTERFACE_NAME = "eth0";
     private static final String IP = "127.0.0.1";
-    private static final String MAC = "mac";
-    private static final String DUMMY_INTERFACE_NAME = "dummy interface";
 
 
     @Mock
@@ -211,15 +209,6 @@ public class AbstractSubutaiHostTest
 
         assertTrue( host.getLastHeartbeat() > lastHeartBeat );
     }
-
-
-    //    @Test
-    //    public void testIsConnected() throws Exception
-    //    {
-    //        host.isConnected();
-    //
-    //        verify( peer ).isConnected( host );
-    //    }
 
 
     @Test

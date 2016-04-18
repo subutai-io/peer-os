@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -32,10 +34,34 @@ public class HostUtil
 
     private Map<String, ExecutorService> taskExecutors = Maps.newConcurrentMap();
 
+    private final Map<String, Set<EnvironmentTaskFuture>> environmentTasksFuturesMap = Maps.newConcurrentMap();
+
 
     public Set<Task> getAllTasks()
     {
         return Collections.unmodifiableSet( allTasks );
+    }
+
+
+    public boolean cancelEnvironmentTasks( String environmentId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        Set<EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
+
+        boolean hasActiveTasks = !CollectionUtil.isCollectionEmpty( environmentTaskFutures );
+
+        if ( hasActiveTasks )
+        {
+            for ( EnvironmentTaskFuture environmentTaskFuture : environmentTaskFutures )
+            {
+                environmentTaskFuture.getTask().setTaskState( Task.TaskState.CANCELLED );
+
+                environmentTaskFuture.getFuture().cancel( true );
+            }
+        }
+
+        return hasActiveTasks;
     }
 
 
@@ -49,15 +75,17 @@ public class HostUtil
         taskExecutors.clear();
 
         allTasks.clear();
+
+        environmentTasksFuturesMap.clear();
     }
 
 
     /**
      * Executes tasks in parallel
      */
-    public Results execute( Tasks tasks )
+    public Results execute( Tasks tasks, String environmentId )
     {
-        return executeParallel( tasks, false );
+        return executeParallel( tasks, false, environmentId );
     }
 
 
@@ -66,13 +94,13 @@ public class HostUtil
      *
      * Returns results of tasks completed so far
      */
-    public Results executeFailFast( Tasks tasks )
+    public Results executeFailFast( Tasks tasks, String environmentId )
     {
-        return executeParallel( tasks, true );
+        return executeParallel( tasks, true, environmentId );
     }
 
 
-    protected Results executeParallel( Tasks tasks, boolean failFast )
+    protected Results executeParallel( Tasks tasks, boolean failFast, String environmentId )
     {
         Preconditions.checkNotNull( tasks, "Invalid tasks" );
         Preconditions.checkArgument( !tasks.isEmpty(), "No tasks" );
@@ -91,7 +119,7 @@ public class HostUtil
 
             for ( Task hostTask : hostTasks )
             {
-                taskFutures.add( submitTask( host, hostTask ) );
+                taskFutures.add( submitTask( host, hostTask, environmentId ) );
             }
         }
 
@@ -126,7 +154,14 @@ public class HostUtil
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( "Error in #execute", e );
+                    if ( e instanceof CancellationException )
+                    {
+                        LOG.warn( "Task cancelled" );
+                    }
+                    else
+                    {
+                        LOG.error( "Error in #execute", e );
+                    }
 
                     if ( failFast )
                     {
@@ -149,7 +184,7 @@ public class HostUtil
     }
 
 
-    public Map<Task, Future<Boolean>> submit( final Tasks tasks )
+    public Map<Task, Future<Boolean>> submit( final Tasks tasks, String environmentId )
     {
         Preconditions.checkNotNull( tasks, "Invalid tasks" );
         Preconditions.checkArgument( !tasks.isEmpty(), "No tasks" );
@@ -166,7 +201,7 @@ public class HostUtil
 
             for ( Task hostTask : hostTasks )
             {
-                taskFutures.put( hostTask, submitTask( host, hostTask ) );
+                taskFutures.put( hostTask, submitTask( host, hostTask, environmentId ) );
             }
         }
 
@@ -269,7 +304,7 @@ public class HostUtil
 
         public enum TaskState
         {
-            NEW, RUNNING, SUCCEEDED, FAILED
+            NEW, RUNNING, SUCCEEDED, CANCELLED, FAILED
         }
 
 
@@ -298,7 +333,10 @@ public class HostUtil
 
         private void setTaskState( final TaskState taskState )
         {
-            this.taskState = taskState;
+            if ( this.taskState != TaskState.CANCELLED )
+            {
+                this.taskState = taskState;
+            }
         }
 
 
@@ -408,7 +446,7 @@ public class HostUtil
     }
 
 
-    private <R> Future<Boolean> submitTask( Host host, final Task<R> task )
+    private <R> Future<Boolean> submitTask( Host host, final Task<R> task, final String environmentId )
     {
         ExecutorService taskExecutor = getTaskExecutor( host, task );
 
@@ -418,7 +456,7 @@ public class HostUtil
 
         task.setTaskState( Task.TaskState.RUNNING );
 
-        return taskExecutor.submit( new Callable<Boolean>()
+        final Future<Boolean> taskFuture = taskExecutor.submit( new Callable<Boolean>()
         {
             @Override
             public Boolean call() throws Exception
@@ -433,11 +471,18 @@ public class HostUtil
                 }
                 catch ( Exception e )
                 {
-                    LOG.error( "Error executing task {}", task.name(), e );
-
                     task.setException( e );
 
-                    task.setTaskState( Task.TaskState.FAILED );
+                    if ( task.getTaskState() == Task.TaskState.CANCELLED )
+                    {
+                        LOG.warn( "Task {} was cancelled", task.name() );
+                    }
+                    else
+                    {
+                        LOG.error( "Error executing task {}", task.name(), e );
+
+                        task.setTaskState( Task.TaskState.FAILED );
+                    }
 
                     return false;
                 }
@@ -445,9 +490,77 @@ public class HostUtil
                 {
                     //remove completed task
                     allTasks.remove( task );
+
+                    if ( environmentId != null )
+                    {
+                        synchronized ( environmentTasksFuturesMap )
+                        {
+                            Set<EnvironmentTaskFuture> environmentTaskFutures =
+                                    environmentTasksFuturesMap.get( environmentId );
+
+                            if ( environmentTaskFutures != null )
+                            {
+                                environmentTaskFutures.remove( environmentId );
+                            }
+                        }
+                    }
                 }
             }
         } );
+
+        if ( environmentId != null )
+        {
+            //add task future to map
+            synchronized ( environmentTasksFuturesMap )
+            {
+                Set<EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
+
+                if ( environmentTaskFutures == null )
+                {
+                    environmentTaskFutures = Sets.newHashSet();
+
+                    environmentTasksFuturesMap.put( environmentId, environmentTaskFutures );
+                }
+
+                environmentTaskFutures.add( new EnvironmentTaskFuture( task, taskFuture, environmentId ) );
+            }
+        }
+
+        return taskFuture;
+    }
+
+
+    private static class EnvironmentTaskFuture
+    {
+        private final Task task;
+        private final Future future;
+        private final String environmentId;
+
+
+        public EnvironmentTaskFuture( final Task task, final Future future, final String environmentId )
+        {
+            this.task = task;
+            this.future = future;
+            this.environmentId = environmentId;
+        }
+
+
+        public Task getTask()
+        {
+            return task;
+        }
+
+
+        public Future getFuture()
+        {
+            return future;
+        }
+
+
+        public String getEnvironmentId()
+        {
+            return environmentId;
+        }
     }
 
 
