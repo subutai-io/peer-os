@@ -2008,7 +2008,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( hasActiveTasks )
         {
-            //await clone commands on agent to complete, best attempt
+            //await clone commands on agent to complete, best effort
             TaskUtil.sleep( 10 * 1000 ); // 10 sec
         }
 

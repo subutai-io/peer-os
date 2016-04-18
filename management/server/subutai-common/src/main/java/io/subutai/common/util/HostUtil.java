@@ -154,11 +154,7 @@ public class HostUtil
                 }
                 catch ( Exception e )
                 {
-                    if ( e instanceof CancellationException )
-                    {
-                        LOG.warn( "Task cancelled" );
-                    }
-                    else
+                    if ( !( e instanceof CancellationException ) )
                     {
                         LOG.error( "Error in #execute", e );
                     }
