@@ -992,7 +992,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         if ( managementHost == null )
         {
-            managementHost = getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
+            throw new HostNotFoundException( String.format( "Management host not found on peer %s.", getId() ) );
         }
 
         return managementHost;
@@ -1158,6 +1158,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
+
         if ( initialized )
         {
             ResourceHostEntity host;
@@ -1167,31 +1168,47 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
             catch ( HostNotFoundException e )
             {
+                //register new RH
                 host = new ResourceHostEntity( getId(), resourceHostInfo );
+
                 resourceHostDataService.persist( host );
+
                 addResourceHost( host );
-                Set<ResourceHost> a = Sets.newHashSet();
-                a.add( host );
-                setResourceHostTransientFields( a );
+
+                setResourceHostTransientFields( Sets.<ResourceHost>newHashSet(host) );
+
                 buildAdminHostRelation( host );
+
                 LOG.debug( String.format( "Resource host %s registered.", resourceHostInfo.getHostname() ) );
             }
+
+            //update host info from heartbeat
             if ( host.updateHostInfo( resourceHostInfo ) )
             {
                 resourceHostDataService.update( host );
+
                 LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
             }
+
             if ( managementHost == null )
             {
                 try
                 {
-                    final Host managementLxc = findHostByName( Common.MANAGEMENT_HOSTNAME );
-                    if ( managementLxc instanceof ContainerHostEntity )
+                    final Host managementContainer = findHostByName( Common.MANAGEMENT_HOSTNAME );
+
+                    if ( managementContainer instanceof ContainerHostEntity )
                     {
-                        managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
-                        buildAdminHostRelation( managementHost );
-                        //todo save flag that exchange happened to db
-                        exchangeMhKeysWithRH();
+                        ResourceHost managementRH = ( ( ContainerHostEntity ) managementContainer ).getParent();
+
+                        if ( managementRH != null )
+                        {
+                            managementHost = managementRH;
+
+                            buildAdminHostRelation( managementRH );
+
+                            //todo save flag that exchange happened to db
+                            exchangeMhKeysWithRH();
+                        }
                     }
                 }
                 catch ( Exception e )
