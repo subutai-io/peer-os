@@ -249,7 +249,6 @@ public class LocalPeerImplTest
         localPeer.resourceHosts = Sets.newHashSet( ( ResourceHost ) resourceHost );
         localPeer.commandUtil = commandUtil;
         localPeer.exceptionUtil = exceptionUtil;
-        localPeer.managementHost = managementHost;
         localPeer.requestListeners = Sets.newHashSet( requestListener );
 
         when( daoManager.getEntityManagerFactory() ).thenReturn( entityManagerFactory );
@@ -530,11 +529,9 @@ public class LocalPeerImplTest
     @Test( expected = HostNotFoundException.class )
     public void testGetManagementHost() throws Exception
     {
-        assertEquals( managementHost, localPeer.getManagementHost() );
 
-        doThrow( new HostNotFoundException( "" )).when( localPeer ).getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
-
-        localPeer.managementHost = null;
+        doThrow( new HostNotFoundException( "" ) ).when( localPeer )
+                                                  .getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
 
         localPeer.getManagementHost();
     }
@@ -632,8 +629,6 @@ public class LocalPeerImplTest
 
         localPeer.initialized = true;
         localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
-
-        localPeer.managementHost = null;
 
         localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
 

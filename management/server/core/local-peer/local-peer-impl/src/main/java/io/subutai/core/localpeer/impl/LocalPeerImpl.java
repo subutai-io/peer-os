@@ -145,7 +145,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
-    protected ResourceHost managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
     private CommandExecutor commandExecutor;
     private QuotaManager quotaManager;
@@ -990,12 +989,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHost getManagementHost() throws HostNotFoundException
     {
-        if ( managementHost == null )
-        {
-            throw new HostNotFoundException( String.format( "Management host not found on peer %s.", getId() ) );
-        }
-
-        return managementHost;
+        return getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
     }
 
 
@@ -1161,7 +1155,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( initialized )
         {
+            boolean firstMhRegistration = false;
+
             ResourceHostEntity host;
+
             try
             {
                 host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
@@ -1175,11 +1172,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 addResourceHost( host );
 
-                setResourceHostTransientFields( Sets.<ResourceHost>newHashSet(host) );
+                setResourceHostTransientFields( Sets.<ResourceHost>newHashSet( host ) );
 
                 buildAdminHostRelation( host );
 
                 LOG.debug( String.format( "Resource host %s registered.", resourceHostInfo.getHostname() ) );
+
+                for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+                {
+                    if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getHostname() ) )
+                    {
+                        firstMhRegistration = true;
+                        break;
+                    }
+                }
             }
 
             //update host info from heartbeat
@@ -1190,30 +1196,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
             }
 
-            if ( managementHost == null )
+            if ( firstMhRegistration )
             {
+                //exchange keys with MH container
                 try
                 {
-                    final Host managementContainer = findHostByName( Common.MANAGEMENT_HOSTNAME );
-
-                    if ( managementContainer instanceof ContainerHostEntity )
-                    {
-                        ResourceHost managementRH = ( ( ContainerHostEntity ) managementContainer ).getParent();
-
-                        if ( managementRH != null )
-                        {
-                            managementHost = managementRH;
-
-                            buildAdminHostRelation( managementRH );
-
-                            //todo save flag that exchange happened to db
-                            exchangeMhKeysWithRH();
-                        }
-                    }
+                    exchangeKeys( host, Common.MANAGEMENT_HOSTNAME );
                 }
                 catch ( Exception e )
                 {
-                    //ignore
+                    LOG.error( "Error exchanging keys with MH" );
+                }
+
+                //setup security
+                try
+                {
+                    buildAdminHostRelation( getContainerHostByName( Common.MANAGEMENT_HOSTNAME ) );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error setting up security relations with MH", e );
                 }
             }
         }
@@ -1252,13 +1254,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void exchangeMhKeysWithRH() throws Exception
+    public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception
     {
         RegistrationManager registrationManager = ServiceLocator.getServiceNoCache( RegistrationManager.class );
 
         String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
 
-        commandUtil.execute( localPeerCommands.getManagementExchangeKeyCommand( token ), getManagementHost() );
+        commandUtil.execute( localPeerCommands.getExchangeKeyCommand( hostname, token ), resourceHost );
     }
 
 
@@ -2154,12 +2156,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public Host findHostByName( final String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
-
-
-        if ( managementHost != null && getManagementHost().getHostname().equals( hostname ) )
-        {
-            return managementHost;
-        }
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
