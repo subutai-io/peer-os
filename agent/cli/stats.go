@@ -61,6 +61,7 @@ func initdb() {
 		Addr:               "https://" + config.Influxdb.Server + ":8086",
 		Username:           config.Influxdb.User,
 		Password:           config.Influxdb.Pass,
+		Timeout:            time.Second * 10,
 		InsecureSkipVerify: true,
 	})
 	log.Check(log.FatalLevel, "Initialize db connection", err)
@@ -303,6 +304,10 @@ func grep(str, filename string) string {
 }
 
 func Stats(command, host, interval string) {
+	if len(host) == 0 {
+		log.Error("Empty host name")
+	}
+
 	initdb()
 	if len(interval) == 0 {
 		interval = "10m"
