@@ -157,7 +157,7 @@ public interface LocalPeer extends Peer
 
     void cancelAllTasks();
 
-    public void exchangeMhKeysWithRH() throws Exception;
+    public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception;
 
     void setPeerInfo( PeerInfo peerInfo );
 

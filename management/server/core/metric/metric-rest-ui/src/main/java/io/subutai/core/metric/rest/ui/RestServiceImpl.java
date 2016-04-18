@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response;
 
 import com.google.common.base.Preconditions;
 
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
@@ -66,7 +67,12 @@ public class RestServiceImpl implements RestService
                 host = localPeer.getManagementHost();
             }
 
-            return Response.ok( monitor.getPlainHistoricalMetrics( host, start, current ) ).build();
+            if ( host instanceof EnvironmentContainerHost )
+            {
+                return Response.ok( host.getPeer().getHistoricalMetrics( host.getHostname(), start, current ) ).build();
+            }
+
+            return Response.ok( monitor.getHistoricalMetrics( host, start, current ) ).build();
         }
         catch ( Exception e )
         {
