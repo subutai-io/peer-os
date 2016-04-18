@@ -992,7 +992,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         if ( managementHost == null )
         {
-            throw new HostNotFoundException( String.format( "Management host not found on peer %s.", getId() ) );
+            managementHost = getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
         }
 
         return managementHost;
@@ -1185,7 +1185,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 try
                 {
-                    final Host managementLxc = findHostByName( "management" );
+                    final Host managementLxc = findHostByName( Common.MANAGEMENT_HOSTNAME );
                     if ( managementLxc instanceof ContainerHostEntity )
                     {
                         managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
@@ -1216,7 +1216,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "bandwidthControl", "true" );
 
-            if ( "management".equalsIgnoreCase( host.getHostname() ) )
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
             {
                 relationTraits.put( "managementSupervisor", "true" );
             }

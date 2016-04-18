@@ -6,6 +6,7 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.settings.Common;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
@@ -27,7 +28,7 @@ public class CheckUpdateManagementCommand extends SubutaiShellCommandSupport
     {
         final RequestBuilder requestBuilder = new RequestBuilder( "/opt/subutai-mng/bin/update-management --check" );
 
-        CommandResult commandResult = localPeer.findHostByName( "management" ).execute( requestBuilder );
+        CommandResult commandResult = localPeer.findHostByName( Common.MANAGEMENT_HOSTNAME ).execute( requestBuilder );
 
         System.out.println( commandResult.toString() );
         return null;
