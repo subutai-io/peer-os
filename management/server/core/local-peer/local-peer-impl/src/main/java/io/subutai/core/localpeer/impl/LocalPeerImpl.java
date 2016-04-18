@@ -1013,6 +1013,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
+        securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(), rhId );
+        securityManager.getHttpContextManager().reloadKeyStore();
+
+        KeyManager keyManager = securityManager.getKeyManager();
+        keyManager.removeKeyData( rhId );
+
+        for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
+        {
+            keyManager.removeKeyData( containerHost.getKeyId() );
+        }
+
         resourceHosts.remove( resourceHost );
 
         resourceHostDataService.remove( resourceHost.getId() );
@@ -2008,7 +2019,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( hasActiveTasks )
         {
-            //await clone commands on agent to complete, best attempt
+            //await clone commands on agent to complete, best effort
             TaskUtil.sleep( 10 * 1000 ); // 10 sec
         }
 
@@ -2033,7 +2044,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             keyManager.removeKeyData( environmentId.getId() );
 
-            keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
+            keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
+
+            Containers containers = getEnvironmentContainers( environmentId );
+            for ( final ContainerHostInfo containerHostInfo : containers.getContainers() )
+            {
+                keyManager.removeKeyData(containerHostInfo.getId());
+            }
         }
         catch ( Exception e )
         {
