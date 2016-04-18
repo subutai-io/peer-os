@@ -430,4 +430,14 @@ public class DefSubutaiStepsWhen {
     public void user_clicks_template_cassandra() throws FindFailed {
         subutaiSteps.clickOnIconTemplateCasandra();
     }
+
+    @When("the user gets Peer ID")
+    public void user_gets_peer_id(){
+        subutaiSteps.getPeerID();
+    }
+
+    @When("the user gets Environment ID")
+    public void user_gets_environment_data(){
+        subutaiSteps.getEnvironmentData();
+    }
 }

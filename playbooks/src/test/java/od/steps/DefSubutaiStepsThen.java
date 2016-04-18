@@ -485,4 +485,32 @@ public class DefSubutaiStepsThen {
         subutaiSteps.clickOnPickerMedium();
         subutaiSteps.clickOnButtonSave();
     }
+
+    @Then("the user gets token")
+    public void user_gets_token() throws FindFailed {
+        subutaiSteps.clickOnButtonShowToken();
+        subutaiSteps.getToken();
+    }
+
+    @Then("the user observes Local Peer ID")
+    public void user_observe_local_peer_id() throws FileNotFoundException {
+        subutaiSteps.observeLocalPeerID();
+    }
+
+    @Then("the user observes Own PGP key")
+    public void user_observe_own_pgp_key() throws FileNotFoundException {
+        subutaiSteps.ownPGPKey();
+        subutaiSteps.observeOwnPGPKey();
+    }
+
+    @Then("the user observes Environment data")
+    public void user_observes_environment_id() throws FileNotFoundException {
+        subutaiSteps.observeEnvironmentData();
+    }
+
+    @Then("the user observes Environment PGP key")
+    public void user_observes_environment_pgp_key() throws FileNotFoundException {
+        subutaiSteps.environmentPGPKey();
+        subutaiSteps.observeEnvironmentPGPKey();
+    }
 }

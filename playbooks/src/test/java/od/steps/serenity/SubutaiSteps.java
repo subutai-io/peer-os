@@ -41,6 +41,9 @@ public class SubutaiSteps extends ScenarioSteps {
     AboutPage aboutPage;
     PgpPlugin pgpPlugin;
     PluginsPage pluginsPage;
+    private Object environmentData;
+    private Object token;
+    private Object peerID;
     Screen screen = new Screen();
     //endregion
 
@@ -881,6 +884,11 @@ public class SubutaiSteps extends ScenarioSteps {
     public void clickOnIconSettingsCont() throws FindFailed {
         screen.click(environmentsPage.sikuliIconSettingsCassandra);
     }
+
+    @Step
+    public void clickOnButtonShowToken() throws FindFailed {
+        screen.click(tokensPage.sikuliButtonShowToken);
+    }
     //endregion
 
     //region Action: Drag And Drop
@@ -1252,10 +1260,34 @@ public class SubutaiSteps extends ScenarioSteps {
     public void userShouldObserveHeaderApache() {
         assertThat(environmentsPage.headerApache.isVisible(), is(true));
     }
+
+    @Step
+    public void observeEnvironmentPGPKey() {
+        assertThat(tokensPage.environmentPGPKey.isVisible(), Matchers.is(true));
+    }
     //endregion
 
+    //region ACTION: Getter
 
+    @Step
+    public Object getToken() {
+        token = tokensPage.token.getText();
+        return token;
+    }
 
+    @Step
+    public Object getPeerID() {
+        peerID = tokensPage.peerID.getText();
+        return peerID;
+    }
+
+    @Step
+    public Object getEnvironmentData() {
+        environmentData = tokensPage.environmentData.getText().substring(19, 55);
+        return environmentData;
+    }
+
+     //endregion
     //region ACTION: Shell command
 
     @Step
@@ -1349,4 +1381,43 @@ public class SubutaiSteps extends ScenarioSteps {
         screen.click(roleManagementPage.sikuliButtonAddRole);
     }
 
+    @Step
+    public void observeLocalPeerID() throws FileNotFoundException {
+        loginPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyfingerprint?sptoken=" + token, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        loginPage.open();
+    }
+
+    @Step
+    public void observeRemotePeerID() throws FileNotFoundException {
+        loginPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyfingerprint?sptoken=" + token, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        loginPage.open();
+    }
+
+    @Step
+    public void ownPGPKey() throws FileNotFoundException {
+        loginPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyring?hostid=" + peerID, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        loginPage.open();
+    }
+    @Step
+    public void observeOwnPGPKey() {
+        assertThat(tokensPage.remotePGPKey.isVisible(), Matchers.is(true));
+    }
+
+    @Step
+    public void remotePGPKey() throws FileNotFoundException {
+        loginPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyring?hostid=" + peerID, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h2")));
+        loginPage.open();
+    }
+
+    @Step
+    public void observeEnvironmentData() throws FileNotFoundException {
+        loginPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/environments?sptoken=" + token, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        loginPage.open();
+    }
+
+    @Step
+    public void environmentPGPKey() throws FileNotFoundException {
+        loginPage.setDefaultBaseUrl(String.format("https://%s:8443/rest/v1/security/keyman/getpublickeyring?hostid=" + peerID +"_"+environmentData, ReaderFromFile.readDataFromFile("src/test/resources/parameters/mng_h1")));
+        loginPage.open();
+    }
 }
