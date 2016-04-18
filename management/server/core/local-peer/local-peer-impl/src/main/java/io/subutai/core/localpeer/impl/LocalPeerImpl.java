@@ -680,8 +680,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         if ( !quotaTasks.isEmpty() )
-        //set quotas to succeeded containers asynchronously
         {
+            //set quotas to succeeded containers asynchronously
             hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
         }
 
