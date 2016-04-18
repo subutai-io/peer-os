@@ -678,8 +678,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
 
+        if ( !quotaTasks.isEmpty() )
         //set quotas to succeeded containers asynchronously
-        hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+        {
+            hostUtil.submit( quotaTasks, reservedNetworkResource.getEnvironmentId() );
+        }
 
         return new CreateEnvironmentContainersResponse( cloneResults );
     }
@@ -736,26 +739,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             result.addAll( resourceHost.getContainerHostsByEnvironmentId( environmentId ) );
         }
         return result;
-    }
-
-
-    @Override
-    public ContainerHost findContainerById( final String containerId )
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-
-        for ( ResourceHost resourceHost : getResourceHosts() )
-        {
-            try
-            {
-                return resourceHost.getContainerHostById( containerId );
-            }
-            catch ( HostNotFoundException ignore )
-            {
-                // ignore
-            }
-        }
-        return null;
     }
 
 
@@ -2175,7 +2158,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
     {
-        ContainerHost containerHost = findContainerById( reverseProxyConfig.getContainerId() );
+        ContainerHost containerHost = getContainerHostById( reverseProxyConfig.getContainerId() );
 
         if ( containerHost == null )
         {
