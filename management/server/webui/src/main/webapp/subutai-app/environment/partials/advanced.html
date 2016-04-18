@@ -255,26 +255,28 @@
 								</span>
 							</td>
 							<td class="b-main-table__controls">
-								<a href
-									class="b-icon b-icon_share"
-									tooltips
-									tooltip-template='Share'
-									ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
-									ng-show = "environment.status === 'HEALTHY'"
-									style = "margin-left: 10px; margin-top: 5px">
-								</a>
-								<a href 
-									class="b-icon b-icon_edit" 
-									tooltips
-									tooltip-template='Edit' 
-									ng-click="advEnvCtrl.editEnvironment(environment)" style = "visibility: visible">
-								</a>
-								<a href 
-									class="b-icon b-icon_remove" 
-									tooltips
-									tooltip-template='Destroy' 
-									ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)">
-								</a>
+								<div class="b-main-table__controls">
+									<a href
+										class="b-icon b-icon_share"
+										tooltips
+										tooltip-template='Share'
+										ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
+										ng-show = "environment.status === 'HEALTHY'"
+										style = "margin-left: 10px; margin-top: 5px">
+									</a>
+									<a href 
+										class="b-icon b-icon_edit" 
+										tooltips
+										tooltip-template='Edit' 
+										ng-click="advEnvCtrl.editEnvironment(environment)" style = "visibility: visible">
+									</a>
+									<a href 
+										class="b-icon b-icon_remove" 
+										tooltips
+										tooltip-template='Destroy' 
+										ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)">
+									</a>
+								</div>
 							</td>
 						</tr>
 					</tbody>
