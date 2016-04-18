@@ -1013,19 +1013,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
+        //remove rh ssl cert
         securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(), rhId );
+
         securityManager.getHttpContextManager().reloadKeyStore();
 
+        //remove rh key
         KeyManager keyManager = securityManager.getKeyManager();
+
         keyManager.removeKeyData( rhId );
 
+        //remove rh containers' keys
         for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
             keyManager.removeKeyData( containerHost.getKeyId() );
         }
 
+        //remove rh from cache
         resourceHosts.remove( resourceHost );
 
+        //remove rh from db
         resourceHostDataService.remove( resourceHost.getId() );
     }
 
@@ -2036,20 +2043,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         hostUtil.submit( tasks, reservedNetworkResource.getEnvironmentId() );
 
 
-        //remove PEK
-        //todo review this part with Security team
         try
         {
+            //remove PEK
             KeyManager keyManager = securityManager.getKeyManager();
 
             keyManager.removeKeyData( environmentId.getId() );
 
             keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
 
+            //remove container keys
             Containers containers = getEnvironmentContainers( environmentId );
+
             for ( final ContainerHostInfo containerHostInfo : containers.getContainers() )
             {
-                keyManager.removeKeyData(containerHostInfo.getId());
+                keyManager.removeKeyData( containerHostInfo.getId() );
             }
         }
         catch ( Exception e )
