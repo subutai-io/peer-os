@@ -29,18 +29,13 @@ public class HostsCommandTest extends SystemOutRedirectTest
 {
     private static final String CONTAINER_HOST_HOSTNAME = "container";
     private static final String RESOURCE_HOST_HOSTNAME = "resource";
-    private static final String MGMT_HOST_HOSTNAME = "management";
     private static final String ID = UUID.randomUUID().toString();
-    private static final String USERNAME = "user";
-    private static final long LAST_HEARTBEAT = System.currentTimeMillis();
     @Mock
     PeerManager peerManager;
     @Mock
     User user;
     @Mock
     LocalPeer localPeer;
-    //    @Mock
-    //    ManagementHost managementHost;
     @Mock
     ResourceHost resourceHost;
     @Mock

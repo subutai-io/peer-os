@@ -788,11 +788,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             catch ( HostNotFoundException e )
             {
-                if ( "management".equals( info.getHostname() ) )
+                if ( Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getContainerName(), "management", info.getArch().name(),
-                            "management", null, null, ContainerSize.SMALL );
+                            info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME, info.getArch().name(),
+                            Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
+
                     addContainerHost( containerHost );
                 }
                 else
