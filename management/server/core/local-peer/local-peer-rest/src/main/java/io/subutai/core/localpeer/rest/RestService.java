@@ -124,7 +124,6 @@ public interface RestService
 
     @GET
     @Path( "hmetrics/{hostname}/{startTime}/{endTime}" )
-    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
                                    @PathParam( "startTime" ) final DateTimeParam startTime,

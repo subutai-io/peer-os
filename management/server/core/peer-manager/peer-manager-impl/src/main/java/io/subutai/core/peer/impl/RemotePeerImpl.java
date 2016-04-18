@@ -61,7 +61,6 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.objects.PermissionObject;
@@ -765,7 +764,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
