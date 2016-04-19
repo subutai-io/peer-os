@@ -3,6 +3,7 @@ package io.subutai.core.registration.rest;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.registration.api.exception.HostRegistrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,37 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         catch ( Exception e )
         {
             LOGGER.error( "Error approving registration request", e );
-            return Response.serverError().build();
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+
+    @Override
+    public Response unRegisterRequest( final String requestId )
+    {
+        try
+        {
+            registrationManager.rejectRequest( requestId );
+            return Response.ok( ).build();
+        }
+        catch (HostRegistrationException e)
+        {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+
+    @Override
+    public Response removeRequest( final String requestId )
+    {
+        try
+        {
+            registrationManager.removeRequest( requestId );
+            return Response.ok( ).build();
+        }
+        catch (HostRegistrationException e)
+        {
+            return Response.serverError().entity(e.getMessage()).build();
         }
     }
 
