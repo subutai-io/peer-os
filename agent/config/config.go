@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/subutai-io/base/agent/log"
@@ -129,9 +128,9 @@ func init() {
 		}
 	}
 
-	name, _ := os.Hostname()
-	config.Agent.GpgUser = name + "@subutai.io"
-
+	if config.Agent.GpgUser == "" {
+		config.Agent.GpgUser = "rh@subutai.io"
+	}
 	Agent = config.Agent
 	Influxdb = config.Influxdb
 	Template = config.Template
