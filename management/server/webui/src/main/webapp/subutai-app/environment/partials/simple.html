@@ -48,7 +48,40 @@
 					id="js-environment-creation"
 					ng-init="environmentSimpleViewCtrl.initJointJs()">
 
-					<div class="b-template-settings js-dropen-menu">
+					<div class="b-environments-plugin js-no-close">
+						<span class="b-icon b-icon_settings js-call-plugins-popup" 
+							tooltips
+							tooltip-side="right" 
+							tooltip-template='Plugins'>
+						</span>
+						<div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">
+							<div class="header">Choose plugin</div>
+							<div class="b-template-settings__body">
+								<div class="b-environments-plugin__list js-scrollbar">
+									<ul class="b-environments-plugin-list">
+										<li class="b-environments-plugin-list__item" ng-repeat="plugin in environmentViewCtrl.plugins">
+											<span class="b-tools-menu__item" 
+											ng-click="environmentViewCtrl.selectPlugin(plugin)" 
+											ng-class="plugin.selected ? 'b-tools-menu__item_selected' : ''">
+												<span class="b-cloud-item">
+													<img
+														src="/{{ plugin.img }}"
+														alt="{{ plugin.name }}"
+														onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+												</span>
+												<span class="b-cloud-item-text">{{ plugin.name }}</span>
+											</span>											
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="footer">
+								<button type="button" class="b-btn b-btn_green" ng-click="environmentViewCtrl.setTemplatesByPlugin()">Apply</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="b-template-settings js-dropen-menu js-no-close">
 						<div class="header"></div>
 						<div class="b-template-settings__coll">
 							<form ng-submit="environmentSimpleViewCtrl.addSettingsToTemplate(templateSettings)">
