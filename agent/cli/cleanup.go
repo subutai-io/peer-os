@@ -14,6 +14,6 @@ func Cleanup(vlan string) {
 		}
 	}
 	net.DelIface("gw-" + vlan)
-	p2p.RemoveByIface("p2p-" + vlan)
+	p2p.RemoveByIface("p2p" + vlan)
 	ProxyDel(vlan, "", true)
 }

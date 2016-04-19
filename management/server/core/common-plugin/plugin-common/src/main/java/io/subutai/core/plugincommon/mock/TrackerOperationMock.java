@@ -14,6 +14,7 @@ public class TrackerOperationMock implements TrackerOperation
     private final UUID uuid = UUID.randomUUID();
     private final Date created = new Date();
     private OperationState state = OperationState.RUNNING;
+    private final String source = "source";
 
 
     @Override
@@ -48,6 +49,13 @@ public class TrackerOperationMock implements TrackerOperation
     public OperationState getState()
     {
         return state;
+    }
+
+
+    @Override
+    public String getSource()
+    {
+        return source;
     }
 
 

@@ -31,6 +31,7 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -240,14 +241,7 @@ public class HostRegistryImpl implements HostRegistry
         {
             public void run()
             {
-                try
-                {
-                    updateHosts();
-                }
-                catch ( Exception e )
-                {
-                    LOG.error( "Error in updater task", e );
-                }
+                updateHosts();
             }
         }, HOST_UPDATER_INTERVAL_SEC, HOST_UPDATER_INTERVAL_SEC, TimeUnit.SECONDS );
     }
@@ -257,12 +251,44 @@ public class HostRegistryImpl implements HostRegistry
     {
         try
         {
-            checkAndUpdateHosts( getResourceHostsInfo() );
+            Set<ResourceHostInfo> cachedResourceHosts = getResourceHostsInfo();
+
+            Set<ResourceHost> registeredResourceHosts = Sets.newHashSet();
 
             LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+
             if ( localPeer != null )
             {
-                checkAndUpdateHosts( Sets.<ResourceHostInfo>newHashSet( localPeer.getResourceHosts() ) );
+                registeredResourceHosts.addAll( localPeer.getResourceHosts() );
+            }
+
+            //if local peer has not received heartbeat because it was initialized after the first heartbeat had arrived
+            //we need to re-request heartbeat from agent based on cache entries
+            if ( cachedResourceHosts.size() > registeredResourceHosts.size() )
+            {
+                for ( final ResourceHostInfo resourceHostInfo : cachedResourceHosts )
+                {
+                    threadPool.execute( new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            requestHeartbeat( resourceHostInfo );
+                        }
+                    } );
+                }
+
+                return;
+            }
+
+            if ( !CollectionUtil.isCollectionEmpty( cachedResourceHosts ) )
+            {
+                checkAndUpdateHosts( cachedResourceHosts );
+            }
+
+            if ( !CollectionUtil.isCollectionEmpty( registeredResourceHosts ) )
+            {
+                checkAndUpdateHosts( Sets.<ResourceHostInfo>newHashSet( registeredResourceHosts ) );
             }
         }
         catch ( Exception e )
@@ -281,15 +307,7 @@ public class HostRegistryImpl implements HostRegistry
                 @Override
                 public void run()
                 {
-                    try
-                    {
-                        updateHost( resourceHostInfo );
-                    }
-                    catch ( Exception e )
-                    {
-                        //ignore
-                        LOG.error( String.format( "Error checking host %s", resourceHostInfo ), e );
-                    }
+                    updateHost( resourceHostInfo );
                 }
             } );
         }
@@ -299,6 +317,7 @@ public class HostRegistryImpl implements HostRegistry
     protected void updateHost( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
+
         try
         {
             webClient = getWebClient( resourceHostInfo, "ping" );
@@ -315,7 +334,7 @@ public class HostRegistryImpl implements HostRegistry
                     }
                     catch ( HostDisconnectedException e )
                     {
-                        getWebClient( resourceHostInfo, "heartbeat" ).get();
+                        requestHeartbeat( resourceHostInfo );
                     }
                 }
                 else
@@ -324,10 +343,20 @@ public class HostRegistryImpl implements HostRegistry
                 }
             }
         }
+        catch ( Exception e )
+        {
+            LOG.error( "Error checking host {}", resourceHostInfo, e );
+        }
         finally
         {
             RestUtil.closeClient( webClient );
         }
+    }
+
+
+    protected void requestHeartbeat( ResourceHostInfo resourceHostInfo )
+    {
+        getWebClient( resourceHostInfo, "heartbeat" ).get();
     }
 
 
@@ -357,10 +386,12 @@ public class HostRegistryImpl implements HostRegistry
         {
             HostInterface hostInterface =
                     resourceHostInfo.getHostInterfaces().findByName( SystemSettings.getMgmtInterface() );
+
             if ( hostInterface instanceof NullHostInterface )
             {
                 throw new RuntimeException( "Network interface not found" );
             }
+
             return hostInterface.getIp();
         }
     }
@@ -369,7 +400,9 @@ public class HostRegistryImpl implements HostRegistry
     public void dispose()
     {
         hosts.invalidateAll();
+
         threadPool.shutdown();
+
         hostUpdater.shutdown();
     }
 }

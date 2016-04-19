@@ -14,7 +14,7 @@ import io.subutai.common.util.UUIDUtil;
 
 
 /**
- * This is an implementation of ProductOperation
+ * This is an implementation of TrackerOperation
  */
 public class TrackerOperationImpl implements TrackerOperation
 {
@@ -84,6 +84,12 @@ public class TrackerOperationImpl implements TrackerOperation
     }
 
 
+    public String getSource()
+    {
+        return source;
+    }
+
+
     public Date createDate()
     {
         return ( Date ) createDate.clone();
@@ -116,6 +122,12 @@ public class TrackerOperationImpl implements TrackerOperation
 
     private void addLog( String logString, OperationState state )
     {
+        //ignore all messages after operation was marked as complete
+        if ( this.state != OperationState.RUNNING )
+        {
+            return;
+        }
+
         if ( !Strings.isNullOrEmpty( logString ) )
         {
 
@@ -124,8 +136,7 @@ public class TrackerOperationImpl implements TrackerOperation
                 log.append( "\n" );
             }
             log.append( String.format( "{\"date\" : %s, \"log\" : \"%s\", \"state\" : \"%s\"},",
-                    new Timestamp(System.currentTimeMillis()).getTime(),
-                    logString, state ) );
+                    new Timestamp( System.currentTimeMillis() ).getTime(), logString, state ) );
         }
         this.state = state;
         tracker.saveTrackerOperation( source, this );
