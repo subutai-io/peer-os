@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -19,10 +20,12 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.tracker.impl.TrackerOperationImpl;
 import io.subutai.core.tracker.impl.TrackerOperationViewImpl;
 import io.subutai.core.tracker.impl.entity.TrackerOperationEntity;
+import io.subutai.core.tracker.impl.entity.TrackerOperationPK;
 
 
 public class TrackerOperationDataService
@@ -161,6 +164,7 @@ public class TrackerOperationDataService
         }
     }
 
+
     private TrackerOperationViewImpl createTrackerOperation( String infoClob )
     {
         if ( infoClob != null && infoClob.length() > 0 )
@@ -201,11 +205,12 @@ public class TrackerOperationDataService
     }
 
 
-    private TrackerOperationEntity extractFromTrackerOperationImpl( String source, TrackerOperationImpl po, long userId )
+    private TrackerOperationEntity extractFromTrackerOperationImpl( String source, TrackerOperationImpl po,
+                                                                    long userId )
     {
         source = source.toUpperCase();
-        return new TrackerOperationEntity( source, po.getId().toString(), po.createDate().getTime(),
-                GSON.toJson( po ), userId );
+        return new TrackerOperationEntity( source, po.getId().toString(), po.createDate().getTime(), GSON.toJson( po ),
+                userId );
     }
 
 
@@ -281,6 +286,7 @@ public class TrackerOperationDataService
         return result;
     }
 
+
     public List<TrackerOperationView> getRecentUserOperations( String source, final Date fromDate, final Date toDate,
                                                                int limit, long userId ) throws SQLException
     {
@@ -323,12 +329,15 @@ public class TrackerOperationDataService
         return result;
     }
 
-    public void setOperationViewState( String source, final UUID operationTrackId, boolean viewState ) throws SQLException
+
+    public void setOperationViewState( String source, final UUID operationTrackId, boolean viewState )
+            throws SQLException
     {
         EntityManager em = emf.createEntityManager();
         source = source.toUpperCase();
 
-        try {
+        try
+        {
             TrackerOperationEntity result;
 
             em.getTransaction().begin();
@@ -366,6 +375,7 @@ public class TrackerOperationDataService
         }
     }
 
+
     public void setOperationsViewState( boolean viewState, long userId ) throws SQLException
     {
         EntityManager em = emf.createEntityManager();
@@ -396,7 +406,8 @@ public class TrackerOperationDataService
         }
     }
 
-    public List<TrackerOperationView> getNewOperations(long userId ) throws SQLException
+
+    public List<TrackerOperationView> getNewOperations( long userId ) throws SQLException
     {
         List<TrackerOperationView> result = Lists.newArrayList();
         EntityManager em = emf.createEntityManager();
@@ -405,7 +416,8 @@ public class TrackerOperationDataService
             em.getTransaction().begin();
 
             TypedQuery<String> query = em.createQuery(
-                    "select to.info from TrackerOperationEntity to where to.viewState = true and to.userId = :userId order by to.ts desc", String.class );
+                    "select to.info from TrackerOperationEntity to where to.viewState = true and to.userId = :userId "
+                            + "order by to.ts desc", String.class );
             query.setParameter( "userId", userId );
 
             List<String> infoList = query.getResultList();
@@ -431,5 +443,86 @@ public class TrackerOperationDataService
         }
 
         return result;
+    }
+
+
+    public void deleteOldTrackerOperations( long daysOld ) throws SQLException
+    {
+        List<TrackerOperationView> operationViews = Lists.newArrayList();
+
+        EntityManager em = emf.createEntityManager();
+
+        try
+        {
+            em.getTransaction().begin();
+
+            TypedQuery<String> query = em.createQuery( "select to.info from TrackerOperationEntity to", String.class );
+
+            List<String> infoList = query.getResultList();
+
+            for ( final String info : infoList )
+            {
+                operationViews.add( createTrackerOperation( info ) );
+            }
+
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error in getTrackerOperations.", e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
+
+        for ( TrackerOperationView operationView : operationViews )
+        {
+            long operationDaysOld =
+                    TimeUnit.MILLISECONDS.toDays( new Date().getTime() - operationView.getCreateDate().getTime() );
+
+            if ( operationView.getState() != OperationState.RUNNING && operationDaysOld >= daysOld )
+            {
+                deleteTrackerOperation(
+                        new TrackerOperationPK( operationView.getSource(), operationView.getId().toString() ) );
+            }
+        }
+    }
+
+
+    public void deleteTrackerOperation( TrackerOperationPK operationId ) throws SQLException
+    {
+        EntityManager em = emf.createEntityManager();
+        try
+        {
+            em.getTransaction().begin();
+
+            Query query = em.createQuery(
+                    "delete from TrackerOperationEntity to where to.source = :source AND to.operationTrackId = "
+                            + ":operationTrackId" );
+            query.setParameter( "source", operationId.getSource() );
+            query.setParameter( "operationTrackId", operationId.getOperationTrackId() );
+            query.executeUpdate();
+
+            em.getTransaction().commit();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( "Error in deleteTrackerOperation.", e );
+            if ( em.getTransaction().isActive() )
+            {
+                em.getTransaction().rollback();
+            }
+            throw new SQLException( e );
+        }
+        finally
+        {
+            em.close();
+        }
     }
 }

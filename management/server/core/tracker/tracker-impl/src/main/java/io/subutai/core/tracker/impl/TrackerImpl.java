@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +35,7 @@ public class TrackerImpl implements Tracker
 {
 
     /**
-     * Used to serialize/deserialize product operation to/from json format
+     * Used to serialize/deserialize tracker operation to/from json format
      */
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private static final Logger LOG = LoggerFactory.getLogger( TrackerImpl.class.getName() );
@@ -40,15 +43,16 @@ public class TrackerImpl implements Tracker
     protected TrackerOperationDataService dataService;
     private DaoManager daoManager;
     private IdentityManager identityManager;
+    private final ScheduledExecutorService purger = Executors.newSingleThreadScheduledExecutor();
 
 
     /**
-     * Get view of product operation by operation id
+     * Get view of tracker operation by operation id
      *
-     * @param source - source of product operation, usually this is a module name
+     * @param source - source of tracker operation, usually this is a module name
      * @param operationTrackId - id of operation
      *
-     * @return - product operation view
+     * @return - tracker operation view
      */
     public TrackerOperationView getTrackerOperation( String source, UUID operationTrackId )
     {
@@ -56,8 +60,10 @@ public class TrackerImpl implements Tracker
         Preconditions.checkNotNull( operationTrackId, "Operation track id is null" );
 
         // @todo add enums instead of values (check for admin)
-        if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+        if ( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+        {
             return dataService.getTrackerOperation( source, operationTrackId );
+        }
 
 
         return dataService.getTrackerUserOperation( source, operationTrackId, identityManager.getActiveUser().getId() );
@@ -65,10 +71,10 @@ public class TrackerImpl implements Tracker
 
 
     /**
-     * Saves product operation o DB
+     * Saves tracker operation o DB
      *
-     * @param source - source of product operation, usually this is a module
-     * @param po - product operation
+     * @param source - source of tracker operation, usually this is a module
+     * @param po - tracker operation
      *
      * @return - true if all went well, false otherwise
      */
@@ -92,19 +98,19 @@ public class TrackerImpl implements Tracker
 
 
     /**
-     * Creates product operation and save it to DB
+     * Creates tracker operation and save it to DB
      *
-     * @param source - source of product operation, usually this is a module
+     * @param source - source of tracker operation, usually this is a module
      * @param description - description of operation
      *
-     * @return - returns created product operation
+     * @return - returns created tracker operation
      */
     public TrackerOperation createTrackerOperation( String source, String description )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), SOURCE_IS_EMPTY_MSG );
         Preconditions.checkNotNull( !Strings.isNullOrEmpty( description ), "Description is null or empty" );
 
-        TrackerOperationImpl po = new TrackerOperationImpl( source.toLowerCase(), description, this );
+        TrackerOperationImpl po = new TrackerOperationImpl( source.toUpperCase(), description, this );
         if ( saveTrackerOperation( source, po ) )
         {
             return po;
@@ -114,14 +120,14 @@ public class TrackerImpl implements Tracker
 
 
     /**
-     * Returns list of product operations (views) filtering them by date interval
+     * Returns list of tracker operations (views) filtering them by date interval
      *
-     * @param source - source of product operation, usually this is a module
+     * @param source - source of tracker operation, usually this is a module
      * @param fromDate - beginning date of filter
      * @param toDate - ending date of filter
      * @param limit - limit of records to return
      *
-     * @return - list of product operation views
+     * @return - list of tracker operation views
      */
     public List<TrackerOperationView> getTrackerOperations( String source, Date fromDate, Date toDate, int limit )
     {
@@ -135,15 +141,16 @@ public class TrackerImpl implements Tracker
         try
         {
             // @todo add enums instead of values (check for admin)
-            if( identityManager.getActiveUser().getType() == 2 && identityManager.getActiveUser().getTrustLevel() == 3 )
+            if ( identityManager.getActiveUser().getType() == 2
+                    && identityManager.getActiveUser().getTrustLevel() == 3 )
             {
                 list = dataService.getTrackerOperations( source, fromDate, toDate, limit );
             }
             else
             {
-                list = dataService.getRecentUserOperations( source, fromDate, toDate, limit, identityManager.getActiveUser().getId() );
+                list = dataService.getRecentUserOperations( source, fromDate, toDate, limit,
+                        identityManager.getActiveUser().getId() );
             }
-
         }
         catch ( SQLException | JsonSyntaxException ex )
         {
@@ -154,9 +161,9 @@ public class TrackerImpl implements Tracker
 
 
     /**
-     * Returns list of all sources of product operations for which product operations exist in DB
+     * Returns list of all sources of tracker operations for which tracker operations exist in DB
      *
-     * @return list of product operation sources
+     * @return list of tracker operation sources
      */
     public List<String> getTrackerOperationSources()
     {
@@ -175,7 +182,7 @@ public class TrackerImpl implements Tracker
 
 
     /**
-     * Prints log of product operation to std out stream
+     * Prints log of tracker operation to std out stream
      *
      * @param operationTrackId - id of operation
      * @param maxOperationDurationMs - max operation duration timeout after which printing ceases
@@ -187,7 +194,7 @@ public class TrackerImpl implements Tracker
         long startedTs = System.currentTimeMillis();
         while ( !Thread.interrupted() )
         {
-            TrackerOperationView po = getTrackerOperation( source.toLowerCase(), operationTrackId );
+            TrackerOperationView po = getTrackerOperation( source.toUpperCase(), operationTrackId );
             if ( po != null )
             {
                 //print log if anything new is appended to it
@@ -228,11 +235,13 @@ public class TrackerImpl implements Tracker
         dataService.setOperationViewState( source, operationId, viewed );
     }
 
+
     @Override
     public void setOperationsViewStates( boolean viewed ) throws SQLException
     {
         dataService.setOperationsViewState( viewed, identityManager.getActiveUser().getId() );
     }
+
 
     @Override
     public List<TrackerOperationView> getNotifications() throws SQLException
@@ -241,10 +250,31 @@ public class TrackerImpl implements Tracker
     }
 
 
-
     public void init()
     {
         dataService = new TrackerOperationDataService( daoManager.getEntityManagerFactory() );
+
+        purger.scheduleAtFixedRate( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    dataService.deleteOldTrackerOperations( 30L );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error purging old operations", e );
+                }
+            }
+        }, 0, 1, TimeUnit.DAYS );
+    }
+
+
+    public void dispose()
+    {
+        purger.shutdown();
     }
 
 
@@ -252,6 +282,7 @@ public class TrackerImpl implements Tracker
     {
         this.daoManager = daoManager;
     }
+
 
     public void setIdentityManager( final IdentityManager identityManager )
     {

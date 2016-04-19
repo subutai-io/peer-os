@@ -17,10 +17,8 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 		vm.activeTab = tab;
 		BazaarSrv.getInstalledHubPlugins().success (function (data) {
 			vm.installedHubPlugins = data;
-			console.log (vm.installedHubPlugins);
 			BazaarSrv.getRefOldPlugins().success(function(data) {
 				vm.refOldPlugins = data;
-				console.log (vm.refOldPlugins);
 				for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 					for (var j = 0; j < vm.refOldPlugins.length; ++j) {
 						if (vm.refOldPlugins[j].name === vm.installedHubPlugins[i].name) {
@@ -92,7 +90,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 		LOADING_SCREEN();
 		// TODO: refactor checking registration and storing plugins
 /*		BazaarSrv.checkRegistration().success (function (data) {
-			console.log (data);
 			if (data.isRegisteredToHub) {
 				vm.notRegistered = false;*/
 				BazaarSrv.getHubPlugins().success (function (data) {
@@ -406,7 +403,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 	}
 
 	function editPermissions() {
-		console.log (vm.permissions2Add);
 		var postData = 'pluginId=' + vm.currentPlugin.id;
 
 		if(vm.permissions2Add.length > 0) {
@@ -568,6 +564,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 	function installPlugin (plugin) {
 		plugin.installButton.options.callback = function (instance) {
 			var arr = plugin.dependencies.slice();
+			var names = [];
 			for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 				for (var j = 0; j < plugin.dependencies.length; ++j) {
 					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
@@ -576,12 +573,49 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					}
 				}
 			}
-			console.log (plugin.dependencies, arr);
+			var nameCollector = function (a, start) {
+			    if (start) {
+			        for (var i = 0; i < a.length; ++i) {
+                        for (var j = 0; j < vm.plugins.length; ++j) {
+                            if (a[i] === vm.plugins[j].id) {
+                                nameCollector (vm.plugins[j].dependencies, false);
+                                names.push (vm.plugins[j].name);
+                                break;
+                            }
+                        }
+                    }
+			    }
+			    else {
+                    var arr = a.slice();
+                    for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                        for (var j = 0; j < a.length; ++j) {
+                            if (vm.installedHubPlugins[i].uid === a[j] && vm.installedHubPlugins[i].restore === false) {
+                                var index = arr.indexOf (a[j]);
+                                arr.splice (index, 1);
+                            }
+                        }
+                    }
+                    for (var i = 0; i < arr.length; ++i) {
+                        for (var j = 0; j < vm.plugins.length; ++j) {
+                            if (arr[i] === vm.plugins[j].id) {
+                                nameCollector (vm.plugins[j].dependencies, false);
+                                names.push (vm.plugins[j].name);
+                                break;
+                            }
+                        }
+                    }
+                }
+			}
+			nameCollector (arr, true);
 			if (arr.length > 0) {
+			    var notification_text = "It seems that there are dependencies that need to be installed. Are you sure you want to continue?\n\nPlugins to be installed: " + names[0];
+			    for (var i = 1; i < names.length; ++i) {
+			        notification_text += ", " + names[i];
+			    }
 				var previousWindowKeyDown = window.onkeydown;
 				SweetAlert.swal({
 					title: "Additional dependencies",
-					text: "It seems that there are dependencies that need to be installed. Are you sure you want to continue?",
+					text: notification_text,
 					type: "warning",
 					showCancelButton: true,
 					confirmButtonColor: "#ff3f3c",
@@ -614,14 +648,12 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 									}
 								}
 							}
-							console.log (dependencies, arr);
 							for (var i = 0; i < arr.length; ++i) {
 								for (var j = 0; j < vm.plugins.length; ++j) {
 									if (arr[i] === vm.plugins[j].id) {
 										installPluginDependencies (vm.plugins[j].dependencies, function() {
 											return;
 										});
-										console.log (vm.plugins[j].restore);
 										if (vm.plugins[j].restore === false) {
 											BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
 												callback();
@@ -632,6 +664,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 												callback();
 											});
 										}
+										break;
 									}
 								}
 							}
@@ -755,7 +788,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 							}
 						}
 					}
-					console.log (dependencies, arr);
 					for (var i = 0; i < arr.length; ++i) {
 						for (var j = 0; j < vm.plugins.length; ++j) {
 							if (arr[i] === vm.plugins[j].id) {
@@ -838,7 +870,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 
 	vm.redirectToPlugin = redirectToPlugin;
 	function redirectToPlugin (url) {
-		console.log (url);
 		$location.path ("/plugins/" + url);
 	}
 
@@ -878,7 +909,6 @@ function fileModel($parse) {
 					}
 					else {
 						karUploader = element[0].files[0];
-						console.log (karUploader);
 						document.getElementById ("filename").value = karUploader.name;
 						document.getElementById ("filename").style.color = "#04346E";
 					}
