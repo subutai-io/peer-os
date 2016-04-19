@@ -3533,9 +3533,6 @@ td.b-main-table__status-col {
 	margin-bottom: 7px;
 }
 
-.b-form-input_full {
-    width: 100%;
-}
 .b-form-input {
     box-sizing: border-box;
     height: 30px;
