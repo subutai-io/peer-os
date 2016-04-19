@@ -2271,6 +2271,7 @@ td.b-main-table__status-col {
 .b-file-uploader {
     font-size: 0px;
     line-height: 0;
+	margin: 0 auto;
 }
 
 .b-file-uploader input:disabled {

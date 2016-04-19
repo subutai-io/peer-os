@@ -3,14 +3,13 @@
 angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel)
+	.directive('onReadFile', onReadFile)
 	.filter( 'sshEmail', function () {
 		return function( input, modify )
 		{
 			if( !modify )
 				return input;
-
 			var newVal = input.split(' ');
-
 			return newVal[newVal.length - 1];
 		}
 	});
@@ -58,6 +57,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	vm.destroyEnvironment = destroyEnvironment;
 	vm.sshKey = sshKey;
+	vm.getSSHfromFile = getSSHfromFile;
 	vm.addSshKey = addSshKey;
 	vm.removeSshKey = removeSshKey;
 	vm.showContainersList = showContainersList;
@@ -532,6 +532,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
+	function getSSHfromFile(sshKey) {
+		$scope.sshkey = sshKey;
+		console.log($scope.sshkey);
+	}
+
 
 	vm.setHtml = setHtml;
 	function setHtml (html) {
@@ -649,6 +654,36 @@ function fileModel($parse) {
 					modelSetter(scope, element[0].files[0]);
 					fileUploader = element[0].files[0];
 				});
+			});
+		}
+	};
+}
+
+function onReadFile($parse) {
+	return {
+		restrict: 'A',
+		scope: false,
+		link: function(scope, element, attrs) {
+			element.bind('change', function(e) {
+				
+				var onFileReadFn = $parse(attrs.onReadFile);
+				var reader = new FileReader();
+				
+				reader.onload = function() {
+					var fileContents = reader.result;
+					// invoke parsed function on scope
+					// special syntax for passing in data
+					// to named parameters
+					// in the parsed function
+					// we are providing a value for the property 'contents'
+					// in the scope we pass in to the function
+					scope.$apply(function() {
+						onFileReadFn(scope, {
+							'contents' : fileContents
+						});
+					});
+				};
+				reader.readAsText(element[0].files[0]);
 			});
 		}
 	};
