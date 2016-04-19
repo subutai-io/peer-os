@@ -18,6 +18,8 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 
 	//functions
 	vm.approveNode = approveNode;
+	vm.unreg = unreg;
+	vm.remove = remove;
 
 	vm.dtOptions = DTOptionsBuilder
 			.newOptions()
@@ -44,13 +46,47 @@ function NodeRegCtrl(nodeRegSrv, SweetAlert, DTOptionsBuilder, DTColumnDefBuilde
 
 		if(nodeId === undefined) return;
 
-		SweetAlert.swal("Success!", "Node is being approved.", "success");
-
 		LOADING_SCREEN();
 		nodeRegSrv.approveNode( nodeId ).success(function (data) {
 			SweetAlert.swal(
 				"Success!",
 				"Node has been added to cluster.",
+				"success"
+			);
+			LOADING_SCREEN('none');
+			getNodes();
+		}).error(function(error){
+			SweetAlert.swal("ERROR!", error, "error");
+			LOADING_SCREEN('none');
+		});
+	}
+
+	function unreg(nodeId) {
+		if(nodeId === undefined) return;
+
+		LOADING_SCREEN();
+		nodeRegSrv.unregNode( nodeId ).success(function (data) {
+			SweetAlert.swal(
+				"Success!",
+				"Node has been unregistered.",
+				"success"
+			);
+			LOADING_SCREEN('none');
+			getNodes();
+		}).error(function(error){
+			SweetAlert.swal("ERROR!", error, "error");
+			LOADING_SCREEN('none');
+		});
+	}
+
+	function remove(nodeId) {
+		if(nodeId === undefined) return;
+
+		LOADING_SCREEN();
+		nodeRegSrv.removeReq( nodeId ).success(function (data) {
+			SweetAlert.swal(
+				"Success!",
+				"Node has been unregistered.",
 				"success"
 			);
 			LOADING_SCREEN('none');
