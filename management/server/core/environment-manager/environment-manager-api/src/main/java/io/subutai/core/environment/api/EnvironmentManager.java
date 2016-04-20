@@ -3,6 +3,7 @@ package io.subutai.core.environment.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -139,6 +140,16 @@ public interface EnvironmentManager
     void destroyContainer( String environmentId, String containerId, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
+    /**
+     * Cancels active workflow for the specified environment
+     *
+     * @param environmentId id of environment
+     *
+     * @throws EnvironmentManagerException if exception is thrown during cancellation
+     */
+    void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException;
+
+    Map<String, CancellableWorkflow> getActiveWorkflows();
 
     /**
      * Returns environment by id

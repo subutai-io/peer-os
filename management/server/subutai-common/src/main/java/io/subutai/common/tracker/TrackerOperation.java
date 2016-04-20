@@ -46,6 +46,8 @@ public interface TrackerOperation
      */
     public OperationState getState();
 
+    public String getSource();
+
     /**
      * Adds log to operation
      *

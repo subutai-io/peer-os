@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.0-RC8-SNAPSHOT</version>
+  <version>4.0.0-RC9-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -141,6 +141,8 @@
     <org.apache.commons.io.version>2.4</org.apache.commons.io.version>
     <slf4j.version>1.7.12</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
+
+    <servicemix-beanflow.version>3.2.3</servicemix-beanflow.version>
   </properties>
 
   <dependencyManagement>

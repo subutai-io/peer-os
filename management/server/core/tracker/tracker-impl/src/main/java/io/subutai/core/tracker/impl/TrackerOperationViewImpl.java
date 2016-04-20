@@ -12,7 +12,7 @@ import io.subutai.common.tracker.TrackerOperationView;
 
 
 /**
- * This is an implementation of ProductOperationView
+ * This is an implementation of TrackerOperationView
  */
 public class TrackerOperationViewImpl implements TrackerOperationView
 {
@@ -38,7 +38,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
      */
     private final Date createDate;
 
-    private final long timestamp;
+    private final String source;
 
 
     public TrackerOperationViewImpl( TrackerOperation po )
@@ -50,7 +50,7 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         log = po.getLog();
         state = po.getState();
         createDate = po.createDate();
-        timestamp = po.createDate().getTime();
+        source = po.getSource().toUpperCase();
     }
 
 
@@ -83,10 +83,12 @@ public class TrackerOperationViewImpl implements TrackerOperationView
         return state;
     }
 
-    public long getTimestamp()
+
+    public String getSource()
     {
-        return timestamp;
+        return source;
     }
+
 
     @Override
     public int hashCode()

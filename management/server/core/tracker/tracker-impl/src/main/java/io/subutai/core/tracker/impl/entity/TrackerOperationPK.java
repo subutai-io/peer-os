@@ -10,6 +10,18 @@ public class TrackerOperationPK implements Serializable
     private String operationTrackId;
 
 
+    public TrackerOperationPK()
+    {
+    }
+
+
+    public TrackerOperationPK( final String source, final String operationTrackId )
+    {
+        this.source = source;
+        this.operationTrackId = operationTrackId;
+    }
+
+
     public String getSource()
     {
 

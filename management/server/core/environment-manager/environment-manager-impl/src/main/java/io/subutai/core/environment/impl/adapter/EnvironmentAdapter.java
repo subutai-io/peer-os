@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.RhP2pIp;
@@ -139,6 +140,33 @@ public class EnvironmentAdapter
     public void removeEnvironment( EnvironmentImpl env )
     {
         hubAdapter.removeEnvironment( env.getId() );
+    }
+
+
+    /**
+     * The method is called each time when SS gets environment list. This is only when we can upload all environments to
+     * Hub. Otherwise there is no way to get all environments on SS side. The intend for all of this: to show on Hub
+     * side SS environments created before SS registered to Hub.
+     *
+     * This implementation of the requirement is not a proper way but more workaround. In future there should be some
+     * refactoring for this.
+     *
+     * TODO:
+     *
+     * this method will slow execution of io.subutai.core.environment.impl.EnvironmentManagerImpl#getEnvironments()
+     *
+     * To handle it properly, this module should receive Peer registration event with Hub and upload all already
+     * existing environments at that moment
+     */
+    public void uploadEnvironments( Set<Environment> envs )
+    {
+        for ( Environment env : envs )
+        {
+            if ( env instanceof EnvironmentImpl )
+            {
+                uploadEnvironment( ( EnvironmentImpl ) env );
+            }
+        }
     }
 
 

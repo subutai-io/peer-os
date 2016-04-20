@@ -140,7 +140,46 @@
 				ng-init="advEnvCtrl.initJointJs()" 
 				ondrop="return drop(event);" ondragenter="return false;" ondragover="return false;">
 
-					<div class="b-template-settings js-dropen-menu">
+					<div class="b-environments-plugin js-no-close">
+						<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup" 
+							tooltips
+							tooltip-side="right" 
+							tooltip-template='Plugins'>
+						</span>
+						<div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">
+							<div class="header">Choose plugin</div>
+							<div class="b-template-settings__body">
+								<div class="b-environments-plugin__list js-scrollbar">
+									<ul class="b-environments-plugin-list">
+										<li class="b-environments-plugin-list__item" ng-repeat="plugin in advEnvCtrl.filteredPlugins">
+											<span class="b-tools-menu__item" 
+											ng-click="advEnvCtrl.selectPlugin(plugin)">
+
+												<i class="fa b-cloud-item-checkbox" 
+													aria-hidden="true" 
+													ng-class="plugin.selected ? 'fa-check-square-o' : 'fa-square-o'">
+												</i>
+
+												<span class="b-cloud-item">
+													<img
+														ng-src="/{{ plugin.img }}"
+														alt="{{ plugin.name }}"
+														onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
+												</span>
+
+												<span class="b-cloud-item-text">{{ plugin.name }}</span>
+											</span>											
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="footer">
+								<button type="button" class="b-btn b-btn_green" ng-click="advEnvCtrl.setTemplatesByPlugin()">Apply</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="b-template-settings js-dropen-menu js-no-close">
 						<div class="header"></div>
 
 						<div class="b-template-settings__coll">
@@ -255,26 +294,28 @@
 								</span>
 							</td>
 							<td class="b-main-table__controls">
-								<a href
-									class="b-icon b-icon_share"
-									tooltips
-									tooltip-template='Share'
-									ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
-									ng-show = "environment.status === 'HEALTHY'"
-									style = "margin-left: 10px; margin-top: 5px">
-								</a>
-								<a href 
-									class="b-icon b-icon_edit" 
-									tooltips
-									tooltip-template='Edit' 
-									ng-click="advEnvCtrl.editEnvironment(environment)" style = "visibility: visible">
-								</a>
-								<a href 
-									class="b-icon b-icon_remove" 
-									tooltips
-									tooltip-template='Destroy' 
-									ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)">
-								</a>
+								<div class="b-main-table__controls">
+									<a href
+										class="b-icon b-icon_share"
+										tooltips
+										tooltip-template='Share'
+										ng-click="environmentViewCtrl.shareEnvironmentWindow (environment)"
+										ng-show = "environment.status === 'HEALTHY'"
+										style = "margin-left: 10px; margin-top: 5px">
+									</a>
+									<a href 
+										class="b-icon b-icon_edit" 
+										tooltips
+										tooltip-template='Edit' 
+										ng-click="advEnvCtrl.editEnvironment(environment)" style = "visibility: visible">
+									</a>
+									<a href 
+										class="b-icon b-icon_remove" 
+										tooltips
+										tooltip-template='Destroy' 
+										ng-click="environmentViewCtrl.destroyEnvironment(environment.id, key)">
+									</a>
+								</div>
 							</td>
 						</tr>
 					</tbody>

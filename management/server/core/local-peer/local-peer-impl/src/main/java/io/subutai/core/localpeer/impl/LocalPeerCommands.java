@@ -9,9 +9,9 @@ import io.subutai.common.settings.Common;
 
 public class LocalPeerCommands
 {
-    public RequestBuilder getManagementExchangeKeyCommand( String token )
+    public RequestBuilder getExchangeKeyCommand( String hostname, String token )
     {
-        return new RequestBuilder( String.format( "subutai import management -t %s", token ) );
+        return new RequestBuilder( String.format( "subutai import %s -t %s", hostname, token ) );
     }
 
 

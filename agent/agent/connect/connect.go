@@ -54,7 +54,6 @@ func Connect(user, pass string) {
 	}
 	gpg.ImportPk(pk)
 
-	config.Agent.GpgUser = hostname + "@subutai.io"
 	config.Management.GpgUser = extractKeyID(pk)
 
 	client := &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}

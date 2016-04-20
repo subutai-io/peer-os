@@ -27,7 +27,6 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
@@ -157,8 +156,7 @@ public class PeerWebClient
     }
 
 
-    public void resetP2PSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
-            throws PeerException
+    public void resetP2PSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
         Response response;
         try
@@ -170,7 +168,7 @@ public class PeerWebClient
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
-            response = client.post( new P2PCredentials( p2pHash, newSecretKey, ttlSeconds ) );
+            response = client.post( p2PCredentials );
         }
         catch ( Exception e )
         {
@@ -299,10 +297,11 @@ public class PeerWebClient
     }
 
 
-    public HistoricalMetrics getHistoricalMetrics( final String hostName, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final String hostName, final Date startTime, final Date endTime )
             throws PeerException
     {
         Response response;
+
         try
         {
             remotePeer.checkRelation();
@@ -312,7 +311,7 @@ public class PeerWebClient
                     startParam.getTimeString(), endParam.getDateString(), endParam.getTimeString() );
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-            client.type( MediaType.APPLICATION_JSON );
+
             client.accept( MediaType.APPLICATION_JSON );
 
             response = client.get();
@@ -324,7 +323,7 @@ public class PeerWebClient
                     String.format( "Error on retrieving historical metrics from remote peer: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, HistoricalMetrics.class );
+        return checkResponse( response, String.class );
     }
 
 

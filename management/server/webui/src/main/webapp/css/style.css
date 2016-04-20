@@ -940,6 +940,16 @@ tip.description-tooltip {
     background-image: url('../assets/elements/icons/notifications.svg');
 }
 
+.b-icon_plugins {
+    background-image: url('../assets/elements/icons/plugins_icon.svg');
+}
+
+.b-icon_30 {
+	width: 30px;
+	height: 30px;
+	background-size: 30px;
+}
+
 .b-fixed-button {
     position: fixed;
     right: 0;
@@ -2271,6 +2281,7 @@ td.b-main-table__status-col {
 .b-file-uploader {
     font-size: 0px;
     line-height: 0;
+	margin: 0 auto;
 }
 
 .b-file-uploader input:disabled {
@@ -2792,6 +2803,11 @@ td.b-main-table__status-col {
     vertical-align: middle;
 	color: #04346E;
 	padding: 0 0 8px 0;
+	cursor: pointer;
+}
+
+.b-tools-menu__item_selected {
+	opacity: 0.6;
 }
 
 .b-cloud-item-resource-name {
@@ -2810,6 +2826,13 @@ td.b-main-table__status-col {
 .b-cloud-item {
     display: inline-block;
 }
+
+.b-cloud-item-checkbox {
+	margin-right: 10px;
+	min-width: 15px;
+	font-size: 16px;
+}
+
 .b-cloud__space {
     margin-right: 247px;
     overflow: hidden;
@@ -3485,6 +3508,7 @@ td.b-main-table__status-col {
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
 }
+
 .b-template-settings .header {
     padding: 10px;
     font-size: 14px;
@@ -3533,9 +3557,6 @@ td.b-main-table__status-col {
 	margin-bottom: 7px;
 }
 
-.b-form-input_full {
-    width: 100%;
-}
 .b-form-input {
     box-sizing: border-box;
     height: 30px;
@@ -3744,3 +3765,52 @@ span.ssh-info-button
     border-color: #61cbeb;
     color: #fff;
 }
+
+.b-environments-plugin {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 15px 5px 0 0;
+	z-index: 10;
+}
+
+.b-environments-plugin__list {
+	max-height: 350px;
+	min-height: 50px;
+	width: 250px;
+	border: 1px solid #CCCEEE;
+	position: relative;
+}
+
+.b-environments-plugin-list {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+}
+
+.b-environments-plugin-list__item {
+	list-style: none;
+	padding: 10px;
+	margin: 0 0 0 0;
+}
+
+.b-template-settings__body {
+	padding: 10px;
+	font-size: 14px;
+	line-height: normal;
+}
+
+.b-template-settings_plugins {
+	top: 50px;
+	right: 1px;
+}
+
+.b-template-settings_plugins:before {
+	right: 16px;
+	left: auto;
+}
+
+.b-template-settings_plugins:after {
+	right: 18px;
+	left: auto;
+}
+
