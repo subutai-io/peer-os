@@ -14,7 +14,7 @@ import org.json.JSONObject;
 //Version 1.1
 public class ProductsDto
 {
-    private List<ProductDto> productsDto = new ArrayList<>();
+    private List<ProductDtoV1_2> productsDto = new ArrayList<>();
 
 
     public ProductsDto()
@@ -32,7 +32,7 @@ public class ProductsDto
             JSONObject product = products.getJSONObject( i );
             try
             {
-                ProductDto productDto = new ProductDto( product );
+                ProductDtoV1_2 productDto = new ProductDtoV1_2( product );
                 this.productsDto.add( productDto );
             }
             catch ( ParseException e )
@@ -40,10 +40,10 @@ public class ProductsDto
                 e.printStackTrace();
             }
         }
-        Collections.sort( productsDto, new Comparator<ProductDto>()
+        Collections.sort( productsDto, new Comparator<ProductDtoV1_2>()
         {
             @Override
-            public int compare( final ProductDto o1, final ProductDto o2 )
+            public int compare( final ProductDtoV1_2 o1, final ProductDtoV1_2 o2 )
             {
                 return o1.getName().compareTo( o2.getName() );
             }
@@ -51,31 +51,31 @@ public class ProductsDto
     }
 
 
-    public ProductsDto( final List<ProductDto> productsDto )
+    public ProductsDto( final List<ProductDtoV1_2> productsDto )
     {
         this.productsDto = productsDto;
     }
 
 
-    public void addProductDto( final ProductDto productDto )
+    public void addProductDto( final ProductDtoV1_2 productDto )
     {
         this.productsDto.add( productDto );
     }
 
 
-    public void removeProductDto( final ProductDto productDto )
+    public void removeProductDto( final ProductDtoV1_2 productDto )
     {
         this.productsDto.remove( productDto );
     }
 
 
-    public List<ProductDto> getProductDtos()
+    public List<ProductDtoV1_2> getProductDtos()
     {
         return productsDto;
     }
 
 
-    public void setProductDtos( final List<ProductDto> productDtos )
+    public void setProductDtos( final List<ProductDtoV1_2> productDtos )
     {
         this.productsDto = productDtos;
     }

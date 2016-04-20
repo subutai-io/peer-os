@@ -81,9 +81,9 @@ public class WebuiModuleServiceImpl implements WebuiModuleService
         StringBuilder builder = new StringBuilder(  );
         for( WebuiModule module : modules )
         {
-            String moduleInfo = module.getAngularDependecyList();
+            String moduleInfo = module.getAngularDependencyList();
             if( null != moduleInfo && moduleInfo.length() > 0 )
-                builder.append( module.getAngularDependecyList() ).append( "\n" );
+                builder.append( module.getAngularDependencyList() ).append( "\n" );
         }
 
         return subutaiAppJs.replace( ".state()", builder.toString() );

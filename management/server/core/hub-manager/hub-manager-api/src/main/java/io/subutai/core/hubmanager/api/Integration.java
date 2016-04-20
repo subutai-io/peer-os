@@ -19,7 +19,7 @@ public interface Integration
 
     String getProducts() throws HubPluginException;
 
-    void installPlugin( String url ) throws HubPluginException;
+    void installPlugin( String url, String filename ) throws HubPluginException;
 
     void uninstallPlugin( String url, String name );
 

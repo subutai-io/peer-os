@@ -2,6 +2,7 @@ package io.subutai.webui.entity;
 
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WebuiModuleResourse
@@ -19,6 +20,7 @@ public class WebuiModuleResourse
         this.layout = "default";
         this.name = name;
         this.img = img;
+        this.dependencies = new ArrayList<>();
     }
 
     public String getImg()
