@@ -43,7 +43,7 @@ var (
 	lastHeartbeat     []byte
 	mutex             sync.Mutex
 	fingerprint       string
-	hostname          string
+	hostname, _       = os.Hostname()
 	client            *http.Client
 	instanceType      string
 	instanceArch      string
@@ -83,9 +83,8 @@ func Start(c *cli.Context) {
 
 func connectionMonitor() {
 	for {
-		hostname, _ = os.Hostname()
 		if fingerprint == "" || config.Management.GpgUser == "" {
-			fingerprint = gpg.GetFingerprint(hostname + "@subutai.io")
+			fingerprint = gpg.GetFingerprint("rh@subutai.io")
 			connect.Connect(config.Agent.GpgUser, config.Management.Secret)
 		} else {
 			resp, err := client.Get("https://" + config.Management.Host + ":8444/rest/v1/agent/check/" + fingerprint)
