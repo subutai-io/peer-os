@@ -307,8 +307,7 @@ public class PeerWebClient
             remotePeer.checkRelation();
             final DateTimeParam startParam = new DateTimeParam( startTime );
             final DateTimeParam endParam = new DateTimeParam( endTime );
-            String path = String.format( "/hmetrics/%s/%s/%s/%s/%s", hostName, startParam.getDateString(),
-                    startParam.getTimeString(), endParam.getDateString(), endParam.getTimeString() );
+            String path = String.format( "/hmetrics/%s/%s/%s", hostName, startParam, endParam );
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
