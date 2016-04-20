@@ -256,7 +256,7 @@ public class IntegrationImpl implements Integration
         {
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
             WebClient client =
-                    configManager.getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "stage.subut.ai" );
+                    configManager.getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
