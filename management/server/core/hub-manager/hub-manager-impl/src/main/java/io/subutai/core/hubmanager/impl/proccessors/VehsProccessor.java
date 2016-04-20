@@ -73,7 +73,6 @@ public class VehsProccessor implements StateLinkProccessor
         this.environmentUserHelper = environmentUserHelper;
     }
 
-
     @Override
     public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
     {
