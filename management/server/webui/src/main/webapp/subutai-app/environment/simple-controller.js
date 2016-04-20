@@ -560,7 +560,22 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		if(vm.selectedPlugin.requirement !== undefined) {
 			for(var template in vm.selectedPlugin.requirement) {
 				for(var i = 0; i < vm.selectedPlugin.requirement[template]; i++) {
-					addContainer(template.toLowerCase());
+					var allElements = graph.getCells();
+					if(allElements.length > 0) {					
+						var alreadyONWorckspace = false;
+						for(var i = 0; i < allElements.length; i++) {
+							var currentTemplate = allElements[i].get('templateName');
+							if(currentTemplate == template.toLowerCase()) {
+								alreadyONWorckspace = true;
+								break;
+							}
+						}
+						if(!alreadyONWorckspace) {
+							addContainer(template.toLowerCase());
+						}
+					} else {
+						addContainer(template.toLowerCase());
+					}
 				}
 			}
 		}

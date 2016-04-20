@@ -96,8 +96,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	clearWorkspace();
 
+	function resetPlugin() {
+		if(vm.selectedPlugin.selected !== undefined) vm.selectedPlugin.selected = false;
+		vm.selectedPlugin = false;
+	}
+
 	function closePopup() {
 		vm.buildCompleted = false;
+		resetPlugin();
 		ngDialog.closeAll();
 	}
 
@@ -752,6 +758,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			className: 'b-build-environment-info',
 			preCloseCallback: function(value) {
 				vm.buildCompleted = false;
+				resetPlugin();
 			}
 		});
 	}
@@ -793,7 +800,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		var allElements = graph.getCells();
 		var addedContainers = getContainers2Build(allElements, true);
 
-		console.log(addedContainers);
 		if(addedContainers.containersList.length > 0) {
 			vm.filteredPlugins = {};
 			for(var i = 0; i < addedContainers.containersList.length; i++) {
@@ -846,11 +852,34 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			for(var template in vm.selectedPlugin.requirement) {
 				for(var i = 0; i < vm.selectedPlugin.requirement[template]; i++) {
 
-					var img = 'assets/templates/' + template + '.jpg';
-					if(!imageExists(img)) {
-						img = 'assets/templates/no-image.jpg';
+					var allElements = graph.getCells();
+					var addedContainers = getContainers2Build(allElements, true);
+
+					if(addedContainers.containersList.length > 0) {
+
+						var alreadyONWorckspace = false;
+						for(var i = 0; i < addedContainers.containersList.length; i++) {
+							var currentTemplate = addedContainers.containersList[i].templateName;
+							if(currentTemplate == template.toLowerCase()) {
+								alreadyONWorckspace = true;
+								break;
+							}
+						}
+						if(!alreadyONWorckspace) {
+							var img = 'assets/templates/' + template + '.jpg';
+							if(!imageExists(img)) {
+								img = 'assets/templates/no-image.jpg';
+							}
+							addContainerToHost(resourceHost, template, img);
+						}
+
+					} else {
+						var img = 'assets/templates/' + template + '.jpg';
+						if(!imageExists(img)) {
+							img = 'assets/templates/no-image.jpg';
+						}
+						addContainerToHost(resourceHost, template, img);
 					}
-					addContainerToHost(resourceHost, template, img);					
 
 				}
 			}
