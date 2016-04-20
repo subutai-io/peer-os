@@ -49,7 +49,7 @@
 					ng-init="environmentSimpleViewCtrl.initJointJs()">
 
 					<div class="b-environments-plugin js-no-close">
-						<span class="b-icon b-icon_settings js-call-plugins-popup" 
+						<span class="b-icon b-icon_plugins b-icon_30 js-call-plugins-popup" 
 							tooltips
 							tooltip-side="right" 
 							tooltip-template='Plugins'>
@@ -59,16 +59,22 @@
 							<div class="b-template-settings__body">
 								<div class="b-environments-plugin__list js-scrollbar">
 									<ul class="b-environments-plugin-list">
-										<li class="b-environments-plugin-list__item" ng-repeat="plugin in environmentViewCtrl.plugins">
+										<li class="b-environments-plugin-list__item" ng-repeat="plugin in environmentSimpleViewCtrl.filteredPlugins">
 											<span class="b-tools-menu__item" 
-											ng-click="environmentViewCtrl.selectPlugin(plugin)" 
-											ng-class="plugin.selected ? 'b-tools-menu__item_selected' : ''">
+											ng-click="environmentSimpleViewCtrl.selectPlugin(plugin)">
+
+												<i class="fa b-cloud-item-checkbox" 
+													aria-hidden="true" 
+													ng-class="plugin.selected ? 'fa-check-square-o' : 'fa-square-o'">
+												</i>
+
 												<span class="b-cloud-item">
 													<img
-														src="/{{ plugin.img }}"
+														ng-src="/{{ plugin.img }}"
 														alt="{{ plugin.name }}"
 														onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 												</span>
+
 												<span class="b-cloud-item-text">{{ plugin.name }}</span>
 											</span>											
 										</li>
@@ -76,7 +82,7 @@
 								</div>
 							</div>
 							<div class="footer">
-								<button type="button" class="b-btn b-btn_green" ng-click="environmentViewCtrl.setTemplatesByPlugin()">Apply</button>
+								<button type="button" class="b-btn b-btn_green" ng-click="environmentSimpleViewCtrl.setTemplatesByPlugin()">Apply</button>
 							</div>
 						</div>
 					</div>
