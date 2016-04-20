@@ -482,11 +482,32 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	});
 	joint.shapes.tm.devElementView = joint.shapes.tm.ToolElementView;
 
+	$rootScope.$on('addContainersByPlugin', function(event, data) {
+		clearWorkspace();
+		for(var pluginName in data) {
+			if(data[pluginName].requirement !== undefined) {
+				for(var template in data[pluginName].requirement) {
+					for(var i = 0; i < data[pluginName].requirement[template]; i++) {
+						addContainer(template.toLowerCase());
+					}
+				}
+			}
+		}
+	});
+
 	var containerCounter = 1;
 	function addContainer(template, $event) {
+		if($event === undefined || $event === null) $event = false;
 
 		var pos = findEmptyCubePostion();
-		var img = $($event.currentTarget).find('img');
+		var img = 'assets/templates/' + template + '.jpg';
+		if($event) {
+			img = $($event.currentTarget).find('img').attr('src');
+		} else {
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
+		}
 
 		var devElement = new joint.shapes.tm.devElement({
 			position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
@@ -494,7 +515,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			quotaSize: 'SMALL',
 			containerName: 'Container ' + (containerCounter++).toString(),
 			attrs: {
-				image: { 'xlink:href': img.attr('src') },
+				image: { 'xlink:href': img },
 				'rect.b-magnet': {fill: vm.colors['SMALL']},
 				title: {text: $(this).data('template')}
 			}

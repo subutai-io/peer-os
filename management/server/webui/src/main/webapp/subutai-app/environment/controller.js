@@ -79,6 +79,10 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
 
+	//plugins actions
+	vm.selectPlugin = selectPlugin;
+	vm.setTemplatesByPlugin = setTemplatesByPlugin;
+
 	function changeMode(modeStatus) {
 		if(modeStatus) {
 			vm.activeMode = 'advanced';
@@ -611,6 +615,39 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			});
 		}
 	}
+
+	vm.plugins = [];
+	function getPlugins() {
+		environmentService.getInstalledPlugins().success(function (data) {
+			vm.plugins = data;
+			if (vm.plugins === undefined || vm.plugins === "") {
+				vm.plugins = [];
+			}
+			console.log(vm.plugins);
+			$('.js-call-plugins-popup').on('click', function() {
+				$('.js-environment-plugins-menu').stop().slideDown(300);
+			});
+		});
+	}
+	getPlugins();
+
+	vm.selectedPlugins = {};
+	function selectPlugin(plugin) {
+		if(vm.selectedPlugins[plugin.name] !== undefined) {
+			delete vm.selectedPlugins[plugin.name];
+			plugin.selected = false;
+		} else {
+			vm.selectedPlugins[plugin.name] = plugin;
+			plugin.selected = true;
+		}
+	}
+
+	function setTemplatesByPlugin() {
+		$rootScope.$emit('addContainersByPlugin', vm.selectedPlugins);
+		vm.selectedPlugins = {};
+		getPlugins();
+	}
+	
 }
 
 function imageExists(image_url){

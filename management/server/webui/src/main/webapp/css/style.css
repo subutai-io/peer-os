@@ -2793,6 +2793,11 @@ td.b-main-table__status-col {
     vertical-align: middle;
 	color: #04346E;
 	padding: 0 0 8px 0;
+	cursor: pointer;
+}
+
+.b-tools-menu__item_selected {
+	opacity: 0.6;
 }
 
 .b-cloud-item-resource-name {
@@ -3486,6 +3491,7 @@ td.b-main-table__status-col {
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
 }
+
 .b-template-settings .header {
     padding: 10px;
     font-size: 14px;
@@ -3742,3 +3748,38 @@ span.ssh-info-button
     border-color: #61cbeb;
     color: #fff;
 }
+
+.b-environments-plugin {
+	position: absolute;
+	padding: 15px 0 0 15px;
+	z-index: 10;
+}
+
+.b-environments-plugin__list {
+	max-height: 350px;
+	width: 250px;
+	border: 1px solid #CCCEEE;
+	position: relative;
+}
+
+.b-environments-plugin-list {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+}
+
+.b-environments-plugin-list__item {
+	list-style: none;
+	padding: 10px;
+	margin: 0 0 0 0;
+}
+
+.b-template-settings__body {
+	padding: 10px;
+	font-size: 14px;
+	line-height: normal;
+}
+
+.b-template-settings_plugins {
+	left: 1px;
+}
+
