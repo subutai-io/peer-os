@@ -20,6 +20,7 @@ public class WebuiModuleResourse
         this.layout = "default";
         this.name = name;
         this.img = img;
+
         this.dependencies = new ArrayList<>();
     }
 
@@ -72,8 +73,8 @@ public class WebuiModuleResourse
 
         Object[] args = { name, bodyClass, layout, depsArg };
         MessageFormat mf = new MessageFormat(
-                "{url:'/plugins/{0}',templateUrl:'plugins/{0}/partials/view.html',data:{bodyClass:'{1}',layout:'{2}'}," +
-                        "resolve: {loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {return $ocLazyLoad.load([{3}]);}]}};" );
+                "'{'url:\"/plugins/{0}\",templateUrl:\"plugins/{0}/partials/view.html\",data:'{'bodyClass:\"{1}\",layout:\"{2}\"}," +
+                        "resolve: '{'loadPlugin: [\"$ocLazyLoad\", function ($ocLazyLoad) '{'return $ocLazyLoad.load([{3}]);}]}}" );
         return mf.format( args );
     }
 }

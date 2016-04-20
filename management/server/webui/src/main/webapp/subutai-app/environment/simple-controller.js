@@ -34,6 +34,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.cubeGrowth = 1;
 	vm.environment2BuildName = '';
 	vm.buildCompleted = false;
+	vm.selectedPlugin = false;
 
 	// functions
 
@@ -45,6 +46,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	vm.addContainer = addContainer;
 	vm.closePopup = closePopup;
+
+	//plugins actions
+	vm.selectPlugin = selectPlugin;
+	vm.setTemplatesByPlugin = setTemplatesByPlugin;
 
 	// @todo workaround
 	environmentService.getTemplates()
@@ -62,8 +67,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		}
 	}
 
+	function resetPlugin() {
+		if(vm.selectedPlugin.selected !== undefined) vm.selectedPlugin.selected = false;
+		vm.selectedPlugin = false;
+	}
+
 	function closePopup() {
 		vm.buildCompleted = false;
+		resetPlugin();
 		ngDialog.closeAll();
 	}
 
@@ -255,6 +266,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			className: 'b-build-environment-info',
 			preCloseCallback: function(value) {
 				vm.buildCompleted = false;
+				resetPlugin();
 			}
 		});
 	}
@@ -317,6 +329,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			className: 'b-build-environment-info',
 			preCloseCallback: function(value) {
 				vm.buildCompleted = false;
+				resetPlugin();
 			}
 		});
 
@@ -448,6 +461,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					}
 					this.model.remove();
 					delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
+
+					filterPluginsList();
+
 					return;
 					break;
 				case 'element-call-menu':
@@ -482,11 +498,105 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	});
 	joint.shapes.tm.devElementView = joint.shapes.tm.ToolElementView;
 
+	vm.plugins = [];
+	vm.filteredPlugins = {};
+	function getPlugins() {
+		environmentService.getInstalledPlugins().success(function (data) {
+			vm.plugins = data;
+			if (vm.plugins === undefined || vm.plugins === "") {
+				vm.plugins = [];
+			}
+			$('.js-call-plugins-popup').on('click', function() {
+				$('.js-environment-plugins-menu').stop().slideDown(300);
+			});
+			filterPluginsList();
+		});
+	}
+	getPlugins();
+
+	function filterPluginsList() {
+		var allElements = graph.getCells();
+
+		if(allElements.length > 0) {
+			vm.filteredPlugins = {};
+			for(var i = 0; i < allElements.length; i++) {
+
+				var currentTemplate = allElements[i].get('templateName');
+
+				for(var j = 0; j < vm.plugins.length; j++) {
+
+					var currentPlugin = vm.plugins[j];
+
+					if(vm.filteredPlugins[currentPlugin.name] == undefined) {
+						if(currentPlugin.requirement !== undefined) {
+							var requirementArray = Object.keys(currentPlugin.requirement);
+							if(requirementArray.indexOf(currentTemplate) > -1) {
+								vm.filteredPlugins[currentPlugin.name] = currentPlugin;
+							}
+						}
+					}
+
+				}
+
+			}
+		} else {
+			vm.filteredPlugins = vm.plugins;
+		}
+	}
+
+	function selectPlugin(plugin) {
+
+		if(vm.selectedPlugin) {
+			vm.selectedPlugin.selected = false;
+		}
+
+		vm.selectedPlugin = plugin;
+		vm.selectedPlugin.selected = true;
+	}
+
+	function setTemplatesByPlugin() {
+
+		console.log(vm.selectedPlugin);
+		if(vm.selectedPlugin.requirement !== undefined) {
+			for(var template in vm.selectedPlugin.requirement) {
+				for(var i = 0; i < vm.selectedPlugin.requirement[template]; i++) {
+					var allElements = graph.getCells();
+					if(allElements.length > 0) {					
+						var alreadyONWorckspace = false;
+						for(var i = 0; i < allElements.length; i++) {
+							var currentTemplate = allElements[i].get('templateName');
+							if(currentTemplate == template.toLowerCase()) {
+								alreadyONWorckspace = true;
+								break;
+							}
+						}
+						if(!alreadyONWorckspace) {
+							addContainer(template.toLowerCase());
+						}
+					} else {
+						addContainer(template.toLowerCase());
+					}
+				}
+			}
+		}
+		$('.b-template-settings').stop().slideUp(100);
+
+		//getPlugins();
+	}
+
 	var containerCounter = 1;
 	function addContainer(template, $event) {
+		if($event === undefined || $event === null) $event = false;
 
 		var pos = findEmptyCubePostion();
-		var img = $($event.currentTarget).find('img');
+		var img = 'assets/templates/' + template + '.jpg';
+		if($event) {
+			img = $($event.currentTarget).find('img').attr('src');
+		} else {
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
+		}
 
 		var devElement = new joint.shapes.tm.devElement({
 			position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
@@ -494,13 +604,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			quotaSize: 'SMALL',
 			containerName: 'Container ' + (containerCounter++).toString(),
 			attrs: {
-				image: { 'xlink:href': img.attr('src') },
+				image: { 'xlink:href': img },
 				'rect.b-magnet': {fill: vm.colors['SMALL']},
-				title: {text: $(this).data('template')}
+				title: {text: template}
 			}
 		});
 		vm.isEditing ? vm.currentEnvironment.includedContainers.push(devElement) : null;
 		graph.addCell(devElement);
+		filterPluginsList();
 		return false;
 	}
 
@@ -664,6 +775,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			className: 'b-build-environment-info',
 			preCloseCallback: function(value) {
 				vm.buildCompleted = false;
+				resetPlugin();
 			}
 		});
 	}
@@ -695,6 +807,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			});
 			graph.addCell(devElement);
 		}
+		filterPluginsList();
 	}
 
 	function clearWorkspace() {
@@ -703,6 +816,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.templateGrid = [];
 		graph.resetCells();
 		vm.environment2BuildName = '';
+		filterPluginsList();
+		//vm.selectedPlugin = false;
 	}
 
 	function addSettingsToTemplate(settings) {

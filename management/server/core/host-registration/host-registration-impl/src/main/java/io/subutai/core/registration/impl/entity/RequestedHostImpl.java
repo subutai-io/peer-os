@@ -111,8 +111,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         Set<HostInterface> netHostInterfaces = requestedHost.getNetHostInterfaces();
         for ( final HostInterface netHostInterface : netHostInterfaces )
         {
-            HostInterfaceImpl hostInterfaceImpl =
-                    new HostInterfaceImpl( netHostInterface );
+            HostInterfaceImpl hostInterfaceImpl = new HostInterfaceImpl( netHostInterface );
             this.netHostInterfaces.add( hostInterfaceImpl );
         }
 
@@ -182,6 +181,12 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
     }
 
 

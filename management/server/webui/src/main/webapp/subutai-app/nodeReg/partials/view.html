@@ -29,8 +29,8 @@
 					<td>{{ clusterNode.hostname }}</td>
 					<td>
 						<button ng-if="clusterNode.status != 'APPROVED'" class="b-btn b-btn_green" ng-click="nodeRegCtrl.approveNode( clusterNode.id )">Approve</button>
-						<button ng-if="clusterNode.status == 'APPROVED'" class="b-btn b-btn_green" ng-click="nodeRegCtrl.unreg( clusterNode.id )">Unregister</button>
-						<button ng-if="clusterNode.status == 'APPROVED'" class="b-btn b-btn_green" ng-click="nodeRegCtrl.remove( clusterNode.id )">Remove</button>
+						<button ng-if="clusterNode.status != 'APPROVED'" class="b-btn b-btn_red" ng-click="nodeRegCtrl.unreg( clusterNode.id )">Reject</button>
+						<button ng-if="clusterNode.status == 'APPROVED'" class="b-btn b-btn_red" ng-click="nodeRegCtrl.remove( clusterNode.id )">Remove</button>
 					</td>
 				</tr>
 				</tbody>
