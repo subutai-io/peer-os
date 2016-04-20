@@ -37,12 +37,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     String getTemplateName();
 
-    void addTag( String tag );
-
-    void removeTag( String tag );
-
-    Set<String> getTags();
-
 
     boolean isLocal();
 

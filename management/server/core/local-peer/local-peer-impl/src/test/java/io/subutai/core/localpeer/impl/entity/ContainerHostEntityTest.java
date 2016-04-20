@@ -108,15 +108,6 @@ public class ContainerHostEntityTest
 
 
     @Test
-    public void testGetTags() throws Exception
-    {
-        containerHostEntity.addTag( TAG );
-
-        assertTrue( containerHostEntity.getTags().contains( TAG ) );
-    }
-
-
-    @Test
     public void testIsLocal() throws Exception
     {
         assertTrue( containerHostEntity.isLocal() );
