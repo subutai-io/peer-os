@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -93,9 +94,23 @@ public class RegistrationManagerImpl implements RegistrationManager
     {
         try
         {
-            if ( requestDataService.find( requestedHost.getId() ) != null )
+            RequestedHostImpl requestedHostImpl = requestDataService.find( requestedHost.getId() );
+
+            if ( requestedHostImpl != null )
             {
                 LOG.info( "Already requested registration" );
+
+                //update hostname
+
+                if ( !Strings.isNullOrEmpty( requestedHost.getHostname() ) && !requestedHostImpl.getHostname()
+                                                                                                .equalsIgnoreCase(
+                                                                                                        requestedHost
+                                                                                                                .getHostname() ) )
+                {
+                    requestedHostImpl.setHostname( requestedHost.getHostname() );
+
+                    requestDataService.update( requestedHostImpl );
+                }
             }
             else
             {
