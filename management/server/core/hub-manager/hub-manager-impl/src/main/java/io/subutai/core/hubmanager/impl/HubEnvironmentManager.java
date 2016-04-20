@@ -186,7 +186,7 @@ public class HubEnvironmentManager
     public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
         io.subutai.common.security.PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
+                peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
         PublicKeyContainer keyContainer = new PublicKeyContainer();
         keyContainer.setKey( publicKeyContainer.getKey() );
@@ -275,7 +275,7 @@ public class HubEnvironmentManager
     }
 
 
-    public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto )
+    public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto, String environmentId )
             throws EnvironmentCreationException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
@@ -294,7 +294,7 @@ public class HubEnvironmentManager
         ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
         CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
 
-        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( localPeer, nodes ) );
+        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( environmentId, localPeer, nodes ) );
         taskExecutor.shutdown();
 
         try
@@ -506,6 +506,7 @@ public class HubEnvironmentManager
 
     public String createSshKey( Set<Host> hosts )
     {
+        //todo use io.subutai.common.command.CommandUtil.executeFailFast() | io.subutai.common.command.CommandUtil.execute()
         CommandUtil.HostCommandResults results = commandUtil.executeParallel( getCreateNReadSSHCommand(), hosts );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )

@@ -169,8 +169,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
     private void infoExchange( EnvironmentPeerDto peerDto )
     {
         EnvironmentInfoDto environmentInfoDto = peerDto.getEnvironmentInfo();
-        String exchangeURL =
-                String.format( "/rest/v1/environments/%s/exchange-info", environmentInfoDto.getId() );
+        String exchangeURL = String.format( "/rest/v1/environments/%s/exchange-info", environmentInfoDto.getId() );
 
         EnvironmentId environmentId = new EnvironmentId( environmentInfoDto.getId() );
         try
@@ -178,8 +177,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             WebClient client = configManager.getTrustedWebClientWithAuth( exchangeURL, configManager.getHubIp() );
 
             // TODO identify for future do we need envKeyId (or do we need keyId for {@link RelationLinkDto})
-            RelationLinkDto envLink = new RelationLinkDto( environmentInfoDto.getId(), Environment.class.getSimpleName(),
-                    PermissionObject.EnvironmentManagement.getName(), "" );
+            RelationLinkDto envLink =
+                    new RelationLinkDto( environmentInfoDto.getId(), Environment.class.getSimpleName(),
+                            PermissionObject.EnvironmentManagement.getName(), "" );
             peerDto = hubEnvironmentManager.getReservedNetworkResource( peerDto );
             peerDto.setPublicKey( hubEnvironmentManager.createPeerEnvironmentKeyPair( envLink ) );
 
@@ -274,7 +274,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentNodesDto envNodes = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
 
-            hubEnvironmentManager.prepareTemplates( peerDto, envNodes );
+            hubEnvironmentManager.prepareTemplates( peerDto, envNodes, peerDto.getEnvironmentInfo().getId() );
             EnvironmentNodesDto updatedNodes = hubEnvironmentManager.cloneContainers( peerDto, envNodes );
 
             byte[] cborData = JsonUtil.toCbor( updatedNodes );
@@ -483,10 +483,10 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             EnvironmentId envId = new EnvironmentId( env.getId() );
 
             localPeer.cleanupEnvironment( envId );
-            ReservedNetworkResources  reservedNetworkResources = localPeer.getReservedNetworkResources();
-            for ( NetworkResource networkResource: reservedNetworkResources.getNetworkResources())
+            ReservedNetworkResources reservedNetworkResources = localPeer.getReservedNetworkResources();
+            for ( NetworkResource networkResource : reservedNetworkResources.getNetworkResources() )
             {
-                if (networkResource.getEnvironmentId().equals( env.getId() ))
+                if ( networkResource.getEnvironmentId().equals( env.getId() ) )
                 {
                     throw new Exception( "Environment network resources are not cleaned yet." );
                 }

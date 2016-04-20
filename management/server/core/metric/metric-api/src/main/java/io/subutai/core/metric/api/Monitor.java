@@ -13,7 +13,6 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.resource.HistoricalMetrics;
 
 
 /**
@@ -32,10 +31,6 @@ public interface Monitor
 
     ProcessResourceUsage getProcessResourceUsage( ContainerId containerId, int pid ) throws MonitorException;
 
-    /**
-     * @param host physical or container host to be monitored
-     */
-    HistoricalMetrics getHistoricalMetrics( Host host, Date startTime, Date endTime );
 
     ResourceHostMetrics getResourceHostMetrics();
 
@@ -60,7 +55,7 @@ public interface Monitor
     Set<AlertListener> getAlertListeners();
 
 
-    String getPlainHistoricalMetrics( final Host host, final Date startTime, final Date endTime );
+    String getHistoricalMetrics( final Host host, final Date startTime, final Date endTime );
 
     void putAlert( Alert alert );
 }

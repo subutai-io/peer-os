@@ -9,6 +9,27 @@
 		<div class="b-popup__body">
 			<textarea class="b-sshKey-textarea" ng-model="sshkey"></textarea>
 		</div>
+
+		<div class="popup-body-box">
+			<div class="b-file-uploader" style="width: 320px;">
+				<input type="text"
+					id="js-uploadFile" 
+					placeholder="Choose File"
+					class="b-popup-body-input"
+					disabled="disabled">
+				
+				<label for="js-uploadBtn" class="b-popup-body-label">Upload SSL key</label>
+
+				<input id="js-uploadBtn"
+					type="file"
+					class="upload"
+					ng-hide="true" 
+					ngf-select 
+					on-read-file="environmentViewCtrl.getSSHfromFile(contents)" />
+			</div>
+			<div class="clear"></div>
+		</div>
+
 		<div class="b-popup__footer">
 			<button class="b-btn b-btn_green g-right" type="submit">
 				Save

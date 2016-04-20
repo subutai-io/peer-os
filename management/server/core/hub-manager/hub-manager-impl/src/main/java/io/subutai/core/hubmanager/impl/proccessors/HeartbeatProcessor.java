@@ -64,7 +64,7 @@ public class HeartbeatProcessor implements Runnable
             final Set<String> result = new HashSet<>();
             try
             {
-                String path = String.format( "/rest/v1.1/peers/%s/heartbeat", configManager.getPeerId() );
+                String path = String.format( "/rest/v1.2/peers/%s/heartbeat", configManager.getPeerId() );
 
                 WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
