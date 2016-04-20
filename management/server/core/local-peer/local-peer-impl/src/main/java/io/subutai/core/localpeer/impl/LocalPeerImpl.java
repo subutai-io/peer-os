@@ -75,7 +75,6 @@ import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.KeyPair;
@@ -145,7 +144,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
-    protected ResourceHost managementHost;
     protected Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
     private CommandExecutor commandExecutor;
     private QuotaManager quotaManager;
@@ -271,6 +269,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         hostUtil.dispose();
+
+        commandUtil.dispose();
     }
 
 
@@ -381,8 +381,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults results = commandUtil
-                .executeParallel( localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ),
-                        hosts );
+                .executeFailFast( localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ),
+                        hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -416,8 +416,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return sshPublicKeys;
         }
 
-        CommandUtil.HostCommandResults readResults =
-                commandUtil.executeParallel( localPeerCommands.getReadOrCreateSSHCommand(), hosts );
+        CommandUtil.HostCommandResults readResults = commandUtil
+                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand(), hosts, environmentId.getId() );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -481,7 +481,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             if ( i % portionSize == 0 || i == keys.size() )
             {
                 CommandUtil.HostCommandResults appendResults = commandUtil
-                        .executeParallel( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ), hosts );
+                        .executeFailFast( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ), hosts,
+                                environmentId.getId() );
 
                 keysString.setLength( 0 );
 
@@ -503,7 +504,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         //config ssh
         CommandUtil.HostCommandResults configResults =
-                commandUtil.executeParallel( localPeerCommands.getConfigSSHCommand(), hosts );
+                commandUtil.executeFailFast( localPeerCommands.getConfigSSHCommand(), hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
         {
@@ -536,8 +537,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts,
+                        environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -570,8 +572,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .executeFailFast( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts,
+                        environmentId.getId() );
 
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
@@ -990,12 +993,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     @Override
     public ResourceHost getManagementHost() throws HostNotFoundException
     {
-        if ( managementHost == null )
-        {
-            throw new HostNotFoundException( String.format( "Management host not found on peer %s.", getId() ) );
-        }
-
-        return managementHost;
+        return getResourceHostByContainerName( Common.MANAGEMENT_HOSTNAME );
     }
 
 
@@ -1020,8 +1018,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
+        //remove rh ssl cert
+        securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(), rhId );
+
+        securityManager.getHttpContextManager().reloadKeyStore();
+
+        //remove rh key
+        KeyManager keyManager = securityManager.getKeyManager();
+
+        keyManager.removeKeyData( rhId );
+
+        //remove rh containers' keys
+        for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
+        {
+            keyManager.removeKeyData( containerHost.getKeyId() );
+        }
+
+        //remove rh from cache
         resourceHosts.remove( resourceHost );
 
+        //remove rh from db
         resourceHostDataService.remove( resourceHost.getId() );
     }
 
@@ -1158,45 +1174,70 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void onHeartbeat( final ResourceHostInfo resourceHostInfo, Set<QuotaAlertValue> alerts )
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
+
         if ( initialized )
         {
+            boolean firstMhRegistration = false;
+
             ResourceHostEntity host;
+
             try
             {
                 host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
             }
             catch ( HostNotFoundException e )
             {
+                //register new RH
                 host = new ResourceHostEntity( getId(), resourceHostInfo );
+
                 resourceHostDataService.persist( host );
+
                 addResourceHost( host );
-                Set<ResourceHost> a = Sets.newHashSet();
-                a.add( host );
-                setResourceHostTransientFields( a );
+
+                setResourceHostTransientFields( Sets.<ResourceHost>newHashSet( host ) );
+
                 buildAdminHostRelation( host );
+
                 LOG.debug( String.format( "Resource host %s registered.", resourceHostInfo.getHostname() ) );
+
+                for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+                {
+                    if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getHostname() ) )
+                    {
+                        firstMhRegistration = true;
+                        break;
+                    }
+                }
             }
+
+            //update host info from heartbeat
             if ( host.updateHostInfo( resourceHostInfo ) )
             {
                 resourceHostDataService.update( host );
+
                 LOG.debug( String.format( "Resource host %s updated.", resourceHostInfo.getHostname() ) );
             }
-            if ( managementHost == null )
+
+            if ( firstMhRegistration )
             {
+                //exchange keys with MH container
                 try
                 {
-                    final Host managementLxc = findHostByName( "management" );
-                    if ( managementLxc instanceof ContainerHostEntity )
-                    {
-                        managementHost = ( ( ContainerHostEntity ) managementLxc ).getParent();
-                        buildAdminHostRelation( managementHost );
-                        //todo save flag that exchange happened to db
-                        exchangeMhKeysWithRH();
-                    }
+                    exchangeKeys( host, Common.MANAGEMENT_HOSTNAME );
                 }
                 catch ( Exception e )
                 {
-                    //ignore
+                    LOG.error( "Error exchanging keys with MH" );
+                }
+
+                //setup security
+                try
+                {
+                    buildAdminHostRelation( getContainerHostByName( Common.MANAGEMENT_HOSTNAME ) );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error setting up security relations with MH", e );
                 }
             }
         }
@@ -1216,7 +1257,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "bandwidthControl", "true" );
 
-            if ( "management".equalsIgnoreCase( host.getHostname() ) )
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
             {
                 relationTraits.put( "managementSupervisor", "true" );
             }
@@ -1235,13 +1276,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void exchangeMhKeysWithRH() throws Exception
+    public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception
     {
         RegistrationManager registrationManager = ServiceLocator.getServiceNoCache( RegistrationManager.class );
 
         String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
 
-        commandUtil.execute( localPeerCommands.getManagementExchangeKeyCommand( token ), getManagementHost() );
+        commandUtil.execute( localPeerCommands.getExchangeKeyCommand( hostname, token ), resourceHost );
     }
 
 
@@ -1988,11 +2029,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //interrupt active environment operations
         boolean hasActiveTasks = hostUtil.cancelEnvironmentTasks( environmentId.getId() );
 
+        hasActiveTasks |= commandUtil.cancelEnvironmentCommands( environmentId.getId() );
+
         if ( hasActiveTasks )
         {
-            //await clone commands on agent to complete, best attempt
+            //await clone commands on agent to complete, best effort
             TaskUtil.sleep( 10 * 1000 ); // 10 sec
         }
+
 
         //send cleanup command to RHs
         Set<ResourceHost> resourceHosts = getResourceHosts();
@@ -2007,15 +2051,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         hostUtil.submit( tasks, reservedNetworkResource.getEnvironmentId() );
 
 
-        //remove PEK
-        //todo review this part with Security team
         try
         {
+            //remove PEK
             KeyManager keyManager = securityManager.getKeyManager();
 
             keyManager.removeKeyData( environmentId.getId() );
 
-            keyManager.removeKeyData( getId() + "-" + environmentId.getId() );
+            keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
+
+            //remove container keys
+            Containers containers = getEnvironmentContainers( environmentId );
+
+            for ( final ContainerHostInfo containerHostInfo : containers.getContainers() )
+            {
+                keyManager.removeKeyData( containerHostInfo.getId() );
+            }
         }
         catch ( Exception e )
         {
@@ -2113,7 +2164,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -2137,12 +2188,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public Host findHostByName( final String hostname ) throws HostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
-
-
-        if ( managementHost != null && getManagementHost().getHostname().equals( hostname ) )
-        {
-            return managementHost;
-        }
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {

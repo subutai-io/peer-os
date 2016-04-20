@@ -41,7 +41,7 @@ func GetContainerPk(name string) string {
 }
 
 func GetPk(name string) string {
-	stdout, err := exec.Command("/bin/bash", "-c", "gpg --export -a "+name).Output()
+	stdout, err := exec.Command("gpg", "--export", "-a", name).Output()
 	log.Check(log.WarnLevel, "Getting public key", err)
 	if len(stdout) == 0 {
 		log.Warn("GPG key for RH not found. Creating new.")
@@ -88,7 +88,7 @@ func EncryptWrapper(args ...string) string {
 func GenerateKey(name string) {
 	path := config.Agent.LxcPrefix + name
 	email := name + "@subutai.io"
-	pass := "12345678"
+	pass := config.Agent.GpgPassword
 	if !container.IsContainer(name) {
 		os.MkdirAll("/root/.gnupg/", 0700)
 		path = "/root/.gnupg"

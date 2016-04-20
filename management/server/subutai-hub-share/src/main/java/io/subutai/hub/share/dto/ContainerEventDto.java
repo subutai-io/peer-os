@@ -4,6 +4,8 @@ package io.subutai.hub.share.dto;
 import java.util.Date;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 
 public class ContainerEventDto
@@ -20,6 +22,8 @@ public class ContainerEventDto
 
     private String containerId;
 
+    private String envId;
+
     private Type type;
 
 
@@ -28,12 +32,13 @@ public class ContainerEventDto
     }
 
 
-    public ContainerEventDto( String containerId, Type type )
+    public ContainerEventDto( String containerId, String envId, Type type )
     {
         id = RandomStringUtils.randomAlphabetic( 12 );
         time = new Date();
 
         this.containerId = containerId;
+        this.envId = envId;
         this.type = type;
     }
 
@@ -50,6 +55,12 @@ public class ContainerEventDto
     }
 
 
+    public String getEnvId()
+    {
+        return envId;
+    }
+
+
     public Type getType()
     {
         return type;
@@ -59,6 +70,19 @@ public class ContainerEventDto
     public Date getTime()
     {
         return time;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE )
+                .append( "id", id )
+                .append( "time", time )
+                .append( "containerId", containerId )
+                .append( "envId", envId )
+                .append( "type", type )
+                .toString();
     }
 }
 
