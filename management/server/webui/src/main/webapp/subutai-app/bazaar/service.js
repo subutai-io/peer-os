@@ -79,7 +79,6 @@ function BazaarSrv($http) {
 			kar = plugin.metadata[1];
 		}
 		var postData = "name=" + plugin.name + "&version=" + plugin.version + "&kar=" + kar + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
-		console.log (postData);
 		return $http.post(
 			BAZAAR_URL + "install",
 			postData,
@@ -96,8 +95,7 @@ function BazaarSrv($http) {
 		else {
 			kar = plugin.metadata[1];
 		}
-		var postData = "id=" + plugin.hubId + "&kar=" + kar + "&name=" + plugin.name.toLowerCase();
-		console.log (postData);
+		var postData = "id=" + plugin.hubId + "&kar=" + kar + "&name=" + plugin.name.toLowerCase();;
 		return $http.post(
 			BAZAAR_URL + "uninstall",
 			postData,
@@ -114,7 +112,6 @@ function BazaarSrv($http) {
 			kar = plugin.metadata[1];
 		}
 		var postData = "id=" + plugin.hubId + "&name=" + plugin.name + "&version=" + plugin.version + "&kar=" + kar + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
-		console.log (postData);
 		return $http.post(
 			BAZAAR_URL + "restore",
 			postData,

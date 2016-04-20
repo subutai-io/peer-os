@@ -269,6 +269,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         hostUtil.dispose();
+
+        commandUtil.dispose();
     }
 
 
@@ -379,8 +381,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults results = commandUtil
-                .executeParallel( localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ),
-                        hosts );
+                .executeFailFast( localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ),
+                        hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -414,8 +416,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return sshPublicKeys;
         }
 
-        CommandUtil.HostCommandResults readResults =
-                commandUtil.executeParallel( localPeerCommands.getReadOrCreateSSHCommand(), hosts );
+        CommandUtil.HostCommandResults readResults = commandUtil
+                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand(), hosts, environmentId.getId() );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -479,7 +481,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             if ( i % portionSize == 0 || i == keys.size() )
             {
                 CommandUtil.HostCommandResults appendResults = commandUtil
-                        .executeParallel( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ), hosts );
+                        .executeFailFast( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ), hosts,
+                                environmentId.getId() );
 
                 keysString.setLength( 0 );
 
@@ -501,7 +504,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         //config ssh
         CommandUtil.HostCommandResults configResults =
-                commandUtil.executeParallel( localPeerCommands.getConfigSSHCommand(), hosts );
+                commandUtil.executeFailFast( localPeerCommands.getConfigSSHCommand(), hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
         {
@@ -534,8 +537,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts,
+                        environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -568,8 +572,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .executeFailFast( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts,
+                        environmentId.getId() );
 
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
@@ -1013,19 +1018,26 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ResourceHost resourceHost = getResourceHostById( rhId );
 
+        //remove rh ssl cert
         securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(), rhId );
+
         securityManager.getHttpContextManager().reloadKeyStore();
 
+        //remove rh key
         KeyManager keyManager = securityManager.getKeyManager();
+
         keyManager.removeKeyData( rhId );
 
+        //remove rh containers' keys
         for ( final ContainerHost containerHost : resourceHost.getContainerHosts() )
         {
             keyManager.removeKeyData( containerHost.getKeyId() );
         }
 
+        //remove rh from cache
         resourceHosts.remove( resourceHost );
 
+        //remove rh from db
         resourceHostDataService.remove( resourceHost.getId() );
     }
 
@@ -2017,11 +2029,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //interrupt active environment operations
         boolean hasActiveTasks = hostUtil.cancelEnvironmentTasks( environmentId.getId() );
 
+        hasActiveTasks |= commandUtil.cancelEnvironmentCommands( environmentId.getId() );
+
         if ( hasActiveTasks )
         {
             //await clone commands on agent to complete, best effort
             TaskUtil.sleep( 10 * 1000 ); // 10 sec
         }
+
 
         //send cleanup command to RHs
         Set<ResourceHost> resourceHosts = getResourceHosts();
@@ -2036,20 +2051,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         hostUtil.submit( tasks, reservedNetworkResource.getEnvironmentId() );
 
 
-        //remove PEK
-        //todo review this part with Security team
         try
         {
+            //remove PEK
             KeyManager keyManager = securityManager.getKeyManager();
 
             keyManager.removeKeyData( environmentId.getId() );
 
             keyManager.removeKeyData( getId() + "_" + environmentId.getId() );
 
+            //remove container keys
             Containers containers = getEnvironmentContainers( environmentId );
+
             for ( final ContainerHostInfo containerHostInfo : containers.getContainers() )
             {
-                keyManager.removeKeyData(containerHostInfo.getId());
+                keyManager.removeKeyData( containerHostInfo.getId() );
             }
         }
         catch ( Exception e )
