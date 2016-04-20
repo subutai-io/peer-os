@@ -85,13 +85,7 @@ function BazaarSrv($http) {
 	function uninstallHubPlugin (plugin) {
 		var kar = "";
 		// TODO: change to filename
-		if (plugin.metadata[0].substring (plugin.metadata[0].length - 4, plugin.metadata[0].length) === ".kar") {
-			kar = plugin.metadata[0];
-		}
-		else {
-			kar = plugin.metadata[1];
-		}
-		var postData = "id=" + plugin.hubId + "&kar=" + kar + "&name=" + plugin.name.toLowerCase();
+		var postData = "id=" + plugin.hubId + "&name=" + plugin.name.toLowerCase();
 		return $http.post(
 			BAZAAR_URL + "uninstall",
 			postData,
@@ -102,13 +96,7 @@ function BazaarSrv($http) {
 	function restoreHubPlugin (plugin) {
 		var kar = "";
 		// TODO: refactor
-		if (plugin.metadata[0].substring (plugin.metadata[0].length - 4, plugin.metadata[0].length) === ".kar") {
-			kar = plugin.metadata[0];
-		}
-		else {
-			kar = plugin.metadata[1];
-		}
-		var postData = "id=" + plugin.hubId + "&name=" + plugin.name + "&version=" + plugin.version + "&kar=" + kar + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
+		var postData = "id=" + plugin.hubId + "&name=" + plugin.name + "&version=" + plugin.version + "&kar=" + plugin.metadata[0] + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
 		return $http.post(
 			BAZAAR_URL + "restore",
 			postData,

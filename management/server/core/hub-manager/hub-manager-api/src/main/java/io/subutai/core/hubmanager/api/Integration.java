@@ -21,7 +21,7 @@ public interface Integration
 
     void installPlugin( String url, String filename ) throws HubPluginException;
 
-    void uninstallPlugin( String url, String name );
+    void uninstallPlugin( String name );
 
     void unregisterPeer() throws HubPluginException;
 

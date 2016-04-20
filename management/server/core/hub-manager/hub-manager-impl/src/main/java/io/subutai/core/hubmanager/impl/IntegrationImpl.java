@@ -302,7 +302,7 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void uninstallPlugin( final String url, final String name )
+    public void uninstallPlugin( final String name )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
         File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
