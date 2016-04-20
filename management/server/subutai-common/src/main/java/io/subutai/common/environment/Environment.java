@@ -18,7 +18,7 @@ import io.subutai.common.security.relation.RelationLink;
 public interface Environment extends RelationLink
 {
 
-    //TODO implement startContainer, stopContainer and resetSwarmSecretKey methods
+    //TODO remove unused methods
 
     /**
      * Return id of environment creator user
