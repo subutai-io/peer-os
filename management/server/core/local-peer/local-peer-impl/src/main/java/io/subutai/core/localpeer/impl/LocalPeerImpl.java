@@ -1183,7 +1183,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             try
             {
-                host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
+                host = ( ResourceHostEntity ) getResourceHostById( resourceHostInfo.getId() );
             }
             catch ( HostNotFoundException e )
             {
