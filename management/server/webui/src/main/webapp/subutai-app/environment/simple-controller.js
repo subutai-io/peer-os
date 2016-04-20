@@ -591,7 +591,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			attrs: {
 				image: { 'xlink:href': img },
 				'rect.b-magnet': {fill: vm.colors['SMALL']},
-				title: {text: $(this).data('template')}
+				title: {text: template}
 			}
 		});
 		vm.isEditing ? vm.currentEnvironment.includedContainers.push(devElement) : null;
@@ -792,6 +792,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			});
 			graph.addCell(devElement);
 		}
+		filterPluginsList();
 	}
 
 	function clearWorkspace() {
