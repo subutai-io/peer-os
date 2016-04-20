@@ -940,6 +940,16 @@ tip.description-tooltip {
     background-image: url('../assets/elements/icons/notifications.svg');
 }
 
+.b-icon_plugins {
+    background-image: url('../assets/elements/icons/plugins_icon.svg');
+}
+
+.b-icon_30 {
+	width: 30px;
+	height: 30px;
+	background-size: 30px;
+}
+
 .b-fixed-button {
     position: fixed;
     right: 0;
@@ -2816,6 +2826,13 @@ td.b-main-table__status-col {
 .b-cloud-item {
     display: inline-block;
 }
+
+.b-cloud-item-checkbox {
+	margin-right: 10px;
+	min-width: 15px;
+	font-size: 16px;
+}
+
 .b-cloud__space {
     margin-right: 247px;
     overflow: hidden;
@@ -3751,12 +3768,15 @@ span.ssh-info-button
 
 .b-environments-plugin {
 	position: absolute;
-	padding: 15px 0 0 15px;
+	top: 0;
+	right: 0;
+	padding: 15px 5px 0 0;
 	z-index: 10;
 }
 
 .b-environments-plugin__list {
 	max-height: 350px;
+	min-height: 50px;
 	width: 250px;
 	border: 1px solid #CCCEEE;
 	position: relative;
@@ -3780,6 +3800,17 @@ span.ssh-info-button
 }
 
 .b-template-settings_plugins {
-	left: 1px;
+	top: 50px;
+	right: 1px;
+}
+
+.b-template-settings_plugins:before {
+	right: 16px;
+	left: auto;
+}
+
+.b-template-settings_plugins:after {
+	right: 18px;
+	left: auto;
 }
 
