@@ -46,6 +46,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.currentPeer = false;
 	vm.currentPeerIndex = false;
 	vm.buildCompleted = false;
+	vm.selectedPlugin = false;
 	vm.editingEnv = false;
 
 	// functions
@@ -60,6 +61,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	vm.showResources = showResources;
 	vm.addResource2Build = addResource2Build;
 	vm.closePopup = closePopup;
+
+	//plugins actions
+	vm.selectPlugin = selectPlugin;
+	vm.setTemplatesByPlugin = setTemplatesByPlugin;
 
 	// @todo workaround
 	environmentService.getTemplates()
@@ -91,8 +96,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	clearWorkspace();
 
+	function resetPlugin() {
+		if(vm.selectedPlugin.selected !== undefined) vm.selectedPlugin.selected = false;
+		vm.selectedPlugin = false;
+	}
+
 	function closePopup() {
 		vm.buildCompleted = false;
+		resetPlugin();
 		ngDialog.closeAll();
 	}
 
@@ -747,6 +758,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			className: 'b-build-environment-info',
 			preCloseCallback: function(value) {
 				vm.buildCompleted = false;
+				resetPlugin();
 			}
 		});
 	}
@@ -766,6 +778,114 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}
 			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id);
 		}
+	}
+
+	vm.plugins = [];
+	vm.filteredPlugins = {};
+	function getPlugins() {
+		environmentService.getInstalledPlugins().success(function (data) {
+			vm.plugins = data;
+			if (vm.plugins === undefined || vm.plugins === "") {
+				vm.plugins = [];
+			}
+			$('.js-call-plugins-popup').on('click', function() {
+				$('.js-environment-plugins-menu').stop().slideDown(300);
+			});
+			filterPluginsList();
+		});
+	}
+	getPlugins();
+
+	function filterPluginsList() {
+		var allElements = graph.getCells();
+		var addedContainers = getContainers2Build(allElements, true);
+
+		if(addedContainers.containersList.length > 0) {
+			vm.filteredPlugins = {};
+			for(var i = 0; i < addedContainers.containersList.length; i++) {
+
+				var currentTemplate = addedContainers.containersList[i].templateName;
+
+				for(var j = 0; j < vm.plugins.length; j++) {
+
+					var currentPlugin = vm.plugins[j];
+
+					if(vm.filteredPlugins[currentPlugin.name] == undefined) {
+						if(currentPlugin.requirement !== undefined) {
+							var requirementArray = Object.keys(currentPlugin.requirement);
+							if(requirementArray.indexOf(currentTemplate) > -1) {
+								vm.filteredPlugins[currentPlugin.name] = currentPlugin;
+							}
+						}
+					}
+
+				}
+
+			}
+		} else {
+			vm.filteredPlugins = vm.plugins;
+		}
+	}
+	$scope.filterPluginsList = filterPluginsList;
+
+	function selectPlugin(plugin) {
+
+		if(vm.selectedPlugin) {
+			vm.selectedPlugin.selected = false;
+		}
+
+		vm.selectedPlugin = plugin;
+		vm.selectedPlugin.selected = true;
+	}
+
+	function setTemplatesByPlugin() {
+
+		console.log(vm.selectedPlugin);
+		if(vm.selectedPlugin.requirement !== undefined) {
+
+			var firstPeer;
+			for (firstPeer in vm.peerIds) break;
+			console.log(firstPeer);
+			var resourceHostItemId = addResource2Build(vm.peerIds[firstPeer].resourceHosts[0].id, firstPeer, 0);
+			var resourceHost = graph.getCell(resourceHostItemId);
+
+			for(var template in vm.selectedPlugin.requirement) {
+				for(var i = 0; i < vm.selectedPlugin.requirement[template]; i++) {
+
+					var allElements = graph.getCells();
+					var addedContainers = getContainers2Build(allElements, true);
+
+					if(addedContainers.containersList.length > 0) {
+
+						var alreadyONWorckspace = false;
+						for(var i = 0; i < addedContainers.containersList.length; i++) {
+							var currentTemplate = addedContainers.containersList[i].templateName;
+							if(currentTemplate == template.toLowerCase()) {
+								alreadyONWorckspace = true;
+								break;
+							}
+						}
+						if(!alreadyONWorckspace) {
+							var img = 'assets/templates/' + template + '.jpg';
+							if(!imageExists(img)) {
+								img = 'assets/templates/no-image.jpg';
+							}
+							addContainerToHost(resourceHost, template, img);
+						}
+
+					} else {
+						var img = 'assets/templates/' + template + '.jpg';
+						if(!imageExists(img)) {
+							img = 'assets/templates/no-image.jpg';
+						}
+						addContainerToHost(resourceHost, template, img);
+					}
+
+				}
+			}
+		}
+		$('.b-template-settings').stop().slideUp(100);
+
 	}
 
 	function getContainers2Build(models, onlyNew, getRemoved) {
@@ -958,15 +1078,6 @@ function checkResourceHost(model) {
 	
 }
 
-function imageExists(image_url){
-	var http = new XMLHttpRequest();
-
-	http.open('HEAD', image_url, false);
-	http.send();
-
-	return http.status != 404;
-}
-
 function startDrag( event ) {
 
 	var containerImage = $(event.target).parent().find('img');
@@ -1051,5 +1162,7 @@ function addContainerToHost(model, template, img, size, containerId) {
 	graph.addCell(devElement);
 	model.embed(devElement);
 	model.set('children', model.get('children') + 1);
+
+	angular.element(document.getElementById('js-environment-creation')).scope().filterPluginsList();
 }
 

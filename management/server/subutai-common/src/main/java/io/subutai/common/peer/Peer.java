@@ -96,6 +96,8 @@ public interface Peer extends RelationLink
     /**
      * Executes command on the container
      *
+     * todo use HostId instead of host
+     *
      * @param requestBuilder - command
      * @param host - target host
      */
@@ -103,6 +105,8 @@ public interface Peer extends RelationLink
 
     /**
      * Executes command on the container
+     *
+     * todo use HostId instead of host
      *
      * @param requestBuilder - command
      * @param host - target host
@@ -194,6 +198,8 @@ public interface Peer extends RelationLink
     /**
      * Returns allowed cpus/cores ids on container
      *
+     * todo use ContainerId instead of host
+     *
      * @param host - container
      *
      * @return - allowed cpu set
@@ -202,6 +208,8 @@ public interface Peer extends RelationLink
 
     /**
      * Sets allowed cpus/cores on container
+     *
+     * todo use ContainerId instead of host
      *
      * @param host - container
      * @param cpuSet - allowed cpu set
