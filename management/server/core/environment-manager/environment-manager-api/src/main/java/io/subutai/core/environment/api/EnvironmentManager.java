@@ -33,7 +33,6 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
  */
 public interface EnvironmentManager
 {
-    //TODO implement startContainer, stopContainer and resetSwarmSecretKey methods
 
     /**
      * Returns all existing environments
