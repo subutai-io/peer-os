@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.jms.IllegalStateException;
-
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Node;
