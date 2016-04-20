@@ -73,6 +73,7 @@ public class VehsProccessor implements StateLinkProccessor
         this.environmentUserHelper = environmentUserHelper;
     }
 
+
     @Override
     public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
     {
@@ -114,39 +115,43 @@ public class VehsProccessor implements StateLinkProccessor
     private void setupHS( EnvironmentPeerDto peerDto )
     {
         EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
-        VehsDto vehsDto = null;
-        String containerDataURL = String.format( "/rest/v1/vehs/%s", peerDto.getEnvironmentInfo().getId() );
-        try
+        if ( environmentDto != null )
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
-            Response r = client.get();
-            byte[] encryptedContent = configManager.readContent( r );
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            vehsDto = JsonUtil.fromCbor( plainContent, VehsDto.class );
-
-            switch ( vehsDto.getState() )
+            VehsDto vehsDto = null;
+            String containerDataURL = String.format( "/rest/v1/vehs/%s", peerDto.getEnvironmentInfo().getId() );
+            try
             {
-                case DEPLOY:
-                    deployHS( environmentDto, vehsDto, peerDto );
-                    break;
-                case VERIFY_CHECKSUM:
-                    verifyChecksumHS( environmentDto, vehsDto, peerDto );
-                    break;
-                case COLLECT_METRIC:
-                    collectMetric( environmentDto, vehsDto, peerDto );
-                    break;
-                case DELETE:
-                    deleteHS( environmentDto, vehsDto, peerDto );
-                    break;
-            }
-            LOG.info( vehsDto.getProjectName() );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage() );
-        }
+                WebClient client =
+                        configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
+                Response r = client.get();
+                byte[] encryptedContent = configManager.readContent( r );
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+                vehsDto = JsonUtil.fromCbor( plainContent, VehsDto.class );
 
-        LOG.info( peerDto.toString() );
+                switch ( vehsDto.getState() )
+                {
+                    case DEPLOY:
+                        deployHS( environmentDto, vehsDto, peerDto );
+                        break;
+                    case VERIFY_CHECKSUM:
+                        verifyChecksumHS( environmentDto, vehsDto, peerDto );
+                        break;
+                    case COLLECT_METRIC:
+                        collectMetric( environmentDto, vehsDto, peerDto );
+                        break;
+                    case DELETE:
+                        deleteHS( environmentDto, vehsDto, peerDto );
+                        break;
+                }
+                LOG.info( vehsDto.getProjectName() );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( e.getMessage() );
+            }
+
+            LOG.info( peerDto.toString() );
+        }
     }
 
 
@@ -155,7 +160,7 @@ public class VehsProccessor implements StateLinkProccessor
         List<ContainerHost> containerHosts = getContainers( environmentDto, vehsDto );
         for ( ContainerHost containerHost : containerHosts )
         {
-            CommandResult commandResult = execute( containerHost, "awk '{print $1}' /var/log/nginx/access.log" );
+            CommandResult commandResult = execute( containerHost, "bash collectMetrics.sh /var/log/nginx/access.log" );
             String verifyDataUrl = String.format( "/rest/v1/vehs/metric/%s", peerDto.getEnvironmentInfo().getId() );
             vehsDto.setData( commandResult.getStdOut() );
             sendPutRequest( verifyDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
