@@ -14,6 +14,11 @@ public class ProductDtoV1_2 extends ProductDto
     private String iconUrl;
 
 
+    public ProductDtoV1_2()
+    {
+        super();
+    }
+
     //JSONObject to ProductDtoV1_2
     public ProductDtoV1_2( JSONObject objProduct ) throws ParseException
     {
