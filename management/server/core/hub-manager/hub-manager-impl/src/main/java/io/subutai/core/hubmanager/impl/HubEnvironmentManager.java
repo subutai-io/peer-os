@@ -428,6 +428,12 @@ public class HubEnvironmentManager
             }
         }
 
+        // No need to exchange SSH keys if environment has less than two containers
+        if ( sshKeys.size() < 2 )
+        {
+            return peerDto;
+        }
+
         completionService.submit( new Callable<Peer>()
         {
             @Override
@@ -456,6 +462,7 @@ public class HubEnvironmentManager
             LOG.error( msg, e );
             throw new EnvironmentCreationException( msg );
         }
+
         return peerDto;
     }
 
