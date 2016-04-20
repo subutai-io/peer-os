@@ -83,6 +83,8 @@ import org.bouncycastle.util.io.Streams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 
 /**
  * Provides methods to encrypt, decrypt, sign and verify signature using PGP keypairs
@@ -274,29 +276,22 @@ public class PGPEncryptionUtil
     public static boolean verifySignature( ContentAndSignatures contentAndSignatures, PGPPublicKey publicKey )
             throws PGPException
     {
+        Preconditions.checkNotNull( contentAndSignatures );
+        Preconditions.checkNotNull( publicKey );
+
         try
         {
             for ( int i = 0; i < contentAndSignatures.getOnePassSignatureList().size(); i++ )
             {
                 PGPOnePassSignature ops = contentAndSignatures.getOnePassSignatureList().get( 0 );
 
-                if ( publicKey != null )
+                ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
+                ops.update( contentAndSignatures.getDecryptedContent() );
+                PGPSignature signature = contentAndSignatures.getSignatureList().get( i );
+
+                if ( !ops.verify( signature ) )
                 {
-                    ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
-                    ops.update( contentAndSignatures.getDecryptedContent() );
-                    PGPSignature signature = contentAndSignatures.getSignatureList().get( i );
-                    if ( ops.verify( signature ) )
-                    {
-                        Iterator<?> userIds = publicKey.getUserIDs();
-                        while ( userIds.hasNext() )
-                        {
-                            String userId = ( String ) userIds.next();
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
             return true;
@@ -401,6 +396,10 @@ public class PGPEncryptionUtil
     public static byte[] decryptAndVerify( byte[] encryptedMessage, final PGPSecretKey secretKey,
                                            final String secretPwd, final PGPPublicKey publicKey ) throws PGPException
     {
+        Preconditions.checkNotNull( encryptedMessage );
+        Preconditions.checkNotNull( secretKey );
+        Preconditions.checkNotNull( secretPwd );
+        Preconditions.checkNotNull( publicKey );
 
         try
         {
@@ -470,23 +469,13 @@ public class PGPEncryptionUtil
                 {
                     PGPOnePassSignature ops = onePassSignatureList.get( 0 );
 
-                    if ( publicKey != null )
+
+                    ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
+                    ops.update( output );
+                    PGPSignature signature = signatureList.get( i );
+                    if ( !ops.verify( signature ) )
                     {
-                        ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
-                        ops.update( output );
-                        PGPSignature signature = signatureList.get( i );
-                        if ( ops.verify( signature ) )
-                        {
-                            Iterator<?> userIds = publicKey.getUserIDs();
-                            while ( userIds.hasNext() )
-                            {
-                                String userId = ( String ) userIds.next();
-                            }
-                        }
-                        else
-                        {
-                            throw new SignatureException( "Signature verification failed" );
-                        }
+                        throw new SignatureException( "Signature verification failed" );
                     }
                 }
             }
@@ -494,10 +483,6 @@ public class PGPEncryptionUtil
             if ( pbe.isIntegrityProtected() && !pbe.verify() )
             {
                 throw new PGPException( "Data is integrity protected but integrity is lost." );
-            }
-            else if ( publicKey == null )
-            {
-                throw new SignatureException( "Signature not found" );
             }
 
             return actualOutput.toByteArray();
@@ -512,6 +497,12 @@ public class PGPEncryptionUtil
     public static byte[] decryptAndVerify( byte[] encryptedMessage, final InputStream secretKeyRing,
                                            final String secretPwd, final PGPPublicKey publicKey ) throws PGPException
     {
+
+        Preconditions.checkNotNull( encryptedMessage );
+        Preconditions.checkNotNull( secretKeyRing );
+        Preconditions.checkNotNull( secretPwd );
+        Preconditions.checkNotNull( publicKey );
+
 
         try
         {
@@ -589,23 +580,13 @@ public class PGPEncryptionUtil
                 {
                     PGPOnePassSignature ops = onePassSignatureList.get( 0 );
 
-                    if ( publicKey != null )
+
+                    ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
+                    ops.update( output );
+                    PGPSignature signature = signatureList.get( i );
+                    if ( !ops.verify( signature ) )
                     {
-                        ops.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), publicKey );
-                        ops.update( output );
-                        PGPSignature signature = signatureList.get( i );
-                        if ( ops.verify( signature ) )
-                        {
-                            Iterator<?> userIds = publicKey.getUserIDs();
-                            while ( userIds.hasNext() )
-                            {
-                                String userId = ( String ) userIds.next();
-                            }
-                        }
-                        else
-                        {
-                            throw new SignatureException( "Signature verification failed" );
-                        }
+                        throw new SignatureException( "Signature verification failed" );
                     }
                 }
             }
@@ -613,10 +594,6 @@ public class PGPEncryptionUtil
             if ( pbe.isIntegrityProtected() && !pbe.verify() )
             {
                 throw new PGPException( "Data is integrity protected but integrity is lost." );
-            }
-            else if ( publicKey == null )
-            {
-                throw new SignatureException( "Signature not found" );
             }
 
             return actualOutput.toByteArray();
