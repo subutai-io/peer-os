@@ -14,8 +14,12 @@ angular.module('subutai.environment.controller', [])
 		}
 	})
 	.filter('isEmpty', [function() {
-		return function(object) {
-			return angular.equals({}, object);
+		return function(object, editStatus) {
+			if(editStatus === true || angular.equals({}, object)) {
+				return true
+			} else {
+				return false;
+			}
 		}
 	}]);
 
@@ -621,7 +625,6 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 
 	function gotToPlugin(plugin) {
-		console.log(plugin);
 		if(plugin.name !== undefined) {
 			$state.go(plugin.name.toLowerCase());
 		}

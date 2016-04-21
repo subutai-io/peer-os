@@ -797,7 +797,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	getPlugins();
 
 	function filterPluginsList() {
-		var allElements = graph.getCells();
+		/*var allElements = graph.getCells();
 		var addedContainers = getContainers2Build(allElements, true);
 
 		if(addedContainers.containersList.length > 0) {
@@ -825,6 +825,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		} else {
 			vm.filteredPlugins = vm.plugins;
 		}
+		$('.js-pluginspopup-scroll').perfectScrollbar('update');*/
 	}
 	$scope.filterPluginsList = filterPluginsList;
 
@@ -845,7 +846,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 			var firstPeer;
 			for (firstPeer in vm.peerIds) break;
-			console.log(firstPeer);
 			var resourceHostItemId = addResource2Build(vm.peerIds[firstPeer].resourceHosts[0].id, firstPeer, 0);
 			var resourceHost = graph.getCell(resourceHostItemId);
 
