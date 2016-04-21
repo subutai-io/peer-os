@@ -3489,6 +3489,7 @@ td.b-main-table__status-col {
 	line-height: 0;
 	font-size: 0;
 	vertical-align: top;
+	height: auto!important;
 }
 .b-template-settings:before {
     content: "";
@@ -3812,5 +3813,11 @@ span.ssh-info-button
 .b-template-settings_plugins:after {
 	right: 18px;
 	left: auto;
+}
+
+a[disabled] {
+    pointer-events: none;
+    background-color: #EAEAEA;
+    color: #333333;
 }
 

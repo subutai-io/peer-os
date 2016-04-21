@@ -174,12 +174,21 @@
 								</div>
 							</div>
 							<div class="footer">
+
 								<button type="button" 
 								class="b-btn b-btn_green" 
 								ng-click="advEnvCtrl.setTemplatesByPlugin()" 
-								ng-disabled="advEnvCtrl.filteredPlugins | isEmpty">
-									Apply
+								ng-disabled="advEnvCtrl.filteredPlugins | isEmpty:advEnvCtrl.isEditing ">
+									Use
 								</button>
+
+								<button type="button" 
+								class="b-btn b-btn_blue"
+								ng-click="environmentViewCtrl.gotToPlugin(advEnvCtrl.selectedPlugin)" 
+								ng-disabled="!advEnvCtrl.selectedPlugin">
+									Go to Plugin
+								</button>
+								
 							</div>
 						</div>
 					</div>
