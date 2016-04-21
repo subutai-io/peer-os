@@ -241,8 +241,7 @@ public interface Peer extends RelationLink
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
-    //todo use PeerId instead of string
-    PeerResources getResourceLimits( String peerId ) throws PeerException;
+    PeerResources getResourceLimits( PeerId peerId ) throws PeerException;
 
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
 

@@ -22,6 +22,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -326,17 +327,17 @@ public class PeerWebClient
     }
 
 
-    public PeerResources getResourceLimits( final String peerId ) throws PeerException
+    public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
         Response response;
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/limits/%s", peerId );
+            String path = String.format( "/limits/%s", peerId.getId() );
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
-            client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
+
             response = client.get();
         }
         catch ( Exception e )

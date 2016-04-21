@@ -18,6 +18,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -336,11 +337,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getResourceLimits( final String peerId )
+    public Response getResourceLimits( final PeerId peerId )
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+            Preconditions.checkNotNull( peerId );
 
             return Response.ok( localPeer.getResourceLimits( peerId ) ).build();
         }
