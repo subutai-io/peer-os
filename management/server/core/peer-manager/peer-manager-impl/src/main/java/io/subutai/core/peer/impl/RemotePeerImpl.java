@@ -4,7 +4,6 @@ package io.subutai.core.peer.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.annotation.security.PermitAll;
@@ -51,6 +50,7 @@ import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
@@ -65,7 +65,6 @@ import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
@@ -301,28 +300,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
         return peerWebClient.getEnvironmentContainers( environmentId );
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        return environmentWebClient.getCpuSet( containerHost.getContainerId() );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void setCpuSet( final ContainerHost containerHost, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
-
-        environmentWebClient.setCpuSet( containerHost.getContainerId(), cpuSet );
     }
 
 
@@ -624,7 +601,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -776,9 +753,9 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PeerResources getResourceLimits( final String peerId ) throws PeerException
+    public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkNotNull( peerId );
 
         return peerWebClient.getResourceLimits( peerId );
     }

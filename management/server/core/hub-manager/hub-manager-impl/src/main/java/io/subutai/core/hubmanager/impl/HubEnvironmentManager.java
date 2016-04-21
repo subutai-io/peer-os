@@ -513,7 +513,8 @@ public class HubEnvironmentManager
 
     public String createSshKey( Set<Host> hosts )
     {
-        //todo use io.subutai.common.command.CommandUtil.executeFailFast() | io.subutai.common.command.CommandUtil.execute()
+        //todo use io.subutai.common.command.CommandUtil.executeFailFast() | io.subutai.common.command.CommandUtil
+        // .execute()
         CommandUtil.HostCommandResults results = commandUtil.executeParallel( getCreateNReadSSHCommand(), hosts );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
@@ -583,7 +584,7 @@ public class HubEnvironmentManager
         @Override
         public Boolean call() throws Exception
         {
-            peer.setupTunnels( p2pIps, environmentId );
+            peer.setupTunnels( p2pIps, new EnvironmentId( environmentId ) );
             return true;
         }
     }

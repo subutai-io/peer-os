@@ -63,6 +63,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
@@ -88,7 +89,6 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
@@ -1304,42 +1304,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public Set<Integer> getCpuSet( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getCpuSet( host.getContainerId() );
-        }
-        catch ( QuotaException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( e );
-        }
-    }
-
-
-    //    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
-
-        try
-        {
-            quotaManager.setCpuSet( host.getContainerId(), cpuSet );
-        }
-        catch ( QuotaException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( e );
-        }
-    }
-
-
     //networking
 
 
@@ -1831,13 +1795,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
-    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         final NetworkResource reservedNetworkResource =
-                getReservedNetworkResources().findByEnvironmentId( environmentId );
+                getReservedNetworkResources().findByEnvironmentId( environmentId.getId() );
 
         if ( reservedNetworkResource == null )
         {
@@ -2093,11 +2057,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public PeerResources getResourceLimits( final String peerId ) throws PeerException
+    public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkNotNull( peerId );
 
-        return quotaManager.getResourceLimits( peerId );
+        return quotaManager.getResourceLimits( peerId.getId() );
     }
 
 
