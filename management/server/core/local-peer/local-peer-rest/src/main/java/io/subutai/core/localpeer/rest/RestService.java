@@ -18,6 +18,7 @@ import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -46,8 +47,7 @@ public interface RestService
     @POST
     @Path( "tunnels/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.TEXT_PLAIN )
-    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, P2pIps p2pIps );
+    Response setupTunnels( @PathParam( "environmentId" ) EnvironmentId environmentId, P2pIps p2pIps );
 
     @POST
     @Path( "pek" )
@@ -131,8 +131,6 @@ public interface RestService
 
     @GET
     @Path( "limits/{peerId}" )
-    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
-
+    Response getResourceLimits( @PathParam( "peerId" ) final PeerId peerId );
 }
