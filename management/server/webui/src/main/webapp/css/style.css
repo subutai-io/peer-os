@@ -3489,6 +3489,7 @@ td.b-main-table__status-col {
 	line-height: 0;
 	font-size: 0;
 	vertical-align: top;
+	height: auto!important;
 }
 .b-template-settings:before {
     content: "";

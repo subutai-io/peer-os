@@ -505,6 +505,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 					delete graph.getCell(rh.model).attributes.grid[rh.x][rh.y];
 					this.model.remove();
+					filterPluginsList();
 					return;
 					break;
 				case 'element-call-menu':
@@ -778,6 +779,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}
 			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id);
 		}
+		filterPluginsList();
 	}
 
 	vm.plugins = [];
@@ -797,9 +799,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	getPlugins();
 
 	function filterPluginsList() {
-		/*var allElements = graph.getCells();
-		var addedContainers = getContainers2Build(allElements, true);
+		var allElements = graph.getCells();
+		var addedContainers = getContainers2Build(allElements);
 
+		console.log(addedContainers.containersList.length);
 		if(addedContainers.containersList.length > 0) {
 			vm.filteredPlugins = {};
 			for(var i = 0; i < addedContainers.containersList.length; i++) {
@@ -825,7 +828,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		} else {
 			vm.filteredPlugins = vm.plugins;
 		}
-		$('.js-pluginspopup-scroll').perfectScrollbar('update');*/
+		$('.js-pluginspopup-scroll').perfectScrollbar('update');
+		$scope.$$phase || $scope.$apply();
 	}
 	$scope.filterPluginsList = filterPluginsList;
 
