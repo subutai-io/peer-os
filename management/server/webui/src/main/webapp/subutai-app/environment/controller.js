@@ -14,17 +14,21 @@ angular.module('subutai.environment.controller', [])
 		}
 	})
 	.filter('isEmpty', [function() {
-		return function(object) {
-			return angular.equals({}, object);
+		return function(object, editStatus) {
+			if(editStatus === true || angular.equals({}, object)) {
+				return true
+			} else {
+				return false;
+			}
 		}
 	}]);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$state'];
 fileModel.$inject = ['$parse'];
 
 var fileUploader = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder, $state) {
 
 	var vm = this;
 
@@ -83,6 +87,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.shareEnvironment = shareEnvironment;
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
+
+	//plugins
+	vm.gotToPlugin = gotToPlugin;
 
 	function changeMode(modeStatus) {
 		if(modeStatus) {
@@ -614,6 +621,12 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			dialogOverlay.css({
 				'top': 0
 			});
+		}
+	}
+
+	function gotToPlugin(plugin) {
+		if(plugin.name !== undefined) {
+			$state.go(plugin.name.toLowerCase());
 		}
 	}
 }

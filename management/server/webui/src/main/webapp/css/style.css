@@ -3814,3 +3814,9 @@ span.ssh-info-button
 	left: auto;
 }
 
+a[disabled] {
+    pointer-events: none;
+    background-color: #EAEAEA;
+    color: #333333;
+}
+
