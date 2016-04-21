@@ -152,6 +152,7 @@
 								<div class="b-environments-plugin__list js-scrollbar">
 									<ul class="b-environments-plugin-list">
 										<li class="b-environments-plugin-list__item" ng-repeat="plugin in advEnvCtrl.filteredPlugins">
+											<a ui-sref="{{ plugin.name.toLowerCase() }}" class="b-cloud-item-link b-btn b-btn_white">goto</a>
 											<span class="b-tools-menu__item" 
 											ng-click="advEnvCtrl.selectPlugin(plugin)">
 
@@ -182,13 +183,6 @@
 									Use
 								</button>
 
-								<button type="button" 
-								class="b-btn b-btn_blue"
-								ng-click="environmentViewCtrl.gotToPlugin(advEnvCtrl.selectedPlugin)" 
-								ng-disabled="!advEnvCtrl.selectedPlugin">
-									Go to Plugin
-								</button>
-								
 							</div>
 						</div>
 					</div>
