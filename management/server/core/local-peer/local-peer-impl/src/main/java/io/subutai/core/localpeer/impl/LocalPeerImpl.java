@@ -88,7 +88,6 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
@@ -1297,42 +1296,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return monitor.getProcessResourceUsage( containerId, pid );
         }
         catch ( MonitorException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getCpuSet( host.getContainerId() );
-        }
-        catch ( QuotaException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( e );
-        }
-    }
-
-
-    //    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
-
-        try
-        {
-            quotaManager.setCpuSet( host.getContainerId(), cpuSet );
-        }
-        catch ( QuotaException e )
         {
             LOG.error( e.getMessage() );
             throw new PeerException( e );

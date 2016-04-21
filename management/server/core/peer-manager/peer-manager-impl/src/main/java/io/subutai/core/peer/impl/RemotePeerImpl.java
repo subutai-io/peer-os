@@ -4,7 +4,6 @@ package io.subutai.core.peer.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.annotation.security.PermitAll;
@@ -65,7 +64,6 @@ import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
@@ -301,28 +299,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
         return peerWebClient.getEnvironmentContainers( environmentId );
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        return environmentWebClient.getCpuSet( containerHost.getContainerId() );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void setCpuSet( final ContainerHost containerHost, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
-
-        environmentWebClient.setCpuSet( containerHost.getContainerId(), cpuSet );
     }
 
 

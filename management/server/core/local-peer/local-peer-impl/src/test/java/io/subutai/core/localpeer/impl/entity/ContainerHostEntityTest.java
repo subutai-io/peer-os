@@ -196,23 +196,4 @@ public class ContainerHostEntityTest
 
         verify( peer ).setQuota( containerHostEntity.getContainerId(), ramQuota );
     }
-
-
-    @Test
-    public void testGetCpuSet() throws Exception
-    {
-        containerHostEntity.getCpuSet();
-
-
-        verify( peer ).getCpuSet( containerHostEntity );
-    }
-
-
-    @Test
-    public void testSetCpuSet() throws Exception
-    {
-        containerHostEntity.setCpuSet( CPU_SET );
-
-        verify( peer ).setCpuSet( containerHostEntity, CPU_SET );
-    }
 }

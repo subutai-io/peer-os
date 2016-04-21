@@ -3,7 +3,6 @@ package io.subutai.common.peer;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
@@ -96,8 +95,6 @@ public interface Peer extends RelationLink
     /**
      * Executes command on the container
      *
-     * todo use HostId instead of host
-     *
      * @param requestBuilder - command
      * @param host - target host
      */
@@ -105,8 +102,6 @@ public interface Peer extends RelationLink
 
     /**
      * Executes command on the container
-     *
-     * todo use HostId instead of host
      *
      * @param requestBuilder - command
      * @param host - target host
@@ -194,27 +189,6 @@ public interface Peer extends RelationLink
      * @param pid - pid of process
      */
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
-
-    /**
-     * Returns allowed cpus/cores ids on container
-     *
-     * todo use ContainerId instead of host
-     *
-     * @param host - container
-     *
-     * @return - allowed cpu set
-     */
-    public Set<Integer> getCpuSet( ContainerHost host ) throws PeerException;
-
-    /**
-     * Sets allowed cpus/cores on container
-     *
-     * todo use ContainerId instead of host
-     *
-     * @param host - container
-     * @param cpuSet - allowed cpu set
-     */
-    public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
 
 
     //networking

@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -58,17 +56,6 @@ public interface EnvironmentRestService
     ProcessResourceUsage getProcessResourceUsage( @PathParam( "containerId" ) ContainerId containerId,
                                                   @PathParam( "pid" ) int pid );
 
-    @GET
-    @Path( "{environmentId}/container/{containerId}/quota/cpuset" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getCpuSet( @PathParam( "containerId" ) ContainerId containerId );
-
-    @POST
-    @Path( "{environmentId}/container/{containerId}/quota/cpuset" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response setCpuSet( @PathParam( "containerId" ) ContainerId containerId, Set<Integer> cpuSet );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota" )
