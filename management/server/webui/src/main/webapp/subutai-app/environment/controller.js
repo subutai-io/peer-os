@@ -619,12 +619,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 }
 
 function imageExists(image_url){
-    var http = new XMLHttpRequest();
+	var http = new XMLHttpRequest();
 
-    http.open('HEAD', image_url, false);
-    http.send();
+	http.open('HEAD', image_url, false);
+	http.send();
 
-    return http.status != 404;
+	return http.status != 404;
+	/*var img = new Image();
+	img.src = image_url;
+	return img.height != 0;*/
 }
 
 function initScrollbar() {
