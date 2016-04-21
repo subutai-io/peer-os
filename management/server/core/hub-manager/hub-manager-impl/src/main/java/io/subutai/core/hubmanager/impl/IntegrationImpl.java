@@ -256,7 +256,7 @@ public class IntegrationImpl implements Integration
         {
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
             WebClient client =
-                    configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
+                    configManager.getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -285,13 +285,11 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void installPlugin( String url ) throws HubPluginException
+    public void installPlugin( String url, String name ) throws HubPluginException
     {
         try
         {
-            int indexOfStr = url.indexOf( "/package/" );
-            String fileName = url.substring( indexOfStr + 9, url.length() );
-            File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
+            File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
             URL website = new URL( url );
             FileUtils.copyURLToFile( website, file );
         }
@@ -304,18 +302,17 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void uninstallPlugin( final String url, final String name )
+    public void uninstallPlugin( final String name )
     {
-        int indexOfStr = url.indexOf( "/package/" );
-        String fileName = url.substring( indexOfStr + 9, url.length() );
-        File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
+        File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        LOG.info (String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar");
         File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
             @Override
             public boolean accept( File pathname )
             {
-                return pathname.getName().matches( ".*" + name + ".*" );
+                return pathname.getName().matches( ".*" + name.toLowerCase() + ".*" );
             }
         } );
         if ( dirs != null )
