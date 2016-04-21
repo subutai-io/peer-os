@@ -507,7 +507,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				vm.plugins = [];
 			}
 			$('.js-call-plugins-popup').on('click', function() {
-				$('.js-environment-plugins-menu').stop().slideDown(300);
+				$('.js-environment-plugins-menu').stop().show(300);
 			});
 			filterPluginsList();
 		});
@@ -561,16 +561,18 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			for(var template in vm.selectedPlugin.requirement) {
 				for(var i = 0; i < vm.selectedPlugin.requirement[template]; i++) {
 					var allElements = graph.getCells();
-					if(allElements.length > 0) {					
+					if(allElements.length > 0) {
 						var alreadyONWorckspace = false;
-						for(var i = 0; i < allElements.length; i++) {
-							var currentTemplate = allElements[i].get('templateName');
+						var templatesCounter = 0;
+						for(var j = 0; j < allElements.length; j++) {
+							var currentTemplate = allElements[j].get('templateName');
 							if(currentTemplate == template.toLowerCase()) {
 								alreadyONWorckspace = true;
-								break;
+								templatesCounter++;
+								//break;
 							}
 						}
-						if(!alreadyONWorckspace) {
+						if(!alreadyONWorckspace || templatesCounter == i) {
 							addContainer(template.toLowerCase());
 						}
 					} else {

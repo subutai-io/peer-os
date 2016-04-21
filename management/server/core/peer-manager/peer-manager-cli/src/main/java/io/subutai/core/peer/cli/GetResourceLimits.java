@@ -9,6 +9,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.resource.HostResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -47,7 +48,7 @@ public class GetResourceLimits extends SubutaiShellCommandSupport
             System.out.println( "Peer not found." );
             return null;
         }
-        final PeerResources limits = peer.getResourceLimits( peerManager.getLocalPeer().getId() );
+        final PeerResources limits = peer.getResourceLimits( new PeerId( peerManager.getLocalPeer().getId() ) );
 
         System.out.println(
                 String.format( "%s, env:%d, cont:%d, net: %d", limits.getPeerId(), limits.getEnvironmentLimit(),

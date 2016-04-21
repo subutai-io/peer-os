@@ -12,7 +12,12 @@ angular.module('subutai.environment.controller', [])
 			var newVal = input.split(' ');
 			return newVal[newVal.length - 1];
 		}
-	});
+	})
+	.filter('isEmpty', [function() {
+		return function(object) {
+			return angular.equals({}, object);
+		}
+	}]);
 
 EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];
@@ -614,12 +619,15 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 }
 
 function imageExists(image_url){
-    var http = new XMLHttpRequest();
+	var http = new XMLHttpRequest();
 
-    http.open('HEAD', image_url, false);
-    http.send();
+	http.open('HEAD', image_url, false);
+	http.send();
 
-    return http.status != 404;
+	return http.status != 404;
+	/*var img = new Image();
+	img.src = image_url;
+	return img.height != 0;*/
 }
 
 function initScrollbar() {
