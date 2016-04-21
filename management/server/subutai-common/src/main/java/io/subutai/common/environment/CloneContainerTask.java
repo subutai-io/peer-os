@@ -1,8 +1,6 @@
 package io.subutai.common.environment;
 
 
-import javax.jms.IllegalStateException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

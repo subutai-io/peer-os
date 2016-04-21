@@ -35,7 +35,7 @@ public interface RestService
 	@POST
 	@Path( "uninstall" )
 	@Produces( { MediaType.TEXT_PLAIN } )
-	public Response uninstallPlugin (@FormParam ("id") Long id, @FormParam ("kar") String kar, @FormParam ("name") String name);
+	public Response uninstallPlugin (@FormParam ("id") Long id, @FormParam ("name") String name);
 
 
 	@POST
