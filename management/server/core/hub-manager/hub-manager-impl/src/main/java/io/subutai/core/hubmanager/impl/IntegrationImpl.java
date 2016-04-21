@@ -305,13 +305,14 @@ public class IntegrationImpl implements Integration
     public void uninstallPlugin( final String name )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        LOG.info (String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar");
         File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
             @Override
             public boolean accept( File pathname )
             {
-                return pathname.getName().matches( ".*" + name + ".*" );
+                return pathname.getName().matches( ".*" + name.toLowerCase() + ".*" );
             }
         } );
         if ( dirs != null )

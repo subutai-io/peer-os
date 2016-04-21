@@ -85,7 +85,7 @@ function BazaarSrv($http) {
 	function uninstallHubPlugin (plugin) {
 		var kar = "";
 		// TODO: change to filename
-		var postData = "id=" + plugin.hubId + "&name=" + plugin.name.toLowerCase();
+		var postData = "id=" + plugin.hubId + "&name=" + plugin.name;
 		return $http.post(
 			BAZAAR_URL + "uninstall",
 			postData,
