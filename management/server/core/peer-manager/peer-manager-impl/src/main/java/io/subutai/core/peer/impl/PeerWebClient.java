@@ -349,16 +349,17 @@ public class PeerWebClient
     }
 
 
-    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
         Response response;
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/tunnels/%s", environmentId );
+            String path = String.format( "/tunnels/%s", environmentId.getId() );
+
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 60000, 1 );
             client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.TEXT_PLAIN );
+
             response = client.post( p2pIps );
         }
         catch ( Exception e )

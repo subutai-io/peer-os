@@ -200,10 +200,8 @@ public interface Peer extends RelationLink
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers
-     *
-     * todo use EnvironmentId instead of string
      */
-    public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
+    public void setupTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
 
 
     /* **************************************************************

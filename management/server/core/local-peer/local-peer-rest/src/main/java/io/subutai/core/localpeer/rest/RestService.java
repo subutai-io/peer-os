@@ -46,8 +46,7 @@ public interface RestService
     @POST
     @Path( "tunnels/{environmentId}" )
     @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.TEXT_PLAIN )
-    Response setupTunnels( @PathParam( "environmentId" ) String environmentId, P2pIps p2pIps );
+    Response setupTunnels( @PathParam( "environmentId" ) EnvironmentId environmentId, P2pIps p2pIps );
 
     @POST
     @Path( "pek" )
@@ -134,5 +133,4 @@ public interface RestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response getResourceLimits( @PathParam( "peerId" ) final String peerId );
-
 }

@@ -152,11 +152,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupTunnels( final String environmentId, final P2pIps p2pIps )
+    public Response setupTunnels( final EnvironmentId environmentId, final P2pIps p2pIps )
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+            Preconditions.checkNotNull( environmentId );
             Preconditions.checkNotNull( p2pIps );
 
             localPeer.setupTunnels( p2pIps, environmentId );

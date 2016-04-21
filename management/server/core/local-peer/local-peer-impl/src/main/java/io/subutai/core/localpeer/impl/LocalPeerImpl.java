@@ -1794,13 +1794,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
-    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         final NetworkResource reservedNetworkResource =
-                getReservedNetworkResources().findByEnvironmentId( environmentId );
+                getReservedNetworkResources().findByEnvironmentId( environmentId.getId() );
 
         if ( reservedNetworkResource == null )
         {
