@@ -563,16 +563,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					var allElements = graph.getCells();
 					if(allElements.length > 0) {
 						var alreadyONWorckspace = false;
-						var templeytsCounter = 0;
+						var templatesCounter = 0;
 						for(var j = 0; j < allElements.length; j++) {
 							var currentTemplate = allElements[j].get('templateName');
 							if(currentTemplate == template.toLowerCase()) {
 								alreadyONWorckspace = true;
-								templeytsCounter++;
+								templatesCounter++;
 								//break;
 							}
 						}
-						if(!alreadyONWorckspace || templeytsCounter == i) {
+						if(!alreadyONWorckspace || templatesCounter == i) {
 							addContainer(template.toLowerCase());
 						}
 					} else {

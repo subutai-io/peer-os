@@ -858,16 +858,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					if(addedContainers.containersList.length > 0) {
 
 						var alreadyONWorckspace = false;
-						var templeytsCounter = 0;
+						var templatesCounter = 0;
 						for(var j = 0; j < addedContainers.containersList.length; j++) {
 							var currentTemplate = addedContainers.containersList[j].templateName;
 							if(currentTemplate == template.toLowerCase()) {
 								alreadyONWorckspace = true;
-								templeytsCounter++;
+								templatesCounter++;
 								//break;
 							}
 						}
-						if(!alreadyONWorckspace  || templeytsCounter == i) {
+						if(!alreadyONWorckspace  || templatesCounter == i) {
 							var img = 'assets/templates/' + template + '.jpg';
 							if(!imageExists(img)) {
 								img = 'assets/templates/no-image.jpg';
