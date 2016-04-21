@@ -386,8 +386,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
                 if ( activeUser != null )
                 {
-                    RelationMeta relationMeta =
-                            new RelationMeta( userDelegate, userDelegate, parent, parent.getId() );
+                    RelationMeta relationMeta = new RelationMeta( userDelegate, userDelegate, parent, parent.getId() );
                     boolean trustedRelation =
                             relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 
@@ -487,20 +486,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public ProcessResourceUsage getProcessResourceUsage( final int processPid ) throws PeerException
     {
         return getPeer().getProcessResourceUsage( getContainerId(), processPid );
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet() throws PeerException
-    {
-        return getPeer().getCpuSet( this );
-    }
-
-
-    @Override
-    public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
-    {
-        getPeer().setCpuSet( this, cpuSet );
     }
 
 

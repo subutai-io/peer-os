@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -252,28 +251,6 @@ public class RemotePeerImplTest
 
 
         remotePeer.getContainerState( containerHost.getContainerId() );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetCpuSet() throws Exception
-    {
-        when( jsonUtil.from( anyString(), any( Type.class ) ) ).thenReturn( CPU_SET );
-
-        remotePeer.getCpuSet( containerHost );
-
-
-        remotePeer.getCpuSet( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testSetCpuSet() throws Exception
-    {
-        remotePeer.setCpuSet( containerHost, CPU_SET );
-
-
-        remotePeer.setCpuSet( containerHost, CPU_SET );
     }
 
 
