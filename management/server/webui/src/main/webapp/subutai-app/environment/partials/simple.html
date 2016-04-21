@@ -82,7 +82,12 @@
 								</div>
 							</div>
 							<div class="footer">
-								<button type="button" class="b-btn b-btn_green" ng-click="environmentSimpleViewCtrl.setTemplatesByPlugin()">Apply</button>
+								<button type="button" 
+								class="b-btn b-btn_green" 
+								ng-click="environmentSimpleViewCtrl.setTemplatesByPlugin()" 
+								ng-disabled="environmentSimpleViewCtrl.filteredPlugins | isEmpty">
+									Apply
+								</button>
 							</div>
 						</div>
 					</div>

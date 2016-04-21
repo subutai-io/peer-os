@@ -789,7 +789,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				vm.plugins = [];
 			}
 			$('.js-call-plugins-popup').on('click', function() {
-				$('.js-environment-plugins-menu').stop().slideDown(300);
+				$('.js-environment-plugins-menu').stop().show(300);
 			});
 			filterPluginsList();
 		});
