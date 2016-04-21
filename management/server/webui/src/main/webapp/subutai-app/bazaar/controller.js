@@ -31,7 +31,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					}
 				}
 				for (var i = 0; i < vm.plugins.length; ++i) {
-					vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 					vm.plugins[i].installed = false;
 					vm.plugins[i].restore = false;
 					for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
@@ -94,6 +93,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				vm.notRegistered = false;*/
 				BazaarSrv.getHubPlugins().success (function (data) {
 					vm.plugins = data.productsDto;
+					console.log (vm.plugins);
 					if (vm.plugins === undefined || vm.plugins === "") {
 						vm.plugins = [];
 					}
@@ -116,7 +116,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 								}
 							}
 							for (var i = 0; i < vm.plugins.length; ++i) {
-								vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 								vm.plugins[i].installed = false;
 								vm.plugins[i].restore = false;
 								for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
@@ -202,7 +201,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					}
 				}
 				for (var i = 0; i < vm.plugins.length; ++i) {
-					vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 					vm.plugins[i].installed = false;
 					vm.plugins[i].restore = false;
 					for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
