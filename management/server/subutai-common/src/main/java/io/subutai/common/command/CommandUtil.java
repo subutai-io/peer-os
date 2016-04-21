@@ -1,6 +1,7 @@
 package io.subutai.common.command;
 
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -177,7 +178,7 @@ public class CommandUtil
         Preconditions.checkNotNull( requestBuilder );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
 
-        final Set<HostCommandResult> hostCommandResults = Sets.newHashSet();
+        final HostCommandResults hostCommandResults = new HostCommandResults();
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
         CompletionService<CommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
@@ -203,42 +204,35 @@ public class CommandUtil
 
             try
             {
-                hostCommandResults
-                        .add( new HostCommandResult( commandFuture.getKey(), commandFuture.getValue().get() ) );
+                hostCommandResults.addCommandResult(
+                        new HostCommandResult( commandFuture.getKey(), commandFuture.getValue().get() ) );
             }
             catch ( Exception e )
             {
-                LOG.error( "Error executing command ", e );
-
-                hostCommandResults.add( new HostCommandResult( commandFuture.getKey(), e ) );
+                hostCommandResults.addCommandResult( new HostCommandResult( commandFuture.getKey(), e ) );
             }
         }
 
-        return new HostCommandResults( hostCommandResults );
+        return hostCommandResults;
     }
 
 
     public static class HostCommandResults
     {
-        private final Set<HostCommandResult> commandResults;
+        private final Set<HostCommandResult> commandResults = new HashSet<>();
         private boolean hasFailures = false;
 
 
-        public HostCommandResults( final Set<HostCommandResult> commandResults )
+        public synchronized void addCommandResult( HostCommandResult commandResult )
         {
-            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( commandResults ) );
+            Preconditions.checkNotNull( commandResult );
 
-            this.commandResults = commandResults;
-
-            for ( HostCommandResult commandResult : commandResults )
+            if ( !commandResult.hasSucceeded() )
             {
-                if ( !commandResult.hasSucceeded() )
-                {
-                    hasFailures = true;
-
-                    break;
-                }
+                hasFailures = true;
             }
+
+            commandResults.add( commandResult );
         }
 
 

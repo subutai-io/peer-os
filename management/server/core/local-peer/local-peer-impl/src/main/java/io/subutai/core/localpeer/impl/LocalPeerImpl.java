@@ -62,6 +62,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
@@ -77,6 +78,9 @@ import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
@@ -515,6 +519,79 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( configResults.hasFailures() )
         {
             throw new PeerException( "Failed to configure ssh on all hosts" );
+        }
+    }
+
+
+    @Override
+    public SshKeys getSshKeys( final EnvironmentId environmentId, final SshEncryptionType sshEncryptionType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( sshEncryptionType, "SSH encryption type is null" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        SshKeys sshKeys = new SshKeys();
+        if ( hosts.isEmpty() )
+        {
+            return sshKeys;
+        }
+
+        CommandUtil.HostCommandResults results =
+                commandUtil.executeParallel( localPeerCommands.getReadSSHKeyCommand( sshEncryptionType ), hosts );
+
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        {
+            if ( !result.hasSucceeded() )
+            {
+                LOG.warn( "SSH key read failed on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
+            else
+            {
+                sshKeys.addKey( new SshKey( result.getHost().getId(), sshEncryptionType,
+                        result.getCommandResult().getStdOut() ) );
+            }
+        }
+
+        return sshKeys;
+    }
+
+
+    @Override
+    public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
+                                final SshEncryptionType sshEncryptionType ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkNotNull( sshEncryptionType, "SSH encryption type is null" );
+
+        try
+        {
+            ContainerHost containerHost = getContainerHostById( containerId.getId() );
+            if ( !containerHost.getEnvironmentId().equals( environmentId ) )
+            {
+                throw new HostNotFoundException( "Environment does not contains requested container." );
+            }
+
+            CommandResult commandResult =
+                    commandUtil.execute( localPeerCommands.getCreateSSHKeyCommand( sshEncryptionType ), containerHost );
+
+            if ( commandResult.hasSucceeded() )
+            {
+                return new SshKey( containerId.getId(), sshEncryptionType, commandResult.getStdOut() );
+            }
+            else
+            {
+                throw new CommandException( "Command execution failed." );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on creating ssh key." );
         }
     }
 

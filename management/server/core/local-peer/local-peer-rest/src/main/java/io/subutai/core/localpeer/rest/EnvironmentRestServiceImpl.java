@@ -22,6 +22,10 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
+import io.subutai.common.util.JsonUtil;
 
 
 /**
@@ -330,6 +334,47 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( reverseProxyConfig );
             localPeer.addReverseProxy( reverseProxyConfig );
             return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response getSshKeys( final EnvironmentId environmentId, final SshEncryptionType encryptionType )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( encryptionType );
+
+            final SshKeys keys = localPeer.getSshKeys( environmentId, encryptionType );
+            return Response.ok( keys ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response createSshKey( final EnvironmentId environmentId, final SshEncryptionType encryptionType,
+                                  final String containerId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( encryptionType );
+
+            final SshKey key = localPeer
+                    .createSshKey( environmentId, JsonUtil.fromJson( containerId, ContainerId.class ), encryptionType );
+            return Response.ok( key ).build();
         }
         catch ( Exception e )
         {

@@ -22,7 +22,9 @@ import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
+import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -101,6 +103,27 @@ public interface EnvironmentManager
      */
     void removeSshKey( String environmentId, String sshKey, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
+
+    /**
+     * Returns ssh keys of environment containers
+     *
+     * @param environmentId environment id
+     * @param encType encription type
+     *
+     * @return ssh keys
+     */
+    SshKeys getSshKeys( String environmentId, SshEncryptionType encType );
+
+
+    /**
+     * Generates ssh key with given encryption type
+     *
+     * @param environmentId environment id
+     * @param encType rsa or dsa
+     *
+     * @return ssh public key
+     */
+    SshKeys createSshKey( String environmentId, String hostname, SshEncryptionType encType );
 
     /**
      * Allows to change p2p network's secret key

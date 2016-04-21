@@ -4,6 +4,7 @@ package io.subutai.core.localpeer.impl;
 import java.util.Map;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
 
 
@@ -56,6 +57,23 @@ public class LocalPeerCommands
                 "chmod 700 %1$s && " +
                 "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " +
                 "cat %1$s/id_dsa.pub; fi", Common.CONTAINER_SSH_FOLDER ) );
+    }
+
+
+    protected RequestBuilder getReadSSHKeyCommand( SshEncryptionType encryptionType )
+    {
+        return new RequestBuilder( String.format( "cat %1$s/id_%2$s.pub ", Common.CONTAINER_SSH_FOLDER,
+                encryptionType.name().toLowerCase() ) );
+    }
+
+
+    protected RequestBuilder getCreateSSHKeyCommand( SshEncryptionType encryptionType )
+    {
+        return new RequestBuilder( String.format( "rm -rf %1$s && " +
+                "mkdir -p %1$s && " +
+                "chmod 700 %1$s && " +
+                "ssh-keygen -t %2$s -P '' -f %1$s/id_%2$s -q && " +
+                "cat %1$s/id_%2$s.pub; fi", Common.CONTAINER_SSH_FOLDER, encryptionType.name().toLowerCase() ) );
     }
 
 

@@ -116,4 +116,5 @@ public class RestServiceImpl implements RestService
             throw new WebApplicationException( e.getMessage() );
         }
     }
+
 }
