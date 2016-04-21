@@ -802,7 +802,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		var allElements = graph.getCells();
 		var addedContainers = getContainers2Build(allElements);
 
-		console.log(addedContainers.containersList.length);
 		if(addedContainers.containersList.length > 0) {
 			vm.filteredPlugins = {};
 			for(var i = 0; i < addedContainers.containersList.length; i++) {
