@@ -1,10 +1,11 @@
 package io.subutai.common.command;
 
 
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -30,6 +32,9 @@ import io.subutai.common.util.CollectionUtil;
 public class CommandUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( CommandUtil.class );
+
+    private final Map<String, Map<String, EnvironmentCommandFuture>> environmentCommandsFuturesMap =
+            Maps.newConcurrentMap();
 
 
     /**
@@ -164,21 +169,24 @@ public class CommandUtil
 
 
     /**
-     * Allows to execute command on all hosts in parallel. If any exception is thrown, ignores is and collects results
+     * Allows to execute command on all hosts in parallel. If any exception is thrown, ignores it and collects results
      * of only succeeded executions
+     *
+     * Deprecated: use io.subutai.common.command.CommandUtil#execute(RequestBuilder, Set<Host><, EnvironmentId) or
+     * io.subutai.common.command.CommandUtil#executeFailFast(RequestBuilder, Set<Host><, EnvironmentId)
      *
      * @param requestBuilder - request
      * @param hosts - hosts
      *
      * @return -  map containing command results
      */
+    @Deprecated
     public HostCommandResults executeParallel( final RequestBuilder requestBuilder, Set<Host> hosts )
-
     {
         Preconditions.checkNotNull( requestBuilder );
         Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
 
-        final HostCommandResults hostCommandResults = new HostCommandResults();
+        final Set<HostCommandResult> hostCommandResults = Sets.newHashSet();
 
         ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
         CompletionService<CommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
@@ -204,35 +212,204 @@ public class CommandUtil
 
             try
             {
-                hostCommandResults.addCommandResult(
-                        new HostCommandResult( commandFuture.getKey(), commandFuture.getValue().get() ) );
+                hostCommandResults
+                        .add( new HostCommandResult( commandFuture.getKey(), commandFuture.getValue().get() ) );
             }
             catch ( Exception e )
             {
-                hostCommandResults.addCommandResult( new HostCommandResult( commandFuture.getKey(), e ) );
+                LOG.error( "Error executing command ", e );
+
+                hostCommandResults.add( new HostCommandResult( commandFuture.getKey(), e ) );
             }
         }
 
-        return hostCommandResults;
+        return new HostCommandResults( hostCommandResults );
+    }
+
+
+    /**
+     * Executes command on hosts in parallel
+     *
+     * Returns results of commands
+     *
+     * @return {@code HostCommandResults}
+     */
+    public HostCommandResults execute( final RequestBuilder requestBuilder, Set<Host> hosts, String environmentId )
+    {
+        return executeParallel( requestBuilder, hosts, false, environmentId );
+    }
+
+
+    /**
+     * Executes command on hosts in parallel. Fails fast if any execution failed.
+     *
+     * Returns results of commands completed so far
+     *
+     * @return {@code HostCommandResults}
+     */
+    public HostCommandResults executeFailFast( final RequestBuilder requestBuilder, Set<Host> hosts,
+                                               String environmentId )
+    {
+        return executeParallel( requestBuilder, hosts, true, environmentId );
+    }
+
+
+    protected HostCommandResults executeParallel( final RequestBuilder requestBuilder, Set<Host> hosts,
+                                                  boolean failFast, final String environmentId )
+    {
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
+
+        final Set<HostCommandResult> hostCommandResults = Sets.newHashSet();
+
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
+        CompletionService<CommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
+
+        Map<Host, Future<CommandResult>> commandFutures = Maps.newHashMap();
+
+        final String hostCommandPrefix = String.valueOf( System.currentTimeMillis() );
+
+        for ( final Host host : hosts )
+        {
+            final String hostCommandId = String.format( "%s-%s", host.getId(), hostCommandPrefix );
+
+            Future<CommandResult> commandFuture = taskCompletionService.submit( new Callable<CommandResult>()
+            {
+                @Override
+                public CommandResult call() throws Exception
+                {
+                    try
+                    {
+                        return execute( requestBuilder, host );
+                    }
+                    finally
+                    {
+                        if ( environmentId != null )
+                        {
+                            synchronized ( environmentCommandsFuturesMap )
+                            {
+                                Map<String, EnvironmentCommandFuture> environmentCommandFutures =
+                                        environmentCommandsFuturesMap.get( environmentId );
+
+                                if ( environmentCommandFutures != null )
+                                {
+                                    environmentCommandFutures.remove( hostCommandId );
+
+                                    if ( environmentCommandFutures.isEmpty() )
+                                    {
+                                        environmentCommandsFuturesMap.remove( environmentId );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } );
+
+
+            if ( environmentId != null )
+            {
+                synchronized ( environmentCommandsFuturesMap )
+                {
+                    Map<String, EnvironmentCommandFuture> environmentCommandFutures =
+                            environmentCommandsFuturesMap.get( environmentId );
+
+                    if ( environmentCommandFutures == null )
+                    {
+                        environmentCommandFutures = Maps.newHashMap();
+
+                        environmentCommandsFuturesMap.put( environmentId, environmentCommandFutures );
+                    }
+
+                    environmentCommandFutures
+                            .put( hostCommandId, new EnvironmentCommandFuture( environmentId, commandFuture ) );
+                }
+            }
+
+            commandFutures.put( host, commandFuture );
+        }
+
+        taskExecutor.shutdown();
+
+
+        futuresLoop:
+        while ( !Thread.interrupted() && !commandFutures.isEmpty() )
+        {
+            Iterator<Map.Entry<Host, Future<CommandResult>>> mapIterator = commandFutures.entrySet().iterator();
+
+            while ( mapIterator.hasNext() )
+            {
+                Map.Entry<Host, Future<CommandResult>> commandEntry = mapIterator.next();
+
+                Host host = commandEntry.getKey();
+
+                Future<CommandResult> future = commandEntry.getValue();
+
+                try
+                {
+                    if ( future.isDone() )
+                    {
+                        mapIterator.remove();
+
+                        hostCommandResults.add( new HostCommandResult( host, future.get() ) );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    if ( !future.isCancelled() )
+                    {
+                        LOG.error( "Error executing command on host {}", host.getHostname(), e );
+
+                        hostCommandResults.add( new HostCommandResult( host, e ) );
+                    }
+                    else
+                    {
+                        hostCommandResults.add( new HostCommandResult( host, new CancellationException(
+                                String.format( "Command was cancelled on host %s", host.getHostname() ) ) ) );
+                    }
+
+                    if ( failFast )
+                    {
+                        break futuresLoop;
+                    }
+                }
+            }
+
+            try
+            {
+                Thread.sleep( 100 );
+            }
+            catch ( InterruptedException e )
+            {
+                break;
+            }
+        }
+
+        return new HostCommandResults( hostCommandResults );
     }
 
 
     public static class HostCommandResults
     {
-        private final Set<HostCommandResult> commandResults = new HashSet<>();
+        private final Set<HostCommandResult> commandResults;
         private boolean hasFailures = false;
 
 
-        public synchronized void addCommandResult( HostCommandResult commandResult )
+        HostCommandResults( final Set<HostCommandResult> commandResults )
         {
-            Preconditions.checkNotNull( commandResult );
+            Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( commandResults ) );
 
-            if ( !commandResult.hasSucceeded() )
+            this.commandResults = commandResults;
+
+            for ( HostCommandResult commandResult : commandResults )
             {
-                hasFailures = true;
-            }
+                if ( !commandResult.hasSucceeded() )
+                {
+                    hasFailures = true;
 
-            commandResults.add( commandResult );
+                    break;
+                }
+            }
         }
 
 
@@ -257,14 +434,14 @@ public class CommandUtil
         private boolean hasSucceeded = true;
 
 
-        public HostCommandResult( final Host host, final CommandResult commandResult )
+        HostCommandResult( final Host host, final CommandResult commandResult )
         {
             this.host = host;
             this.commandResult = commandResult;
         }
 
 
-        public HostCommandResult( final Host host, final Exception exception )
+        HostCommandResult( final Host host, final Exception exception )
         {
             this.host = host;
             this.exception = exception;
@@ -322,5 +499,72 @@ public class CommandUtil
         {
             stopped.set( true );
         }
+    }
+
+
+    private class EnvironmentCommandFuture
+    {
+        private final String environmentId;
+        private final Future<CommandResult> commandFuture;
+
+
+        EnvironmentCommandFuture( final String environmentId, final Future<CommandResult> commandFuture )
+        {
+            this.environmentId = environmentId;
+            this.commandFuture = commandFuture;
+        }
+
+
+        public String getEnvironmentId()
+        {
+            return environmentId;
+        }
+
+
+        Future<CommandResult> getCommandFuture()
+        {
+            return commandFuture;
+        }
+    }
+
+
+    public boolean cancelEnvironmentCommands( String environmentId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        Map<String, EnvironmentCommandFuture> environmentCommandFutures =
+                environmentCommandsFuturesMap.remove( environmentId );
+
+        boolean hasActiveTasks = environmentCommandFutures != null && !environmentCommandFutures.isEmpty();
+
+        if ( hasActiveTasks )
+        {
+            for ( EnvironmentCommandFuture environmentCommandFuture : environmentCommandFutures.values() )
+            {
+                environmentCommandFuture.getCommandFuture().cancel( true );
+            }
+        }
+
+        return hasActiveTasks;
+    }
+
+
+    public void cancelAll()
+    {
+        for ( Map<String, EnvironmentCommandFuture> commandFutureMap : environmentCommandsFuturesMap.values() )
+        {
+            for ( EnvironmentCommandFuture commandFuture : commandFutureMap.values() )
+            {
+                commandFuture.getCommandFuture().cancel( true );
+            }
+        }
+
+        environmentCommandsFuturesMap.clear();
+    }
+
+
+    public void dispose()
+    {
+        cancelAll();
     }
 }

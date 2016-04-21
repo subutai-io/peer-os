@@ -58,11 +58,11 @@ $(document).on('click', function(event) {
 	}
 
 	if(
-		!$(event.target).closest('.js-dropen-menu').hasClass('js-dropen-menu') &&
+		!$(event.target).closest('.js-no-close').hasClass('js-no-close') &&
 		$(event.target).closest('g').attr('class') != 'element-call-menu' &&
 		$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
 	){
-		$('.b-template-settings').stop().slideUp(100);
+		$('.b-template-settings').stop().hide(100);
 	}
 });
 

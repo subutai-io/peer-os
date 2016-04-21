@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Set;
-
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
@@ -132,44 +130,6 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
     }
 
     //*********** Quota functions ***************
-
-
-    @Override
-    public Response getCpuSet( final ContainerId containerId )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            return Response.ok( localPeer.getContainerHostById( containerId.getId() ).getCpuSet() ).build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Response setCpuSet( final ContainerId containerId, final Set<Integer> cpuSet )
-    {
-        try
-        {
-            Preconditions.checkNotNull( containerId );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
-
-            localPeer.getContainerHostById( containerId.getId() ).setCpuSet( cpuSet );
-
-            return Response.ok().build();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
 
 
     @Override

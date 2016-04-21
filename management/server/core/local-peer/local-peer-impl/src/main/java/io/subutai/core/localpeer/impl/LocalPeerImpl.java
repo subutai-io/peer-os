@@ -64,6 +64,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
@@ -92,7 +93,6 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
@@ -273,6 +273,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         hostUtil.dispose();
+
+        commandUtil.dispose();
     }
 
 
@@ -383,8 +385,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults results = commandUtil
-                .executeParallel( localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ),
-                        hosts );
+                .executeFailFast( localPeerCommands.getAddIpHostToEtcHostsCommand( hostAddresses.getHostAddresses() ),
+                        hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -418,8 +420,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return sshPublicKeys;
         }
 
-        CommandUtil.HostCommandResults readResults =
-                commandUtil.executeParallel( localPeerCommands.getReadOrCreateSSHCommand(), hosts );
+        CommandUtil.HostCommandResults readResults = commandUtil
+                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand(), hosts, environmentId.getId() );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -483,7 +485,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             if ( i % portionSize == 0 || i == keys.size() )
             {
                 CommandUtil.HostCommandResults appendResults = commandUtil
-                        .executeParallel( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ), hosts );
+                        .executeFailFast( localPeerCommands.getAppendSshKeysCommand( keysString.toString() ), hosts,
+                                environmentId.getId() );
 
                 keysString.setLength( 0 );
 
@@ -505,7 +508,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         //config ssh
         CommandUtil.HostCommandResults configResults =
-                commandUtil.executeParallel( localPeerCommands.getConfigSSHCommand(), hosts );
+                commandUtil.executeFailFast( localPeerCommands.getConfigSSHCommand(), hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : configResults.getCommandResults() )
         {
@@ -611,8 +614,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts,
+                        environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -645,8 +649,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .executeFailFast( localPeerCommands.getRemoveSshKeyCommand( sshPublicKey ), hosts,
+                        environmentId.getId() );
 
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
@@ -1255,7 +1260,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             try
             {
-                host = ( ResourceHostEntity ) getResourceHostByName( resourceHostInfo.getHostname() );
+                host = ( ResourceHostEntity ) getResourceHostById( resourceHostInfo.getId() );
             }
             catch ( HostNotFoundException e )
             {
@@ -1369,42 +1374,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             return monitor.getProcessResourceUsage( containerId, pid );
         }
         catch ( MonitorException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( e );
-        }
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet( final ContainerHost host ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-
-        try
-        {
-            return quotaManager.getCpuSet( host.getContainerId() );
-        }
-        catch ( QuotaException e )
-        {
-            LOG.error( e.getMessage() );
-            throw new PeerException( e );
-        }
-    }
-
-
-    //    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void setCpuSet( final ContainerHost host, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Preconditions.checkNotNull( host, "Invalid container host" );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
-
-        try
-        {
-            quotaManager.setCpuSet( host.getContainerId(), cpuSet );
-        }
-        catch ( QuotaException e )
         {
             LOG.error( e.getMessage() );
             throw new PeerException( e );
@@ -1903,13 +1872,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //TODO this is for basic environment via hub
     //@RolesAllowed( "Environment-Management|Write" )
     @Override
-    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
         final NetworkResource reservedNetworkResource =
-                getReservedNetworkResources().findByEnvironmentId( environmentId );
+                getReservedNetworkResources().findByEnvironmentId( environmentId.getId() );
 
         if ( reservedNetworkResource == null )
         {
@@ -2101,11 +2070,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         //interrupt active environment operations
         boolean hasActiveTasks = hostUtil.cancelEnvironmentTasks( environmentId.getId() );
 
+        hasActiveTasks |= commandUtil.cancelEnvironmentCommands( environmentId.getId() );
+
         if ( hasActiveTasks )
         {
             //await clone commands on agent to complete, best effort
             TaskUtil.sleep( 10 * 1000 ); // 10 sec
         }
+
 
         //send cleanup command to RHs
         Set<ResourceHost> resourceHosts = getResourceHosts();
@@ -2162,11 +2134,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public PeerResources getResourceLimits( final String peerId ) throws PeerException
+    public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkNotNull( peerId );
 
-        return quotaManager.getResourceLimits( peerId );
+        return quotaManager.getResourceLimits( peerId.getId() );
     }
 
 

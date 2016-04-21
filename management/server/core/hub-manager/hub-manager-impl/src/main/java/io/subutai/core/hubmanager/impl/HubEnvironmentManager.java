@@ -428,6 +428,12 @@ public class HubEnvironmentManager
             }
         }
 
+        // No need to exchange SSH keys if environment has less than two containers
+        if ( sshKeys.size() < 2 )
+        {
+            return peerDto;
+        }
+
         completionService.submit( new Callable<Peer>()
         {
             @Override
@@ -456,6 +462,7 @@ public class HubEnvironmentManager
             LOG.error( msg, e );
             throw new EnvironmentCreationException( msg );
         }
+
         return peerDto;
     }
 
@@ -506,6 +513,8 @@ public class HubEnvironmentManager
 
     public String createSshKey( Set<Host> hosts )
     {
+        //todo use io.subutai.common.command.CommandUtil.executeFailFast() | io.subutai.common.command.CommandUtil
+        // .execute()
         CommandUtil.HostCommandResults results = commandUtil.executeParallel( getCreateNReadSSHCommand(), hosts );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
@@ -575,7 +584,7 @@ public class HubEnvironmentManager
         @Override
         public Boolean call() throws Exception
         {
-            peer.setupTunnels( p2pIps, environmentId );
+            peer.setupTunnels( p2pIps, new EnvironmentId( environmentId ) );
             return true;
         }
     }

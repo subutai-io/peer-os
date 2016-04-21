@@ -1,9 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,9 +23,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.security.SshEncryptionType;
-import io.subutai.common.security.SshKey;
-import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.WebClientBuilder;
 
 
@@ -172,56 +166,6 @@ public class EnvironmentWebClient
         }
 
         return checkResponse( response, ProcessResourceUsage.class );
-    }
-
-
-    public Set<Integer> getCpuSet( final ContainerId containerId ) throws PeerException
-    {
-        Response response;
-        String path = String.format( "/%s/container/%s/quota/cpuset", containerId.getEnvironmentId().getId(),
-                containerId.getId() );
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-        try
-        {
-            remotePeer.checkRelation();
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            response = client.get();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on obtaining cpu set: " + e.getMessage() );
-        }
-
-        checkResponse( response );
-
-        return new HashSet<>( client.getCollection( Integer.class ) );
-    }
-
-
-    public void setCpuSet( final ContainerId containerId, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Response response;
-        try
-        {
-            remotePeer.checkRelation();
-            String path = String.format( "/%s/container/%s/quota/cpuset", containerId.getEnvironmentId().getId(),
-                    containerId.getId() );
-
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-            client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.APPLICATION_JSON );
-            response = client.post( cpuSet );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on setting cpu set: " + e.getMessage() );
-        }
-
-        checkResponse( response );
     }
 
 
@@ -475,51 +419,5 @@ public class EnvironmentWebClient
         {
             throw new PeerException( "Error parsing response", e );
         }
-    }
-
-
-    public SshKeys getSshKeys( final EnvironmentId environmentId, final SshEncryptionType sshEncryptionType )
-            throws PeerException
-    {
-        String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-        Response response;
-
-        try
-        {
-            response = client.get();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error reading ssh keys of the environment: " + e.getMessage() );
-        }
-
-        return checkResponse( response, SshKeys.class );
-    }
-
-
-    public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
-                                 final SshEncryptionType sshEncryptionType ) throws PeerException
-    {
-        String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-        Response response;
-
-        try
-        {
-            response = client.post( containerId );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error creating ssh key: " + e.getMessage() );
-        }
-
-        return checkResponse( response, SshKey.class );
     }
 }

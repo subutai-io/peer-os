@@ -44,7 +44,7 @@ public class PeerUtil<T>
     /**
      * Executes added tasks in parallel
      *
-     * @return set of {@code PeerTaskResult}
+     * @return {@code PeerTaskResults}
      */
     public PeerTaskResults<T> executeParallel()
     {
@@ -64,7 +64,7 @@ public class PeerUtil<T>
      *
      * Returns results of tasks completed so far
      *
-     * @return set of {@code PeerTaskResult}
+     * @return {@code PeerTaskResults}
      */
     public PeerTaskResults<T> executeParallelFailFast()
     {
@@ -97,12 +97,8 @@ public class PeerUtil<T>
 
         taskExecutor.shutdown();
 
-        int doneTasks = 0;
-
-        int totalTasks = peerFutures.size();
-
         futuresLoop:
-        while ( !Thread.interrupted() && doneTasks < totalTasks && !peerFutures.isEmpty() )
+        while ( !Thread.interrupted() && !peerFutures.isEmpty() )
         {
             Iterator<Map.Entry<Peer, Future<T>>> mapIterator = peerFutures.entrySet().iterator();
 
@@ -118,7 +114,6 @@ public class PeerUtil<T>
                 {
                     if ( peerFuture.isDone() )
                     {
-                        doneTasks++;
 
                         mapIterator.remove();
 
