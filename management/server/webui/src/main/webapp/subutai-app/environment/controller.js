@@ -12,7 +12,12 @@ angular.module('subutai.environment.controller', [])
 			var newVal = input.split(' ');
 			return newVal[newVal.length - 1];
 		}
-	});
+	})
+	.filter('isEmpty', [function() {
+		return function(object) {
+			return angular.equals({}, object);
+		}
+	}]);
 
 EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
 fileModel.$inject = ['$parse'];

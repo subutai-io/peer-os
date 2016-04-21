@@ -62,7 +62,7 @@ $(document).on('click', function(event) {
 		$(event.target).closest('g').attr('class') != 'element-call-menu' &&
 		$(event.target).closest('g').attr('class') != 'b-container-plus-icon'
 	){
-		$('.b-template-settings').stop().slideUp(100);
+		$('.b-template-settings').stop().hide(100);
 	}
 });
 
