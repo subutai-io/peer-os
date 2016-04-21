@@ -28,7 +28,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = "4.0.0-RC9"
+	app.Version = "4.0.0-RC10-SNAPSHOT" + TIMESTAMP
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
