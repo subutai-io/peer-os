@@ -28,7 +28,7 @@ public interface TemplateManager extends QuotaManagedRepository
      *
      * @return JSON encoded meta data
      */
-    TemplateKurjun getTemplate( String repository, byte[] md5, String templateOwner, boolean isKurjunClient ) throws IOException;
+    TemplateKurjun getTemplateByMd5( String repository, String md5, String templateOwner, boolean isKurjunClient ) throws IOException;
 
 
     /**
@@ -41,7 +41,7 @@ public interface TemplateManager extends QuotaManagedRepository
      *
      * @return JSON encoded meta data
      */
-    TemplateKurjun getTemplate( String repository, String name, String version, boolean isKurjunClient ) throws IOException;
+    TemplateKurjun getTemplateByName( String repository, String name, String version, boolean isKurjunClient ) throws IOException;
 
 
     /**
@@ -72,7 +72,7 @@ public interface TemplateManager extends QuotaManagedRepository
      *
      * @return input stream to read package data
      */
-    InputStream getTemplateData( String repository, byte[] md5, String templateOwner, boolean isKurjunClient ) throws IOException;
+    InputStream getTemplateData( String repository, String md5, String templateOwner, boolean isKurjunClient ) throws IOException;
 
 
     /**
@@ -86,7 +86,7 @@ public interface TemplateManager extends QuotaManagedRepository
     List<TemplateKurjun> list( String repository, boolean isKurjunClient ) throws IOException;
 
 //
-//    List<Map<String, Object>> getSharedTemplateInfos( byte[] md5, String templateOwner ) throws IOException;
+//    List<Map<String, Object>> getSharedTemplateInfos( String md5, String templateOwner ) throws IOException;
 //
 //
 //    List<Map<String, Object>> listAsSimple( String repository ) throws IOException;
@@ -129,7 +129,7 @@ public interface TemplateManager extends QuotaManagedRepository
      *
      * @return {@code true} if package successfully deleted; {@code false} otherwise
      */
-    boolean delete( String repository, String templateOwner, byte[] md5 ) throws IOException;
+    boolean delete( String repository, String templateOwner, String md5 ) throws IOException;
 
 
     /**
