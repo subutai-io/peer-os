@@ -867,7 +867,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "dd-MM-yyyy:HH:mm:SS" );
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "dd-MM-yyyy HH:mm:ss" );
 
             CommandResult result = commandUtil.execute( new RequestBuilder(
                     String.format( "journalctl -u *p2p* --since \"%s\" --until " + "\"%s\"",
