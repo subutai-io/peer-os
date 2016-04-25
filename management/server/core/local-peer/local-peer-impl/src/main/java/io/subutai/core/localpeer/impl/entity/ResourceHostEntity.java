@@ -836,7 +836,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            return commandUtil.execute( new RequestBuilder( "subutai -v" ), this ).getStdOut();
+            return commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
         }
         catch ( CommandException e )
         {

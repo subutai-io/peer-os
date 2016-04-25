@@ -83,4 +83,10 @@ public class ResourceHostCommands
 
         return new RequestBuilder( result.toString() );
     }
+
+
+    public RequestBuilder getGetRhVersionCommand()
+    {
+        return new RequestBuilder( "subutai -v" );
+    }
 }
