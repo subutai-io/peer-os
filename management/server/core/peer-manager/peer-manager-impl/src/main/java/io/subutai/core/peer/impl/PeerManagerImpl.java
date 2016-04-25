@@ -38,6 +38,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
@@ -913,7 +914,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         {
             try
             {
-                PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( localPeerId );
+                PeerResources peerResources = getPeer( peer.getId() ).getResourceLimits( new PeerId( localPeerId ) );
                 resources.add( peerResources );
             }
             catch ( Exception ignore )

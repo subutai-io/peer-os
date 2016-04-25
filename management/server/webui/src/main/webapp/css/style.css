@@ -2833,6 +2833,17 @@ td.b-main-table__status-col {
 	font-size: 16px;
 }
 
+.b-cloud-item-link {
+	float: right;
+	margin: 3px 0 0 0;
+	line-height: 27px;
+	padding: 0 10px;
+}
+
+.b-cloud-item-link:hover {
+	background-color: #f8fcfc;
+}
+
 .b-cloud__space {
     margin-right: 247px;
     overflow: hidden;
@@ -3489,6 +3500,7 @@ td.b-main-table__status-col {
 	line-height: 0;
 	font-size: 0;
 	vertical-align: top;
+	height: auto!important;
 }
 .b-template-settings:before {
     content: "";
@@ -3791,6 +3803,7 @@ span.ssh-info-button
 	list-style: none;
 	padding: 10px;
 	margin: 0 0 0 0;
+	position: relative;
 }
 
 .b-template-settings__body {
@@ -3812,5 +3825,11 @@ span.ssh-info-button
 .b-template-settings_plugins:after {
 	right: 18px;
 	left: auto;
+}
+
+a[disabled] {
+    pointer-events: none;
+    background-color: #EAEAEA;
+    color: #333333;
 }
 

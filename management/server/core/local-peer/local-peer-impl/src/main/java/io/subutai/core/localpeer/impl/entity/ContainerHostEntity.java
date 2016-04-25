@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.util.Set;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -233,20 +231,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
         getPeer().setQuota( this.getContainerId(), containerQuota );
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet() throws PeerException
-    {
-        return getPeer().getCpuSet( this );
-    }
-
-
-    @Override
-    public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
-    {
-        getPeer().setCpuSet( this, cpuSet );
     }
 
 

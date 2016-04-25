@@ -505,6 +505,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 					delete graph.getCell(rh.model).attributes.grid[rh.x][rh.y];
 					this.model.remove();
+					filterPluginsList();
 					return;
 					break;
 				case 'element-call-menu':
@@ -778,6 +779,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			}
 			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id);
 		}
+		filterPluginsList();
 	}
 
 	vm.plugins = [];
@@ -798,7 +800,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 	function filterPluginsList() {
 		var allElements = graph.getCells();
-		var addedContainers = getContainers2Build(allElements, true);
+		var addedContainers = getContainers2Build(allElements);
 
 		if(addedContainers.containersList.length > 0) {
 			vm.filteredPlugins = {};
@@ -825,6 +827,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		} else {
 			vm.filteredPlugins = vm.plugins;
 		}
+		$('.js-pluginspopup-scroll').perfectScrollbar('update');
+		$scope.$$phase || $scope.$apply();
 	}
 	$scope.filterPluginsList = filterPluginsList;
 
@@ -845,7 +849,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
 			var firstPeer;
 			for (firstPeer in vm.peerIds) break;
-			console.log(firstPeer);
 			var resourceHostItemId = addResource2Build(vm.peerIds[firstPeer].resourceHosts[0].id, firstPeer, 0);
 			var resourceHost = graph.getCell(resourceHostItemId);
 
@@ -858,14 +861,16 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 					if(addedContainers.containersList.length > 0) {
 
 						var alreadyONWorckspace = false;
-						for(var i = 0; i < addedContainers.containersList.length; i++) {
-							var currentTemplate = addedContainers.containersList[i].templateName;
+						var templatesCounter = 0;
+						for(var j = 0; j < addedContainers.containersList.length; j++) {
+							var currentTemplate = addedContainers.containersList[j].templateName;
 							if(currentTemplate == template.toLowerCase()) {
 								alreadyONWorckspace = true;
-								break;
+								templatesCounter++;
+								//break;
 							}
 						}
-						if(!alreadyONWorckspace) {
+						if(!alreadyONWorckspace  || templatesCounter == i) {
 							var img = 'assets/templates/' + template + '.jpg';
 							if(!imageExists(img)) {
 								img = 'assets/templates/no-image.jpg';
