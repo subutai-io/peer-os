@@ -143,7 +143,7 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public SystemInfo getSystemInfo() throws ConfigurationException
+    public SystemInfo getSystemInfo()
     {
         SystemInfo pojo = new SystemInfoPojo();
 
