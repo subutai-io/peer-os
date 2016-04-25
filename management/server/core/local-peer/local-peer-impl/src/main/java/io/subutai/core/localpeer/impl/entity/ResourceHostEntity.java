@@ -867,11 +867,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "dd-MM-yyyy HH:mm:ss" );
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
-            CommandResult result = commandUtil.execute( new RequestBuilder(
+            CommandResult result = execute( new RequestBuilder(
                     String.format( "journalctl -u *p2p* --since \"%s\" --until " + "\"%s\"",
-                            simpleDateFormat.format( from ), simpleDateFormat.format( till ) ) ), this );
+                            simpleDateFormat.format( from ), simpleDateFormat.format( till ) ) ) );
 
             StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
 
@@ -883,7 +883,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 {
                     p2pLogs.addLog( logLine );
                 }
-                else if ( logLine.contains( logLevel.name() ) )
+                else if ( logLine.contains( String.format( "[%s]", logLevel.name() ) ) )
                 {
                     p2pLogs.addLog( logLine );
                 }
