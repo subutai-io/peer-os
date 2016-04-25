@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -30,6 +32,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
@@ -40,7 +43,9 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
@@ -791,8 +796,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 if ( Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME, info.getArch().name(),
-                            Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
+                            info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME,
+                            info.getArch().name(), Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
 
                     addContainerHost( containerHost );
                 }
@@ -823,6 +828,73 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         return true;
+    }
+
+
+    @Override
+    public String getRhVersion() throws ResourceHostException
+    {
+        try
+        {
+            return commandUtil.execute( new RequestBuilder( "subutai -v" ), this ).getStdOut();
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining RH version: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String getP2pVersion() throws ResourceHostException
+    {
+        try
+        {
+            //todo use "subutai" binding when implemented
+            return commandUtil.execute( new RequestBuilder( "/apps/subutai/current/bin/p2p version" ), this )
+                              .getStdOut();
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException
+    {
+        P2pLogs p2pLogs = new P2pLogs();
+
+        try
+        {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "dd-MM-yyyy:HH:mm:SS" );
+
+            CommandResult result = commandUtil.execute( new RequestBuilder(
+                    String.format( "journalctl -u *p2p* --since \"%s\" --until " + "\"%s\"",
+                            simpleDateFormat.format( from ), simpleDateFormat.format( till ) ) ), this );
+
+            StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
+
+            while ( st.hasMoreTokens() )
+            {
+                String logLine = st.nextToken();
+
+                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) )
+                {
+                    p2pLogs.addLog( logLine );
+                }
+                else if ( logLine.contains( logLevel.name() ) )
+                {
+                    p2pLogs.addLog( logLine );
+                }
+            }
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining P2P logs: %s", e.getMessage() ), e );
+        }
+
+        return p2pLogs;
     }
 
 

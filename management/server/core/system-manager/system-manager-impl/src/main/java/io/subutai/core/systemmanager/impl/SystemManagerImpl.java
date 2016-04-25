@@ -13,11 +13,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
@@ -158,22 +156,18 @@ public class SystemManagerImpl implements SystemManager
         pojo.setGitBuildTime( SubutaiInfo.getBuildTime() );
         pojo.setProjectVersion( SubutaiInfo.getVersion() );
 
-        CommandResult result;
-        RequestBuilder requestBuilder = new RequestBuilder( "subutai -v" );
         try
         {
-            Host host = peerManager.getLocalPeer().getManagementHost();
-            result = peerManager.getLocalPeer().execute( requestBuilder, host );
+            ResourceHost host = peerManager.getLocalPeer().getManagementHost();
+            pojo.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
+            pojo.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
         }
-        catch ( HostNotFoundException | CommandException e )
+        catch ( HostNotFoundException | ResourceHostException e )
         {
             e.printStackTrace();
             pojo.setRhVersion( "No RH connected" );
             return pojo;
         }
-
-        String[] version = result.getStdOut().split( "\\s" );
-        pojo.setRhVersion( version[2] );
 
         return pojo;
     }
