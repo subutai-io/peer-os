@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,7 +31,6 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
@@ -850,11 +848,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         try
         {
-            //todo use "subutai" binding when implemented
-            return commandUtil.execute( new RequestBuilder( "/apps/subutai/current/bin/p2p version" ), this )
-                              .getStdOut();
+            return getNetworkManager().getP2pVersion( this );
         }
-        catch ( CommandException e )
+        catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ), e );
         }
@@ -863,38 +859,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException
     {
-        P2pLogs p2pLogs = new P2pLogs();
-
         try
         {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-
-            CommandResult result = execute( new RequestBuilder(
-                    String.format( "journalctl -u *p2p* --since \"%s\" --until " + "\"%s\"",
-                            simpleDateFormat.format( from ), simpleDateFormat.format( till ) ) ) );
-
-            StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
-
-            while ( st.hasMoreTokens() )
-            {
-                String logLine = st.nextToken();
-
-                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) )
-                {
-                    p2pLogs.addLog( logLine );
-                }
-                else if ( logLine.contains( String.format( "[%s]", logLevel.name() ) ) )
-                {
-                    p2pLogs.addLog( logLine );
-                }
-            }
+            return getNetworkManager().getP2pLogs( this, logLevel, from, till );
         }
-        catch ( CommandException e )
+        catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Error obtaining P2P logs: %s", e.getMessage() ), e );
         }
-
-        return p2pLogs;
     }
 
 

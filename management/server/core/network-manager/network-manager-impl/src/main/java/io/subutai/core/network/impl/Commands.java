@@ -1,6 +1,8 @@
 package io.subutai.core.network.impl;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import com.google.common.base.Strings;
@@ -18,6 +20,14 @@ public class Commands
 {
     private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
     private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
+    private final SimpleDateFormat p2pDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+
+
+    public RequestBuilder getGetP2pVersionCommand()
+    {
+        //todo use "subutai" binding when implemented
+        return new RequestBuilder( "/apps/subutai/current/bin/p2p version" );
+    }
 
 
     public RequestBuilder getP2PConnectionsCommand()
@@ -123,5 +133,13 @@ public class Commands
     public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
     {
         return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
+    }
+
+
+    public RequestBuilder getGetP2pLogsCommand( Date from, Date till )
+    {
+        return new RequestBuilder(
+                String.format( "journalctl -u *p2p* --since \"%s\" --until " + "\"%s\"", p2pDateFormat.format( from ),
+                        p2pDateFormat.format( till ) ) );
     }
 }
