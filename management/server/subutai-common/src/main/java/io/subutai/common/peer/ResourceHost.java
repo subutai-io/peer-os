@@ -1,12 +1,15 @@
 package io.subutai.common.peer;
 
 
+import java.util.Date;
 import java.util.Set;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.P2pLogs;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
@@ -95,4 +98,11 @@ public interface ResourceHost extends Host, ResourceHostInfo
             throws ResourceHostException;
 
     void setContainerQuota( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
+
+
+    String getRhVersion() throws ResourceHostException;
+
+    String getP2pVersion() throws ResourceHostException;
+
+    public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException;
 }

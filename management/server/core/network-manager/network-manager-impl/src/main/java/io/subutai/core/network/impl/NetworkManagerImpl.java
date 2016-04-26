@@ -2,6 +2,7 @@ package io.subutai.core.network.impl;
 
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,6 +14,8 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConnection;
@@ -104,6 +107,55 @@ public class NetworkManagerImpl implements NetworkManager
         return connections;
     }
 
+
+    public String getP2pVersion( final Host host ) throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+
+        CommandResult result = execute( host, commands.getGetP2pVersionCommand() );
+
+        return result.getStdOut();
+    }
+
+
+    @Override
+    public P2pLogs getP2pLogs( final Host host, final JournalCtlLevel logLevel, final Date from, final Date till )
+            throws NetworkManagerException
+    {
+        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkNotNull( logLevel, "Invalid log level" );
+        Preconditions.checkNotNull( from, "Invalid from date" );
+        Preconditions.checkNotNull( till, "Invalid till date" );
+
+        P2pLogs p2pLogs = new P2pLogs();
+
+        try
+        {
+            CommandResult result = host.execute( commands.getGetP2pLogsCommand( from, till ) );
+
+            StringTokenizer st = new StringTokenizer( result.getStdOut(), System.lineSeparator() );
+
+            while ( st.hasMoreTokens() )
+            {
+                String logLine = st.nextToken();
+
+                if ( logLevel == JournalCtlLevel.ALL && !Strings.isNullOrEmpty( logLine ) )
+                {
+                    p2pLogs.addLog( logLine );
+                }
+                else if ( logLine.contains( String.format( "[%s]", logLevel.name() ) ) )
+                {
+                    p2pLogs.addLog( logLine );
+                }
+            }
+        }
+        catch ( CommandException e )
+        {
+            throw new NetworkManagerException( e );
+        }
+
+        return p2pLogs;
+    }
 
     //------------------ P2P SECTION END --------------------------------
 
@@ -203,9 +255,9 @@ public class NetworkManagerImpl implements NetworkManager
                 commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
     }
 
+
     @Override
-    public void setVlanDomain( final int vLanId, final String domain,
-                               final String host, final String sslCertPath )
+    public void setVlanDomain( final int vLanId, final String domain, final String host, final String sslCertPath )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
@@ -214,8 +266,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( host, "Invalid host" );
 
-        execute( getManagementHost(),
-                commands.getSetVlanDomainCommand( vLanId, domain, host, sslCertPath ) );
+        execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain, host, sslCertPath ) );
     }
 
 
