@@ -542,6 +542,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		} else {
 			vm.filteredPlugins = vm.plugins;
 		}
+		$('.js-pluginspopup-scroll').perfectScrollbar('update');
+		$scope.$$phase || $scope.$apply();
 	}
 
 	function selectPlugin(plugin) {

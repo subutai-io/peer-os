@@ -19,8 +19,6 @@ import javax.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.codec.binary.Hex;
-
 import com.google.common.collect.Lists;
 import com.google.inject.Injector;
 
@@ -135,7 +133,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public TemplateKurjun getTemplate( String repository, byte[] md5, String templateOwner, boolean isKurjunClient )
+    public TemplateKurjun getTemplateByMd5( String repository, String md5, String templateOwner, boolean isKurjunClient )
             throws IOException
     {
 
@@ -155,7 +153,7 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public TemplateKurjun getTemplate( String repository, String name, String version, boolean isKurjunClient )
+    public TemplateKurjun getTemplateByName( String repository, String name, String version, boolean isKurjunClient )
             throws IOException
     {
         DefaultMetadata m = new DefaultMetadata();
@@ -177,7 +175,7 @@ public class TemplateManagerImpl implements TemplateManager
     {
         try
         {
-            return getTemplate( TemplateRepository.PUBLIC, name, null, false );
+            return getTemplateByName( TemplateRepository.PUBLIC, name, null, false );
         }
         catch ( IOException e )
         {
@@ -189,11 +187,11 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public InputStream getTemplateData( String repository, byte[] md5, String templateOwner, boolean isKurjunClient )
+    public InputStream getTemplateData( String repository, String md5, String templateOwner, boolean isKurjunClient )
             throws IOException
     {
 
-        if ( templateOwner == null || md5 == null || md5.length == 0 )
+        if ( templateOwner == null || md5 == null)
         {
             LOGGER.error( "Incorrect params provided: templateOwner: {}, md5: {}", templateOwner, md5 );
             return null;
@@ -202,7 +200,7 @@ public class TemplateManagerImpl implements TemplateManager
         DefaultTemplate m = new DefaultTemplate();
         m.setId( templateOwner, md5 );
 
-        TemplateId tid = new TemplateId( templateOwner, Hex.encodeHexString( md5 ) );
+        TemplateId tid = new TemplateId( templateOwner,md5 );
 
         //check if download is already in progress
         //if yes, sleep while download is in progress
@@ -302,12 +300,12 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public boolean delete( String repository, String templateOwner, byte[] md5 ) throws IOException
+    public boolean delete( String repository, String templateOwner, String md5 ) throws IOException
     {
 
         try
         {
-            TemplateId tid = new TemplateId( templateOwner, Hex.encodeHexString( md5 ) );
+            TemplateId tid = new TemplateId( templateOwner, md5 );
             return localTemplateRepository.delete( tid.get(), md5 );
         }
         catch ( IOException ex )
@@ -564,7 +562,7 @@ public class TemplateManagerImpl implements TemplateManager
     private TemplateKurjun convertToSubutaiTemplate( SubutaiTemplateMetadata meta )
     {
         TemplateKurjun template =
-                new TemplateKurjun( String.valueOf( meta.getId() ), Hex.encodeHexString( meta.getMd5Sum() ),
+                new TemplateKurjun( String.valueOf( meta.getId() ),  meta.getMd5Sum(),
                         meta.getName(), meta.getVersion(), meta.getArchitecture().name(), meta.getParent(),
                         meta.getPackage(), meta.getOwnerFprint() );
 

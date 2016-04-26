@@ -43,7 +43,7 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 		.withOption('stateSave', true);
 
 	vm.dtColumns = [
-		DTColumnBuilder.newColumn('createDate').withTitle('Date'),
+		DTColumnBuilder.newColumn('createDate').withTitle('Date').renderWith(dateHTML),
 		DTColumnBuilder.newColumn('description').withTitle('Operation'),
 		DTColumnBuilder.newColumn(null).withTitle('Status').renderWith(statusHTML),
 		DTColumnBuilder.newColumn(null).withTitle('Logs').notSortable().renderWith(viewLogsButton),
@@ -72,6 +72,10 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 	function statusHTML(data, type, full, meta) {
 		vm.logs[data.id] = data;
 		return '<div class="b-status-icon b-status-icon_' + data.state + '" tooltips tooltip-template="' + data.state + '" tooltip-smart="true"></div>';
+	}
+
+	function dateHTML(data, type, full, meta) {
+		return '<div>' + moment( data.createDate ).format('MMM Do YY HH:mm:ss') + '</div>';
 	}
 
 	function viewLogsButton(data, type, full, meta) {
