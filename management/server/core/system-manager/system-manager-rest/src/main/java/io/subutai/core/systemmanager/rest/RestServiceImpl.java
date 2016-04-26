@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.util.JsonUtil;
@@ -40,7 +38,7 @@ public class RestServiceImpl implements RestService
 
             return Response.status( Response.Status.OK ).entity( projectInfo ).build();
         }
-        catch ( ConfigurationException | CommandException | HostNotFoundException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
             e.printStackTrace();

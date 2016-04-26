@@ -57,9 +57,10 @@
 						<div class="b-template-settings b-template-settings_plugins js-environment-plugins-menu">
 							<div class="header">Choose plugin</div>
 							<div class="b-template-settings__body">
-								<div class="b-environments-plugin__list js-scrollbar">
+								<div class="b-environments-plugin__list js-scrollbar js-pluginspopup-scroll">
 									<ul class="b-environments-plugin-list">
 										<li class="b-environments-plugin-list__item" ng-repeat="plugin in environmentSimpleViewCtrl.filteredPlugins">
+											<a ui-sref="{{ plugin.name.toLowerCase() }}" class="b-cloud-item-link b-btn b-btn_white">goto</a>
 											<span class="b-tools-menu__item" 
 											ng-click="environmentSimpleViewCtrl.selectPlugin(plugin)">
 
@@ -76,18 +77,21 @@
 												</span>
 
 												<span class="b-cloud-item-text">{{ plugin.name }}</span>
+
 											</span>											
 										</li>
 									</ul>
 								</div>
 							</div>
 							<div class="footer">
+
 								<button type="button" 
 								class="b-btn b-btn_green" 
 								ng-click="environmentSimpleViewCtrl.setTemplatesByPlugin()" 
-								ng-disabled="environmentSimpleViewCtrl.filteredPlugins | isEmpty">
-									Apply
+								ng-disabled="environmentSimpleViewCtrl.filteredPlugins | isEmpty:environmentSimpleViewCtrl.isEditing ">
+									Use
 								</button>
+
 							</div>
 						</div>
 					</div>
