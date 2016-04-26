@@ -23,10 +23,10 @@ public interface AptManager extends QuotaManagedRepository
     InputStream getPackageByFilename( String filename ) throws IllegalArgumentException;
 
 
-    String getPackageInfo( byte[] md5, String name, String version );
+    String getPackageInfo( String md5, String name, String version );
 
 
-    InputStream getPackage( byte[] md5 );
+    InputStream getPackage( String md5 );
 
 
     URI upload( InputStream is );
@@ -35,7 +35,7 @@ public interface AptManager extends QuotaManagedRepository
     List<AptPackage> list();
     
 
-    boolean delete( byte[] md5 ) throws IOException;
+    boolean delete( String md5 ) throws IOException;
 
 
     boolean isCompressionTypeSupported( String packagesIndex );
@@ -59,10 +59,10 @@ public interface AptManager extends QuotaManagedRepository
     void removeRemoteRepository( URL url );
 
 
-    String getSerializedPackageInfo( String filename ) throws IllegalArgumentException;
+    String getSerializedPackageInfoByName( String filename ) throws IllegalArgumentException;
 
 
-    String getSerializedPackageInfo( byte[] md5 ) throws IllegalArgumentException;
+    String getSerializedPackageInfoByMd5( String md5 ) throws IllegalArgumentException;
 
 }
 

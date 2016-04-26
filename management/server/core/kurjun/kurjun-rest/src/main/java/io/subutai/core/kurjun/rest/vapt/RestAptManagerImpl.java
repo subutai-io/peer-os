@@ -85,7 +85,7 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     {
         try
         {
-            String serialized = aptManager.getSerializedPackageInfo( filename );
+            String serialized = aptManager.getSerializedPackageInfoByName( filename );
 
             if ( serialized != null )
             {
@@ -142,7 +142,7 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     public Response getPackageInfo( String md5, String name, String version )
     {
 
-        String str = aptManager.getPackageInfo( decodeMd5( md5 ), name, version );
+        String str = aptManager.getPackageInfo( md5, name, version );
 
         if ( str != null )
         {
@@ -156,11 +156,11 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     public Response getPackage( String md5 )
     {
 
-        String serialized = aptManager.getSerializedPackageInfo( decodeMd5( md5 ) );
+        String serialized = aptManager.getSerializedPackageInfoByMd5(md5 );
 
         if ( serialized != null )
         {
-            InputStream is = aptManager.getPackage( decodeMd5( md5 ) );
+            InputStream is = aptManager.getPackage( md5 );
 
             if ( is != null )
             {
@@ -191,12 +191,12 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
     @Override
     public Response deletePackage( String md5 )
     {
-        byte[] md5bytes = decodeMd5( md5 );
-        if ( md5bytes != null )
+
+        if ( md5 != null )
         {
             try
             {
-                boolean deleted = aptManager.delete( md5bytes );
+                boolean deleted = aptManager.delete( md5 );
                 if ( deleted )
                 {
                     return Response.ok( "Apt package deleted" ).build();
