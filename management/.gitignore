@@ -12,9 +12,9 @@
 .metadata
 target
 git.properties
-
+.gitignore
 # Package Files #
-*.jar
+#.jar
 *.war
 *.ear
 /server/server-karaf/nb-configuration.xml
