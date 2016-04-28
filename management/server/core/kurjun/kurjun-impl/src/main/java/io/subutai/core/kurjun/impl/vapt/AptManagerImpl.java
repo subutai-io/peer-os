@@ -328,6 +328,7 @@ public class AptManagerImpl implements AptManager
     public List<AptPackage> list()
     {
         List<SerializableMetadata> list = unifiedRepository.listPackages();
+
         List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) )
                                        .collect( Collectors.toList() );
         return deflist;

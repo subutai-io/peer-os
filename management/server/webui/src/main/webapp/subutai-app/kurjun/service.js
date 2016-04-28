@@ -54,7 +54,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 
 	function getTemplates(repository) {
 		setUrlsValues();
-		return $http.get(TEMPLATE_URL + 'list?repository=all', {
+		return $http.get(LOCAL_TEMPLATE_URL + 'list?repository=all', {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
@@ -70,7 +70,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 
 	function getRawFiles() {
 		setUrlsValues();
-		return $http.get(RAW_URL + "list?repository=all", {
+		return $http.get(LOCAL_RAW_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
