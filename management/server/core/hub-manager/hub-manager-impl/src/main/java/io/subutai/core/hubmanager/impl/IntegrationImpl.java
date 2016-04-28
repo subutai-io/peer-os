@@ -51,6 +51,7 @@ import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.VehsProccessor;
+import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.network.api.NetworkManager;
@@ -157,6 +158,8 @@ public class IntegrationImpl implements Integration
                     new VehsProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
                             environmentUserHelper );
 
+            StateLinkProccessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
+
             heartbeatProcessor.addProccessor( vehsProccessor );
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
@@ -165,6 +168,8 @@ public class IntegrationImpl implements Integration
                     new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
             heartbeatProcessor.addProccessor( appScaleProcessor );
+
+            heartbeatProcessor.addProccessor( tunnelProcessor );
 
             hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
