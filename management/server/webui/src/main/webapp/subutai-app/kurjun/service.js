@@ -62,7 +62,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 
 	function getAPTList() {
 		setUrlsValues();
-		return $http.get(LOCAL_DEB_URL + "list?repository=all", {
+		return $http.get(DEB_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
