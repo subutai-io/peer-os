@@ -93,7 +93,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
                 repository = "raw";
             }
             rawMetadata.setName( name );
-            rawMetadata.setMd5Sum( md5);
+            rawMetadata.setMd5Sum( md5 );
             rawMetadata.setFingerprint( repository );
 
             Metadata metadata = ( Metadata ) rawManager.getInfo( repository, md5 );
@@ -164,7 +164,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
             if ( rawMetadata != null )
             {
-                return Response.ok( rawMetadata ).build();
+                return Response.ok( rawMetadata.getId() + " uploaded successfully" ).build();
             }
             else
             {
