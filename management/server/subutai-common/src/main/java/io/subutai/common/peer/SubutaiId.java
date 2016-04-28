@@ -42,4 +42,29 @@ public abstract class SubutaiId
     {
         return id;
     }
+
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof SubutaiId ) )
+        {
+            return false;
+        }
+
+        final SubutaiId subutaiId = ( SubutaiId ) o;
+
+        return !( id != null ? !id.equals( subutaiId.id ) : subutaiId.id != null );
+    }
+
+
+    @Override
+    public int hashCode()
+    {
+        return id != null ? id.hashCode() : 0;
+    }
 }
