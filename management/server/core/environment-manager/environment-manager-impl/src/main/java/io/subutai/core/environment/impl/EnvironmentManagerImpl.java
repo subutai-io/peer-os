@@ -850,7 +850,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             Environment environment = loadEnvironment( environmentId );
 
             ContainerHost host = environment.getContainerHostByHostname( hostname );
-            SshKey sshKey = host.getPeer().createSshKey( environment.getEnvironmentId(), host.getContainerId(), encType );
+            SshKey sshKey =
+                    host.getPeer().createSshKey( environment.getEnvironmentId(), host.getContainerId(), encType );
+            sshKeys.addKey( sshKey );
         }
         catch ( Exception e )
         {

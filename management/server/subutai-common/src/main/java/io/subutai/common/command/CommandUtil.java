@@ -217,7 +217,7 @@ public class CommandUtil
             }
             catch ( Exception e )
             {
-                LOG.error( "Error executing command ", e );
+//                LOG.error( "Error executing command ", e );
 
                 hostCommandResults.add( new HostCommandResult( commandFuture.getKey(), e ) );
             }
