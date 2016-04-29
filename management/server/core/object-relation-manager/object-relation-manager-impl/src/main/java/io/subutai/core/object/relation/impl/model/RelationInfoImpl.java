@@ -183,4 +183,15 @@ public class RelationInfoImpl implements RelationInfo
     {
         return ( int ) ( id ^ ( id >>> 32 ) );
     }
+
+
+    @Override
+    public String toString()
+    {
+        return "RelationInfoImpl{" +
+                "id=" + id +
+                ", ownershipLevel=" + ownershipLevel +
+                ", relationTraits=" + relationTraits +
+                '}';
+    }
 }

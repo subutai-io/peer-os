@@ -87,8 +87,9 @@ public class RelationManagerImpl implements RelationManager
             }
 
             // Verification check have to be applied to verify that stored data is the same as the one being supported
-            Relation storedRelation = relationDataService.findBySourceTargetObject( relation.getSource(),
-                            relation.getTarget(), relation.getTrustedObject() );
+            Relation storedRelation = relationDataService
+                    .findBySourceTargetObject           ( relation.getSource(), relation.getTarget(),
+                            relation.getTrustedObject() );
 
             if ( storedRelation == null )
             {
@@ -129,13 +130,14 @@ public class RelationManagerImpl implements RelationManager
     public Relation buildRelation( final RelationInfoMeta relationInfoMeta, final RelationMeta relationMeta )
     {
         RelationInfoImpl relationInfo = new RelationInfoImpl( relationInfoMeta );
-        RelationImpl relation = new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject(), relationInfo, relationMeta.getKeyId() );
+        RelationImpl relation =
+                new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(), relationMeta.getObject(),
+                        relationInfo, relationMeta.getKeyId() );
 
         saveRelation( relation );
 
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject() );
+                relationMeta.getObject()                   );
     }
 
 
@@ -172,7 +174,7 @@ public class RelationManagerImpl implements RelationManager
         saveRelation( relation );
 
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject() );
+                relationMeta.getObject()                   );
     }
 
 
@@ -180,7 +182,7 @@ public class RelationManagerImpl implements RelationManager
     public Relation getRelation( final RelationMeta relationMeta )
     {
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject());
+                relationMeta.getObject()                   );
     }
 
 
@@ -199,6 +201,13 @@ public class RelationManagerImpl implements RelationManager
     public RelationInfoManagerImpl getRelationInfoManager()
     {
         return relationInfoManager;
+    }
+
+
+    @Override
+    public List<Relation> getRelations()
+    {
+        return relationDataService.getAllRelations();
     }
 
 
@@ -234,7 +243,7 @@ public class RelationManagerImpl implements RelationManager
     public void removeRelation( final RelationMeta relationMeta )
     {
         Relation relation = relationDataService
-                .findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
+                .findBySourceTargetObject        ( relationMeta.getSource(), relationMeta.getTarget(),
                         relationMeta.getObject() );
         removeRelation( relation.getId() );
     }

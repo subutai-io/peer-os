@@ -179,4 +179,20 @@ public class RelationImpl implements Relation
         result = 31 * result + ( keyId != null ? keyId.hashCode() : 0 );
         return result;
     }
+
+
+    @Override
+    public String toString()
+    {
+        return "RelationImpl{" +
+                "id=" + id +
+                ", source=" + source +
+                ", target=" + target +
+                ", trustedObject=" + trustedObject +
+                ", relationInfo=" + relationInfo +
+                ", relationStatus=" + relationStatus +
+                ", keyId='" + keyId + '\'' +
+                ", linkType=" + linkType +
+                '}';
+    }
 }

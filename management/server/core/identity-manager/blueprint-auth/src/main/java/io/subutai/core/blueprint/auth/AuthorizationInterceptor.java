@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.subutai.blueprint.auth;
+package io.subutai.core.blueprint.auth;
 
 
 import java.lang.annotation.Annotation;

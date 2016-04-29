@@ -110,4 +110,16 @@ public class LinkType implements Serializable
     {
         return ( int ) ( id ^ ( id >>> 32 ) );
     }
+
+
+    @Override
+    public String toString()
+    {
+        return "LinkType{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", inward='" + inward + '\'' +
+                ", outward='" + outward + '\'' +
+                '}';
+    }
 }
