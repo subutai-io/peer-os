@@ -23,6 +23,9 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.WebClientBuilder;
 
 
@@ -385,6 +388,50 @@ public class EnvironmentWebClient
         checkResponse( response );
     }
 
+    public SshKeys getSshKeys( final EnvironmentId environmentId, final SshEncryptionType sshEncryptionType )
+             throws PeerException
+     {
+         String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
+
+         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+         Response response;
+
+         try
+         {
+             response = client.get();
+         }
+         catch ( Exception e )
+         {
+             LOG.error( e.getMessage(), e );
+             throw new PeerException( "Error reading ssh keys of the environment: " + e.getMessage() );
+         }
+
+         return checkResponse( response, SshKeys.class );
+     }
+
+
+     public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
+                                  final SshEncryptionType sshEncryptionType ) throws PeerException
+     {
+         String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
+
+         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+         Response response;
+
+         try
+         {
+             response = client.post( containerId );
+         }
+         catch ( Exception e )
+         {
+             LOG.error( e.getMessage(), e );
+             throw new PeerException( "Error creating ssh key: " + e.getMessage() );
+         }
+
+         return checkResponse( response, SshKey.class );
+     }
 
     protected <T> T checkResponse( Response response, Class<T> clazz ) throws PeerException
     {

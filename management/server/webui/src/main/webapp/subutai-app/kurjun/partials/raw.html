@@ -22,17 +22,15 @@
 				<td>{{ file.name }}</td>
 				<td>{{ kurjunCtrl.formatSize(file.size) }}</td>
 				<td>
-					<a href
-					   class="b-icon b-icon_share"
-					   tooltips
-					   tooltip-template='Download'
-					   ng-click="kurjunCtrl.downloadFile(file)">
+					<a ng-href='/rest/kurjun/file/get?md5={{ file.md5Sum }}'
+					   target='_self'
+					   class="b-icon b-icon_share">
 					</a>
-					<a href
-					   class="b-icon b-icon_remove"
-					   ng-if="file.deletable"
-					   ng-click="kurjunCtrl.deleteFile(file)">
-					</a>
+					<!--<a href-->
+					   <!--class="b-icon b-icon_remove"-->
+					   <!--ng-if="file.deletable"-->
+					   <!--ng-click="kurjunCtrl.deleteFile(file)">-->
+					<!--</a>-->
 				</td>
 			</tr>
 			</tbody>

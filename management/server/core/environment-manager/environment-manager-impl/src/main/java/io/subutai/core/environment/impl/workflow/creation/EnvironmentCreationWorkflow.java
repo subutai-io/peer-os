@@ -192,7 +192,7 @@ public class EnvironmentCreationWorkflow
 
         try
         {
-            new RegisterHostsStep( environment, operationTracker ).execute();
+            new RegisterHostsStep( topology, environment, operationTracker ).execute();
 
             saveEnvironment();
 
@@ -215,7 +215,7 @@ public class EnvironmentCreationWorkflow
         {
             environment.addSshKey( sshKey );
 
-            new RegisterSshStep( environment, operationTracker ).execute();
+            new RegisterSshStep( topology, environment, operationTracker ).execute();
 
             saveEnvironment();
 
