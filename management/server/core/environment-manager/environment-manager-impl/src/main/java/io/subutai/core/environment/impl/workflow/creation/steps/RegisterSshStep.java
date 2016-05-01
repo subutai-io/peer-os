@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.SshPublicKeys;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -19,21 +20,20 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 public class RegisterSshStep
 {
+    private final Topology topology;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
 
 
-    public RegisterSshStep( final EnvironmentImpl environment, final TrackerOperation trackerOperation )
+    public RegisterSshStep( final Topology topology, final EnvironmentImpl environment,
+                            final TrackerOperation trackerOperation )
     {
+        this.topology = topology;
         this.environment = environment;
         this.trackerOperation = trackerOperation;
     }
 
 
-    /**
-     * IMPORTANT: Containers always need access to each other via SSH. For example: ssh root@192.168.1.1 date. This is a
-     * workaround for: https://github.com/optdyn/hub/issues/413.
-     */
     public void execute() throws EnvironmentManagerException, PeerException
     {
         Set<Host> hosts = Sets.newHashSet();
@@ -42,7 +42,7 @@ public class RegisterSshStep
 
         Set<String> userKeys = environment.getSshKeys();
 
-        if ( hosts.size() > 1 )
+        if ( hosts.size() > 1 && topology.exchangeSshKeys() )
         {
             exchangeSshKeys( userKeys );
         }

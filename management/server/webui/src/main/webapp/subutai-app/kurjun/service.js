@@ -48,13 +48,11 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function getRepositories() {
-		setUrlsValues();
 		return $http.get(REPOSITORY_URL, {withCredentials: false, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function getTemplates(repository) {
-		setUrlsValues();
-		return $http.get(TEMPLATE_URL + 'list?repository=all', {
+		return $http.get(LOCAL_TEMPLATE_URL + 'list?repository=all', {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
@@ -69,8 +67,7 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function getRawFiles() {
-		setUrlsValues();
-		return $http.get(RAW_URL + "list?repository=all", {
+		return $http.get(LOCAL_RAW_URL + "list?repository=all", {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
 		});
@@ -81,8 +78,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function addTemplate(file) {
-		//setUrlsValues();
-		//@todo repository=
 		return uploadTemplate(file, LOCAL_TEMPLATE_URL + 'upload');
 	}
 
@@ -91,7 +86,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function deleteTemplate(id) {
-		setUrlsValues();
 		return $http.delete(LOCAL_TEMPLATE_URL + 'delete', {params: {id: id}}, {
 			withCredentials: false,
 			headers: {'Content-Type': 'application/json'}
@@ -99,7 +93,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function shareTemplate(users, templateId) {
-		setUrlsValues();
 		// TODO: doesn't work properly
 		var postData = "users=" + users + "&templateId=" + templateId;
 		return $http.post(
@@ -110,7 +103,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function deleteAPT(md5) {
-		setUrlsValues();
 		return $http.delete(LOCAL_DEB_URL + 'delete', {params: {md5: md5}}, {
 			withCredentials: false,
 			headers: {withCredentials: false, 'Content-Type': 'application/json'}
@@ -118,7 +110,6 @@ function kurjunService($http, Upload, SettingsKurjunSrv)
 	}
 
 	function isUploadAllowed(repository) {
-		setUrlsValues();
 		return $http.get(LOCAL_TEMPLATE_URL + repository + '/can-upload', {
 			withCredentials: false,
 			headers: {withCredentials: false, 'Content-Type': 'application/json'}

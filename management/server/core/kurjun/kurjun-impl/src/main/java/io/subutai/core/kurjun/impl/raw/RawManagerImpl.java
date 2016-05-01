@@ -49,6 +49,7 @@ public class RawManagerImpl implements RawManager
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
 
     private static final String DEFAULT_RAW_REPO_NAME = "raw";
+
     private static final String RAW_PATH = "/file";
 
     private RepositoryFactory repositoryFactory;
@@ -71,17 +72,12 @@ public class RawManagerImpl implements RawManager
 
         _local();
 
-        _remote();
+        _unified();
     }
 
 
     public void init()
     {
-        injector = bootstrapDI();
-
-        _local();
-
-        _remote();
     }
 
 
@@ -94,15 +90,17 @@ public class RawManagerImpl implements RawManager
     }
 
 
-    private void _remote()
+    private void _unified()
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+
         this.unifiedRepository = repositoryFactory.createUnifiedRepo();
 
         for ( String s : SystemSettings.getGlobalKurjunUrls() )
         {
             this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalRaw( s, null, "all" ) );
         }
+        this.unifiedRepository.getRepositories().add( this.localPublicRawRepository );
     }
 
 
@@ -294,20 +292,7 @@ public class RawManagerImpl implements RawManager
     @Override
     public List<SerializableMetadata> list( String repository )
     {
-        List<RawMetadata> rawMetadatas;
-
-        switch ( repository )
-        {
-            //return local list
-            case "public":
-                return localPublicRawRepository.listPackages();
-            //return unified repo list
-            case "all":
-                return unifiedRepository.listPackages();
-            //return personal repository list
-            default:
-                return repositoryFactory.createLocalTemplate( new KurjunContext( repository ) ).listPackages();
-        }
+        return unifiedRepository.listPackages();
     }
 
 
