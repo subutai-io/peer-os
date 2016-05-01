@@ -47,6 +47,10 @@ public class TunnelProcessor implements StateLinkProccessor
     {
         for ( String stateLink : stateLinks )
         {
+            if ( !stateLink.contains( "tunnel" ) )
+            {
+                return;
+            }
             processLink( stateLink );
         }
     }
