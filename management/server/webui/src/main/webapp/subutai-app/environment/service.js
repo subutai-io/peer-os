@@ -83,6 +83,8 @@ function environmentService($http, $q) {
 
 		revoke: revoke,
 
+		getInstalledPlugins: getInstalledPlugins,
+
 		getServerUrl : function getServerUrl() { return ENVIRONMENTS_URL; }
 	};
 
@@ -327,5 +329,9 @@ function environmentService($http, $q) {
 
 	function revoke (environmentId) {
 		return $http.put (ENVIRONMENTS_URL + environmentId + "/revoke");
+	}
+
+	function getInstalledPlugins() {
+		return $http.get(SERVER_URL + 'js/plugins.json', {headers: {'Content-Type': 'application/json'}});
 	}
 }

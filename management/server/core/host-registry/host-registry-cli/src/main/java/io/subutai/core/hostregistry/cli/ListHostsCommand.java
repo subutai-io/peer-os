@@ -55,6 +55,8 @@ public class ListHostsCommand extends SubutaiShellCommandSupport
                                 containerHostInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE )
                                                  .getIp(), containerHostInfo.getState() ) );
             }
+
+            System.out.println( "-------" );
         }
         return null;
     }

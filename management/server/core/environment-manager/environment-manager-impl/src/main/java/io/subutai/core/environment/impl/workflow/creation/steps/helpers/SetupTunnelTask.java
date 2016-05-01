@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 import java.util.concurrent.Callable;
 
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.P2pIps;
 
@@ -25,7 +26,7 @@ public class SetupTunnelTask implements Callable<Boolean>
     @Override
     public Boolean call() throws Exception
     {
-        peer.setupTunnels( p2pIps, environmentId );
+        peer.setupTunnels( p2pIps, new EnvironmentId( environmentId ) );
 
         return true;
     }

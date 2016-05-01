@@ -90,4 +90,10 @@ public interface SystemInfo
 
 
     public void setRhVersion( final String rhVersion );
+
+
+    public String getP2pVersion();
+
+
+    public void setP2pVersion( final String p2pVersion );
 }

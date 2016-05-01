@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -21,12 +22,15 @@ import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 public class RegisterHostsStep
 {
+    private final Topology topology;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
 
 
-    public RegisterHostsStep( final EnvironmentImpl environment, final TrackerOperation trackerOperation )
+    public RegisterHostsStep( final Topology topology, final EnvironmentImpl environment,
+                              final TrackerOperation trackerOperation )
     {
+        this.topology = topology;
         this.environment = environment;
         this.trackerOperation = trackerOperation;
     }
@@ -35,8 +39,10 @@ public class RegisterHostsStep
     public void execute() throws EnvironmentManagerException, PeerException
     {
         Set<Host> hosts = Sets.newHashSet();
+
         hosts.addAll( environment.getContainerHosts() );
-        if ( hosts.size() > 1 )
+
+        if ( hosts.size() > 1 && topology.registerHosts() )
         {
             registerHosts( hosts );
         }

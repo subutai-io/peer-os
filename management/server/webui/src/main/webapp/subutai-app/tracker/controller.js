@@ -43,7 +43,7 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 		.withOption('stateSave', true);
 
 	vm.dtColumns = [
-		DTColumnBuilder.newColumn('createDate').withTitle('Date'),
+		DTColumnBuilder.newColumn('createDate').withTitle('Date').renderWith(dateHTML),
 		DTColumnBuilder.newColumn('description').withTitle('Operation'),
 		DTColumnBuilder.newColumn(null).withTitle('Status').renderWith(statusHTML),
 		DTColumnBuilder.newColumn(null).withTitle('Logs').notSortable().renderWith(viewLogsButton),
@@ -74,6 +74,10 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 		return '<div class="b-status-icon b-status-icon_' + data.state + '" tooltips tooltip-template="' + data.state + '" tooltip-smart="true"></div>';
 	}
 
+	function dateHTML(data, type, full, meta) {
+		return '<div>' + moment( data.createDate ).format('MMM Do YY HH:mm:ss') + '</div>';
+	}
+
 	function viewLogsButton(data, type, full, meta) {
 		return '<a href class="b-btn b-btn_green" ng-click="trackerCtrl.viewLogs(\'' + data.id + '\')">View logs</a>';
 	}
@@ -92,17 +96,126 @@ function TrackerCtrl(trackerSrv, $scope, $rootScope, DTOptionsBuilder, DTColumnB
 			scope: $scope
 		});
 
-		trackerSrv.getOperation(vm.selectedModule, id).success(function (data) {
-			var logsArray = data.log.split(/(?:\r\n|\r|\n)/g);
-			var logs = [];
-			for(var i = 0; i < logsArray.length; i++) {
-				var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
-				currentLog.date = moment(currentLog.date).format('HH:mm:ss');
-				logs.push(currentLog);
-			}
-			vm.currentLog = logs;
-			console.log(vm.currentLog);
-		});
+		getLogById(id);
+	}
+
+	function checkLastLog(status, log) {
+		if(log === undefined || log === null) log = false;
+		var lastLog = vm.currentLog[vm.currentLog.length - 1];
+
+		if(log) {
+			var logObj = JSON.parse(log.substring(0, log.length - 1));
+			lastLog.time = moment(logObj.date).format('HH:mm:ss');
+		} else {
+			lastLog.time = moment().format('HH:mm:ss');
+		}
+
+		if(status === true) {
+			lastLog.status = 'success';
+			lastLog.classes = ['fa-check', 'g-text-green'];
+		} else {
+			lastLog.status = 'success';
+			lastLog.classes = ['fa-times', 'g-text-red'];
+		}
+	}
+
+	function getLogById(id, checkLast, prevLogs) {
+		if(checkLast === undefined || checkLast === null) checkLast = false;
+		if(prevLogs === undefined || prevLogs === null) prevLogs = false;
+		trackerSrv.getOperation(vm.selectedModule, id)
+			.success(function (data) {
+				if(data.state == 'RUNNING') {
+
+					if(checkLast) {
+						checkLastLog(true);
+					}
+
+					var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+					var result = [];
+					var i = 0;
+					if(prevLogs) {
+						i = prevLogs.length;
+						if(logs.length > prevLogs.length) {
+							checkLastLog(true);
+						}
+					}
+					for(i; i < logs.length; i++) {
+
+						var logCheck = logs[i].replace(/ /g,'');
+						if(logCheck.length > 0) {
+
+							var logObj = JSON.parse(logs[i].substring(0, logs[i].length - 1));
+							var logTime = moment(logObj.date).format('HH:mm:ss');
+
+							var logStatus = 'success';
+							var logClasses = ['fa-check', 'g-text-green'];
+
+							if(i+1 == logs.length) {
+								logTime = '';
+								logStatus = 'in-progress';
+								logClasses = ['fa-spinner', 'fa-pulse'];
+							}
+
+							var  currentLog = {
+								"time": logTime,
+								"status": logStatus,
+								"classes": logClasses,
+								"log": logObj.log
+							};
+							result.push(currentLog);
+
+						}
+					}
+
+					vm.currentLog = vm.currentLog.concat(result);
+
+					setTimeout(function() {
+						getLogById(id, false, logs);
+					}, 2000);
+
+					return result;
+				} else {
+					if(!prevLogs) {
+						var logsArray = data.log.split(/(?:\r\n|\r|\n)/g);
+						var logs = [];
+						for(var i = 0; i < logsArray.length; i++) {
+							var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
+							currentLog.time = moment(currentLog.date).format('HH:mm:ss');
+
+							currentLog.classes = ['fa-check', 'g-text-green'];
+							if(currentLog.state == 'FAILED') {
+								currentLog.classes = ['fa-times', 'g-text-red'];
+							}
+
+							logs.push(currentLog);
+						}
+						vm.currentLog = logs;
+					} else {
+						if(data.state == 'FAILED') {
+							checkLastLog(false);
+						} else {
+
+							if(prevLogs) {
+								var logs = data.log.split(/(?:\r\n|\r|\n)/g);
+								if(logs.length > prevLogs.length) {
+									checkLastLog(true, logs[logs.length-1]);
+								}
+							} else {
+								checkLastLog(true);
+							}
+							var currentLog = {
+								"time": moment().format('HH:mm:ss'),
+								"status": 'success',
+								"classes": ['fa-check', 'g-text-green'],
+								"log": 'Your environment has been built successfully'
+							};
+							vm.currentLog.push(currentLog);						
+						}
+					}
+				}
+			}).error(function(error) {
+				console.log(error);
+			});
 	}
 
 	function getDateInStringFormat() {

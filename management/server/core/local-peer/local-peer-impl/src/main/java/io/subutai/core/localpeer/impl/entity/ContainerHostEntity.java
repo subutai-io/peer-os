@@ -1,24 +1,16 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -68,11 +60,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Enumerated( EnumType.STRING )
     private ContainerSize containerSize = ContainerSize.SMALL;
 
-
-    @ElementCollection( targetClass = String.class, fetch = FetchType.EAGER )
-    private Set<String> tags = new HashSet<>();
-
-
     @Transient
     private ContainerId containerId;
 
@@ -119,7 +106,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-
     public EnvironmentId getEnvironmentId()
     {
         return new EnvironmentId( environmentId );
@@ -144,29 +130,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public Peer getPeer()
     {
         return parent.getPeer();
-    }
-
-
-    @Override
-    public void addTag( final String tag )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
-        this.tags.add( tag );
-    }
-
-
-    @Override
-    public void removeTag( final String tag )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
-        this.tags.remove( tag );
-    }
-
-
-    @Override
-    public Set<String> getTags()
-    {
-        return this.tags;
     }
 
 
@@ -268,20 +231,6 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
         getPeer().setQuota( this.getContainerId(), containerQuota );
-    }
-
-
-    @Override
-    public Set<Integer> getCpuSet() throws PeerException
-    {
-        return getPeer().getCpuSet( this );
-    }
-
-
-    @Override
-    public void setCpuSet( final Set<Integer> cpuSet ) throws PeerException
-    {
-        getPeer().setCpuSet( this, cpuSet );
     }
 
 

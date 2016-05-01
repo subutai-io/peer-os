@@ -81,7 +81,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -686,31 +685,5 @@ public class LocalPeerImplTest
         doThrow( new QuotaException( "" ) ).when( quotaManager ).getQuota( containerId );
 
         localPeer.getQuota( containerId );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetCpuSet() throws Exception
-    {
-        localPeer.getCpuSet( containerHost );
-
-        verify( quotaManager ).getCpuSet( containerId );
-
-        doThrow( new QuotaException() ).when( quotaManager ).getCpuSet( containerId );
-
-        localPeer.getCpuSet( containerHost );
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testSetCpuSet() throws Exception
-    {
-        localPeer.setCpuSet( containerHost, Sets.newHashSet( QUOTA ) );
-
-        verify( quotaManager ).setCpuSet( eq( containerId ), anySet() );
-
-        doThrow( new QuotaException() ).when( quotaManager ).setCpuSet( eq( containerId ), anySet() );
-
-        localPeer.setCpuSet( containerHost, Sets.newHashSet( QUOTA ) );
     }
 }

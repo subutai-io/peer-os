@@ -64,23 +64,23 @@ public class BazaarImpl implements Bazaar
     @Override
     public void installPlugin( String name, String version, String kar, String url, String uid ) throws HubPluginException
     {
-		this.integration.installPlugin (kar);
+		this.integration.installPlugin (kar, name);
         this.configDataService.savePlugin( name, version, kar, url, uid );
     }
 
 
     @Override
-    public void uninstallPlugin( Long id, String kar, String name )
+    public void uninstallPlugin( Long id, String name )
     {
-        this.integration.uninstallPlugin( kar, name );
+        this.integration.uninstallPlugin( name );
         this.configDataService.deletePlugin( id );
     }
 
 	@Override
 	public void restorePlugin (Long id, String name, String version, String kar, String url, String uid) throws HubPluginException
 	{
-		this.integration.uninstallPlugin (kar, name);
-		this.integration.installPlugin (kar);
+		this.integration.uninstallPlugin (name);
+		this.integration.installPlugin (kar, name);
 		this.configDataService.deletePlugin (id);
 		this.configDataService.savePlugin( name, version, kar, url, uid );
 	}

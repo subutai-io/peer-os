@@ -13,6 +13,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 	var vm = this;
 	vm.activeTab = "hub";
 	vm.changeTab = changeTab;
+	vm.running = false;
 	function changeTab (tab) {
 		vm.activeTab = tab;
 		BazaarSrv.getInstalledHubPlugins().success (function (data) {
@@ -31,7 +32,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					}
 				}
 				for (var i = 0; i < vm.plugins.length; ++i) {
-					vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 					vm.plugins[i].installed = false;
 					vm.plugins[i].restore = false;
 					for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
@@ -94,6 +94,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				vm.notRegistered = false;*/
 				BazaarSrv.getHubPlugins().success (function (data) {
 					vm.plugins = data.productsDto;
+					console.log (vm.plugins);
 					if (vm.plugins === undefined || vm.plugins === "") {
 						vm.plugins = [];
 					}
@@ -116,7 +117,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 								}
 							}
 							for (var i = 0; i < vm.plugins.length; ++i) {
-								vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 								vm.plugins[i].installed = false;
 								vm.plugins[i].restore = false;
 								for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
@@ -202,7 +202,6 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 					}
 				}
 				for (var i = 0; i < vm.plugins.length; ++i) {
-					vm.plugins[i].img = "https://s3-eu-west-1.amazonaws.com/subutai-hub/products/" + vm.plugins[i].id + "/logo/logo.png";
 					vm.plugins[i].installed = false;
 					vm.plugins[i].restore = false;
 					for (var j = 0; j < vm.installedHubPlugins.length; ++j) {
@@ -562,298 +561,328 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 
 	vm.installPlugin = installPlugin;
 	function installPlugin (plugin) {
-		plugin.installButton.options.callback = function (instance) {
-			var arr = plugin.dependencies.slice();
-			var names = [];
-			for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
-				for (var j = 0; j < plugin.dependencies.length; ++j) {
-					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
-						var index = arr.indexOf (plugin.dependencies[j]);
-						arr.splice (index, 1);
-					}
-				}
-			}
-			var nameCollector = function (a, start) {
-			    if (start) {
-			        for (var i = 0; i < a.length; ++i) {
-                        for (var j = 0; j < vm.plugins.length; ++j) {
-                            if (a[i] === vm.plugins[j].id) {
-                                nameCollector (vm.plugins[j].dependencies, false);
-                                names.push (vm.plugins[j].name);
-                                break;
+	    if (vm.running) {
+            plugin.installButton.options.callback = function (instance) {
+                instance.stop (-1);
+            }
+	    }
+	    else {
+	        vm.running = true;
+            plugin.installButton.options.callback = function (instance) {
+                var arr = plugin.dependencies.slice();
+                var names = [];
+                for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                    for (var j = 0; j < plugin.dependencies.length; ++j) {
+                        if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
+                            var index = arr.indexOf (plugin.dependencies[j]);
+                            arr.splice (index, 1);
+                        }
+                    }
+                }
+                var nameCollector = function (a, start) {
+                    if (start) {
+                        for (var i = 0; i < a.length; ++i) {
+                            for (var j = 0; j < vm.plugins.length; ++j) {
+                                if (a[i] === vm.plugins[j].id) {
+                                    nameCollector (vm.plugins[j].dependencies, false);
+                                    names.push (vm.plugins[j].name);
+                                    break;
+                                }
                             }
                         }
                     }
-			    }
-			    else {
-                    var arr = a.slice();
-                    for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
-                        for (var j = 0; j < a.length; ++j) {
-                            if (vm.installedHubPlugins[i].uid === a[j] && vm.installedHubPlugins[i].restore === false) {
-                                var index = arr.indexOf (a[j]);
-                                arr.splice (index, 1);
+                    else {
+                        var arr = a.slice();
+                        for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                            for (var j = 0; j < a.length; ++j) {
+                                if (vm.installedHubPlugins[i].uid === a[j] && vm.installedHubPlugins[i].restore === false) {
+                                    var index = arr.indexOf (a[j]);
+                                    arr.splice (index, 1);
+                                }
                             }
                         }
-                    }
-                    for (var i = 0; i < arr.length; ++i) {
-                        for (var j = 0; j < vm.plugins.length; ++j) {
-                            if (arr[i] === vm.plugins[j].id) {
-                                nameCollector (vm.plugins[j].dependencies, false);
-                                names.push (vm.plugins[j].name);
-                                break;
+                        for (var i = 0; i < arr.length; ++i) {
+                            for (var j = 0; j < vm.plugins.length; ++j) {
+                                if (arr[i] === vm.plugins[j].id) {
+                                    nameCollector (vm.plugins[j].dependencies, false);
+                                    names.push (vm.plugins[j].name);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-			}
-			nameCollector (arr, true);
-			if (arr.length > 0) {
-			    var notification_text = "It seems that there are dependencies that need to be installed. Are you sure you want to continue?\n\nPlugins to be installed: " + names[0];
-			    for (var i = 1; i < names.length; ++i) {
-			        notification_text += ", " + names[i];
-			    }
-				var previousWindowKeyDown = window.onkeydown;
-				SweetAlert.swal({
-					title: "Additional dependencies",
-					text: notification_text,
-					type: "warning",
-					showCancelButton: true,
-					confirmButtonColor: "#ff3f3c",
-					confirmButtonText: "Install",
-					cancelButtonText: "Cancel",
-					closeOnConfirm: true,
-					closeOnCancel: true,
-					showLoaderOnConfirm: false
-				},
-				function (isConfirm) {
-					window.onkeydown = previousWindowKeyDown;
-					if (isConfirm) {
-						var progress = 0,
-							interval = setInterval (function() {
-								progress = Math.min (progress + Math.random() * 0.1, 0.99);
-								instance.setProgress (progress);
-			/*					if( progress === 0.99 ) {
-									progress = 1;
-									instance.stop(  -1 );
-									clearInterval( interval );
-								}*/
-							}, 150);
-						var installPluginDependencies = function (dependencies, callback) {
-							var arr = dependencies.slice();
-							for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
-								for (var j = 0; j < dependencies.length; ++j) {
-									if (vm.installedHubPlugins[i].uid === dependencies[j] && vm.installedHubPlugins[i].restore === false) {
-										var index = arr.indexOf (dependencies[j]);
-										arr.splice (index, 1);
-									}
-								}
-							}
-							for (var i = 0; i < arr.length; ++i) {
-								for (var j = 0; j < vm.plugins.length; ++j) {
-									if (arr[i] === vm.plugins[j].id) {
-										installPluginDependencies (vm.plugins[j].dependencies, function() {
-											return;
-										});
-										if (vm.plugins[j].restore === false) {
-											BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
-												callback();
-											});
-										}
-										else {
-											BazaarSrv.restoreHubPlugin (vm.plugins[j]).success (function (data) {;
-												callback();
-											});
-										}
-										break;
-									}
-								}
-							}
-						}
-						installPluginDependencies (arr, function() {
-							setTimeout (function() {
-								BazaarSrv.installHubPlugin (plugin).success (function (data) {
-									setTimeout (function() {
-										progress = 1;
-										instance.stop (1);
-										clearInterval (interval);
-										setTimeout (function() {
-											localStorage.setItem ("bazaarScroll", plugin.id);
-											$rootScope.$emit('reloadPluginsStates');
-										}, 2000);
-									}, 2000);
-								}).error (function (error) {
-									instance.stop (-1);
-									clearInterval (interval);
-								});
-							}, 2000);
-						});
-					}
-					else {
-						instance.stop (-1);
-					}
-				});
-			}
-			else {
-				var progress = 0,
-					interval = setInterval (function() {
-						progress = Math.min (progress + Math.random() * 0.1, 0.99);
-						instance.setProgress (progress);
-	/*					if( progress === 0.99 ) {
-							progress = 1;
-							instance.stop(  1 );
-							clearInterval( interval );
-						}*/
-					}, 150);
-				BazaarSrv.installHubPlugin (plugin).success (function (data) {
-					setTimeout (function() {
-						progress = 1;
-						instance.stop (1);
-						clearInterval (interval);
-						setTimeout (function() {
-							localStorage.setItem ("bazaarScroll", plugin.id);
-							$rootScope.$emit('reloadPluginsStates');
-						}, 2000);
-					}, 2000);
-				}).error (function (error) {
-					instance.stop (-1);
-					clearInterval (interval);
-				});
-			}
-		};
+                nameCollector (arr, true);
+                if (arr.length > 0) {
+                    var notification_text = "It seems that there are dependencies that need to be installed. Are you sure you want to continue?\n\nPlugins to be installed: " + names[0];
+                    for (var i = 1; i < names.length; ++i) {
+                        notification_text += ", " + names[i];
+                    }
+                    var previousWindowKeyDown = window.onkeydown;
+                    SweetAlert.swal({
+                        title: "Additional dependencies",
+                        text: notification_text,
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#ff3f3c",
+                        confirmButtonText: "Install",
+                        cancelButtonText: "Cancel",
+                        closeOnConfirm: true,
+                        closeOnCancel: true,
+                        showLoaderOnConfirm: false
+                    },
+                    function (isConfirm) {
+                        window.onkeydown = previousWindowKeyDown;
+                        if (isConfirm) {
+                            var progress = 0,
+                                interval = setInterval (function() {
+                                    progress = Math.min (progress + Math.random() * 0.1, 0.99);
+                                    instance.setProgress (progress);
+                /*					if( progress === 0.99 ) {
+                                        progress = 1;
+                                        instance.stop(  -1 );
+                                        clearInterval( interval );
+                                    }*/
+                                }, 150);
+                            var installPluginDependencies = function (dependencies, callback) {
+                                var arr = dependencies.slice();
+                                for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                                    for (var j = 0; j < dependencies.length; ++j) {
+                                        if (vm.installedHubPlugins[i].uid === dependencies[j] && vm.installedHubPlugins[i].restore === false) {
+                                            var index = arr.indexOf (dependencies[j]);
+                                            arr.splice (index, 1);
+                                        }
+                                    }
+                                }
+                                for (var i = 0; i < arr.length; ++i) {
+                                    for (var j = 0; j < vm.plugins.length; ++j) {
+                                        if (arr[i] === vm.plugins[j].id) {
+                                            installPluginDependencies (vm.plugins[j].dependencies, function() {
+                                                return;
+                                            });
+                                            if (vm.plugins[j].restore === false) {
+                                                BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
+                                                    callback();
+                                                });
+                                            }
+                                            else {
+                                                BazaarSrv.restoreHubPlugin (vm.plugins[j]).success (function (data) {;
+                                                    callback();
+                                                });
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            installPluginDependencies (arr, function() {
+                                setTimeout (function() {
+                                    BazaarSrv.installHubPlugin (plugin).success (function (data) {
+                                        setTimeout (function() {
+                                            progress = 1;
+                                            instance.stop (1);
+                                            clearInterval (interval);
+                                            setTimeout (function() {
+                                                localStorage.setItem ("bazaarScroll", plugin.id);
+                                                $rootScope.$emit('reloadPluginsStates');
+                                            }, 2000);
+                                        }, 2000);
+                                    }).error (function (error) {
+                                        instance.stop (-1);
+                                        clearInterval (interval);
+                                        vm.running = false;
+                                    });
+                                }, 2000);
+                            });
+                        }
+                        else {
+                            instance.stop (-1);
+                            vm.running = false;
+                        }
+                    });
+                }
+                else {
+                    var progress = 0,
+                        interval = setInterval (function() {
+                            progress = Math.min (progress + Math.random() * 0.1, 0.99);
+                            instance.setProgress (progress);
+        /*					if( progress === 0.99 ) {
+                                progress = 1;
+                                instance.stop(  1 );
+                                clearInterval( interval );
+                            }*/
+                        }, 150);
+                    BazaarSrv.installHubPlugin (plugin).success (function (data) {
+                        setTimeout (function() {
+                            progress = 1;
+                            instance.stop (1);
+                            clearInterval (interval);
+                            setTimeout (function() {
+                                localStorage.setItem ("bazaarScroll", plugin.id);
+                                $rootScope.$emit('reloadPluginsStates');
+                            }, 2000);
+                        }, 2000);
+                    }).error (function (error) {
+                        instance.stop (-1);
+                        clearInterval (interval);
+                        vm.running = false;
+                    });
+                }
+            };
+        }
 	}
 
 
 	vm.uninstallPlugin = uninstallPlugin;
 	function uninstallPlugin (plugin) {
-		plugin.launch = false;
-		plugin.uninstallButton.options.callback = function (instance) {
-			var progress = 0,
-				interval = setInterval (function() {
-					progress = Math.min (progress + Math.random() * 0.1, 0.99);
-					instance.setProgress (progress);
-/*					if( progress === 0.99 ) {
-						progress = 1;
-						instance.stop(  1 );
-						clearInterval( interval );
-					}*/
-				}, 150);
-			BazaarSrv.uninstallHubPlugin (plugin).success (function (data) {
-				setTimeout (function() {
-					progress = 1;
-					instance.stop (1);
-					clearInterval (interval);
-					setTimeout (function() {
-						localStorage.setItem ("bazaarScroll", plugin.id);
-						$rootScope.$emit('reloadPluginsStates');
-					}, 2000);
-				}, 2000);
-			}).error (function (error) {
-				instance.stop (-1);
-				clearInterval (interval);
-			});
-		};
+        if (vm.running) {
+            plugin.uninstallButton.options.callback = function (instance) {
+                instance.stop (-1);
+            }
+        }
+        else {
+            vm.running = true
+            plugin.launch = false;
+            plugin.uninstallButton.options.callback = function (instance) {
+                var progress = 0,
+                    interval = setInterval (function() {
+                        progress = Math.min (progress + Math.random() * 0.1, 0.99);
+                        instance.setProgress (progress);
+    /*					if( progress === 0.99 ) {
+                            progress = 1;
+                            instance.stop(  1 );
+                            clearInterval( interval );
+                        }*/
+                    }, 150);
+                BazaarSrv.uninstallHubPlugin (plugin).success (function (data) {
+                    setTimeout (function() {
+                        progress = 1;
+                        instance.stop (1);
+                        clearInterval (interval);
+                        setTimeout (function() {
+                            localStorage.setItem ("bazaarScroll", plugin.id);
+                            $rootScope.$emit('reloadPluginsStates');
+                        }, 2000);
+                    }, 2000);
+                }).error (function (error) {
+                    instance.stop (-1);
+                    clearInterval (interval);
+                    vm.running = false;
+                });
+            };
+        }
 	}
 
 
 	vm.restorePlugin = restorePlugin;
 	function restorePlugin (plugin) {
-		plugin.restoreButton.options.callback = function (instance) {
-			var arr = plugin.dependencies.slice();
-			for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
-				for (var j = 0; j < plugin.dependencies.length; ++j) {
-					if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
-						var index = arr.indexOf (plugin.dependencies[j]);
-						arr.splice (index, 1);
-					}
-				}
-			}
-			if (arr.length > 0) {
-				var progress = 0,
-					interval = setInterval (function() {
-						progress = Math.min (progress + Math.random() * 0.1, 0.99);
-						instance.setProgress (progress);
-	/*					if( progress === 0.99 ) {
-							progress = 1;
-							instance.stop(  -1 );
-							clearInterval( interval );
-						}*/
-					}, 150);
-				var installPluginDependencies = function (dependencies, callback) {
-					var arr = dependencies.slice();
-					for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
-						for (var j = 0; j < dependencies.length; ++j) {
-							if (vm.installedHubPlugins[i].uid === dependencies[j] && vm.installedHubPlugins[i].restore === false) {
-								var index = arr.indexOf (dependencies[j]);
-								arr.splice (index, 1);
-							}
-						}
-					}
-					for (var i = 0; i < arr.length; ++i) {
-						for (var j = 0; j < vm.plugins.length; ++j) {
-							if (arr[i] === vm.plugins[j].id) {
-								installPluginDependencies (vm.plugins[j].dependencies, function() {
-									return;
-								});
-								if (vm.plugins[j].restore === false) {
-									BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
-										callback();
-									});
-								}
-								else {
-									BazaarSrv.restoreHubPlugin (vm.plugins[j]).success (function (data) {;
-										callback();
-									});
-								}
-							}
-						}
-					}
-				}
-				installPluginDependencies (arr, function() {
-					setTimeout (function() {
-						BazaarSrv.restoreHubPlugin (plugin).success (function (data) {
-							setTimeout (function() {
-								progress = 1;
-								instance.stop (1);
-								clearInterval (interval);
-								setTimeout (function() {
-									localStorage.setItem ("bazaarScroll", plugin.id);
-									$rootScope.$emit('reloadPluginsStates');
-								}, 2000);
-							}, 2000);
-						}).error (function (error) {
-							instance.stop (-1);
-							clearInterval (interval);
-						});
-					}, 2000);
-				});
-			}
-			else {
-				var progress = 0,
-					interval = setInterval (function() {
-						progress = Math.min (progress + Math.random() * 0.1, 0.99);
-						instance.setProgress (progress);
-	/*					if( progress === 0.99 ) {
-							progress = 1;
-							instance.stop(  1 );
-							clearInterval( interval );
-						}*/
-					}, 150);
-				BazaarSrv.restoreHubPlugin (plugin).success (function (data) {
-					setTimeout (function() {
-						progress = 1;
-						instance.stop (1);
-						clearInterval (interval);
-						setTimeout (function() {
-							localStorage.setItem ("bazaarScroll", plugin.id);
-							$rootScope.$emit('reloadPluginsStates');
-						}, 2000);
-					}, 2000);
-				}).error (function (error) {
-					instance.stop (-1);
-					clearInterval (interval);
-				});
-			}
-		};
+        if (vm.running) {
+            plugin.restoreButton.options.callback = function (instance) {
+                instance.stop (-1);
+            }
+        }
+        else {
+            vm.running = true;
+            plugin.restoreButton.options.callback = function (instance) {
+                var arr = plugin.dependencies.slice();
+                for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                    for (var j = 0; j < plugin.dependencies.length; ++j) {
+                        if (vm.installedHubPlugins[i].uid === plugin.dependencies[j] && vm.installedHubPlugins[i].restore === false) {
+                            var index = arr.indexOf (plugin.dependencies[j]);
+                            arr.splice (index, 1);
+                        }
+                    }
+                }
+                if (arr.length > 0) {
+                    var progress = 0,
+                        interval = setInterval (function() {
+                            progress = Math.min (progress + Math.random() * 0.1, 0.99);
+                            instance.setProgress (progress);
+        /*					if( progress === 0.99 ) {
+                                progress = 1;
+                                instance.stop(  -1 );
+                                clearInterval( interval );
+                            }*/
+                        }, 150);
+                    var installPluginDependencies = function (dependencies, callback) {
+                        var arr = dependencies.slice();
+                        for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
+                            for (var j = 0; j < dependencies.length; ++j) {
+                                if (vm.installedHubPlugins[i].uid === dependencies[j] && vm.installedHubPlugins[i].restore === false) {
+                                    var index = arr.indexOf (dependencies[j]);
+                                    arr.splice (index, 1);
+                                }
+                            }
+                        }
+                        for (var i = 0; i < arr.length; ++i) {
+                            for (var j = 0; j < vm.plugins.length; ++j) {
+                                if (arr[i] === vm.plugins[j].id) {
+                                    installPluginDependencies (vm.plugins[j].dependencies, function() {
+                                        return;
+                                    });
+                                    if (vm.plugins[j].restore === false) {
+                                        BazaarSrv.installHubPlugin (vm.plugins[j]).success (function (data) {;
+                                            callback();
+                                        });
+                                    }
+                                    else {
+                                        BazaarSrv.restoreHubPlugin (vm.plugins[j]).success (function (data) {;
+                                            callback();
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    installPluginDependencies (arr, function() {
+                        setTimeout (function() {
+                            BazaarSrv.restoreHubPlugin (plugin).success (function (data) {
+                                setTimeout (function() {
+                                    progress = 1;
+                                    instance.stop (1);
+                                    clearInterval (interval);
+                                    setTimeout (function() {
+                                        localStorage.setItem ("bazaarScroll", plugin.id);
+                                        $rootScope.$emit('reloadPluginsStates');
+                                    }, 2000);
+                                }, 2000);
+                            }).error (function (error) {
+                                instance.stop (-1);
+                                clearInterval (interval);
+                                vm.running = false;
+                            });
+                        }, 2000);
+                    });
+                }
+                else {
+                    var progress = 0,
+                        interval = setInterval (function() {
+                            progress = Math.min (progress + Math.random() * 0.1, 0.99);
+                            instance.setProgress (progress);
+        /*					if( progress === 0.99 ) {
+                                progress = 1;
+                                instance.stop(  1 );
+                                clearInterval( interval );
+                            }*/
+                        }, 150);
+                    BazaarSrv.restoreHubPlugin (plugin).success (function (data) {
+                        setTimeout (function() {
+                            progress = 1;
+                            instance.stop (1);
+                            clearInterval (interval);
+                            setTimeout (function() {
+                                localStorage.setItem ("bazaarScroll", plugin.id);
+                                $rootScope.$emit('reloadPluginsStates');
+                            }, 2000);
+                        }, 2000);
+                    }).error (function (error) {
+                        instance.stop (-1);
+                        clearInterval (interval);
+                        vm.running = false;
+                    });
+                }
+            };
+        }
 	}
 
 

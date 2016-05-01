@@ -21,7 +21,6 @@ import com.google.gson.GsonBuilder;
 import ai.subut.kurjun.metadata.common.raw.RawMetadata;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
-import io.subutai.core.kurjun.api.Utils;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.rest.RestManagerBase;
 
@@ -52,14 +51,11 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
         try
         {
-
-            byte[] md5bytes = decodeMd5( md5 );
-
-            RawMetadata raw = ( RawMetadata ) rawManager.getInfo( repository, md5bytes );
+            RawMetadata raw = ( RawMetadata ) rawManager.getInfo( repository, md5 );
 
             if ( raw != null )
             {
-                InputStream is = rawManager.getFile( repository, md5bytes );
+                InputStream is = rawManager.getFile( repository, md5 );
 
                 if ( is != null )
                 {
@@ -97,10 +93,10 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
                 repository = "raw";
             }
             rawMetadata.setName( name );
-            rawMetadata.setMd5Sum( Utils.MD5.toByteArray( md5 ) );
+            rawMetadata.setMd5Sum( md5 );
             rawMetadata.setFingerprint( repository );
 
-            Metadata metadata = ( Metadata ) rawManager.getInfo( repository, decodeMd5( md5 ) );
+            Metadata metadata = ( Metadata ) rawManager.getInfo( repository, md5 );
 
             if ( metadata != null )
             {
@@ -168,7 +164,7 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
             if ( rawMetadata != null )
             {
-                return Response.ok( rawMetadata ).build();
+                return Response.ok( rawMetadata.getId() + " uploaded successfully" ).build();
             }
             else
             {
@@ -200,11 +196,11 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
         try
         {
-            byte[] md5bytes = decodeMd5( md5 );
 
-            if ( md5bytes != null )
+
+            if ( md5 != null )
             {
-                boolean deleted = rawManager.delete( repository, md5bytes );
+                boolean deleted = rawManager.delete( repository, md5 );
                 if ( deleted )
                 {
                     return Response.ok( "File deleted" ).build();

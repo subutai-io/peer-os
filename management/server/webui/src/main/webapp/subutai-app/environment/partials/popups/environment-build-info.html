@@ -62,6 +62,12 @@
 				Build
 			</button>
 
+			<a class="b-btn b-btn_green js-environment-build" 
+			ng-if="environmentSimpleViewCtrl.buildCompleted && environmentSimpleViewCtrl.selectedPlugin" 
+			ui-sref="{{ environmentSimpleViewCtrl.selectedPlugin.name.toLowerCase() }}">
+				Plugin
+			</a>
+
 			<button class="b-btn b-btn_green js-environment-build" 
 			ng-if="environmentSimpleViewCtrl.buildCompleted" 
 			ng-click="environmentSimpleViewCtrl.closePopup()">

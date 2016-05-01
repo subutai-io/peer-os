@@ -34,7 +34,7 @@ public class HostUtil
 
     private Map<String, ExecutorService> taskExecutors = Maps.newConcurrentMap();
 
-    private final Map<String, Set<EnvironmentTaskFuture>> environmentTasksFuturesMap = Maps.newConcurrentMap();
+    private final Map<String, Map<Task, EnvironmentTaskFuture>> environmentTasksFuturesMap = Maps.newConcurrentMap();
 
 
     public Set<Task> getAllTasks()
@@ -47,13 +47,13 @@ public class HostUtil
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        Set<EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
+        Map<Task, EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.remove( environmentId );
 
-        boolean hasActiveTasks = !CollectionUtil.isCollectionEmpty( environmentTaskFutures );
+        boolean hasActiveTasks = environmentTaskFutures != null && !environmentTaskFutures.isEmpty();
 
         if ( hasActiveTasks )
         {
-            for ( EnvironmentTaskFuture environmentTaskFuture : environmentTaskFutures )
+            for ( EnvironmentTaskFuture environmentTaskFuture : environmentTaskFutures.values() )
             {
                 environmentTaskFuture.getTask().setTaskState( Task.TaskState.CANCELLED );
 
@@ -123,12 +123,9 @@ public class HostUtil
             }
         }
 
-        int doneTasks = 0;
-
-        int totalTasks = taskFutures.size();
 
         futuresLoop:
-        while ( !Thread.interrupted() && doneTasks < totalTasks && !taskFutures.isEmpty() )
+        while ( !Thread.interrupted() && !taskFutures.isEmpty() )
         {
 
             Iterator<Future<Boolean>> listIterator = taskFutures.iterator();
@@ -142,7 +139,6 @@ public class HostUtil
                 {
                     if ( taskFuture.isDone() )
                     {
-                        doneTasks++;
 
                         listIterator.remove();
 
@@ -491,12 +487,17 @@ public class HostUtil
                     {
                         synchronized ( environmentTasksFuturesMap )
                         {
-                            Set<EnvironmentTaskFuture> environmentTaskFutures =
+                            Map<Task, EnvironmentTaskFuture> environmentTaskFutures =
                                     environmentTasksFuturesMap.get( environmentId );
 
                             if ( environmentTaskFutures != null )
                             {
-                                environmentTaskFutures.remove( environmentId );
+                                environmentTaskFutures.remove( task );
+
+                                if ( environmentTaskFutures.isEmpty() )
+                                {
+                                    environmentTasksFuturesMap.remove( environmentId );
+                                }
                             }
                         }
                     }
@@ -509,16 +510,17 @@ public class HostUtil
             //add task future to map
             synchronized ( environmentTasksFuturesMap )
             {
-                Set<EnvironmentTaskFuture> environmentTaskFutures = environmentTasksFuturesMap.get( environmentId );
+                Map<Task, EnvironmentTaskFuture> environmentTaskFutures =
+                        environmentTasksFuturesMap.get( environmentId );
 
                 if ( environmentTaskFutures == null )
                 {
-                    environmentTaskFutures = Sets.newHashSet();
+                    environmentTaskFutures = Maps.newHashMap();
 
                     environmentTasksFuturesMap.put( environmentId, environmentTaskFutures );
                 }
 
-                environmentTaskFutures.add( new EnvironmentTaskFuture( task, taskFuture, environmentId ) );
+                environmentTaskFutures.put( task, new EnvironmentTaskFuture( task, taskFuture, environmentId ) );
             }
         }
 
@@ -526,14 +528,14 @@ public class HostUtil
     }
 
 
-    private static class EnvironmentTaskFuture
+    private class EnvironmentTaskFuture
     {
-        private final Task task;
+        private final HostUtil.Task task;
         private final Future future;
         private final String environmentId;
 
 
-        public EnvironmentTaskFuture( final Task task, final Future future, final String environmentId )
+        EnvironmentTaskFuture( final HostUtil.Task task, final Future future, final String environmentId )
         {
             this.task = task;
             this.future = future;
@@ -541,7 +543,7 @@ public class HostUtil
         }
 
 
-        public Task getTask()
+        public HostUtil.Task getTask()
         {
             return task;
         }
@@ -562,11 +564,6 @@ public class HostUtil
 
     public void dispose()
     {
-        allTasks.clear();
-
-        for ( ExecutorService executorService : taskExecutors.values() )
-        {
-            executorService.shutdownNow();
-        }
+        cancelAll();
     }
 }

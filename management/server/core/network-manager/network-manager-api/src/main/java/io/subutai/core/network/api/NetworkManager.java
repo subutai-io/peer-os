@@ -1,7 +1,11 @@
 package io.subutai.core.network.api;
 
 
+import java.util.Date;
+
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.JournalCtlLevel;
+import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnels;
@@ -37,11 +41,15 @@ public interface NetworkManager
 
     public P2PConnections getP2PConnections( Host host ) throws NetworkManagerException;
 
+    public String getP2pVersion( Host host ) throws NetworkManagerException;
+
+    public P2pLogs getP2pLogs( Host host, JournalCtlLevel logLevel, Date from, Date till )
+            throws NetworkManagerException;
 
     public void createTunnel( Host host, String tunnelName, String tunnelIp, int vlan, long vni )
             throws NetworkManagerException;
 
-    public Tunnels getTunnels( final Host host ) throws NetworkManagerException;
+    public Tunnels getTunnels( Host host ) throws NetworkManagerException;
 
 
     /**
@@ -71,8 +79,7 @@ public interface NetworkManager
     public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                String sslCertPath ) throws NetworkManagerException;
 
-    void setVlanDomain( int vLanId, String domain, String host, String sslCertPath )
-            throws NetworkManagerException;
+    void setVlanDomain( int vLanId, String domain, String host, String sslCertPath ) throws NetworkManagerException;
 
     /**
      * Checks if IP is in vlan reverse proxy domain

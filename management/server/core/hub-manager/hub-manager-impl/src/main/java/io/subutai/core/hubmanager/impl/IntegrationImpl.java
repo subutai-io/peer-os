@@ -51,6 +51,7 @@ import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.VehsProccessor;
+import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.network.api.NetworkManager;
@@ -156,6 +157,8 @@ public class IntegrationImpl implements Integration
                     new VehsProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
                             environmentUserHelper );
 
+            StateLinkProccessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
+
             heartbeatProcessor.addProccessor( vehsProccessor );
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
@@ -163,6 +166,8 @@ public class IntegrationImpl implements Integration
             AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
             heartbeatProcessor.addProccessor( appScaleProcessor );
+
+            heartbeatProcessor.addProccessor( tunnelProcessor );
 
             hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
@@ -256,7 +261,7 @@ public class IntegrationImpl implements Integration
         {
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
             WebClient client =
-                    configManager.getTrustedWebClientWithAuth( "/rest/v1/marketplace/products/public", "hub.subut.ai" );
+                    configManager.getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -285,13 +290,11 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void installPlugin( String url ) throws HubPluginException
+    public void installPlugin( String url, String name ) throws HubPluginException
     {
         try
         {
-            int indexOfStr = url.indexOf( "/package/" );
-            String fileName = url.substring( indexOfStr + 9, url.length() );
-            File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
+            File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
             URL website = new URL( url );
             FileUtils.copyURLToFile( website, file );
         }
@@ -304,18 +307,17 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void uninstallPlugin( final String url, final String name )
+    public void uninstallPlugin( final String name )
     {
-        int indexOfStr = url.indexOf( "/package/" );
-        String fileName = url.substring( indexOfStr + 9, url.length() );
-        File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + fileName );
+        File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        LOG.info (String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar");
         File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
             @Override
             public boolean accept( File pathname )
             {
-                return pathname.getName().matches( ".*" + name + ".*" );
+                return pathname.getName().matches( ".*" + name.toLowerCase() + ".*" );
             }
         } );
         if ( dirs != null )

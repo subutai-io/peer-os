@@ -22,6 +22,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -307,8 +308,7 @@ public class PeerWebClient
             remotePeer.checkRelation();
             final DateTimeParam startParam = new DateTimeParam( startTime );
             final DateTimeParam endParam = new DateTimeParam( endTime );
-            String path = String.format( "/hmetrics/%s/%s/%s/%s/%s", hostName, startParam.getDateString(),
-                    startParam.getTimeString(), endParam.getDateString(), endParam.getTimeString() );
+            String path = String.format( "/hmetrics/%s/%s/%s", hostName, startParam, endParam );
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
@@ -327,17 +327,17 @@ public class PeerWebClient
     }
 
 
-    public PeerResources getResourceLimits( final String peerId ) throws PeerException
+    public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
         Response response;
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/limits/%s", peerId );
+            String path = String.format( "/limits/%s", peerId.getId() );
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
-            client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
+
             response = client.get();
         }
         catch ( Exception e )
@@ -350,16 +350,17 @@ public class PeerWebClient
     }
 
 
-    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
         Response response;
         try
         {
             remotePeer.checkRelation();
-            String path = String.format( "/tunnels/%s", environmentId );
+            String path = String.format( "/tunnels/%s", environmentId.getId() );
+
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 60000, 1 );
             client.type( MediaType.APPLICATION_JSON );
-            client.accept( MediaType.TEXT_PLAIN );
+
             response = client.post( p2pIps );
         }
         catch ( Exception e )

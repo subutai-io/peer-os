@@ -6,7 +6,7 @@
   <parent>
     <artifactId>network-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC9-SNAPSHOT</version>
+    <version>4.0.0-RC11-SNAPSHOT</version>
   </parent>
 
   <artifactId>network-manager-api</artifactId>

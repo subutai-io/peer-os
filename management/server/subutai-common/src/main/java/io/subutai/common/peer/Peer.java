@@ -3,7 +3,6 @@ package io.subutai.common.peer;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
@@ -33,6 +32,9 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 
@@ -191,23 +193,6 @@ public interface Peer extends RelationLink
      */
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
 
-    /**
-     * Returns allowed cpus/cores ids on container
-     *
-     * @param host - container
-     *
-     * @return - allowed cpu set
-     */
-    public Set<Integer> getCpuSet( ContainerHost host ) throws PeerException;
-
-    /**
-     * Sets allowed cpus/cores on container
-     *
-     * @param host - container
-     * @param cpuSet - allowed cpu set
-     */
-    public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
-
 
     //networking
 
@@ -218,10 +203,8 @@ public interface Peer extends RelationLink
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers
-     *
-     * todo use EnvironmentId instead of string
      */
-    public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
+    public void setupTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
 
 
     /* **************************************************************
@@ -261,8 +244,7 @@ public interface Peer extends RelationLink
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
-    //todo use PeerId instead of string
-    PeerResources getResourceLimits( String peerId ) throws PeerException;
+    PeerResources getResourceLimits( PeerId peerId ) throws PeerException;
 
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
 
@@ -289,4 +271,9 @@ public interface Peer extends RelationLink
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 
     void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
+
+    SshKeys getSshKeys( EnvironmentId environmentId, SshEncryptionType sshEncryptionType ) throws PeerException;
+
+    SshKey createSshKey( EnvironmentId environmentId, ContainerId containerId, SshEncryptionType encType )
+            throws PeerException;
 }

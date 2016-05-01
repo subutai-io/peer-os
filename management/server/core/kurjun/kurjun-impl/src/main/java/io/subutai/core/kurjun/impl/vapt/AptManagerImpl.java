@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.codec.binary.Hex;
-
 import com.google.inject.Injector;
 
 import ai.subut.kurjun.ar.CompressionType;
@@ -273,7 +271,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public String getSerializedPackageInfo( String filename ) throws IllegalArgumentException
+    public String getSerializedPackageInfoByName( String filename ) throws IllegalArgumentException
     {
         SerializableMetadata meta = getPackageInfoByFilename( filename );
         return ( meta != null ) ? meta.serialize() : null;
@@ -281,7 +279,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public String getSerializedPackageInfo( byte[] md5 ) throws IllegalArgumentException
+    public String getSerializedPackageInfoByMd5( String md5 ) throws IllegalArgumentException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
@@ -316,7 +314,7 @@ public class AptManagerImpl implements AptManager
         try
         {
             Metadata meta = getLocalRepository().put( is );
-            return new URI( null, null, "/info", "md5=" + Hex.encodeHexString( meta.getMd5Sum() ), null );
+            return new URI( null, null, "/info", "md5=" +  meta.getMd5Sum(), null );
         }
         catch ( IOException | URISyntaxException ex )
         {
@@ -330,6 +328,7 @@ public class AptManagerImpl implements AptManager
     public List<AptPackage> list()
     {
         List<SerializableMetadata> list = unifiedRepository.listPackages();
+
         List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) )
                                        .collect( Collectors.toList() );
         return deflist;
@@ -337,7 +336,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public boolean delete( byte[] md5 ) throws IOException
+    public boolean delete( String md5 ) throws IOException
     {
         LocalRepository repo = getLocalRepository();
         try
@@ -354,14 +353,14 @@ public class AptManagerImpl implements AptManager
 
     private AptPackage convertToAptPackage( DefaultPackageMetadata meta )
     {
-        return new AptPackage( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+        return new AptPackage( meta.getMd5Sum(), meta.getName(), meta.getVersion(),
                 meta.getSource(), meta.getMaintainer(), meta.getArchitecture().name(), meta.getInstalledSize(),
                 meta.getDescription() );
     }
 
 
     @Override
-    public String getPackageInfo( byte[] md5, String name, String version )
+    public String getPackageInfo( String md5, String name, String version )
     {
         if ( md5 == null && name == null && version == null )
         {
@@ -383,7 +382,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public InputStream getPackage( byte[] md5 )
+    public InputStream getPackage( String md5 )
     {
         if ( md5 == null )
         {

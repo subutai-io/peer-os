@@ -101,6 +101,8 @@ public class WebClientBuilder
         String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
@@ -141,6 +143,8 @@ public class WebClientBuilder
         String effectiveUrl = String.format( ENVIRONMENT_URL_TEMPLATE, peerInfo.getIp(), peerInfo.getPublicSecurePort(),
                 ( path.startsWith( "/" ) ? path : "/" + path ) );
         WebClient client = WebClient.create( effectiveUrl, Arrays.asList( provider ) );
+        client.type( MediaType.APPLICATION_JSON );
+        client.accept( MediaType.APPLICATION_JSON );
         HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
