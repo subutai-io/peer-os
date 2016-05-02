@@ -13,7 +13,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -271,7 +270,7 @@ public class EnvironmentWebClient
     }
 
 
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
@@ -284,7 +283,7 @@ public class EnvironmentWebClient
 
         try
         {
-            response = client.post( sshPublicKeys );
+            response = client.post( sshKeys );
         }
         catch ( Exception e )
         {

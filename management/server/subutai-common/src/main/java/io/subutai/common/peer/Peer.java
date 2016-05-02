@@ -16,7 +16,6 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
@@ -260,10 +259,10 @@ public interface Peer extends RelationLink
 
     PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
-    SshKeys generateSshKeyForEnvironment( EnvironmentId environmentId, SshEncryptionType sshKeyType )
+    SshKeys readOrCreateSshKeysForEnvironment( EnvironmentId environmentId, SshEncryptionType sshKeyType )
             throws PeerException;
 
-    void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
+    void configureSshInEnvironment( EnvironmentId environmentId, SshKeys sshKeys ) throws PeerException;
 
     void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 

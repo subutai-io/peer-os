@@ -31,7 +31,6 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
@@ -308,8 +307,8 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public SshKeys generateSshKeyForEnvironment( final EnvironmentId environmentId, final SshEncryptionType sshKeyType )
-            throws PeerException
+    public SshKeys readOrCreateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                      final SshEncryptionType sshKeyType ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
@@ -319,14 +318,14 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkNotNull( sshPublicKeys, "SshPublicKey is null" );
-        Preconditions.checkArgument( !sshPublicKeys.isEmpty(), "No ssh keys" );
+        Preconditions.checkNotNull( sshKeys, "SshPublicKey is null" );
+        Preconditions.checkArgument( !sshKeys.isEmpty(), "No ssh keys" );
 
-        environmentWebClient.configureSshInEnvironment( environmentId, sshPublicKeys );
+        environmentWebClient.configureSshInEnvironment( environmentId, sshKeys );
     }
 
 

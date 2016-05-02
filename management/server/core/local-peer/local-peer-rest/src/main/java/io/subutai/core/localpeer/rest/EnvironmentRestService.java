@@ -12,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -80,8 +79,7 @@ public interface EnvironmentRestService
     @POST
     @Path( "{environmentId}/containers/sshkeys" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
-                                        SshPublicKeys sshPublicKeys );
+    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId, SshKeys sshKeys );
 
     @PUT
     @Path( "{environmentId}/containers/sshkeys/{encType}" )

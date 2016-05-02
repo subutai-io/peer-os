@@ -6,12 +6,10 @@ import java.util.concurrent.Callable;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -50,27 +48,31 @@ public class RegisterSshStep
         }
         else if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
         {
-            appendSshKeys( userKeys );
+            SshKeys sshKeys = new SshKeys();
+
+            sshKeys.addStringKeys( userKeys );
+
+            appendSshKeys( sshKeys );
         }
     }
 
 
     protected void exchangeSshKeys( Set<String> userKeys ) throws EnvironmentManagerException, PeerException
     {
-        final Set<String> sshKeys = Sets.newHashSet();
+        final SshKeys sshKeys = new SshKeys();
 
         if ( !CollectionUtil.isCollectionEmpty( userKeys ) )
         {
-            sshKeys.addAll( userKeys );
+            sshKeys.addStringKeys( userKeys );
         }
 
-        sshKeys.addAll( createSshKeys() );
+        sshKeys.addKeys( readOrCreateSshKeys().getKeys() );
 
         appendSshKeys( sshKeys );
     }
 
 
-    protected void appendSshKeys( final Set<String> sshKeys ) throws EnvironmentManagerException, PeerException
+    protected void appendSshKeys( final SshKeys sshKeys ) throws EnvironmentManagerException, PeerException
     {
         Set<Peer> peers = environment.getPeers();
 
@@ -83,7 +85,7 @@ public class RegisterSshStep
                 @Override
                 public Object call() throws Exception
                 {
-                    peer.configureSshInEnvironment( environment.getEnvironmentId(), new SshPublicKeys( sshKeys ) );
+                    peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
 
                     return null;
                 }
@@ -113,10 +115,10 @@ public class RegisterSshStep
     }
 
 
-    protected Set<String> createSshKeys() throws EnvironmentManagerException, PeerException
+    protected SshKeys readOrCreateSshKeys() throws EnvironmentManagerException, PeerException
     {
 
-        final Set<String> keys = Sets.newConcurrentHashSet();
+        final SshKeys allSshKeys = new SshKeys();
 
         Set<Peer> peers = environment.getPeers();
 
@@ -129,13 +131,10 @@ public class RegisterSshStep
                 @Override
                 public Object call() throws Exception
                 {
-                    SshKeys sshPublicKeys = peer.generateSshKeyForEnvironment( environment.getEnvironmentId(),
+                    SshKeys sshPublicKeys = peer.readOrCreateSshKeysForEnvironment( environment.getEnvironmentId(),
                             topology.getSshKeyType() );
 
-                    for ( SshKey sshKey : sshPublicKeys.getKeys() )
-                    {
-                        keys.add( sshKey.getPublicKey() );
-                    }
+                    allSshKeys.addKeys( sshPublicKeys.getKeys() );
 
                     return null;
                 }
@@ -163,6 +162,6 @@ public class RegisterSshStep
             throw new EnvironmentManagerException( "Failed to generate ssh keys on all peers" );
         }
 
-        return keys;
+        return allSshKeys;
     }
 }
