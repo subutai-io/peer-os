@@ -618,7 +618,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults results = commandUtil
-                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts,
+                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey.trim() ), hosts,
                         environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
