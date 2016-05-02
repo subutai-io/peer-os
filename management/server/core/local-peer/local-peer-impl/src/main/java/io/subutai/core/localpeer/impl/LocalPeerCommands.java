@@ -87,7 +87,7 @@ public class LocalPeerCommands
     {
         return new RequestBuilder( String.format( "mkdir -p %1$s && " +
                 "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && " +
+                "echo '%3$s' >> %2$s && sort -u '%2$s' -o '%2$s' && " +
                 "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
     }
 
