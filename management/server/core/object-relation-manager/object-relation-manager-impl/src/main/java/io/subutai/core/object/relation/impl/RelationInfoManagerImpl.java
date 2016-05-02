@@ -120,7 +120,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-    private RelationMeta getUserLinkRelation( RelationLink relationLink ) throws RelationVerificationException
+    private RelationLink getDelegatedUserLink( RelationLink target ) throws RelationVerificationException
     {
         User activeUser = identityManager.getActiveUser();
         UserDelegate delegatedUser = null;
@@ -141,8 +141,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             // select first object where relation.source.context = PermissionObject.IdentityManagement.getName()
 
             // Ownership User already defines that trusted object is owned by source or target
-            List<Relation> relationList =
-                    relationDataService.getTrustedRelationsByOwnership( relationLink, Ownership.USER );
+            List<Relation> relationList = relationDataService.getTrustedRelationsByOwnership( target, Ownership.USER );
             for ( final Relation relation : relationList )
             {
                 if ( PermissionObject.IdentityManagement.getName().equals( relation.getSource().getContext() ) )
@@ -168,8 +167,13 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             throw new RelationVerificationException( "Failed to get trusted object owner" );
         }
+        return delegatedUser;
+    }
 
-        return new RelationMeta( delegatedUser, relationLink, relationLink.getLinkId() );
+
+    private RelationMeta getUserLinkRelation( RelationLink target ) throws RelationVerificationException
+    {
+        return new RelationMeta( getDelegatedUserLink( target ), target, target.getLinkId() );
     }
 
 
@@ -199,8 +203,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 // Requested relation should be less then or equal to relation that was granted
                 return compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0;
             }
-            int result = getDeeper( relationInfo, ( RelationLinkImpl ) targetRelation.getTrustedObject(), object,
-                    relationLinks );
+            int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
             if ( result != -3 )
             {
                 return result >= 0;
@@ -431,8 +434,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
 
     @Override
-    public void checkRelationValidity( final RelationLink source, final RelationLink targetObject,
-                                       final RelationInfoMeta relationInfoMeta, final String encodedToken )
+    public void checkRelation( final RelationLink targetObject, final RelationInfoMeta relationInfoMeta,
+                               final String encodedToken ) throws RelationVerificationException
+    {
+        checkRelation( getDelegatedUserLink( targetObject ), targetObject, relationInfoMeta, encodedToken );
+    }
+
+
+    @Override
+    public void checkRelation( final RelationLink source, final RelationLink targetObject,
+                               final RelationInfoMeta relationInfoMeta, final String encodedToken )
             throws RelationVerificationException
     {
         if ( !SystemSettings.getKeyTrustCheckState() )
@@ -476,7 +487,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
             if ( result != -3 )
             {
-                if (!( result >= 0 ))
+                if ( !( result >= 0 ) )
                 {
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }

@@ -6,6 +6,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import io.subutai.common.security.relation.Trait;
+
 
 @Retention( RetentionPolicy.RUNTIME )
 @Target( ElementType.PARAMETER )
@@ -16,7 +18,7 @@ public @interface RelationDeclaration
      */
     String rql() default "";
 
-    RelationCondition[] conditions();
+    Trait[] conditions();
 
 
 }

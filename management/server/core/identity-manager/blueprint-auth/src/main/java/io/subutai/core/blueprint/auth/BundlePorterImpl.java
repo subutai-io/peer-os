@@ -20,7 +20,7 @@ public class BundlePorterImpl implements BundlePorter
     public BundlePorterImpl()
     {
         BundleContext ctx = FrameworkUtil.getBundle( this.getClass() ).getBundleContext();
-        serviceTracker = new ServiceTracker<RelationManager, RelationManager>( ctx,RelationManager.class,null );
+        serviceTracker = new ServiceTracker<>( ctx,RelationManager.class,null );
         serviceTracker.open();
     }
 

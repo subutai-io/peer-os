@@ -62,7 +62,7 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.security.relation.RelationCredibility;
+import io.subutai.common.security.relation.RelationPreCredibility;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -252,7 +252,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @PermitAll
-    @RelationCredibility
+    @RelationPreCredibility
     @Override
     public Set<Environment> getEnvironments()
     {

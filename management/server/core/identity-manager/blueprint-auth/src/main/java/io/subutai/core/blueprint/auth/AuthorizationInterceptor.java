@@ -39,18 +39,22 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.aries.blueprint.Interceptor;
 
-import io.subutai.common.datatypes.RelationDeclaration;
+import io.subutai.common.security.relation.RelationPreCredibility;
 
 
 public class AuthorizationInterceptor implements Interceptor
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( AuthorizationInterceptor.class );
+    private static final Logger logger = LoggerFactory.getLogger( AuthorizationInterceptor.class );
     private Class<?> beanClass;
+    private Object bean;
+    private MethodWalker methodWalker;
 
 
-    public AuthorizationInterceptor( Class<?> beanClass )
+    public AuthorizationInterceptor( Object bean )
     {
-        this.beanClass = beanClass;
+        this.bean = bean;
+        this.beanClass = bean.getClass();
+        this.methodWalker = new MethodWalker( logger );
     }
 
 
@@ -71,9 +75,9 @@ public class AuthorizationInterceptor implements Interceptor
     }
 
 
-    public Object preCall( ComponentMetadata cm, Method m, Object... parameters ) throws Throwable
+    public Object preCall( ComponentMetadata cm, Method method, Object... parameters ) throws Throwable
     {
-        Annotation ann = new SecurityAnnotationParser().getEffectiveAnnotation( beanClass, m );
+        Annotation ann = new SecurityAnnotationParser().getEffectiveAnnotation( beanClass, method );
 
         if ( ann instanceof PermitAll )
         {
@@ -85,25 +89,17 @@ public class AuthorizationInterceptor implements Interceptor
             rolesAr = ( ( RolesAllowed ) ann ).value();
         }
 
-        // check parameters for annotation existence
-        Annotation[][] parameterAnnotations = m.getParameterAnnotations();
-        Class[] parameterTypes = m.getParameterTypes();
-
-        int i = 0;
-        for ( Annotation[] annotations : parameterAnnotations )
+        if ( ann instanceof RelationPreCredibility )
         {
-            Object parameter = parameters[i];
-            Class parameterType = parameterTypes[i++];
-
-            for ( Annotation annotation : annotations )
+            try
             {
-                if ( annotation instanceof RelationDeclaration )
-                {
-                    RelationDeclaration myAnnotation = ( RelationDeclaration ) annotation;
-                    LOGGER.debug( parameterType.getName() );
-                    LOGGER.debug( parameter.toString() );
-                    //                    LOGGER.debug( myAnnotation.context() );
-                }
+                methodWalker.performCheck( bean, method, parameters );
+                return null;
+            }
+            catch ( Exception ex )
+            {
+                String msg = "Sorry you don't have sufficient relations for this operation for details see logs.";
+                throw new SecurityException( msg, ex );
             }
         }
 
@@ -112,8 +108,8 @@ public class AuthorizationInterceptor implements Interceptor
         Subject subject = Subject.getSubject( acc );
         if ( subject == null )
         {
-            throw new AccessControlException(
-                    "Method call " + m.getDeclaringClass() + "." + m.getName() + " denied. No JAAS login present" );
+            throw new AccessControlException( "Method call " + method.getDeclaringClass() + "." + method.getName()
+                    + " denied. No JAAS login present" );
         }
         Set<Principal> principals = subject.getPrincipals();
 
@@ -121,12 +117,12 @@ public class AuthorizationInterceptor implements Interceptor
         {
             if ( roles.contains( principal.getName() ) )
             {
-                LOGGER.debug( "Granting access to Method: {} for {}.", m, principal );
+                logger.debug( "Granting access to Method: {} for {}.", method, principal );
                 return null;
             }
         }
         String msg = String.format( "Method call %s.%s denied. Roles allowed are %s. Your principals are %s.",
-                m.getDeclaringClass(), m.getName(), roles, getNames( principals ) );
+                method.getDeclaringClass(), method.getName(), roles, getNames( principals ) );
         throw new AccessControlException( msg );
     }
 

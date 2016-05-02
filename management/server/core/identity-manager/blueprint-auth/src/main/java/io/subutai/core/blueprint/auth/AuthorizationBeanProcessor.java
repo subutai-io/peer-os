@@ -61,7 +61,7 @@ public class AuthorizationBeanProcessor implements BeanProcessor
         if ( new SecurityAnnotationParser().isSecured( c ) )
         {
             LOGGER.debug( "Adding annotation based authorization interceptor for bean {} with class {}", beanName, c );
-            cdr.registerInterceptorWithComponent( beanData, new AuthorizationInterceptor( bean.getClass() ) );
+            cdr.registerInterceptorWithComponent( beanData, new AuthorizationInterceptor( bean ) );
         }
         return bean;
     }

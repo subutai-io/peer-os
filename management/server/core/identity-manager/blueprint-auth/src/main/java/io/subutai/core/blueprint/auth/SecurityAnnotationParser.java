@@ -21,9 +21,12 @@ import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import io.subutai.common.security.relation.RelationPreCredibility;
+
 
 /**
- * Evaluates JEE security annotations 
+ * Evaluates JEE security annotations
+ *
  * @see PermitAll
  * @see DenyAll
  * @see RolesAllowed
@@ -32,11 +35,11 @@ public class SecurityAnnotationParser
 {
 
     /**
-     * Get the effective annotation regarding method annotations override class annotations.
-     * DenyAll has highest priority then RolesAllowed and in the end PermitAll. 
-     * So the most restrictive annotation is preferred.
+     * Get the effective annotation regarding method annotations override class annotations. DenyAll has highest
+     * priority then RolesAllowed and in the end PermitAll. So the most restrictive annotation is preferred.
      *
      * @param m Method to check
+     *
      * @return effective annotation (either DenyAll, PermitAll or RolesAllowed)
      */
     Annotation getEffectiveAnnotation( Class<?> beanClass, Method m )
@@ -67,16 +70,17 @@ public class SecurityAnnotationParser
         {
             ann = element.getAnnotation( PermitAll.class );
         }
+        if ( ann == null )
+        {
+            ann = element.getAnnotation( RelationPreCredibility.class );
+        }
         return ann;
     }
 
 
     /**
-     * A class is secured if either the class or one of its methods is secured.
-     * An AnnotatedElement is secured if @RolesAllowed or @DenyAll is present.
-     *
-     * @param clazz
-     * @return
+     * A class is secured if either the class or one of its methods is secured. An AnnotatedElement is secured if
+     * @RolesAllowed or @DenyAll is present.
      */
     public boolean isSecured( Class<?> clazz )
     {
@@ -101,6 +105,7 @@ public class SecurityAnnotationParser
 
     private boolean isSecuredEl( AnnotatedElement element )
     {
-        return element.isAnnotationPresent( RolesAllowed.class ) || element.isAnnotationPresent( DenyAll.class );
+        return element.isAnnotationPresent( RelationPreCredibility.class ) || element.isAnnotationPresent( RolesAllowed.class )
+                || element.isAnnotationPresent( DenyAll.class );
     }
 }

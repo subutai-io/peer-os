@@ -4,8 +4,6 @@ package io.subutai.core.object.relation.impl;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import javax.annotation.security.RolesAllowed;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationPreCredibility;
+import io.subutai.common.security.relation.Trait;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.object.relation.api.RelationManager;
@@ -39,7 +39,8 @@ public class RelationManagerImpl implements RelationManager
     private RelationMessageManagerImpl trustMessageManager;
     private RelationInfoManagerImpl relationInfoManager;
     private DaoManager daoManager = null;
-    private RelationDataService relationDataService;
+    private @RelationPreCredibility( traits = { @Trait( traitKey = "key", traitValue = "value" ) } ) RelationDataService
+            relationDataService;
 
 
     //*****************************************
@@ -90,7 +91,7 @@ public class RelationManagerImpl implements RelationManager
 
             // Verification check have to be applied to verify that stored data is the same as the one being supported
             Relation storedRelation = relationDataService
-                    .findBySourceTargetObject           ( relation.getSource(), relation.getTarget(),
+                    .findBySourceTargetObject( relation.getSource(), relation.getTarget(),
                             relation.getTrustedObject() );
 
             if ( storedRelation == null )
@@ -139,7 +140,7 @@ public class RelationManagerImpl implements RelationManager
         saveRelation( relation );
 
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject()                   );
+                relationMeta.getObject() );
     }
 
 
@@ -176,7 +177,7 @@ public class RelationManagerImpl implements RelationManager
         saveRelation( relation );
 
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject()                   );
+                relationMeta.getObject() );
     }
 
 
@@ -184,7 +185,7 @@ public class RelationManagerImpl implements RelationManager
     public Relation getRelation( final RelationMeta relationMeta )
     {
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject()                   );
+                relationMeta.getObject() );
     }
 
 
@@ -207,9 +208,10 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    @RolesAllowed( "Environment-Management" )
+    @RelationPreCredibility
     public List<Relation> getRelations()
     {
+        @RelationPreCredibility(source = "relationDataService") String str = "";
         return relationDataService.getAllRelations();
     }
 
@@ -246,7 +248,7 @@ public class RelationManagerImpl implements RelationManager
     public void removeRelation( final RelationMeta relationMeta )
     {
         Relation relation = relationDataService
-                .findBySourceTargetObject        ( relationMeta.getSource(), relationMeta.getTarget(),
+                .findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
                         relationMeta.getObject() );
         removeRelation( relation.getId() );
     }

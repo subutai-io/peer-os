@@ -141,7 +141,7 @@ public class RemotePeerImpl implements RemotePeer
         relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
         relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
 
-        relationInfoManager.checkRelationValidity( localPeer, this, relationInfoMeta, null );
+        relationInfoManager.checkRelation( localPeer, this, relationInfoMeta, null );
     }
 
 

@@ -23,7 +23,7 @@ import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 
 
 /**
- * Relation info is simple string presentation of propertyKey=propertyValue where each pair will describe relation with
+ * Relation info is simple string presentation of traitKey=traitValue where each pair will describe relation with
  * other object. When verifying transitive relation, relation validity is checked upon key=pair existence.
  */
 @Entity
