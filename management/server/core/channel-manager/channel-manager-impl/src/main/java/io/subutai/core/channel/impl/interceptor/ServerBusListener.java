@@ -3,12 +3,9 @@ package io.subutai.core.channel.impl.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
-
-import io.subutai.common.settings.ChannelSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -35,54 +32,26 @@ public class ServerBusListener extends AbstractFeature
         bus.setProperty( AsyncHTTPConduit.USE_ASYNC, Boolean.TRUE );
         //***************************************************************
 
+        // initialise the feature on the bus, which will add the interceptors
 
-        if ( !ChannelSettings.SPECIAL_REST_BUS.contains( bus.getId() ) )
-        {
+        //***** RECEIVE    **********************************
+        bus.getInInterceptors().add( new AccessControlInterceptor( channelManagerImpl ) );
 
-            // initialise the feature on the bus, which will add the interceptors
+        //***** PRE_STREAM **********************************
+        bus.getOutInterceptors().add( new ClientOutInterceptor( channelManagerImpl, peerManager ) );
 
-            //***** RECEIVE    **********************************
-            bus.getInInterceptors().add( new AccessControlInterceptor( channelManagerImpl ) );
+        //***** POST_LOGICAL **********************************
+        bus.getOutInterceptors().add( new ClientHeaderInterceptor( channelManagerImpl, peerManager ) );
 
-            //***** PRE_STREAM **********************************
-            bus.getOutInterceptors().add( new ClientOutInterceptor( channelManagerImpl, peerManager ) );
+        //***** RECEIVE    **********************************
+        bus.getInInterceptors().add( new ServerInInterceptor( channelManagerImpl, peerManager ) );
 
-            //***** POST_LOGICAL **********************************
-            bus.getOutInterceptors().add( new ClientHeaderInterceptor( channelManagerImpl, peerManager ) );
+        //***** PRE_STREAM **********************************
+        bus.getOutInterceptors().add( new ServerOutInterceptor( channelManagerImpl, peerManager ) );
 
-            //***** RECEIVE    **********************************
-            bus.getInInterceptors().add( new ServerInInterceptor( channelManagerImpl, peerManager ) );
+        //***** RECEIVE    **********************************
+        bus.getInInterceptors().add( new ClientInInterceptor( channelManagerImpl, peerManager ) );
 
-            //***** PRE_STREAM **********************************
-            bus.getOutInterceptors().add( new ServerOutInterceptor( channelManagerImpl, peerManager ) );
-
-            //***** RECEIVE    **********************************
-            bus.getInInterceptors().add( new ClientInInterceptor( channelManagerImpl, peerManager ) );
-
-            //*****************************************
-            /*
-            if ( bus.getId().equalsIgnoreCase( "cxfBusTemplateManager" ) )
-            {
-                bus.setProperty( AsyncHTTPConduit.USE_ASYNC, Boolean.FALSE );
-            }
-
-            if ( bus.getId().equalsIgnoreCase( "cxfBusRawManager" ) )
-            {
-                bus.setProperty( AsyncHTTPConduit.USE_ASYNC, Boolean.FALSE );
-            }
-            if ( bus.getId().equalsIgnoreCase( "cxfBusAptManager" ) )
-            {
-                bus.setProperty( AsyncHTTPConduit.USE_ASYNC, Boolean.FALSE );
-            }
-            */
-            //***************************************************************
-
-            //***************************************************************
-        }
-        else
-        {
-            LOG.warn( "Channel Manager specific interceptors are skipped for the bus: " + bus.getId() );
-        }
 
         LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus.getId() );
     }
@@ -104,4 +73,5 @@ public class ServerBusListener extends AbstractFeature
     {
         this.peerManager = peerManager;
     }
+
 }

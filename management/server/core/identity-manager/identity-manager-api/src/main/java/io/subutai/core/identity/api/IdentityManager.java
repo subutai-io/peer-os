@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.annotation.security.PermitAll;
+
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -58,6 +60,12 @@ public interface IdentityManager
     /* *************************************************
      */
     User authenticateByToken( String token );
+
+
+    /* *************************************************
+     */
+    User authenticateByMessage(String fingerprint, String message );
+
 
 
     /* *************************************************
