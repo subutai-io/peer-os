@@ -42,7 +42,7 @@ public class RegisterSshStep
 
         Set<String> userKeys = environment.getSshKeys();
 
-        if ( hosts.size() > 1 && topology.exchangeSshKeys() )
+        if ( !hosts.isEmpty() && topology.exchangeSshKeys() )
         {
             exchangeSshKeys( userKeys );
         }

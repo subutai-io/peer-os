@@ -28,7 +28,7 @@ public class TunnelProcessor implements StateLinkProccessor
 
     private final Logger LOG = LoggerFactory.getLogger( getClass() );
 
-    private static final String TUNNEL_COMMAND = "subutai tunnel %s %s %s -g";
+    private static final String TUNNEL_COMMAND = "subutai tunnel %s:%s %s -g";
 
     private PeerManager peerManager;
 
@@ -65,8 +65,8 @@ public class TunnelProcessor implements StateLinkProccessor
             resourceHost = peerManager.getLocalPeer().getManagementHost();
 
             CommandResult result = execute( resourceHost,
-                    String.format( TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getTtl(),
-                            tunnelInfoDto.getPortToOpen() ) );
+                    String.format( TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
+                            tunnelInfoDto.getTtl() ) );
 
             if ( result.hasSucceeded() )
             {
