@@ -260,7 +260,8 @@ public interface Peer extends RelationLink
 
     PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
-    SshPublicKeys generateSshKeyForEnvironment( EnvironmentId environmentId ) throws PeerException;
+    SshKeys generateSshKeyForEnvironment( EnvironmentId environmentId, SshEncryptionType sshKeyType )
+            throws PeerException;
 
     void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
 

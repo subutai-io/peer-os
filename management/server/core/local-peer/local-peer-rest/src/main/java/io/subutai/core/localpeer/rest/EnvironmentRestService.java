@@ -21,6 +21,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKeys;
 
 
 public interface EnvironmentRestService
@@ -83,9 +84,10 @@ public interface EnvironmentRestService
                                         SshPublicKeys sshPublicKeys );
 
     @PUT
-    @Path( "{environmentId}/containers/sshkeys" )
+    @Path( "{environmentId}/containers/sshkeys/{encType}" )
     @Produces( MediaType.APPLICATION_JSON )
-    SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    SshKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                           @PathParam( "encType" ) SshEncryptionType sshKeyType );
 
     @POST
     @Path( "{environmentId}/containers/sshkey/add" )
@@ -117,5 +119,5 @@ public interface EnvironmentRestService
     @Path( "{environmentId}/sshkeys/{encType}" )
     @Consumes( MediaType.APPLICATION_JSON )
     Response createSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId,
-                         @PathParam( "encType" ) SshEncryptionType encryptionType, String containerId );
+                           @PathParam( "encType" ) SshEncryptionType encryptionType, String containerId );
 }

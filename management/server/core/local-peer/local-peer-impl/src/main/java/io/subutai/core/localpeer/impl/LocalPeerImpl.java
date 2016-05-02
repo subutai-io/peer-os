@@ -62,7 +62,6 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
@@ -405,11 +404,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public SshPublicKeys generateSshKeyForEnvironment( final EnvironmentId environmentId ) throws PeerException
+    public SshKeys generateSshKeyForEnvironment( final EnvironmentId environmentId, final SshEncryptionType sshKeyType )
+            throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( sshKeyType, "Ssh key type is null" );
 
-        SshPublicKeys sshPublicKeys = new SshPublicKeys();
+        SshKeys sshPublicKeys = new SshKeys();
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -421,7 +422,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults readResults = commandUtil
-                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand(), hosts, environmentId.getId() );
+                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand( sshKeyType ), hosts,
+                        environmentId.getId() );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -430,7 +432,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
             {
-                sshPublicKeys.addSshPublicKey( result.getCommandResult().getStdOut() );
+                sshPublicKeys.addKey(
+                        new SshKey( result.getHost().getId(), sshKeyType, result.getCommandResult().getStdOut() ) );
 
                 succeededHosts.add( result.getHost() );
             }
@@ -538,13 +541,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
 
         SshKeys sshKeys = new SshKeys();
+
         if ( hosts.isEmpty() )
         {
             return sshKeys;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getReadSSHKeyCommand( sshEncryptionType ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getReadSSHKeyCommand( sshEncryptionType ), hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -580,8 +584,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 throw new HostNotFoundException( "Environment does not contains requested container." );
             }
 
-            CommandResult commandResult =
-                    commandUtil.execute( localPeerCommands.getCreateSSHKeyCommand( sshEncryptionType ), containerHost );
+            CommandResult commandResult = commandUtil
+                    .execute( localPeerCommands.getReadOrCreateSSHCommand( sshEncryptionType ), containerHost );
 
             if ( commandResult.hasSucceeded() )
             {

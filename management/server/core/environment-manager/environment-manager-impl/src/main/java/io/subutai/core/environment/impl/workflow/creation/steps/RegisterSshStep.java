@@ -11,6 +11,8 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.PeerUtil;
@@ -127,9 +129,13 @@ public class RegisterSshStep
                 @Override
                 public Object call() throws Exception
                 {
-                    SshPublicKeys sshPublicKeys = peer.generateSshKeyForEnvironment( environment.getEnvironmentId() );
+                    SshKeys sshPublicKeys = peer.generateSshKeyForEnvironment( environment.getEnvironmentId(),
+                            topology.getSshKeyType() );
 
-                    keys.addAll( sshPublicKeys.getSshPublicKeys() );
+                    for ( SshKey sshKey : sshPublicKeys.getKeys() )
+                    {
+                        keys.add( sshKey.getPublicKey() );
+                    }
 
                     return null;
                 }

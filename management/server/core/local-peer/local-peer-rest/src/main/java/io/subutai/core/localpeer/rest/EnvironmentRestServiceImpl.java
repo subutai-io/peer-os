@@ -133,13 +133,14 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public SshPublicKeys generateSshKeysForEnvironment( final EnvironmentId environmentId )
+    public SshKeys generateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                  final SshEncryptionType sshKeyType )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
 
-            return localPeer.generateSshKeyForEnvironment( environmentId );
+            return localPeer.generateSshKeyForEnvironment( environmentId, sshKeyType );
         }
         catch ( Exception e )
         {

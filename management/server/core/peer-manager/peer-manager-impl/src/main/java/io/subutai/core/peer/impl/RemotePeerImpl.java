@@ -308,11 +308,12 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public SshPublicKeys generateSshKeyForEnvironment( final EnvironmentId environmentId ) throws PeerException
+    public SshKeys generateSshKeyForEnvironment( final EnvironmentId environmentId, final SshEncryptionType sshKeyType )
+            throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
-        return environmentWebClient.generateSshKeysForEnvironment( environmentId );
+        return environmentWebClient.generateSshKeysForEnvironment( environmentId, sshKeyType );
     }
 
 
