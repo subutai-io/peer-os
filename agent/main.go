@@ -280,14 +280,14 @@ func main() {
 		// Flags: []cli.Flag{
 		// 	cli.BoolFlag{Name: "g", Usage: "create tunnel to global proxy"}},
 		Action: func(c *cli.Context) {
-			lib.Tunnel(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2), c.Args().Get(3))
+			lib.Tunnel(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
 		},
 		Subcommands: []cli.Command{
 			{
 				Name:  "list",
 				Usage: "list active ssh tunnels",
 				Action: func(c *cli.Context) {
-					lib.TunList()
+					lib.TunList(false)
 				}},
 		}}, {
 
