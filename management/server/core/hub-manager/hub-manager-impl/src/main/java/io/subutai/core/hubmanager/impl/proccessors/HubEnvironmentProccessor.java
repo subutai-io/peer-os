@@ -40,6 +40,8 @@ import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.UserDto;
+import io.subutai.hub.share.dto.UserTrustDto;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
@@ -96,6 +98,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             if ( environmentDataMatcher.matches() )
             {
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
+                UserDto userDto = getUserDataFromHub( envPeerDto.getOwnerId() );
+                Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
                 environmentBuildProcess( envPeerDto );
             }
         }
@@ -558,5 +562,62 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
             LOG.error( mgs, e.getMessage() );
         }
+    }
+
+
+    private UserDto getUserDataFromHub( String userId )
+    {
+        String path = "/rest/v1/users/" + userId;
+
+        UserDto userDto = null;
+
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+            Response r = client.get();
+
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                byte[] encryptedContent = configManager.readContent( r );
+
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
+                userDto = JsonUtil.fromCbor( plainContent, UserDto.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to get user data: ", e );
+        }
+
+        return userDto;
+    }
+
+
+    private Boolean getUserTrustLevel( String fingerprint )
+    {
+        String path = "/rest/v1/keyserver/hub/trust/" + fingerprint;
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+            Response r = client.get();
+
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                byte[] encryptedContent = configManager.readContent( r );
+
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
+                UserTrustDto userTrustDto = JsonUtil.fromCbor( plainContent, UserTrustDto.class );
+                return userTrustDto.getTrusted();
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to get user data: ", e );
+        }
+        return false;
     }
 }
