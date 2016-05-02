@@ -42,7 +42,7 @@ public class RegisterHostsStep
 
         hosts.addAll( environment.getContainerHosts() );
 
-        if ( hosts.size() > 1 && topology.registerHosts() )
+        if ( !hosts.isEmpty() && topology.registerHosts() )
         {
             registerHosts( hosts );
         }
