@@ -100,7 +100,10 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
                 UserDto userDto = getUserDataFromHub( envPeerDto.getOwnerId() );
                 Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
-                environmentBuildProcess( envPeerDto );
+                if ( isTrustedUser )
+                {
+                    environmentBuildProcess( envPeerDto );
+                }
             }
         }
     }
