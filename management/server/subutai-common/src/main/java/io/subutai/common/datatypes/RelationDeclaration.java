@@ -17,4 +17,6 @@ public @interface RelationDeclaration
     String rql() default "";
 
     RelationCondition[] conditions();
+
+
 }

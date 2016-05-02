@@ -58,7 +58,7 @@ public class AuthorizationBeanProcessor implements BeanProcessor
     public Object beforeInit( Object bean, String beanName, BeanCreator beanCreator, BeanMetadata beanData )
     {
         Class<?> c = bean.getClass();
-        if ( new SecurityAnotationParser().isSecured( c ) )
+        if ( new SecurityAnnotationParser().isSecured( c ) )
         {
             LOGGER.debug( "Adding annotation based authorization interceptor for bean {} with class {}", beanName, c );
             cdr.registerInterceptorWithComponent( beanData, new AuthorizationInterceptor( bean.getClass() ) );

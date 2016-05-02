@@ -4,6 +4,8 @@ package io.subutai.core.object.relation.impl;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,6 +207,7 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
+    @RolesAllowed( "Environment-Management" )
     public List<Relation> getRelations()
     {
         return relationDataService.getAllRelations();

@@ -28,7 +28,7 @@ import javax.annotation.security.RolesAllowed;
  * @see DenyAll
  * @see RolesAllowed
  */
-class SecurityAnotationParser
+public class SecurityAnnotationParser
 {
 
     /**

@@ -73,7 +73,7 @@ public class AuthorizationInterceptor implements Interceptor
 
     public Object preCall( ComponentMetadata cm, Method m, Object... parameters ) throws Throwable
     {
-        Annotation ann = new SecurityAnotationParser().getEffectiveAnnotation( beanClass, m );
+        Annotation ann = new SecurityAnnotationParser().getEffectiveAnnotation( beanClass, m );
 
         if ( ann instanceof PermitAll )
         {
