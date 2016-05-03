@@ -48,8 +48,7 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
 
 
     public HubLoggerProcessor()
-    {
-    }
+    { }
 
 
     @Override
