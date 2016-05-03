@@ -1078,23 +1078,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException
     {
-        CancellableWorkflow activeWorkflow = activeWorkflows.get( environmentId );
-
-        if ( activeWorkflow != null )
+        try
         {
-            try
+            CancellableWorkflow activeWorkflow = activeWorkflows.get( environmentId );
+
+            if ( activeWorkflow != null )
             {
                 activeWorkflow.cancel();
 
                 removeActiveWorkflow( environmentId );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+                EnvironmentImpl environment = environmentService.find( environmentId );
 
-                throw new EnvironmentManagerException(
-                        String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
+                environment.setStatus( EnvironmentStatus.CANCELLED );
+
+                update( environment );
             }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+
+            throw new EnvironmentManagerException(
+                    String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
         }
     }
 

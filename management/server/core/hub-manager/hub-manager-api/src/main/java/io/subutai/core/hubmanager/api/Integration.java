@@ -11,6 +11,8 @@ public interface Integration
 {
     void sendHeartbeat() throws HubPluginException;
 
+    void sendOnlyHeartbeat() throws HubPluginException;
+
     void sendResourceHostInfo() throws HubPluginException;
 
     void registerPeer( String hupIp, String email, String password ) throws HubPluginException;

@@ -73,17 +73,21 @@ public class VehsProccessor implements StateLinkProccessor
         this.environmentUserHelper = environmentUserHelper;
     }
 
+
     @Override
     public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
     {
         for ( String link : stateLinks )
         {
-            // Environment Data     GET /rest/v1/environments/{environment-id}/peers/{peer-id}
             Matcher environmentDataMatcher = ENVIRONMENT_PEER_DATA_PATTERN.matcher( link );
             if ( environmentDataMatcher.matches() )
             {
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
-                setupHS( envPeerDto );
+
+                if ( envPeerDto != null )
+                {
+                    setupHS( envPeerDto );
+                }
             }
         }
     }

@@ -13,7 +13,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -246,9 +245,10 @@ public class EnvironmentWebClient
     }
 
 
-    public SshPublicKeys generateSshKeysForEnvironment( final EnvironmentId environmentId ) throws PeerException
+    public SshKeys generateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                  final SshEncryptionType sshKeyType ) throws PeerException
     {
-        String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
+        String path = String.format( "/%s/containers/sshkeys/%s", environmentId.getId(), sshKeyType );
 
         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
@@ -266,11 +266,11 @@ public class EnvironmentWebClient
             throw new PeerException( "Error generating ssh keys in environment: " + e.getMessage() );
         }
 
-        return checkResponse( response, SshPublicKeys.class );
+        return checkResponse( response, SshKeys.class );
     }
 
 
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
@@ -283,7 +283,7 @@ public class EnvironmentWebClient
 
         try
         {
-            response = client.post( sshPublicKeys );
+            response = client.post( sshKeys );
         }
         catch ( Exception e )
         {
@@ -388,50 +388,52 @@ public class EnvironmentWebClient
         checkResponse( response );
     }
 
+
     public SshKeys getSshKeys( final EnvironmentId environmentId, final SshEncryptionType sshEncryptionType )
-             throws PeerException
-     {
-         String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
+            throws PeerException
+    {
+        String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
 
-         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
-         Response response;
+        Response response;
 
-         try
-         {
-             response = client.get();
-         }
-         catch ( Exception e )
-         {
-             LOG.error( e.getMessage(), e );
-             throw new PeerException( "Error reading ssh keys of the environment: " + e.getMessage() );
-         }
+        try
+        {
+            response = client.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error reading ssh keys of the environment: " + e.getMessage() );
+        }
 
-         return checkResponse( response, SshKeys.class );
-     }
+        return checkResponse( response, SshKeys.class );
+    }
 
 
-     public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
-                                  final SshEncryptionType sshEncryptionType ) throws PeerException
-     {
-         String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
+    public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
+                                final SshEncryptionType sshEncryptionType ) throws PeerException
+    {
+        String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
 
-         WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
-         Response response;
+        Response response;
 
-         try
-         {
-             response = client.post( containerId );
-         }
-         catch ( Exception e )
-         {
-             LOG.error( e.getMessage(), e );
-             throw new PeerException( "Error creating ssh key: " + e.getMessage() );
-         }
+        try
+        {
+            response = client.post( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error creating ssh key: " + e.getMessage() );
+        }
 
-         return checkResponse( response, SshKey.class );
-     }
+        return checkResponse( response, SshKey.class );
+    }
+
 
     protected <T> T checkResponse( Response response, Class<T> clazz ) throws PeerException
     {
