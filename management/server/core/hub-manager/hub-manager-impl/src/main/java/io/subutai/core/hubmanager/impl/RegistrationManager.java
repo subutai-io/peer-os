@@ -40,7 +40,7 @@ import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.json.JsonUtil;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
-
+//TODO close web clients and responses
 public class RegistrationManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class );

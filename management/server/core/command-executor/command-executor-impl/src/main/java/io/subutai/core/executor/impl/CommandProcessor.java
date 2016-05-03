@@ -262,7 +262,7 @@ public class CommandProcessor implements RestProcessor
         }
         finally
         {
-            RestUtil.closeClient( webClient );
+            RestUtil.close( webClient );
         }
     }
 

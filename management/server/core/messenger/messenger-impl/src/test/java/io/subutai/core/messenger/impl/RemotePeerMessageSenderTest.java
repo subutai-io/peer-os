@@ -4,6 +4,8 @@ package io.subutai.core.messenger.impl;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ws.rs.core.Response;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +52,8 @@ public class RemotePeerMessageSenderTest
     PeerInfo peerInfo;
     @Mock
     WebClient webClient;
+    @Mock
+    Response response;
 
 
     RemotePeerMessageSender remotePeerMessageSender;
@@ -75,6 +79,9 @@ public class RemotePeerMessageSenderTest
     @Test
     public void testCall() throws Exception
     {
+        doReturn( response ).when( webClient ).post( anyString() );
+        doReturn( Response.Status.ACCEPTED.getStatusCode() ).when( response ).getStatus();
+
         remotePeerMessageSender.call();
 
         verify( webClient ).post( anyString() );

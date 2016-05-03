@@ -72,9 +72,9 @@ public class PeerWebClient
 
             response = client.get();
 
-            WebClientBuilder.close( response );
+            WebClientBuilder.checkResponse( response, Response.Status.OK );
 
-            return response.getStatus() == Response.Status.OK.getStatusCode();
+            return true;
         }
         catch ( RelationVerificationException e )
         {
@@ -317,12 +317,7 @@ public class PeerWebClient
             client.accept( MediaType.APPLICATION_JSON );
             Response response = client.post( alert );
 
-            WebClientBuilder.close( response );
-
-            if ( Response.Status.ACCEPTED.getStatusCode() != response.getStatus() )
-            {
-                throw new PeerException( "Alert not accepted." );
-            }
+            WebClientBuilder.checkResponse( response, Response.Status.ACCEPTED );
         }
         catch ( Exception e )
         {

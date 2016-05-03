@@ -26,7 +26,7 @@ import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class EnvironmentUserHelper
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );

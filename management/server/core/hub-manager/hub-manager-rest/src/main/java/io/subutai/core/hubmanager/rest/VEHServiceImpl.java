@@ -28,6 +28,7 @@ import io.subutai.core.peer.api.PeerManager;
 
 
 //TODO after finish ENVIRONMENT MANAGEMENT should delete this class
+//TODO close webclient with RestUtil.close
 public class VEHServiceImpl
 {
     private static final Logger LOG = LoggerFactory.getLogger( VEHServiceImpl.class.getName() );

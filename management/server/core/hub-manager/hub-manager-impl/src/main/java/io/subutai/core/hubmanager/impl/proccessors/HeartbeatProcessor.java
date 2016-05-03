@@ -26,7 +26,7 @@ import io.subutai.core.hubmanager.impl.IntegrationImpl;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class HeartbeatProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( HeartbeatProcessor.class );
