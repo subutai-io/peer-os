@@ -1,7 +1,10 @@
 package io.subutai.core.identity.rest;
 
 
+import javax.ws.rs.core.Response;
+
 import com.google.common.base.Strings;
+
 import io.subutai.core.identity.api.IdentityManager;
 
 
@@ -21,7 +24,7 @@ public class RestServiceImpl implements RestService
     {
         String token = identityManager.getUserToken( userName, password );
 
-        if( !Strings.isNullOrEmpty(token))
+        if ( !Strings.isNullOrEmpty( token ) )
         {
             return token;
         }
@@ -29,7 +32,6 @@ public class RestServiceImpl implements RestService
         {
             return "Access Denied to the resource!";
         }
-
     }
 
 
@@ -37,5 +39,20 @@ public class RestServiceImpl implements RestService
     public String createTokenGET( final String userName, final String password )
     {
         return createTokenPOST( userName, password );
+    }
+
+
+    @Override
+    public Response authenticateByAuthSignature( final String fingerprint, final String signedAuth )
+    {
+        try
+        {
+            String jwtToken = identityManager.authenticateByAuthSignature( fingerprint, signedAuth );
+            return Response.ok().entity( jwtToken ).build();
+        }
+        catch ( Exception ex )
+        {
+            return Response.serverError().entity( ex ).build();
+        }
     }
 }
