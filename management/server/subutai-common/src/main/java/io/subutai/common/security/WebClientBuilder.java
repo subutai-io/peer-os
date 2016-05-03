@@ -214,6 +214,18 @@ public class WebClientBuilder
     }
 
 
+    public static void checkResponse( Response response, Response.Status status ) throws PeerException
+    {
+        checkResponse( response, true );
+
+        if ( response.getStatus() != status.getStatusCode() )
+        {
+            throw new PeerException( String.format( "Http status is %d whereas %d was expected", response.getStatus(),
+                    status.getStatusCode() ) );
+        }
+    }
+
+
     static void checkResponse( Response response, boolean close ) throws PeerException
     {
         try
@@ -248,6 +260,22 @@ public class WebClientBuilder
             try
             {
                 response.close();
+            }
+            catch ( Exception ignore )
+            {
+                //ignore
+            }
+        }
+    }
+
+
+    public static void close( WebClient webClient )
+    {
+        if ( webClient != null )
+        {
+            try
+            {
+                webClient.close();
             }
             catch ( Exception ignore )
             {

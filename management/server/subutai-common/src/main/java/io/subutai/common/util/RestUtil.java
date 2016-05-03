@@ -3,6 +3,8 @@ package io.subutai.common.util;
 
 import java.util.Arrays;
 
+import javax.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class RestUtil
     }
 
 
-    public static void closeClient( WebClient webClient )
+    public static void close( WebClient webClient )
     {
         if ( webClient != null )
         {
@@ -47,10 +49,25 @@ public class RestUtil
             {
                 webClient.close();
             }
-            catch ( Exception e )
+            catch ( Exception ignore )
             {
                 //ignore
-                LOG.warn( "Error disposing web client", e );
+            }
+        }
+    }
+
+
+    public static void close( Response response )
+    {
+        if ( response != null )
+        {
+            try
+            {
+                response.close();
+            }
+            catch ( Exception ignore )
+            {
+                //ignore
             }
         }
     }
