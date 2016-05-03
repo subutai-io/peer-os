@@ -6,7 +6,9 @@ import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +19,7 @@ import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
@@ -56,11 +59,22 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
         {
             try
             {
-                Set<String> logs = new HashSet<>( errLogs.values() );
+                List<String> valueList = new ArrayList<String>( errLogs.values() );
+                Set<String> sendingLogs = new HashSet<>();
+
+                if ( valueList.size() >= 5 )
+                {
+                    sendingLogs.add( valueList.get( valueList.size() - 1 ) );
+                    sendingLogs.add( valueList.get( valueList.size() - 2 ) );
+                    sendingLogs.add( valueList.get( valueList.size() - 3 ) );
+                    sendingLogs.add( valueList.get( valueList.size() - 4 ) );
+                    sendingLogs.add( valueList.get( valueList.size() - 5 ) );
+                }
+
                 WebClient client =
                         configManager.getTrustedWebClientWithAuth( "/rest/v1/system-bugs", configManager.getHubIp() );
                 SystemLogsDto logsDto = new SystemLogsDto();
-                logsDto.setLogs( logs );
+                logsDto.setLogs( sendingLogs );
 
                 byte[] plainData = JsonUtil.toCbor( logsDto );
                 byte[] encryptedData = configManager.getMessenger().produce( plainData );
