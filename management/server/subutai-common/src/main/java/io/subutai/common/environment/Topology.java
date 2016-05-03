@@ -15,6 +15,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.security.SshEncryptionType;
+
 
 @JsonAutoDetect( fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE,
         setterVisibility = JsonAutoDetect.Visibility.NONE )
@@ -38,6 +40,9 @@ public class Topology
     @JsonProperty( "registerHosts" )
     private boolean registerHosts = true;
 
+    @JsonProperty( "sshKeyType" )
+    private SshEncryptionType sshKeyType = SshEncryptionType.RSA;
+
 
     public Topology( @JsonProperty( "id" ) final UUID id, @JsonProperty( "name" ) final String environmentName,
                      @JsonProperty( "placement" ) final Map<String, Set<Node>> nodeGroupPlacement,
@@ -47,6 +52,7 @@ public class Topology
         this.environmentName = environmentName;
         this.nodeGroupPlacement = nodeGroupPlacement;
         this.sshKey = sshKey;
+        this.sshKeyType = SshEncryptionType.parseTypeFromKey( sshKey );
     }
 
 
@@ -55,6 +61,7 @@ public class Topology
         this.id = id;
         this.environmentName = environmentName;
         this.sshKey = sshKey;
+        this.sshKeyType = SshEncryptionType.parseTypeFromKey( sshKey );
     }
 
 
@@ -173,6 +180,18 @@ public class Topology
     public void setRegisterHosts( final boolean registerHosts )
     {
         this.registerHosts = registerHosts;
+    }
+
+
+    public SshEncryptionType getSshKeyType()
+    {
+        return sshKeyType;
+    }
+
+
+    public void setSshKeyType( final SshEncryptionType sshKeyType )
+    {
+        this.sshKeyType = sshKeyType;
     }
 
 
