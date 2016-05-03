@@ -75,6 +75,7 @@ public class RegistrationManager
         peerInfoDto.setVersion( ssVersion );
         peerInfoDto.setName( configManager.getPeerManager().getLocalPeer().getName() );
         registrationData.setPeerInfo( peerInfoDto );
+        registrationData.setToken( configManager.getPermanentToken() );
 
         register( configManager.getPeerId(), registrationData );
         sentTrustData( configManager.getPeerPublicKey(), configManager.getOwnerPublicKey() );
