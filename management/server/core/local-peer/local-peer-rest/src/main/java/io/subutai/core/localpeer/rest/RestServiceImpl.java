@@ -47,6 +47,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response ping()
+    {
+        return Response.ok().build();
+    }
+
+
+    @Override
     public PeerInfo getPeerInfo()
     {
         try

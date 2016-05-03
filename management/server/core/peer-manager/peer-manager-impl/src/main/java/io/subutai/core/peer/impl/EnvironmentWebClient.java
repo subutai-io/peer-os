@@ -1,7 +1,6 @@
 package io.subutai.core.peer.impl;
 
 
-import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -71,7 +70,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error starting container: " + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -95,7 +94,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error stopping container:" + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -119,7 +118,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error destroying container: " + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -143,7 +142,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error on reading container state: " + e.getMessage() );
         }
 
-        return checkResponse( response, ContainerHostState.class );
+        return WebClientBuilder.checkResponse( response, ContainerHostState.class );
     }
 
 
@@ -167,7 +166,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error on obtaining process resource usage: " + e.getMessage() );
         }
 
-        return checkResponse( response, ProcessResourceUsage.class );
+        return WebClientBuilder.checkResponse( response, ProcessResourceUsage.class );
     }
 
 
@@ -192,7 +191,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error on obtaining available quota: " + e.getMessage() );
         }
 
-        return checkResponse( response, ContainerQuota.class );
+        return WebClientBuilder.checkResponse( response, ContainerQuota.class );
     }
 
 
@@ -217,7 +216,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error on setting quota: " + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -241,7 +240,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error on obtaining resource host id by container id: " + e.getMessage() );
         }
 
-        return checkResponse( response, HostId.class );
+        return WebClientBuilder.checkResponse( response, HostId.class );
     }
 
 
@@ -266,7 +265,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error generating ssh keys in environment: " + e.getMessage() );
         }
 
-        return checkResponse( response, SshKeys.class );
+        return WebClientBuilder.checkResponse( response, SshKeys.class );
     }
 
 
@@ -291,7 +290,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error configuring ssh in environment: " + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -313,7 +312,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error adding ssh key in environment: " + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -335,7 +334,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error removing ssh key in environment: " + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -360,7 +359,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error configuring hosts in environment: " + e.getMessage() );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -385,7 +384,7 @@ public class EnvironmentWebClient
             throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -408,7 +407,7 @@ public class EnvironmentWebClient
             throw new PeerException( "Error reading ssh keys of the environment: " + e.getMessage() );
         }
 
-        return checkResponse( response, SshKeys.class );
+        return WebClientBuilder.checkResponse( response, SshKeys.class );
     }
 
 
@@ -431,42 +430,6 @@ public class EnvironmentWebClient
             throw new PeerException( "Error creating ssh key: " + e.getMessage() );
         }
 
-        return checkResponse( response, SshKey.class );
-    }
-
-
-    protected <T> T checkResponse( Response response, Class<T> clazz ) throws PeerException
-    {
-
-        checkResponse( response );
-
-        try
-        {
-            return response.readEntity( clazz );
-        }
-        catch ( ResponseProcessingException e )
-        {
-            throw new PeerException( "Error parsing response", e );
-        }
-    }
-
-
-    protected void checkResponse( Response response ) throws PeerException
-    {
-        try
-        {
-            if ( response == null )
-            {
-                throw new PeerException( "No response to parse" );
-            }
-            else if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-        }
-        catch ( ResponseProcessingException e )
-        {
-            throw new PeerException( "Error parsing response", e );
-        }
+        return WebClientBuilder.checkResponse( response, SshKey.class );
     }
 }

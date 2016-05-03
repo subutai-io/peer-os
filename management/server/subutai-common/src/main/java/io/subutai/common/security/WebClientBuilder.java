@@ -5,7 +5,9 @@ import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collections;
 
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
@@ -182,5 +185,74 @@ public class WebClientBuilder
     public static WebClient buildPeerWebClient( final PeerInfo peerInfo, final String path )
     {
         return buildPeerWebClient( peerInfo, path, null );
+    }
+
+
+    public static <T> T checkResponse( Response response, Class<T> clazz ) throws PeerException
+    {
+
+        checkResponse( response, false );
+
+        try
+        {
+            return response.readEntity( clazz );
+        }
+        catch ( ResponseProcessingException e )
+        {
+            throw new PeerException( "Error parsing response", e );
+        }
+        finally
+        {
+            close( response );
+        }
+    }
+
+
+    public static void checkResponse( Response response ) throws PeerException
+    {
+        checkResponse( response, true );
+    }
+
+
+    static void checkResponse( Response response, boolean close ) throws PeerException
+    {
+        try
+        {
+            if ( response == null )
+            {
+                throw new PeerException( "No response to parse" );
+            }
+            else if ( response.getStatus() == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() )
+            {
+                throw new PeerException( response.readEntity( String.class ) );
+            }
+        }
+        catch ( ResponseProcessingException e )
+        {
+            throw new PeerException( "Error parsing response", e );
+        }
+        finally
+        {
+            if ( close )
+            {
+                close( response );
+            }
+        }
+    }
+
+
+    public static void close( Response response )
+    {
+        if ( response != null )
+        {
+            try
+            {
+                response.close();
+            }
+            catch ( Exception ignore )
+            {
+                //ignore
+            }
+        }
     }
 }
