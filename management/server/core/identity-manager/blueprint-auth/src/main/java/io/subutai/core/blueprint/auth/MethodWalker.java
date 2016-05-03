@@ -4,9 +4,9 @@ package io.subutai.core.blueprint.auth;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.BundleContext;
@@ -75,10 +75,10 @@ public class MethodWalker
         String sourceValueName = credibility.source();
         RelationLink source = getLink( sourceValueName );
 
-        if ( List.class.isAssignableFrom( returnObject.getClass() ) )
+        if ( Collection.class.isAssignableFrom( returnObject.getClass() ) )
         {
             boolean allowed = true;
-            List collection = ( List<?> ) returnObject;
+            Collection collection = ( Collection<?> ) returnObject;
             for ( final Object item : collection )
             {
                 if ( !( item instanceof RelationLink ) )
@@ -129,10 +129,15 @@ public class MethodWalker
         try
         {
             Method beanMethod = beanClass.getMethod( method.getName(), method.getParameterTypes() );
-            RelationPreCredibility credibility = beanMethod.getAnnotation( RelationPreCredibility.class );
+            RelationPreCredibility credibility = beanMethod.getDeclaredAnnotation( RelationPreCredibility.class );
 
             String targetValueName = credibility.target();
             String sourceValueName = credibility.source();
+
+            if ( "return".equals( targetValueName ) )
+            {
+                return;
+            }
 
             RelationLink target = getLink( targetValueName );
             RelationLink source = getLink( sourceValueName );
@@ -151,8 +156,8 @@ public class MethodWalker
         Map<String, String> relationTraits = new HashMap<>();
         for ( final Trait trait : traits )
         {
-            relationTraits.put( trait.traitKey(), trait.traitValue() );
-            logger.info( "{} :: {}", trait.traitKey(), trait.traitValue() );
+            relationTraits.put( trait.key(), trait.value() );
+            logger.info( "{} :: {}", trait.key(), trait.value() );
         }
         RelationInfoMeta meta = new RelationInfoMeta();
         meta.setRelationTraits( relationTraits );

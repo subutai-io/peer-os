@@ -372,9 +372,10 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                             messageResponseListener, provider, this );
 
             RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-            relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
-            relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
-            relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "receiveHeartbeats", "allow" );
+            traits.put( "sendHeartbeats", "allow" );
+            traits.put( "hostTemplates", "allow" );
 
             User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
             RelationMeta relationMeta = new RelationMeta( peerOwner, localPeer, remotePeer, localPeer.getKeyId() );

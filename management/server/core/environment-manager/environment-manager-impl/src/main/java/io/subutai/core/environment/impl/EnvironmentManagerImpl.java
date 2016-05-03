@@ -64,6 +64,7 @@ import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.RelationPreCredibility;
+import io.subutai.common.security.relation.Trait;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
@@ -251,8 +252,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @PermitAll
-    @RelationPreCredibility
+    @RelationPreCredibility( target = "return", traits = {
+            @Trait( key = "ownership", value = "All" ), @Trait( key = "read", value = "true" )
+    } )
     @Override
     public Set<Environment> getEnvironments()
     {
@@ -262,11 +264,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         for ( Environment environment : environmentService.getAll() )
         {
-            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
-
-            final boolean b = environment.getUserId().equals( activeUser.getId() );
-
-            if ( b || trustedRelation )
+//            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
+//
+//            final boolean b = environment.getUserId().equals( activeUser.getId() );
+//
+//            if ( b || trustedRelation )
             {
                 environments.add( environment );
 
@@ -706,8 +708,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
+    //    @RelationPreCredibility( traits = {
+    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
+    //    } )
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
@@ -989,8 +994,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
     @Override
+    @RolesAllowed( "Environment-Management|Delete" )
+    //    @RelationPreCredibility( traits = {
+    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "delete", value = "true" )
+    //    } )
     public void destroyContainer( final String environmentId, final String containerId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -1176,8 +1184,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
+    //    @RelationPreCredibility( traits = {
+    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
+    //    } )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                          final String sslCertPath )
@@ -1441,16 +1452,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            // TODO user should send signed trust message between delegatedUser and himself
-            RelationInfoMeta relationInfoMeta =
-                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
 
-            RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
-
-            // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
                     new RelationMeta( delegatedUser, delegatedUser, environment, activeUser.getSecurityKeyId() );
-            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
         }
@@ -1924,6 +1936,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             RelationInfoMeta relationInfoMeta =
                     new RelationInfoMeta( dto.isRead(), dto.isWrite(), dto.isUpdate(), dto.isDelete(),
                             Ownership.GROUP.getLevel() );
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", String.valueOf( dto.isRead() ) );
+            traits.put( "write", String.valueOf( dto.isWrite() ) );
+            traits.put( "update", String.valueOf( dto.isUpdate() ) );
+            traits.put( "delete", String.valueOf( dto.isDelete() ) );
+            traits.put( "ownership", Ownership.GROUP.getName() );
 
             RelationMeta relationMeta =
                     new RelationMeta( delegatedUser, targetDelegate, environment, delegatedUser.getId() );

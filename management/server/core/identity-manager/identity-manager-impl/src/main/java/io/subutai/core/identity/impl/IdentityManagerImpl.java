@@ -12,6 +12,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -908,14 +909,17 @@ public class IdentityManagerImpl implements IdentityManager
                 generateKeyPair( delegatedUser.getId(), SecurityKeyType.UserKey.getId() );
             }
 
-
-            // TODO user should send signed trust message between delegatedUser and himself
+            assert relationManager != null;
             RelationInfoMeta relationInfoMeta =
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
 
-            assert relationManager != null;
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
 
-            // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
                     new RelationMeta( activeUser, delegatedUser, delegatedUser, activeUser.getSecurityKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );

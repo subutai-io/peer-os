@@ -5,6 +5,7 @@ import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import ai.subut.kurjun.metadata.common.subutai.TemplateId;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
-import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.core.identity.api.IdentityManager;
@@ -31,13 +31,12 @@ import io.subutai.core.kurjun.impl.model.TemplateAccess;
 
 /**
  * Helper class that uses Subutai API for template security access
- *
  */
 class SubutaiSecurityHelper
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( SubutaiSecurityHelper.class );
-    
+
     private static final String TEMPLATE_ACCESS_CLASS = TemplateAccess.class.getSimpleName();
 
     private final IdentityManager subutaiIdentityManager;
@@ -48,7 +47,7 @@ class SubutaiSecurityHelper
 
 
     SubutaiSecurityHelper( IdentityManager identityManager, RelationManager relationManager,
-            io.subutai.core.security.api.SecurityManager securityManager )
+                           io.subutai.core.security.api.SecurityManager securityManager )
     {
         Objects.requireNonNull( identityManager );
         Objects.requireNonNull( securityManager );
@@ -73,8 +72,8 @@ class SubutaiSecurityHelper
         }
         return fprints;
     }
-    
-  
+
+
     boolean isUserHasKeyId( String fprint )
     {
         User user = subutaiIdentityManager.getUserByFingerprint( fprint.toUpperCase( Locale.US ) );
@@ -174,19 +173,24 @@ class SubutaiSecurityHelper
     }
 
 
-    private void buildRelationChain( TemplateAccess templateAccess, UserDelegate from, UserDelegate to,
-            boolean canRead, boolean canWrite, boolean canUpdate, boolean canDelete )
+    private void buildRelationChain( TemplateAccess templateAccess, UserDelegate from, UserDelegate to, boolean canRead,
+                                     boolean canWrite, boolean canUpdate, boolean canDelete )
     {
         RelationMeta relationMeta = new RelationMeta();
         relationMeta.setSource( from );
         relationMeta.setTarget( to );
         relationMeta.setObject( templateAccess );
 
-        RelationInfoMeta relationInfoMeta
-                = new RelationInfoMeta( canRead, canWrite, canUpdate, canDelete, Ownership.USER.getLevel() );
-        RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( canRead, canWrite, canUpdate, canDelete, Ownership.USER.getLevel() );
+        Map<String, String> traits = relationInfoMeta.getRelationTraits();
+        traits.put( "read", "true" );
+        traits.put( "write", "true" );
+        traits.put( "delete", "true" );
+        traits.put( "update", "true" );
+        traits.put( "ownership", Ownership.USER.getName());
 
-        Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+        Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
 
         relationManager.saveRelation( relation );
     }
@@ -217,7 +221,8 @@ class SubutaiSecurityHelper
         {
             if ( TEMPLATE_ACCESS_CLASS.equals( relation.getTrustedObject().getClassPath() ) )
             {
-                long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() ).getUserId();
+                long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() )
+                                                        .getUserId();
                 User fromUser = subutaiIdentityManager.getUser( fromUserId );
                 String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
                 if ( !toUserFingerprint.equals( fromUserFprint ) )
@@ -243,11 +248,13 @@ class SubutaiSecurityHelper
 
             if ( TEMPLATE_ACCESS_CLASS.equals( relation.getTrustedObject().getClassPath() ) )
             {
-                long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() ).getUserId();
+                long fromUserId = subutaiIdentityManager.getUserDelegate( relation.getSource().getUniqueIdentifier() )
+                                                        .getUserId();
                 User fromUser = subutaiIdentityManager.getUser( fromUserId );
                 String fromUserFprint = getUserFingerprint( fromUser.getSecurityKeyId() );
 
-                long toUserId = subutaiIdentityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() ).getUserId();
+                long toUserId = subutaiIdentityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() )
+                                                      .getUserId();
                 User toUser = subutaiIdentityManager.getUser( toUserId );
                 String toUserFprint = getUserFingerprint( toUser.getSecurityKeyId() );
                 if ( !fromUserFprint.equals( toUserFprint ) )
@@ -287,9 +294,9 @@ class SubutaiSecurityHelper
         if ( !isGetAllowed( context, md5, owner ) )
         {
             TemplateId tid = new TemplateId( owner, Hex.encodeHexString( md5 ) );
-            throw new AccessControlException(
-                    String.format( "Action denied for the user %s to get a template with an id %s from the repository %s",
-                            getActiveUserFingerprint(), tid.get(), context.getName() ) );
+            throw new AccessControlException( String.format(
+                    "Action denied for the user %s to get a template with an id %s from the repository %s",
+                    getActiveUserFingerprint(), tid.get(), context.getName() ) );
         }
     }
 
@@ -310,9 +317,9 @@ class SubutaiSecurityHelper
         if ( !isDeleteAllowed( context, md5, owner ) )
         {
             TemplateId tid = new TemplateId( owner, Hex.encodeHexString( md5 ) );
-            throw new AccessControlException(
-                    String.format( "Action denied for the user %s to delete a template with an id %s from the repository %s",
-                            getActiveUserFingerprint(), tid.get(), context.getName() ) );
+            throw new AccessControlException( String.format(
+                    "Action denied for the user %s to delete a template with an id %s from the repository %s",
+                    getActiveUserFingerprint(), tid.get(), context.getName() ) );
         }
     }
 
@@ -370,5 +377,4 @@ class SubutaiSecurityHelper
         }
         return null;
     }
-
 }

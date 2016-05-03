@@ -1336,6 +1336,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "bandwidthControl", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
 
             if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
             {
@@ -1736,6 +1737,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "encryptMessage", "true" );
             relationTraits.put( "decryptMessage", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
 
             RelationMeta relationMeta = new RelationMeta( this, peerLink, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );

@@ -216,6 +216,7 @@ public class ContainerCloneStep
                 Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
                 relationTraits.put( "containerLimit", "unlimited" );
                 relationTraits.put( "bandwidthLimit", "unlimited" );
+                relationTraits.put("ownership", Ownership.USER.getName());
 
                 RelationMeta relationMeta = new RelationMeta( delegatedUser, environment, container, "" );
                 Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );

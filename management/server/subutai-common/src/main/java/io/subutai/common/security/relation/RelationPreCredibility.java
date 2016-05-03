@@ -13,7 +13,7 @@ public @interface RelationPreCredibility
 {
     Trait[] traits() default {};
 
-    String target() default "";
+    String target();
 
     String source() default "";
 }

@@ -136,9 +136,10 @@ public class RemotePeerImpl implements RemotePeer
         RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
 
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-        relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
-        relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
-        relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
+        Map<String, String> traits = relationInfoMeta.getRelationTraits();
+        traits.put( "receiveHeartbeats", "allow" );
+        traits.put( "sendHeartbeats", "allow" );
+        traits.put( "hostTemplates", "allow" );
 
         relationInfoManager.checkRelation( localPeer, this, relationInfoMeta, null );
     }

@@ -20,6 +20,7 @@ public interface Relation extends Serializable
 
     RelationStatus getRelationStatus();
 
+    // TODO should be omitted so that only system can change relation status
     void setRelationStatus( final RelationStatus relationStatus );
 
     String getKeyId();

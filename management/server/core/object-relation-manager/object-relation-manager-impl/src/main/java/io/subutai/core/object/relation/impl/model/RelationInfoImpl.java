@@ -23,8 +23,8 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
 /**
- * Relation info is simple string presentation of traitKey=traitValue where each pair will describe relation with
- * other object. When verifying transitive relation, relation validity is checked upon key=pair existence.
+ * Relation info is simple string presentation of key=value where each pair will describe relation with other
+ * object. When verifying transitive relation, relation validity is checked upon key=pair existence.
  */
 @Entity
 @Table( name = "relation_info" )
@@ -48,6 +48,7 @@ public class RelationInfoImpl implements RelationInfo
     @Column( name = "delete_p" )
     private boolean deletePermission;
 
+    // TODO set ownership level according to relations by lookup method
     //Permission, role
     @Column( name = "ownership_level" )
     private int ownershipLevel = Ownership.ALL.getLevel();
@@ -56,7 +57,7 @@ public class RelationInfoImpl implements RelationInfo
     @CollectionTable( name = "relation_traits" )
     @MapKeyColumn( name = "trait_key" )
     @Column( name = "trait_value" )
-//    @CollectionTable( name = "relation_traits", joinColumns = @JoinColumn( name = "relation_info_id" ) )
+    //    @CollectionTable( name = "relation_traits", joinColumns = @JoinColumn( name = "relation_info_id" ) )
     private Map<String, String> relationTraits = new HashMap<String, String>(); // maps from attribute name to value
 
 

@@ -12,9 +12,7 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.RelationPreCredibility;
 import io.subutai.common.security.relation.RelationVerificationException;
-import io.subutai.common.security.relation.Trait;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
@@ -39,8 +37,7 @@ public class RelationManagerImpl implements RelationManager
     private RelationMessageManagerImpl trustMessageManager;
     private RelationInfoManagerImpl relationInfoManager;
     private DaoManager daoManager = null;
-    private @RelationPreCredibility( traits = { @Trait( traitKey = "key", traitValue = "value" ) } ) RelationDataService
-            relationDataService;
+    private RelationDataService relationDataService;
 
 
     //*****************************************
@@ -208,10 +205,8 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    @RelationPreCredibility
     public List<Relation> getRelations()
     {
-        @RelationPreCredibility(source = "relationDataService") String str = "";
         return relationDataService.getAllRelations();
     }
 
