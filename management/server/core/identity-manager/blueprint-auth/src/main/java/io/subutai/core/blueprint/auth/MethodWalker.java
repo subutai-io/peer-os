@@ -18,10 +18,10 @@ import org.apache.commons.collections.Unmodifiable;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.security.relation.RelationCredibility;
 import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.RelationPreCredibility;
 import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.security.relation.Trait;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
@@ -71,7 +71,7 @@ public class MethodWalker
         }
 
         Method beanMethod = beanClass.getMethod( method.getName(), method.getParameterTypes() );
-        RelationPreCredibility credibility = beanMethod.getAnnotation( RelationPreCredibility.class );
+        RelationCredibility credibility = beanMethod.getAnnotation( RelationCredibility.class );
         String sourceValueName = credibility.source();
         RelationLink source = getLink( sourceValueName );
 
@@ -129,7 +129,7 @@ public class MethodWalker
         try
         {
             Method beanMethod = beanClass.getMethod( method.getName(), method.getParameterTypes() );
-            RelationPreCredibility credibility = beanMethod.getDeclaredAnnotation( RelationPreCredibility.class );
+            RelationCredibility credibility = beanMethod.getDeclaredAnnotation( RelationCredibility.class );
 
             String targetValueName = credibility.target();
             String sourceValueName = credibility.source();

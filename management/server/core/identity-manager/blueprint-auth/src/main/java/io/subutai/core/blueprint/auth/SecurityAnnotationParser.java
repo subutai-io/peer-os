@@ -21,7 +21,7 @@ import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
-import io.subutai.common.security.relation.RelationPreCredibility;
+import io.subutai.common.security.relation.RelationCredibility;
 
 
 /**
@@ -72,7 +72,7 @@ public class SecurityAnnotationParser
         }
         if ( ann == null )
         {
-            ann = element.getAnnotation( RelationPreCredibility.class );
+            ann = element.getAnnotation( RelationCredibility.class );
         }
         return ann;
     }
@@ -105,7 +105,7 @@ public class SecurityAnnotationParser
 
     private boolean isSecuredEl( AnnotatedElement element )
     {
-        return element.isAnnotationPresent( RelationPreCredibility.class ) || element.isAnnotationPresent( RolesAllowed.class )
+        return element.isAnnotationPresent( RelationCredibility.class ) || element.isAnnotationPresent( RolesAllowed.class )
                 || element.isAnnotationPresent( DenyAll.class );
     }
 }

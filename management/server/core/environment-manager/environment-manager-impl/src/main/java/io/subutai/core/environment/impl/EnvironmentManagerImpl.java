@@ -62,8 +62,8 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.relation.RelationCredibility;
 import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.RelationPreCredibility;
 import io.subutai.common.security.relation.Trait;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfo;
@@ -252,7 +252,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RelationPreCredibility( target = "return", traits = {
+    @RelationCredibility( target = "return", traits = {
             @Trait( key = "ownership", value = "All" ), @Trait( key = "read", value = "true" )
     } )
     @Override
@@ -710,7 +710,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    //    @RelationPreCredibility( traits = {
+    //    @RelationCredibility( traits = {
     //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
     //    } )
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
@@ -996,7 +996,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     @RolesAllowed( "Environment-Management|Delete" )
-    //    @RelationPreCredibility( traits = {
+    //    @RelationCredibility( traits = {
     //            @Trait( key = "ownership", value = "All" ), @Trait( key = "delete", value = "true" )
     //    } )
     public void destroyContainer( final String environmentId, final String containerId, final boolean async )
@@ -1186,7 +1186,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    //    @RelationPreCredibility( traits = {
+    //    @RelationCredibility( traits = {
     //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
     //    } )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,

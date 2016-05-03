@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.aries.blueprint.Interceptor;
 
-import io.subutai.common.security.relation.RelationPreCredibility;
+import io.subutai.common.security.relation.RelationCredibility;
 
 
 public class AuthorizationInterceptor implements Interceptor
@@ -73,7 +73,7 @@ public class AuthorizationInterceptor implements Interceptor
             throws Exception
     {
         Annotation ann = new SecurityAnnotationParser().getEffectiveAnnotation( beanClass, method );
-        if ( ann instanceof RelationPreCredibility )
+        if ( ann instanceof RelationCredibility )
         {
             try
             {
@@ -106,7 +106,7 @@ public class AuthorizationInterceptor implements Interceptor
             rolesAr = ( ( RolesAllowed ) ann ).value();
         }
 
-        if ( ann instanceof RelationPreCredibility )
+        if ( ann instanceof RelationCredibility )
         {
             try
             {
