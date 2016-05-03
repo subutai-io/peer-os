@@ -26,7 +26,9 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -431,6 +433,61 @@ public class IdentityManagerImpl implements IdentityManager
         }
 
         return token;
+    }
+
+
+    /*
+     *************************************************
+     */
+    @Override
+    public String authenticateByAuthSignature( final String fingerprint, final String signedAuth )
+            throws SecurityException
+    {
+        KeyManager keyManager = securityManager.getKeyManager();
+        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
+        PGPPublicKeyRing publicKeyRing = keyManager.getPublicKeyRing( fingerprint );
+
+        try
+        {
+            if ( encryptionTool.verifyClearSign( signedAuth.getBytes(), publicKeyRing ) )
+            {
+                User user = getUserByFingerprint( fingerprint );
+                if ( user != null )
+                {
+                    String userToken = new String( encryptionTool.extractClearSignContent( signedAuth.getBytes() ) );
+                    UserToken token = identityDataService.getUserToken( userToken );
+
+                    Date now = new Date( System.currentTimeMillis() );
+                    if ( now.compareTo( token.getValidDate() ) >= 0 )
+                    {
+                        throw new SecurityException( "Token lifetime expired" );
+                    }
+
+                    User tokenUser = identityDataService.getUser( token.getUserId() );
+                    if ( tokenUser != null && tokenUser.equals( user ) )
+                    {
+                        return token.getFullToken();
+                    }
+                    else
+                    {
+                        throw new SecurityException( "User associated with signed document doesn't match" );
+                    }
+                }
+                else
+                {
+                    throw new SecurityException( "User not found associated with fingerprint: " + fingerprint );
+                }
+            }
+            else
+            {
+                throw new SecurityException( "Signed Auth verification failed." );
+            }
+        }
+        catch ( PGPException e )
+        {
+            throw new SecurityException( e );
+        }
     }
 
 

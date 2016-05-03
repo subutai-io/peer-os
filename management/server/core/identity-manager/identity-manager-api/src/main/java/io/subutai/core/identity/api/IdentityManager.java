@@ -57,6 +57,10 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    String authenticateByAuthSignature( String fingerprint, String signedAuth ) throws SecurityException;
+
+    /* *************************************************
+     */
     User authenticateByToken( String token );
 
 
