@@ -93,7 +93,7 @@ const defaultConfig = `
 
 	[template]
 	version = 4.0.0
-	branch = stable
+	branch =
 	arch = amd64
 `
 
