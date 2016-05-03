@@ -450,38 +450,34 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            if ( encryptionTool.verifyClearSign( signedAuth.getBytes(), publicKeyRing ) )
+            if ( !encryptionTool.verifyClearSign( signedAuth.getBytes(), publicKeyRing ) )
             {
-                User user = getUserByFingerprint( fingerprint );
-                if ( user != null )
-                {
-                    String userToken = new String( encryptionTool.extractClearSignContent( signedAuth.getBytes() ) );
-                    UserToken token = identityDataService.getUserToken( userToken );
+                throw new SecurityException( "Signed Auth verification failed." );
+            }
 
-                    Date now = new Date( System.currentTimeMillis() );
-                    if ( now.compareTo( token.getValidDate() ) >= 0 )
-                    {
-                        throw new SecurityException( "Token lifetime expired" );
-                    }
+            User user = getUserByFingerprint( fingerprint );
+            if ( user == null )
+            {
+                throw new SecurityException( "User not found associated with fingerprint: " + fingerprint );
+            }
 
-                    User tokenUser = identityDataService.getUser( token.getUserId() );
-                    if ( tokenUser != null && tokenUser.equals( user ) )
-                    {
-                        return token.getFullToken();
-                    }
-                    else
-                    {
-                        throw new SecurityException( "User associated with signed document doesn't match" );
-                    }
-                }
-                else
-                {
-                    throw new SecurityException( "User not found associated with fingerprint: " + fingerprint );
-                }
+            String userToken = new String( encryptionTool.extractClearSignContent( signedAuth.getBytes() ) );
+            UserToken token = identityDataService.getUserToken( userToken );
+
+            Date now = new Date( System.currentTimeMillis() );
+            if ( now.compareTo( token.getValidDate() ) >= 0 )
+            {
+                throw new SecurityException( "Token lifetime expired" );
+            }
+
+            User tokenUser = identityDataService.getUser( token.getUserId() );
+            if ( tokenUser != null && tokenUser.equals( user ) )
+            {
+                return token.getFullToken();
             }
             else
             {
-                throw new SecurityException( "Signed Auth verification failed." );
+                throw new SecurityException( "User associated with signed document doesn't match" );
             }
         }
         catch ( PGPException e )
