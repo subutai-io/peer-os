@@ -11,6 +11,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.ws.rs.core.Response;
 
@@ -33,6 +35,9 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
@@ -52,6 +57,7 @@ public class ConfigManager
     private static final int HUB_PORT = 444;
 
     private SecurityManager securityManager;
+    private IdentityManager identityManager;
     private PeerManager peerManager;
 
     private PGPPublicKey hPublicKey;
@@ -76,9 +82,10 @@ public class ConfigManager
 
 
     public ConfigManager( final SecurityManager securityManager, final PeerManager peerManager,
-                          final ConfigDataService configDataService )
+                          final ConfigDataService configDataService, final IdentityManager identityManager )
             throws IOException, PGPException, KeyStoreException, CertificateException, NoSuchAlgorithmException
     {
+        this.identityManager = identityManager;
         this.peerManager = peerManager;
         this.securityManager = securityManager;
 
@@ -232,5 +239,25 @@ public class ConfigManager
 
         IOUtils.copy( is, bos );
         return bos.toByteArray();
+    }
+
+    public String getPermanentToken()
+    {
+        Date newDate = new Date();
+        java.util.Calendar cal = Calendar.getInstance();
+        cal.setTime( newDate );
+        cal.add( Calendar.YEAR, 2 );
+
+        User user = identityManager.getActiveUser();
+
+        UserToken token = identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
+
+        return token.getFullToken();
+    }
+
+
+    public IdentityManager getIdentityManager()
+    {
+        return identityManager;
     }
 }
