@@ -91,8 +91,22 @@ public class MethodWalker
             {
                 if ( Unmodifiable.class.isAssignableFrom( returnObject.getClass() ) )
                 {
+                    //todo return new unmodifiable collection but with filtered content
                     throw new RelationVerificationException(
                             "Cannot filter items, correct return type or remove annotation." );
+                    //                    try
+                    //                    {
+                    //                        Collection filtered = ( Collection ) returnObject.getClass()
+                    // .newInstance();
+                    //                        for ( final Object obj : collection )
+                    //                        {
+                    //                            filtered.add( obj );
+                    //                        }
+                    //                    }
+                    //                    catch ( InstantiationException | IllegalAccessException e )
+                    //                    {
+                    //                        logger.warn( "Couldn't instantiate new collection", e );
+                    //                    }
                 }
                 else
                 {
@@ -110,10 +124,19 @@ public class MethodWalker
                     }
                 }
             }
+            else
+            {
+                throw new RelationVerificationException(
+                        "Cannot filter items, correct return type or remove annotation." );
+            }
         }
         else if ( returnObject instanceof RelationLink )
         {
             check( source, ( RelationLink ) returnObject, credibility.traits() );
+        }
+        else
+        {
+            throw new RelationVerificationException( "Cannot filter items, correct return type or remove annotation." );
         }
     }
 
