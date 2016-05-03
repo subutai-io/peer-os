@@ -51,6 +51,7 @@ import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.VehsProccessor;
+import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.network.api.NetworkManager;
@@ -129,7 +130,7 @@ public class IntegrationImpl implements Integration
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
 
-            configManager = new ConfigManager( securityManager, peerManager, configDataService );
+            configManager = new ConfigManager( securityManager, peerManager, configDataService, identityManager );
 
             hubEnvironmentManager =
                     new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager,
@@ -146,23 +147,29 @@ public class IntegrationImpl implements Integration
 
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
-            EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
-                    environmentManager );
+            EnvironmentUserHelper environmentUserHelper =
+                    new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor, environmentUserHelper );
+                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
+                            environmentUserHelper );
 
             StateLinkProccessor vehsProccessor =
                     new VehsProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
                             environmentUserHelper );
 
+            StateLinkProccessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
+
             heartbeatProcessor.addProccessor( vehsProccessor );
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
 
-            AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
+            AppScaleProcessor appScaleProcessor =
+                    new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
             heartbeatProcessor.addProccessor( appScaleProcessor );
+
+            heartbeatProcessor.addProccessor( tunnelProcessor );
 
             hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
@@ -214,6 +221,13 @@ public class IntegrationImpl implements Integration
 
 
     @Override
+    public void sendOnlyHeartbeat() throws HubPluginException
+    {
+        heartbeatProcessor.sendHeartbeat();
+    }
+
+
+    @Override
     public void sendResourceHostInfo() throws HubPluginException
     {
         resourceHostConfProcessor.sendResourceHostConf();
@@ -255,8 +269,8 @@ public class IntegrationImpl implements Integration
         try
         {
             //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-            WebClient client =
-                    configManager.getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
+            WebClient client = configManager
+                    .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
 
@@ -289,7 +303,8 @@ public class IntegrationImpl implements Integration
     {
         try
         {
-            File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+            File file =
+                    new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
             URL website = new URL( url );
             FileUtils.copyURLToFile( website, file );
         }
@@ -305,7 +320,7 @@ public class IntegrationImpl implements Integration
     public void uninstallPlugin( final String name )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-        LOG.info (String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar");
+        LOG.info( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
         File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
@@ -514,7 +529,7 @@ public class IntegrationImpl implements Integration
             e.printStackTrace();
         }
 /*		}
-		else
+        else
 		{
 			LOG.info ("Peer not registered. Trying again in 1 hour.");
 		}*/
@@ -553,15 +568,16 @@ public class IntegrationImpl implements Integration
                 else
                 {
                     LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
-//                    throw new HubPluginException(
-//                            "Could not send SS configuration to Hub: " + r.readEntity( String.class ) );
+                    //                    throw new HubPluginException(
+                    //                            "Could not send SS configuration to Hub: " + r.readEntity( String
+                    // .class ) );
                 }
             }
             catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
                     NoSuchAlgorithmException e )
             {
                 LOG.error( "Could not send SS configuration to Hub", e );
-//                throw new HubPluginException( e.toString(), e );
+                //                throw new HubPluginException( e.toString(), e );
             }
         }
     }

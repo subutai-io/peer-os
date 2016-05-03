@@ -503,7 +503,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( userToken != null )
         {
-            if ( !TokenUtil.verifySignature( token, userToken.getSecret() ) )
+            if ( !TokenUtil.verifySignatureAndDate( token, userToken.getSecret() ) )
             {
                 return null;
             }
@@ -513,6 +513,34 @@ public class IdentityManagerImpl implements IdentityManager
             }
         }
         else
+        {
+            return null;
+        }
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public User authenticateByMessage(String fingerprint, String message )
+    {
+        try
+        {
+            if(!Strings.isNullOrEmpty( message ))
+            {
+                //PGPPublicKey pubKey =
+
+                byte cont[] = securityManager.getEncryptionTool().extractClearSignContent( message.getBytes() );
+                //securityManager.getEncryptionTool().verify( message.getBytes() , get )
+                return null;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch ( PGPException e )
         {
             return null;
         }
@@ -697,11 +725,10 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /**
-     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Write" ). See
-     * createUser() for details.
+
+    /* *************************************************
      */
-    @PermitAll
+    @RolesAllowed( "Identity-Management|Write" )
     @Override
     public void assignUserRole( User user, Role role )
     {
@@ -894,7 +921,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Write" )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public UserDelegate createUserDelegate( User user, String delegateUserId, boolean genKeyPair )
     {
@@ -1004,11 +1031,10 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /**
-     * IMPORTANT. Here we have quick and dirty workaround for https://github.com/optdyn/hub/issues/413. We have to
-     * create a new account in SS for an environment owner from Hub. Normally this method should be annotated with
+
+    /* *************************************************
      */
-    @PermitAll
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public User createUser( String userName, String password, String fullName, String email, int type, int trustLevel,
                             boolean generateKeyPair, boolean createUserDelegate ) throws Exception
@@ -1070,7 +1096,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Read" )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" , "Identity-Management|Read" } )
     @Override
     public User getUserByUsername( String userName )
     {
@@ -1080,7 +1106,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Write" )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update"} )
     @Override
     public User modifyUser( User user, String password ) throws Exception
     {
@@ -1175,7 +1201,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Update" )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update"} )
     @Override
     public void updateUser( User user )
     {
@@ -1192,7 +1218,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Update" )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update"} )
     @Override
     public void updateUser( User user, String publicKey )
     {
@@ -1207,11 +1233,9 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
-    /**
-     * IMPORTANT. Normally the method should be annotated with @RolesAllowed( "Identity-Management|Delete" ). See
-     * createUser() for details.
+    /* *************************************************
      */
-    @PermitAll
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Delete" } )
     @Override
     public void removeUser( long userId )
     {
@@ -1300,7 +1324,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Write" )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public Role createRole( String roleName, int roleType )
     {
@@ -1336,7 +1360,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( "Identity-Management|Update" )
+    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update" } )
     @Override
     public void updateRole( Role role )
     {

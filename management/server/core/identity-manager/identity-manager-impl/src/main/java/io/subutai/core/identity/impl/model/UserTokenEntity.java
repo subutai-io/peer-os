@@ -67,6 +67,12 @@ public class UserTokenEntity implements UserToken
         String str = "";
 
         str += "{\"iss\":\"" + issuer + "\",";
+
+        if(validDate == null)
+            str += "\"exp\":0,";
+        else
+            str += "\"exp\":" + validDate.getTime() + ",";
+
         str += "\"sub\":\"" + token + "\"}";
 
         return str;

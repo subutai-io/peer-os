@@ -34,7 +34,6 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -78,6 +77,9 @@ import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
@@ -401,11 +403,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public SshPublicKeys generateSshKeyForEnvironment( final EnvironmentId environmentId ) throws PeerException
+    public SshKeys readOrCreateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                      final SshEncryptionType sshKeyType ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( sshKeyType, "Ssh key type is null" );
 
-        SshPublicKeys sshPublicKeys = new SshPublicKeys();
+        SshKeys sshPublicKeys = new SshKeys();
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -417,7 +421,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults readResults = commandUtil
-                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand(), hosts, environmentId.getId() );
+                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand( sshKeyType ), hosts,
+                        environmentId.getId() );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -426,7 +431,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
             {
-                sshPublicKeys.addSshPublicKey( result.getCommandResult().getStdOut() );
+                sshPublicKeys.addKey( new SshKey( result.getHost().getId(), sshKeyType,
+                        result.getCommandResult().getStdOut().trim() ) );
 
                 succeededHosts.add( result.getHost() );
             }
@@ -449,12 +455,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkNotNull( sshPublicKeys, "SshPublicKey is null" );
-        Preconditions.checkArgument( !sshPublicKeys.isEmpty(), "No ssh keys" );
+        Preconditions.checkNotNull( sshKeys, "SshPublicKey is null" );
+        Preconditions.checkArgument( !sshKeys.isEmpty(), "No ssh keys" );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -466,14 +472,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //add keys in portions, since all can not fit into one command, it fails
-        int portionSize = 100;
+        int portionSize = Common.MAX_KEYS_IN_ECHO_CMD;
         int i = 0;
         StringBuilder keysString = new StringBuilder();
-        Set<String> keys = sshPublicKeys.getSshPublicKeys();
+        Set<SshKey> keys = sshKeys.getKeys();
 
-        for ( String key : keys )
+        for ( SshKey key : keys )
         {
-            keysString.append( key );
+            keysString.append( key.getPublicKey() ).append( System.lineSeparator() );
 
             i++;
 
@@ -523,6 +529,80 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public SshKeys getSshKeys( final EnvironmentId environmentId, final SshEncryptionType sshEncryptionType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( sshEncryptionType, "SSH encryption type is null" );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        SshKeys sshKeys = new SshKeys();
+
+        if ( hosts.isEmpty() )
+        {
+            return sshKeys;
+        }
+
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getReadSSHKeyCommand( sshEncryptionType ), hosts, environmentId.getId() );
+
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        {
+            if ( !result.hasSucceeded() )
+            {
+                LOG.warn( "SSH key read failed on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
+            else
+            {
+                sshKeys.addKey( new SshKey( result.getHost().getId(), sshEncryptionType,
+                        result.getCommandResult().getStdOut().trim() ) );
+            }
+        }
+
+        return sshKeys;
+    }
+
+
+    @Override
+    public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
+                                final SshEncryptionType sshEncryptionType ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+        Preconditions.checkNotNull( sshEncryptionType, "SSH encryption type is null" );
+
+        try
+        {
+            ContainerHost containerHost = getContainerHostById( containerId.getId() );
+            if ( !containerHost.getEnvironmentId().equals( environmentId ) )
+            {
+                throw new HostNotFoundException( "Environment does not contains requested container." );
+            }
+
+            CommandResult commandResult = commandUtil
+                    .execute( localPeerCommands.getReadOrCreateSSHCommand( sshEncryptionType ), containerHost );
+
+            if ( commandResult.hasSucceeded() )
+            {
+                return new SshKey( containerId.getId(), sshEncryptionType, commandResult.getStdOut().trim() );
+            }
+            else
+            {
+                throw new CommandException( "Command execution failed." );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new PeerException( "Error on creating ssh key." );
+        }
+    }
+
+
+    @Override
     public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
@@ -538,7 +618,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults results = commandUtil
-                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts,
+                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey.trim() ), hosts,
                         environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )

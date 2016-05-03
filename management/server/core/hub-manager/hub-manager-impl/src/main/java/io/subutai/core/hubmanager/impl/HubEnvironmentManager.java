@@ -33,7 +33,6 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -45,6 +44,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
@@ -372,7 +372,7 @@ public class HubEnvironmentManager
                         Set<Host> hosts = new HashSet<>();
                         Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
                         hosts.add( host );
-                        String sshKey = createSshKey( hosts );
+                        String sshKey = createSshKey( hosts, peerDto.getEnvironmentInfo().getId() );
                         nodeDto.addSshKey( sshKey );
                     }
                 }
@@ -416,22 +416,16 @@ public class HubEnvironmentManager
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
         final EnvironmentId environmentId = new EnvironmentId( env.getId() );
-        final Set<String> sshKeys = new HashSet<>();
+        final SshKeys sshKeys = new SshKeys();
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
                 if ( nodeDto.getSshKeys() != null )
                 {
-                    sshKeys.addAll( nodeDto.getSshKeys() );
+                    sshKeys.addStringKeys( nodeDto.getSshKeys() );
                 }
             }
-        }
-
-        // No need to exchange SSH keys if environment has less than two containers
-        if ( sshKeys.size() < 2 )
-        {
-            return peerDto;
         }
 
         completionService.submit( new Callable<Peer>()
@@ -439,7 +433,8 @@ public class HubEnvironmentManager
             @Override
             public Peer call() throws Exception
             {
-                localPeer.configureSshInEnvironment( environmentId, new SshPublicKeys( sshKeys ) );
+
+                localPeer.configureSshInEnvironment( environmentId, sshKeys );
                 return localPeer;
             }
         } );
@@ -511,11 +506,11 @@ public class HubEnvironmentManager
     }
 
 
-    public String createSshKey( Set<Host> hosts )
+    public String createSshKey( Set<Host> hosts, String environmentId )
     {
-        //todo use io.subutai.common.command.CommandUtil.executeFailFast() | io.subutai.common.command.CommandUtil
-        // .execute()
-        CommandUtil.HostCommandResults results = commandUtil.executeParallel( getCreateNReadSSHCommand(), hosts );
+
+        CommandUtil.HostCommandResults results =
+                commandUtil.execute( getCreateNReadSSHCommand(), hosts, environmentId );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {

@@ -16,7 +16,6 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
@@ -32,6 +31,9 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 
@@ -257,9 +259,10 @@ public interface Peer extends RelationLink
 
     PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
-    SshPublicKeys generateSshKeyForEnvironment( EnvironmentId environmentId ) throws PeerException;
+    SshKeys readOrCreateSshKeysForEnvironment( EnvironmentId environmentId, SshEncryptionType sshKeyType )
+            throws PeerException;
 
-    void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
+    void configureSshInEnvironment( EnvironmentId environmentId, SshKeys sshKeys ) throws PeerException;
 
     void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
@@ -268,4 +271,9 @@ public interface Peer extends RelationLink
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 
     void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
+
+    SshKeys getSshKeys( EnvironmentId environmentId, SshEncryptionType sshEncryptionType ) throws PeerException;
+
+    SshKey createSshKey( EnvironmentId environmentId, ContainerId containerId, SshEncryptionType encType )
+            throws PeerException;
 }

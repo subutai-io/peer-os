@@ -169,65 +169,6 @@ public class CommandUtil
 
 
     /**
-     * Allows to execute command on all hosts in parallel. If any exception is thrown, ignores it and collects results
-     * of only succeeded executions
-     *
-     * Deprecated: use io.subutai.common.command.CommandUtil#execute(RequestBuilder, Set<Host><, EnvironmentId) or
-     * io.subutai.common.command.CommandUtil#executeFailFast(RequestBuilder, Set<Host><, EnvironmentId)
-     *
-     * @param requestBuilder - request
-     * @param hosts - hosts
-     *
-     * @return -  map containing command results
-     */
-    @Deprecated
-    public HostCommandResults executeParallel( final RequestBuilder requestBuilder, Set<Host> hosts )
-    {
-        Preconditions.checkNotNull( requestBuilder );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( hosts ) );
-
-        final Set<HostCommandResult> hostCommandResults = Sets.newHashSet();
-
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
-        CompletionService<CommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
-
-        Map<Host, Future<CommandResult>> commandFutures = Maps.newHashMap();
-
-        for ( final Host host : hosts )
-        {
-            commandFutures.put( host, taskCompletionService.submit( new Callable<CommandResult>()
-            {
-                @Override
-                public CommandResult call() throws Exception
-                {
-                    return execute( requestBuilder, host );
-                }
-            } ) );
-        }
-
-        taskExecutor.shutdown();
-
-        for ( Map.Entry<Host, Future<CommandResult>> commandFuture : commandFutures.entrySet() )
-        {
-
-            try
-            {
-                hostCommandResults
-                        .add( new HostCommandResult( commandFuture.getKey(), commandFuture.getValue().get() ) );
-            }
-            catch ( Exception e )
-            {
-                LOG.error( "Error executing command ", e );
-
-                hostCommandResults.add( new HostCommandResult( commandFuture.getKey(), e ) );
-            }
-        }
-
-        return new HostCommandResults( hostCommandResults );
-    }
-
-
-    /**
      * Executes command on hosts in parallel
      *
      * Returns results of commands

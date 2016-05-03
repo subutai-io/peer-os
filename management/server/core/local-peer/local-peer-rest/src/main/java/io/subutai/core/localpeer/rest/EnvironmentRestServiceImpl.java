@@ -11,7 +11,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -20,6 +19,10 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
+import io.subutai.common.util.JsonUtil;
 
 
 /**
@@ -129,13 +132,14 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public SshPublicKeys generateSshKeysForEnvironment( final EnvironmentId environmentId )
+    public SshKeys generateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                  final SshEncryptionType sshKeyType )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
 
-            return localPeer.generateSshKeyForEnvironment( environmentId );
+            return localPeer.readOrCreateSshKeysForEnvironment( environmentId, sshKeyType );
         }
         catch ( Exception e )
         {
@@ -182,15 +186,15 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public Response configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkNotNull( sshPublicKeys );
-            Preconditions.checkArgument( !sshPublicKeys.isEmpty() );
+            Preconditions.checkNotNull( sshKeys );
+            Preconditions.checkArgument( !sshKeys.isEmpty() );
 
-            localPeer.configureSshInEnvironment( environmentId, sshPublicKeys );
+            localPeer.configureSshInEnvironment( environmentId, sshKeys );
 
             return Response.ok().build();
         }
@@ -290,6 +294,47 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( reverseProxyConfig );
             localPeer.addReverseProxy( reverseProxyConfig );
             return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response getSshKeys( final EnvironmentId environmentId, final SshEncryptionType encryptionType )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( encryptionType );
+
+            final SshKeys keys = localPeer.getSshKeys( environmentId, encryptionType );
+            return Response.ok( keys ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response createSshKey( final EnvironmentId environmentId, final SshEncryptionType encryptionType,
+                                  final String containerId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( encryptionType );
+
+            final SshKey key = localPeer
+                    .createSshKey( environmentId, JsonUtil.fromJson( containerId, ContainerId.class ), encryptionType );
+            return Response.ok( key ).build();
         }
         catch ( Exception e )
         {

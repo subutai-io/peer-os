@@ -223,7 +223,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            new RegisterHostsStep( environment, operationTracker ).execute();
+            new RegisterHostsStep( topology, environment, operationTracker ).execute();
 
             saveEnvironment();
 
@@ -244,7 +244,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            new RegisterSshStep( environment, operationTracker ).execute();
+            new RegisterSshStep( topology, environment, operationTracker ).execute();
 
             saveEnvironment();
 

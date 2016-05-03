@@ -188,7 +188,7 @@ public class EnvironmentGrowingWorkflow extends CancellableWorkflow<EnvironmentG
 
         try
         {
-            new RegisterHostsStep( environment, operationTracker ).execute();
+            new RegisterHostsStep( topology, environment, operationTracker ).execute();
 
             saveEnvironment();
 
@@ -209,7 +209,7 @@ public class EnvironmentGrowingWorkflow extends CancellableWorkflow<EnvironmentG
 
         try
         {
-            new RegisterSshStep( environment, operationTracker ).execute();
+            new RegisterSshStep( topology, environment, operationTracker ).execute();
 
             saveEnvironment();
 

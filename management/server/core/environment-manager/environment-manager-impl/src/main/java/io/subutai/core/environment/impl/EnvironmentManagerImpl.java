@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.WebApplicationException;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -54,6 +55,9 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
@@ -812,6 +816,50 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    @Override
+    public SshKeys getSshKeys( final String environmentId, final SshEncryptionType encType )
+    {
+        SshKeys sshKeys = new SshKeys();
+        try
+        {
+            Environment environment = loadEnvironment( environmentId );
+
+            for ( Peer peer : environment.getPeers() )
+            {
+                SshKeys keys = peer.getSshKeys( environment.getEnvironmentId(), encType );
+                sshKeys.addKeys( keys.getKeys() );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+        }
+        return sshKeys;
+    }
+
+
+    @Override
+    public SshKeys createSshKey( final String environmentId, final String hostname, final SshEncryptionType encType )
+    {
+        SshKeys sshKeys = new SshKeys();
+        try
+        {
+            Environment environment = loadEnvironment( environmentId );
+
+            ContainerHost host = environment.getContainerHostByHostname( hostname );
+            SshKey sshKey =
+                    host.getPeer().createSshKey( environment.getEnvironmentId(), host.getContainerId(), encType );
+            sshKeys.addKey( sshKey );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new WebApplicationException( e.getMessage() );
+        }
+        return sshKeys;
+    }
+
+
     @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void resetP2PSecretKey( final String environmentId, final String newP2pSecretKey,
@@ -1028,23 +1076,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException
     {
-        CancellableWorkflow activeWorkflow = activeWorkflows.get( environmentId );
-
-        if ( activeWorkflow != null )
+        try
         {
-            try
+            CancellableWorkflow activeWorkflow = activeWorkflows.get( environmentId );
+
+            if ( activeWorkflow != null )
             {
                 activeWorkflow.cancel();
 
                 removeActiveWorkflow( environmentId );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+                EnvironmentImpl environment = environmentService.find( environmentId );
 
-                throw new EnvironmentManagerException(
-                        String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
+                environment.setStatus( EnvironmentStatus.CANCELLED );
+
+                update( environment );
             }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+
+            throw new EnvironmentManagerException(
+                    String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
         }
     }
 
