@@ -1,16 +1,17 @@
 package lib
 
 import (
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/container"
-	"github.com/subutai-io/base/agent/lib/fs"
-	"github.com/subutai-io/base/agent/lib/net"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/fs"
+	"github.com/subutai-io/base/agent/lib/net"
+	"github.com/subutai-io/base/agent/log"
 )
 
 // LxcPromote promotes the given container name.
@@ -19,12 +20,12 @@ func LxcPromote(name string) {
 
 	// check: start container if it is not running already
 	if container.State(name) != "RUNNING" {
-		container.Start(name)
+		LxcStart(name)
 		// log.Info("Container " + name + " is started")
 	}
-	// check: write package list to packages
-	pkgCmmdResult, _ := container.AttachExec(name, []string{"dpkg", "-l"})
 
+	// check: write package list to packages
+	pkgCmmdResult, _ := container.AttachExec(name, []string{"timeout", "60", "dpkg", "-l"})
 	strCmdRes := strings.Join(pkgCmmdResult, "\n")
 	log.Check(log.FatalLevel, "Write packages",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/packages",
