@@ -8,7 +8,7 @@ import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.object.relation.api.BundlePorter;
+import io.subutai.core.object.relation.api.RelationManager;
 
 
 @Command( scope = "test", name = "test", description = "test command" )
@@ -16,12 +16,12 @@ public class TestRoleValidation extends SubutaiShellCommandSupport
 {
     private static final Logger LOG = LoggerFactory.getLogger( TestCommand.class.getName() );
 
-    private BundlePorter bundlePorter;
+    private RelationManager relationManager;
 
 
-    public void setBundlePorter( final BundlePorter bundlePorter )
+    public void setRelationManager( final RelationManager relationManager )
     {
-        this.bundlePorter = bundlePorter;
+        this.relationManager = relationManager;
     }
 
 
@@ -31,7 +31,7 @@ public class TestRoleValidation extends SubutaiShellCommandSupport
         try
         {
             System.out.println( "Hello there!" );
-            System.out.println( bundlePorter.getPort() );
+            System.out.println( relationManager.getRelations() );
         }
         catch ( Exception e )
         {

@@ -15,14 +15,4 @@
   </service>
   <!--*****************************************************************-->
 
-  <bean id="bundlePorter" scope="singleton" activation="eager"
-        class="io.subutai.core.blueprint.auth.BundlePorterImpl">
-  </bean>
-
-  <service ref="bundlePorter" activation="eager"
-           interface="io.subutai.core.object.relation.api.BundlePorter">
-  </service>
-
-  <!--*****************************************************************-->
-
 </blueprint>

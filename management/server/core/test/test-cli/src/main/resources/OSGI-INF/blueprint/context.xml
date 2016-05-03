@@ -3,8 +3,8 @@
 
   <authz:enable />
 
-  <reference id="bundlePorter" availability="mandatory"
-             interface="io.subutai.core.object.relation.api.BundlePorter" />
+  <reference id="relationManager" availability="mandatory"
+             interface="io.subutai.core.object.relation.api.RelationManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="test/error">
@@ -15,7 +15,7 @@
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="test/test">
       <action class="io.subutai.core.test.cli.TestRoleValidation">
-        <property name="bundlePorter" ref="bundlePorter" />
+        <property name="relationManager" ref="relationManager" />
       </action>
     </command>
   </command-bundle>

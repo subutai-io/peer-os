@@ -69,9 +69,22 @@ public class AuthorizationInterceptor implements Interceptor
     }
 
 
-    public void postCallWithReturn( ComponentMetadata cm, Method m, Object returnType, Object preCallToken )
+    public void postCallWithReturn( ComponentMetadata cm, Method method, Object returnType, Object preCallToken )
             throws Exception
     {
+        Annotation ann = new SecurityAnnotationParser().getEffectiveAnnotation( beanClass, method );
+        if ( ann instanceof RelationPreCredibility )
+        {
+            try
+            {
+                methodWalker.performCheck( bean, method, returnType );
+            }
+            catch ( Exception ex )
+            {
+                String msg = "Sorry you don't have sufficient relations for this operation for details see logs.";
+                throw new SecurityException( msg, ex );
+            }
+        }
     }
 
 
@@ -93,7 +106,7 @@ public class AuthorizationInterceptor implements Interceptor
         {
             try
             {
-                methodWalker.performCheck( bean, method, parameters );
+//                methodWalker.performCheck( bean, method, parameters );
                 return null;
             }
             catch ( Exception ex )
