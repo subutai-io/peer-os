@@ -31,11 +31,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-appender</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>io.subutai</groupId>
-      <artifactId>object-relation-manager-api</artifactId>
-    </dependency>
   </dependencies>
 
   <build>

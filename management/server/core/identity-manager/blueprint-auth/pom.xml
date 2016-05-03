@@ -55,11 +55,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.subutai</groupId>
-      <artifactId>object-relation-manager-api</artifactId>
-    </dependency>
-
   </dependencies>
 
   <build>

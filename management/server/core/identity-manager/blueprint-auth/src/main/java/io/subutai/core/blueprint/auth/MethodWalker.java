@@ -18,13 +18,13 @@ import org.apache.commons.collections.Unmodifiable;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.RelationPreCredibility;
+import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.security.relation.Trait;
-import io.subutai.core.object.relation.api.RelationInfoManager;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
 /**
@@ -52,6 +52,7 @@ public class MethodWalker
 
     private RelationManager getRelationManager()
     {
+        //        return ServiceLocator.getServiceNoCache( RelationManager.class );
         return serviceTracker.getService();
     }
 

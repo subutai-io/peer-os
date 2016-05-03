@@ -16,17 +16,17 @@ import org.apache.commons.codec.binary.Hex;
 import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.metadata.common.subutai.TemplateId;
 import io.subutai.common.security.objects.Ownership;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.template.TemplateRepository;
 import io.subutai.core.kurjun.impl.model.SharedTemplateInfo;
 import io.subutai.core.kurjun.impl.model.TemplateAccess;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**

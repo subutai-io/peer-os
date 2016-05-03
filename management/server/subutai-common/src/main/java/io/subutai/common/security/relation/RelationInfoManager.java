@@ -1,9 +1,8 @@
-package io.subutai.core.object.relation.api;
+package io.subutai.common.security.relation;
 
 
-import io.subutai.common.security.relation.RelationLink;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
 
 
 /**

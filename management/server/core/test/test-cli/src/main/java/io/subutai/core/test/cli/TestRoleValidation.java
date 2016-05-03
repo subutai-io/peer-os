@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.shell.commands.Command;
 
+import io.subutai.common.security.relation.RelationManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.object.relation.api.RelationManager;
 
 
 @Command( scope = "test", name = "test", description = "test command" )

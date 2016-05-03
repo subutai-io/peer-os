@@ -17,8 +17,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import io.subutai.common.security.relation.RelationLink;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationStatus;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationStatus;
 
 
 @Entity

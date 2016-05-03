@@ -18,8 +18,8 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
 /**

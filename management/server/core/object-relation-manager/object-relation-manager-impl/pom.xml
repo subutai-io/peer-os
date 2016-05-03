@@ -15,10 +15,6 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>object-relation-manager-api</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>

@@ -15,7 +15,7 @@ import com.google.common.collect.Lists;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationLink;
-import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.common.security.relation.model.Relation;
 import io.subutai.core.object.relation.impl.model.RelationChallengeImpl;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.object.relation.impl.model.RelationLinkImpl;

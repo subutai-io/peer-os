@@ -1,13 +1,12 @@
-package io.subutai.core.object.relation.api;
+package io.subutai.common.security.relation;
 
 
 import java.util.List;
 
-import io.subutai.common.security.relation.RelationLink;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
 
 
 public interface RelationManager
@@ -16,7 +15,7 @@ public interface RelationManager
     /**
      * Method for constructing relation parameters
      *
-     * @deprecated use Challenge {@link io.subutai.core.object.relation.api.model.RelationChallenge} approach instead.
+     * @deprecated use Challenge {@link io.subutai.common.security.relation.model.RelationChallenge} approach instead.
      */
     @Deprecated
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;

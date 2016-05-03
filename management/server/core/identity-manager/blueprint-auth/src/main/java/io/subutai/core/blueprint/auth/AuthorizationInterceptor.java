@@ -91,6 +91,10 @@ public class AuthorizationInterceptor implements Interceptor
     public Object preCall( ComponentMetadata cm, Method method, Object... parameters ) throws Throwable
     {
         Annotation ann = new SecurityAnnotationParser().getEffectiveAnnotation( beanClass, method );
+        if ( ann == null )
+        {
+            return null;
+        }
 
         if ( ann instanceof PermitAll )
         {
@@ -106,7 +110,7 @@ public class AuthorizationInterceptor implements Interceptor
         {
             try
             {
-//                methodWalker.performCheck( bean, method, parameters );
+                methodWalker.performCheck( bean, method, parameters );
                 return null;
             }
             catch ( Exception ex )

@@ -12,8 +12,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import io.subutai.core.object.relation.api.model.RelationChallenge;
-import io.subutai.core.object.relation.api.model.RelationStatus;
+import io.subutai.common.security.relation.model.RelationChallenge;
+import io.subutai.common.security.relation.model.RelationStatus;
 
 
 /**

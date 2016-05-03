@@ -1,4 +1,4 @@
-package io.subutai.core.object.relation.api.model;
+package io.subutai.common.security.relation.model;
 
 
 import io.subutai.common.security.relation.RelationLink;

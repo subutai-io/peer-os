@@ -1,4 +1,4 @@
-package io.subutai.core.object.relation.api;
+package io.subutai.common.security.relation;
 
 
 public class RelationVerificationException extends Exception
