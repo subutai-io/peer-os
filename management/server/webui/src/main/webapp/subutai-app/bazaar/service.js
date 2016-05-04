@@ -72,13 +72,7 @@ function BazaarSrv($http) {
 
 	function installHubPlugin (plugin) {
 		var kar = "";
-		if (plugin.metadata[0].substring (plugin.metadata[0].length - 4, plugin.metadata[0].length) === ".kar") {
-			kar = plugin.metadata[0];
-		}
-		else {
-			kar = plugin.metadata[1];
-		}
-		var postData = "name=" + plugin.name + "&version=" + plugin.version + "&kar=" + kar + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
+		var postData = "name=" + plugin.name + "&version=" + plugin.version + "&kar=" + plugin.metadata[0] + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
 		console.log (postData);
 		return $http.post(
 			BAZAAR_URL + "install",
@@ -90,14 +84,8 @@ function BazaarSrv($http) {
 
 	function uninstallHubPlugin (plugin) {
 		var kar = "";
-		if (plugin.metadata[0].substring (plugin.metadata[0].length - 4, plugin.metadata[0].length) === ".kar") {
-			kar = plugin.metadata[0];
-		}
-		else {
-			kar = plugin.metadata[1];
-		}
-		var postData = "id=" + plugin.hubId + "&kar=" + kar + "&name=" + plugin.name.toLowerCase();
-		console.log (postData);
+		// TODO: change to filename
+		var postData = "id=" + plugin.hubId + "&name=" + plugin.name;
 		return $http.post(
 			BAZAAR_URL + "uninstall",
 			postData,
@@ -107,14 +95,8 @@ function BazaarSrv($http) {
 
 	function restoreHubPlugin (plugin) {
 		var kar = "";
-		if (plugin.metadata[0].substring (plugin.metadata[0].length - 4, plugin.metadata[0].length) === ".kar") {
-			kar = plugin.metadata[0];
-		}
-		else {
-			kar = plugin.metadata[1];
-		}
-		var postData = "id=" + plugin.hubId + "&name=" + plugin.name + "&version=" + plugin.version + "&kar=" + kar + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
-		console.log (postData);
+		// TODO: refactor
+		var postData = "id=" + plugin.hubId + "&name=" + plugin.name + "&version=" + plugin.version + "&kar=" + plugin.metadata[0] + "&url=" + plugin.name.toLowerCase() + "&uid=" + plugin.id;
 		return $http.post(
 			BAZAAR_URL + "restore",
 			postData,

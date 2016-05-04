@@ -26,7 +26,7 @@ import io.subutai.core.hubmanager.impl.IntegrationImpl;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class HeartbeatProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( HeartbeatProcessor.class );
@@ -64,7 +64,7 @@ public class HeartbeatProcessor implements Runnable
             final Set<String> result = new HashSet<>();
             try
             {
-                String path = String.format( "/rest/v1.1/peers/%s/heartbeat", configManager.getPeerId() );
+                String path = String.format( "/rest/v1.2/peers/%s/heartbeat", configManager.getPeerId() );
 
                 WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 

@@ -44,7 +44,7 @@ class HttpClient
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final String HUB_ADDRESS = "https://hub.subut.ai";
+    private static final String HUB_ADDRESS = "https://hub.subut.ai:444";
 
     private final PGPMessenger messenger;
 

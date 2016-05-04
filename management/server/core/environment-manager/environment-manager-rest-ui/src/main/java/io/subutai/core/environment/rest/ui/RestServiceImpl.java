@@ -100,8 +100,9 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
+        // @todo added management template filtration, needs minor enhancement
         Set<String> templates =
-                templateRegistry.list().stream().map( TemplateKurjun::getName ).collect( Collectors.toSet() );
+                templateRegistry.list().stream().map( TemplateKurjun::getName ).filter( n -> !n.equalsIgnoreCase("management") ).collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
@@ -150,7 +151,9 @@ public class RestServiceImpl implements RestService
 
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
-            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
+            {
+            }.getType() );
 
 
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
@@ -180,7 +183,9 @@ public class RestServiceImpl implements RestService
         {
             checkName( name );
 
-            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
+            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
+            {
+            }.getType() );
 
             Topology topology = new Topology( name );
 
@@ -210,10 +215,13 @@ public class RestServiceImpl implements RestService
             ContainerPlacementStrategy placementStrategy = strategyManager.findStrategyById( RoundRobinStrategy.ID );
 
 
-            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>() {}.getType() );
+            List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
+            {
+            }.getType() );
 
-            List<String> containers =
-                    JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
+            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
+            {
+            }.getType() );
 
 
             Topology topology = null;
@@ -249,9 +257,12 @@ public class RestServiceImpl implements RestService
                                             .filter( e -> e.getEnvironmentId().getId().equals( environmentId ) )
                                             .findFirst().get().getName();
 
-            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>() {}.getType() );
-            List<String> containers =
-                    JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>() {}.getType() );
+            List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
+            {
+            }.getType() );
+            List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
+            {
+            }.getType() );
 
 
             Topology topology = new Topology( name );
@@ -276,6 +287,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            environmentManager.cancelEnvironmentWorkflow( environmentId );
+
             environmentManager.destroyEnvironment( environmentId, false );
         }
         catch ( Exception e )
@@ -408,7 +421,7 @@ public class RestServiceImpl implements RestService
                 // path
             }
 
-            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy, path);
+            environmentManager.assignEnvironmentDomain( environmentId, hostName, strategy, path );
         }
         catch ( Exception e )
         {
@@ -482,27 +495,6 @@ public class RestServiceImpl implements RestService
 
 
     /** Containers **************************************************** */
-
-    @Override
-    public Response getContainerEnvironmentId( final String containerId )
-    {
-        if ( Strings.isNullOrEmpty( containerId ) )
-        {
-            return Response.status( Response.Status.BAD_REQUEST )
-                           .entity( JsonUtil.toJson( ERROR_KEY, "Invalid container id" ) ).build();
-        }
-
-
-        Environment environment = findEnvironmentByContainerId( containerId );
-
-        if ( environment != null )
-        {
-            return Response.ok( environment.getId() ).build();
-        }
-
-        return Response.status( Response.Status.NOT_FOUND ).build();
-    }
-
 
     @Override
     public Response destroyContainer( final String containerId )
@@ -743,10 +735,11 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
 
-            ContainerHost containerHost = environment.getContainerHostById( containerId );
+            EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
 
             Set<String> tags = JsonUtil.fromJson( tagsJson, new TypeToken<Set<String>>()
-            {}.getType() );
+            {
+            }.getType() );
 
             tags.stream().forEach( containerHost::addTag );
 
@@ -856,16 +849,15 @@ public class RestServiceImpl implements RestService
                         containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                         containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
-                        containerHost.getClass().getName() )
-                 );
+                        containerHost.getClass().getName() ) );
             }
             catch ( Exception e )
             {
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName() )
-                );
+                        containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(),
+                        containerHost.getClass().getName() ) );
             }
         }
 

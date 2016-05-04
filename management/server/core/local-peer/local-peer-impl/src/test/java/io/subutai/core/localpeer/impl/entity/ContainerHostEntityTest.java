@@ -108,15 +108,6 @@ public class ContainerHostEntityTest
 
 
     @Test
-    public void testGetTags() throws Exception
-    {
-        containerHostEntity.addTag( TAG );
-
-        assertTrue( containerHostEntity.getTags().contains( TAG ) );
-    }
-
-
-    @Test
     public void testIsLocal() throws Exception
     {
         assertTrue( containerHostEntity.isLocal() );
@@ -204,24 +195,5 @@ public class ContainerHostEntityTest
         containerHostEntity.setQuota( ramQuota );
 
         verify( peer ).setQuota( containerHostEntity.getContainerId(), ramQuota );
-    }
-
-
-    @Test
-    public void testGetCpuSet() throws Exception
-    {
-        containerHostEntity.getCpuSet();
-
-
-        verify( peer ).getCpuSet( containerHostEntity );
-    }
-
-
-    @Test
-    public void testSetCpuSet() throws Exception
-    {
-        containerHostEntity.setCpuSet( CPU_SET );
-
-        verify( peer ).setCpuSet( containerHostEntity, CPU_SET );
     }
 }

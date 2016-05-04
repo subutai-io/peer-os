@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.jms.IllegalStateException;
-
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Node;
@@ -20,13 +18,16 @@ import io.subutai.common.tracker.TrackerOperation;
 public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse>
 {
 
+    private final String environmentId;
     private final Peer peer;
     private final Set<Node> nodes;
     private final TrackerOperation trackerOperation;
 
 
-    public PeerImportTemplateTask( final Peer peer, final Set<Node> nodes, final TrackerOperation trackerOperation )
+    public PeerImportTemplateTask( final String environmentId, final Peer peer, final Set<Node> nodes,
+                                   final TrackerOperation trackerOperation )
     {
+        this.environmentId = environmentId;
         this.peer = peer;
         this.nodes = nodes;
         this.trackerOperation = trackerOperation;
@@ -51,7 +52,8 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
             templates.add( node.getTemplateName() );
         }
 
-        PrepareTemplatesResponse response = peer.prepareTemplates( new PrepareTemplatesRequest( rhTemplates ) );
+        PrepareTemplatesResponse response =
+                peer.prepareTemplates( new PrepareTemplatesRequest( environmentId, rhTemplates ) );
 
         for ( String message : response.getMessages() )
         {

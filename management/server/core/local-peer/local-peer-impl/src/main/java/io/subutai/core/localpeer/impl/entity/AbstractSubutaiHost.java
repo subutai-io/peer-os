@@ -168,7 +168,11 @@ public abstract class AbstractSubutaiHost implements Host
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
         this.lastHeartbeat = System.currentTimeMillis();
+
         this.hostInterfaces = hostInfo.getHostInterfaces();
+
+        this.hostname = hostInfo.getHostname();
+
         return false;
     }
 

@@ -33,7 +33,6 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -45,6 +44,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
@@ -69,7 +69,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 import io.subutai.hub.share.dto.environment.SSHKeyDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class HubEnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentManager.class.getName() );
@@ -186,7 +186,7 @@ public class HubEnvironmentManager
     public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
         io.subutai.common.security.PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
+                peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
         PublicKeyContainer keyContainer = new PublicKeyContainer();
         keyContainer.setKey( publicKeyContainer.getKey() );
@@ -275,7 +275,7 @@ public class HubEnvironmentManager
     }
 
 
-    public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto )
+    public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto, String environmentId )
             throws EnvironmentCreationException
     {
         LocalPeer localPeer = peerManager.getLocalPeer();
@@ -294,7 +294,7 @@ public class HubEnvironmentManager
         ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
         CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
 
-        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( localPeer, nodes ) );
+        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( environmentId, localPeer, nodes ) );
         taskExecutor.shutdown();
 
         try
@@ -372,7 +372,7 @@ public class HubEnvironmentManager
                         Set<Host> hosts = new HashSet<>();
                         Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
                         hosts.add( host );
-                        String sshKey = createSshKey( hosts );
+                        String sshKey = createSshKey( hosts, peerDto.getEnvironmentInfo().getId() );
                         nodeDto.addSshKey( sshKey );
                     }
                 }
@@ -416,14 +416,14 @@ public class HubEnvironmentManager
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
         final EnvironmentId environmentId = new EnvironmentId( env.getId() );
-        final Set<String> sshKeys = new HashSet<>();
+        final SshKeys sshKeys = new SshKeys();
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
                 if ( nodeDto.getSshKeys() != null )
                 {
-                    sshKeys.addAll( nodeDto.getSshKeys() );
+                    sshKeys.addStringKeys( nodeDto.getSshKeys() );
                 }
             }
         }
@@ -433,7 +433,8 @@ public class HubEnvironmentManager
             @Override
             public Peer call() throws Exception
             {
-                localPeer.configureSshInEnvironment( environmentId, new SshPublicKeys( sshKeys ) );
+
+                localPeer.configureSshInEnvironment( environmentId, sshKeys );
                 return localPeer;
             }
         } );
@@ -456,6 +457,7 @@ public class HubEnvironmentManager
             LOG.error( msg, e );
             throw new EnvironmentCreationException( msg );
         }
+
         return peerDto;
     }
 
@@ -504,9 +506,11 @@ public class HubEnvironmentManager
     }
 
 
-    public String createSshKey( Set<Host> hosts )
+    public String createSshKey( Set<Host> hosts, String environmentId )
     {
-        CommandUtil.HostCommandResults results = commandUtil.executeParallel( getCreateNReadSSHCommand(), hosts );
+
+        CommandUtil.HostCommandResults results =
+                commandUtil.execute( getCreateNReadSSHCommand(), hosts, environmentId );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -575,7 +579,7 @@ public class HubEnvironmentManager
         @Override
         public Boolean call() throws Exception
         {
-            peer.setupTunnels( p2pIps, environmentId );
+            peer.setupTunnels( p2pIps, new EnvironmentId( environmentId ) );
             return true;
         }
     }

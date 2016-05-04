@@ -14,23 +14,23 @@ public interface RawManager
 {
 
 
-    InputStream getFile( String repository, byte[] md5 ) throws IOException;
+    InputStream getFile( String repository, String md5 ) throws IOException;
 
     List<SerializableMetadata> list( String repository ) throws IOException;
 
-    boolean delete( byte[] md5 ) throws IOException;
+    boolean delete( String md5 ) throws IOException;
 
-    boolean delete( String repository, final byte[] md5 );
+    boolean delete( String repository, final String md5 );
 
     String md5();
 
-    Object getInfo( String repository, byte[] md5 );
+    Object getInfo( String repository, String md5 );
 
-    Object getInfo( String repository, String name, String version, byte[]md5 );
+    Object getInfo( String repository, String name, String version, String md5 );
 
     Object getInfo( final Object metadata );
 
-    Object getInfo( final byte[] md5 );
+    Object getInfo( final String md5 );
 
     Object put( final File file, final String filename, final String repository );
 

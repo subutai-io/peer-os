@@ -27,6 +27,14 @@ public interface RegistrationRestService
     public Response approveRegistrationRequest( @PathParam( "id" ) String requestId );
 
     @POST
+    @Path( "requests/{id}/unregister" )
+    public Response unRegisterRequest( @PathParam( "id" ) String requestId );
+
+    @POST
+    @Path( "requests/{id}/remove" )
+    public Response removeRequest( @PathParam( "id" ) String requestId );
+
+    @POST
     @Path( "verify/container-token" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response verifyContainerToken( String message );

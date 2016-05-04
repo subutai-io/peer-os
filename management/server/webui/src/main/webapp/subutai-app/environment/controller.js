@@ -3,24 +3,32 @@
 angular.module('subutai.environment.controller', [])
 	.controller('EnvironmentViewCtrl', EnvironmentViewCtrl)
 	.directive('fileModel', fileModel)
+	.directive('onReadFile', onReadFile)
 	.filter( 'sshEmail', function () {
 		return function( input, modify )
 		{
 			if( !modify )
 				return input;
-
 			var newVal = input.split(' ');
-
 			return newVal[newVal.length - 1];
 		}
-	});
+	})
+	.filter('isEmpty', [function() {
+		return function(object, editStatus) {
+			if(editStatus === true || angular.equals({}, object)) {
+				return true
+			} else {
+				return false;
+			}
+		}
+	}]);
 
-EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder'];
+EnvironmentViewCtrl.$inject = ['$scope', '$rootScope', 'environmentService', 'trackerSrv', 'identitySrv', 'SweetAlert', '$resource', '$compile', 'ngDialog', '$timeout', '$sce', '$stateParams', 'DTOptionsBuilder', 'DTColumnDefBuilder', '$state'];
 fileModel.$inject = ['$parse'];
 
 var fileUploader = {};
 
-function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder) {
+function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv, identitySrv, SweetAlert, $resource, $compile, ngDialog, $timeout, $sce, $stateParams, DTOptionsBuilder, DTColumnDefBuilder, $state) {
 
 	var vm = this;
 
@@ -58,6 +66,7 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 
 	vm.destroyEnvironment = destroyEnvironment;
 	vm.sshKey = sshKey;
+	vm.getSSHfromFile = getSSHfromFile;
 	vm.addSshKey = addSshKey;
 	vm.removeSshKey = removeSshKey;
 	vm.showContainersList = showContainersList;
@@ -78,6 +87,9 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	vm.shareEnvironment = shareEnvironment;
 	vm.addUser2Stack = addUser2Stack;
 	vm.removeUserFromStack = removeUserFromStack;
+
+	//plugins
+	vm.gotToPlugin = gotToPlugin;
 
 	function changeMode(modeStatus) {
 		if(modeStatus) {
@@ -532,6 +544,11 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		});
 	}
 
+	function getSSHfromFile(sshKey) {
+		$scope.sshkey = sshKey;
+		console.log($scope.sshkey);
+	}
+
 
 	vm.setHtml = setHtml;
 	function setHtml (html) {
@@ -606,15 +623,24 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 			});
 		}
 	}
+
+	function gotToPlugin(plugin) {
+		if(plugin.name !== undefined) {
+			$state.go(plugin.name.toLowerCase());
+		}
+	}
 }
 
 function imageExists(image_url){
-    var http = new XMLHttpRequest();
+	var http = new XMLHttpRequest();
 
-    http.open('HEAD', image_url, false);
-    http.send();
+	http.open('HEAD', image_url, false);
+	http.send();
 
-    return http.status != 404;
+	return http.status != 404;
+	/*var img = new Image();
+	img.src = image_url;
+	return img.height != 0;*/
 }
 
 function initScrollbar() {
@@ -649,6 +675,36 @@ function fileModel($parse) {
 					modelSetter(scope, element[0].files[0]);
 					fileUploader = element[0].files[0];
 				});
+			});
+		}
+	};
+}
+
+function onReadFile($parse) {
+	return {
+		restrict: 'A',
+		scope: false,
+		link: function(scope, element, attrs) {
+			element.bind('change', function(e) {
+				
+				var onFileReadFn = $parse(attrs.onReadFile);
+				var reader = new FileReader();
+				
+				reader.onload = function() {
+					var fileContents = reader.result;
+					// invoke parsed function on scope
+					// special syntax for passing in data
+					// to named parameters
+					// in the parsed function
+					// we are providing a value for the property 'contents'
+					// in the scope we pass in to the function
+					scope.$apply(function() {
+						onFileReadFn(scope, {
+							'contents' : fileContents
+						});
+					});
+				};
+				reader.readAsText(element[0].files[0]);
 			});
 		}
 	};

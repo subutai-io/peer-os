@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/subutai-io/base/agent/log"
@@ -129,9 +128,9 @@ func init() {
 		}
 	}
 
-	name, _ := os.Hostname()
-	config.Agent.GpgUser = name + "@subutai.io"
-
+	if config.Agent.GpgUser == "" {
+		config.Agent.GpgUser = "rh@subutai.io"
+	}
 	Agent = config.Agent
 	Influxdb = config.Influxdb
 	Template = config.Template
@@ -146,11 +145,11 @@ func InitAgentDebug() {
 }
 
 func CheckKurjun() (client *http.Client) {
-	_, err := net.DialTimeout("tcp", Management.Host+":"+Cdn.Sslport, time.Duration(2)*time.Second)
+	_, err := net.DialTimeout("tcp", Management.Host+":8339", time.Duration(2)*time.Second)
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client = &http.Client{Transport: tr}
 	if !log.Check(log.InfoLevel, "Trying local repo", err) {
-		Cdn.Kurjun = "https://" + Management.Host + ":" + Cdn.Sslport + "/rest/kurjun"
+		Cdn.Kurjun = "https://" + Management.Host + ":8339/rest/kurjun"
 	} else {
 		Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
 		if !Cdn.Allowinsecure {

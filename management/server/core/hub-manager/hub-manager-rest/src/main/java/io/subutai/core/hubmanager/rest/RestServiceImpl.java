@@ -44,6 +44,22 @@ public class RestServiceImpl implements RestService
     }
 
 
+    public Response resendHeartbeat()
+    {
+        try
+        {
+            integration.sendOnlyHeartbeat();
+            return Response.ok().build();
+        }
+        catch ( HubPluginException e )
+        {
+            LOG.error( e.getMessage() );
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                    entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
+        }
+    }
+
+
     public Response register( final String hubIp, final String email, final String password )
     {
         try

@@ -14,16 +14,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.codec.binary.Hex;
 
 import com.google.inject.Injector;
 
@@ -88,6 +88,8 @@ public class AptManagerImpl implements AptManager
     private RepositoryFactory repositoryFactory;
     private UnifiedRepository unifiedRepository;
     private LocalRepository localAptRepository;
+
+    private static Map<String, String> debsInSync = new ConcurrentHashMap();
 
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
@@ -162,7 +164,7 @@ public class AptManagerImpl implements AptManager
 
         for ( String s : SystemSettings.getGlobalKurjunUrls() )
         {
-            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalApt( new URL( s ) ) );
+            this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalApt( new URL( s ), "all" ) );
         }
     }
 
@@ -242,12 +244,34 @@ public class AptManagerImpl implements AptManager
     public InputStream getPackageByFilename( String filename ) throws IllegalArgumentException
     {
         SerializableMetadata meta = getPackageInfoByFilename( filename );
-        return ( meta != null ) ? unifiedRepository.getPackageStream( meta ) : null;
+        while ( debsInSync.get( filename ) != null )
+        {
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+        }
+        debsInSync.put( filename, filename );
+
+        if ( meta != null )
+        {
+            debsInSync.remove( filename );
+            return unifiedRepository.getPackageStream( meta );
+        }
+        else
+        {
+            debsInSync.remove( filename );
+            return null;
+        }
     }
 
 
     @Override
-    public String getSerializedPackageInfo( String filename ) throws IllegalArgumentException
+    public String getSerializedPackageInfoByName( String filename ) throws IllegalArgumentException
     {
         SerializableMetadata meta = getPackageInfoByFilename( filename );
         return ( meta != null ) ? meta.serialize() : null;
@@ -255,7 +279,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public String getSerializedPackageInfo( byte[] md5 ) throws IllegalArgumentException
+    public String getSerializedPackageInfoByMd5( String md5 ) throws IllegalArgumentException
     {
         DefaultMetadata m = new DefaultMetadata();
         m.setMd5sum( md5 );
@@ -290,7 +314,7 @@ public class AptManagerImpl implements AptManager
         try
         {
             Metadata meta = getLocalRepository().put( is );
-            return new URI( null, null, "/info", "md5=" + Hex.encodeHexString( meta.getMd5Sum() ), null );
+            return new URI( null, null, "/info", "md5=" +  meta.getMd5Sum(), null );
         }
         catch ( IOException | URISyntaxException ex )
         {
@@ -304,6 +328,7 @@ public class AptManagerImpl implements AptManager
     public List<AptPackage> list()
     {
         List<SerializableMetadata> list = unifiedRepository.listPackages();
+
         List<AptPackage> deflist = list.stream().map( t -> convertToAptPackage( ( DefaultPackageMetadata ) t ) )
                                        .collect( Collectors.toList() );
         return deflist;
@@ -311,7 +336,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public boolean delete( byte[] md5 ) throws IOException
+    public boolean delete( String md5 ) throws IOException
     {
         LocalRepository repo = getLocalRepository();
         try
@@ -328,14 +353,14 @@ public class AptManagerImpl implements AptManager
 
     private AptPackage convertToAptPackage( DefaultPackageMetadata meta )
     {
-        return new AptPackage( Hex.encodeHexString( meta.getMd5Sum() ), meta.getName(), meta.getVersion(),
+        return new AptPackage( meta.getMd5Sum(), meta.getName(), meta.getVersion(),
                 meta.getSource(), meta.getMaintainer(), meta.getArchitecture().name(), meta.getInstalledSize(),
                 meta.getDescription() );
     }
 
 
     @Override
-    public String getPackageInfo( byte[] md5, String name, String version )
+    public String getPackageInfo( String md5, String name, String version )
     {
         if ( md5 == null && name == null && version == null )
         {
@@ -357,7 +382,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public InputStream getPackage( byte[] md5 )
+    public InputStream getPackage( String md5 )
     {
         if ( md5 == null )
         {

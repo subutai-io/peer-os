@@ -1,7 +1,6 @@
 package io.subutai.core.metric.impl;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,7 +48,6 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
@@ -202,49 +200,33 @@ public class MonitorImpl implements Monitor, HostListener
 
 
     @Override
-    public HistoricalMetrics getHistoricalMetrics( final Host host, Date startTime, Date endTime )
+    public String getHistoricalMetrics( final Host host, final Date startTime, final Date endTime )
     {
-        HistoricalMetrics result = new HistoricalMetrics();
-
-        try
-        {
-            CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
-
-
-            if ( null != commandResult && commandResult.hasSucceeded() )
-            {
-                result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
-            }
-            else
-            {
-                LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
-                        commandResult != null ? commandResult.getStdErr() : "" ) );
-            }
-        }
-        catch ( IOException | CommandException e )
-        {
-            LOG.error( "Could not run command successfully! Error: {}", e );
-        }
-        catch ( HostNotFoundException e )
-        {
-            LOG.error( "Could not find resource host of host {}!", host.getHostname() );
-        }
-
-
-        return result;
-    }
-
-
-    @Override
-    public String getPlainHistoricalMetrics( final Host host, final Date startTime, final Date endTime )
-    {
-
 
         String result = null;
 
         try
         {
-            CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
+
+            CommandResult commandResult;
+
+            RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
+
+            if ( host instanceof ResourceHost )
+            {
+                commandResult = peerManager.getLocalPeer().getResourceHostById( host.getId() )
+                                           .execute( historicalMetricCommand );
+            }
+            else if ( host instanceof ContainerHost )
+            {
+
+                commandResult = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId() )
+                                           .execute( historicalMetricCommand );
+            }
+            else
+            {
+                commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+            }
 
             if ( commandResult.hasSucceeded() )
             {
@@ -267,30 +249,6 @@ public class MonitorImpl implements Monitor, HostListener
 
 
         return result;
-    }
-
-
-    private CommandResult getHistoricalMetricsResp( final Host host, final Date startTime, final Date endTime )
-            throws CommandException, HostNotFoundException
-    {
-        Preconditions.checkNotNull( host );
-
-        RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
-
-        CommandResult commandResult;
-        if ( host instanceof ResourceHost )
-        {
-            commandResult =
-                    peerManager.getLocalPeer().getResourceHostById( host.getId() ).execute( historicalMetricCommand );
-        }
-        else
-        {
-            //todo metrics for remote container must be obtained from its peer or add Container.getMetrics method
-            // which will delegate to its peer
-            commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
-        }
-
-        return commandResult;
     }
 
 

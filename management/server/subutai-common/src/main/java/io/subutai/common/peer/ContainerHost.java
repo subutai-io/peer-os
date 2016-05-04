@@ -1,8 +1,6 @@
 package io.subutai.common.peer;
 
 
-import java.util.Set;
-
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -37,12 +35,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     String getTemplateName();
 
-    void addTag( String tag );
-
-    void removeTag( String tag );
-
-    Set<String> getTags();
-
 
     boolean isLocal();
 
@@ -55,19 +47,6 @@ public interface ContainerHost extends Host, ContainerHostInfo
      */
     public ProcessResourceUsage getProcessResourceUsage( int processPid ) throws PeerException;
 
-    /**
-     * Returns allowed cpus/cores ids on container
-     *
-     * @return - allowed cpu set
-     */
-    public Set<Integer> getCpuSet() throws PeerException;
-
-    /**
-     * Sets allowed cpus/cores on container
-     *
-     * @param cpuSet - allowed cpu set
-     */
-    public void setCpuSet( Set<Integer> cpuSet ) throws PeerException;
 
     /**
      * Returns available quota values

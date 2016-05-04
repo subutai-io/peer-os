@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl.entity;
 
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -40,7 +41,9 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
@@ -788,11 +791,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             catch ( HostNotFoundException e )
             {
-                if ( "management".equals( info.getHostname() ) )
+                if ( Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
                 {
                     containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getContainerName(), "management", info.getArch().name(),
-                            "management", null, null, ContainerSize.SMALL );
+                            info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME,
+                            info.getArch().name(), Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
+
                     addContainerHost( containerHost );
                 }
                 else
@@ -822,6 +826,47 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         }
 
         return true;
+    }
+
+
+    @Override
+    public String getRhVersion() throws ResourceHostException
+    {
+        try
+        {
+            return commandUtil.execute( resourceHostCommands.getGetRhVersionCommand(), this ).getStdOut();
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining RH version: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public String getP2pVersion() throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getP2pVersion( this );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining P2P version: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException
+    {
+        try
+        {
+            return getNetworkManager().getP2pLogs( this, logLevel, from, till );
+        }
+        catch ( NetworkManagerException e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining P2P logs: %s", e.getMessage() ), e );
+        }
     }
 
 

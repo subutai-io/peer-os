@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,6 @@ import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.core.kurjun.api.Utils;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.impl.TemplateManagerImpl;
 import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
@@ -48,6 +49,7 @@ public class RawManagerImpl implements RawManager
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
 
     private static final String DEFAULT_RAW_REPO_NAME = "raw";
+
     private static final String RAW_PATH = "/file";
 
     private RepositoryFactory repositoryFactory;
@@ -61,6 +63,8 @@ public class RawManagerImpl implements RawManager
 
     private Injector injector;
 
+    private static Map<String, String> rawInSync = new ConcurrentHashMap();
+
 
     public RawManagerImpl()
     {
@@ -68,17 +72,12 @@ public class RawManagerImpl implements RawManager
 
         _local();
 
-        _remote();
+        _unified();
     }
 
 
     public void init()
     {
-        injector = bootstrapDI();
-
-        _local();
-
-        _remote();
     }
 
 
@@ -91,15 +90,17 @@ public class RawManagerImpl implements RawManager
     }
 
 
-    private void _remote()
+    private void _unified()
     {
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
+
         this.unifiedRepository = repositoryFactory.createUnifiedRepo();
 
         for ( String s : SystemSettings.getGlobalKurjunUrls() )
         {
             this.unifiedRepository.getRepositories().add( repositoryFactory.createNonLocalRaw( s, null, "all" ) );
         }
+        this.unifiedRepository.getRepositories().add( this.localPublicRawRepository );
     }
 
 
@@ -133,12 +134,12 @@ public class RawManagerImpl implements RawManager
     @Override
     public String md5()
     {
-        return Utils.MD5.toString( localPublicRawRepository.md5() );
+        return localPublicRawRepository.md5();
     }
 
 
     @Override
-    public RawMetadata getInfo( final String repository, final byte[] md5 )
+    public RawMetadata getInfo( final String repository, final String md5 )
     {
         RawMetadata rawMetadata = new RawMetadata();
         rawMetadata.setFingerprint( repository );
@@ -149,7 +150,7 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public RawMetadata getInfo( final String repository, final String name, final String version, final byte[] md5 )
+    public RawMetadata getInfo( final String repository, final String name, final String version, final String md5 )
     {
         RawMetadata rawMetadata = new RawMetadata();
         rawMetadata.setFingerprint( repository );
@@ -175,7 +176,7 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public boolean delete( String repository, final byte[] md5 )
+    public boolean delete( String repository, final String md5 )
     {
         DefaultMetadata defaultMetadata = new DefaultMetadata();
         defaultMetadata.setFingerprint( repository );
@@ -193,7 +194,7 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public RawMetadata getInfo( final byte[] md5 )
+    public RawMetadata getInfo( final String md5 )
     {
         DefaultMetadata metadata = new DefaultMetadata();
         metadata.setMd5sum( md5 );
@@ -260,34 +261,43 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public InputStream getFile( final String repository, final byte[] md5 ) throws IOException
+    public InputStream getFile( final String repository, final String md5 ) throws IOException
     {
-        return null;
+        RawMetadata rawMetadata = new RawMetadata();
+        rawMetadata.setMd5Sum( md5 );
+        rawMetadata.setFingerprint( repository );
+
+        while ( rawInSync.get( md5 ) != null )
+        {
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+        }
+
+        rawInSync.put( md5, md5 );
+
+        InputStream inputStream = unifiedRepository.getPackageStream( rawMetadata );
+
+        rawInSync.remove( md5 );
+
+        return inputStream;
     }
 
 
     @Override
     public List<SerializableMetadata> list( String repository )
     {
-        List<RawMetadata> rawMetadatas;
-
-        switch ( repository )
-        {
-            //return local list
-            case "public":
-                return localPublicRawRepository.listPackages();
-            //return unified repo list
-            case "all":
-                return unifiedRepository.listPackages();
-            //return personal repository list
-            default:
-                return repositoryFactory.createLocalTemplate( new KurjunContext( repository ) ).listPackages();
-        }
+        return unifiedRepository.listPackages();
     }
 
 
     @Override
-    public boolean delete( final byte[] md5 ) throws IOException
+    public boolean delete( final String md5 ) throws IOException
     {
         DefaultMetadata defaultMetadata = new DefaultMetadata();
 

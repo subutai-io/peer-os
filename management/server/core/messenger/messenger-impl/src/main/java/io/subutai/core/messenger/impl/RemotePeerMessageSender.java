@@ -4,6 +4,8 @@ package io.subutai.core.messenger.impl;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,15 +42,18 @@ public class RemotePeerMessageSender implements Callable<Boolean>
     @Override
     public Boolean call()
     {
-        WebClient client;
+        WebClient client = null;
         try
         {
             client = getWebClient( targetPeer.getPeerInfo() );
             for ( Envelope envelope : envelopes )
             {
+                Response response = null;
                 try
                 {
-                    client.post( JsonUtil.toJson( envelope ) );
+                    response = client.post( JsonUtil.toJson( envelope ) );
+
+                    WebClientBuilder.checkResponse( response, Response.Status.ACCEPTED );
 
                     messengerDao.markAsSent( envelope );
                 }
@@ -56,7 +61,7 @@ public class RemotePeerMessageSender implements Callable<Boolean>
                 {
                     messengerDao.incrementDeliveryAttempts( envelope );
 
-                    LOG.error( "Error in PeerMessenger", e );
+                    LOG.error( "Error in RemotePeerMessageSender", e );
 
                     //break transmission of all subsequent messages for this peer in this round
                     break;
@@ -67,6 +72,10 @@ public class RemotePeerMessageSender implements Callable<Boolean>
         catch ( Exception e )
         {
             LOG.error( e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         return false;

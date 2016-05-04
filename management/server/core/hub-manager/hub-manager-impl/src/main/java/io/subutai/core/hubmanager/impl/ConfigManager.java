@@ -44,13 +44,15 @@ public class ConfigManager
     private static final Logger LOG = LoggerFactory.getLogger( ConfigManager.class.getName() );
 
     public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/h.public.gpg";
+
     public static final String PEER_KEYSTORE = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.jks";
+
     private static final String PEER_CERT_ALIAS = "peer_cert";
 
+    private static final int HUB_PORT = 444;
 
     private SecurityManager securityManager;
     private PeerManager peerManager;
-    private ConfigDataService configDataService;
 
     private PGPPublicKey hPublicKey;
     private PGPPublicKey ownerPublicKey;
@@ -59,7 +61,6 @@ public class ConfigManager
     private KeyStore keyStore;
     private String peerId;
     private PGPMessenger messenger;
-    private String hubIp;
 
 
     public SecurityManager getSecurityManager()
@@ -80,7 +81,6 @@ public class ConfigManager
     {
         this.peerManager = peerManager;
         this.securityManager = securityManager;
-        this.configDataService = configDataService;
 
         this.sender = securityManager.getKeyManager().getPrivateKey( null );
 
@@ -182,7 +182,8 @@ public class ConfigManager
     public WebClient getTrustedWebClientWithAuth( String path, final String hubIp )
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
-        String baseUrl = String.format( "https://%s", hubIp );
+        String baseUrl = String.format( "https://%s:" + HUB_PORT, hubIp );
+
         return HttpClient.createTrustedWebClientWithAuth( baseUrl + path, keyStore,
                 SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), hPublicKey.getFingerprint() );
     }
@@ -190,14 +191,25 @@ public class ConfigManager
 
     public WebClient getTrustedWebClient( final String hubIp )
     {
-        String baseUrl = String.format( "https://%s", hubIp );
-        return HttpClient.createTrustedWebClient( baseUrl );
+        String baseUrl = String.format( "https://%s:" + HUB_PORT, hubIp );
+
+        try
+        {
+            return HttpClient.createTrustedWebClientWithAuth( baseUrl, keyStore,
+                    SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), hPublicKey.getFingerprint() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to create WebClient: ", e );
+
+            return null;
+        }
     }
 
 
     public void addHubConfig( final String hubIp )
     {
-        this.hubIp = hubIp;
+//        this.hubIp = hubIp;
     }
 
 

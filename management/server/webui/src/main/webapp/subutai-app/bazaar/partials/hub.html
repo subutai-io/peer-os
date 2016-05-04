@@ -19,7 +19,7 @@
 		</td>
 		<tr ng-repeat="plugin in bazaarCtrl.plugins | filter:searchPlugin" id = "{{ plugin.id }}">
 			<td>
-				<img src = "{{ plugin.img }}" 
+				<img src = "{{ plugin.iconUrl }}"
 					style = "width: 60px" 
 					ng-show = "plugin.metadata.length !== 0 && plugin.name !== 'Big data' && plugin.name !== 'Plugin-common'"/>
 			</td>

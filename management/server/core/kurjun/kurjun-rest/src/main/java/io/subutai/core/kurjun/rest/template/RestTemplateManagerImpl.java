@@ -63,11 +63,12 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             if ( id != null )
             {
                 TemplateId tid = IdValidators.Template.validate( id );
-                byte[] md5bytes = decodeMd5( tid.getMd5() );
+                String md5bytes =  tid.getMd5();
+
                 if ( md5bytes != null )
                 {
                     TemplateKurjun template =
-                            templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                            templateManager.getTemplateByMd5( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
                     if ( template != null )
                     {
                         InputStream is = templateManager
@@ -98,7 +99,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             }
             else if ( RestTemplateManager.RESPONSE_TYPE_ID.equals( type ) )
             {
-                TemplateKurjun template = templateManager.getTemplate( repository, name, version, isKurjunClient );
+                TemplateKurjun template = templateManager.getTemplateByName( repository, name, version, isKurjunClient );
 
                 if ( template != null )
                 {
@@ -138,11 +139,11 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             if ( id != null )
             {
                 TemplateId tid = IdValidators.Template.validate( id );
-                byte[] md5bytes = decodeMd5( tid.getMd5() );
-                if ( md5bytes != null )
+
+                if ( tid.getMd5() != null )
                 {
                     TemplateKurjun template =
-                            templateManager.getTemplate( repository, md5bytes, tid.getOwnerFprint(), isKurjunClient );
+                            templateManager.getTemplateByMd5( repository, tid.getMd5(), tid.getOwnerFprint(), isKurjunClient );
                     if ( template != null )
                     {
                         return Response.ok( GSON.toJson( convertToDefaultTemplate( template ) ) ).build();
@@ -150,7 +151,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                 }
             }
 
-            TemplateKurjun template = templateManager.getTemplate( repository, name, version, isKurjunClient );
+            TemplateKurjun template = templateManager.getTemplateByName( repository, name, version, isKurjunClient );
 
             if ( template != null )
             {
@@ -264,12 +265,12 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         try
         {
             TemplateId tid = IdValidators.Template.validate( id );
-            byte[] md5bytes = decodeMd5( tid.getMd5() );
-            if ( md5bytes != null )
+
+            if ( tid.getMd5() != null )
             {
                 try
                 {
-                    boolean deleted = templateManager.delete( repository, tid.getOwnerFprint(), md5bytes );
+                    boolean deleted = templateManager.delete( repository, tid.getOwnerFprint(), tid.getMd5() );
                     if ( deleted )
                     {
                         return Response.ok( "Template deleted" ).build();
@@ -308,7 +309,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         defaultTemplate.setOwnerFprint( template.getOwnerFprint() );
         defaultTemplate.setName( template.getName() );
         defaultTemplate.setVersion( template.getVersion() );
-        defaultTemplate.setMd5Sum( decodeMd5( template.getMd5Sum() ) );
+        defaultTemplate.setMd5Sum(  template.getMd5Sum() );
         defaultTemplate.setArchitecture( Architecture.getByValue( template.getArchitecture() ) );
         defaultTemplate.setParent( template.getParent() );
         defaultTemplate.setPackage( template.getPackageName() );

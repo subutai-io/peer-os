@@ -4,7 +4,6 @@ package io.subutai.core.peer.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.annotation.security.PermitAll;
@@ -32,7 +31,6 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
@@ -51,6 +49,7 @@ import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RemotePeer;
@@ -61,12 +60,13 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
-import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
@@ -136,9 +136,9 @@ public class RemotePeerImpl implements RemotePeer
         RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
 
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-        relationInfoMeta.getRelationTraits().put("receiveHeartbeats", "allow");
-        relationInfoMeta.getRelationTraits().put("sendHeartbeats", "allow");
-        relationInfoMeta.getRelationTraits().put("hostTemplates", "allow");
+        relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
+        relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
+        relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
 
         relationInfoManager.checkRelationValidity( localPeer, this, relationInfoMeta, null );
     }
@@ -169,16 +169,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean isOnline()
     {
-        try
-        {
-            check();
-            return true;
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( e.getMessage(), e );
-            return false;
-        }
+        return peerWebClient.ping();
     }
 
 
@@ -305,48 +296,27 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @Override
-    public Set<Integer> getCpuSet( final ContainerHost containerHost ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-
-        return environmentWebClient.getCpuSet( containerHost.getContainerId() );
-    }
-
-
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void setCpuSet( final ContainerHost containerHost, final Set<Integer> cpuSet ) throws PeerException
-    {
-        Preconditions.checkNotNull( containerHost, "Container host is null" );
-        Preconditions.checkArgument( containerHost instanceof EnvironmentContainerHost );
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( cpuSet ), "Empty cpu set" );
-
-        environmentWebClient.setCpuSet( containerHost.getContainerId(), cpuSet );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public SshPublicKeys generateSshKeyForEnvironment( final EnvironmentId environmentId ) throws PeerException
+    public SshKeys readOrCreateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                      final SshEncryptionType sshKeyType ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
 
-        return environmentWebClient.generateSshKeysForEnvironment( environmentId );
+        return environmentWebClient.generateSshKeysForEnvironment( environmentId, sshKeyType );
     }
 
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkNotNull( sshPublicKeys, "SshPublicKey is null" );
-        Preconditions.checkArgument( !sshPublicKeys.isEmpty(), "No ssh keys" );
+        Preconditions.checkNotNull( sshKeys, "SshPublicKey is null" );
+        Preconditions.checkArgument( !sshKeys.isEmpty(), "No ssh keys" );
 
-        environmentWebClient.configureSshInEnvironment( environmentId, sshPublicKeys );
+        environmentWebClient.configureSshInEnvironment( environmentId, sshKeys );
     }
 
 
@@ -357,6 +327,29 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
 
         environmentWebClient.addSshKey( environmentId, sshPublicKey );
+    }
+
+
+    @Override
+    public SshKeys getSshKeys( final EnvironmentId environmentId, final SshEncryptionType sshEncryptionType )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( sshEncryptionType, "SSH encryption type id is null" );
+
+        return environmentWebClient.getSshKeys( environmentId, sshEncryptionType );
+    }
+
+
+    @Override
+    public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
+                                final SshEncryptionType sshEncryptionType ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( sshEncryptionType, "SSH encryption type id is null" );
+
+        return environmentWebClient.createSshKey( environmentId, containerId, sshEncryptionType );
     }
 
 
@@ -625,7 +618,7 @@ public class RemotePeerImpl implements RemotePeer
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public void setupTunnels( final P2pIps p2pIps, final String environmentId ) throws PeerException
+    public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
         Preconditions.checkNotNull( p2pIps, "Invalid peer ips set" );
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
@@ -707,8 +700,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );
 
-        peerWebClient.resetP2PSecretKey( p2PCredentials.getP2pHash(), p2PCredentials.getP2pSecretKey(),
-                        p2PCredentials.getP2pTtlSeconds() );
+        peerWebClient.resetP2PSecretKey( p2PCredentials );
     }
 
 
@@ -766,7 +758,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public HistoricalMetrics getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
@@ -778,9 +770,9 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public PeerResources getResourceLimits( final String peerId ) throws PeerException
+    public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkNotNull( peerId );
 
         return peerWebClient.getResourceLimits( peerId );
     }

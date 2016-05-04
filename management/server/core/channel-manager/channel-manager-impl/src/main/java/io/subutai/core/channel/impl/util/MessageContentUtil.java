@@ -103,7 +103,7 @@ public class MessageContentUtil
                 status = 1;
             }
         }
-        else if ( inPort == SystemSettings.getSecurePortX3() )
+        else if ( inPort == SystemSettings.getSecurePortX3())
         {
             if ( basePath.startsWith( "/rest/kurjun" )  || basePath.startsWith( "/kurjun/rest" ) )
             {
@@ -118,11 +118,11 @@ public class MessageContentUtil
         {
             if ( basePath.startsWith( "/rest/kurjun" ) )
             {
-                status = 1;
+                status = 0;
             }
             else
             {
-                status = 2;
+                status = 1;
             }
         }
         else
@@ -196,9 +196,8 @@ public class MessageContentUtil
                 if ( secKey != null )
                 {
                     LOG.debug( " ****** Decrypting with: " + hostIdSource + " ****** " );
-                    byte[] outData = encTool.decrypt( data, secKey, "" );
-                    //byte[] outData = encTool.decryptAndVerify();
-                    return outData;
+
+                    return encTool.decrypt( data, secKey, "" );
                 }
                 else
                 {
@@ -297,9 +296,8 @@ public class MessageContentUtil
                 if ( pubKey != null )
                 {
                     LOG.debug( String.format( " ****** Encrypting with %s ****** ", hostIdTarget ) );
-                    byte[] outData = encTool.encrypt( data, pubKey, true );
-                    //byte[] outData = encTool.signAndEncrypt(  data, pubKey, false );
-                    return outData;
+
+                    return encTool.encrypt( data, pubKey, true );
                 }
                 else
                 {

@@ -3,7 +3,6 @@ package io.subutai.common.peer;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
@@ -17,7 +16,6 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
@@ -31,9 +29,11 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 
@@ -192,23 +192,6 @@ public interface Peer extends RelationLink
      */
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
 
-    /**
-     * Returns allowed cpus/cores ids on container
-     *
-     * @param host - container
-     *
-     * @return - allowed cpu set
-     */
-    public Set<Integer> getCpuSet( ContainerHost host ) throws PeerException;
-
-    /**
-     * Sets allowed cpus/cores on container
-     *
-     * @param host - container
-     * @param cpuSet - allowed cpu set
-     */
-    public void setCpuSet( ContainerHost host, Set<Integer> cpuSet ) throws PeerException;
-
 
     //networking
 
@@ -219,17 +202,14 @@ public interface Peer extends RelationLink
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers
-     *
-     * todo use EnvironmentId instead of string
      */
-    public void setupTunnels( P2pIps p2pIps, String environmentId ) throws PeerException;
+    public void setupTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
 
 
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto )
-            throws PeerException;
+    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto ) throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -263,8 +243,7 @@ public interface Peer extends RelationLink
 
     ResourceHostMetrics getResourceHostMetrics() throws PeerException;
 
-    //todo use PeerId instead of string
-    PeerResources getResourceLimits( String peerId ) throws PeerException;
+    PeerResources getResourceLimits( PeerId peerId ) throws PeerException;
 
     ContainerQuota getQuota( ContainerId containerId ) throws PeerException;
 
@@ -272,7 +251,7 @@ public interface Peer extends RelationLink
 
     void alert( AlertEvent alert ) throws PeerException;
 
-    HistoricalMetrics getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
+    String getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 
@@ -280,9 +259,10 @@ public interface Peer extends RelationLink
 
     PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException;
 
-    SshPublicKeys generateSshKeyForEnvironment( EnvironmentId environmentId ) throws PeerException;
+    SshKeys readOrCreateSshKeysForEnvironment( EnvironmentId environmentId, SshEncryptionType sshKeyType )
+            throws PeerException;
 
-    void configureSshInEnvironment( EnvironmentId environmentId, SshPublicKeys sshPublicKeys ) throws PeerException;
+    void configureSshInEnvironment( EnvironmentId environmentId, SshKeys sshKeys ) throws PeerException;
 
     void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
@@ -291,4 +271,9 @@ public interface Peer extends RelationLink
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 
     void addReverseProxy( ReverseProxyConfig reverseProxyConfig ) throws PeerException;
+
+    SshKeys getSshKeys( EnvironmentId environmentId, SshEncryptionType sshEncryptionType ) throws PeerException;
+
+    SshKey createSshKey( EnvironmentId environmentId, ContainerId containerId, SshEncryptionType encType )
+            throws PeerException;
 }

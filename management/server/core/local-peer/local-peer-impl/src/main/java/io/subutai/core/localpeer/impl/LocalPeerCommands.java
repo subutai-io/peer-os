@@ -4,14 +4,15 @@ package io.subutai.core.localpeer.impl;
 import java.util.Map;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.settings.Common;
 
 
 public class LocalPeerCommands
 {
-    public RequestBuilder getManagementExchangeKeyCommand( String token )
+    public RequestBuilder getExchangeKeyCommand( String hostname, String token )
     {
-        return new RequestBuilder( String.format( "subutai import management -t %s", token ) );
+        return new RequestBuilder( String.format( "subutai import %s -t %s", hostname, token ) );
     }
 
 
@@ -47,15 +48,22 @@ public class LocalPeerCommands
     }
 
 
-    protected RequestBuilder getReadOrCreateSSHCommand()
+    protected RequestBuilder getReadOrCreateSSHCommand( SshEncryptionType encryptionType )
     {
-        return new RequestBuilder( String.format( "if [ -f %1$s/id_dsa.pub ]; " +
-                "then cat %1$s/id_dsa.pub ;" +
+        return new RequestBuilder( String.format( "if [ -f %1$s/id_%2$s.pub ]; " +
+                "then cat %1$s/id_%2$s.pub ;" +
                 "else rm -rf %1$s && " +
                 "mkdir -p %1$s && " +
                 "chmod 700 %1$s && " +
-                "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " +
-                "cat %1$s/id_dsa.pub; fi", Common.CONTAINER_SSH_FOLDER ) );
+                "ssh-keygen -t %2$s -P '' -f %1$s/id_%2$s -q && " +
+                "cat %1$s/id_%2$s.pub; fi", Common.CONTAINER_SSH_FOLDER, encryptionType.name().toLowerCase() ) );
+    }
+
+
+    protected RequestBuilder getReadSSHKeyCommand( SshEncryptionType encryptionType )
+    {
+        return new RequestBuilder( String.format( "cat %1$s/id_%2$s.pub ", Common.CONTAINER_SSH_FOLDER,
+                encryptionType.name().toLowerCase() ) );
     }
 
 
@@ -79,7 +87,7 @@ public class LocalPeerCommands
     {
         return new RequestBuilder( String.format( "mkdir -p %1$s && " +
                 "chmod 700 %1$s && " +
-                "echo '%3$s' >> %2$s && " +
+                "echo '%3$s' >> %2$s && sort -u '%2$s' -o '%2$s' && " +
                 "chmod 644 %2$s", Common.CONTAINER_SSH_FOLDER, Common.CONTAINER_SSH_FILE, keys ) );
     }
 

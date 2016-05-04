@@ -1,8 +1,6 @@
 package io.subutai.core.localpeer.rest;
 
 
-import java.util.Set;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -22,6 +19,8 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKeys;
 
 
 public interface EnvironmentRestService
@@ -58,17 +57,6 @@ public interface EnvironmentRestService
     ProcessResourceUsage getProcessResourceUsage( @PathParam( "containerId" ) ContainerId containerId,
                                                   @PathParam( "pid" ) int pid );
 
-    @GET
-    @Path( "{environmentId}/container/{containerId}/quota/cpuset" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response getCpuSet( @PathParam( "containerId" ) ContainerId containerId );
-
-    @POST
-    @Path( "{environmentId}/container/{containerId}/quota/cpuset" )
-    @Consumes( MediaType.APPLICATION_JSON )
-    @Produces( MediaType.APPLICATION_JSON )
-    Response setCpuSet( @PathParam( "containerId" ) ContainerId containerId, Set<Integer> cpuSet );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/quota" )
@@ -91,13 +79,13 @@ public interface EnvironmentRestService
     @POST
     @Path( "{environmentId}/containers/sshkeys" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
-                                        SshPublicKeys sshPublicKeys );
+    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId, SshKeys sshKeys );
 
     @PUT
-    @Path( "{environmentId}/containers/sshkeys" )
+    @Path( "{environmentId}/containers/sshkeys/{encType}" )
     @Produces( MediaType.APPLICATION_JSON )
-    SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    SshKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                           @PathParam( "encType" ) SshEncryptionType sshKeyType );
 
     @POST
     @Path( "{environmentId}/containers/sshkey/add" )
@@ -118,4 +106,16 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response addReverseProxy( ReverseProxyConfig reverseProxyConfig );
+
+    @GET
+    @Path( "{environmentId}/sshkeys/{encType}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response getSshKeys( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                         @PathParam( "encType" ) SshEncryptionType encryptionType );
+
+    @POST
+    @Path( "{environmentId}/sshkeys/{encType}" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    Response createSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                           @PathParam( "encType" ) SshEncryptionType encryptionType, String containerId );
 }

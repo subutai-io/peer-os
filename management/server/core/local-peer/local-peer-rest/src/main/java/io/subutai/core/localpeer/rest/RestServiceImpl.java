@@ -18,6 +18,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -42,6 +43,13 @@ public class RestServiceImpl implements RestService
         Preconditions.checkNotNull( localPeer );
 
         this.localPeer = localPeer;
+    }
+
+
+    @Override
+    public Response ping()
+    {
+        return Response.ok().build();
     }
 
 
@@ -152,11 +160,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setupTunnels( final String environmentId, final P2pIps p2pIps )
+    public Response setupTunnels( final EnvironmentId environmentId, final P2pIps p2pIps )
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
+            Preconditions.checkNotNull( environmentId );
             Preconditions.checkNotNull( p2pIps );
 
             localPeer.setupTunnels( p2pIps, environmentId );
@@ -336,11 +344,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getResourceLimits( final String peerId )
+    public Response getResourceLimits( final PeerId peerId )
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+            Preconditions.checkNotNull( peerId );
 
             return Response.ok( localPeer.getResourceLimits( peerId ) ).build();
         }

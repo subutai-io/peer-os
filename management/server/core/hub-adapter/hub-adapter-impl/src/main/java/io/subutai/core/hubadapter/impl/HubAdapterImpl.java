@@ -24,6 +24,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 import static java.lang.String.format;
 
+
 public class HubAdapterImpl implements HubAdapter
 {
     private static final String ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
@@ -45,7 +46,8 @@ public class HubAdapterImpl implements HubAdapter
     private final String peerId;
 
 
-    public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager, IdentityManager identityManager ) throws Exception
+    public HubAdapterImpl( DaoManager daoManager, SecurityManager securityManager, PeerManager peerManager,
+                           IdentityManager identityManager ) throws Exception
     {
         daoHelper = new DaoHelper( daoManager );
 
@@ -57,7 +59,7 @@ public class HubAdapterImpl implements HubAdapter
     }
 
 
-    private boolean isRegistered()
+    public boolean isRegistered()
     {
         return daoHelper.isPeerRegisteredToHub( peerId );
     }
@@ -76,7 +78,7 @@ public class HubAdapterImpl implements HubAdapter
         log.debug( "Active user: username={}, email={}", user.getUserName(), user.getEmail() );
 
         // For the admin, get peer owner data from Hub
-        if ( user.getUserName().equals( "admin") )
+        if ( user.getUserName().equals( "admin" ) )
         {
             return getOwnerId();
         }
