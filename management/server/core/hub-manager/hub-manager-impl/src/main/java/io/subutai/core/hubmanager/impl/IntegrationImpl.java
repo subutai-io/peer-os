@@ -130,7 +130,7 @@ public class IntegrationImpl implements Integration
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
 
-            configManager = new ConfigManager( securityManager, peerManager, configDataService );
+            configManager = new ConfigManager( securityManager, peerManager, configDataService, identityManager );
 
             hubEnvironmentManager =
                     new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager,
