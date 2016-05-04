@@ -162,9 +162,14 @@ func main() {
 				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
 				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
 				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
-				cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"}},
+				cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"},
+				cli.BoolFlag{Name: "v", Usage: "print p2p version (p2p -v)"}},
 			Action: func(c *cli.Context) {
-				lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+				if c.Bool("v") {
+					lib.P2Pversion()
+				} else {
+					lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+				}
 			}}},
 
 		Action: func(c *cli.Context) {
