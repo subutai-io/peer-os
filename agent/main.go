@@ -119,6 +119,15 @@ func main() {
 			lib.LxcImport(c.Args().Get(0), c.String("v"), c.String("t"))
 		}}, {
 
+		Name: "hostname", Usage: "Set hostname of container or host",
+		Action: func(c *cli.Context) {
+			if len(c.Args().Get(1)) != 0 {
+				lib.LxcHostname(c.Args().Get(0), c.Args().Get(1))
+			} else {
+				lib.Hostname(c.Args().Get(0))
+			}
+		}}, {
+
 		Name: "list", Usage: "list Subutai container",
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "c", Usage: "containers only"},

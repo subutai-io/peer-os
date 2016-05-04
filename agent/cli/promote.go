@@ -25,8 +25,8 @@ func LxcPromote(name string) {
 	}
 
 	// check: write package list to packages
-	pkgCmmdResult, _ := container.AttachExec(name, []string{"timeout", "60", "dpkg", "-l"})
-	strCmdRes := strings.Join(pkgCmmdResult, "\n")
+	pkgCmdResult, _ := container.AttachExec(name, []string{"timeout", "60", "dpkg", "-l"})
+	strCmdRes := strings.Join(pkgCmdResult, "\n")
 	log.Check(log.FatalLevel, "Write packages",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/packages",
 			[]byte(strCmdRes), 0755))
