@@ -54,20 +54,11 @@ public class AppScaleManager
 
         appscaleInitCluster( controllerHost, config );
 
-//        makeCleanUpPreviousInstallation( controllerHost );
+        makeCleanUpPreviousInstallation( controllerHost );
 
         runAfterInitCommands( controllerHost, config );
 
-//        addKeyPairSH( controllerHost );
-
-        if ( controllerHost.getTemplateName().equals( "appscale271" ) )
-        {
-            String aptGet = " echo 'deb http://archive.ubuntu.com/ubuntu/ vivid main restricted' >> /etc/apt/sources.list; "
-                    + " apt-get --force-yes --assume-yes update; "
-                    + " apt-get --force-yes --assume-yes install expect; ";
-
-            execute( controllerHost, aptGet );
-        }
+        addKeyPairSH( controllerHost );
 
         int envContainersCount = config.getContainerAddresses().size();
 
@@ -77,15 +68,15 @@ public class AppScaleManager
 
         execute( controllerHost, runShell );
 
-//        createUpShell ( controllerHost );
+        createUpShell ( controllerHost );
 
         runInRH ( controllerHost, config );
 
         execute( controllerHost, "echo '127.0.1.1 appscale-image0' >> /etc/hosts" );
 
-//        execute( controllerHost, Commands.backUpSSH () );
+        execute( controllerHost, Commands.backUpSSH () );
 
-//        execute( controllerHost, Commands.backUpAppscale () );
+        execute( controllerHost, Commands.backUpAppscale () );
 
         log.debug( "AppScale installation done" );
     }
@@ -122,27 +113,27 @@ public class AppScaleManager
     }
 
 
-//    private void createUpShell ( ContainerHost containerHost )
-//    {
-//
-//        String a = "#!/usr/bin/expect -f\n" + "set timeout -1\n" + "set num $argv\n"
-//                + "spawn /root/appscale-tools/bin/appscale up\n" + "\n"
-//                + "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
-//                + "expect \"Enter your desired admin e-mail address:\"\n" + "send -- \"a@a.com\\n\"\n"
-//                + "expect \"Enter new password:\"\n" + "send -- \"aaaaaa\\n\"\n" + "expect \"Confirm password:\"\n"
-//                + "send -- \"aaaaaa\\n\"\n" + "\n" + "}\n" + "\n" + "expect EOD";
-//
-//        try
-//        {
-//            containerHost.execute ( new RequestBuilder ( "touch /root/up.sh" ) );
-//            containerHost.execute ( new RequestBuilder ( "echo '" + a + "' > /root/up.sh" ) );
-//            containerHost.execute ( new RequestBuilder ( "chmod +x /root/up.sh" ) );
-//        }
-//        catch ( CommandException ex )
-//        {
-//            log.error ( "Error on create up shell: " + ex );
-//        }
-//    }
+    private void createUpShell ( ContainerHost containerHost )
+    {
+
+        String a = "#!/usr/bin/expect -f\n" + "set timeout -1\n" + "set num $argv\n"
+                + "spawn /root/appscale-tools/bin/appscale up\n" + "\n"
+                + "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
+                + "expect \"Enter your desired admin e-mail address:\"\n" + "send -- \"a@a.com\\n\"\n"
+                + "expect \"Enter new password:\"\n" + "send -- \"aaaaaa\\n\"\n" + "expect \"Confirm password:\"\n"
+                + "send -- \"aaaaaa\\n\"\n" + "\n" + "}\n" + "\n" + "expect EOD";
+
+        try
+        {
+            containerHost.execute ( new RequestBuilder ( "touch /root/up.sh" ) );
+            containerHost.execute ( new RequestBuilder ( "echo '" + a + "' > /root/up.sh" ) );
+            containerHost.execute ( new RequestBuilder ( "chmod +x /root/up.sh" ) );
+        }
+        catch ( CommandException ex )
+        {
+            log.error ( "Error on create up shell: " + ex );
+        }
+    }
 
 
     private void createRunSH( ContainerHost containerHost, int envContainersCount )
@@ -169,13 +160,13 @@ public class AppScaleManager
                 + "set num $argv\n"
                 + "spawn /root/appscale-tools/bin/appscale up\n" + "\n";
 
-//        if ( envContainersCount == 1 )
-//        {
-//            // This works for environment with one container only. With several containers it fails.
-//            sh += "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
-//                    + "    expect \"Are you sure you want to continue connecting (yes/no)?\"\n" + "    send -- \"yes\\n\"\n"
-//                    + "    expect \" password:\"\n" + "    send -- \"a\\n\"\n" + "}\n" + "\n";
-//        }
+        if ( envContainersCount == 1 )
+        {
+            // This works for environment with one container only. With several containers it fails.
+            sh += "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
+                    + "    expect \"Are you sure you want to continue connecting (yes/no)?\"\n" + "    send -- \"yes\\n\"\n"
+                    + "    expect \" password:\"\n" + "    send -- \"a\\n\"\n" + "}\n" + "\n";
+        }
 
         sh += "expect \"Enter your desired admin e-mail address:\"\n" + "send -- \"a@a.com\\n\"\n"
                 + "expect \"Enter new password:\"\n" + "send -- \"aaaaaa\\n\"\n" + "expect \"Confirm password:\"\n"
@@ -185,33 +176,33 @@ public class AppScaleManager
     }
 
 
-//    private void addKeyPairSH( ContainerHost containerHost )
-//    {
-//        try
-//        {
-//            String add = "#!/usr/bin/expect -f\n"
-//                    + "set timeout -1\n"
-//                    + "set num argv\n"
-//                    + "spawn /root/appscale-tools/bin/appscale-add-keypair --ips ips.yaml --keyname appscale\n"
-//                    + "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
-//                    + "    expect \"Are you sure you want to continue connecting (yes/no)?\"\n"
-//                    + "    send -- \"yes\\n\"\n"
-//                    + "    expect \" password:\"\n"
-//                    + "    send -- \"a\\n\"\n"
-//                    + "}\n"
-//                    + "expect EOD";
-//
-//            containerHost.execute( new RequestBuilder ( "mkdir .ssh" ) );
-//            containerHost.execute( new RequestBuilder ( "rm /root/addKey.sh " ) );
-//            containerHost.execute( new RequestBuilder ( "touch /root/addKey.sh" ) );
-//            containerHost.execute( new RequestBuilder ( "echo '" + add + "' > /root/addKey.sh" ) );
-//            containerHost.execute( new RequestBuilder ( "chmod +x /root/addKey.sh" ) );
-//        }
-//        catch ( CommandException ex )
-//        {
-//            log.error ( ex.toString () );
-//        }
-//    }
+    private void addKeyPairSH( ContainerHost containerHost )
+    {
+        try
+        {
+            String add = "#!/usr/bin/expect -f\n"
+                    + "set timeout -1\n"
+                    + "set num argv\n"
+                    + "spawn /root/appscale-tools/bin/appscale-add-keypair --ips ips.yaml --keyname appscale\n"
+                    + "for {set i 1} {\"$i\" <= \"$num\"} {incr i} {\n"
+                    + "    expect \"Are you sure you want to continue connecting (yes/no)?\"\n"
+                    + "    send -- \"yes\\n\"\n"
+                    + "    expect \" password:\"\n"
+                    + "    send -- \"a\\n\"\n"
+                    + "}\n"
+                    + "expect EOD";
+
+            containerHost.execute( new RequestBuilder ( "mkdir .ssh" ) );
+            containerHost.execute( new RequestBuilder ( "rm /root/addKey.sh " ) );
+            containerHost.execute( new RequestBuilder ( "touch /root/addKey.sh" ) );
+            containerHost.execute( new RequestBuilder ( "echo '" + add + "' > /root/addKey.sh" ) );
+            containerHost.execute( new RequestBuilder ( "chmod +x /root/addKey.sh" ) );
+        }
+        catch ( CommandException ex )
+        {
+            log.error ( ex.toString () );
+        }
+    }
 
 
     private void runAfterInitCommands( ContainerHost containerHost, AppScaleConfigDto config )
@@ -294,30 +285,30 @@ public class AppScaleManager
     }
 
 
-//    private void makeCleanUpPreviousInstallation( ContainerHost containerHost )
-//    {
-//        try
-//        {
-//            CommandResult cr = containerHost.execute ( new RequestBuilder ( "ls /root/.ssh" ) );
-//
-//            if ( !cr.toString ().equals ( "" ) )
-//            {
-//                //                execute( containerHost, "rm /root/.ssh/*" );
-//                execute( containerHost, "touch /root/.ssh/known_hosts" );
-//            }
-//
-//            cr = containerHost.execute ( new RequestBuilder ( "ls /root/.appscale" ) );
-//
-//            if ( !cr.toString ().equals ( "" ) )
-//            {
-//                execute( containerHost, "rm /root/.appscale/*" );
-//            }
-//        }
-//        catch ( CommandException e )
-//        {
-//            log.error ( "Clean process command exception: ", e );
-//        }
-//    }
+    private void makeCleanUpPreviousInstallation( ContainerHost containerHost )
+    {
+        try
+        {
+            CommandResult cr = containerHost.execute ( new RequestBuilder ( "ls /root/.ssh" ) );
+
+            if ( !cr.toString ().equals ( "" ) )
+            {
+                //                execute( containerHost, "rm /root/.ssh/*" );
+                execute( containerHost, "touch /root/.ssh/known_hosts" );
+            }
+
+            cr = containerHost.execute ( new RequestBuilder ( "ls /root/.appscale" ) );
+
+            if ( !cr.toString ().equals ( "" ) )
+            {
+                execute( containerHost, "rm /root/.appscale/*" );
+            }
+        }
+        catch ( CommandException e )
+        {
+            log.error ( "Clean process command exception: ", e );
+        }
+    }
 
 
     private void appscaleInitCluster ( ContainerHost containerHost, AppScaleConfigDto config )
