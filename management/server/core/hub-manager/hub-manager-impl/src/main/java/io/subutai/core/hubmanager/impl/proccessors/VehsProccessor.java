@@ -38,7 +38,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class VehsProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );

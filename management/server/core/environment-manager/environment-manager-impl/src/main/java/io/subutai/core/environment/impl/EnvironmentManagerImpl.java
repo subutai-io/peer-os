@@ -62,6 +62,14 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.relation.RelationCredibility;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.Trait;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -92,12 +100,6 @@ import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
-import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
@@ -250,9 +252,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @PermitAll
+    @RelationCredibility( target = "return", traits = {
+            @Trait( key = "ownership", value = "All" ), @Trait( key = "read", value = "true" )
+    } )
     @Override
     public Set<Environment> getEnvironments()
+    {
+        Set<Environment> environments = getLocalEnvironments();
+
+        environments.addAll( environmentAdapter.getEnvironments() );
+
+        return environments;
+    }
+
+
+    private Set<Environment> getLocalEnvironments()
     {
         User activeUser = identityManager.getActiveUser();
 
@@ -260,11 +274,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         for ( Environment environment : environmentService.getAll() )
         {
-            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
-
-            final boolean b = environment.getUserId().equals( activeUser.getId() );
-
-            if ( b || trustedRelation )
+            //            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions(
+            // environment );
+            //
+            //            final boolean b = environment.getUserId().equals( activeUser.getId() );
+            //
+            //            if ( b || trustedRelation )
             {
                 environments.add( environment );
 
@@ -273,10 +288,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 setContainersTransientFields( environment );
             }
         }
-
-        environmentAdapter.uploadEnvironments( environments );
-
-        environments.addAll( environmentAdapter.getEnvironments() );
 
         return environments;
     }
@@ -507,8 +518,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation operationTracker =
-                tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
+        return growEnvironment( environment, topology, async );
+    }
+
+
+    @RelationCredibility( target = "environment", traits = {
+            @Trait( key = "ownership", value = "Group" ), @Trait( key = "update", value = "true" )
+    } )
+    private Set<EnvironmentContainerHost> growEnvironment( final EnvironmentImpl environment, final Topology topology,
+                                                           final boolean async )
+
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Growing environment %s", environment.getId() ) );
 
         //collect participating peers
         Set<Peer> allPeers = new HashSet<>();
@@ -613,8 +636,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
+        return modifyEnvironmentAndGetTrackerID( environment, topology, removedContainers, async );
+    }
+
+
+    @RelationCredibility( target = "environment", traits = {
+            @Trait( key = "ownership", value = "Group" ), @Trait( key = "update", value = "true" )
+    } )
+    private UUID modifyEnvironmentAndGetTrackerID(final EnvironmentImpl environment, final Topology topology,
+                                                  final List<String> removedContainers, final boolean async)
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Modifying environment %s", environmentId ) );
+                String.format( "Modifying environment %s", environment.getId() ) );
 
         Set<Peer> allPeers = new HashSet<>();
 
@@ -704,8 +738,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
+    //    @RelationCredibility( traits = {
+    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
+    //    } )
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
@@ -987,8 +1024,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Delete" )
     @Override
+    @RolesAllowed( "Environment-Management|Delete" )
+    //    @RelationCredibility( traits = {
+    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "delete", value = "true" )
+    //    } )
     public void destroyContainer( final String environmentId, final String containerId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -1174,8 +1214,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
+    //    @RelationCredibility( traits = {
+    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
+    //    } )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                          final String sslCertPath )
@@ -1439,16 +1482,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            // TODO user should send signed trust message between delegatedUser and himself
-            RelationInfoMeta relationInfoMeta =
-                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
 
-            RelationInfo relationInfo = relationManager.createTrustRelationship( relationInfoMeta );
-
-            // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
                     new RelationMeta( delegatedUser, delegatedUser, environment, activeUser.getSecurityKeyId() );
-            Relation relation = relationManager.buildTrustRelation( relationInfo, relationMeta );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
         }
@@ -1922,6 +1966,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             RelationInfoMeta relationInfoMeta =
                     new RelationInfoMeta( dto.isRead(), dto.isWrite(), dto.isUpdate(), dto.isDelete(),
                             Ownership.GROUP.getLevel() );
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", String.valueOf( dto.isRead() ) );
+            traits.put( "write", String.valueOf( dto.isWrite() ) );
+            traits.put( "update", String.valueOf( dto.isUpdate() ) );
+            traits.put( "delete", String.valueOf( dto.isDelete() ) );
+            traits.put( "ownership", Ownership.GROUP.getName() );
 
             RelationMeta relationMeta =
                     new RelationMeta( delegatedUser, targetDelegate, environment, delegatedUser.getId() );
@@ -2001,6 +2051,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    private void uploadEnvironmentsToHub()
+    {
+        try
+        {
+            environmentAdapter.uploadEnvironments( getLocalEnvironments() );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error uploading environments to Hub: {}", e.getMessage() );
+        }
+    }
+
+
     private class BackgroundTasksRunner implements Runnable
     {
         @Override
@@ -2009,6 +2072,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             LOG.debug( "Environment background tasks started..." );
 
             resetP2Pkey();
+
+            // workaround for now,
+            // todo should not run if all environments already uploaded
+            uploadEnvironmentsToHub();
 
             LOG.debug( "Environment background tasks finished." );
         }

@@ -52,7 +52,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogEvent;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class HubEnvironmentProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );

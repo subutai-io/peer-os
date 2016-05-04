@@ -3,7 +3,6 @@ package io.subutai.core.peer.impl;
 
 import java.util.Date;
 
-import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -32,6 +31,7 @@ import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.util.DateTimeParam;
 
 
@@ -59,12 +59,43 @@ public class PeerWebClient
     }
 
 
+    public boolean ping()
+    {
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+
+            String path = "/ping";
+
+            WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 5000, 1 );
+
+            response = client.get();
+
+            WebClientBuilder.checkResponse( response, Response.Status.OK );
+
+            return true;
+        }
+        catch ( RelationVerificationException e )
+        {
+            LOG.error( e.getMessage(), e );
+
+            return false;
+        }
+        catch ( Exception e )
+        {
+            return false;
+        }
+    }
+
+
     public PeerInfo getInfo() throws PeerException
     {
         Response response;
         try
         {
             remotePeer.checkRelation();
+
             String path = "/info";
 
             WebClient client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider, 3000, 15000, 1 );
@@ -80,7 +111,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error getting peer info: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, PeerInfo.class );
+        return WebClientBuilder.checkResponse( response, PeerInfo.class );
     }
 
 
@@ -105,7 +136,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error creating peer environment key: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, PublicKeyContainer.class );
+        return WebClientBuilder.checkResponse( response, PublicKeyContainer.class );
     }
 
 
@@ -129,7 +160,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error updating peer environment key: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -153,7 +184,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error getting interfaces: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, HostInterfaces.class );
+        return WebClientBuilder.checkResponse( response, HostInterfaces.class );
     }
 
 
@@ -177,7 +208,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error resetting P2P secret key: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -200,7 +231,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error joining P2P swarm: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -223,7 +254,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error joining/updating P2P swarm: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -247,7 +278,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error cleaning up environment: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -270,7 +301,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error getting rh metrics: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, ResourceHostMetrics.class );
+        return WebClientBuilder.checkResponse( response, ResourceHostMetrics.class );
     }
 
 
@@ -285,10 +316,8 @@ public class PeerWebClient
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
             Response response = client.post( alert );
-            if ( Response.Status.ACCEPTED.getStatusCode() != response.getStatus() )
-            {
-                throw new PeerException( "Alert not accepted." );
-            }
+
+            WebClientBuilder.checkResponse( response, Response.Status.ACCEPTED );
         }
         catch ( Exception e )
         {
@@ -323,7 +352,7 @@ public class PeerWebClient
                     String.format( "Error on retrieving historical metrics from remote peer: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, String.class );
+        return WebClientBuilder.checkResponse( response, String.class );
     }
 
 
@@ -346,7 +375,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error on retrieving peer limits: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, PeerResources.class );
+        return WebClientBuilder.checkResponse( response, PeerResources.class );
     }
 
 
@@ -369,7 +398,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error setting up tunnels: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -392,7 +421,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error adding PEK: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -415,7 +444,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error on obtaining environment containers: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, Containers.class );
+        return WebClientBuilder.checkResponse( response, Containers.class );
     }
 
 
@@ -439,7 +468,7 @@ public class PeerWebClient
                     String.format( "Error obtaining reserved network resources: %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, UsedNetworkResources.class );
+        return WebClientBuilder.checkResponse( response, UsedNetworkResources.class );
     }
 
 
@@ -463,7 +492,7 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error reserving network resources: %s", e.getMessage() ) );
         }
 
-        checkResponse( response );
+        WebClientBuilder.checkResponse( response );
     }
 
 
@@ -487,42 +516,6 @@ public class PeerWebClient
             throw new PeerException( String.format( "Error obtaining template : %s", e.getMessage() ) );
         }
 
-        return checkResponse( response, TemplateKurjun.class );
-    }
-
-
-    protected <T> T checkResponse( Response response, Class<T> clazz ) throws PeerException
-    {
-
-        checkResponse( response );
-
-        try
-        {
-            return response.readEntity( clazz );
-        }
-        catch ( ResponseProcessingException e )
-        {
-            throw new PeerException( "Error parsing response", e );
-        }
-    }
-
-
-    protected void checkResponse( Response response ) throws PeerException
-    {
-        try
-        {
-            if ( response == null )
-            {
-                throw new PeerException( "No response to parse" );
-            }
-            else if ( response.getStatus() == 500 )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-        }
-        catch ( ResponseProcessingException e )
-        {
-            throw new PeerException( "Error parsing response", e );
-        }
+        return WebClientBuilder.checkResponse( response, TemplateKurjun.class );
     }
 }

@@ -66,15 +66,15 @@ import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.core.object.relation.api.RelationInfoManager;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -136,11 +136,12 @@ public class RemotePeerImpl implements RemotePeer
         RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
 
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-        relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
-        relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
-        relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
+        Map<String, String> traits = relationInfoMeta.getRelationTraits();
+        traits.put( "receiveHeartbeats", "allow" );
+        traits.put( "sendHeartbeats", "allow" );
+        traits.put( "hostTemplates", "allow" );
 
-        relationInfoManager.checkRelationValidity( localPeer, this, relationInfoMeta, null );
+        relationInfoManager.checkRelation( localPeer, this, relationInfoMeta, null );
     }
 
 
@@ -169,16 +170,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean isOnline()
     {
-        try
-        {
-            check();
-            return true;
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( e.getMessage(), e );
-            return false;
-        }
+        return peerWebClient.ping();
     }
 
 

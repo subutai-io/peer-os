@@ -19,7 +19,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ContainerEventDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class ContainerEventProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );

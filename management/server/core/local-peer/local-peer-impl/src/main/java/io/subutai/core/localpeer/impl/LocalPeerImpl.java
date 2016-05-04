@@ -88,6 +88,11 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
@@ -124,11 +129,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
-import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -1336,6 +1336,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "bandwidthControl", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
             {
@@ -1694,6 +1699,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             relationTraits.put( "hostEnvironment", "true" );
             relationTraits.put( "containerLimit", "unlimited" );
             relationTraits.put( "bandwidthLimit", "unlimited" );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( peerOwner, this, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
@@ -1736,6 +1745,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "encryptMessage", "true" );
             relationTraits.put( "decryptMessage", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( this, peerLink, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );

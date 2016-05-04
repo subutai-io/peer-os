@@ -12,6 +12,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -46,6 +47,11 @@ import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.objects.UserStatus;
 import io.subutai.common.security.objects.UserType;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.token.TokenUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -66,11 +72,6 @@ import io.subutai.core.identity.impl.model.UserDelegateEntity;
 import io.subutai.core.identity.impl.model.UserEntity;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 import io.subutai.core.identity.impl.utils.SecurityUtil;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -988,14 +989,17 @@ public class IdentityManagerImpl implements IdentityManager
                 generateKeyPair( delegatedUser.getId(), SecurityKeyType.UserKey.getId() );
             }
 
-
-            // TODO user should send signed trust message between delegatedUser and himself
+            assert relationManager != null;
             RelationInfoMeta relationInfoMeta =
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
 
-            assert relationManager != null;
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
 
-            // TODO relation verification should be done by delegated user, automatically
             RelationMeta relationMeta =
                     new RelationMeta( activeUser, delegatedUser, delegatedUser, activeUser.getSecurityKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );

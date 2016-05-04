@@ -22,7 +22,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class TunnelProcessor implements StateLinkProccessor
 {
 

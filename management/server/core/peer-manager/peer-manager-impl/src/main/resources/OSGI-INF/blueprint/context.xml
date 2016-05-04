@@ -42,7 +42,7 @@
 
   <reference id="templateRegistry" interface="io.subutai.core.kurjun.api.TemplateManager" />
 
-  <reference id="relationManager" interface="io.subutai.core.object.relation.api.RelationManager" />
+  <reference id="relationManager" interface="io.subutai.common.security.relation.RelationManager" />
 
   <bean id="messageResponseListener" class="io.subutai.core.peer.impl.request.MessageResponseListener"
         destroy-method="dispose" scope="singleton" activation="eager">

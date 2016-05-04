@@ -18,13 +18,13 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
 import io.subutai.common.security.objects.Ownership;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 
 
 /**
- * Relation info is simple string presentation of propertyKey=propertyValue where each pair will describe relation with
- * other object. When verifying transitive relation, relation validity is checked upon key=pair existence.
+ * Relation info is simple string presentation of key=value where each pair will describe relation with other
+ * object. When verifying transitive relation, relation validity is checked upon key=pair existence.
  */
 @Entity
 @Table( name = "relation_info" )
@@ -48,6 +48,7 @@ public class RelationInfoImpl implements RelationInfo
     @Column( name = "delete_p" )
     private boolean deletePermission;
 
+    // TODO set ownership level according to relations by lookup method
     //Permission, role
     @Column( name = "ownership_level" )
     private int ownershipLevel = Ownership.ALL.getLevel();
@@ -56,7 +57,7 @@ public class RelationInfoImpl implements RelationInfo
     @CollectionTable( name = "relation_traits" )
     @MapKeyColumn( name = "trait_key" )
     @Column( name = "trait_value" )
-//    @CollectionTable( name = "relation_traits", joinColumns = @JoinColumn( name = "relation_info_id" ) )
+    //    @CollectionTable( name = "relation_traits", joinColumns = @JoinColumn( name = "relation_info_id" ) )
     private Map<String, String> relationTraits = new HashMap<String, String>(); // maps from attribute name to value
 
 
@@ -182,5 +183,16 @@ public class RelationInfoImpl implements RelationInfo
     public int hashCode()
     {
         return ( int ) ( id ^ ( id >>> 32 ) );
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "RelationInfoImpl{" +
+                "id=" + id +
+                ", ownershipLevel=" + ownershipLevel +
+                ", relationTraits=" + relationTraits +
+                '}';
     }
 }
