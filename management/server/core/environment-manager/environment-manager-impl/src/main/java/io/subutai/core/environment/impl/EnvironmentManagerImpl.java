@@ -1096,9 +1096,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             {
                 EnvironmentImpl environment = environmentService.find( environmentId );
 
-                environment.setStatus( EnvironmentStatus.CANCELLED );
+                if ( environment != null )
+                {
+                    environment.setStatus( EnvironmentStatus.CANCELLED );
 
-                update( environment );
+                    update( environment );
+                }
             }
         }
         catch ( Exception e )
