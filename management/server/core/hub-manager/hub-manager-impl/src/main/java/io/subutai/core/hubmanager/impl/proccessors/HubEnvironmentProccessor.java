@@ -363,16 +363,19 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                         {
                             if ( nodeDto.getState().equals( ContainerStateDto.STOPPING ) )
                             {
+                                //TODO JAAS
                                 localPeer.stopContainer( containerId );
                                 nodeDto.setState( ContainerStateDto.STOPPED );
                             }
                             if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
                             {
+                                //TODO JAAS
                                 localPeer.startContainer( containerId );
                                 nodeDto.setState( ContainerStateDto.RUNNING );
                             }
                             if ( nodeDto.getState().equals( ContainerStateDto.ABORTING ) )
                             {
+                                //TODO JAAS
                                 localPeer.destroyContainer( containerId );
                                 nodeDto.setState( ContainerStateDto.FROZEN );
                             }
@@ -431,6 +434,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             if ( assign )
             {
                 DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
+                //TODO JAAS
                 localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
                 for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
                 {
@@ -440,6 +444,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                         {
                             try
                             {
+                                //TODO JAAS
                                 localPeer.addIpToVniDomain( nodeDto.getIp(), env.getVni() );
                             }
                             catch ( Exception e )
@@ -452,6 +457,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             }
             else
             {
+                //TODO JAAS
                 localPeer.removeVniDomain( env.getVni() );
             }
 
@@ -489,6 +495,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             EnvironmentId envId = new EnvironmentId( env.getId() );
 
+            //TODO JAAS
             localPeer.cleanupEnvironment( envId );
             ReservedNetworkResources reservedNetworkResources = localPeer.getReservedNetworkResources();
             for ( NetworkResource networkResource : reservedNetworkResources.getNetworkResources() )
