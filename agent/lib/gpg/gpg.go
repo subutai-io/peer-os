@@ -156,7 +156,7 @@ func GetToken() string {
 	defer resp.Body.Close()
 	token, _ := ioutil.ReadAll(resp.Body)
 
-	if len(string(token)) != 168 {
+	if resp.StatusCode != 200 {
 		return ""
 	}
 

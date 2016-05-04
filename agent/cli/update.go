@@ -48,21 +48,21 @@ func getInstalled() string {
 	return "0"
 }
 
-func upgradeRh(name string) {
+func upgradeRh(packet string) {
 	log.Info("Updating Resource host")
-	file, err := os.Create("/tmp/" + name)
+	file, err := os.Create("/tmp/" + packet)
 	log.Check(log.FatalLevel, "Creating update file", err)
 	defer file.Close()
 	client := &http.Client{}
-	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?name=" + name)
-	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?name="+name, err)
+	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?name=" + packet)
+	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?name="+packet, err)
 	defer resp.Body.Close()
 	_, err = io.Copy(file, resp.Body)
 	log.Check(log.FatalLevel, "Writing response to file", err)
 
-	log.Check(log.FatalLevel, "Installing update /tmp/"+name,
-		exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+name).Run())
-	log.Check(log.FatalLevel, "Removing update file /tmp/"+name, os.Remove("/tmp/"+name))
+	log.Check(log.FatalLevel, "Installing update /tmp/"+packet,
+		exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+packet).Run())
+	log.Check(log.FatalLevel, "Removing update file /tmp/"+packet, os.Remove("/tmp/"+packet))
 
 }
 
@@ -74,14 +74,14 @@ func Update(name string, check bool) {
 		}
 		defer unlockSubutai()
 
-		name := "subutai_" + config.Template.Version + "_" + config.Template.Arch + ".snap"
+		packet := "subutai_" + config.Template.Version + "_" + config.Template.Arch + ".snap"
 		if len(config.Template.Branch) != 0 {
-			name = "subutai_" + config.Template.Version + "_" + config.Template.Arch + "-" + config.Template.Branch + ".snap"
+			packet = "subutai_" + config.Template.Version + "_" + config.Template.Arch + "-" + config.Template.Branch + ".snap"
 		}
 
 		installed, err := strconv.Atoi(getInstalled())
 		log.Check(log.FatalLevel, "Converting installed package timestamp to int", err)
-		available, err := strconv.Atoi(getAvailable(name))
+		available, err := strconv.Atoi(getAvailable(packet))
 		log.Check(log.FatalLevel, "Converting available package timestamp to int", err)
 
 		if installed >= available {
@@ -92,7 +92,7 @@ func Update(name string, check bool) {
 			os.Exit(0)
 		}
 
-		upgradeRh(name)
+		upgradeRh(packet)
 
 	default:
 		if !container.IsContainer(name) {
