@@ -1,7 +1,6 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.security.auth.Subject;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -35,7 +33,6 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -57,7 +54,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -562,26 +558,7 @@ public class HubEnvironmentManager
         @Override
         public P2PConfig call() throws Exception
         {
-            final Session session = identityManager.authenticateByToken( "HERE TOKEN" );
-
-            Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
-            {
-                @Override
-                public Void run()
-                {
-                    try
-                    {
-                        //TODO JAAS
-                        peer.joinP2PSwarm( p2PConfig );
-                    }
-                    catch ( Exception ex )
-                    {
-                        LOG.error( ex.getMessage() );
-                    }
-                    return null;
-                }
-            } );
-
+            peer.joinP2PSwarm( p2PConfig );
             return p2PConfig;
         }
     }
