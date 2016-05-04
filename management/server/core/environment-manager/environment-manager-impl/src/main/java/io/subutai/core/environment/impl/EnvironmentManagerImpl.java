@@ -264,11 +264,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         for ( Environment environment : environmentService.getAll() )
         {
-//            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions( environment );
-//
-//            final boolean b = environment.getUserId().equals( activeUser.getId() );
-//
-//            if ( b || trustedRelation )
+            //            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions(
+            // environment );
+            //
+            //            final boolean b = environment.getUserId().equals( activeUser.getId() );
+            //
+            //            if ( b || trustedRelation )
             {
                 environments.add( environment );
 
@@ -511,8 +512,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        TrackerOperation operationTracker =
-                tracker.createTrackerOperation( MODULE_NAME, String.format( "Growing environment %s", environmentId ) );
+        return growEnvironment( environment, topology, async );
+    }
+
+
+    @RelationCredibility( target = "environment", traits = {
+            @Trait( key = "ownership", value = "Group" ), @Trait( key = "update", value = "true" )
+    } )
+    private Set<EnvironmentContainerHost> growEnvironment( final EnvironmentImpl environment, final Topology topology,
+                                                           final boolean async )
+
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Growing environment %s", environment.getId() ) );
 
         //collect participating peers
         Set<Peer> allPeers = new HashSet<>();
@@ -617,8 +630,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
+        return modifyEnvironmentAndGetTrackerID( environment, topology, removedContainers, async );
+    }
+
+
+    @RelationCredibility( target = "environment", traits = {
+            @Trait( key = "ownership", value = "Group" ), @Trait( key = "update", value = "true" )
+    } )
+    private UUID modifyEnvironmentAndGetTrackerID(final EnvironmentImpl environment, final Topology topology,
+                                                  final List<String> removedContainers, final boolean async)
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Modifying environment %s", environmentId ) );
+                String.format( "Modifying environment %s", environment.getId() ) );
 
         Set<Peer> allPeers = new HashSet<>();
 

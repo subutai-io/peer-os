@@ -73,6 +73,13 @@ public class MethodWalker
         Method beanMethod = beanClass.getMethod( method.getName(), method.getParameterTypes() );
         RelationCredibility credibility = beanMethod.getAnnotation( RelationCredibility.class );
         String sourceValueName = credibility.source();
+        String targetValueName = credibility.target();
+
+        if ( !"return".equals( targetValueName ) )
+        {
+            return;
+        }
+
         RelationLink source = getLink( sourceValueName );
 
         if ( Collection.class.isAssignableFrom( returnObject.getClass() ) )

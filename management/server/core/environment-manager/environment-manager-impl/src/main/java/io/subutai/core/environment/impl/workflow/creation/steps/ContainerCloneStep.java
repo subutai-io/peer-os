@@ -216,12 +216,17 @@ public class ContainerCloneStep
                 Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
                 relationTraits.put( "containerLimit", "unlimited" );
                 relationTraits.put( "bandwidthLimit", "unlimited" );
-                relationTraits.put("ownership", Ownership.USER.getName());
+                relationTraits.put( "read", "true" );
+                relationTraits.put( "write", "true" );
+                relationTraits.put( "update", "true" );
+                relationTraits.put( "delete", "true" );
+                relationTraits.put( "ownership", Ownership.USER.getName() );
 
                 RelationMeta relationMeta = new RelationMeta( delegatedUser, environment, container, "" );
                 Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
                 relation.setRelationStatus( RelationStatus.VERIFIED );
-                relationManager.saveRelation( relation );            }
+                relationManager.saveRelation( relation );
+            }
         }
         catch ( Exception ex )
         {

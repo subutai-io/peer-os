@@ -1337,6 +1337,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "bandwidthControl", "true" );
             relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
             {
@@ -1695,6 +1699,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             relationTraits.put( "hostEnvironment", "true" );
             relationTraits.put( "containerLimit", "unlimited" );
             relationTraits.put( "bandwidthLimit", "unlimited" );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( peerOwner, this, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
@@ -1738,6 +1746,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             relationTraits.put( "encryptMessage", "true" );
             relationTraits.put( "decryptMessage", "true" );
             relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( this, peerLink, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
