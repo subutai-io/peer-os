@@ -14,6 +14,12 @@ public interface RestService
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response sendHeartbeat( @QueryParam( "hubIp" ) String hubIp );
 
+    //Resend heartbeat
+    @POST
+    @Path( "/resend-heartbeat" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response resendHeartbeat();
+
     //Register to HUB
     @POST
     @Path( "/register" )

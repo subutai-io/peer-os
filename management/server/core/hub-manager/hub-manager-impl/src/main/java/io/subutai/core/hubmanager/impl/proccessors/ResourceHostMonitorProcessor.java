@@ -24,7 +24,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostMonitorDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class ResourceHostMonitorProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostMonitorProcessor.class );

@@ -33,9 +33,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -60,6 +57,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
@@ -72,7 +70,6 @@ import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
-import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -257,6 +254,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
+        Set<Environment> environments = getLocalEnvironments();
+
+        environments.addAll( environmentAdapter.getEnvironments() );
+
+        return environments;
+    }
+
+
+    private Set<Environment> getLocalEnvironments()
+    {
         User activeUser = identityManager.getActiveUser();
 
         Set<Environment> environments = new HashSet<>();
@@ -276,10 +283,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 setContainersTransientFields( environment );
             }
         }
-
-        environmentAdapter.uploadEnvironments( environments );
-
-        environments.addAll( environmentAdapter.getEnvironments() );
 
         return environments;
     }
@@ -1079,23 +1082,34 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void cancelEnvironmentWorkflow( final String environmentId ) throws EnvironmentManagerException
     {
-        CancellableWorkflow activeWorkflow = activeWorkflows.get( environmentId );
-
-        if ( activeWorkflow != null )
+        try
         {
-            try
+            CancellableWorkflow activeWorkflow = activeWorkflows.get( environmentId );
+
+            if ( activeWorkflow != null )
             {
                 activeWorkflow.cancel();
 
                 removeActiveWorkflow( environmentId );
             }
-            catch ( Exception e )
+            else
             {
-                LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+                EnvironmentImpl environment = environmentService.find( environmentId );
 
-                throw new EnvironmentManagerException(
-                        String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
+                if ( environment != null )
+                {
+                    environment.setStatus( EnvironmentStatus.CANCELLED );
+
+                    update( environment );
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error cancelling environment workflow {}", e.getMessage(), e );
+
+            throw new EnvironmentManagerException(
+                    String.format( "Error cancelling environment workflow %s", e.getMessage() ) );
         }
     }
 
@@ -1996,6 +2010,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    private void uploadEnvironmentsToHub()
+    {
+        try
+        {
+            environmentAdapter.uploadEnvironments( getLocalEnvironments() );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error uploading environments to Hub: {}", e.getMessage() );
+        }
+    }
+
+
     private class BackgroundTasksRunner implements Runnable
     {
         @Override
@@ -2004,6 +2031,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             LOG.debug( "Environment background tasks started..." );
 
             resetP2Pkey();
+
+            // workaround for now,
+            // todo should not run if all environments already uploaded
+            uploadEnvironmentsToHub();
 
             LOG.debug( "Environment background tasks finished." );
         }

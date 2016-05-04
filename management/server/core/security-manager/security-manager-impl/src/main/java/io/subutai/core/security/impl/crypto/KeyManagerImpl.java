@@ -1156,6 +1156,10 @@ public class KeyManagerImpl implements KeyManager
                     String publicKeyring = response.readEntity( String.class );
                     savePublicKeyRing( peerInfo.getId(), ( short ) 3, publicKeyring );
                 }
+
+                RestUtil.close( response );
+                RestUtil.close( client );
+
                 return getPublicKey( peerInfo.getId() );
             }
             else

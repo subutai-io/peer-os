@@ -30,7 +30,7 @@ import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.ProductDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class ProductProccessor implements StateLinkProccessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ProductProccessor.class.getName() );

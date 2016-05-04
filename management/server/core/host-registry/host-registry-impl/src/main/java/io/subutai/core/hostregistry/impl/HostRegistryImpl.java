@@ -349,7 +349,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         finally
         {
-            RestUtil.closeClient( webClient );
+            RestUtil.close( webClient );
         }
     }
 
