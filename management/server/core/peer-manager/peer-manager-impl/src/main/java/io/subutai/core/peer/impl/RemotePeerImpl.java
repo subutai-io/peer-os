@@ -170,16 +170,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public boolean isOnline()
     {
-        try
-        {
-            check();
-            return true;
-        }
-        catch ( PeerException e )
-        {
-            LOG.error( e.getMessage(), e );
-            return false;
-        }
+        return peerWebClient.ping();
     }
 
 

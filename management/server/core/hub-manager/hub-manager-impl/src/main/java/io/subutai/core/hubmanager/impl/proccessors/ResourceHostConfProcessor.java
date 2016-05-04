@@ -33,7 +33,7 @@ import io.subutai.hub.share.dto.ResourceHostMetricDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class ResourceHostConfProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostConfProcessor.class );

@@ -1,19 +1,14 @@
 package io.subutai.core.hubmanager.impl.proccessors;
 
 
-import java.io.IOException;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +29,7 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
     private static final Logger LOG = LoggerFactory.getLogger( HubLoggerProcessor.class.getName() );
     private ConfigManager configManager;
     private IntegrationImpl manager;
-    private static Map<String, String> errLogs = new ConcurrentHashMap<>();
+    private final Map<String, String> errLogs = new LinkedHashMap<>();
 
 
     public HubLoggerProcessor( final ConfigManager configManager, final IntegrationImpl integration )
@@ -52,13 +47,21 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
     @Override
     public void run()
     {
-        if ( !errLogs.isEmpty() && manager.getRegistrationState() )
+        Set<String> logs = new HashSet<>();
+
+        synchronized ( errLogs )
         {
+            logs.addAll( errLogs.values() );
+            errLogs.clear();
+        }
+
+        if ( !logs.isEmpty() && manager.getRegistrationState() )
+        {
+            WebClient client = null;
             try
             {
-                Set<String> logs = new HashSet<>( errLogs.values() );
-                WebClient client =
-                        configManager.getTrustedWebClientWithAuth( "/rest/v1/system-bugs", configManager.getHubIp() );
+                client = configManager.getTrustedWebClientWithAuth( "/rest/v1/system-bugs", configManager.getHubIp() );
+
                 SystemLogsDto logsDto = new SystemLogsDto();
                 logsDto.setLogs( logs );
 
@@ -71,17 +74,26 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
 
                 if ( r.getStatus() != HttpStatus.SC_NO_CONTENT )
                 {
-                    LOG.error( "Could not send data to Hub (REST)", r.readEntity( String.class ) );
+                    LOG.warn( "Could not send logs to Hub {}", r.readEntity( String.class ) );
+                }
+                else
+                {
+
+                    LOG.debug( "System logs sent to HUB successfully." );
                 }
 
-                LOG.debug( "System logs sent to HUB successfully." );
-
-                errLogs.clear();
+                r.close();
             }
-            catch ( PGPException | UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException |
-                    IOException e )
+            catch ( Exception e )
             {
-                LOG.error( "Could not send data to Hub (SS)", e.getMessage() );
+                LOG.warn( "Could not send logs to Hub {}", e.getMessage() );
+            }
+            finally
+            {
+                if ( client != null )
+                {
+                    client.close();
+                }
             }
         }
     }
@@ -101,11 +113,20 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
             byte[] theDigest = md.digest( combined );
             String key = new String( theDigest );
 
-            errLogs.put( key, event.toString() );
+            synchronized ( errLogs )
+            {
+                errLogs.put( key, event.toString() );
+
+                while ( errLogs.size() > 10 )
+                {
+                    //delete oldest value
+                    errLogs.remove( errLogs.keySet().iterator().next() );
+                }
+            }
         }
         catch ( Exception e )
         {
-            LOG.error( "******* Error in collecting logs to Map object.", e );
+            LOG.warn( "Error in #onEvent {}", e.getMessage() );
         }
     }
 }

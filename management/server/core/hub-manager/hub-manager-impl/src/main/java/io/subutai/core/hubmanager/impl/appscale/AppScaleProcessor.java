@@ -20,7 +20,7 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class AppScaleProcessor implements StateLinkProccessor
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );

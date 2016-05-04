@@ -258,6 +258,16 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
+        Set<Environment> environments = getLocalEnvironments();
+
+        environments.addAll( environmentAdapter.getEnvironments() );
+
+        return environments;
+    }
+
+
+    private Set<Environment> getLocalEnvironments()
+    {
         User activeUser = identityManager.getActiveUser();
 
         Set<Environment> environments = new HashSet<>();
@@ -278,10 +288,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 setContainersTransientFields( environment );
             }
         }
-
-        environmentAdapter.uploadEnvironments( environments );
-
-        environments.addAll( environmentAdapter.getEnvironments() );
 
         return environments;
     }
@@ -2045,6 +2051,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    private void uploadEnvironmentsToHub()
+    {
+        try
+        {
+            environmentAdapter.uploadEnvironments( getLocalEnvironments() );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error uploading environments to Hub: {}", e.getMessage() );
+        }
+    }
+
+
     private class BackgroundTasksRunner implements Runnable
     {
         @Override
@@ -2053,6 +2072,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             LOG.debug( "Environment background tasks started..." );
 
             resetP2Pkey();
+
+            // workaround for now,
+            // todo should not run if all environments already uploaded
+            uploadEnvironmentsToHub();
 
             LOG.debug( "Environment background tasks finished." );
         }

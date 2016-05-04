@@ -37,7 +37,7 @@ import io.subutai.core.security.api.SecurityManager;
 
 
 /**
- *
+ * TODO close web clients and responses with RestUtil.close
  */
 public class KurjunManagerImpl implements KurjunManager
 {
