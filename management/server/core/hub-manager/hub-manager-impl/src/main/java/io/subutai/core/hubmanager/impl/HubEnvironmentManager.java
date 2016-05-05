@@ -185,7 +185,6 @@ public class HubEnvironmentManager
 
     public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
-        //TODO JAAS
         io.subutai.common.security.PublicKeyContainer publicKeyContainer =
                 peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
@@ -279,7 +278,6 @@ public class HubEnvironmentManager
     public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto, String environmentId )
             throws EnvironmentCreationException
     {
-        //TODO JAAS
         LocalPeer localPeer = peerManager.getLocalPeer();
         Set<Node> nodes = new HashSet<>();
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
@@ -331,7 +329,6 @@ public class HubEnvironmentManager
     public EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
             throws EnvironmentCreationException
     {
-        //TODO JAAS
         CreateEnvironmentContainersRequest containerGroupRequest =
                 new CreateEnvironmentContainersRequest( peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
                         peerDto.getOwnerId() );
@@ -356,7 +353,6 @@ public class HubEnvironmentManager
         final CreateEnvironmentContainersResponse containerCollector;
         try
         {
-            //TODO JAAS
             containerCollector = peerManager.getLocalPeer().createEnvironmentContainers( containerGroupRequest );
             Set<CloneResponse> cloneResponseList = containerCollector.getResponses();
             for ( CloneResponse cloneResponse : cloneResponseList )
@@ -559,6 +555,7 @@ public class HubEnvironmentManager
         public P2PConfig call() throws Exception
         {
             peer.joinP2PSwarm( p2PConfig );
+
             return p2PConfig;
         }
     }
@@ -582,7 +579,6 @@ public class HubEnvironmentManager
         @Override
         public Boolean call() throws Exception
         {
-            //TODO JAAS
             peer.setupTunnels( p2pIps, new EnvironmentId( environmentId ) );
             return true;
         }
