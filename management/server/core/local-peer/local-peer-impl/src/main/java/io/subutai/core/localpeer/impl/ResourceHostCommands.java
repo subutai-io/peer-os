@@ -95,4 +95,10 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( String.format( "subutai hostname %s %s", containerName, newHostname ) );
     }
+
+
+    public RequestBuilder getGetSetRhHostnameCommand( final String newHostname )
+    {
+        return new RequestBuilder( String.format( "subutai hostname %s ", newHostname ) );
+    }
 }

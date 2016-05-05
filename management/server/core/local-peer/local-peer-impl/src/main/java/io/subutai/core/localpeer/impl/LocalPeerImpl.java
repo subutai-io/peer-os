@@ -95,7 +95,6 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -2296,12 +2295,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         ContainerHost containerHost = getContainerHostById( containerId.getId() );
 
-        //check if new hostname differs from current one
-        if ( StringUtil.areStringsEqual( containerHost.getHostname(), hostname, true ) )
-        {
-            throw new PeerException( "No change in hostname" );
-        }
-
         //check if container with new hostname already exists on peer
         try
         {
@@ -2316,7 +2309,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            //issue change command
             ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
 
             resourceHost.setContainerHostname( containerHost, hostname );
