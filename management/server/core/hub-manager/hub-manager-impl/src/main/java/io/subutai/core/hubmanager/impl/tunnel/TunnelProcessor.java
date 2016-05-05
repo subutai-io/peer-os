@@ -144,7 +144,7 @@ public class TunnelProcessor implements StateLinkProccessor
 
     private TunnelInfoDto getData( String link )
     {
-        LOG.debug( "Getting AppScale data from Hub: {}", link );
+        LOG.debug( "Getting tunnel data from Hub: {}", link );
 
         try
         {

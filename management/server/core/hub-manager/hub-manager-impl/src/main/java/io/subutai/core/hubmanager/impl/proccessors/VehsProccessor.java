@@ -38,6 +38,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
+
 //TODO close web clients and responses
 public class VehsProccessor implements StateLinkProccessor
 {
@@ -84,7 +85,7 @@ public class VehsProccessor implements StateLinkProccessor
             {
                 EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
 
-                if ( envPeerDto != null )
+                if ( envPeerDto != null && envPeerDto.getPeerId() != null )
                 {
                     setupHS( envPeerDto );
                 }
@@ -131,20 +132,23 @@ public class VehsProccessor implements StateLinkProccessor
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 vehsDto = JsonUtil.fromCbor( plainContent, VehsDto.class );
 
-                switch ( vehsDto.getState() )
+                if ( vehsDto.getState() != null )
                 {
-                    case DEPLOY:
-                        deployHS( environmentDto, vehsDto, peerDto );
-                        break;
-                    case VERIFY_CHECKSUM:
-                        verifyChecksumHS( environmentDto, vehsDto, peerDto );
-                        break;
-                    case COLLECT_METRIC:
-                        collectMetric( environmentDto, vehsDto, peerDto );
-                        break;
-                    case DELETE:
-                        deleteHS( environmentDto, vehsDto, peerDto );
-                        break;
+                    switch ( vehsDto.getState() )
+                    {
+                        case DEPLOY:
+                            deployHS( environmentDto, vehsDto, peerDto );
+                            break;
+                        case VERIFY_CHECKSUM:
+                            verifyChecksumHS( environmentDto, vehsDto, peerDto );
+                            break;
+                        case COLLECT_METRIC:
+                            collectMetric( environmentDto, vehsDto, peerDto );
+                            break;
+                        case DELETE:
+                            deleteHS( environmentDto, vehsDto, peerDto );
+                            break;
+                    }
                 }
                 LOG.info( vehsDto.getProjectName() );
             }
