@@ -15,6 +15,8 @@ public class SecurityControllerImpl implements SecurityController
     private static final Logger LOGGER = LoggerFactory.getLogger( SecurityControllerImpl.class.getName() );
 
 
+    
+    @Override
     public void logEvent(String userName , String action)
     {
         LOGGER.info( " *** Security event *** UserName:" + userName + ",  Action:" + action);
