@@ -95,6 +95,7 @@ import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -2257,11 +2258,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         ContainerHost containerHost = getContainerHostById( reverseProxyConfig.getContainerId() );
 
-        if ( containerHost == null )
-        {
-            throw new PeerException( "Container host not found." );
-        }
-
         final NetworkResource networkResource =
                 getReservedNetworkResources().findByEnvironmentId( containerHost.getEnvironmentId().getId() );
 
@@ -2287,7 +2283,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on adding reverse proxy." );
+            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
         }
     }
 
@@ -2298,7 +2294,39 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         Preconditions.checkNotNull( containerId, "Invalid container id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        //todo implement
+        ContainerHost containerHost = getContainerHostById( containerId.getId() );
+
+        //check if new hostname differs from current one
+        if ( StringUtil.areStringsEqual( containerHost.getHostname(), hostname, true ) )
+        {
+            throw new PeerException( "No change in hostname" );
+        }
+
+        //check if container with new hostname already exists on peer
+        try
+        {
+            getContainerHostByName( hostname );
+
+            throw new PeerException( String.format( "Container with hostname %s already exists", hostname ) );
+        }
+        catch ( HostNotFoundException ignore )
+        {
+            //ignore since all is ok
+        }
+
+        try
+        {
+            //issue change command
+            ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
+
+            resourceHost.setContainerHostname( containerHost, hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException(
+                    String.format( "Error setting container %s hostname: %s", containerId.getId(), e.getMessage() ) );
+        }
     }
 
 

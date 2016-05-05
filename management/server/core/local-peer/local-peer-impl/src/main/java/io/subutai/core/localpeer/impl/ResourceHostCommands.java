@@ -89,4 +89,10 @@ public class ResourceHostCommands
     {
         return new RequestBuilder( "subutai -v" );
     }
+
+
+    public RequestBuilder getGetSetContainerHostnameCommand( final String containerName, final String newHostname )
+    {
+        return new RequestBuilder( String.format( "subutai hostname %s %s", containerName, newHostname ) );
+    }
 }

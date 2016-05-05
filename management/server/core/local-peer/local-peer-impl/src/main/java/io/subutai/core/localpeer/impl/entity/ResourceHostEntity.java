@@ -871,6 +871,23 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public void setContainerHostname( final ContainerHost containerHost, final String hostname )
+            throws ResourceHostException
+    {
+        try
+        {
+            commandUtil.execute( resourceHostCommands
+                    .getGetSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
+        }
+        catch ( CommandException e )
+        {
+            throw new ResourceHostException( String.format( "Error setting container hostname: %s", e.getMessage() ),
+                    e );
+        }
+    }
+
+
+    @Override
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );

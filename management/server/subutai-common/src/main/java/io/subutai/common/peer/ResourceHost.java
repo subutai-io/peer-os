@@ -105,4 +105,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     String getP2pVersion() throws ResourceHostException;
 
     public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException;
+
+    void setContainerHostname( ContainerHost containerHost, String hostname ) throws ResourceHostException;
 }
