@@ -274,12 +274,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         for ( Environment environment : environmentService.getAll() )
         {
-            //            boolean trustedRelation = relationManager.getRelationInfoManager().allHasReadPermissions(
-            // environment );
-            //
-            //            final boolean b = environment.getUserId().equals( activeUser.getId() );
-            //
-            //            if ( b || trustedRelation )
+            final boolean owner = environment.getUserId().equals( activeUser.getId() );
+
+            if ( owner )
             {
                 environments.add( environment );
 
@@ -643,8 +640,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @RelationCredibility( target = "environment", traits = {
             @Trait( key = "ownership", value = "Group" ), @Trait( key = "update", value = "true" )
     } )
-    private UUID modifyEnvironmentAndGetTrackerID(final EnvironmentImpl environment, final Topology topology,
-                                                  final List<String> removedContainers, final boolean async)
+    private UUID modifyEnvironmentAndGetTrackerID( final EnvironmentImpl environment, final Topology topology,
+                                                   final List<String> removedContainers, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
