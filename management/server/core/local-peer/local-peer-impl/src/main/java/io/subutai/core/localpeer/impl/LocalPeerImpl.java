@@ -2292,6 +2292,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        //todo implement
+    }
+
+
     protected NetworkManager getNetworkManager()
     {
 
