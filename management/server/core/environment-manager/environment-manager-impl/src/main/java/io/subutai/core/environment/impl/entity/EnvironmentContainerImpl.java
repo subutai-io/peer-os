@@ -365,6 +365,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public void setHostname( final String hostname )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        //todo check if such container hostname already exists on the target RH
+        //todo call peer.setHostname(containerId, hostname)
+
         this.hostname = hostname;
     }
 
