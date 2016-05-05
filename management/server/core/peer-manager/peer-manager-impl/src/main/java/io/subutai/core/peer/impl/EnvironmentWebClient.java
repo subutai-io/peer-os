@@ -29,6 +29,8 @@ import io.subutai.common.security.WebClientBuilder;
 
 /**
  * Environment REST client
+ *
+ * todo close web client
  */
 public class EnvironmentWebClient
 {
@@ -116,6 +118,30 @@ public class EnvironmentWebClient
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error destroying container: " + e.getMessage() );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void setContainerHostName( final ContainerId containerId, final String hostname ) throws PeerException
+    {
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+
+            String path = String.format( "/%s/container/%s/hostname", containerId.getEnvironmentId().getId(),
+                    containerId.getId() );
+
+            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            response = client.post( hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error setting container hostname: " + e.getMessage() );
         }
 
         WebClientBuilder.checkResponse( response );

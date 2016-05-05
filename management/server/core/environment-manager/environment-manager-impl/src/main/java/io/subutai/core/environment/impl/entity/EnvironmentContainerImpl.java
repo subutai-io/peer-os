@@ -57,6 +57,7 @@ import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -363,8 +364,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public void setHostname( final String hostname )
+    public void setHostname( final String hostname ) throws PeerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions
+                .checkArgument( !StringUtil.areStringsEqual( this.hostname, hostname, true ), "No change in hostname" );
+
+        getPeer().setContainerHostname( getContainerId(), hostname );
+
         this.hostname = hostname;
     }
 
