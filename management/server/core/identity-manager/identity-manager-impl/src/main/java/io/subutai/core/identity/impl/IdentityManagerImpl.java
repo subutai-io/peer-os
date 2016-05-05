@@ -56,6 +56,7 @@ import io.subutai.common.security.token.TokenUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.SecurityController;
 import io.subutai.core.identity.api.SessionManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Permission;
@@ -89,6 +90,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private IdentityDataService identityDataService = null;
+    private SecurityController securityController = null;
     private DaoManager daoManager = null;
     private SecurityManager securityManager = null;
     private SessionManager sessionManager = null;
@@ -108,6 +110,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         identityDataService = new IdentityDataServiceImpl( daoManager );
         sessionManager = new SessionManagerImpl( identityDataService );
+        securityController = new SecurityControllerImpl();
         sessionManager.startSessionController();
 
         try
@@ -1599,4 +1602,14 @@ public class IdentityManagerImpl implements IdentityManager
 
         return user == null;
     }
+
+
+    /* *************************************************
+     */
+    public SecurityController getSecurityController()
+    {
+        return securityController;
+    }
+
+
 }
