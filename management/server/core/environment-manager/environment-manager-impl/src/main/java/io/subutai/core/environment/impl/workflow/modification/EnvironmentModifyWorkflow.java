@@ -92,7 +92,9 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            new DestroyContainersStep( environment, environmentManager, removedContainers, operationTracker ).execute();
+            //todo add check if just deleting last container without growing
+            environment =
+                    ( EnvironmentImpl ) new DestroyContainersStep( environment, environmentManager, removedContainers, operationTracker ).execute();
 
             saveEnvironment();
 

@@ -77,7 +77,7 @@ public class ContainerDestructionWorkflow
 
         try
         {
-            new DestroyContainerStep( environmentManager, environment, containerHost ).execute();
+            environment = ( EnvironmentImpl ) new DestroyContainerStep( containerHost ).execute();
 
             RelationManager relationManager = environmentManager.getRelationManager();
             relationManager.removeRelation( containerHost );
