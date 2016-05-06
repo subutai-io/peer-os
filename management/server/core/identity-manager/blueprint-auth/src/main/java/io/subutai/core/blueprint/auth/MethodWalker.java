@@ -187,7 +187,6 @@ public class MethodWalker
         for ( final Trait trait : traits )
         {
             relationTraits.put( trait.key(), trait.value() );
-            logger.debug( "{} :: {}", trait.key(), trait.value() );
         }
         RelationInfoMeta meta = new RelationInfoMeta();
         meta.setRelationTraits( relationTraits );
