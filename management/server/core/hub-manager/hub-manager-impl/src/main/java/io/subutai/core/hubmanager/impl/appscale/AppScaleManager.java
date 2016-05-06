@@ -75,7 +75,22 @@ public class AppScaleManager
 
     private void installAppScale( ContainerHost containerHost, AppScaleConfigDto config ) throws CommandException
     {
-        String cmd =  format( "sudo /var/lib/subutai-appscale/setup.sh %s %s %s", config.getUserDomain(), "a@a.com", "aaaaaa" );
+        String email = "a@a.com";
+        String password = "aaaaaa";
+
+        for ( String s : config.getNodes() )
+        {
+            if ( StringUtils.startsWith( s, "email:" ) )
+            {
+                email = StringUtils.substringAfter( s, "email:" );
+            }
+            else if ( StringUtils.startsWith( s, "password:" ) )
+            {
+                password = StringUtils.substringAfter( s, "password:" );
+            }
+        }
+
+        String cmd =  format( "sudo /var/lib/subutai-appscale/setup.sh %s %s %s", config.getUserDomain(), email, password );
 
         execute( containerHost, cmd );
     }
