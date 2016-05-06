@@ -4,9 +4,9 @@ package io.subutai.core.environment.impl.workflow.destruction;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
 import io.subutai.core.object.relation.api.RelationManager;
 
@@ -77,7 +77,7 @@ public class ContainerDestructionWorkflow
 
         try
         {
-            new DestroyContainerStep( environmentManager, environment, containerHost ).execute();
+            environment = ( EnvironmentImpl ) new DestroyContainerStep( containerHost ).execute();
 
             RelationManager relationManager = environmentManager.getRelationManager();
             relationManager.removeRelation( containerHost );

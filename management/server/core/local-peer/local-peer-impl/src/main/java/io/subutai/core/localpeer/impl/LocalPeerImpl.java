@@ -1034,7 +1034,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
 
-        ContainerHostEntity host = bindHost( containerId );
+        ContainerHostEntity host;
+        try
+        {
+            host = bindHost( containerId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return;
+        }
+
         ResourceHost resourceHost = host.getParent();
 
         try
