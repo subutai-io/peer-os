@@ -6,6 +6,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
 import java.security.UnrecoverableKeyException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,6 +46,7 @@ import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TrustDataDto;
 import io.subutai.hub.share.dto.UserDto;
@@ -116,17 +119,32 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
                     if ( envPeerDto.getEnvironmentInfo().getOwnerToken() == null )
                     {
-                        try
+                        final Session session = identityManager.login( "token", envPeerDto.getToken() );
+                        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
                         {
-                            User user = environmentUserHelper.handleEnvironmentOwnerCreation( envPeerDto );
-                            String ownerToken = identityManager.getUserToken( user.getUserName(), user.getPassword() );
-                            envPeerDto.getEnvironmentInfo().setOwnerToken( ownerToken );
-                            updateEnvironmentPeerData( envPeerDto );
-                        }
-                        catch ( Exception e )
-                        {
-                            LOG.error( "Could not create environment owner account", e.getMessage() );
-                        }
+
+                            @Override
+                            public Void run()
+                            {
+                                try
+                                {
+                                    User user = environmentUserHelper.handleEnvironmentOwnerCreation( envPeerDto );
+                                    java.util.Calendar cal = Calendar.getInstance();
+                                    cal.setTime( new Date() );
+                                    cal.add( Calendar.YEAR, 3 );
+                                    UserToken token =
+                                            identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
+                                    String ownerToken = token.getFullToken();
+                                    envPeerDto.getEnvironmentInfo().setOwnerToken( ownerToken );
+                                    updateEnvironmentPeerData( envPeerDto );
+                                }
+                                catch ( Exception ex )
+                                {
+                                    LOG.error( ex.getMessage() );
+                                }
+                                return null;
+                            }
+                        } );
                     }
                     final Session session =
                             identityManager.login( "token", envPeerDto.getEnvironmentInfo().getOwnerToken() );

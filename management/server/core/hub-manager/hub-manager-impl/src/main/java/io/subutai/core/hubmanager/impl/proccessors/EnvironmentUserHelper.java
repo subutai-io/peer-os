@@ -125,7 +125,7 @@ public class EnvironmentUserHelper
         {
             log.debug( "No need to create new user for environment" );
 
-            return null;
+            return identityManager.getActiveUser();
         }
 
         UserDto userDto = getUserDataFromHub( envOwnerId );
