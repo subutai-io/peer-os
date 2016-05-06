@@ -21,6 +21,7 @@ import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -188,9 +189,10 @@ class SubutaiSecurityHelper
         traits.put( "write", "true" );
         traits.put( "delete", "true" );
         traits.put( "update", "true" );
-        traits.put( "ownership", Ownership.USER.getName());
+        traits.put( "ownership", Ownership.USER.getName() );
 
         Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+        relation.setRelationStatus( RelationStatus.VERIFIED );
 
         relationManager.saveRelation( relation );
     }
