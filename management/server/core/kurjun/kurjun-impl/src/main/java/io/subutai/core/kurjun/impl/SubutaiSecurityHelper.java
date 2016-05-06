@@ -14,10 +14,15 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
+import com.google.common.collect.Maps;
+
 import ai.subut.kurjun.common.service.KurjunContext;
 import ai.subut.kurjun.metadata.common.subutai.TemplateId;
 import io.subutai.common.security.objects.Ownership;
+import io.subutai.common.security.relation.RelationInfoManager;
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
@@ -326,6 +331,43 @@ class SubutaiSecurityHelper
     }
 
 
+    private Map<String, String> traitsBuilder( String traitCollection )
+    {
+        Map<String, String> keyValue = Maps.newHashMap();
+        String[] traits = traitCollection.split( ";" );
+        for ( final String trait : traits )
+        {
+            String[] pair = trait.split( "=" );
+            keyValue.put( pair[0], pair[1] );
+        }
+        return keyValue;
+    }
+
+
+    private boolean check( RelationLink source, RelationLink target, Map<String, String> traits )
+    {
+        RelationInfoMeta meta = new RelationInfoMeta();
+        meta.setRelationTraits( traits );
+        RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
+        try
+        {
+            if ( source == null )
+            {
+                relationInfoManager.checkRelation( target, meta, null );
+            }
+            else
+            {
+                relationInfoManager.checkRelation( source, target, meta, null );
+            }
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
+        return true;
+    }
+
+
     boolean isGetAllowed( KurjunContext context, byte[] md5, String owner )
     {
         switch ( context.getName() )
@@ -338,7 +380,7 @@ class SubutaiSecurityHelper
 
             default:
                 TemplateAccess templateAccess = new TemplateAccess( owner, Hex.encodeHexString( md5 ) );
-                return relationManager.getRelationInfoManager().allHasReadPermissions( templateAccess );
+                return check( null, templateAccess, traitsBuilder( "ownership=All;read=true" ) );
         }
     }
 
@@ -352,7 +394,7 @@ class SubutaiSecurityHelper
 
             default:
                 TemplateAccess templateAccess = new TemplateAccess( context.getName(), context.getName() );
-                return relationManager.getRelationInfoManager().allHasWritePermissions( templateAccess );
+                return check( null, templateAccess, traitsBuilder( "ownership=All;write=true" ) );
         }
     }
 
@@ -360,7 +402,7 @@ class SubutaiSecurityHelper
     boolean isDeleteAllowed( KurjunContext context, byte[] md5, String owner )
     {
         TemplateAccess templateAccess = new TemplateAccess( owner, Hex.encodeHexString( md5 ) );
-        return relationManager.getRelationInfoManager().allHasDeletePermissions( templateAccess );
+        return check( null, templateAccess, traitsBuilder( "ownership=All;delete=true" ) );
     }
 
 
