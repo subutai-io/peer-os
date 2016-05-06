@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl;
 
 
+import java.security.AccessControlException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -292,7 +293,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
         Environment environment = environmentManager.loadEnvironment( environmentId );
         try
         {
-            check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
+            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
         }
         catch ( RelationVerificationException e )
         {
@@ -335,7 +336,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
         try
         {
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
-            check( null, containerHost, traitsBuilder( "ownership=All;read=true" ) );
+            check( null, containerHost, traitsBuilder( "ownership=All;delete=true" ) );
         }
         catch ( RelationVerificationException | ContainerHostNotFoundException e )
         {
@@ -593,6 +594,15 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
     @Override
     public void shareEnvironment( final ShareDto[] shareDto, final String environmentId )
     {
+        try
+        {
+            Environment environment = environmentManager.loadEnvironment( environmentId );
+            check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
+        }
+        catch ( RelationVerificationException | EnvironmentNotFoundException e )
+        {
+            throw new AccessControlException( e.getMessage() );
+        }
         environmentManager.shareEnvironment( shareDto, environmentId );
     }
 

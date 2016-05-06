@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl;
 
 
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,9 +61,7 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.security.relation.RelationCredibility;
 import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.Trait;
 import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
@@ -81,7 +78,6 @@ import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
-import io.subutai.core.environment.api.exception.EnvironmentSecurityException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
@@ -252,9 +248,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RelationCredibility( target = "return", traits = {
-            @Trait( key = "ownership", value = "All" ), @Trait( key = "read", value = "true" )
-    } )
     @Override
     public Set<Environment> getEnvironments()
     {
@@ -459,8 +452,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         //create empty environment
         final EnvironmentImpl environment = createEmptyEnvironment( topology );
 
-        // TODO add additional step for receiving trust message
-
         //launch environment creation workflow
         final EnvironmentCreationWorkflow environmentCreationWorkflow =
                 getEnvironmentCreationWorkflow( environment, topology, topology.getSshKey(), operationTracker );
@@ -510,23 +501,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( environment ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
 
-        return growEnvironment( environment, topology, async );
-    }
-
-
-    @RelationCredibility( target = "environment", traits = {
-            @Trait( key = "ownership", value = "Group" ), @Trait( key = "update", value = "true" )
-    } )
-    private Set<EnvironmentContainerHost> growEnvironment( final EnvironmentImpl environment, final Topology topology,
-                                                           final boolean async )
-
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Growing environment %s", environment.getId() ) );
 
@@ -628,22 +603,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( environment ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
 
-        return modifyEnvironmentAndGetTrackerID( environment, topology, removedContainers, async );
-    }
-
-
-    @RelationCredibility( target = "environment", traits = {
-            @Trait( key = "ownership", value = "Group" ), @Trait( key = "update", value = "true" )
-    } )
-    private UUID modifyEnvironmentAndGetTrackerID( final EnvironmentImpl environment, final Topology topology,
-                                                   final List<String> removedContainers, final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Modifying environment %s", environment.getId() ) );
 
@@ -737,9 +697,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    //    @RelationCredibility( traits = {
-    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
-    //    } )
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
@@ -747,11 +704,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Adding ssh key %s to environment %s ", sshKey, environmentId ) );
@@ -804,11 +756,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Removing ssh key %s from environment %s ", sshKey, environmentId ) );
@@ -905,10 +852,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( p2pSecretKeyTtlSec > 0, "Invalid p2p secret key time-to-live" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Resetting p2p secret key for environment %s ", environmentId ) );
@@ -968,11 +911,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             return;
         }
 
-        if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( environment ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Destroying environment %s", environmentId ) );
 
@@ -1023,9 +961,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @Override
     @RolesAllowed( "Environment-Management|Delete" )
-    //    @RelationCredibility( traits = {
-    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "delete", value = "true" )
-    //    } )
     public void destroyContainer( final String environmentId, final String containerId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -1040,18 +975,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             environmentAdapter.destroyContainer( ( ProxyEnvironment ) environment, containerId );
 
             return;
-        }
-
-        User activeUser = identityManager.getActiveUser();
-
-        //final boolean deleteAll = identityManager
-        //.isUserPermitted                   ( activeUser, PermissionObject.EnvironmentManagement,
-        //PermissionScope.ALL_SCOPE,
-        //PermissionOperation.Delete );
-        boolean canDelete = relationManager.getRelationInfoManager().allHasDeletePermissions( environment );
-        if ( !( environment.getUserId().equals( activeUser.getId() ) || canDelete ) )
-        {
-            throw new AccessControlException( "You have not enough permissions." );
         }
 
         TrackerOperation operationTracker =
@@ -1069,10 +992,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         try
         {
             environmentContainer = environment.getContainerHostById( containerId );
-            if ( !relationManager.getRelationInfoManager().allHasDeletePermissions( environmentContainer ) )
-            {
-                throw new ContainerHostNotFoundException( "Container host not found." );
-            }
         }
         catch ( ContainerHostNotFoundException e )
         {
@@ -1173,13 +1092,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentNotFoundException();
         }
 
-        //check access to environment
-        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( environment ) )
-        {
-            throw new EnvironmentSecurityException(
-                    String.format( "Access to environment %s is denied", environment.getName() ) );
-        }
-
         //set environment's transient fields
         setEnvironmentTransientFields( environment );
 
@@ -1204,21 +1116,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
-        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
-        {
-            return;
-        }
-
         modifyEnvironmentDomain( environmentId, null, null, null );
     }
 
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    //    @RelationCredibility( traits = {
-    //            @Trait( key = "ownership", value = "All" ), @Trait( key = "update", value = "true" )
-    //    } )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                          final String sslCertPath )
@@ -1228,13 +1131,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
         Preconditions.checkNotNull( domainLoadBalanceStrategy );
-
-        EnvironmentImpl environment = environmentService.find( environmentId );
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environment ) )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-
 
         modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, sslCertPath );
     }
@@ -1336,8 +1232,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-
-
         toggleContainerDomain( containerHostId, environmentId, true );
     }
 
@@ -1361,12 +1255,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
 
         ContainerHost containerHost = environment.getContainerHostById( containerHostId );
-
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( containerHost ) )
-        {
-            throw new EnvironmentSecurityException(
-                    String.format( "Access to container %s is denied", environment.getName() ) );
-        }
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "%s container %s environment domain", add ? "Adding" : "Removing", containerHostId ) );
@@ -1419,11 +1307,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         EnvironmentContainerHost environmentContainer = environment.getContainerHostById( containerHostId );
 
-        if ( !relationManager.getRelationInfoManager().allHasUpdatePermissions( environmentContainer ) )
-        {
-            throw new ContainerHostNotFoundException( "Container host not found." );
-        }
-
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting up ssh tunnel for container %s ", containerHostId ) );
 
@@ -1469,11 +1352,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
 
-        // User - Delegated user - Environment
-        // Delegated user - Delegated user - Environment
-        // Delegated user - Environment - Container
-
-        // TODO create relation between activeUser and delegatedUser
         environment.setRawTopology( JsonUtil.toJson( topology ) );
 
         environment.setUserId( delegatedUser.getUserId() );
@@ -1482,6 +1360,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
+            // User - Delegated user - Environment
+            // Delegated user - Delegated user - Environment
+            // Delegated user - Environment - Container
             RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
             Map<String, String> traits = relationInfoMeta.getRelationTraits();
             traits.put( "read", "true" );
@@ -1594,10 +1475,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                                           final Topology topology, final String sshKey,
                                                                           final TrackerOperation operationTracker )
     {
-        if ( !relationManager.getRelationInfoManager().allHasReadPermissions( environment ) )
-        {
-            throw new AccessControlException( "You don't have enough permissions to create environment" );
-        }
         return new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, this, peerManager, securityManager,
                 environment, topology, sshKey, operationTracker );
     }
@@ -1938,12 +1815,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.warn( "Don't have permissions.", e );
             return;
-        }
-
-        if ( !relationManager.getRelationInfoManager().groupHasUpdatePermissions( environment ) )
-        {
-            throw new EnvironmentSecurityException(
-                    String.format( "Access to environment %s is denied", environment.getName() ) );
         }
 
         List<Relation> relations = relationManager.getRelationsByObject( environment );
