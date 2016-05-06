@@ -8,4 +8,19 @@ public interface SecurityController
 {
     //****************************
     void logEvent( String userName, String action );
+
+
+    int checkTrustLevel( String fingeprint );
+
+
+    String getGlobalkeyServer();
+
+
+    void setGlobalkeyServer( String globalkeyServer );
+
+
+    String getLocalkeyServer();
+
+
+    void setLocalkeyServer( String localkeyServer );
 }

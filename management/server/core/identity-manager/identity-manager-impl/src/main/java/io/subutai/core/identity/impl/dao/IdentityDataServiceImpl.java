@@ -75,8 +75,8 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
     /* *************************************************
-         *
-         */
+     *
+     */
     @Override
     public User getUser( long userId )
     {

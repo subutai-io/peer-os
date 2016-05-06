@@ -14,12 +14,49 @@ public class SecurityControllerImpl implements SecurityController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SecurityControllerImpl.class.getName() );
 
+    private String globalkeyServer = "";
+    private String localkeyServer = "";
 
-    
+
     @Override
-    public void logEvent(String userName , String action)
+    public void logEvent( String userName, String action )
     {
         LOGGER.info( " *** Security event *** UserName:" + userName + ",  Action:" + action);
     }
 
+
+    @Override
+    public int checkTrustLevel( String fingerprint )
+    {
+        int level = 0;
+        return level;
+    }
+
+
+    @Override
+    public String getGlobalkeyServer()
+    {
+        return globalkeyServer;
+    }
+
+
+    @Override
+    public void setGlobalkeyServer( final String globalkeyServer )
+    {
+        this.globalkeyServer = globalkeyServer;
+    }
+
+
+    @Override
+    public String getLocalkeyServer()
+    {
+        return localkeyServer;
+    }
+
+
+    @Override
+    public void setLocalkeyServer( final String localkeyServer )
+    {
+        this.localkeyServer = localkeyServer;
+    }
 }

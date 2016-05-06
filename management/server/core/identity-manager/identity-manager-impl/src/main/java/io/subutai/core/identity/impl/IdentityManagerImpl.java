@@ -144,14 +144,13 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             //***Create User ********************************************
-            User internal =
-                    createUser( "internal", "secretSubutai", "System User", "internal@subutai.io", 1, 3, false, false );
+            User internal = createUser( "internal", "", "System User", "internal@subutai.io", 1, 3, false, false );
             User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
             User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, 3, true, true );
             //***********************************************************
 
             //***Create Token *******************************************
-            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 1 );
+            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 10 );
             createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
             //***********************************************************
 
@@ -423,6 +422,33 @@ public class IdentityManagerImpl implements IdentityManager
         String token = "";
 
         User user = authenticateUser( userName, password );
+
+        if ( user != null )
+        {
+            UserToken uToken = identityDataService.getUserToken( user.getId() );
+
+            if ( uToken == null )
+            {
+                uToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+            }
+
+            token = uToken.getFullToken();
+        }
+
+        return token;
+    }
+
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public String getSystemUserToken()
+    {
+        String token = "";
+
+        User user = identityDataService.getUserByUsername( "internal" );
 
         if ( user != null )
         {
@@ -1045,6 +1071,13 @@ public class IdentityManagerImpl implements IdentityManager
         User user = new UserEntity();
         String salt = "";
 
+        //*********************************
+        if(Strings.isNullOrEmpty( userName ))
+            userName = UUID.randomUUID().toString();
+        if(Strings.isNullOrEmpty( password ))
+            password = UUID.randomUUID().toString();
+        //*********************************
+
         isValidUserName( userName );
         isValidPassword( userName, password );
 
@@ -1276,7 +1309,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private void isValidPassword( String userName, String password )
     {
-        if ( Strings.isNullOrEmpty( password ) && password.length() < 4 )
+        if ( Strings.isNullOrEmpty( password ) || password.length() < 4 )
         {
             throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
         }
