@@ -272,9 +272,19 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public void destroy() throws PeerException
+    public Environment destroy() throws PeerException
     {
         getPeer().destroyContainer( getContainerId() );
+
+        ( ( EnvironmentImpl ) parent ).removeContainer( this );
+
+        Environment env = environmentManager.update( ( EnvironmentImpl ) parent );
+
+        environment = null;
+
+        environmentManager.notifyOnContainerDestroyed( env, getId() );
+
+        return env;
     }
 
 
@@ -321,18 +331,24 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public void addTag( final String tag )
+    public EnvironmentContainerHost addTag( final String tag )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+
         this.tags.add( tag );
+
+        return environmentManager.update( this );
     }
 
 
     @Override
-    public void removeTag( final String tag )
+    public EnvironmentContainerHost removeTag( final String tag )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );
+
         this.tags.remove( tag );
+
+        return environmentManager.update( this );
     }
 
 
@@ -364,7 +380,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public void setHostname( final String hostname ) throws PeerException
+    public EnvironmentContainerHost setHostname( final String hostname ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
         Preconditions
@@ -373,6 +389,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         getPeer().setContainerHostname( getContainerId(), hostname );
 
         this.hostname = hostname;
+
+        return environmentManager.update( this );
     }
 
 
@@ -654,5 +672,11 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public String getKeyId()
     {
         return getId();
+    }
+
+
+    public Environment getEnvironment()
+    {
+        return parent;
     }
 }

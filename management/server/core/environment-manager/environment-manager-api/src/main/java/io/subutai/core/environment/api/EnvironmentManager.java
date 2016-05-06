@@ -17,14 +17,13 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
-import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.common.security.SshKeys;
+import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -248,8 +247,6 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
-
-    void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
 
     void addAlertHandler( AlertHandler alertHandler );
 

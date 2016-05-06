@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.List;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -33,11 +34,11 @@ public class DestroyContainersStep
     }
 
 
-    public void execute() throws Exception
+    public Environment execute() throws Exception
     {
         if ( !CollectionUtil.isCollectionEmpty( removedContainers ) )
         {
-            TaskUtil<Object> destroyUtil = new TaskUtil<>();
+            TaskUtil<Environment> destroyUtil = new TaskUtil<>();
 
             for ( String containerId : removedContainers )
             {
@@ -46,18 +47,14 @@ public class DestroyContainersStep
                 destroyUtil.addTask( new ContainerDestroyTask( containerHost ) );
             }
 
-            TaskUtil.TaskResults<Object> destroyResults = destroyUtil.executeParallel();
+            TaskUtil.TaskResults<Environment> destroyResults = destroyUtil.executeParallel();
 
-            for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getTaskResults() )
+            for ( TaskUtil.TaskResult<Environment> destroyResult : destroyResults.getTaskResults() )
             {
                 ContainerHost containerHost = ( ( ContainerDestroyTask ) destroyResult.getTask() ).getContainerHost();
 
                 if ( destroyResult.hasSucceeded() )
                 {
-                    environment.removeContainer( containerHost );
-
-                    environmentManager.notifyOnContainerDestroyed( environment, containerHost.getId() );
-
                     trackerOperation.addLog( String.format( "Container %s destroyed", containerHost.getHostname() ) );
                 }
                 else
@@ -67,6 +64,10 @@ public class DestroyContainersStep
                                     destroyResult.getFailureReason() ) );
                 }
             }
+
+            return environmentManager.loadEnvironment( environment.getId() );
         }
+
+        return environment;
     }
 }

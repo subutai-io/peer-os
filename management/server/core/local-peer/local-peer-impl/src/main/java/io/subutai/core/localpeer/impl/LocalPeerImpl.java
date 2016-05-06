@@ -1030,7 +1030,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
 
-        ContainerHostEntity host = bindHost( containerId );
+        ContainerHostEntity host;
+        try
+        {
+            host = bindHost( containerId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return;
+        }
+
         ResourceHost resourceHost = host.getParent();
 
         try
@@ -1129,7 +1138,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
                                   final CommandCallback callback ) throws CommandException
     {
-        Preconditions.checkNotNull( requestBuilder, "Invalid request" );
+       Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
         CommandResult result;

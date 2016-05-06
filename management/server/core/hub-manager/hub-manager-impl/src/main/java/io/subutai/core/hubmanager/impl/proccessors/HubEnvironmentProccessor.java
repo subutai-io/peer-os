@@ -43,6 +43,7 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TrustDataDto;
 import io.subutai.hub.share.dto.UserDto;
@@ -112,7 +113,23 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
                 if ( isTrustedUser )
                 {
-                    final Session session = identityManager.login( "token", envPeerDto.getToken() );
+
+                    if ( envPeerDto.getEnvironmentInfo().getOwnerToken() == null )
+                    {
+                        try
+                        {
+                            User user = environmentUserHelper.handleEnvironmentOwnerCreation( envPeerDto );
+                            String ownerToken = identityManager.getUserToken( user.getUserName(), user.getPassword() );
+                            envPeerDto.getEnvironmentInfo().setOwnerToken( ownerToken );
+                            updateEnvironmentPeerData( envPeerDto );
+                        }
+                        catch ( Exception e )
+                        {
+                            LOG.error( "Could not create environment owner account", e.getMessage() );
+                        }
+                    }
+                    final Session session =
+                            identityManager.login( "token", envPeerDto.getEnvironmentInfo().getOwnerToken() );
                     Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
                     {
                         @Override
@@ -184,7 +201,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     break;
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
-                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case CHANGE_CONTAINER_STATE:
                     controlContainer( peerDto );
