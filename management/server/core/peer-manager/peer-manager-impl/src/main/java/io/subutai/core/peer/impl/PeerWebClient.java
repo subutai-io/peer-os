@@ -37,6 +37,8 @@ import io.subutai.common.util.DateTimeParam;
 
 /**
  * Peer REST client
+ *
+ * todo close web client
  */
 public class PeerWebClient
 {
