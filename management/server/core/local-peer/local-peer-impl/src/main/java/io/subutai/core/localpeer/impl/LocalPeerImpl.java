@@ -235,6 +235,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public boolean isInitialized()
+    {
+        return initialized;
+    }
+
+
     protected void initPeerInfo()
     {
         peerInfo = new PeerInfo();
@@ -1260,7 +1267,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
 
-        if ( initialized )
+        if ( isInitialized() )
         {
             boolean firstMhRegistration = false;
 

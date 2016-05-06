@@ -162,5 +162,7 @@ public interface LocalPeer extends Peer
     void setPeerInfo( PeerInfo peerInfo );
 
     public ReservedNetworkResources getReservedNetworkResources() throws PeerException;
+
+    boolean isInitialized();
 }
 
