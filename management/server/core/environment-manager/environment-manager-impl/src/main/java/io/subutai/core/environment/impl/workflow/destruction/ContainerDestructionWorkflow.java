@@ -58,15 +58,23 @@ public class ContainerDestructionWorkflow
     {
         operationTracker.addLog( "Validating environment state" );
 
-        if ( environment.getContainerHosts().size() <= 1 )
+        try
         {
-            fail( "Environment has 0 or 1 container. Please, destroy environment instead" );
+            if ( environment.getContainerHosts().size() <= 1 )
+            {
+                throw new IllegalStateException(
+                        "Environment will have 0 containers after modification. Please, destroy environment instead" );
+            }
+            else
+            {
+                return ContainerDestructionPhase.DESTROY_CONTAINER;
+            }
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
 
             return null;
-        }
-        else
-        {
-            return ContainerDestructionPhase.DESTROY_CONTAINER;
         }
     }
 
