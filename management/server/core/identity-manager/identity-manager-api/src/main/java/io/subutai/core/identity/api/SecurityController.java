@@ -10,6 +10,8 @@ public interface SecurityController
     void logEvent( String userName, String action );
 
 
+    void logEvent( String userName, String password, String action );
+
     int checkTrustLevel( String fingeprint );
 
 
