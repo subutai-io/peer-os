@@ -37,6 +37,8 @@ import io.subutai.core.object.relation.api.RelationVerificationException;
 
 /**
  * Peer REST client
+ *
+ * todo close web client
  */
 public class PeerWebClient
 {

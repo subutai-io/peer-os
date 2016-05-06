@@ -3,16 +3,14 @@ package io.subutai.common.peer;
 
 import java.util.Set;
 
-import io.subutai.common.environment.Environment;
-
 
 public interface EnvironmentContainerHost extends ContainerHost
 {
-    void setEnvironment( Environment environment );
+    EnvironmentContainerHost addTag( String tag );
 
-    void addTag( String tag );
-
-    void removeTag( String tag );
+    EnvironmentContainerHost removeTag( String tag );
 
     Set<String> getTags();
+
+    EnvironmentContainerHost setHostname( String newHostname ) throws PeerException;
 }

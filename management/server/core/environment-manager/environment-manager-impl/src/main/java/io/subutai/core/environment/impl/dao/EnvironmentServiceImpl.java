@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
@@ -31,8 +32,7 @@ public class EnvironmentServiceImpl implements EnvironmentService
     @Override
     public List<EnvironmentImpl> getAll()
     {
-        return em.createQuery( "select e from EnvironmentImpl e", EnvironmentImpl.class )
-                 .getResultList();
+        return em.createQuery( "select e from EnvironmentImpl e", EnvironmentImpl.class ).getResultList();
     }
 
 
@@ -65,5 +65,18 @@ public class EnvironmentServiceImpl implements EnvironmentService
         em.refresh( environment );
 
         return environment;
+    }
+
+
+    @Override
+    public EnvironmentContainerImpl mergeContainer( EnvironmentContainerImpl item )
+    {
+        EnvironmentContainerImpl environmentContainer = em.merge( item );
+
+        em.flush();
+
+        em.refresh( environmentContainer );
+
+        return environmentContainer;
     }
 }

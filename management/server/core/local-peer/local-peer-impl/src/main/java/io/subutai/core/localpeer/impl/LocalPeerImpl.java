@@ -1034,7 +1034,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
 
-        ContainerHostEntity host = bindHost( containerId );
+        ContainerHostEntity host;
+        try
+        {
+            host = bindHost( containerId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return;
+        }
+
         ResourceHost resourceHost = host.getParent();
 
         try
@@ -2257,11 +2266,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         ContainerHost containerHost = getContainerHostById( reverseProxyConfig.getContainerId() );
 
-        if ( containerHost == null )
-        {
-            throw new PeerException( "Container host not found." );
-        }
-
         final NetworkResource networkResource =
                 getReservedNetworkResources().findByEnvironmentId( containerHost.getEnvironmentId().getId() );
 
@@ -2287,7 +2291,42 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on adding reverse proxy." );
+            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
+        }
+    }
+
+
+    @Override
+    public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        ContainerHost containerHost = getContainerHostById( containerId.getId() );
+
+        //check if container with new hostname already exists on peer
+        try
+        {
+            getContainerHostByName( hostname );
+
+            throw new PeerException( String.format( "Container with hostname %s already exists", hostname ) );
+        }
+        catch ( HostNotFoundException ignore )
+        {
+            //ignore since all is ok
+        }
+
+        try
+        {
+            ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
+
+            resourceHost.setContainerHostname( containerHost, hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException(
+                    String.format( "Error setting container %s hostname: %s", containerId.getId(), e.getMessage() ) );
         }
     }
 

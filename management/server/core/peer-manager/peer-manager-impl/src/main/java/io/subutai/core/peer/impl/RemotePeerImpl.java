@@ -751,7 +751,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void alert( final AlertEvent alert ) throws PeerException
     {
-        Preconditions.checkNotNull( alert );
+        Preconditions.checkNotNull( alert, "Invalid alert" );
 
         peerWebClient.alert( alert );
     }
@@ -761,9 +761,9 @@ public class RemotePeerImpl implements RemotePeer
     public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
-        Preconditions.checkNotNull( startTime );
-        Preconditions.checkNotNull( endTime );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkNotNull( startTime, "Invalid start time" );
+        Preconditions.checkNotNull( endTime, "Invalid end time" );
 
         return peerWebClient.getHistoricalMetrics( hostname, startTime, endTime );
     }
@@ -772,7 +772,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
-        Preconditions.checkNotNull( peerId );
+        Preconditions.checkNotNull( peerId, "Invalid peer id" );
 
         return peerWebClient.getResourceLimits( peerId );
     }
@@ -781,7 +781,19 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
     {
+        Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
+
         environmentWebClient.addReverseProxy( reverseProxyConfig );
+    }
+
+
+    @Override
+    public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        environmentWebClient.setContainerHostName( containerId, hostname );
     }
 
 

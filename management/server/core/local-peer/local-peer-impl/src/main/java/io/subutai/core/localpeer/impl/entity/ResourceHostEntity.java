@@ -58,8 +58,10 @@ import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
+import io.subutai.common.util.StringUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
@@ -501,7 +503,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public ContainerHost getContainerHostById( final String id ) throws HostNotFoundException
     {
-        Preconditions.checkNotNull( id, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ), "Invalid container id" );
 
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -518,6 +520,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public Set<ContainerHost> getContainerHostsByEnvironmentId( final String environmentId )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -533,6 +537,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public Set<ContainerHost> getContainerHostsByOwnerId( final String ownerId )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ownerId ), "Invalid owner id" );
+
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -548,6 +554,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public Set<ContainerHost> getContainerHostsByPeerId( final String peerId )
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+
         Set<ContainerHost> result = new HashSet<>();
         for ( ContainerHost containerHost : getContainerHosts() )
         {
@@ -578,6 +586,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void cleanup( final EnvironmentId environmentId, final int vlan ) throws ResourceHostException
     {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+        Preconditions
+                .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan" );
         try
         {
             commandUtil.execute( resourceHostCommands.getCleanupEnvironmentCommand( vlan ), this );
@@ -641,6 +652,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void joinP2PSwarm( final String p2pIp, final String interfaceName, final String p2pHash,
                               final String secretKey, final long secretKeyTtlSec ) throws ResourceHostException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pIp ), "Invalid p2p IP" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( interfaceName ), "Invalid interface name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( secretKey ), "Invalid secret" );
+        Preconditions.checkArgument( secretKeyTtlSec > 0, "Ttl must be greater than 0" );
+
         try
         {
             if ( getP2PConnections().findByHash( p2pHash ) != null )
@@ -663,6 +680,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public void resetSwarmSecretKey( final String p2pHash, final String newSecretKey, final long ttlSeconds )
             throws ResourceHostException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newSecretKey ), "Invalid secret" );
+        Preconditions.checkArgument( ttlSeconds > 0, "Ttl must be greater than 0" );
+
         try
         {
             if ( getP2PConnections().findByHash( p2pHash ) != null )
@@ -695,6 +716,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void createTunnel( final Tunnel tunnel ) throws ResourceHostException
     {
+        Preconditions.checkNotNull( tunnel, "Invalid tunnel" );
+
         try
         {
             getNetworkManager().createTunnel( this, tunnel.getTunnelName(), tunnel.getTunnelIp(), tunnel.getVlan(),
@@ -710,6 +733,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public void importTemplate( final String templateName ) throws ResourceHostException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+
         try
         {
             commandUtil.execute( resourceHostCommands.getImportTemplateCommand( templateName ), this );
@@ -726,6 +751,14 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     public String cloneContainer( final String templateName, final String hostname, final String ip, final int vlan,
                                   final String environmentId ) throws ResourceHostException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions
+                .checkArgument( NumUtil.isIntBetween( vlan, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ), "Invalid vlan" );
+
+
         try
         {
             //generate registration token for container for 30 min
@@ -859,6 +892,10 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException
     {
+        Preconditions.checkNotNull( logLevel, "Invalid log level" );
+        Preconditions.checkNotNull( from, "Invalid from date" );
+        Preconditions.checkNotNull( till, "Invalid till date" );
+
         try
         {
             return getNetworkManager().getP2pLogs( this, logLevel, from, till );
@@ -866,6 +903,50 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Error obtaining P2P logs: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public void setContainerHostname( final ContainerHost containerHost, final String hostname )
+            throws ResourceHostException
+    {
+        Preconditions.checkNotNull( containerHost, "Invalid container" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        //check if new hostname differs from current one
+        if ( !StringUtil.areStringsEqual( containerHost.getHostname(), hostname, true ) )
+        {
+            try
+            {
+                commandUtil.execute( resourceHostCommands
+                        .getGetSetContainerHostnameCommand( containerHost.getContainerName(), hostname ), this );
+            }
+            catch ( CommandException e )
+            {
+                throw new ResourceHostException(
+                        String.format( "Error setting container hostname: %s", e.getMessage() ), e );
+            }
+        }
+    }
+
+
+    @Override
+    public void setHostname( final String hostname ) throws ResourceHostException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        if ( !StringUtil.areStringsEqual( this.hostname, hostname, true ) )
+        {
+            try
+            {
+                commandUtil.execute( resourceHostCommands.getGetSetRhHostnameCommand( hostname ), this );
+            }
+            catch ( CommandException e )
+            {
+                throw new ResourceHostException(
+                        String.format( "Error setting resource host hostname: %s", e.getMessage() ), e );
+            }
         }
     }
 
