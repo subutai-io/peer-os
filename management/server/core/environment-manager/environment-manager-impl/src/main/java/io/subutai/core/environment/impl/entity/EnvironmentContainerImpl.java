@@ -272,9 +272,19 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public void destroy() throws PeerException
+    public Environment destroy() throws PeerException
     {
         getPeer().destroyContainer( getContainerId() );
+
+        ( ( EnvironmentImpl ) parent ).removeContainer( this );
+
+        Environment env = environmentManager.update( ( EnvironmentImpl ) parent );
+
+        environment = null;
+
+        environmentManager.notifyOnContainerDestroyed( env, getId() );
+
+        return env;
     }
 
 
