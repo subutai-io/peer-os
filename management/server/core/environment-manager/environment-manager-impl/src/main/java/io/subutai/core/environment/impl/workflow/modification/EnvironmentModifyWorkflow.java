@@ -88,22 +88,25 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
     public EnvironmentGrowingPhase DESTROY_CONTAINERS()
     {
-        operationTracker.addLog( "Removing containers" );
+        operationTracker.addLog( "Destroying containers" );
 
         try
         {
-            //todo add check if just deleting last container without growing
+            boolean deleteOnly = topology == null || CollectionUtil.isCollectionEmpty( topology.getAllPeers() );
+
+            if ( deleteOnly && environment.getContainerHosts().size() <= removedContainers.size() )
+            {
+                throw new IllegalStateException(
+                        "Environment will have 0 containers after modification. Please, destroy environment instead" );
+            }
+
             environment =
-                    ( EnvironmentImpl ) new DestroyContainersStep( environment, environmentManager, removedContainers, operationTracker ).execute();
+                    ( EnvironmentImpl ) new DestroyContainersStep( environment, environmentManager, removedContainers,
+                            operationTracker ).execute();
 
             saveEnvironment();
 
-            if ( topology == null || CollectionUtil.isCollectionEmpty( topology.getAllPeers() ) )
-            {
-                return EnvironmentGrowingPhase.FINALIZE;
-            }
-
-            return EnvironmentGrowingPhase.GENERATE_KEYS;
+            return deleteOnly ? EnvironmentGrowingPhase.FINALIZE : EnvironmentGrowingPhase.GENERATE_KEYS;
         }
         catch ( Exception e )
         {
