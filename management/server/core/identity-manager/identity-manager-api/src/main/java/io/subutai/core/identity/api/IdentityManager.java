@@ -318,5 +318,7 @@ public interface IdentityManager
     void removeUserToken( String tokenId );
 
 
-
+    /* *************************************************
+         */
+    SecurityController getSecurityController();
 }

@@ -26,6 +26,13 @@ public class SecurityControllerImpl implements SecurityController
 
 
     @Override
+    public void logEvent( String userName,String password, String action )
+    {
+        LOGGER.info( " *** Security event *** UserName:" + userName + ", Password:" + password + ", Action:" + action);
+    }
+
+
+    @Override
     public int checkTrustLevel( String fingerprint )
     {
         int level = 0;

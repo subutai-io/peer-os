@@ -1138,7 +1138,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
                                   final CommandCallback callback ) throws CommandException
     {
-        Preconditions.checkNotNull( requestBuilder, "Invalid request" );
+       Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
         CommandResult result;

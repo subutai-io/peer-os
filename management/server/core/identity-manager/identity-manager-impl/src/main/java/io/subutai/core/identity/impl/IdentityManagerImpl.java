@@ -1639,6 +1639,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
+    @Override
     public SecurityController getSecurityController()
     {
         return securityController;
