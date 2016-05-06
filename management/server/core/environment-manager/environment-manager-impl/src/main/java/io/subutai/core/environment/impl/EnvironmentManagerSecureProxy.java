@@ -549,13 +549,6 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
-    public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
-    {
-        environmentManager.notifyOnContainerStateChanged( environment, containerHost );
-    }
-
-
-    @Override
     public void addAlertHandler( final AlertHandler alertHandler )
     {
         environmentManager.addAlertHandler( alertHandler );
