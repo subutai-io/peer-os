@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -44,6 +45,7 @@ import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -69,6 +71,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerSecureProxy.class );
     private final EnvironmentManagerImpl environmentManager;
     private final IdentityManager identityManager;
+    private final Tracker tracker;
     private RelationManager relationManager;
 
 
@@ -84,6 +87,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
         Preconditions.checkNotNull( tracker );
 
         this.relationManager = relationManager;
+        this.tracker = tracker;
         this.identityManager = identityManager;
         this.environmentManager =
                 new EnvironmentManagerImpl( peerManager, securityManager, identityManager, tracker, relationManager,
@@ -112,6 +116,37 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
     public void unregisterListener( final EnvironmentEventListener listener )
     {
         environmentManager.unregisterListener( listener );
+    }
+
+
+    private void buildRelation( Environment environment )
+    {
+        try
+        {
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+
+            // User - Delegated user - Environment
+            // Delegated user - Delegated user - Environment
+            // Delegated user - Environment - Container
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
+
+            RelationMeta relationMeta =
+                    new RelationMeta( delegatedUser, delegatedUser, environment, activeUser.getSecurityKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error message.", e );
+        }
     }
 
 
@@ -187,7 +222,9 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
     public Environment createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
-        return environmentManager.createEnvironment( topology, async );
+        Environment environment = environmentManager.createEnvironment( topology, async );
+        buildRelation( environment );
+        return environment;
     }
 
 
@@ -196,7 +233,18 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
     public UUID createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
-        return environmentManager.createEnvironmentAndGetTrackerID( topology, async );
+        Preconditions.checkNotNull( topology, "Invalid topology" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
+        Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
+
+        //create operation tracker
+        TrackerOperation operationTracker = tracker.createTrackerOperation( EnvironmentManagerImpl.MODULE_NAME,
+                String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
+
+        Environment environment = environmentManager.createEnvironment( topology, async, operationTracker );
+        buildRelation( environment );
+
+        return operationTracker.getId();
     }
 
 
