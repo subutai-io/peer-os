@@ -92,7 +92,7 @@ public class AppScaleProcessor implements StateLinkProccessor
                 {
                     log.error( "Error to install AppScale cluster: ", e );
 
-                    update( stateLink, "FAILED" );
+                    update( stateLink, e.getMessage() );
                 }
                 finally
                 {
