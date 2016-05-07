@@ -25,8 +25,8 @@ public class Commands
 
     public RequestBuilder getGetP2pVersionCommand()
     {
-        //todo use "subutai" binding when implemented
-        return new RequestBuilder( "/apps/subutai/current/bin/p2p version" );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.<String>newArrayList( "p2p", "-v" ) );
     }
 
 

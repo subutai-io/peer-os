@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostId;
@@ -208,6 +209,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Override
     public boolean updateHostInfo( final HostInfo hostInfo )
     {
+        this.containerName = ( ( ContainerHostInfo ) hostInfo ).getContainerName();
+
         return super.updateHostInfo( hostInfo );
     }
 

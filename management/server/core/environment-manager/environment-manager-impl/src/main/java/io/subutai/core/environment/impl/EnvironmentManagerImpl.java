@@ -1667,14 +1667,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     @PermitAll
-    @Override
-    public void notifyOnContainerStateChanged( final Environment environment, final ContainerHost containerHost )
-    {
-        update( ( EnvironmentImpl ) environment );
-    }
-
-
-    @PermitAll
     public void notifyOnEnvironmentDestroyed( final String environmentId )
     {
         for ( final EnvironmentEventListener listener : listeners )
@@ -2020,6 +2012,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.warn( "Error uploading environments to Hub: {}", e.getMessage() );
         }
+    }
+
+
+    public EnvironmentContainerImpl update( final EnvironmentContainerImpl container )
+    {
+        Environment environment = container.getEnvironment();
+
+        EnvironmentContainerImpl envContainer = environmentService.mergeContainer( container );
+
+        envContainer.setEnvironmentManager( this );
+
+        //update cache
+        ( ( EnvironmentImpl ) environment ).removeContainer( envContainer );
+        ( ( EnvironmentImpl ) environment ).addContainers( Sets.newHashSet( envContainer ) );
+
+        return envContainer;
     }
 
 

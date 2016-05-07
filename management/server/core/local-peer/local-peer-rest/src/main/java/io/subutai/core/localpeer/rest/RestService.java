@@ -33,6 +33,10 @@ public interface RestService
 {
 
     @GET
+    @Path( "/inited" )
+    public Response isInited();
+
+    @GET
     @Path( "/ping" )
     public Response ping();
 
