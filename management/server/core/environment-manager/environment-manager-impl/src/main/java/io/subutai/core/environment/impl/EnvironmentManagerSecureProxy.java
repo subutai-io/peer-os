@@ -9,6 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
@@ -29,11 +35,15 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -44,6 +54,8 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
 import io.subutai.core.peer.api.PeerActionResponse;
@@ -54,7 +66,9 @@ import io.subutai.core.tracker.api.Tracker;
 
 public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerActionListener, AlertListener
 {
+    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerSecureProxy.class );
     private final EnvironmentManagerImpl environmentManager;
+    private final IdentityManager identityManager;
     private RelationManager relationManager;
 
 
@@ -70,6 +84,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
         Preconditions.checkNotNull( tracker );
 
         this.relationManager = relationManager;
+        this.identityManager = identityManager;
         this.environmentManager =
                 new EnvironmentManagerImpl( peerManager, securityManager, identityManager, tracker, relationManager,
                         hubAdapter, environmentService );
@@ -159,6 +174,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
     }
 
 
+    @PermitAll
     @Override
     public Set<Environment> getEnvironmentsByOwnerId( final long userId )
     {
@@ -167,6 +183,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Write" )
     public Environment createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
@@ -175,6 +192,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Write" )
     public UUID createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
@@ -183,6 +201,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Write" )
     public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
@@ -202,6 +221,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Write" )
     public UUID modifyEnvironmentAndGetTrackerID( final String environmentId, final Topology topology,
                                                   final List<String> removedContainers, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
@@ -220,6 +240,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void addSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
@@ -237,6 +258,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void removeSshKey( final String environmentId, final String sshKey, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
@@ -286,6 +308,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void resetP2PSecretKey( final String environmentId, final String newP2pSecretKey,
                                    final long p2pSecretKeyTtlSec, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
@@ -304,6 +327,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Delete" )
     public void destroyEnvironment( final String environmentId, final boolean async )
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
@@ -321,6 +345,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Delete" )
     public void destroyContainer( final String environmentId, final String containerId, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -361,6 +386,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @PermitAll
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
@@ -385,6 +411,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void removeEnvironmentDomain( final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -402,6 +429,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
                                          final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                          final String sslCertPath )
@@ -421,6 +449,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @PermitAll
     public String getEnvironmentDomain( final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
@@ -438,6 +467,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @PermitAll
     public boolean isContainerInEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentManagerException, EnvironmentNotFoundException
     {
@@ -464,6 +494,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void addContainerToEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
@@ -490,6 +521,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public int setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
@@ -516,6 +548,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void removeContainerFromEnvironmentDomain( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
@@ -542,6 +575,7 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @PermitAll
     public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
     {
         environmentManager.notifyOnContainerDestroyed( environment, containerId );
@@ -585,12 +619,48 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
 
 
     @Override
+    @RolesAllowed( "Environment-Management|Update" )
     public void shareEnvironment( final ShareDto[] shareDto, final String environmentId )
     {
         try
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
+
+            List<Relation> relations = relationManager.getRelationsByObject( environment );
+
+            for ( final Relation relation : relations )
+            {
+                if ( !relation.getSource().equals( relation.getTarget() ) )
+                {
+                    relationManager.removeRelation( relation.getId() );
+                }
+            }
+
+            for ( final ShareDto dto : shareDto )
+            {
+                User activeUser = identityManager.getActiveUser();
+                UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+                User targetUser = identityManager.getUser( dto.getId() );
+                UserDelegate targetDelegate = identityManager.getUserDelegate( targetUser.getId() );
+
+                RelationInfoMeta relationInfoMeta =
+                        new RelationInfoMeta( dto.isRead(), dto.isWrite(), dto.isUpdate(), dto.isDelete(),
+                                Ownership.GROUP.getLevel() );
+                Map<String, String> traits = relationInfoMeta.getRelationTraits();
+                traits.put( "read", String.valueOf( dto.isRead() ) );
+                traits.put( "write", String.valueOf( dto.isWrite() ) );
+                traits.put( "update", String.valueOf( dto.isUpdate() ) );
+                traits.put( "delete", String.valueOf( dto.isDelete() ) );
+                traits.put( "ownership", Ownership.GROUP.getName() );
+
+                RelationMeta relationMeta =
+                        new RelationMeta( delegatedUser, targetDelegate, environment, delegatedUser.getId() );
+
+                Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+                relation.setRelationStatus( RelationStatus.VERIFIED );
+                relationManager.saveRelation( relation );
+            }
         }
         catch ( RelationVerificationException | EnvironmentNotFoundException e )
         {

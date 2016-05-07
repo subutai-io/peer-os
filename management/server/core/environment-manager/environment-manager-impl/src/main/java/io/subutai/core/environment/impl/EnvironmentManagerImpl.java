@@ -1798,51 +1798,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void shareEnvironment( final ShareDto[] shareDto, final String environmentId )
     {
-        Environment environment;
-        try
-        {
-            environment = loadEnvironment( environmentId );
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            LOG.warn( "Don't have permissions.", e );
-            return;
-        }
 
-        List<Relation> relations = relationManager.getRelationsByObject( environment );
-
-        for ( final Relation relation : relations )
-        {
-            if ( !relation.getSource().equals( relation.getTarget() ) )
-            {
-                relationManager.removeRelation( relation.getId() );
-            }
-        }
-
-        for ( final ShareDto dto : shareDto )
-        {
-            User activeUser = identityManager.getActiveUser();
-            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
-            User targetUser = identityManager.getUser( dto.getId() );
-            UserDelegate targetDelegate = identityManager.getUserDelegate( targetUser.getId() );
-
-            RelationInfoMeta relationInfoMeta =
-                    new RelationInfoMeta( dto.isRead(), dto.isWrite(), dto.isUpdate(), dto.isDelete(),
-                            Ownership.GROUP.getLevel() );
-            Map<String, String> traits = relationInfoMeta.getRelationTraits();
-            traits.put( "read", String.valueOf( dto.isRead() ) );
-            traits.put( "write", String.valueOf( dto.isWrite() ) );
-            traits.put( "update", String.valueOf( dto.isUpdate() ) );
-            traits.put( "delete", String.valueOf( dto.isDelete() ) );
-            traits.put( "ownership", Ownership.GROUP.getName() );
-
-            RelationMeta relationMeta =
-                    new RelationMeta( delegatedUser, targetDelegate, environment, delegatedUser.getId() );
-
-            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
-            relation.setRelationStatus( RelationStatus.VERIFIED );
-            relationManager.saveRelation( relation );
-        }
     }
 
 
