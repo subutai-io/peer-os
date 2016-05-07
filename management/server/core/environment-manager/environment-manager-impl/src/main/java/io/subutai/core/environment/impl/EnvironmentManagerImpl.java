@@ -253,8 +253,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private Set<Environment> getLocalEnvironments()
     {
-        User activeUser = identityManager.getActiveUser();
-
         Set<Environment> environments = new HashSet<>();
 
         for ( Environment environment : environmentService.getAll() )
