@@ -5,7 +5,7 @@
   <parent>
     <artifactId>test-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC11-SNAPSHOT</version>
+    <version>4.0.0-RC12-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
