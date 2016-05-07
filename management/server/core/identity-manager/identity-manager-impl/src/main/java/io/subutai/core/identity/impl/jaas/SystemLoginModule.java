@@ -121,6 +121,7 @@ public class SystemLoginModule extends AbstractKarafLoginModule
             }
             else
             {
+                identityManager.getSecurityController().logEvent( user ,password , "Invalid Login" );
                 throw new LoginException( "Invalid Login" );
             }
         }

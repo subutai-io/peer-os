@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>test-parent</artifactId>
+    <groupId>io.subutai</groupId>
+    <version>4.0.0-RC11-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>test-dp</artifactId>
+  <name>Subutai Test Dynamic Proxies</name>
+  <description>Sample test to intercept proxies</description>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- Export package versions are maintained in packageinfo files -->
+    <bundle.export.pkg>javax.annotation.security</bundle.export.pkg>
+    <bundle.import.pkg>javax.annotation.security,*</bundle.import.pkg>
+    <bundle.private.pkg>io.subutai.core.blueprint.auth</bundle.private.pkg>
+    <bundle.activator>io.subutai.core.test.dp.Activator</bundle.activator>
+
+    <!-- Not exporting any packages -->
+    <aries.skip.version.check>true</aries.skip.version.check>
+  </properties>
+
+  <!--<dependencies>-->
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>slf4j-api</artifactId>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+      <!--<groupId>org.slf4j</groupId>-->
+      <!--<artifactId>slf4j-simple</artifactId>-->
+    <!--</dependency>-->
+  <!--</dependencies>-->
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>8</source>
+          <target>8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.springsource.bundlor</groupId>
+        <artifactId>com.springsource.bundlor.maven</artifactId>
+        <version>1.0.0.M6</version>
+        <executions>
+          <execution>
+            <id>bundlor</id>
+            <goals>
+              <goal>transform</goal>
+              <!--   <goal>bundlor</goal> -->
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>com.springsource.repository.bundles.milestone</id>
+      <url>http://repository.springsource.com/maven/bundles/milestone</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>com.springsource.repository.bundles.milestone</id>
+      <name>SpringSource Enterprise Bundle Repository</name>
+      <url>http://repository.springsource.com/maven/bundles/milestone</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+</project>

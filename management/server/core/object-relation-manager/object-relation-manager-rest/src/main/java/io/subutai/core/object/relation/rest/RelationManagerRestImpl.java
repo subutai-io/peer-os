@@ -3,7 +3,7 @@ package io.subutai.core.object.relation.rest;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.object.relation.api.RelationManager;
+import io.subutai.common.security.relation.RelationManager;
 
 
 /**

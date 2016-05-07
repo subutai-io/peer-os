@@ -16,6 +16,7 @@
 
   <modules>
     <module>test-cli</module>
+    <module>test-dp</module>
   </modules>
 
   <dependencies>

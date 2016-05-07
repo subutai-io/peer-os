@@ -1,7 +1,10 @@
 package io.subutai.core.identity.rest;
 
 
+import javax.ws.rs.core.Response;
+
 import com.google.common.base.Strings;
+
 import io.subutai.core.identity.api.IdentityManager;
 
 
@@ -21,7 +24,7 @@ public class RestServiceImpl implements RestService
     {
         String token = identityManager.getUserToken( userName, password );
 
-        if( !Strings.isNullOrEmpty(token))
+        if ( !Strings.isNullOrEmpty( token ) )
         {
             return token;
         }
@@ -29,7 +32,6 @@ public class RestServiceImpl implements RestService
         {
             return "Access Denied to the resource!";
         }
-
     }
 
 
@@ -38,4 +40,5 @@ public class RestServiceImpl implements RestService
     {
         return createTokenPOST( userName, password );
     }
+
 }

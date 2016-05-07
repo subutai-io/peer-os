@@ -4,11 +4,15 @@ package io.subutai.core.hubmanager.impl.proccessors;
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedAction;
 import java.security.UnrecoverableKeyException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.security.auth.Subject;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -39,7 +43,13 @@ import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProccessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.TrustDataDto;
+import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
@@ -49,6 +59,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogEvent;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
 import io.subutai.hub.share.json.JsonUtil;
+
 
 //TODO close web clients and responses
 public class HubEnvironmentProccessor implements StateLinkProccessor
@@ -69,10 +80,13 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private final EnvironmentUserHelper environmentUserHelper;
 
+    private final IdentityManager identityManager;
+
 
     public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
                                      final ConfigManager hConfigManager, final PeerManager peerManager,
-                                     CommandExecutor commandExecutor, EnvironmentUserHelper environmentUserHelper )
+                                     final IdentityManager identityManager, CommandExecutor commandExecutor,
+                                     EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
 
@@ -83,6 +97,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         this.commandExecutor = commandExecutor;
 
         this.environmentUserHelper = environmentUserHelper;
+
+        this.identityManager = identityManager;
     }
 
 
@@ -95,8 +111,63 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             Matcher environmentDataMatcher = ENVIRONMENT_PEER_DATA_PATTERN.matcher( link );
             if ( environmentDataMatcher.matches() )
             {
-                EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
-                environmentBuildProcess( envPeerDto );
+                final EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
+                UserDto userDto = getUserDataFromHub( envPeerDto.getOwnerId() );
+                Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
+                if ( isTrustedUser )
+                {
+
+                    if ( envPeerDto.getEnvOwnerToken() == null )
+                    {
+                        final Session session = identityManager.login( "token", envPeerDto.getPeerToken() );
+                        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
+                        {
+
+                            @Override
+                            public Void run()
+                            {
+                                try
+                                {
+                                    User user = environmentUserHelper.handleEnvironmentOwnerCreation( envPeerDto );
+                                    java.util.Calendar cal = Calendar.getInstance();
+                                    cal.setTime( new Date() );
+                                    cal.add( Calendar.YEAR, 3 );
+                                    UserToken token =
+                                            identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
+                                    envPeerDto.setEnvOwnerToken( token.getFullToken() );
+                                    updateEnvironmentPeerData( envPeerDto );
+                                }
+                                catch ( Exception ex )
+                                {
+                                    LOG.error( ex.getMessage() );
+                                }
+                                return null;
+                            }
+                        } );
+                    }
+                    final Session session = identityManager.login( "token", envPeerDto.getEnvOwnerToken() );
+                    Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
+                    {
+                        @Override
+                        public Void run()
+                        {
+                            try
+                            {
+                                environmentBuildProcess( envPeerDto );
+                            }
+                            catch ( Exception ex )
+                            {
+                                LOG.error( ex.getMessage() );
+                            }
+                            return null;
+                        }
+                    } );
+                }
+                else
+                {
+                    String msg = "User is not trusted.";
+                    hubEnvironmentManager.sendLogToHub( envPeerDto, msg, null, LogEvent.HUB, LogType.ERROR, null );
+                }
             }
         }
     }
@@ -109,8 +180,8 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
             LOG.debug( "Getting Environment peer data from Hub..." );
-
             Response r = client.get();
+            client.close();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
@@ -146,7 +217,6 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     break;
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
-                    environmentUserHelper.handleEnvironmentOwnerCreation( peerDto );
                     break;
                 case CHANGE_CONTAINER_STATE:
                     controlContainer( peerDto );
@@ -186,7 +256,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response r = client.post( encryptedData );
-
+            client.close();
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
                 LOG.debug( "Collected data successfully sent to Hub" );
@@ -244,6 +314,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             WebClient client =
                     configManager.getTrustedWebClientWithAuth( setupTunnelDataURL, configManager.getHubIp() );
             Response r = client.get();
+            client.close();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
@@ -280,7 +351,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] cborData = JsonUtil.toCbor( updatedNodes );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response response = client.put( encryptedData );
-
+            client.close();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "env_via_hub: Environment successfully build!!!" );
@@ -319,6 +390,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
             Response response = clientUpdate.put( encryptedData );
+            clientUpdate.close();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "SSH configuration successfully done" );
@@ -389,6 +461,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                         byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
                         Response response = clientUpdate.put( encryptedData );
+                        clientUpdate.close();
                         if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
                         {
                             LOG.debug( "Container successfully updated" );
@@ -453,6 +526,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response response = clientUpdate.put( encryptedData );
+            clientUpdate.close();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "Domain configuration successfully done" );
@@ -498,7 +572,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
 
             Response response = client.delete();
-
+            client.close();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "Environment data cleaned successfully" );
@@ -520,6 +594,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( envDataPath, configManager.getHubIp() );
             Response r = client.get();
+            client.close();
             byte[] encryptedContent = configManager.readContent( r );
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             return JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
@@ -544,6 +619,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             byte[] cborData = JsonUtil.toCbor( peerDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response r = client.put( encryptedData );
+            client.close();
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
                 String mgs = "Environment peer data successfully sent to hub";
@@ -558,5 +634,66 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                     .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
             LOG.error( mgs, e.getMessage() );
         }
+    }
+
+
+    private UserDto getUserDataFromHub( String userId )
+    {
+        String path = "/rest/v1/users/" + userId;
+
+        UserDto userDto = null;
+
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+            Response r = client.get();
+            client.close();
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                byte[] encryptedContent = configManager.readContent( r );
+
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
+                userDto = JsonUtil.fromCbor( plainContent, UserDto.class );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to get user data: ", e );
+        }
+
+        return userDto;
+    }
+
+
+    private Boolean getUserTrustLevel( String fingerprint )
+    {
+        String path = "/rest/v1/keyserver/hub/trust/" + fingerprint;
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+
+            Response r = client.get();
+            client.close();
+            if ( r.getStatus() == HttpStatus.SC_OK )
+            {
+                byte[] encryptedContent = configManager.readContent( r );
+
+                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
+                TrustDataDto userTrustDto = JsonUtil.fromCbor( plainContent, TrustDataDto.class );
+                if ( userTrustDto.getTrustLevel().equals( TrustDataDto.TrustLevel.FULL ) )
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Error to get user data: ", e );
+        }
+        return false;
     }
 }

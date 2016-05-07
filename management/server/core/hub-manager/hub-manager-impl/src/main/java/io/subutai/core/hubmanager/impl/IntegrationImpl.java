@@ -62,6 +62,7 @@ import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
+
 //TODO close web clients and responses
 public class IntegrationImpl implements Integration
 {
@@ -130,7 +131,7 @@ public class IntegrationImpl implements Integration
         {
             configDataService = new ConfigDataServiceImpl( daoManager );
 
-            configManager = new ConfigManager( securityManager, peerManager, configDataService );
+            configManager = new ConfigManager( securityManager, peerManager, configDataService, identityManager );
 
             hubEnvironmentManager =
                     new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager,
@@ -151,8 +152,8 @@ public class IntegrationImpl implements Integration
                     new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
-                            environmentUserHelper );
+                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, identityManager,
+                            commandExecutor, environmentUserHelper );
 
             StateLinkProccessor vehsProccessor =
                     new VehsProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
