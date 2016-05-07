@@ -8,7 +8,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 
 public interface RestService
@@ -23,8 +22,4 @@ public interface RestService
     @Produces( MediaType.TEXT_PLAIN )
     public String createTokenGET( @QueryParam( "username" ) String userName, @QueryParam( "password" ) String password );
 
-    @POST
-    @Path( "authenticate/signature" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response authenticateByAuthSignature( @FormParam( "fingerprint" ) String fingerprint, @FormParam( "signedAuth" ) String signedAuth);
 }

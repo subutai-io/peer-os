@@ -29,12 +29,14 @@ public interface IdentityManager
     void removeRolePermission( long roleId, Permission permission );
 
     /* *************************************************
-         */
+     */
     List<Permission> getAllPermissions();
+
 
     /* *************************************************
      */
     void updatePermission( Permission permission );
+
 
     /* *************************************************
      *
@@ -59,22 +61,17 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     String getSystemUserToken();
 
+
     /* *************************************************
-         */
-    String authenticateByAuthSignature( String fingerprint, String signedAuth ) throws SecurityException;
+    */
+    User authenticateByAuthSignature( String fingerprint, String signedAuth ) throws SecurityException;
+
 
     /* *************************************************
      */
     User authenticateByToken( String token );
-
-
-    /* *************************************************
-     */
-    User authenticateByMessage(String fingerprint, String message );
-
 
 
     /* *************************************************
@@ -319,6 +316,6 @@ public interface IdentityManager
 
 
     /* *************************************************
-         */
+     */
     SecurityController getSecurityController();
 }
