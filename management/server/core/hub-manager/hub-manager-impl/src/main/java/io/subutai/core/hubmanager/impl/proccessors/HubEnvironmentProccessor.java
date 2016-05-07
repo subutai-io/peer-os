@@ -117,9 +117,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 if ( isTrustedUser )
                 {
 
-                    if ( envPeerDto.getEnvironmentInfo().getOwnerToken() == null )
+                    if ( envPeerDto.getEnvOwnerToken() == null )
                     {
-                        final Session session = identityManager.login( "token", envPeerDto.getToken() );
+                        final Session session = identityManager.login( "token", envPeerDto.getPeerToken() );
                         Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
                         {
 
@@ -134,8 +134,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                                     cal.add( Calendar.YEAR, 3 );
                                     UserToken token =
                                             identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
-                                    String ownerToken = token.getFullToken();
-                                    envPeerDto.getEnvironmentInfo().setOwnerToken( ownerToken );
+                                    envPeerDto.setEnvOwnerToken( token.getFullToken() );
                                     updateEnvironmentPeerData( envPeerDto );
                                 }
                                 catch ( Exception ex )
@@ -146,8 +145,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                             }
                         } );
                     }
-                    final Session session =
-                            identityManager.login( "token", envPeerDto.getEnvironmentInfo().getOwnerToken() );
+                    final Session session = identityManager.login( "token", envPeerDto.getEnvOwnerToken() );
                     Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
                     {
                         @Override

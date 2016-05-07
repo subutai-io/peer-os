@@ -177,16 +177,13 @@ public class EnvironmentUserHelper
 
         // Trick to get later the user id in Hub
         String email = userDto.getId() + "@hub.subut.ai";
-
-        String password = "" + Math.abs( userDto.getEmail().hashCode() );
-
         try
         {
-            User user = identityManager.createUser( userDto.getEmail(), password, "[Hub] " + userDto.getName(), email,
-                    UserType.Regular.getId(), KeyTrustLevel.Marginal.getId(), true, true );
+            User user = identityManager.createUser( userDto.getFingerprint(), null, "[Hub] " + userDto.getName(), email,
+                    UserType.Regular.getId(), KeyTrustLevel.Marginal.getId(), false, true );
 
+            identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
             identityManager.assignUserRole( user, getRole( "Environment-Manager" ) );
-
             identityManager.assignUserRole( user, getRole( "Template-Management" ) );
 
             log.debug( "User created successfully" );
