@@ -52,7 +52,9 @@ public class EnvironmentPeerDto
 
     private Set<EnvironmentPeerRHDto> rhs = new HashSet<>();
 
-    private String token;
+    private String peerToken;
+
+    private String envOwnerToken;
 
     public EnvironmentPeerDto()
     {
@@ -263,14 +265,26 @@ public class EnvironmentPeerDto
     }
 
 
-    public String getToken()
+    public String getPeerToken()
     {
-        return token;
+        return peerToken;
     }
 
 
-    public void setToken( final String token )
+    public void setPeerToken( final String peerToken )
     {
-        this.token = token;
+        this.peerToken = peerToken;
+    }
+
+
+    public String getEnvOwnerToken()
+    {
+        return envOwnerToken;
+    }
+
+
+    public void setEnvOwnerToken( final String envOwnerToken )
+    {
+        this.envOwnerToken = envOwnerToken;
     }
 }
