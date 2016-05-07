@@ -477,7 +477,7 @@ public class IdentityManagerImpl implements IdentityManager
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
-        PGPPublicKeyRing publicKeyRing = keyManager.getPublicKeyRing( fingerprint );
+        PGPPublicKeyRing publicKeyRing = keyManager.getPublicKeyRingByFingerprint( fingerprint );
 
         try
         {
