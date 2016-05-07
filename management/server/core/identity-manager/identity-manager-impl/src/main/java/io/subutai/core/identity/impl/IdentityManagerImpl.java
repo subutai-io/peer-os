@@ -469,8 +469,9 @@ public class IdentityManagerImpl implements IdentityManager
     /*
      *************************************************
      */
+    @PermitAll
     @Override
-    public String authenticateByAuthSignature( final String fingerprint, final String signedAuth )
+    public User authenticateByAuthSignature( final String fingerprint, final String signedAuth )
             throws SecurityException
     {
         KeyManager keyManager = securityManager.getKeyManager();
@@ -503,7 +504,7 @@ public class IdentityManagerImpl implements IdentityManager
             User tokenUser = identityDataService.getUser( token.getUserId() );
             if ( tokenUser != null && tokenUser.equals( user ) )
             {
-                return token.getFullToken();
+                return tokenUser;
             }
             else
             {
@@ -549,34 +550,6 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public User authenticateByMessage(String fingerprint, String message )
-    {
-        try
-        {
-            if(!Strings.isNullOrEmpty( message ))
-            {
-                //PGPPublicKey pubKey =
-
-                byte cont[] = securityManager.getEncryptionTool().extractClearSignContent( message.getBytes() );
-                //securityManager.getEncryptionTool().verify( message.getBytes() , get )
-                return null;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        catch ( PGPException e )
-        {
-            return null;
-        }
-    }
-
-
-    /* *************************************************
-     */
-    @PermitAll
-    @Override
     public User authenticateUser( String userName, String password )
     {
         User user = null;
@@ -584,6 +557,10 @@ public class IdentityManagerImpl implements IdentityManager
         if ( userName.equalsIgnoreCase( "token" ) )
         {
             user = authenticateByToken( password );
+        }
+        else if ( userName.length() == 40 )
+        {
+            user = authenticateByAuthSignature( userName ,password );
         }
         else
         {
@@ -1298,6 +1275,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( userName.equalsIgnoreCase( "token" ) ||
                 userName.equalsIgnoreCase( "administrator" ) ||
+                userName.equalsIgnoreCase( "authmessage" ) ||
                 userName.equalsIgnoreCase( "system" ) )
         {
             throw new IllegalArgumentException( "User name is reserved by the system." );
