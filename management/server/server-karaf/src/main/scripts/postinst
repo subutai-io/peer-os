@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if [ -f /tmp/.mng-firstrun ]; then
-	ln -fs /usr/share/zoneinfo/Universal /etc/localtime
-	echo "subutai:$6$fcP9G9YA$n5VVUh8wBN1Jn8h6D2Dx1U61zQ8OsSzre0EPe2BqAFfMehd11F3lmTavbIN9/H5SOAIonmZtBSlef8k0MAC.H0:16420:0:99999:7:::" >> /etc/shadow
+	echo "Etc/UTC" > /etc/timezone
+	sed -i /etc/shadow -e '1 s/^.*$/root:$6$s095rK7.$0bqNwLNnABaQ8LKR\/mSFJfHTlW24Xg.6uUv5Wt50NaV3b\/xAH6kYJyx7vaOrAZzsBTH1t1iU2WvQ2buCrVDL50:16928:0:99999:7:::/g'
 	sed -i /etc/ssh/sshd_config -e 's/PermitRootLogin without-password/PermitRootLogin yes/g'
 	echo -e "nameserver 10.10.10.254\ndomain intra.lan\nsearch intra.lan\n" > /etc/resolvconf/resolv.conf.d/original 
 	sed -i /etc/network/interfaces -e 's/iface eth0 inet dhcp/iface eth0 inet static\naddress 10.10.10.1\nnetmask 255.255.255.0\ngateway 10.10.10.254\n/g'
