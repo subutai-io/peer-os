@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -42,6 +43,7 @@ import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
@@ -49,6 +51,7 @@ import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
@@ -66,7 +69,8 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 
 
-public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerActionListener, AlertListener
+public class EnvironmentManagerSecureProxy
+        implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerSecureProxy.class );
     private final EnvironmentManagerImpl environmentManager;
@@ -662,7 +666,31 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
     @Override
     public List<ShareDto> getSharedUsers( final String objectId ) throws EnvironmentNotFoundException
     {
-        return environmentManager.getSharedUsers( objectId );
+        Environment environment = loadEnvironment( objectId );
+
+        List<Relation> relations = relationManager.getRelationsByObject( environment );
+        List<ShareDto> sharedUsers = Lists.newArrayList();
+
+        for ( final Relation relation : relations )
+        {
+            UserDelegate delegatedUser = identityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() );
+            if ( delegatedUser == null )
+            {
+                continue;
+            }
+            ShareDto shareDto = new ShareDto();
+            shareDto.setId( delegatedUser.getUserId() );
+
+            RelationInfo relationInfo = relation.getRelationInfo();
+            shareDto.setRead( relationInfo.isReadPermission() );
+            shareDto.setDelete( relationInfo.isDeletePermission() );
+            shareDto.setUpdate( relationInfo.isUpdatePermission() );
+            shareDto.setWrite( relationInfo.isWritePermission() );
+
+            sharedUsers.add( shareDto );
+        }
+
+        return sharedUsers;
     }
 
 
@@ -714,7 +742,6 @@ public class EnvironmentManagerSecureProxy implements EnvironmentManager, PeerAc
         {
             throw new AccessControlException( e.getMessage() );
         }
-        environmentManager.shareEnvironment( shareDto, environmentId );
     }
 
 

@@ -23,7 +23,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
-import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -256,11 +255,6 @@ public interface EnvironmentManager
 
     EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
             throws EnvironmentNotFoundException;
-
-
-    List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
-
-    void shareEnvironment( ShareDto[] shareDto, String environmentId );
 
 
     void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )

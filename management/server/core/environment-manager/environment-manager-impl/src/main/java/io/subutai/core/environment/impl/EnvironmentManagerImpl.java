@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -61,8 +60,6 @@ import io.subutai.common.security.crypto.pgp.KeyPair;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationManager;
-import io.subutai.common.security.relation.model.Relation;
-import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.ExceptionUtil;
@@ -70,7 +67,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
-import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
@@ -1687,45 +1683,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 alertEvent.addLog( e.getMessage() );
             }
         }
-    }
-
-
-    @Override
-    public List<ShareDto> getSharedUsers( final String objectId ) throws EnvironmentNotFoundException
-    {
-        Environment environment = loadEnvironment( objectId );
-
-        List<Relation> relations = relationManager.getRelationsByObject( environment );
-        List<ShareDto> sharedUsers = Lists.newArrayList();
-
-        for ( final Relation relation : relations )
-        {
-            UserDelegate delegatedUser = identityManager.getUserDelegate( relation.getTarget().getUniqueIdentifier() );
-            if ( delegatedUser == null )
-            {
-                continue;
-            }
-            ShareDto shareDto = new ShareDto();
-            shareDto.setId( delegatedUser.getUserId() );
-
-            RelationInfo relationInfo = relation.getRelationInfo();
-            shareDto.setRead( relationInfo.isReadPermission() );
-            shareDto.setDelete( relationInfo.isDeletePermission() );
-            shareDto.setUpdate( relationInfo.isUpdatePermission() );
-            shareDto.setWrite( relationInfo.isWritePermission() );
-
-            sharedUsers.add( shareDto );
-        }
-
-        return sharedUsers;
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void shareEnvironment( final ShareDto[] shareDto, final String environmentId )
-    {
-
     }
 
 
