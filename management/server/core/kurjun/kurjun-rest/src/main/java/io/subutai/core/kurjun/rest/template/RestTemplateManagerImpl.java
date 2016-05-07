@@ -195,7 +195,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
             if ( list != null )
             {
                 List<DefaultTemplate> deflist =
-                        list.stream().map( t -> convertToDefaultTemplate( t ) ).collect( Collectors.toList() );
+                        list.stream().map( this::convertToDefaultTemplate ).collect( Collectors.toList() );
                 return Response.ok( GSON.toJson( deflist ) ).build();
             }
         }
@@ -312,6 +312,7 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
         defaultTemplate.setMd5Sum(  template.getMd5Sum() );
         defaultTemplate.setArchitecture( Architecture.getByValue( template.getArchitecture() ) );
         defaultTemplate.setParent( template.getParent() );
+        defaultTemplate.setSize( template.getSize() );
         defaultTemplate.setPackage( template.getPackageName() );
         if ( includeFileContents )
         {

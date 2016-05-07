@@ -126,7 +126,6 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
             if ( list != null )
             {
-
                 return Response.ok( GSON.toJson( list ) ).build();
             }
         }
