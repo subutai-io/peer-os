@@ -21,6 +21,8 @@ import com.google.common.collect.Sets;
 
 public class TaskUtil<T>
 {
+    private static final int MAX_EXECUTOR_SIZE = 10;
+
     private static final Logger LOG = LoggerFactory.getLogger( TaskUtil.class );
 
 
@@ -73,7 +75,8 @@ public class TaskUtil<T>
 
         Set<TaskResult<T>> taskResults = Sets.newHashSet();
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( tasks.size() );
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( Math.min( MAX_EXECUTOR_SIZE, tasks.size() ) );
+
         CompletionService<T> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
 
         Map<Task<T>, Future<T>> taskFutures = Maps.newHashMap();
@@ -85,12 +88,9 @@ public class TaskUtil<T>
 
         taskExecutor.shutdown();
 
-        int doneTasks = 0;
-
-        int totalTasks = taskFutures.size();
 
         futuresLoop:
-        while ( !Thread.interrupted() && doneTasks < totalTasks && !taskFutures.isEmpty() )
+        while ( !Thread.interrupted() && !taskFutures.isEmpty() )
         {
 
             Iterator<Map.Entry<Task<T>, Future<T>>> mapIterator = taskFutures.entrySet().iterator();
@@ -106,10 +106,9 @@ public class TaskUtil<T>
 
                 try
                 {
+
                     if ( future.isDone() )
                     {
-                        doneTasks++;
-
                         mapIterator.remove();
 
                         taskResults.add( new TaskResult<>( task, future.get() ) );

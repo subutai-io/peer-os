@@ -22,8 +22,9 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
     private ConfigBase clusterConfig;
     private ContainerHost containerHost;
 
-    public AbstractNodeOperationTask( Tracker tracker, ConfigBase clusterConfig,
-                                      CompleteEvent completeEvent, UUID trackID, ContainerHost containerHost )
+
+    public AbstractNodeOperationTask( Tracker tracker, ConfigBase clusterConfig, CompleteEvent completeEvent,
+                                      UUID trackID, ContainerHost containerHost )
     {
         this.tracker = tracker;
         this.completeEvent = completeEvent;
@@ -38,7 +39,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
 
         if ( trackID != null )
         {
-            while ( true )
+            while ( !Thread.interrupted() )
             {
                 TrackerOperationView prevPo = tracker.getTrackerOperation( clusterConfig.getProductKey(), trackID );
                 if ( prevPo.getState() == OperationState.RUNNING )
@@ -82,8 +83,7 @@ public abstract class AbstractNodeOperationTask implements Runnable, NodeOperati
                     {
                         state = NodeState.STOPPED;
                     }
-                    else if ( po.getLog().toLowerCase()
-                                .contains( getProductRunningIdentifier().toLowerCase() ) )
+                    else if ( po.getLog().toLowerCase().contains( getProductRunningIdentifier().toLowerCase() ) )
                     {
                         state = NodeState.RUNNING;
                     }
