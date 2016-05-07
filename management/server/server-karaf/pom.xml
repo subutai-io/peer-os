@@ -312,7 +312,7 @@
                   <goal>package</goal>
                 </goals>
                 <configuration>
-                  <packageName>management</packageName>
+                  <packageName>management-${git.branch}</packageName>
                   <packageVersion>${project.version}</packageVersion>
                   <maintainerName>Subutai Social</maintainerName>
 		   <packageDependencies>
