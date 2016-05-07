@@ -259,16 +259,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         for ( Environment environment : environmentService.getAll() )
         {
-            final boolean owner = environment.getUserId().equals( activeUser.getId() );
+            environments.add( environment );
 
-            if ( owner )
-            {
-                environments.add( environment );
+            setEnvironmentTransientFields( environment );
 
-                setEnvironmentTransientFields( environment );
-
-                setContainersTransientFields( environment );
-            }
+            setContainersTransientFields( environment );
         }
 
         return environments;
