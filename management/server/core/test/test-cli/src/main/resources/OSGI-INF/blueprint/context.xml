@@ -3,6 +3,9 @@
 
   <authz:enable />
 
+  <reference id="relationManager" availability="mandatory"
+             interface="io.subutai.common.security.relation.RelationManager" />
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="test/error">
       <action class="io.subutai.core.test.cli.TestCommand" />
@@ -10,11 +13,13 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/verify">
-      <action class="io.subutai.core.test.cli.TestRoleValidation" />
+    <command name="test/test">
+      <action class="io.subutai.core.test.cli.TestRoleValidation">
+        <property name="relationManager" ref="relationManager" />
+      </action>
     </command>
   </command-bundle>
 
-  <bean id="errLstnr" scope="singleton" class="io.subutai.core.test.cli.SubutaiEventListenerImpl" />
-  <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
+  <!--<bean id="errLstnr" scope="singleton" class="io.subutai.core.test.cli.SubutaiEventListenerImpl" />-->
+  <!--<service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />-->
 </blueprint>

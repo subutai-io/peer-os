@@ -17,8 +17,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import io.subutai.common.security.relation.RelationLink;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationStatus;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationStatus;
 
 
 @Entity
@@ -178,5 +178,21 @@ public class RelationImpl implements Relation
         result = 31 * result + ( trustedObject != null ? trustedObject.hashCode() : 0 );
         result = 31 * result + ( keyId != null ? keyId.hashCode() : 0 );
         return result;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return "RelationImpl{" +
+                "id=" + id +
+                ", source=" + source +
+                ", target=" + target +
+                ", trustedObject=" + trustedObject +
+                ", relationInfo=" + relationInfo +
+                ", relationStatus=" + relationStatus +
+                ", keyId='" + keyId + '\'' +
+                ", linkType=" + linkType +
+                '}';
     }
 }

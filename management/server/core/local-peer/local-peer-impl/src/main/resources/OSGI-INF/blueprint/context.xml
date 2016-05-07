@@ -36,7 +36,7 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <reference id="relationManager"
-             interface="io.subutai.core.object.relation.api.RelationManager" />
+             interface="io.subutai.common.security.relation.RelationManager" />
 
   <reference id="securityManager" availability="mandatory"
              interface="io.subutai.core.security.api.SecurityManager" />

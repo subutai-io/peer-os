@@ -1,0 +1,18 @@
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+  <!--*****************************************************************-->
+  <bean id="blueprintAuth" scope="singleton" activation="eager"
+        class="io.subutai.core.blueprint.auth.AuthorizationNsHandler">
+  </bean>
+
+  <service ref="blueprintAuth" activation="eager"
+           interface="org.apache.aries.blueprint.NamespaceHandler">
+    <service-properties>
+      <entry key="osgi.service.blueprint.namespace"
+             value="http://aries.apache.org/xmlns/authorization/v1.0.0" />
+    </service-properties>
+  </service>
+  <!--*****************************************************************-->
+
+</blueprint>

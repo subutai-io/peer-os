@@ -53,6 +53,7 @@ import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.rest.ui.entity.ContainerDto;
 import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
@@ -76,6 +77,7 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final QuotaManager quotaManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
+    private SecureEnvironmentManager secureEnvironmentManager;
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -92,6 +94,12 @@ public class RestServiceImpl implements RestService
         this.templateRegistry = templateRegistry;
         this.strategyManager = strategyManager;
         this.quotaManager = quotaManager;
+    }
+
+
+    public void setSecureEnvironmentManager( final SecureEnvironmentManager secureEnvironmentManager )
+    {
+        this.secureEnvironmentManager = secureEnvironmentManager;
     }
 
 
@@ -795,7 +803,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            List<ShareDto> sharedUsers = environmentManager.getSharedUsers( objectId );
+            List<ShareDto> sharedUsers = secureEnvironmentManager.getSharedUsers( objectId );
             return Response.ok( JsonUtil.toJson( sharedUsers ) ).build();
         }
         catch ( Exception e )
@@ -810,7 +818,7 @@ public class RestServiceImpl implements RestService
     {
         ShareDto[] shareDto = gson.fromJson( users, ShareDto[].class );
 
-        environmentManager.shareEnvironment( shareDto, environmentId );
+        secureEnvironmentManager.shareEnvironment( shareDto, environmentId );
 
         return Response.ok().build();
     }

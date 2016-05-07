@@ -28,4 +28,21 @@ public enum Ownership
     {
         return id;
     }
+
+
+    public static Ownership getByName( String name )
+    {
+        if ( Ownership.USER.getName().equals( name ) )
+        {
+            return Ownership.USER;
+        }
+        else if ( Ownership.GROUP.getName().equals( name ) )
+        {
+            return Ownership.GROUP;
+        }
+        else
+        {
+            return Ownership.ALL;
+        }
+    }
 }
