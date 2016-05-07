@@ -144,7 +144,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "", "System User", "internal@subutai.io", 1, 3, false, false );
+            User internal = createUser( "internal", "secretSubutai", "System User", "internal@subutai.io", 1, 3, false, false );
             User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
             User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, 3, true, true );
             //***********************************************************
