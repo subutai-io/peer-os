@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cheggaaa/pb"
+
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/log"
@@ -57,7 +59,12 @@ func upgradeRh(packet string) {
 	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?name=" + packet)
 	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?name="+packet, err)
 	defer resp.Body.Close()
-	_, err = io.Copy(file, resp.Body)
+	log.Info("Downloading snap package")
+	bar := pb.New(int(resp.ContentLength)).SetUnits(pb.U_BYTES)
+	bar.Start()
+	rd := bar.NewProxyReader(resp.Body)
+
+	_, err = io.Copy(file, rd)
 	log.Check(log.FatalLevel, "Writing response to file", err)
 
 	log.Check(log.FatalLevel, "Installing update /tmp/"+packet,
