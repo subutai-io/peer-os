@@ -18,6 +18,8 @@ public class UserDto
 
     private String email;
 
+    private String publicKey;
+
 
     public UserDto()
     {
@@ -105,5 +107,17 @@ public class UserDto
     public void setEmail( String email )
     {
         this.email = email;
+    }
+
+
+    public String getPublicKey()
+    {
+        return publicKey;
+    }
+
+
+    public void setPublicKey( final String publicKey )
+    {
+        this.publicKey = publicKey;
     }
 }

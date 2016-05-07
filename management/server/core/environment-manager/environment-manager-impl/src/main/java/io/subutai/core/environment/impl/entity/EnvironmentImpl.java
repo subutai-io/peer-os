@@ -50,14 +50,14 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.model.RelationMeta;
 
 
 /**

@@ -35,6 +35,8 @@ public class EnvironmentDto
 
     private State state;
 
+    private String ownerToken;
+
     private ArrayList<EnvironmentPeerDto> peers = new ArrayList<>();
 
     private List<EnvironmentNodesDto> nodes = new ArrayList<>();
@@ -152,5 +154,17 @@ public class EnvironmentDto
     public void removeNode( EnvironmentNodesDto node )
     {
         this.nodes.remove( node );
+    }
+
+
+    public String getOwnerToken()
+    {
+        return ownerToken;
+    }
+
+
+    public void setOwnerToken( final String ownerToken )
+    {
+        this.ownerToken = ownerToken;
     }
 }

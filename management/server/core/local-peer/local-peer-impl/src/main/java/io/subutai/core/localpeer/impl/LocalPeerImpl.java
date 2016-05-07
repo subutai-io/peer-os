@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -88,6 +89,11 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
@@ -124,11 +130,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
-import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -680,8 +681,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
@@ -709,8 +709,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public CreateEnvironmentContainersResponse createEnvironmentContainers(
             final CreateEnvironmentContainersRequest requestGroup ) throws PeerException
@@ -988,8 +987,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
@@ -1011,8 +1009,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
@@ -1034,8 +1031,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
@@ -1149,7 +1145,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
                                   final CommandCallback callback ) throws CommandException
     {
-        Preconditions.checkNotNull( requestBuilder, "Invalid request" );
+       Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
         CommandResult result;
@@ -1352,6 +1348,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "bandwidthControl", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
             {
@@ -1578,8 +1579,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public int setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout ) throws PeerException
     {
@@ -1646,8 +1646,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     /* ***********************************************
      *  Create PEK
      */
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
@@ -1710,6 +1709,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             relationTraits.put( "hostEnvironment", "true" );
             relationTraits.put( "containerLimit", "unlimited" );
             relationTraits.put( "bandwidthLimit", "unlimited" );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( peerOwner, this, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
@@ -1752,6 +1755,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "encryptMessage", "true" );
             relationTraits.put( "decryptMessage", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( this, peerLink, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
@@ -1888,8 +1896,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION BEGIN --------------------
 
 
-    //TODO this is for basic environment via hub
-    //@RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
@@ -1966,8 +1973,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
@@ -2070,8 +2076,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION END --------------------
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {

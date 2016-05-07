@@ -30,7 +30,7 @@
              interface="io.subutai.core.tracker.api.Tracker" />
 
   <reference id="relationManager"
-             interface="io.subutai.core.object.relation.api.RelationManager" />
+             interface="io.subutai.common.security.relation.RelationManager" />
 
   <reference id="hubAdapter" interface="io.subutai.core.hubadapter.api.HubAdapter" />
 
@@ -75,7 +75,7 @@
   </reference-list>
 
   <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
-        class="io.subutai.core.environment.impl.EnvironmentManagerImpl">
+        class="io.subutai.core.environment.impl.EnvironmentManagerSecureProxy">
     <argument ref="peerManager" />
     <argument ref="securityManager" />
     <argument ref="identityManager" />

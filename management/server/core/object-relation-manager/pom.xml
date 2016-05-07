@@ -14,7 +14,6 @@
   <description>Subutai Object Relation Manager Parent</description>
   <packaging>pom</packaging>
   <modules>
-    <module>object-relation-manager-api</module>
     <module>object-relation-manager-impl</module>
     <module>object-relation-manager-rest</module>
   </modules>

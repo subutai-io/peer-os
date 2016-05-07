@@ -26,6 +26,7 @@ import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
+
 //TODO close web clients and responses
 public class EnvironmentUserHelper
 {
@@ -40,8 +41,8 @@ public class EnvironmentUserHelper
     private final EnvironmentManager environmentManager;
 
 
-    public EnvironmentUserHelper( ConfigManager configManager, IdentityManager identityManager, ConfigDataService configDataService,
-                                  EnvironmentManager environmentManager )
+    public EnvironmentUserHelper( ConfigManager configManager, IdentityManager identityManager,
+                                  ConfigDataService configDataService, EnvironmentManager environmentManager )
     {
         this.configManager = configManager;
 
@@ -64,7 +65,8 @@ public class EnvironmentUserHelper
             return;
         }
 
-        log.debug( "Deleting environment owner: id={}, name={}, email={}", user.getId(), user.getUserName(), user.getEmail() );
+        log.debug( "Deleting environment owner: id={}, name={}, email={}", user.getId(), user.getUserName(),
+                user.getEmail() );
 
         boolean hasLocalEnvironments = environmentManager.getEnvironmentsByOwnerId( user.getId() ).size() > 0;
 
@@ -113,7 +115,7 @@ public class EnvironmentUserHelper
     }
 
 
-    void handleEnvironmentOwnerCreation( EnvironmentPeerDto peerDto )
+    public User handleEnvironmentOwnerCreation( EnvironmentPeerDto peerDto )
     {
         String envOwnerId = peerDto.getOwnerId();
 
@@ -123,12 +125,12 @@ public class EnvironmentUserHelper
         {
             log.debug( "No need to create new user for environment" );
 
-            return;
+            return identityManager.getActiveUser();
         }
 
         UserDto userDto = getUserDataFromHub( envOwnerId );
 
-        createNewUser( userDto );
+        return createNewUser( userDto );
     }
 
 
@@ -161,38 +163,37 @@ public class EnvironmentUserHelper
     }
 
 
-//    public void test()
-//    {
-//        UserDto dto = getUserDataFromHub( "43163772-a8c2-459f-bfcb-4d0bcc5759f6" );
-//
-//        createNewUser( dto );
-//    }
+    //    public void test()
+    //    {
+    //        UserDto dto = getUserDataFromHub( "43163772-a8c2-459f-bfcb-4d0bcc5759f6" );
+    //
+    //        createNewUser( dto );
+    //    }
 
 
-    private void createNewUser( UserDto userDto )
+    private User createNewUser( UserDto userDto )
     {
         log.debug( "Creating new user: {}", userDto.getEmail() );
 
         // Trick to get later the user id in Hub
         String email = userDto.getId() + "@hub.subut.ai";
-
-        String password = "" + Math.abs( userDto.getEmail().hashCode() );
-
         try
         {
-            User user = identityManager.createUser( userDto.getEmail(), password, "[Hub] " + userDto.getName(), email, UserType.Regular.getId(),
-                    KeyTrustLevel.Marginal.getId(), true, true );
+            User user = identityManager.createUser( userDto.getFingerprint(), null, "[Hub] " + userDto.getName(), email,
+                    UserType.Regular.getId(), KeyTrustLevel.Marginal.getId(), false, true );
 
+            identityManager.setUserPublicKey( user.getId(), userDto.getPublicKey() );
             identityManager.assignUserRole( user, getRole( "Environment-Manager" ) );
-
             identityManager.assignUserRole( user, getRole( "Template-Management" ) );
 
             log.debug( "User created successfully" );
+            return user;
         }
         catch ( Exception e )
         {
             log.error( "Error to create user: ", e );
         }
+        return null;
     }
 
 
