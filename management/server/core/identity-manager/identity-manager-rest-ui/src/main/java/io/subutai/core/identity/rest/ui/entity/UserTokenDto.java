@@ -29,11 +29,12 @@ public class UserTokenDto
         this.userId = userId;
         this.userName = userName;
         this.token = token;
-        this.secret = secret;
+        //this.secret = secret;
         this.type = type;
         this.hashAlgorithm = hashAlgorithm;
         this.issuer = issuer;
         this.validDate = validDate;
+        this.secret = "";
     }
 
 
@@ -75,13 +76,14 @@ public class UserTokenDto
 
     public String getSecret()
     {
-        return secret;
+        return "";
     }
 
 
     public void setSecret( final String secret )
     {
-        this.secret = secret;
+        //this.secret = secret;
+        this.secret = "";
     }
 
 

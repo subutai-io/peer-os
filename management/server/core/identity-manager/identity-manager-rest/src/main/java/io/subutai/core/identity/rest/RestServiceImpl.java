@@ -41,18 +41,4 @@ public class RestServiceImpl implements RestService
         return createTokenPOST( userName, password );
     }
 
-
-    @Override
-    public Response authenticateByAuthSignature( final String fingerprint, final String signedAuth )
-    {
-        try
-        {
-            String jwtToken = identityManager.authenticateByAuthSignature( fingerprint, signedAuth );
-            return Response.ok().entity( jwtToken ).build();
-        }
-        catch ( Exception ex )
-        {
-            return Response.serverError().entity( ex ).build();
-        }
-    }
 }
