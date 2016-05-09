@@ -71,9 +71,11 @@ public class TunnelProcessor implements StateLinkProccessor
                     String.format( TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
                             tunnelInfoDto.getTtl() ) );
 
+            LOG.debug( "Tunnel output: " + result.getStdOut() );
 
             if ( result.hasSucceeded() )
             {
+
                 String[] data = result.getStdOut().split( ":" );
                 tunnelInfoDto.setOpenedIp( data[0] );
                 tunnelInfoDto.setOpenedPort( data[1] );
