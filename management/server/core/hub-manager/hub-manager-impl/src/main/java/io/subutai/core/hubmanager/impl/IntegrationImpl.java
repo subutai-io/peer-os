@@ -95,8 +95,6 @@ public class IntegrationImpl implements Integration
 
     private ResourceHostConfProcessor resourceHostConfProcessor;
 
-    private SystemConfProcessor systemConfProcessor;
-
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
 
     private HubLoggerProcessor hubLoggerProcessor;
@@ -522,8 +520,6 @@ public class IntegrationImpl implements Integration
 
     private void generateChecksum()
     {
-/*		if (getRegistrationState ())
-        {*/
         try
         {
             LOG.info( "Generating plugins list md5 checksum" );
@@ -550,11 +546,6 @@ public class IntegrationImpl implements Integration
             LOG.error( e.getMessage() );
             e.printStackTrace();
         }
-/*		}
-        else
-		{
-			LOG.info ("Peer not registered. Trying again in 1 hour.");
-		}*/
     }
 
 
@@ -590,16 +581,12 @@ public class IntegrationImpl implements Integration
                 else
                 {
                     LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
-                    //                    throw new HubPluginException(
-                    //                            "Could not send SS configuration to Hub: " + r.readEntity( String
-                    // .class ) );
                 }
             }
             catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
                     NoSuchAlgorithmException e )
             {
                 LOG.error( "Could not send SS configuration to Hub", e );
-                //                throw new HubPluginException( e.toString(), e );
             }
         }
     }
