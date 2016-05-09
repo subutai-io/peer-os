@@ -22,6 +22,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
+
 //TODO close web clients and responses
 public class TunnelProcessor implements StateLinkProccessor
 {
@@ -58,6 +59,8 @@ public class TunnelProcessor implements StateLinkProccessor
 
     private void processLink( String stateLink )
     {
+        LOG.debug( "processing tunnel statelink" );
+
         TunnelInfoDto tunnelInfoDto = getData( stateLink );
         ResourceHost resourceHost = null;
         try
@@ -68,13 +71,23 @@ public class TunnelProcessor implements StateLinkProccessor
                     String.format( TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
                             tunnelInfoDto.getTtl() ) );
 
+            LOG.debug( "Tunnel output: " + result.getStdOut() );
+
             if ( result.hasSucceeded() )
             {
+
                 String[] data = result.getStdOut().split( ":" );
                 tunnelInfoDto.setOpenedIp( data[0] );
                 tunnelInfoDto.setOpenedPort( data[1] );
 
                 updateTunnelStatus( stateLink, tunnelInfoDto );
+            }
+            else
+            {
+                TunnelInfoDto tunnelInfoDto1 = new TunnelInfoDto();
+                tunnelInfoDto1.setTunnelStatus( null );
+                updateTunnelStatus( stateLink, tunnelInfoDto );
+                LOG.debug( "Something wrong with creating tunnel" );
             }
         }
         catch ( Exception e )
@@ -93,10 +106,15 @@ public class TunnelProcessor implements StateLinkProccessor
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response r = client.put( encryptedData );
 
+
+            LOG.debug( "Resonce status: " + r.getStatus() );
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
-                String mgs = "Tunnel peer data successfully sent to hub";
-                LOG.debug( mgs );
+                LOG.debug( "Tunnel peer data successfully sent to hub" );
+            }
+            else
+            {
+                LOG.error( "Tunnel peer data was not successfully sent to hub" );
             }
         }
         catch ( Exception e )
@@ -113,24 +131,33 @@ public class TunnelProcessor implements StateLinkProccessor
         int tryCount = 0;
         CommandResult result = null;
 
+        LOG.debug( "Creating tunnel with cmd: " + cmd );
         while ( exec )
         {
             tryCount++;
             exec = tryCount > 3 ? false : true;
             try
             {
+                LOG.debug( "Create tunnel try count: " + tryCount );
                 result = resourceHost.execute( new RequestBuilder( cmd ) );
-                exec = false;
+                LOG.debug( "Exit code: " + result.getExitCode() );
+
+                if ( result.getExitCode() == 0 )
+                {
+                    exec = false;
+                }
+
                 return result;
             }
             catch ( CommandException e )
             {
+                LOG.error( e.getMessage() );
                 e.printStackTrace();
             }
 
             try
             {
-                Thread.sleep( 1000 );
+                Thread.sleep( 5000 );
             }
             catch ( InterruptedException e )
             {
