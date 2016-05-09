@@ -249,8 +249,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             }
             if ( compare >= 0 && !relationLinks.contains( targetRelation.getTrustedObject() ) )
             {
-                int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object,
-                        relationLinks );
+                int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
                 if ( result != -3 )
                 {
                     return result;
@@ -540,7 +539,11 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
             if ( result != -3 )
             {
-                if ( !( result >= 0 ) )
+                if ( result >= 0 )
+                {
+                    return;
+                }
+                else
                 {
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
