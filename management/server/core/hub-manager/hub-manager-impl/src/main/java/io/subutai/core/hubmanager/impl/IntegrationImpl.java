@@ -367,25 +367,40 @@ public class IntegrationImpl implements Integration
         try
         {
             String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+
             String path = String.format( "/rest/v1/peers/%s/delete", configManager.getPeerId() );
 
             WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
             Response r = client.delete();
 
+            LOG.debug( "Response status: {} - {}", r.getStatus(), r.getStatusInfo().getReasonPhrase() );
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Peer unregistered successfully." );
+                LOG.debug( "Peer unregistered successfully" );
+
                 configDataService.deleteConfig( configManager.getPeerId() );
             }
             else
             {
-                LOG.error( r.readEntity( String.class ) );
-                throw new HubPluginException( "Could not unregister peer" );
+                String error = r.readEntity( String.class );
+
+                LOG.debug( "Error: {}", error );
+
+                if ( r.getStatus() == HttpStatus.SC_FORBIDDEN )
+                {
+                    LOG.debug( "Got 'peer not found' error but unregistered anyway" );
+
+                    configDataService.deleteConfig( configManager.getPeerId() );
+                }
+                else
+                {
+                    throw new HubPluginException( "Could not unregister peer" );
+                }
             }
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e )
+        catch ( Exception e )
         {
             throw new HubPluginException( "Could not unregister peer", e );
         }
