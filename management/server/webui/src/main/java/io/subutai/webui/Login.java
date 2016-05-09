@@ -21,62 +21,85 @@ import io.subutai.core.identity.api.model.User;
 
 public class Login extends HttpServlet
 {
-    private static final Logger logger = LoggerFactory.getLogger(Login.class );
+    private static final Logger logger = LoggerFactory.getLogger( Login.class );
+
+
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
+
         String username = request.getParameter( "username" );
         String password = request.getParameter( "password" );
+        String sptoken = request.getParameter( "sptoken" );
+        User user = null;
 
-        if ( !Strings.isNullOrEmpty( username ) )
+        try
         {
-            try
+            if ( !Strings.isNullOrEmpty( username ) )
             {
                 IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
-                String token = null;
                 if ( identityManager != null )
                 {
-                    token = identityManager.getUserToken( username, password );
-                }
-
-                if ( !Strings.isNullOrEmpty( token ) )
-                {
-                    User user = identityManager.authenticateByToken( token );
-                    request.getSession().setAttribute( "userSessionData", token );
-                    Cookie sptoken = new Cookie( "sptoken", token );
-//                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
-
-                    logger.info(user.getFingerprint());
-                    logger.info(user.getEmail());
-                    logger.info(user.getFullName());
-                    logger.info(user.getSecurityKeyId());
-                    logger.info(user.getUserName());
-                    Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
-//                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
-
-                    response.addCookie( sptoken );
-                    response.addCookie( fingerprint );
-                }
-                else
-                {
-                    request.setAttribute( "error", "Wrong Username or Password !!!" );
-                    response.getWriter().write( "Error, Wrong Username or Password" );
-                    response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                    sptoken = identityManager.getUserToken( username, password );
+                    user = identityManager.authenticateByToken( sptoken );
                 }
             }
-            catch ( Exception e )
+            else if ( !Strings.isNullOrEmpty( sptoken ) )
             {
-                request.setAttribute( "error", "karaf exceptions !!!" );
-                response.getWriter().write( "Error, karaf exceptions !!!" );
+                IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+
+                if ( identityManager != null )
+                {
+                    user = identityManager.authenticateByToken( sptoken );
+                }
+            }
+            else
+            {
+                request.setAttribute( "error", "Please enter username or password" );
+                response.getWriter().write( "Error, Please enter username or password" );
+                response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+            }
+
+
+            if ( user != null )
+            {
+                request.getSession().setAttribute( "userSessionData", sptoken );
+                Cookie ctoken = new Cookie( "sptoken", sptoken );
+                //                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+
+                logger.info( user.getFingerprint() );
+                logger.info( user.getEmail() );
+                logger.info( user.getFullName() );
+                logger.info( user.getSecurityKeyId() );
+                logger.info( user.getUserName() );
+                Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+                //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+
+                response.addCookie( ctoken );
+                response.addCookie( fingerprint );
+            }
+            else
+            {
+                request.setAttribute( "error", "Wrong Username or Password !!!" );
+                response.getWriter().write( "Error, Wrong Username or Password" );
                 response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
             }
         }
-        else
+        catch ( Exception e )
         {
-            request.setAttribute( "error", "Please enter username or password" );
-            response.getWriter().write( "Error, Please enter username or password" );
+            request.setAttribute( "error", "karaf exceptions !!!" );
+            response.getWriter().write( "Error, karaf exceptions !!!" );
             response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
         }
+    }
+
+
+    @Override
+    protected void doGet( final HttpServletRequest req, final HttpServletResponse resp )
+            throws ServletException, IOException
+    {
+        doPost( req , resp );
+        resp.sendRedirect( "/" );
     }
 }

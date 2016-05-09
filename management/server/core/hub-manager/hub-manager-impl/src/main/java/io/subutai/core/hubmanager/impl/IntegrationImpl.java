@@ -47,6 +47,7 @@ import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.proccessors.ProductProccessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
@@ -114,6 +115,8 @@ public class IntegrationImpl implements Integration
 
     private ContainerEventProcessor containerEventProcessor;
 
+    private ProductProccessor productProccessor;
+
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
     private String checksum = "";
@@ -146,6 +149,8 @@ public class IntegrationImpl implements Integration
             resourceHostMonitorProcessor =
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
+            productProccessor = new ProductProccessor( configManager );
+
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
             EnvironmentUserHelper environmentUserHelper =
@@ -164,6 +169,7 @@ public class IntegrationImpl implements Integration
             heartbeatProcessor.addProccessor( vehsProccessor );
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
+            heartbeatProcessor.addProccessor( productProccessor );
 
             AppScaleProcessor appScaleProcessor =
                     new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
