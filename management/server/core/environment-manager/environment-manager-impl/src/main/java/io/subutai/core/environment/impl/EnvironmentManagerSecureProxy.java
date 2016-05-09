@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl;
 
 import java.security.AccessControlException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,7 @@ import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
@@ -207,7 +209,21 @@ public class EnvironmentManagerSecureProxy
     {
         Set<Environment> result = environmentManager.getEnvironments();
 
+        // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
+        // Meantime, we just bypass the relation check.
+        Set<Environment> hubEnvs = new HashSet<>();
+
+        for ( Environment env : result )
+        {
+            if ( env instanceof ProxyEnvironment )
+            {
+                hubEnvs.add( env );
+            }
+        }
+
         check( null, result, traitsBuilder( "ownership=All;read=true" ) );
+
+        result.addAll( hubEnvs );
 
         return result;
     }
