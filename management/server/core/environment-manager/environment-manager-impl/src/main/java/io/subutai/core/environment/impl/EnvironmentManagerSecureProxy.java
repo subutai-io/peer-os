@@ -400,14 +400,21 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
         try
         {
-            check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
+            // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
+            // Meantime, we just bypass the relation check.
+            if ( !( environment instanceof ProxyEnvironment ) )
+            {
+                check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
+            }
         }
         catch ( RelationVerificationException e )
         {
             throw new EnvironmentNotFoundException();
         }
+
         environmentManager.destroyEnvironment( environmentId, async );
     }
 
@@ -418,6 +425,16 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
+        // Environments created on Hub doesn't have relation data on SS side. We have to add this in future.
+        // Meantime, we just bypass the relation check.
+        if ( environment instanceof ProxyEnvironment )
+        {
+            environmentManager.destroyContainer( environmentId, containerId, async );
+
+            return;
+        }
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;delete=true" ) );
@@ -426,6 +443,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
+
         try
         {
             EnvironmentContainerHost containerHost = environment.getContainerHostById( containerId );
@@ -435,6 +453,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentModificationException( e );
         }
+
         environmentManager.destroyContainer( environmentId, containerId, async );
     }
 
