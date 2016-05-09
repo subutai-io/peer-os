@@ -54,9 +54,9 @@ func Tunnel(socket, timeout, tmp string) {
 	stderr, _ := cmd.StderrPipe()
 	log.Check(log.FatalLevel, "Creating SSH tunnel to "+socket, cmd.Start())
 	r := bufio.NewReader(stderr)
-	i := 0
-	for line, _, err := r.ReadLine(); err == nil && i < 20; i++ {
-		log.Check(log.FatalLevel, "Reading SSH pipe", err)
+	line, _, err := r.ReadLine()
+	log.Check(log.FatalLevel, "Reading tunnel output pipe", err)
+	for i := 0; err == nil && i < 10; i++ {
 		if strings.Contains(string(line), "Allocated port") {
 			port := strings.Fields(string(line))
 			tun := "local"
@@ -71,6 +71,8 @@ func Tunnel(socket, timeout, tmp string) {
 			tunAdd("ssh-tunnels", tunsrv+":"+port[2]+" "+socket+" "+strconv.Itoa(int(time.Now().Unix())+tout)+" "+strconv.Itoa(cmd.Process.Pid)+" "+tun)
 			return
 		}
+		time.Sleep(1 * time.Second)
+		line, _, err = r.ReadLine()
 	}
 	log.Error("Cannot get tunnel port")
 }
