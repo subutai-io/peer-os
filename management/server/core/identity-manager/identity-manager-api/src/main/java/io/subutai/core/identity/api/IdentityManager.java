@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.annotation.security.PermitAll;
 import javax.security.auth.Subject;
 
 import io.subutai.common.security.objects.PermissionObject;
@@ -143,11 +142,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     User getSystemUser();
 
+
     /* *************************************************
-         */
+     */
     User getActiveUser();
 
 
@@ -163,11 +162,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    @PermitAll
     void runAs( Session userSession, Runnable action );
 
+
     /* *************************************************
-         */
+     */
     User createTempUser( String userName, String password, String fullName, String email, int type );
 
 
@@ -243,12 +242,12 @@ public interface IdentityManager
     /* ***********************************
      *  Authenticate Internal User
      */
-    @PermitAll
     Subject loginSystemUser();
 
+
     /* *************************************************
-         *
-         */
+     *
+     */
     Session login( String userName, String password );
 
 
@@ -260,6 +259,7 @@ public interface IdentityManager
     /* *************************************************
      */
     Role getRole( long roleId );
+
 
     /* *************************************************
      */
