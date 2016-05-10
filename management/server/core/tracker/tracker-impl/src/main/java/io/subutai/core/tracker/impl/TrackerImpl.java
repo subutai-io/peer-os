@@ -24,6 +24,7 @@ import io.subutai.common.tracker.OperationState;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.tracker.TrackerOperationView;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.core.tracker.impl.dao.TrackerOperationDataService;
 
@@ -85,7 +86,18 @@ public class TrackerImpl implements Tracker
 
         try
         {
-            dataService.saveTrackerOperation( source, po, identityManager.getActiveUser().getId() );
+            //*********************************
+            long userId = 0;
+            User user   = identityManager.getActiveUser();
+
+            if(user != null)
+                userId = user.getId();
+            else
+                userId = identityManager.getSystemUser().getId();
+
+            //*********************************
+
+            dataService.saveTrackerOperation( source, po, userId );
             return true;
         }
         catch ( Exception e )
