@@ -154,6 +154,7 @@ public class HubEnvironmentManager
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
         final String subnetWithoutMask = env.getSubnetCidr().replace( "/24", "" );
+
         completionService.submit( new Callable<Peer>()
         {
             @Override
@@ -166,6 +167,7 @@ public class HubEnvironmentManager
         } );
 
         executorService.shutdown();
+
         try
         {
             Future<Peer> f = completionService.take();
@@ -173,11 +175,18 @@ public class HubEnvironmentManager
         }
         catch ( Exception e )
         {
+            if ( e.getMessage().contains( "Error reserving network resources" ) && e.getMessage().contains( "already reserved" ) )
+            {
+                return;
+            }
 
             String msg = "Failed to reserve network resources on Peer ID: " + localPeer.getId();
+
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.NETWORK,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
+
             LOG.error( msg, e.getMessage() );
+
             throw new EnvironmentCreationException( msg );
         }
     }

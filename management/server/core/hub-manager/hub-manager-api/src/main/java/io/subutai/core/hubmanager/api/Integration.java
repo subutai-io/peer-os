@@ -11,7 +11,7 @@ public interface Integration
 {
     void sendHeartbeat() throws HubPluginException;
 
-    void sendOnlyHeartbeat() throws HubPluginException;
+    void triggerHeartbeat();
 
     void sendResourceHostInfo() throws HubPluginException;
 

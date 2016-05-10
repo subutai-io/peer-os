@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -95,8 +96,6 @@ public class IntegrationImpl implements Integration
 
     private ResourceHostConfProcessor resourceHostConfProcessor;
 
-    private SystemConfProcessor systemConfProcessor;
-
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
 
     private HubLoggerProcessor hubLoggerProcessor;
@@ -118,6 +117,8 @@ public class IntegrationImpl implements Integration
     private ProductProccessor productProccessor;
 
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+
+    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
 
     private String checksum = "";
 
@@ -227,10 +228,26 @@ public class IntegrationImpl implements Integration
     }
 
 
+    /**
+     * Called by Hub to trigger heartbeat on peer
+     */
     @Override
-    public void sendOnlyHeartbeat() throws HubPluginException
+    public void triggerHeartbeat()
     {
-        heartbeatProcessor.sendHeartbeat();
+        asyncHeartbeatExecutor.execute( new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    heartbeatProcessor.sendHeartbeat();
+                }
+                catch ( HubPluginException e )
+                {
+
+                }
+            }
+        } );
     }
 
 
@@ -522,8 +539,6 @@ public class IntegrationImpl implements Integration
 
     private void generateChecksum()
     {
-/*		if (getRegistrationState ())
-        {*/
         try
         {
             LOG.info( "Generating plugins list md5 checksum" );
@@ -550,11 +565,6 @@ public class IntegrationImpl implements Integration
             LOG.error( e.getMessage() );
             e.printStackTrace();
         }
-/*		}
-        else
-		{
-			LOG.info ("Peer not registered. Trying again in 1 hour.");
-		}*/
     }
 
 
@@ -590,16 +600,12 @@ public class IntegrationImpl implements Integration
                 else
                 {
                     LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
-                    //                    throw new HubPluginException(
-                    //                            "Could not send SS configuration to Hub: " + r.readEntity( String
-                    // .class ) );
                 }
             }
             catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
                     NoSuchAlgorithmException e )
             {
                 LOG.error( "Could not send SS configuration to Hub", e );
-                //                throw new HubPluginException( e.toString(), e );
             }
         }
     }
