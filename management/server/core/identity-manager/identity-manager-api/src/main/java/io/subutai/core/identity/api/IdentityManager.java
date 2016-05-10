@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.annotation.security.PermitAll;
+import javax.security.auth.Subject;
 
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
@@ -142,6 +142,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    User getSystemUser();
+
+
+    /* *************************************************
+     */
     User getActiveUser();
 
 
@@ -153,6 +158,11 @@ public interface IdentityManager
     /* *************************************************
      */
     void runAs( Session userSession, Callable action );
+
+
+    /* *************************************************
+     */
+    void runAs( Session userSession, Runnable action );
 
 
     /* *************************************************
@@ -229,6 +239,12 @@ public interface IdentityManager
     Role createRole( String roleName, int roleType );
 
 
+    /* ***********************************
+     *  Authenticate Internal User
+     */
+    Subject loginSystemUser();
+
+
     /* *************************************************
      *
      */
@@ -243,6 +259,7 @@ public interface IdentityManager
     /* *************************************************
      */
     Role getRole( long roleId );
+
 
     /* *************************************************
      */
