@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -116,6 +117,8 @@ public class IntegrationImpl implements Integration
     private ProductProccessor productProccessor;
 
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+
+    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
 
     private String checksum = "";
 
@@ -225,10 +228,26 @@ public class IntegrationImpl implements Integration
     }
 
 
+    /**
+     * Called by Hub to trigger heartbeat on peer
+     */
     @Override
-    public void sendOnlyHeartbeat() throws HubPluginException
+    public void triggerHeartbeat()
     {
-        heartbeatProcessor.sendHeartbeat();
+        asyncHeartbeatExecutor.execute( new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    heartbeatProcessor.sendHeartbeat();
+                }
+                catch ( HubPluginException e )
+                {
+
+                }
+            }
+        } );
     }
 
 
