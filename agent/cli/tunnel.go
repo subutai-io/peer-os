@@ -125,7 +125,7 @@ func TunList(restore bool) {
 			if ttl > int(time.Now().Unix()) {
 				f, err := ioutil.ReadFile("/proc/" + row[3] + "/cmdline")
 				if err == nil && strings.Contains(string(f), row[1]) && !restore {
-					fmt.Println(row[0] + " " + row[1])
+					fmt.Println(row[0] + " " + row[1] + " " + row[2])
 				} else if restore && !(err == nil && strings.Contains(string(f), row[1])) {
 					if row[4] == "global" {
 						Tunnel(row[1], strconv.Itoa(ttl-int(time.Now().Unix())), "-g")
