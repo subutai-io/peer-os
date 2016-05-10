@@ -12,6 +12,8 @@ import javax.ws.rs.core.Response;
 
 public interface RegistrationRestService
 {
+    //todo remove this method once this issue is done: https://github.com/subutai-io/base/issues/861
+    @Deprecated
     @GET
     @Path( "public-key" )
     @Produces( { MediaType.TEXT_PLAIN } )
