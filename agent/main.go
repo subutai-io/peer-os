@@ -303,6 +303,12 @@ func main() {
 				Action: func(c *cli.Context) {
 					lib.TunList(false)
 				}},
+			{
+				Name:  "del",
+				Usage: "delete tunnel",
+				Action: func(c *cli.Context) {
+					lib.TunDel(c.Args().Get(0))
+				}},
 		}}, {
 
 		Name: "unregister", Usage: "unregister Subutai container",

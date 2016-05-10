@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/subutai-io/base/agent/config"
@@ -102,7 +103,7 @@ func cleanup(pid string) {
 		if len(row) == 5 {
 			ttl, err := strconv.Atoi(row[2])
 			log.Check(log.ErrorLevel, "Converting timeout to int", err)
-			if ttl > int(time.Now().Unix()) && !(len(pid) != 0 && row[3] == pid) {
+			if ttl > int(time.Now().Unix()) && row[3] != pid {
 				tunAdd("ssh-tunnels.new", scanner.Text())
 			}
 		}
@@ -137,6 +138,26 @@ func TunList(restore bool) {
 			} else {
 				cleanup("")
 			}
+		}
+	}
+	log.Check(log.WarnLevel, "Scanning tunnel list", scanner.Err())
+}
+
+func TunDel(socket string) {
+	f, err := os.Open(config.Agent.DataPrefix + "var/subutai-network/ssh-tunnels")
+	log.Check(log.WarnLevel, "Opening tunnel list", err)
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		row := strings.Split(scanner.Text(), " ")
+		if len(row) == 5 && row[1] == socket {
+			cleanup(row[3])
+			pid, err := strconv.Atoi(row[3])
+			log.Check(log.FatalLevel, "Converting pid to int", err)
+			pgid, err := syscall.Getpgid(pid)
+			log.Check(log.FatalLevel, "Getting process group id", err)
+			log.Check(log.FatalLevel, "Killing tunnel process", syscall.Kill(-pgid, 15))
 		}
 	}
 	log.Check(log.WarnLevel, "Scanning tunnel list", scanner.Err())
