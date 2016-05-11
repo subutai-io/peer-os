@@ -244,7 +244,7 @@ public class IntegrationImpl implements Integration
                 }
                 catch ( HubPluginException e )
                 {
-
+                    LOG.error( "Error to send heartbeat: ", e );
                 }
             }
         } );
