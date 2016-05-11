@@ -26,10 +26,8 @@ type managementConfig struct {
 	Cdn           string
 	Host          string
 	Port          string
-	Login         string
 	Secret        string
 	GpgUser       string
-	Password      string
 	RestVerify    string
 	RestPublicKey string
 }
@@ -72,8 +70,6 @@ const defaultConfig = `
 	gpgUser =
 	port = 8443
 	host = 10.10.10.1
-	login = internal
-	password = secretSubutai
 	secret = secret
 	restPublicKey = /rest/v1/security/keyman/getpublickeyring	
 
