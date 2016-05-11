@@ -400,7 +400,7 @@ public class IdentityManagerImpl implements IdentityManager
                         .addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
             }
 
-            userToken.setToken( token );
+            userToken.setTokenId( token );
             userToken.setHashAlgorithm( "HS256" );
             userToken.setIssuer( issuer );
             userToken.setSecret( secret );

@@ -103,20 +103,19 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response getPublicKey( final String identityId )
     {
-        String key;
 
         try
         {
-            key = securityManager.getKeyManager().getPublicKeyRingAsASCII( identityId );
+            PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( identityId );
 
-            if ( Strings.isNullOrEmpty( key ) )
+            if ( pkey == null )
             {
                 logger.info( " ************* Public Key not found with id:" + identityId );
                 return Response.status( Response.Status.NOT_FOUND ).entity( "Object Not found" ).build();
             }
             else
             {
-                return Response.ok( key ).build();
+                return Response.ok( PGPKeyUtil.exportAscii( pkey ) ).build();
             }
         }
         catch ( Exception ex )

@@ -376,7 +376,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( {"Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
     public void resetP2PSecretKey( final String environmentId, final String newP2pSecretKey,
                                    final long p2pSecretKeyTtlSec, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException

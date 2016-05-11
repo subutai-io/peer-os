@@ -13,7 +13,8 @@ public enum PermissionObject
     EnvironmentManagement(3,"Environment-Management" ),
     ResourceManagement(4, "Resource-Management" ),
     TemplateManagement(5, "Template-Management" ),
-    KarafServerAdministration(6, "Karaf-Server-Administration" );
+    KarafServerAdministration(6, "Karaf-Server-Administration" ),
+    SystemManagement(7, "System-Management" );
 
     private String name;
     private int id;
