@@ -43,16 +43,16 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
-import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ProductProccessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.VehsProccessor;
+import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
+import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
+import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
+import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.processor.ProductProccessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostConfProcessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
+import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
+import io.subutai.core.hubmanager.impl.processor.VehsProccessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
@@ -158,7 +158,7 @@ public class IntegrationImpl implements Integration
                     new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, identityManager,
+                    new HubEnvironmentProcessor( hubEnvironmentManager, configManager, peerManager, identityManager,
                             commandExecutor, environmentUserHelper );
 
             StateLinkProccessor vehsProccessor =
@@ -222,8 +222,8 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendHeartbeat() throws HubPluginException
     {
-        heartbeatProcessor.sendHeartbeat();
         resourceHostConfProcessor.sendResourceHostConf();
+        heartbeatProcessor.sendHeartbeat();
         containerEventProcessor.process();
     }
 
