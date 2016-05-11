@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ import io.subutai.hub.share.json.JsonUtil;
 //TODO close web clients and responses
 public class VehsProccessor implements StateLinkProccessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
 
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
