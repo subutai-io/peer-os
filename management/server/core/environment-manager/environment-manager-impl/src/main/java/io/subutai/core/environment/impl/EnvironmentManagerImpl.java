@@ -433,6 +433,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
+        operationTracker.addLog("Logger initialized");
+
         createEnvironment( topology, async, operationTracker );
 
         return operationTracker.getId();
@@ -556,6 +558,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Modifying environment %s", environment.getId() ) );
+
+        operationTracker.addLog("Logger initialized");
 
         Set<Peer> allPeers = new HashSet<>();
 

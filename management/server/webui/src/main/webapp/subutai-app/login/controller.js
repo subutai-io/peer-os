@@ -47,16 +47,40 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 
 	vm.name = "";
 	vm.pass = "";
+	vm.fingerprint = "";
+	vm.sptoken = "";
 	vm.errorMessage = false;
+	vm.activeMode = 'username';
 
 	//functions
 	vm.login = login;
+	vm.changeMode = changeMode;
+
+	function changeMode(modeStatus) {
+		if(modeStatus) {
+			vm.activeMode = 'sptoken';
+		} else {
+			vm.activeMode = 'username';
+		}
+	}
 
 	function login() {
-		loginSrv.login( vm.name, vm.pass ).success(function(data){
+
+		var postData = '';
+		if(vm.activeMode == 'sptoken') {
+			postData =
+				'username=' + vm.fingerprint +
+				'&password=' + vm.sptoken;
+		} else {
+			postData =
+				'username=' + vm.name +
+				'&password=' + vm.pass;
+		}
+
+		loginSrv.login( postData ).success(function(data){
 			localStorage.setItem('currentUser', vm.name);
 			$rootScope.currentUser = vm.name;
-			$http.defaults.headers.common['sptoken']= getCookie('sptoken');
+			$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 			//$state.go('home');
 			window.location = '/';
 		}).error(function(error){
