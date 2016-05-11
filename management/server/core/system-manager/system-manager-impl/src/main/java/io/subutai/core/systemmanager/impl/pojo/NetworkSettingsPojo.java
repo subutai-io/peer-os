@@ -12,6 +12,20 @@ public class NetworkSettingsPojo implements NetworkSettings
     public String publicUrl;
     public int agentPort;
     public int publicSecurePort;
+    public String keyServer;
+
+
+    public String getKeyServer()
+    {
+        return keyServer;
+    }
+
+
+    public void setKeyServer( final String keyServer )
+    {
+        this.keyServer = keyServer;
+    }
+
 
     public int getAgentPort()
     {
