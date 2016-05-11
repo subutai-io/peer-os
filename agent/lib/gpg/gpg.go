@@ -9,8 +9,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 
+	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/log"
@@ -21,8 +21,8 @@ const (
 )
 
 //ImportPk import PK gpg2 --import pubkey.key
-func ImportPk(k string) string {
-	err := ioutil.WriteFile(tmpfile, []byte(k), 0644)
+func ImportPk(k []byte) string {
+	err := ioutil.WriteFile(tmpfile, k, 0644)
 	log.Check(log.WarnLevel, "Writing Pubkey to temp file", err)
 
 	command := exec.Command("gpg", "--import", tmpfile)
@@ -67,14 +67,14 @@ func DecryptWrapper(args ...string) string {
 	return string(output)
 }
 
-func EncryptWrapper(args ...string) string {
-	gpg := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always --armor -u " + args[0] + " -r " + args[1] + " --sign --encrypt --no-tty"
-	if len(args) == 5 {
-		gpg = gpg + " --no-default-keyring --keyring " + args[3] + " --secret-keyring " + args[4]
+func EncryptWrapper(user, recipient string, message []byte, args ...string) string {
+	gpg := "gpg --batch --passphrase " + config.Agent.GpgPassword + " --trust-model always --armor -u " + user + " -r " + recipient + " --sign --encrypt --no-tty"
+	if len(args) >= 2 {
+		gpg = gpg + " --no-default-keyring --keyring " + args[0] + " --secret-keyring " + args[1]
 	}
 	command := exec.Command("/bin/bash", "-c", gpg)
 	stdin, _ := command.StdinPipe()
-	stdin.Write([]byte(args[2]))
+	stdin.Write(message)
 	stdin.Close()
 
 	output, err := command.Output()
@@ -144,31 +144,12 @@ func GetFingerprint(email string) string {
 	return ""
 }
 
-func GetToken() string {
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr, Timeout: 3 * time.Second}
-
-	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestToken + "?username=" + config.Management.Login + "&password=" + config.Management.Password)
-	if log.Check(log.DebugLevel, "Getting token", err) {
-		return ""
-	}
-
-	defer resp.Body.Close()
-	token, _ := ioutil.ReadAll(resp.Body)
-
-	if resp.StatusCode != 200 {
-		return ""
-	}
-
-	return string(token)
-}
-
 func getMngKey(c string) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	client := &http.Client{Transport: tr}
-	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestPublicKey + "?sptoken=" + GetToken())
+	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestPublicKey)
 	log.Check(log.FatalLevel, "Getting Management public key", err)
 
 	defer resp.Body.Close()
@@ -210,11 +191,8 @@ func sendData(c string) {
 	log.Check(log.FatalLevel, "Reading encrypted stdin.txt.asc", err)
 	defer asc.Close()
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-	resp, err := client.Post("https://"+config.Management.Host+":"+config.Management.Port+config.Management.RestVerify+"?sptoken="+GetToken(), "text/plain", asc)
+	client := utils.TLSConfig()
+	resp, err := client.Post("https://"+config.Management.Host+":8444/rest/v1/registration/verify/container-token", "text/plain", asc)
 	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt.asc")
 	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt")
 	log.Check(log.FatalLevel, "Sending registration request to management", err)

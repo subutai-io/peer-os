@@ -47,46 +47,42 @@ func Connect(user, pass string) {
 	})
 	log.Check(log.WarnLevel, "Marshal Resource host json: "+string(rh), err)
 
-	url := "https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestPublicKey + "?sptoken=" + gpg.GetToken()
-	pk := getKey(url)
-	if len(pk) == 0 {
-		return
-	}
-	gpg.ImportPk(pk)
+	if pk := getKey(); pk != nil {
+		gpg.ImportPk(pk)
+		config.Management.GpgUser = extractKeyID(pk)
 
-	config.Management.GpgUser = extractKeyID(pk)
+		client := &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+		resp, err := client.Post("https://"+config.Management.Host+":"+config.Management.Port+"/rest/v1/registration/public-key", "text/plain",
+			bytes.NewBuffer([]byte(gpg.EncryptWrapper(user, config.Management.GpgUser, rh))))
 
-	client := &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
-	resp, err := client.Post(url, "text/plain",
-		bytes.NewBuffer([]byte(gpg.EncryptWrapper(user, config.Management.GpgUser, string(rh)))))
-
-	if !log.Check(log.WarnLevel, "POSTing request to "+url, err) {
-		resp.Body.Close()
+		if !log.Check(log.WarnLevel, "POSTing registration request to SS", err) {
+			resp.Body.Close()
+		}
 	}
 }
 
-func getKey(url string) string {
+func getKey() []byte {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr, Timeout: time.Second * 5}
-	resp, err := client.Get(url)
+	resp, err := client.Get("https://" + config.Management.Host + ":" + config.Management.Port + config.Management.RestPublicKey)
 	if log.Check(log.WarnLevel, "Getting Management host Public Key", err) {
-		return ""
+		return nil
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		key, _ := ioutil.ReadAll(resp.Body)
-		return string(key)
+		return key
 	}
 
-	log.Warn("Failed to fetch PK from Management Server. Status Code " + strconv.Itoa(resp.StatusCode) + " url " + url)
-	return ""
+	log.Warn("Failed to fetch PK from Management Server. Status Code " + strconv.Itoa(resp.StatusCode))
+	return nil
 }
 
-func extractKeyID(k string) string {
+func extractKeyID(k []byte) string {
 	command := exec.Command("gpg")
 	stdin, err := command.StdinPipe()
-	stdin.Write([]byte(k))
+	stdin.Write(k)
 	stdin.Close()
 	out, err := command.Output()
 	log.Check(log.WarnLevel, "Extracting ID from Key", err)

@@ -30,7 +30,6 @@ type managementConfig struct {
 	Secret        string
 	GpgUser       string
 	Password      string
-	RestToken     string
 	RestVerify    string
 	RestPublicKey string
 }
@@ -76,9 +75,7 @@ const defaultConfig = `
 	login = internal
 	password = secretSubutai
 	secret = secret
-	restToken = /rest/v1/identity/gettoken
-	restPublicKey = /rest/v1/registration/public-key
-	restVerify = /rest/v1/registration/verify/container-token
+	restPublicKey = /rest/v1/security/keyman/getpublickeyring	
 
     [cdn]
     url = cdn.subut.ai

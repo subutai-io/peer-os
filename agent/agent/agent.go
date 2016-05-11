@@ -57,16 +57,20 @@ func initAgent() {
 
 	instanceType = utils.InstanceType()
 	instanceArch = strings.ToUpper(runtime.GOARCH)
-	client = tlsConfig()
+	client = utils.TLSConfig()
 }
 
 func Start(c *cli.Context) {
+	initAgent()
+	for !checkSS() {
+		time.Sleep(time.Second * 3)
+	}
+
 	http.HandleFunc("/trigger", trigger)
 	http.HandleFunc("/ping", ping)
 	http.HandleFunc("/heartbeat", heartbeatCall)
 	go http.ListenAndServe(":7070", nil)
 
-	initAgent()
 	go lib.Collect()
 	go connectionMonitor()
 	go alert.AlertProcessing()
@@ -82,8 +86,24 @@ func Start(c *cli.Context) {
 	}
 }
 
+func checkSS() (status bool) {
+	resp, err := client.Get("https://" + config.Management.Host + ":8443/rest/v1/peer/inited")
+	if err == nil {
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return true
+		}
+	}
+	return false
+}
+
 func connectionMonitor() {
 	for {
+		if !checkSS() {
+			time.Sleep(time.Second * 3)
+			continue
+		}
+
 		if fingerprint == "" || config.Management.GpgUser == "" {
 			fingerprint = gpg.GetFingerprint("rh@subutai.io")
 			connect.Connect(config.Agent.GpgUser, config.Management.Secret)
@@ -133,7 +153,7 @@ func heartbeat() bool {
 
 	message, err := json.Marshal(map[string]string{
 		"hostId":   fingerprint,
-		"response": gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jbeat)),
+		"response": gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, jbeat),
 	})
 	log.Check(log.WarnLevel, "Marshal response json", err)
 
@@ -190,9 +210,9 @@ func execute(rsp executer.EncRequest) {
 			jsonR, err := json.Marshal(resp)
 			log.Check(log.WarnLevel, "Marshal response", err)
 			if rsp.HostId == fingerprint {
-				payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, string(jsonR))
+				payload = gpg.EncryptWrapper(config.Agent.GpgUser, config.Management.GpgUser, jsonR)
 			} else {
-				payload = gpg.EncryptWrapper(contName, config.Management.GpgUser, string(jsonR), pub, keyring)
+				payload = gpg.EncryptWrapper(contName, config.Management.GpgUser, jsonR, pub, keyring)
 			}
 			message, err := json.Marshal(map[string]string{
 				"hostId":   elem.Id,
@@ -205,20 +225,6 @@ func execute(rsp executer.EncRequest) {
 		}
 	}
 	go heartbeat()
-}
-
-func tlsConfig() *http.Client {
-	tlsconfig := newTLSConfig()
-	for tlsconfig == nil || len(tlsconfig.Certificates[0].Certificate) == 0 {
-		time.Sleep(time.Second * 2)
-		for utils.PublicCert() == "" {
-			x509generate()
-		}
-		tlsconfig = newTLSConfig()
-	}
-
-	transport := &http.Transport{TLSClientConfig: tlsconfig}
-	return &http.Client{Transport: transport, Timeout: time.Second * 30}
 }
 
 func response(msg []byte) {
