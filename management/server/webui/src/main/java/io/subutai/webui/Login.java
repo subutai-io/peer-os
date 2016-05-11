@@ -81,15 +81,15 @@ public class Login extends HttpServlet
             }
             else
             {
-                request.setAttribute( "error", "Wrong Username or Password !!!" );
-                response.getWriter().write( "Error, Wrong Username or Password" );
+                request.setAttribute( "error", "Wrong Auth Credentials !!!" );
+                response.getWriter().write( "Error, Wrong Auth Credentials" );
                 response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
             }
         }
         catch ( Exception e )
         {
             request.setAttribute( "error", "karaf exceptions !!!" );
-            response.getWriter().write( "Error, karaf exceptions !!!" );
+            response.getWriter().write( "Error: " + e.getMessage() );
             response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
         }
     }
