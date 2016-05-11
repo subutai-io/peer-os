@@ -18,10 +18,7 @@ function loginSrv($http)
 	return loginSrv;
 
 
-	function login( user, pass ) {
-		var postData =
-			'username=' + user +
-			'&password=' + pass;
+	function login( postData ) {
 		return $http.post(LOGIN_URL, postData, {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
 	}
 
