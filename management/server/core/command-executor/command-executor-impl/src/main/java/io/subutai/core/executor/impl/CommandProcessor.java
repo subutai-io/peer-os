@@ -335,7 +335,7 @@ public class CommandProcessor implements RestProcessor
 
             if ( commandProcess != null )
             {
-                LOG.debug( String.format( "Response:%n%s", JsonUtil.toJson( response ) ) );
+                LOG.debug( "Response: {}", response );
 
                 commandProcess.processResponse( response );
             }
