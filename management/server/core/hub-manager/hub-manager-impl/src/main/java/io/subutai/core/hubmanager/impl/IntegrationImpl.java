@@ -49,7 +49,7 @@ import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
-import io.subutai.core.hubmanager.impl.processor.ResourceHostConfProcessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
@@ -94,7 +94,7 @@ public class IntegrationImpl implements Integration
 
     private HeartbeatProcessor heartbeatProcessor;
 
-    private ResourceHostConfProcessor resourceHostConfProcessor;
+    private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
 
@@ -143,7 +143,7 @@ public class IntegrationImpl implements Integration
 
             heartbeatProcessor = new HeartbeatProcessor( this, configManager );
 
-            resourceHostConfProcessor = new ResourceHostConfProcessor( this, peerManager, configManager, monitor );
+            resourceHostDataProcessor = new ResourceHostDataProcessor( this, peerManager, configManager, monitor );
 
             hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
@@ -167,22 +167,22 @@ public class IntegrationImpl implements Integration
 
             StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
-            heartbeatProcessor.addProccessor( vehsProccessor );
-            heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
-            heartbeatProcessor.addProccessor( systemConfProcessor );
-            heartbeatProcessor.addProccessor( productProccessor );
+            heartbeatProcessor.addProcessor( vehsProccessor );
+            heartbeatProcessor.addProcessor( hubEnvironmentProccessor );
+            heartbeatProcessor.addProcessor( systemConfProcessor );
+            heartbeatProcessor.addProcessor( productProccessor );
 
             AppScaleProcessor appScaleProcessor =
                     new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
-            heartbeatProcessor.addProccessor( appScaleProcessor );
+            heartbeatProcessor.addProcessor( appScaleProcessor );
 
-            heartbeatProcessor.addProccessor( tunnelProcessor );
+            heartbeatProcessor.addProcessor( tunnelProcessor );
 
             hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
 
             resourceHostConfExecutorService
-                    .scheduleWithFixedDelay( resourceHostConfProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
             resourceHostMonitorExecutorService
                     .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
@@ -222,7 +222,7 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendHeartbeat() throws HubPluginException
     {
-        resourceHostConfProcessor.sendResourceHostConf();
+        resourceHostDataProcessor.process();
         heartbeatProcessor.sendHeartbeat();
         containerEventProcessor.process();
     }
@@ -238,14 +238,7 @@ public class IntegrationImpl implements Integration
         {
             public void run()
             {
-                try
-                {
-                    heartbeatProcessor.sendHeartbeat();
-                }
-                catch ( HubPluginException e )
-                {
-                    LOG.error( "Error to send heartbeat: ", e );
-                }
+                heartbeatProcessor.sendHeartbeat();
             }
         } );
     }
@@ -254,7 +247,7 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendResourceHostInfo() throws HubPluginException
     {
-        resourceHostConfProcessor.sendResourceHostConf();
+        resourceHostDataProcessor.process();
     }
 
 
