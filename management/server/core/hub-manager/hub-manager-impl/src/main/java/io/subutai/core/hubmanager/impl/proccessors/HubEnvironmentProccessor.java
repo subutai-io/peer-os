@@ -114,9 +114,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 final EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
                 UserDto userDto = getUserDataFromHub( envPeerDto.getOwnerId() );
                 Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
+
                 if ( isTrustedUser )
                 {
-
                     if ( envPeerDto.getEnvOwnerToken() == null )
                     {
                         final Session session = identityManager.login( "token", envPeerDto.getPeerToken() );
@@ -145,6 +145,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                             }
                         } );
                     }
+
                     final Session session = identityManager.login( "token", envPeerDto.getEnvOwnerToken() );
                     Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
                     {
@@ -179,18 +180,23 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
-            LOG.debug( "Getting Environment peer data from Hub..." );
-            Response r = client.get();
+            LOG.debug( "Getting EnvironmentPeerDto from Hub..." );
+
+            Response response = client.get();
+
             client.close();
-            byte[] encryptedContent = configManager.readContent( r );
+
+            byte[] encryptedContent = configManager.readContent( response );
+
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
-            LOG.debug( "EnvironmentPeerDto: " + result.toString() );
+            LOG.debug( "Response: {} - {}", response.getStatus(), response.getStatusInfo().getReasonPhrase() );
+
             return result;
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( Exception e )
         {
             throw new HubPluginException( "Could not retrieve environment peer data", e );
         }
