@@ -15,13 +15,13 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.collect.Sets;
 
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 //TODO close web clients and responses
-public class AppScaleProcessor implements StateLinkProccessor
+public class AppScaleProcessor implements StateLinkProcessor
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 

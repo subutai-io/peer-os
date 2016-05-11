@@ -20,7 +20,7 @@ import org.apache.http.HttpStatus;
 import com.google.common.collect.Sets;
 
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.IntegrationImpl;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
@@ -31,7 +31,7 @@ public class HeartbeatProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( HeartbeatProcessor.class );
     private ConfigManager configManager;
-    private Set<StateLinkProccessor> proccessors = Sets.newHashSet();
+    private Set<StateLinkProcessor> proccessors = Sets.newHashSet();
     private IntegrationImpl manager;
 
 
@@ -88,7 +88,7 @@ public class HeartbeatProcessor implements Runnable
 
                     result.addAll( new HashSet<>( response.getStateLinks() ) );
 
-                    for ( final StateLinkProccessor proccessor : proccessors )
+                    for ( StateLinkProcessor proccessor : proccessors )
                     {
                         try
                         {
@@ -114,7 +114,7 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    public void addProccessor( StateLinkProccessor proccessor )
+    public void addProccessor( StateLinkProcessor proccessor )
     {
         proccessors.add( proccessor );
     }

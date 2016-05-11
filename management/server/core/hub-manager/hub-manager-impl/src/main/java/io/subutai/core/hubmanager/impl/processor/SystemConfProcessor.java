@@ -19,13 +19,13 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 //TODO close web clients and responses
-public class SystemConfProcessor implements StateLinkProccessor
+public class SystemConfProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemConfProcessor.class.getName() );
     private ConfigManager configManager;

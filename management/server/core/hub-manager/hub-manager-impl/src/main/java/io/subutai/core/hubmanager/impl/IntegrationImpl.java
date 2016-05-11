@@ -37,7 +37,7 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.Integration;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
@@ -48,11 +48,11 @@ import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.processor.ProductProccessor;
+import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
-import io.subutai.core.hubmanager.impl.processor.VehsProccessor;
+import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
@@ -114,7 +114,7 @@ public class IntegrationImpl implements Integration
 
     private ContainerEventProcessor containerEventProcessor;
 
-    private ProductProccessor productProccessor;
+    private ProductProcessor productProccessor;
 
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
@@ -150,22 +150,22 @@ public class IntegrationImpl implements Integration
             resourceHostMonitorProcessor =
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
-            productProccessor = new ProductProccessor( configManager );
+            productProccessor = new ProductProcessor( configManager );
 
-            StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
+            StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
 
             EnvironmentUserHelper environmentUserHelper =
                     new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
 
-            StateLinkProccessor hubEnvironmentProccessor =
+            StateLinkProcessor hubEnvironmentProccessor =
                     new HubEnvironmentProcessor( hubEnvironmentManager, configManager, peerManager, identityManager,
                             commandExecutor, environmentUserHelper );
 
-            StateLinkProccessor vehsProccessor =
-                    new VehsProccessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
+            StateLinkProcessor vehsProccessor =
+                    new VehsProcessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
                             environmentUserHelper );
 
-            StateLinkProccessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
+            StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
             heartbeatProcessor.addProccessor( vehsProccessor );
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
