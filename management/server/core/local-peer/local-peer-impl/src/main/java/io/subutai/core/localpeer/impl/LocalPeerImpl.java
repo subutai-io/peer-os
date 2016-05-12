@@ -97,6 +97,7 @@ import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.HostUtil;
 import io.subutai.common.util.P2PUtil;
@@ -1145,7 +1146,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public CommandResult execute( final RequestBuilder requestBuilder, final Host aHost,
                                   final CommandCallback callback ) throws CommandException
     {
-       Preconditions.checkNotNull( requestBuilder, "Invalid request" );
+        Preconditions.checkNotNull( requestBuilder, "Invalid request" );
         Preconditions.checkNotNull( aHost, "Invalid host" );
 
         CommandResult result;
@@ -1267,7 +1268,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
 
-        if ( isInitialized() )
+        if ( isInitialized() && !CollectionUtil.isCollectionEmpty( resourceHostInfo.getHostInterfaces().getAll() ) )
         {
             boolean firstMhRegistration = false;
 
@@ -1292,12 +1293,19 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 LOG.debug( String.format( "Resource host %s registered.", resourceHostInfo.getHostname() ) );
 
-                for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
+                try
                 {
-                    if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getHostname() ) )
+                    getManagementHost();
+                }
+                catch ( HostNotFoundException ignore )
+                {
+                    for ( ContainerHostInfo containerHostInfo : resourceHostInfo.getContainers() )
                     {
-                        firstMhRegistration = true;
-                        break;
+                        if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( containerHostInfo.getHostname() ) )
+                        {
+                            firstMhRegistration = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -2296,9 +2304,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             getNetworkManager().removeVlanDomain( networkResource.getVlan() );
-            getNetworkManager()
-                    .setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(), netInterface.getIp(),
-                            reverseProxyConfig.getSslCertPath() );
+            getNetworkManager().setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(),
+                    DomainLoadBalanceStrategy.LOAD_BALANCE, reverseProxyConfig.getSslCertPath() );
+            getNetworkManager().addIpToVlanDomain( netInterface.getIp(), networkResource.getVlan() );
         }
         catch ( Exception e )
         {

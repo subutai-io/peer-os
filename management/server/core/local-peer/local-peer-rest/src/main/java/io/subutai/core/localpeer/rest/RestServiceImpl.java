@@ -21,6 +21,7 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
@@ -48,22 +49,30 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response isInited()
+    public Response isMhPresent()
     {
-        boolean inited = localPeer.isInitialized();
+        boolean mhPresent = localPeer.isInitialized();
 
         try
         {
-            localPeer.getManagementHost();
+            ResourceHost mh = localPeer.getManagementHost();
 
-            inited &= true;
+            mhPresent &= mh.isConnected();
         }
-        catch ( HostNotFoundException e )
+        catch ( HostNotFoundException ignore )
         {
-            inited = false;
+            mhPresent = false;
         }
 
-        return inited ? Response.ok().build() : Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
+        return mhPresent ? Response.ok().build() : Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
+    }
+
+
+    @Override
+    public Response isInited()
+    {
+        return localPeer.isInitialized() ? Response.ok().build() :
+               Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
     }
 
 

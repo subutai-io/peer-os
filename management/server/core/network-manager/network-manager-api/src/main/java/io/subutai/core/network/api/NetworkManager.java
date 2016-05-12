@@ -79,7 +79,6 @@ public interface NetworkManager
     public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
                                String sslCertPath ) throws NetworkManagerException;
 
-    void setVlanDomain( int vLanId, String domain, String host, String sslCertPath ) throws NetworkManagerException;
 
     /**
      * Checks if IP is in vlan reverse proxy domain
