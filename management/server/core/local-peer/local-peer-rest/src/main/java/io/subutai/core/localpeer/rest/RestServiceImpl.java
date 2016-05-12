@@ -17,7 +17,6 @@ import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
@@ -50,20 +49,8 @@ public class RestServiceImpl implements RestService
     @Override
     public Response isInited()
     {
-        boolean inited = localPeer.isInitialized();
-
-        try
-        {
-            localPeer.getManagementHost();
-
-            inited &= true;
-        }
-        catch ( HostNotFoundException e )
-        {
-            inited = false;
-        }
-
-        return inited ? Response.ok().build() : Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
+        return localPeer.isInitialized() ? Response.ok().build() :
+               Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
     }
 
 
