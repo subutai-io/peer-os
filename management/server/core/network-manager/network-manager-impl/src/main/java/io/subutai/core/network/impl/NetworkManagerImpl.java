@@ -263,8 +263,7 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
-        Preconditions.checkArgument( domain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
-        Preconditions.checkNotNull( host, "Invalid host" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( host ), "Invalid host" );
 
         execute( getManagementHost(), commands.getSetVlanDomainCommand( vLanId, domain, host, sslCertPath ) );
     }
