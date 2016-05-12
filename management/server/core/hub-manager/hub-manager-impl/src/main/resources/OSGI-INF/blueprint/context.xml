@@ -23,7 +23,7 @@
     </command>
   </command-bundle>
 
-  <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor" />
+  <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor" />
   <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
 
 
