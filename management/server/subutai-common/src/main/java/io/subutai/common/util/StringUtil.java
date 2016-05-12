@@ -83,9 +83,9 @@ public class StringUtil
     }
 
 
-    public static boolean areStringsEqual( String str1, String str2 )
+    public static boolean areStringsEqual( String str1, String str2, boolean ignoreCase )
     {
-        return str1 != null && str2 != null && str2.equals( str1 );
+        return str1 != null && str2 != null && ( ignoreCase ? str1.equalsIgnoreCase( str2 ) : str1.equals( str2 ) );
     }
 
 
@@ -118,7 +118,4 @@ public class StringUtil
         }
         return 0;
     }
-
-
-
 }

@@ -13,6 +13,8 @@
 
   <reference id="environmentManager" availability="mandatory"
              interface="io.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="secureEnvironmentManager" availability="mandatory"
+             interface="io.subutai.core.environment.api.SecureEnvironmentManager" />
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
@@ -28,6 +30,7 @@
     <argument ref="templateRegistry" />
     <argument ref="strategyManager" />
     <argument ref="quotaManager" />
+    <property name="secureEnvironmentManager" ref="secureEnvironmentManager" />
   </bean>
 
   <jaxrs:server address="/ui/environments" id="environmentRestUIService">

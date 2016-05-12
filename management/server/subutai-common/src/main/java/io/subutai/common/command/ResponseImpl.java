@@ -3,7 +3,10 @@ package io.subutai.common.command;
 
 import java.util.UUID;
 
-import com.google.common.base.MoreObjects;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.google.common.base.Preconditions;
 
 
@@ -96,8 +99,15 @@ public class ResponseImpl implements Response
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper( this ).add( "type", type ).add( "id", id ).add( "commandId", commandId )
-                          .add( "pid", pid ).add( "responseNumber", responseNumber ).add( "stdOut", stdOut )
-                          .add( "stdErr", stdErr ).add( "exitCode", exitCode ).toString();
+        return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE )
+                .append( "type", type )
+                .append( "id", id )
+                .append( "commandId", commandId )
+                .append( "pid", pid )
+                .append( "responseNumber", responseNumber )
+                .append( "stdOut", StringUtils.abbreviate( stdOut, 500 ) )
+                .append( "stdErr", stdErr )
+                .append( "exitCode", exitCode )
+                .toString();
     }
 }

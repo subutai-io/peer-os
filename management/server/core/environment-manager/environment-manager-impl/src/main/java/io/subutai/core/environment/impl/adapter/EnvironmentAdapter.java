@@ -273,4 +273,10 @@ public class EnvironmentAdapter
             rhs.add( rhJson );
         }
     }
+
+
+    public boolean isRegistered()
+    {
+        return hubAdapter.isRegistered();
+    }
 }

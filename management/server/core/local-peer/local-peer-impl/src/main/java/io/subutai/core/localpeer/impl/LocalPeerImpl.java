@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -34,7 +35,6 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -62,7 +62,6 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
@@ -90,6 +89,11 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.task.CloneRequest;
@@ -126,11 +130,6 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
-import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -233,6 +232,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         initialized = true;
+    }
+
+
+    @Override
+    public boolean isInitialized()
+    {
+        return initialized;
     }
 
 
@@ -405,11 +411,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public SshPublicKeys generateSshKeyForEnvironment( final EnvironmentId environmentId ) throws PeerException
+    public SshKeys readOrCreateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                      final SshEncryptionType sshKeyType ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
+        Preconditions.checkNotNull( sshKeyType, "Ssh key type is null" );
 
-        SshPublicKeys sshPublicKeys = new SshPublicKeys();
+        SshKeys sshPublicKeys = new SshKeys();
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -421,7 +429,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults readResults = commandUtil
-                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand(), hosts, environmentId.getId() );
+                .executeFailFast( localPeerCommands.getReadOrCreateSSHCommand( sshKeyType ), hosts,
+                        environmentId.getId() );
 
         Set<Host> succeededHosts = Sets.newHashSet();
         Set<Host> failedHosts = Sets.newHashSet( hosts );
@@ -430,7 +439,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
             {
-                sshPublicKeys.addSshPublicKey( result.getCommandResult().getStdOut() );
+                sshPublicKeys.addKey( new SshKey( result.getHost().getId(), sshKeyType,
+                        result.getCommandResult().getStdOut().trim() ) );
 
                 succeededHosts.add( result.getHost() );
             }
@@ -453,12 +463,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
-        Preconditions.checkNotNull( sshPublicKeys, "SshPublicKey is null" );
-        Preconditions.checkArgument( !sshPublicKeys.isEmpty(), "No ssh keys" );
+        Preconditions.checkNotNull( sshKeys, "SshPublicKey is null" );
+        Preconditions.checkArgument( !sshKeys.isEmpty(), "No ssh keys" );
 
         Set<Host> hosts = Sets.newHashSet();
 
@@ -470,14 +480,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         //add keys in portions, since all can not fit into one command, it fails
-        int portionSize = 100;
+        int portionSize = Common.MAX_KEYS_IN_ECHO_CMD;
         int i = 0;
         StringBuilder keysString = new StringBuilder();
-        Set<String> keys = sshPublicKeys.getSshPublicKeys();
+        Set<SshKey> keys = sshKeys.getKeys();
 
-        for ( String key : keys )
+        for ( SshKey key : keys )
         {
-            keysString.append( key );
+            keysString.append( key.getPublicKey() ).append( System.lineSeparator() );
 
             i++;
 
@@ -538,13 +548,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
 
         SshKeys sshKeys = new SshKeys();
+
         if ( hosts.isEmpty() )
         {
             return sshKeys;
         }
 
-        CommandUtil.HostCommandResults results =
-                commandUtil.executeParallel( localPeerCommands.getReadSSHKeyCommand( sshEncryptionType ), hosts );
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getReadSSHKeyCommand( sshEncryptionType ), hosts, environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {
@@ -556,7 +567,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             else
             {
                 sshKeys.addKey( new SshKey( result.getHost().getId(), sshEncryptionType,
-                        result.getCommandResult().getStdOut() ) );
+                        result.getCommandResult().getStdOut().trim() ) );
             }
         }
 
@@ -580,12 +591,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 throw new HostNotFoundException( "Environment does not contains requested container." );
             }
 
-            CommandResult commandResult =
-                    commandUtil.execute( localPeerCommands.getCreateSSHKeyCommand( sshEncryptionType ), containerHost );
+            CommandResult commandResult = commandUtil
+                    .execute( localPeerCommands.getReadOrCreateSSHCommand( sshEncryptionType ), containerHost );
 
             if ( commandResult.hasSucceeded() )
             {
-                return new SshKey( containerId.getId(), sshEncryptionType, commandResult.getStdOut() );
+                return new SshKey( containerId.getId(), sshEncryptionType, commandResult.getStdOut().trim() );
             }
             else
             {
@@ -615,7 +626,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         CommandUtil.HostCommandResults results = commandUtil
-                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey ), hosts,
+                .executeFailFast( localPeerCommands.getAppendSshKeyCommand( sshPublicKey.trim() ), hosts,
                         environmentId.getId() );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
@@ -670,8 +681,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PrepareTemplatesResponse prepareTemplates( final PrepareTemplatesRequest request ) throws PeerException
     {
@@ -699,8 +709,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public CreateEnvironmentContainersResponse createEnvironmentContainers(
             final CreateEnvironmentContainersRequest requestGroup ) throws PeerException
@@ -978,8 +987,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void startContainer( final ContainerId containerId ) throws PeerException
     {
@@ -1001,8 +1009,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void stopContainer( final ContainerId containerId ) throws PeerException
     {
@@ -1024,14 +1031,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void destroyContainer( final ContainerId containerId ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Cannot operate on null container id" );
 
-        ContainerHostEntity host = bindHost( containerId );
+        ContainerHostEntity host;
+        try
+        {
+            host = bindHost( containerId );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return;
+        }
+
         ResourceHost resourceHost = host.getParent();
 
         try
@@ -1252,7 +1267,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         LOG.debug( "On heartbeat: " + resourceHostInfo.getHostname() );
 
-        if ( initialized )
+        if ( isInitialized() )
         {
             boolean firstMhRegistration = false;
 
@@ -1333,6 +1348,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "bandwidthControl", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
             {
@@ -1559,8 +1579,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public int setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout ) throws PeerException
     {
@@ -1627,8 +1646,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     /* ***********************************************
      *  Create PEK
      */
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto envLink ) throws PeerException
     {
@@ -1691,6 +1709,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             relationTraits.put( "hostEnvironment", "true" );
             relationTraits.put( "containerLimit", "unlimited" );
             relationTraits.put( "bandwidthLimit", "unlimited" );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( peerOwner, this, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
@@ -1733,6 +1755,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
             relationTraits.put( "encryptMessage", "true" );
             relationTraits.put( "decryptMessage", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
 
             RelationMeta relationMeta = new RelationMeta( this, peerLink, envLink, this.getKeyId() );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
@@ -1869,8 +1896,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION BEGIN --------------------
 
 
-    //TODO this is for basic environment via hub
-    //@RolesAllowed( "Environment-Management|Write" )
+    @RolesAllowed( "Environment-Management|Write" )
     @Override
     public void setupTunnels( final P2pIps p2pIps, final EnvironmentId environmentId ) throws PeerException
     {
@@ -1947,8 +1973,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void joinP2PSwarm( final P2PConfig config ) throws PeerException
     {
@@ -2051,8 +2076,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //----------- P2P SECTION END --------------------
 
 
-    //TODO this is for basic environment via hub
-    //    @RolesAllowed( "Environment-Management|Delete" )
+    @RolesAllowed( "Environment-Management|Delete" )
     @Override
     public void cleanupEnvironment( final EnvironmentId environmentId ) throws PeerException
     {
@@ -2254,11 +2278,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         ContainerHost containerHost = getContainerHostById( reverseProxyConfig.getContainerId() );
 
-        if ( containerHost == null )
-        {
-            throw new PeerException( "Container host not found." );
-        }
-
         final NetworkResource networkResource =
                 getReservedNetworkResources().findByEnvironmentId( containerHost.getEnvironmentId().getId() );
 
@@ -2277,14 +2296,49 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         try
         {
             getNetworkManager().removeVlanDomain( networkResource.getVlan() );
-            getNetworkManager()
-                    .setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(), netInterface.getIp(),
-                            reverseProxyConfig.getSslCertPath() );
+            getNetworkManager().setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(),
+                    DomainLoadBalanceStrategy.LOAD_BALANCE, reverseProxyConfig.getSslCertPath() );
+            getNetworkManager().addIpToVlanDomain( netInterface.getIp(), networkResource.getVlan() );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
-            throw new PeerException( "Error on adding reverse proxy." );
+            throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
+        }
+    }
+
+
+    @Override
+    public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        ContainerHost containerHost = getContainerHostById( containerId.getId() );
+
+        //check if container with new hostname already exists on peer
+        try
+        {
+            getContainerHostByName( hostname );
+
+            throw new PeerException( String.format( "Container with hostname %s already exists", hostname ) );
+        }
+        catch ( HostNotFoundException ignore )
+        {
+            //ignore since all is ok
+        }
+
+        try
+        {
+            ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
+
+            resourceHost.setContainerHostname( containerHost, hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException(
+                    String.format( "Error setting container %s hostname: %s", containerId.getId(), e.getMessage() ) );
         }
     }
 

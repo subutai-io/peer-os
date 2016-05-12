@@ -40,7 +40,7 @@ import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.json.JsonUtil;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
-
+//TODO close web clients and responses
 public class RegistrationManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class );
@@ -75,6 +75,7 @@ public class RegistrationManager
         peerInfoDto.setVersion( ssVersion );
         peerInfoDto.setName( configManager.getPeerManager().getLocalPeer().getName() );
         registrationData.setPeerInfo( peerInfoDto );
+        registrationData.setToken( configManager.getPermanentToken() );
 
         register( configManager.getPeerId(), registrationData );
         sentTrustData( configManager.getPeerPublicKey(), configManager.getOwnerPublicKey() );

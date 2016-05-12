@@ -12,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -21,6 +20,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKeys;
 
 
 public interface EnvironmentRestService
@@ -42,6 +42,10 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( { MediaType.APPLICATION_JSON } )
     void destroyContainer( @PathParam( "id" ) ContainerId containerId );
+
+    @POST
+    @Path( "{environmentId}/container/{id}/hostname" )
+    void setContainerHostname( @PathParam( "id" ) ContainerId containerId, String hostname );
 
 
     @GET
@@ -79,13 +83,13 @@ public interface EnvironmentRestService
     @POST
     @Path( "{environmentId}/containers/sshkeys" )
     @Consumes( MediaType.APPLICATION_JSON )
-    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
-                                        SshPublicKeys sshPublicKeys );
+    Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId, SshKeys sshKeys );
 
     @PUT
-    @Path( "{environmentId}/containers/sshkeys" )
+    @Path( "{environmentId}/containers/sshkeys/{encType}" )
     @Produces( MediaType.APPLICATION_JSON )
-    SshPublicKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId );
+    SshKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                           @PathParam( "encType" ) SshEncryptionType sshKeyType );
 
     @POST
     @Path( "{environmentId}/containers/sshkey/add" )
@@ -117,5 +121,5 @@ public interface EnvironmentRestService
     @Path( "{environmentId}/sshkeys/{encType}" )
     @Consumes( MediaType.APPLICATION_JSON )
     Response createSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId,
-                         @PathParam( "encType" ) SshEncryptionType encryptionType, String containerId );
+                           @PathParam( "encType" ) SshEncryptionType encryptionType, String containerId );
 }

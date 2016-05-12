@@ -17,13 +17,11 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
-import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.common.security.SshKeys;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
@@ -249,8 +247,6 @@ public interface EnvironmentManager
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 
-    void notifyOnContainerStateChanged( Environment environment, ContainerHost containerHost );
-
     void addAlertHandler( AlertHandler alertHandler );
 
     void removeAlertHandler( AlertHandler alertHandler );
@@ -259,11 +255,6 @@ public interface EnvironmentManager
 
     EnvironmentAlertHandlers getEnvironmentAlertHandlers( EnvironmentId environmentId )
             throws EnvironmentNotFoundException;
-
-
-    List<ShareDto> getSharedUsers( String objectId ) throws EnvironmentNotFoundException;
-
-    void shareEnvironment( ShareDto[] shareDto, String environmentId );
 
 
     void startMonitoring( String handlerId, AlertHandlerPriority handlerPriority, String environmentId )

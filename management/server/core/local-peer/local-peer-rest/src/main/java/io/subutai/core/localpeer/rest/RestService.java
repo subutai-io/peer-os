@@ -33,6 +33,14 @@ public interface RestService
 {
 
     @GET
+    @Path( "/inited" )
+    public Response isInited();
+
+    @GET
+    @Path( "/ping" )
+    public Response ping();
+
+    @GET
     @Path( "/info" )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )

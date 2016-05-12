@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface HubAdapter
 {
+    public boolean isRegistered();
     //
     // Environments
     //

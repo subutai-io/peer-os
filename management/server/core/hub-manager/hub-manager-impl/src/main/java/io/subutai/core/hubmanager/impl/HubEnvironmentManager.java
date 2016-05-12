@@ -33,7 +33,6 @@ import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.UsedNetworkResources;
@@ -45,6 +44,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
@@ -69,7 +69,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 import io.subutai.hub.share.dto.environment.SSHKeyDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-
+//TODO close web clients and responses
 public class HubEnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentManager.class.getName() );
@@ -154,6 +154,7 @@ public class HubEnvironmentManager
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
         final String subnetWithoutMask = env.getSubnetCidr().replace( "/24", "" );
+
         completionService.submit( new Callable<Peer>()
         {
             @Override
@@ -166,6 +167,7 @@ public class HubEnvironmentManager
         } );
 
         executorService.shutdown();
+
         try
         {
             Future<Peer> f = completionService.take();
@@ -173,11 +175,18 @@ public class HubEnvironmentManager
         }
         catch ( Exception e )
         {
+            if ( e.getMessage().contains( "Error reserving network resources" ) && e.getMessage().contains( "already reserved" ) )
+            {
+                return;
+            }
 
             String msg = "Failed to reserve network resources on Peer ID: " + localPeer.getId();
+
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.NETWORK,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
+
             LOG.error( msg, e.getMessage() );
+
             throw new EnvironmentCreationException( msg );
         }
     }
@@ -334,6 +343,7 @@ public class HubEnvironmentManager
                         peerDto.getOwnerId() );
 
         Set<EnvironmentNodeDto> failedNodes = new HashSet<>();
+
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
             if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
@@ -351,10 +361,13 @@ public class HubEnvironmentManager
         }
 
         final CreateEnvironmentContainersResponse containerCollector;
+
         try
         {
             containerCollector = peerManager.getLocalPeer().createEnvironmentContainers( containerGroupRequest );
+
             Set<CloneResponse> cloneResponseList = containerCollector.getResponses();
+
             for ( CloneResponse cloneResponse : cloneResponseList )
             {
                 for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
@@ -362,6 +375,7 @@ public class HubEnvironmentManager
                     if ( cloneResponse.getHostname().equals( nodeDto.getHostName() ) )
                     {
                         failedNodes.remove( nodeDto );
+
                         nodeDto.setIp( cloneResponse.getIp() );
                         nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
@@ -372,15 +386,17 @@ public class HubEnvironmentManager
                         Set<Host> hosts = new HashSet<>();
                         Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
                         hosts.add( host );
-                        String sshKey = createSshKey( hosts );
+
+                        String sshKey = createSshKey( hosts, peerDto.getEnvironmentInfo().getId() );
                         nodeDto.addSshKey( sshKey );
                     }
                 }
             }
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             String msg = "Failed on cloning container: ";
+
             for ( EnvironmentNodeDto nodeDto : failedNodes )
             {
                 msg += nodeDto.getContainerId();
@@ -394,14 +410,18 @@ public class HubEnvironmentManager
         if ( failedNodes.size() != 0 )
         {
             String msg = "Failed on cloning container: ";
+
             for ( EnvironmentNodeDto nodeDto : failedNodes )
             {
                 sendLogToHub( peerDto, msg + nodeDto.getContainerId(), null, EnvironmentPeerLogDto.LogEvent.CONTAINER,
                         EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
+
                 LOG.error( msg + nodeDto.getContainerId() );
             }
+
             throw new EnvironmentCreationException( msg );
         }
+
         return envNodes;
     }
 
@@ -416,22 +436,16 @@ public class HubEnvironmentManager
         ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
 
         final EnvironmentId environmentId = new EnvironmentId( env.getId() );
-        final Set<String> sshKeys = new HashSet<>();
+        final SshKeys sshKeys = new SshKeys();
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
                 if ( nodeDto.getSshKeys() != null )
                 {
-                    sshKeys.addAll( nodeDto.getSshKeys() );
+                    sshKeys.addStringKeys( nodeDto.getSshKeys() );
                 }
             }
-        }
-
-        // No need to exchange SSH keys if environment has less than two containers
-        if ( sshKeys.size() < 2 )
-        {
-            return peerDto;
         }
 
         completionService.submit( new Callable<Peer>()
@@ -439,7 +453,8 @@ public class HubEnvironmentManager
             @Override
             public Peer call() throws Exception
             {
-                localPeer.configureSshInEnvironment( environmentId, new SshPublicKeys( sshKeys ) );
+
+                localPeer.configureSshInEnvironment( environmentId, sshKeys );
                 return localPeer;
             }
         } );
@@ -511,11 +526,11 @@ public class HubEnvironmentManager
     }
 
 
-    public String createSshKey( Set<Host> hosts )
+    public String createSshKey( Set<Host> hosts, String environmentId )
     {
-        //todo use io.subutai.common.command.CommandUtil.executeFailFast() | io.subutai.common.command.CommandUtil
-        // .execute()
-        CommandUtil.HostCommandResults results = commandUtil.executeParallel( getCreateNReadSSHCommand(), hosts );
+
+        CommandUtil.HostCommandResults results =
+                commandUtil.execute( getCreateNReadSSHCommand(), hosts, environmentId );
 
         for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
         {

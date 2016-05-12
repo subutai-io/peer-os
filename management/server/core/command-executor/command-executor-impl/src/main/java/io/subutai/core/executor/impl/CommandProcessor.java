@@ -262,7 +262,7 @@ public class CommandProcessor implements RestProcessor
         }
         finally
         {
-            RestUtil.closeClient( webClient );
+            RestUtil.close( webClient );
         }
     }
 
@@ -335,10 +335,8 @@ public class CommandProcessor implements RestProcessor
 
             if ( commandProcess != null )
             {
+                LOG.debug( "Response: {}", response );
 
-                LOG.debug( String.format( "Response:%n%s", JsonUtil.toJson( response ) ) );
-
-                //process response
                 commandProcess.processResponse( response );
             }
             else

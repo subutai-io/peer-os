@@ -53,6 +53,7 @@ import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
 import io.subutai.core.environment.rest.ui.entity.ContainerDto;
 import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
@@ -76,6 +77,7 @@ public class RestServiceImpl implements RestService
     private final StrategyManager strategyManager;
     private final QuotaManager quotaManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
+    private SecureEnvironmentManager secureEnvironmentManager;
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
@@ -95,14 +97,21 @@ public class RestServiceImpl implements RestService
     }
 
 
+    public void setSecureEnvironmentManager( final SecureEnvironmentManager secureEnvironmentManager )
+    {
+        this.secureEnvironmentManager = secureEnvironmentManager;
+    }
+
+
     /** Templates *************************************************** */
 
     @Override
     public Response listTemplates()
     {
         // @todo added management template filtration, needs minor enhancement
-        Set<String> templates =
-                templateRegistry.list().stream().map( TemplateKurjun::getName ).filter( n -> !n.equalsIgnoreCase("management") ).collect( Collectors.toSet() );
+        Set<String> templates = templateRegistry.list().stream().map( TemplateKurjun::getName )
+                                                .filter( n -> !n.equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
+                                                .collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
@@ -741,9 +750,10 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-            tags.stream().forEach( containerHost::addTag );
-
-            environmentManager.notifyOnContainerStateChanged( environment, null );
+            for ( String tag : tags )
+            {
+                containerHost = containerHost.addTag( tag );
+            }
         }
         catch ( Exception e )
         {
@@ -761,8 +771,6 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = environmentManager.loadEnvironment( environmentId );
             environment.getContainerHostById( containerId ).removeTag( tag );
-
-            environmentManager.notifyOnContainerStateChanged( environment, null );
         }
         catch ( Exception e )
         {
@@ -795,7 +803,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            List<ShareDto> sharedUsers = environmentManager.getSharedUsers( objectId );
+            List<ShareDto> sharedUsers = secureEnvironmentManager.getSharedUsers( objectId );
             return Response.ok( JsonUtil.toJson( sharedUsers ) ).build();
         }
         catch ( Exception e )
@@ -810,7 +818,7 @@ public class RestServiceImpl implements RestService
     {
         ShareDto[] shareDto = gson.fromJson( users, ShareDto[].class );
 
-        environmentManager.shareEnvironment( shareDto, environmentId );
+        secureEnvironmentManager.shareEnvironment( shareDto, environmentId );
 
         return Response.ok().build();
     }

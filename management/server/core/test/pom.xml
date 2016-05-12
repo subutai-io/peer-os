@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-core-parent</artifactId>
-    <version>4.0.0-RC11-SNAPSHOT</version>
+    <version>4.0.0-RC12-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -16,6 +16,7 @@
 
   <modules>
     <module>test-cli</module>
+    <module>test-dp</module>
   </modules>
 
   <dependencies>

@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.0-RC11-SNAPSHOT</version>
+  <version>4.0.0-RC12-SNAPSHOT</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -208,11 +208,6 @@
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <!-- Relation-manager -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>object-relation-manager-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>object-relation-manager-impl</artifactId>

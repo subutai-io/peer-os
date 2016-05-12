@@ -11,7 +11,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.environment.SshPublicKeys;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -52,6 +51,24 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( containerId );
 
             localPeer.destroyContainer( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void setContainerHostname( final ContainerId containerId, final String hostname )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+
+            localPeer.setContainerHostname( containerId, hostname );
         }
         catch ( Exception e )
         {
@@ -133,13 +150,14 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public SshPublicKeys generateSshKeysForEnvironment( final EnvironmentId environmentId )
+    public SshKeys generateSshKeysForEnvironment( final EnvironmentId environmentId,
+                                                  final SshEncryptionType sshKeyType )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
 
-            return localPeer.generateSshKeyForEnvironment( environmentId );
+            return localPeer.readOrCreateSshKeysForEnvironment( environmentId, sshKeyType );
         }
         catch ( Exception e )
         {
@@ -186,15 +204,15 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
-    public Response configureSshInEnvironment( final EnvironmentId environmentId, final SshPublicKeys sshPublicKeys )
+    public Response configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
     {
         try
         {
             Preconditions.checkNotNull( environmentId );
-            Preconditions.checkNotNull( sshPublicKeys );
-            Preconditions.checkArgument( !sshPublicKeys.isEmpty() );
+            Preconditions.checkNotNull( sshKeys );
+            Preconditions.checkArgument( !sshKeys.isEmpty() );
 
-            localPeer.configureSshInEnvironment( environmentId, sshPublicKeys );
+            localPeer.configureSshInEnvironment( environmentId, sshKeys );
 
             return Response.ok().build();
         }

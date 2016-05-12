@@ -3,12 +3,12 @@ package io.subutai.core.environment.impl.workflow.destruction;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.workflow.destruction.steps.DestroyContainerStep;
-import io.subutai.core.object.relation.api.RelationManager;
 
 
 public class ContainerDestructionWorkflow
@@ -58,15 +58,23 @@ public class ContainerDestructionWorkflow
     {
         operationTracker.addLog( "Validating environment state" );
 
-        if ( environment.getContainerHosts().size() <= 1 )
+        try
         {
-            fail( "Environment has 0 or 1 container. Please, destroy environment instead" );
+            if ( environment.getContainerHosts().size() <= 1 )
+            {
+                throw new IllegalStateException(
+                        "Environment will have 0 containers after modification. Please, destroy environment instead" );
+            }
+            else
+            {
+                return ContainerDestructionPhase.DESTROY_CONTAINER;
+            }
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
 
             return null;
-        }
-        else
-        {
-            return ContainerDestructionPhase.DESTROY_CONTAINER;
         }
     }
 
@@ -77,7 +85,7 @@ public class ContainerDestructionWorkflow
 
         try
         {
-            new DestroyContainerStep( environmentManager, environment, containerHost ).execute();
+            environment = ( EnvironmentImpl ) new DestroyContainerStep( containerHost ).execute();
 
             RelationManager relationManager = environmentManager.getRelationManager();
             relationManager.removeRelation( containerHost );

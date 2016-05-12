@@ -28,6 +28,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
     public Response sendHeartbeat( final String hubIp )
     {
         try
@@ -44,6 +45,16 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response triggerHeartbeat()
+    {
+        integration.triggerHeartbeat();
+
+        return Response.noContent().build();
+    }
+
+
+    @Override
     public Response register( final String hubIp, final String email, final String password )
     {
         try
@@ -60,6 +71,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
     public Response sendRHConfigurations( final String hubIp )
     {
         try
@@ -76,6 +88,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
     public Response getHubDns()
     {
         try

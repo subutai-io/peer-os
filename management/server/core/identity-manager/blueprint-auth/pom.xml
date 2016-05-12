@@ -7,7 +7,7 @@
   <parent>
     <artifactId>identity-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC11-SNAPSHOT</version>
+    <version>4.0.0-RC12-SNAPSHOT</version>
   </parent>
 
   <artifactId>blueprint-auth</artifactId>
@@ -19,8 +19,8 @@
     <!-- Export package versions are maintained in packageinfo files -->
     <blueprint.auth.export.pkg>javax.annotation.security</blueprint.auth.export.pkg>
     <blueprint.auth.import.pkg>javax.annotation.security,*</blueprint.auth.import.pkg>
-    <blueprint.auth.private.pkg>io.subutai.blueprint.auth</blueprint.auth.private.pkg>
-    <blueprint.auth.activator>io.subutai.blueprint.auth.Activator</blueprint.auth.activator>
+    <blueprint.auth.private.pkg>io.subutai.core.blueprint.auth</blueprint.auth.private.pkg>
+    <blueprint.auth.activator>io.subutai.core.blueprint.auth.Activator</blueprint.auth.activator>
 
     <!-- Not exporting any packages -->
     <aries.skip.version.check>true</aries.skip.version.check>
@@ -50,29 +50,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>io.subutai</groupId>
       <artifactId>subutai-common</artifactId>
-      <version>4.0.0-RC11-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
   </dependencies>
@@ -88,11 +68,11 @@
         <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.groupId}.blueprint.auth</Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.groupId}.core.blueprint.auth</Bundle-SymbolicName>
             <Export-Package>${blueprint.auth.export.pkg}</Export-Package>
-            <Private-Package>${blueprint.auth.private.pkg}</Private-Package>
+            <!--<Private-Package>${blueprint.auth.private.pkg}</Private-Package>-->
             <Import-Package>${blueprint.auth.import.pkg}</Import-Package>
-            <Bundle-Activator>${blueprint.auth.activator}</Bundle-Activator>
+            <!--<Bundle-Activator>${blueprint.auth.activator}</Bundle-Activator>-->
           </instructions>
         </configuration>
       </plugin>

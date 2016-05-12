@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
-import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.object.relation.impl.dao.RelationDataService;
 import io.subutai.core.object.relation.impl.model.RelationChallengeImpl;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
@@ -87,8 +87,9 @@ public class RelationManagerImpl implements RelationManager
             }
 
             // Verification check have to be applied to verify that stored data is the same as the one being supported
-            Relation storedRelation = relationDataService.findBySourceTargetObject( relation.getSource(),
-                            relation.getTarget(), relation.getTrustedObject() );
+            Relation storedRelation = relationDataService
+                    .findBySourceTargetObject( relation.getSource(), relation.getTarget(),
+                            relation.getTrustedObject() );
 
             if ( storedRelation == null )
             {
@@ -129,8 +130,9 @@ public class RelationManagerImpl implements RelationManager
     public Relation buildRelation( final RelationInfoMeta relationInfoMeta, final RelationMeta relationMeta )
     {
         RelationInfoImpl relationInfo = new RelationInfoImpl( relationInfoMeta );
-        RelationImpl relation = new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject(), relationInfo, relationMeta.getKeyId() );
+        RelationImpl relation =
+                new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(), relationMeta.getObject(),
+                        relationInfo, relationMeta.getKeyId() );
 
         saveRelation( relation );
 
@@ -180,7 +182,7 @@ public class RelationManagerImpl implements RelationManager
     public Relation getRelation( final RelationMeta relationMeta )
     {
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject());
+                relationMeta.getObject() );
     }
 
 
@@ -199,6 +201,13 @@ public class RelationManagerImpl implements RelationManager
     public RelationInfoManagerImpl getRelationInfoManager()
     {
         return relationInfoManager;
+    }
+
+
+    @Override
+    public List<Relation> getRelations()
+    {
+        return relationDataService.getAllRelations();
     }
 
 
