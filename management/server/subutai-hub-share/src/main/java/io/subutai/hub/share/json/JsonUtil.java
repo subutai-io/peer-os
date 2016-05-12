@@ -4,6 +4,8 @@ package io.subutai.hub.share.json;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -69,7 +71,9 @@ public class JsonUtil
 
     public static <T> T fromCbor( byte data[], Class<T> type ) throws IOException
     {
-        return CBOR_MAPPER.readValue( data, type );
+        return ArrayUtils.isNotEmpty( data )
+               ? CBOR_MAPPER.readValue( data, type )
+               : null;
     }
 
 
