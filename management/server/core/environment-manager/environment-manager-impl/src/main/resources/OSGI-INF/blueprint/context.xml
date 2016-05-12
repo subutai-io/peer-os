@@ -9,7 +9,7 @@
            xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
-    >
+>
   <!-- Allow the use of system properties -->
   <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
 
@@ -30,7 +30,7 @@
              interface="io.subutai.core.tracker.api.Tracker" />
 
   <reference id="relationManager"
-             interface="io.subutai.core.object.relation.api.RelationManager" />
+             interface="io.subutai.common.security.relation.RelationManager" />
 
   <reference id="hubAdapter" interface="io.subutai.core.hubadapter.api.HubAdapter" />
 
@@ -75,7 +75,7 @@
   </reference-list>
 
   <bean id="environmentManager" scope="singleton" init-method="init" destroy-method="dispose"
-        class="io.subutai.core.environment.impl.EnvironmentManagerImpl">
+        class="io.subutai.core.environment.impl.EnvironmentManagerSecureProxy">
     <argument ref="peerManager" />
     <argument ref="securityManager" />
     <argument ref="identityManager" />
@@ -86,6 +86,7 @@
   </bean>
 
   <service ref="environmentManager" interface="io.subutai.core.environment.api.EnvironmentManager" />
+  <service ref="environmentManager" interface="io.subutai.core.environment.api.SecureEnvironmentManager" />
   <service ref="environmentManager" interface="io.subutai.common.peer.AlertListener" />
   <service ref="environmentManager" interface="io.subutai.core.peer.api.PeerActionListener" />
 

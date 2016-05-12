@@ -29,6 +29,6 @@
     <property name="identityManager" ref="identityManager" />
   </bean>
 
-  <service ref="relationManager" activation="eager" interface="io.subutai.core.object.relation.api.RelationManager" />
+  <service ref="relationManager" activation="eager" interface="io.subutai.common.security.relation.RelationManager" />
 
 </blueprint>

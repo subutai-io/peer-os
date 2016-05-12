@@ -25,6 +25,6 @@
   </bean>
 
   <reference id="relationManager" availability="mandatory"
-             interface="io.subutai.core.object.relation.api.RelationManager" />
+             interface="io.subutai.common.security.relation.RelationManager" />
 
 </blueprint>

@@ -10,6 +10,8 @@ public class RegistrationDto
 
     private PeerInfoDto peerInfo;
 
+    private String token;
+
     public RegistrationDto()
     {
     }
@@ -71,5 +73,17 @@ public class RegistrationDto
     public void setOwnerPassword( final String ownerPassword )
     {
         this.ownerPassword = ownerPassword;
+    }
+
+
+    public String getToken()
+    {
+        return token;
+    }
+
+
+    public void setToken( final String token )
+    {
+        this.token = token;
     }
 }

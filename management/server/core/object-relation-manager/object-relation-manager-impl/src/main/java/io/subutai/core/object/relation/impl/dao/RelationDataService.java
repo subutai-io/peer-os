@@ -15,7 +15,7 @@ import com.google.common.collect.Lists;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.relation.RelationLink;
-import io.subutai.core.object.relation.api.model.Relation;
+import io.subutai.common.security.relation.model.Relation;
 import io.subutai.core.object.relation.impl.model.RelationChallengeImpl;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
@@ -153,7 +153,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.source.linkId=:source ORDER BY ss.relationStatus DESC" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
+                    + " where ss.source.linkId=:source ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "source", source.getLinkId() );
             result.addAll( qr.getResultList() );
         }
@@ -175,7 +176,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss" + " where ss.target.linkId=:target ORDER BY ss.relationStatus DESC" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
+                    + " where ss.target.linkId=:target ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "target", target.getLinkId() );
             result.addAll( qr.getResultList() );
         }
@@ -197,7 +199,7 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery                                              (
+            Query qr = em.createQuery(
                     "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject "
                             + "and ss.relationInfo.ownershipLevel=:ownershipLevel ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "trustedObject", trustedObject.getLinkId() );
@@ -216,8 +218,24 @@ public class RelationDataService
     }
 
 
-    public void findAllRelationships()
+    public List<Relation> getAllRelations()
     {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+        List<Relation> result = Lists.newArrayList();
+        try
+        {
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss ORDER BY ss.relationStatus DESC" );
+            result.addAll( qr.getResultList() );
+        }
+        catch ( Exception ex )
+        {
+            logger.warn( "Error querying for trust relation.", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+        return result;
     }
 
 
@@ -227,8 +245,8 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery                                                                     (
-                    "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
+            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
+                    + " where ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
         }
@@ -312,7 +330,8 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
+                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject ORDER BY ss"
+                    + ".relationStatus DESC" );
             qr.setParameter( "source", source.getLinkId() );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
@@ -365,7 +384,8 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
+                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject ORDER BY ss"
+                    + ".relationStatus DESC" );
             qr.setParameter( "target", target.getLinkId() );
             qr.setParameter( "trustedObject", object.getLinkId() );
             result.addAll( qr.getResultList() );
@@ -410,14 +430,15 @@ public class RelationDataService
         return result;
     }
 
+
     public RelationLink getRelationLinkByUniqueId( final String uniqueIdentifier )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         RelationLink result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from RelationLinkImpl AS ss"
-                    + " where ss.uniqueIdentifier=:uniqueIdentifier" );
+            Query qr = em.createQuery(
+                    "select ss from RelationLinkImpl AS ss" + " where ss.uniqueIdentifier=:uniqueIdentifier" );
             qr.setParameter( "uniqueIdentifier", uniqueIdentifier );
             List<RelationLink> list = qr.getResultList();
 
@@ -444,8 +465,9 @@ public class RelationDataService
         RelationChallengeImpl result = null;
         try
         {
-            TypedQuery<RelationChallengeImpl> qr = em.createQuery( "select rt from RelationChallengeImpl AS rt"
-                    + " where rt.token=:token", RelationChallengeImpl.class );
+            TypedQuery<RelationChallengeImpl> qr =
+                    em.createQuery( "select rt from RelationChallengeImpl AS rt" + " where rt" + ".token=:token",
+                            RelationChallengeImpl.class );
             qr.setParameter( "token", token );
             List<RelationChallengeImpl> list = qr.getResultList();
 

@@ -13,23 +13,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLink;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
+import io.subutai.common.security.relation.model.RelationInfo;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
-import io.subutai.core.object.relation.api.RelationInfoManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.Relation;
-import io.subutai.core.object.relation.api.model.RelationInfo;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
-import io.subutai.core.object.relation.api.model.RelationMeta;
-import io.subutai.core.object.relation.api.model.RelationStatus;
 import io.subutai.core.object.relation.impl.dao.RelationDataService;
 import io.subutai.core.object.relation.impl.model.RelationChallengeImpl;
 import io.subutai.core.object.relation.impl.model.RelationInfoImpl;
@@ -120,7 +121,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     }
 
 
-    private RelationMeta getUserLinkRelation( RelationLink relationLink ) throws RelationVerificationException
+    private RelationLink getDelegatedUserLink( RelationLink target ) throws RelationVerificationException
     {
         User activeUser = identityManager.getActiveUser();
         UserDelegate delegatedUser = null;
@@ -141,8 +142,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             // select first object where relation.source.context = PermissionObject.IdentityManagement.getName()
 
             // Ownership User already defines that trusted object is owned by source or target
-            List<Relation> relationList =
-                    relationDataService.getTrustedRelationsByOwnership( relationLink, Ownership.USER );
+            List<Relation> relationList = relationDataService.getTrustedRelationsByOwnership( target, Ownership.USER );
             for ( final Relation relation : relationList )
             {
                 if ( PermissionObject.IdentityManagement.getName().equals( relation.getSource().getContext() ) )
@@ -168,8 +168,13 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             throw new RelationVerificationException( "Failed to get trusted object owner" );
         }
+        return delegatedUser;
+    }
 
-        return new RelationMeta( delegatedUser, relationLink, relationLink.getLinkId() );
+
+    private RelationMeta getUserLinkRelation( RelationLink target ) throws RelationVerificationException
+    {
+        return new RelationMeta( getDelegatedUserLink( target ), target, target.getLinkId() );
     }
 
 
@@ -199,8 +204,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 // Requested relation should be less then or equal to relation that was granted
                 return compareRelationships( targetRelation.getRelationInfo(), relationInfo ) >= 0;
             }
-            int result = getDeeper( relationInfo, ( RelationLinkImpl ) targetRelation.getTrustedObject(), object,
-                    relationLinks );
+            int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
             if ( result != -3 )
             {
                 return result >= 0;
@@ -245,8 +249,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             }
             if ( compare >= 0 && !relationLinks.contains( targetRelation.getTrustedObject() ) )
             {
-                int result = getDeeper( relationInfo, ( RelationLinkImpl ) targetRelation.getTrustedObject(), object,
-                        relationLinks );
+                int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
                 if ( result != -3 )
                 {
                     return result;
@@ -267,27 +270,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     private int compareRelationships( RelationInfo a, RelationInfo b )
     {
         int ownership = 0;
-        if ( a.getOwnershipLevel() > b.getOwnershipLevel() )
-        {
-            ownership = 1;
-        }
-        else if ( a.getOwnershipLevel() < b.getOwnershipLevel() )
-        {
-            ownership = -1;
-        }
-
-        //Calculate permission operations level
-        int operation = 0;
-        if ( !a.isDeletePermission() && b.isDeletePermission() || !a.isReadPermission() && b.isReadPermission()
-                || !a.isUpdatePermission() && b.isUpdatePermission() || !a.isWritePermission() && b
-                .isWritePermission() )
-        {
-            operation = -1;
-        }
-        else
-        {
-            operation = 0;
-        }
 
         // This relation comparison logic can be taken out by interface means so that client could implement his own
         // comparison mechanism
@@ -299,18 +281,27 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
                 String valueB = entry.getValue();
                 String valueA = a.getRelationTraits().get( keyB );
-                if ( !Strings.isNullOrEmpty( valueB ) && !valueB.equals( valueA ) )
+
+                if ( "ownership".equals( keyB ) )
+                {
+                    Ownership ownA = Ownership.getByName( valueA );
+                    Ownership ownB = Ownership.getByName( valueB );
+                    if ( ownA.getLevel() > ownB.getLevel() )
+                    {
+                        ownership = 1;
+                    }
+                    else if ( ownA.getLevel() < ownB.getLevel() )
+                    {
+                        ownership = -1;
+                    }
+                }
+                else if ( !Strings.isNullOrEmpty( valueB ) && !valueB.equals( valueA ) )
                 {
                     return -1;
                 }
             }
         }
-
-        if ( operation == 0 )
-        {
-            return ownership;
-        }
-        return operation;
+        return ownership;
     }
 
 
@@ -319,8 +310,22 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, relationMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.GROUP.getName() );
+        traits.put( "write", "true" );
+        relationInfoMeta.setRelationTraits( traits );
+
+        try
+        {
+            checkRelation( relationMeta.getSource(), relationMeta.getObject(), relationInfoMeta, null );
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -329,7 +334,20 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
         RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
-        return isRelationValid( relationInfo, relationMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.ALL.getName() );
+        traits.put( "read", "true" );
+        relationInfoMeta.setRelationTraits( traits );
+        try
+        {
+            checkRelation( relationMeta.getSource(), relationMeta.getTarget(), relationInfoMeta, null );
+            return true;
+        }
+        catch ( RelationVerificationException e )
+        {
+            return false;
+        }
     }
 
 
@@ -337,10 +355,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, false, false, true, Ownership.GROUP.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.GROUP.getName() );
+        traits.put( "delete", "true" );
+        relationInfoMeta.setRelationTraits( traits );
         try
         {
-            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+            checkRelation( relationLink, relationInfoMeta, null );
+            return true;
+            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
         }
         catch ( RelationVerificationException e )
         {
@@ -354,10 +378,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     {
         RelationInfoMeta relationInfoMeta =
                 new RelationInfoMeta( false, false, true, false, Ownership.GROUP.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.GROUP.getName() );
+        traits.put( "update", "true" );
+        relationInfoMeta.setRelationTraits( traits );
         try
         {
-            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+            checkRelation( relationLink, relationInfoMeta, null );
+            return true;
+            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
         }
         catch ( RelationVerificationException e )
         {
@@ -370,10 +400,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     public boolean allHasReadPermissions( final RelationLink relationLink )
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, false, false, false, Ownership.ALL.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.ALL.getName() );
+        traits.put( "read", "true" );
+        relationInfoMeta.setRelationTraits( traits );
         try
         {
-            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+            checkRelation( relationLink, relationInfoMeta, null );
+            return true;
+            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
         }
         catch ( RelationVerificationException e )
         {
@@ -386,10 +422,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     public boolean allHasWritePermissions( final RelationLink relationLink )
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, true, false, false, Ownership.ALL.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.ALL.getName() );
+        traits.put( "write", "true" );
+        relationInfoMeta.setRelationTraits( traits );
         try
         {
-            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+            checkRelation( relationLink, relationInfoMeta, null );
+            return true;
+            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
         }
         catch ( RelationVerificationException e )
         {
@@ -402,10 +444,17 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     public boolean allHasDeletePermissions( final RelationLink relationLink )
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, false, true, Ownership.ALL.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.ALL.getName() );
+        traits.put( "delete", "true" );
+        relationInfoMeta.setRelationTraits( traits );
+
         try
         {
-            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+            checkRelation( relationLink, relationInfoMeta, null );
+            return true;
+            //            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
         }
         catch ( RelationVerificationException e )
         {
@@ -418,10 +467,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     public boolean allHasUpdatePermissions( final RelationLink relationLink )
     {
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.ALL.getLevel() );
-        RelationInfo relationInfo = new RelationInfoImpl( relationInfoMeta );
+
+        Map<String, String> traits = Maps.newHashMap();
+        traits.put( "ownership", Ownership.ALL.getName() );
+        traits.put( "update", "true" );
+        relationInfoMeta.setRelationTraits( traits );
+
         try
         {
-            return isRelationValid( relationInfo, getUserLinkRelation( relationLink ) );
+            checkRelation( relationLink, relationInfoMeta, null );
+            return true;
         }
         catch ( RelationVerificationException e )
         {
@@ -431,8 +486,16 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
 
     @Override
-    public void checkRelationValidity( final RelationLink source, final RelationLink targetObject,
-                                       final RelationInfoMeta relationInfoMeta, final String encodedToken )
+    public void checkRelation( final RelationLink targetObject, final RelationInfoMeta relationInfoMeta,
+                               final String encodedToken ) throws RelationVerificationException
+    {
+        checkRelation( getDelegatedUserLink( targetObject ), targetObject, relationInfoMeta, encodedToken );
+    }
+
+
+    @Override
+    public void checkRelation( final RelationLink source, final RelationLink targetObject,
+                               final RelationInfoMeta relationInfoMeta, final String encodedToken )
             throws RelationVerificationException
     {
         if ( !SystemSettings.getKeyTrustCheckState() )
@@ -476,7 +539,11 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             int result = getDeeper( relationInfo, targetRelation.getTrustedObject(), object, relationLinks );
             if ( result != -3 )
             {
-                if (!( result >= 0 ))
+                if ( result >= 0 )
+                {
+                    return;
+                }
+                else
                 {
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }

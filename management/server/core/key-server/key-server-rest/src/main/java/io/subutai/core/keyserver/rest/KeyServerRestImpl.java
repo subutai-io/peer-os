@@ -105,7 +105,8 @@ public class KeyServerRestImpl implements KeyServerRest
 
 
     /********************************
-     *     */
+     *
+     */
     @Override
     public Response saveSecurityKey( String keyId, String fingerprint, short keyType, String keyData )
     {

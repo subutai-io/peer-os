@@ -66,15 +66,15 @@ import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.relation.RelationInfoManager;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
-import io.subutai.core.object.relation.api.RelationInfoManager;
-import io.subutai.core.object.relation.api.RelationManager;
-import io.subutai.core.object.relation.api.RelationVerificationException;
-import io.subutai.core.object.relation.api.model.RelationInfoMeta;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -136,11 +136,12 @@ public class RemotePeerImpl implements RemotePeer
         RelationInfoManager relationInfoManager = relationManager.getRelationInfoManager();
 
         RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-        relationInfoMeta.getRelationTraits().put( "receiveHeartbeats", "allow" );
-        relationInfoMeta.getRelationTraits().put( "sendHeartbeats", "allow" );
-        relationInfoMeta.getRelationTraits().put( "hostTemplates", "allow" );
+        Map<String, String> traits = relationInfoMeta.getRelationTraits();
+        traits.put( "receiveHeartbeats", "allow" );
+        traits.put( "sendHeartbeats", "allow" );
+        traits.put( "hostTemplates", "allow" );
 
-        relationInfoManager.checkRelationValidity( localPeer, this, relationInfoMeta, null );
+        relationInfoManager.checkRelation( localPeer, this, relationInfoMeta, null );
     }
 
 
@@ -751,7 +752,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void alert( final AlertEvent alert ) throws PeerException
     {
-        Preconditions.checkNotNull( alert );
+        Preconditions.checkNotNull( alert, "Invalid alert" );
 
         peerWebClient.alert( alert );
     }
@@ -761,9 +762,9 @@ public class RemotePeerImpl implements RemotePeer
     public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
-        Preconditions.checkNotNull( startTime );
-        Preconditions.checkNotNull( endTime );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkNotNull( startTime, "Invalid start time" );
+        Preconditions.checkNotNull( endTime, "Invalid end time" );
 
         return peerWebClient.getHistoricalMetrics( hostname, startTime, endTime );
     }
@@ -772,7 +773,7 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public PeerResources getResourceLimits( final PeerId peerId ) throws PeerException
     {
-        Preconditions.checkNotNull( peerId );
+        Preconditions.checkNotNull( peerId, "Invalid peer id" );
 
         return peerWebClient.getResourceLimits( peerId );
     }
@@ -781,7 +782,19 @@ public class RemotePeerImpl implements RemotePeer
     @Override
     public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
     {
+        Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
+
         environmentWebClient.addReverseProxy( reverseProxyConfig );
+    }
+
+
+    @Override
+    public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        environmentWebClient.setContainerHostName( containerId, hostname );
     }
 
 

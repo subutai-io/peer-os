@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.security.auth.Subject;
+
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -27,12 +29,14 @@ public interface IdentityManager
     void removeRolePermission( long roleId, Permission permission );
 
     /* *************************************************
-         */
+     */
     List<Permission> getAllPermissions();
+
 
     /* *************************************************
      */
     void updatePermission( Permission permission );
+
 
     /* *************************************************
      *
@@ -53,6 +57,16 @@ public interface IdentityManager
     /* *************************************************
      */
     String getUserToken( String userName, String password );
+
+
+    /* *************************************************
+     */
+    String getSystemUserToken();
+
+
+    /* *************************************************
+    */
+    User authenticateByAuthSignature( String fingerprint, String signedAuth ) throws SecurityException;
 
 
     /* *************************************************
@@ -128,6 +142,11 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    User getSystemUser();
+
+
+    /* *************************************************
+     */
     User getActiveUser();
 
 
@@ -139,6 +158,11 @@ public interface IdentityManager
     /* *************************************************
      */
     void runAs( Session userSession, Callable action );
+
+
+    /* *************************************************
+     */
+    void runAs( Session userSession, Runnable action );
 
 
     /* *************************************************
@@ -215,6 +239,12 @@ public interface IdentityManager
     Role createRole( String roleName, int roleType );
 
 
+    /* ***********************************
+     *  Authenticate Internal User
+     */
+    Subject loginSystemUser();
+
+
     /* *************************************************
      *
      */
@@ -229,6 +259,7 @@ public interface IdentityManager
     /* *************************************************
      */
     Role getRole( long roleId );
+
 
     /* *************************************************
      */
@@ -301,5 +332,7 @@ public interface IdentityManager
     void removeUserToken( String tokenId );
 
 
-
+    /* *************************************************
+     */
+    SecurityController getSecurityController();
 }

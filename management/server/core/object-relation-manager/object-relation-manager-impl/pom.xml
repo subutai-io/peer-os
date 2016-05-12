@@ -5,7 +5,7 @@
   <parent>
     <artifactId>object-relation-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC11-SNAPSHOT</version>
+    <version>4.0.0-RC12-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -15,10 +15,6 @@
   <packaging>bundle</packaging>
 
   <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>object-relation-manager-api</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>

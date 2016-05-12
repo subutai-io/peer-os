@@ -186,6 +186,11 @@ input[type=checkbox] {
     font-weight: 400;
 }
 
+.b-title_by {
+	float: left;
+	padding-right: 10px;
+}
+
 .b-title a,
 .b-title span {
     text-decoration: none;
@@ -1768,10 +1773,6 @@ td.b-main-table__status-col {
     width: 100%;
 }
 
-.b-form-input_textarea {
-    height: 100px;
-}
-
 .b-form-input_half {
     width: 50%;
 }
@@ -2988,6 +2989,11 @@ td.b-main-table__status-col {
     line-height: normal;
 }
 
+.b-switcher_login {
+	padding: 10px 0 0 0;
+	float: left;
+}
+
 /*Toggle btn*/
 .b-toggle, .b-toggler {
     display: inline-block;
@@ -3024,6 +3030,10 @@ td.b-main-table__status-col {
     border-radius: 2px;
 }
 
+.b-switcher_login .b-toggle_cloud {
+    width: 210px;
+}
+
 .b-check {
     position: absolute;
     display: block;
@@ -3046,6 +3056,9 @@ td.b-main-table__status-col {
 .b-toggle_cloud .b-check:checked ~ .b-switch {
     right: -1px;
     left: 44%;
+}
+.b-switcher_login .b-toggle_cloud .b-check:checked ~ .b-switch {
+    left: 54%;
 }
 .b-check:checked ~ .b-toggle-bg {
     background-color: #4bbc6e;
@@ -3082,6 +3095,9 @@ td.b-main-table__status-col {
     line-height: 10px;
     z-index: 5;
 }
+.b-switcher_login .b-toggle_cloud .b-toggle-bg:before {
+    content: "Username";
+}
 .b-toggle_cloud .b-toggle-bg:after {
     content: "Advanced";
     position: absolute;
@@ -3091,6 +3107,10 @@ td.b-main-table__status-col {
     color: #04346E;
     font-weight: 400;
     line-height: 10px;
+}
+.b-switcher_login .b-toggle_cloud .b-toggle-bg:after {
+    content: "PGP signature";
+	right: 10px;
 }
 .b-toggle_cloud .b-check:checked ~ .b-toggle-bg:after  {
     color: #fff;
@@ -3121,6 +3141,10 @@ td.b-main-table__status-col {
     position: absolute;
     right: 56%;
     border-radius: 2px;
+}
+
+.b-switcher_login .b-toggle_cloud .b-switch {
+    right: 46%;
 }
 
 .b-pgp-page-row {
@@ -3580,6 +3604,9 @@ td.b-main-table__status-col {
     font-size: 13px;
 	color: #3d3d3d;
 	background: transparent;
+}
+.b-form-input_textarea {
+    height: 100px;
 }
 
 .b-text-logs {

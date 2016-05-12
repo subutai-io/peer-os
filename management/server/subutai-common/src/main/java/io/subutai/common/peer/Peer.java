@@ -276,4 +276,6 @@ public interface Peer extends RelationLink
 
     SshKey createSshKey( EnvironmentId environmentId, ContainerId containerId, SshEncryptionType encType )
             throws PeerException;
+
+    void setContainerHostname( ContainerId containerId, String hostname ) throws PeerException;
 }

@@ -52,13 +52,14 @@ public class EnvironmentWebClient
 
     void startContainer( ContainerId containerId ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/start", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -69,6 +70,10 @@ public class EnvironmentWebClient
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error starting container: " + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         WebClientBuilder.checkResponse( response );
     }
@@ -76,13 +81,14 @@ public class EnvironmentWebClient
 
     void stopContainer( ContainerId containerId ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/stop", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -93,6 +99,10 @@ public class EnvironmentWebClient
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error stopping container:" + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         WebClientBuilder.checkResponse( response );
     }
@@ -100,13 +110,14 @@ public class EnvironmentWebClient
 
     public void destroyContainer( ContainerId containerId ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/destroy", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -117,6 +128,39 @@ public class EnvironmentWebClient
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error destroying container: " + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void setContainerHostName( final ContainerId containerId, final String hostname ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+
+            String path = String.format( "/%s/container/%s/hostname", containerId.getEnvironmentId().getId(),
+                    containerId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            response = client.post( hostname );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error setting container hostname: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         WebClientBuilder.checkResponse( response );
     }
@@ -124,13 +168,14 @@ public class EnvironmentWebClient
 
     public ContainerHostState getState( ContainerId containerId ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/state", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 3000, 15000, 1 );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider, 3000, 15000, 1 );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -141,6 +186,10 @@ public class EnvironmentWebClient
             LOG.warn( e.getMessage() );
             throw new PeerException( "Error on reading container state: " + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         return WebClientBuilder.checkResponse( response, ContainerHostState.class );
     }
@@ -148,13 +197,14 @@ public class EnvironmentWebClient
 
     public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/usage/%d", containerId.getEnvironmentId().getId(),
                     containerId.getId(), pid );
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -165,6 +215,10 @@ public class EnvironmentWebClient
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining process resource usage: " + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         return WebClientBuilder.checkResponse( response, ProcessResourceUsage.class );
     }
@@ -172,6 +226,7 @@ public class EnvironmentWebClient
 
     public ContainerQuota getQuota( final ContainerId containerId ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
@@ -179,7 +234,7 @@ public class EnvironmentWebClient
             String path = String.format( "/%s/container/%s/quota", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
 
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -190,6 +245,10 @@ public class EnvironmentWebClient
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining available quota: " + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         return WebClientBuilder.checkResponse( response, ContainerQuota.class );
     }
@@ -197,6 +256,7 @@ public class EnvironmentWebClient
 
     public void setQuota( final ContainerId containerId, final ContainerQuota containerQuota ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
@@ -204,7 +264,7 @@ public class EnvironmentWebClient
             String path = String.format( "/%s/container/%s/quota", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
 
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -215,6 +275,10 @@ public class EnvironmentWebClient
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on setting quota: " + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         WebClientBuilder.checkResponse( response );
     }
@@ -222,13 +286,14 @@ public class EnvironmentWebClient
 
     public HostId getResourceHostIdByContainerId( final ContainerId containerId ) throws PeerException
     {
+        WebClient client = null;
         Response response;
         try
         {
             remotePeer.checkRelation();
             String path = String.format( "/%s/container/%s/rhId", containerId.getEnvironmentId().getId(),
                     containerId.getId() );
-            WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
 
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
@@ -239,6 +304,10 @@ public class EnvironmentWebClient
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error on obtaining resource host id by container id: " + e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
 
         return WebClientBuilder.checkResponse( response, HostId.class );
     }
@@ -247,22 +316,26 @@ public class EnvironmentWebClient
     public SshKeys generateSshKeysForEnvironment( final EnvironmentId environmentId,
                                                   final SshEncryptionType sshKeyType ) throws PeerException
     {
-        String path = String.format( "/%s/containers/sshkeys/%s", environmentId.getId(), sshKeyType );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-        client.accept( MediaType.APPLICATION_JSON );
-
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/containers/sshkeys/%s", environmentId.getId(), sshKeyType );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.accept( MediaType.APPLICATION_JSON );
+
             response = client.put( null );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error generating ssh keys in environment: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         return WebClientBuilder.checkResponse( response, SshKeys.class );
@@ -272,22 +345,26 @@ public class EnvironmentWebClient
     public void configureSshInEnvironment( final EnvironmentId environmentId, final SshKeys sshKeys )
             throws PeerException
     {
-        String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/containers/sshkeys", environmentId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
             response = client.post( sshKeys );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error configuring ssh in environment: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         WebClientBuilder.checkResponse( response );
@@ -296,20 +373,24 @@ public class EnvironmentWebClient
 
     public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
-        String path = String.format( "/%s/containers/sshkey/add", environmentId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/containers/sshkey/add", environmentId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
             response = client.post( sshPublicKey );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error adding ssh key in environment: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         WebClientBuilder.checkResponse( response );
@@ -318,20 +399,24 @@ public class EnvironmentWebClient
 
     public void removeSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
-        String path = String.format( "/%s/containers/sshkey/remove", environmentId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/containers/sshkey/remove", environmentId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
             response = client.post( sshPublicKey );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error removing ssh key in environment: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         WebClientBuilder.checkResponse( response );
@@ -341,22 +426,26 @@ public class EnvironmentWebClient
     public void configureHostsInEnvironment( final EnvironmentId environmentId, final HostAddresses hostAddresses )
             throws PeerException
     {
-        String path = String.format( "/%s/containers/hosts", environmentId.getId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/containers/hosts", environmentId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
             response = client.post( hostAddresses );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error configuring hosts in environment: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         WebClientBuilder.checkResponse( response );
@@ -365,23 +454,28 @@ public class EnvironmentWebClient
 
     public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
     {
-        String path = String.format( "/%s/container/%s/reverseProxy", reverseProxyConfig.getEnvironmentId(),
-                reverseProxyConfig.getContainerId() );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
-        client.accept( MediaType.APPLICATION_JSON );
-        client.type( MediaType.APPLICATION_JSON );
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/container/%s/reverseProxy", reverseProxyConfig.getEnvironmentId(),
+                    reverseProxyConfig.getContainerId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.accept( MediaType.APPLICATION_JSON );
+            client.type( MediaType.APPLICATION_JSON );
+
             response = client.post( reverseProxyConfig );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( String.format( "Error on adding reverse proxy: %s", e.getMessage() ) );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         WebClientBuilder.checkResponse( response );
@@ -391,20 +485,24 @@ public class EnvironmentWebClient
     public SshKeys getSshKeys( final EnvironmentId environmentId, final SshEncryptionType sshEncryptionType )
             throws PeerException
     {
-        String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
             response = client.get();
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error reading ssh keys of the environment: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         return WebClientBuilder.checkResponse( response, SshKeys.class );
@@ -414,20 +512,24 @@ public class EnvironmentWebClient
     public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
                                 final SshEncryptionType sshEncryptionType ) throws PeerException
     {
-        String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
-
-        WebClient client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
-
+        WebClient client = null;
         Response response;
-
         try
         {
+            String path = String.format( "/%s/sshkeys/%s", environmentId.getId(), sshEncryptionType );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
             response = client.post( containerId );
         }
         catch ( Exception e )
         {
             LOG.error( e.getMessage(), e );
             throw new PeerException( "Error creating ssh key: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
         }
 
         return WebClientBuilder.checkResponse( response, SshKey.class );

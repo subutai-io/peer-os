@@ -61,6 +61,24 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
+    public void setContainerHostname( final ContainerId containerId, final String hostname )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+
+            localPeer.setContainerHostname( containerId, hostname );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public void startContainer( final ContainerId containerId )
     {
         try

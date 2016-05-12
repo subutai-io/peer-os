@@ -33,6 +33,14 @@ public interface RestService
 {
 
     @GET
+    @Path( "/mhpresent" )
+    public Response isMhPresent();
+
+    @GET
+    @Path( "/inited" )
+    public Response isInited();
+
+    @GET
     @Path( "/ping" )
     public Response ping();
 

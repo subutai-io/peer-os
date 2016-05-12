@@ -25,8 +25,8 @@ public class Commands
 
     public RequestBuilder getGetP2pVersionCommand()
     {
-        //todo use "subutai" binding when implemented
-        return new RequestBuilder( "/apps/subutai/current/bin/p2p version" );
+        return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING )
+                .withCmdArgs( Lists.<String>newArrayList( "p2p", "-v" ) );
     }
 
 
@@ -87,19 +87,6 @@ public class Commands
     {
         List<String> args = Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain, "-p",
                 domainLoadBalanceStrategy.getValue() );
-        if ( !Strings.isNullOrEmpty( sslCertPath ) )
-        {
-            args.add( "-f" );
-            args.add( sslCertPath );
-        }
-        return new RequestBuilder( MANAGEMENT_PROXY_BINDING ).withCmdArgs( args );
-    }
-
-
-    public RequestBuilder getSetVlanDomainCommand( final int vLanId, final String domain, final String host,
-                                                   final String sslCertPath )
-    {
-        List<String> args = Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain, "-h", host );
         if ( !Strings.isNullOrEmpty( sslCertPath ) )
         {
             args.add( "-f" );

@@ -37,6 +37,8 @@ public class EnvironmentInfoDto
 
     private String VEHS;
 
+    private String ownerToken;
+
     private Set<SSHKeyDto> sshKeys = new HashSet<>();
 
 
@@ -240,5 +242,17 @@ public class EnvironmentInfoDto
     public void setSslCertPath( final String sslCertPath )
     {
         this.sslCertPath = sslCertPath;
+    }
+
+
+    public String getOwnerToken()
+    {
+        return ownerToken;
+    }
+
+
+    public void setOwnerToken( final String ownerToken )
+    {
+        this.ownerToken = ownerToken;
     }
 }

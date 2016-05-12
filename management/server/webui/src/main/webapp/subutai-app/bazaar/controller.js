@@ -22,7 +22,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				vm.refOldPlugins = data;
 				for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 					for (var j = 0; j < vm.refOldPlugins.length; ++j) {
-						if (vm.refOldPlugins[j].name === vm.installedHubPlugins[i].name) {
+						if (vm.refOldPlugins[j].name.toLowerCase() === vm.installedHubPlugins[i].name.toLowerCase()) {
 							vm.installedHubPlugins[i].restore = false;
 							break;
 						}
@@ -107,7 +107,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 							vm.refOldPlugins = data;
 							for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 								for (var j = 0; j < vm.refOldPlugins.length; ++j) {
-									if (vm.refOldPlugins[j].name === vm.installedHubPlugins[i].name) {
+									if (vm.refOldPlugins[j].name.toLowerCase() === vm.installedHubPlugins[i].name.toLowerCase()) {
 										vm.installedHubPlugins[i].restore = false;
 										break;
 									}
@@ -192,7 +192,7 @@ function BazaarCtrl($scope, $rootScope, BazaarSrv, ngDialog, SweetAlert, $locati
 				vm.refOldPlugins = data;
 				for (var i = 0; i < vm.installedHubPlugins.length; ++i) {
 					for (var j = 0; j < vm.refOldPlugins.length; ++j) {
-						if (vm.refOldPlugins[j].name === vm.installedHubPlugins[i].name) {
+						if (vm.refOldPlugins[j].name.toLowerCase() === vm.installedHubPlugins[i].name.toLowerCase()) {
 							vm.installedHubPlugins[i].restore = false;
 							break;
 						}

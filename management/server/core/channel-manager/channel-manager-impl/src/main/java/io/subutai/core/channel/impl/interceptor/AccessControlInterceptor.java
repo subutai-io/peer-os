@@ -119,14 +119,17 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
     //******************************************************************
     private Session authenticateAccess( Message message, HttpServletRequest req )
     {
+        String sptoken = "";
+
         if ( message == null )
         {
             //***********internal auth ********* for regisration and 8444 port
-            return channelManagerImpl.getIdentityManager().login( "internal", "secretSubutai" );
+            sptoken = channelManagerImpl.getIdentityManager().getSystemUserToken();
+            return channelManagerImpl.getIdentityManager().login( "token", sptoken);
         }
         else
         {
-            String sptoken = req.getParameter( "sptoken" );
+            sptoken = req.getParameter( "sptoken" );
 
             if ( Strings.isNullOrEmpty( sptoken ) )
             {

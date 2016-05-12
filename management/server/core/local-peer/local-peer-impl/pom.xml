@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>local-peer-parent</artifactId>
-    <version>4.0.0-RC11-SNAPSHOT</version>
+    <version>4.0.0-RC12-SNAPSHOT</version>
   </parent>
 
   <artifactId>local-peer-impl</artifactId>
@@ -30,10 +30,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>object-relation-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

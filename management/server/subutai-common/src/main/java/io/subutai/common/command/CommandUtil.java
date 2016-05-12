@@ -31,6 +31,8 @@ import io.subutai.common.util.CollectionUtil;
  */
 public class CommandUtil
 {
+    private static final int MAX_EXECUTOR_SIZE = 10;
+
     private static final Logger LOG = LoggerFactory.getLogger( CommandUtil.class );
 
     private final Map<String, Map<String, EnvironmentCommandFuture>> environmentCommandsFuturesMap =
@@ -203,7 +205,8 @@ public class CommandUtil
 
         final Set<HostCommandResult> hostCommandResults = Sets.newHashSet();
 
-        ExecutorService taskExecutor = Executors.newFixedThreadPool( hosts.size() );
+        ExecutorService taskExecutor = Executors.newFixedThreadPool( Math.min( MAX_EXECUTOR_SIZE, hosts.size() ) );
+
         CompletionService<CommandResult> taskCompletionService = new ExecutorCompletionService<>( taskExecutor );
 
         Map<Host, Future<CommandResult>> commandFutures = Maps.newHashMap();

@@ -6,8 +6,6 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import io.subutai.common.util.StringUtil;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -58,7 +56,7 @@ public class StringUtilTest
     @Test
     public void testAreStringsEqual() throws Exception
     {
-        assertTrue( StringUtil.areStringsEqual( "test", "test" ) );
+        assertTrue( StringUtil.areStringsEqual( "test", "test", false ) );
     }
 
 
@@ -77,6 +75,6 @@ public class StringUtilTest
     public void testGetLen() throws Exception
     {
         assertNotNull( StringUtil.getLen( "test" ) );
-        assertEquals(0, StringUtil.getLen( null ) );
+        assertEquals( 0, StringUtil.getLen( null ) );
     }
 }

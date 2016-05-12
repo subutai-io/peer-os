@@ -43,6 +43,10 @@ public interface EnvironmentRestService
     @Produces( { MediaType.APPLICATION_JSON } )
     void destroyContainer( @PathParam( "id" ) ContainerId containerId );
 
+    @POST
+    @Path( "{environmentId}/container/{id}/hostname" )
+    void setContainerHostname( @PathParam( "id" ) ContainerId containerId, String hostname );
+
 
     @GET
     @Path( "{environmentId}/container/{containerId}/state" )
