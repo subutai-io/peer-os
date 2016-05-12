@@ -24,16 +24,17 @@ import org.apache.http.HttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.ProductDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
-public class ProductProccessor implements StateLinkProccessor
+
+// TODO: Replace WebClient with HubRestClient.
+public class ProductProcessor implements StateLinkProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ProductProccessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ProductProcessor.class.getName() );
     private ConfigManager configManager;
 
     private static final Pattern PRODUCT_DATA_PATTERN = Pattern.compile( "/rest/v1/peers/[a-zA-z0-9]{1,100}/products/"
@@ -42,7 +43,7 @@ public class ProductProccessor implements StateLinkProccessor
     private static final String PATH_TO_DEPLOY = String.format( "%s/deploy", System.getProperty( "karaf.home" ) );
 
 
-    public ProductProccessor( final ConfigManager hConfigManager )
+    public ProductProcessor( final ConfigManager hConfigManager )
     {
         this.configManager = hConfigManager;
     }

@@ -5,6 +5,8 @@ import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import io.subutai.hub.share.pgp.crypto.PGPDecrypt;
 import io.subutai.hub.share.pgp.crypto.PGPEncrypt;
 import io.subutai.hub.share.pgp.crypto.PGPSign;
@@ -59,9 +61,9 @@ public class PGPMessenger
 
     public byte[] consume( byte encData[] ) throws PGPException
     {
-        if ( encData == null )
+        if ( ArrayUtils.isEmpty( encData ) )
         {
-            return null;
+            return encData;
         }
 
         try
