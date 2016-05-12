@@ -4,13 +4,13 @@ import (
 	"bytes"
 	// "crypto/tls"
 	"fmt"
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/gpg"
-	"github.com/subutai-io/base/agent/log"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/log"
 )
 
 func LxcRegister(name string) {
@@ -35,8 +35,8 @@ func LxcRegister(name string) {
 	_, err = io.Copy(fw, f)
 	log.Check(log.FatalLevel, "Copying file to request", err)
 
-	req, err := http.NewRequest("POST", config.Cdn.Kurjun+"/upload/public?sptoken="+gpg.GetToken(), &data)
-	log.Debug(config.Cdn.Kurjun + "/upload/public?sptoken=" + gpg.GetToken())
+	req, err := http.NewRequest("POST", config.Cdn.Kurjun+"/upload/public", &data)
+	log.Debug(config.Cdn.Kurjun + "/upload/public")
 
 	log.Check(log.FatalLevel, "Creating post request", err)
 
