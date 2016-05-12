@@ -3,7 +3,6 @@ package io.subutai.core.registration.rest;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.registration.api.exception.HostRegistrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +11,7 @@ import com.google.gson.GsonBuilder;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.rest.transitional.RequestedHostJson;
 import io.subutai.core.security.api.SecurityManager;
@@ -31,13 +31,6 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     {
         this.securityManager = securityManager;
         this.registrationManager = registrationManager;
-    }
-
-
-    @Override
-    public Response getPublicKey()
-    {
-        return Response.ok( securityManager.getKeyManager().getPublicKeyRingAsASCII( null ) ).build();
     }
 
 
@@ -75,7 +68,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         catch ( Exception e )
         {
             LOGGER.error( "Error approving registration request", e );
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 
@@ -86,11 +79,11 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         try
         {
             registrationManager.rejectRequest( requestId );
-            return Response.ok( ).build();
+            return Response.ok().build();
         }
-        catch (HostRegistrationException e)
+        catch ( HostRegistrationException e )
         {
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 
@@ -101,11 +94,11 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         try
         {
             registrationManager.removeRequest( requestId );
-            return Response.ok( ).build();
+            return Response.ok().build();
         }
-        catch (HostRegistrationException e)
+        catch ( HostRegistrationException e )
         {
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 

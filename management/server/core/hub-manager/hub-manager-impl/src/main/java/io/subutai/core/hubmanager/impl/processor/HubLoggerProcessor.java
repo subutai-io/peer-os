@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.security.MessageDigest;

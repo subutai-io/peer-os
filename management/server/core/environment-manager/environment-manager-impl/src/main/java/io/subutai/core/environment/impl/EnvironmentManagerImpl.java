@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl;
 
 
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.security.auth.Subject;
 import javax.ws.rs.WebApplicationException;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -115,6 +117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
     private final Map<String, CancellableWorkflow> activeWorkflows = Maps.newConcurrentMap();
+    Subject systemUser = null;
 
     private EnvironmentAdapter environmentAdapter;
     private EnvironmentService environmentService;
@@ -136,12 +139,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
+
+        //******************************************
+        systemUser = identityManager.loginSystemUser();
+        //******************************************
+
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
         environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
 
         this.environmentService = environmentService;
+
     }
 
 
@@ -424,6 +433,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
+        operationTracker.addLog("Logger initialized");
+
         createEnvironment( topology, async, operationTracker );
 
         return operationTracker.getId();
@@ -547,6 +558,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Modifying environment %s", environment.getId() ) );
+
+        operationTracker.addLog("Logger initialized");
 
         Set<Peer> allPeers = new HashSet<>();
 
@@ -1783,11 +1796,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.debug( "Environment background tasks started..." );
 
-            resetP2Pkey();
+            //**************************************************
+            Subject.doAs( systemUser, new PrivilegedAction<Void>()
+            {
+                @Override
+                public Void run()
+                {
+                    resetP2Pkey();
+                    return null;
+                }
+            } );
+            //**************************************************
 
+            uploadEnvironmentsToHub();
             // workaround for now,
             // todo should not run if all environments already uploaded
-            uploadEnvironmentsToHub();
 
             LOG.debug( "Environment background tasks finished." );
         }
@@ -1814,4 +1837,5 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             LOG.warn( e.getMessage() );
         }
     }
+
 }

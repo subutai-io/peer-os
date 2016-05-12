@@ -12,11 +12,6 @@ import javax.ws.rs.core.Response;
 
 public interface RegistrationRestService
 {
-    @GET
-    @Path( "public-key" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response getPublicKey();
-
 
     @POST
     @Path( "public-key" )

@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -42,15 +43,16 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.proccessors.ContainerEventProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.EnvironmentUserHelper;
-import io.subutai.core.hubmanager.impl.proccessors.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubEnvironmentProccessor;
-import io.subutai.core.hubmanager.impl.proccessors.HubLoggerProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostConfProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.ResourceHostMonitorProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.SystemConfProcessor;
-import io.subutai.core.hubmanager.impl.proccessors.VehsProccessor;
+import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
+import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
+import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
+import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
+import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
+import io.subutai.core.hubmanager.impl.processor.ProductProccessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostConfProcessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
+import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
+import io.subutai.core.hubmanager.impl.processor.VehsProccessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
@@ -94,8 +96,6 @@ public class IntegrationImpl implements Integration
 
     private ResourceHostConfProcessor resourceHostConfProcessor;
 
-    private SystemConfProcessor systemConfProcessor;
-
     private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
 
     private HubLoggerProcessor hubLoggerProcessor;
@@ -114,7 +114,11 @@ public class IntegrationImpl implements Integration
 
     private ContainerEventProcessor containerEventProcessor;
 
+    private ProductProccessor productProccessor;
+
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+
+    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
 
     private String checksum = "";
 
@@ -146,13 +150,15 @@ public class IntegrationImpl implements Integration
             resourceHostMonitorProcessor =
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
+            productProccessor = new ProductProccessor( configManager );
+
             StateLinkProccessor systemConfProcessor = new SystemConfProcessor( configManager );
 
             EnvironmentUserHelper environmentUserHelper =
                     new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
 
             StateLinkProccessor hubEnvironmentProccessor =
-                    new HubEnvironmentProccessor( hubEnvironmentManager, configManager, peerManager, identityManager,
+                    new HubEnvironmentProcessor( hubEnvironmentManager, configManager, peerManager, identityManager,
                             commandExecutor, environmentUserHelper );
 
             StateLinkProccessor vehsProccessor =
@@ -164,6 +170,7 @@ public class IntegrationImpl implements Integration
             heartbeatProcessor.addProccessor( vehsProccessor );
             heartbeatProcessor.addProccessor( hubEnvironmentProccessor );
             heartbeatProcessor.addProccessor( systemConfProcessor );
+            heartbeatProcessor.addProccessor( productProccessor );
 
             AppScaleProcessor appScaleProcessor =
                     new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
@@ -215,16 +222,32 @@ public class IntegrationImpl implements Integration
     @Override
     public void sendHeartbeat() throws HubPluginException
     {
-        heartbeatProcessor.sendHeartbeat();
         resourceHostConfProcessor.sendResourceHostConf();
+        heartbeatProcessor.sendHeartbeat();
         containerEventProcessor.process();
     }
 
 
+    /**
+     * Called by Hub to trigger heartbeat on peer
+     */
     @Override
-    public void sendOnlyHeartbeat() throws HubPluginException
+    public void triggerHeartbeat()
     {
-        heartbeatProcessor.sendHeartbeat();
+        asyncHeartbeatExecutor.execute( new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    heartbeatProcessor.sendHeartbeat();
+                }
+                catch ( HubPluginException e )
+                {
+                    LOG.error( "Error to send heartbeat: ", e );
+                }
+            }
+        } );
     }
 
 
@@ -361,25 +384,40 @@ public class IntegrationImpl implements Integration
         try
         {
             String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
+
             String path = String.format( "/rest/v1/peers/%s/delete", configManager.getPeerId() );
 
             WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
 
             Response r = client.delete();
 
+            LOG.debug( "Response status: {} - {}", r.getStatus(), r.getStatusInfo().getReasonPhrase() );
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Peer unregistered successfully." );
+                LOG.debug( "Peer unregistered successfully" );
+
                 configDataService.deleteConfig( configManager.getPeerId() );
             }
             else
             {
-                LOG.error( r.readEntity( String.class ) );
-                throw new HubPluginException( "Could not unregister peer" );
+                String error = r.readEntity( String.class );
+
+                LOG.debug( "Error: {}", error );
+
+                if ( r.getStatus() == HttpStatus.SC_FORBIDDEN )
+                {
+                    LOG.debug( "Got 'peer not found' error but unregistered anyway" );
+
+                    configDataService.deleteConfig( configManager.getPeerId() );
+                }
+                else
+                {
+                    throw new HubPluginException( "Could not unregister peer" );
+                }
             }
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e )
+        catch ( Exception e )
         {
             throw new HubPluginException( "Could not unregister peer", e );
         }
@@ -501,8 +539,6 @@ public class IntegrationImpl implements Integration
 
     private void generateChecksum()
     {
-/*		if (getRegistrationState ())
-        {*/
         try
         {
             LOG.info( "Generating plugins list md5 checksum" );
@@ -529,11 +565,6 @@ public class IntegrationImpl implements Integration
             LOG.error( e.getMessage() );
             e.printStackTrace();
         }
-/*		}
-        else
-		{
-			LOG.info ("Peer not registered. Trying again in 1 hour.");
-		}*/
     }
 
 
@@ -569,16 +600,12 @@ public class IntegrationImpl implements Integration
                 else
                 {
                     LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
-                    //                    throw new HubPluginException(
-                    //                            "Could not send SS configuration to Hub: " + r.readEntity( String
-                    // .class ) );
                 }
             }
             catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
                     NoSuchAlgorithmException e )
             {
                 LOG.error( "Could not send SS configuration to Hub", e );
-                //                throw new HubPluginException( e.toString(), e );
             }
         }
     }

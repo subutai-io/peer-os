@@ -63,7 +63,7 @@ public class AppScaleManager
 
         String masterIP = ipList.get( config.getClusterName() );
 
-        String cmd = format( "sudo /var/lib/subutai-appscale/create-appscalefile.sh -master %s -appengine %s -database %s -zookeeper %s", masterIP,
+        String cmd = format( "sudo /var/lib/appscale/create-appscalefile.sh -master %s -appengine %s -database %s -zookeeper %s", masterIP,
             formatIps( ipList, config.getAppenList() ),
             formatIps( ipList, config.getCassList() ),
             formatIps( ipList, config.getZooList() )
@@ -90,7 +90,7 @@ public class AppScaleManager
             }
         }
 
-        String cmd =  format( "sudo /var/lib/subutai-appscale/setup.sh %s %s %s", config.getUserDomain(), email, password );
+        String cmd =  format( "sudo /var/lib/appscale/setup.sh %s %s %s", config.getUserDomain(), email, password );
 
         execute( containerHost, cmd );
     }

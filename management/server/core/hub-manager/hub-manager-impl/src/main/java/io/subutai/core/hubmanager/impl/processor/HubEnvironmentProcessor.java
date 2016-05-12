@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
@@ -62,9 +62,9 @@ import io.subutai.hub.share.json.JsonUtil;
 
 
 //TODO close web clients and responses
-public class HubEnvironmentProccessor implements StateLinkProccessor
+public class HubEnvironmentProcessor implements StateLinkProccessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
 
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
@@ -76,25 +76,21 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private final HubEnvironmentManager hubEnvironmentManager;
 
-    private final CommandExecutor commandExecutor;
-
     private final EnvironmentUserHelper environmentUserHelper;
 
     private final IdentityManager identityManager;
 
 
-    public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
-                                     final ConfigManager hConfigManager, final PeerManager peerManager,
-                                     final IdentityManager identityManager, CommandExecutor commandExecutor,
-                                     EnvironmentUserHelper environmentUserHelper )
+    public HubEnvironmentProcessor( final HubEnvironmentManager hubEnvironmentManager,
+                                    final ConfigManager hConfigManager, final PeerManager peerManager,
+                                    final IdentityManager identityManager, CommandExecutor commandExecutor,
+                                    EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
 
         this.peerManager = peerManager;
 
         this.hubEnvironmentManager = hubEnvironmentManager;
-
-        this.commandExecutor = commandExecutor;
 
         this.environmentUserHelper = environmentUserHelper;
 
@@ -114,9 +110,9 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                 final EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
                 UserDto userDto = getUserDataFromHub( envPeerDto.getOwnerId() );
                 Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
+
                 if ( isTrustedUser )
                 {
-
                     if ( envPeerDto.getEnvOwnerToken() == null )
                     {
                         final Session session = identityManager.login( "token", envPeerDto.getPeerToken() );
@@ -145,6 +141,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
                             }
                         } );
                     }
+
                     final Session session = identityManager.login( "token", envPeerDto.getEnvOwnerToken() );
                     Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
                     {
@@ -179,18 +176,23 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
-            LOG.debug( "Getting Environment peer data from Hub..." );
-            Response r = client.get();
+            LOG.debug( "Getting EnvironmentPeerDto from Hub..." );
+
+            Response response = client.get();
+
             client.close();
-            byte[] encryptedContent = configManager.readContent( r );
+
+            byte[] encryptedContent = configManager.readContent( response );
+
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
-            LOG.debug( "EnvironmentPeerDto: " + result.toString() );
+            LOG.debug( "Response: {} - {}", response.getStatus(), response.getStatusInfo().getReasonPhrase() );
+
             return result;
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( Exception e )
         {
             throw new HubPluginException( "Could not retrieve environment peer data", e );
         }
@@ -346,28 +348,28 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             EnvironmentNodesDto envNodes = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
 
             hubEnvironmentManager.prepareTemplates( peerDto, envNodes, peerDto.getEnvironmentInfo().getId() );
+
             EnvironmentNodesDto updatedNodes = hubEnvironmentManager.cloneContainers( peerDto, envNodes );
 
             byte[] cborData = JsonUtil.toCbor( updatedNodes );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response response = client.put( encryptedData );
             client.close();
+
+            LOG.debug( "response.status: {}", response.getStatus() );
+
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "env_via_hub: Environment successfully build!!!" );
             }
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( Exception e )
         {
             String mgs = "Could not get container creation data from Hub.";
-            hubEnvironmentManager
-                    .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
+
+            hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
+
             LOG.error( mgs, e );
-        }
-        catch ( EnvironmentCreationException e )
-        {
-            LOG.error( e.getMessage() );
         }
     }
 
