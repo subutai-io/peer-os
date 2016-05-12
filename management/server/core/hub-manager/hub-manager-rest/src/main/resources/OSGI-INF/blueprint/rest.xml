@@ -11,7 +11,7 @@
   </cxf:bus>
 
   <reference id="integration"
-             interface="io.subutai.core.hubmanager.api.Integration" />
+             interface="io.subutai.core.hubmanager.api.HubManager" />
 
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />

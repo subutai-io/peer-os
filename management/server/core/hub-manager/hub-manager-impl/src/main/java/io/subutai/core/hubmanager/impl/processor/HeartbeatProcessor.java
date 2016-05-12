@@ -4,39 +4,38 @@ package io.subutai.core.hubmanager.impl.processor;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
 
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.IntegrationImpl;
+import io.subutai.core.hubmanager.impl.HubManagerImpl;
+import io.subutai.core.hubmanager.impl.http.HubRestClient;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.hub.share.dto.HeartbeatResponseDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 
 public class HeartbeatProcessor implements Runnable
 {
-    private static final String URL = "/rest/v1.2/peers/%s/heartbeat";
-
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final Set<StateLinkProcessor> processors = new HashSet<>();
 
-    private ConfigManager configManager;
+    private final HubManagerImpl integrationManager;
 
-    private IntegrationImpl manager;
+    private final String path;
+
+    private final HubRestClient restClient;
 
 
-    public HeartbeatProcessor( IntegrationImpl integration, ConfigManager configManager )
+    public HeartbeatProcessor( HubManagerImpl integrationManager, ConfigManager configManager )
     {
-        this.manager = integration;
-        this.configManager = configManager;
+        this.integrationManager = integrationManager;
+
+        path = String.format( "/rest/v1.2/peers/%s/heartbeat", configManager.getPeerId() );
+
+        restClient = new HubRestClient( configManager );
     }
 
 
@@ -49,63 +48,58 @@ public class HeartbeatProcessor implements Runnable
     @Override
     public void run()
     {
-        sendHeartbeat();
+        try
+        {
+            sendHeartbeat();
+        }
+        catch ( HubPluginException e )
+        {
+            log.error( "Error to process heartbeat: ", e );
+        }
     }
 
 
-    public void sendHeartbeat()
+    public void sendHeartbeat() throws HubPluginException
     {
-        if ( !manager.getRegistrationState() )
+        if ( !integrationManager.getRegistrationState() )
         {
             return;
         }
 
         try
         {
-            String path = String.format( URL, configManager.getPeerId() );
+            RestResult<HeartbeatResponseDto> restResult = restClient.put( path, null, HeartbeatResponseDto.class );
 
-            WebClient webClient = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
-
-            Response response = webClient.put( null );
-
-            log.debug( "res.status: {}", response.getStatus() );
-
-            if ( response.getStatus() != HttpStatus.SC_OK )
+            if ( !restResult.isSuccess() )
             {
-                log.error( "Error response for heartbeat: ", response.readEntity( String.class ) );
-                return;
+                throw new HubPluginException( restResult.getError() );
             }
 
-            byte[] data = configManager.readContent( response );
+            HeartbeatResponseDto dto = restResult.getEntity();
 
-            if ( data == null )
-            {
-                log.error( "Empty response for heartbeat" );
-                return;
-            }
-
-            HeartbeatResponseDto dto = JsonUtil.fromCbor( configManager.getMessenger().consume( data ), HeartbeatResponseDto.class );
-
-            log.debug( "State links: {}", dto.getStateLinks() );
-
-            for ( StateLinkProcessor processor : processors )
-            {
-                try
-                {
-                    processor.processStateLinks( dto.getStateLinks() );
-                }
-                catch ( HubPluginException e )
-                {
-                    log.error( e.getMessage() );
-                }
-            }
-
-            response.close();
-            webClient.close();
+            processStateLinks( dto.getStateLinks() );
         }
         catch ( Exception e )
         {
-            log.error( "Error to send heartbeat: ", e );
+            throw new HubPluginException( e.getMessage(), e );
+        }
+    }
+
+
+    private void processStateLinks( Set<String> stateLinks )
+    {
+        log.info( "stateLinks: {}", stateLinks );
+
+        for ( StateLinkProcessor processor : processors )
+        {
+            try
+            {
+                processor.processStateLinks( stateLinks );
+            }
+            catch ( HubPluginException e )
+            {
+                log.error( "Error to process state links: ", e );
+            }
         }
     }
 }

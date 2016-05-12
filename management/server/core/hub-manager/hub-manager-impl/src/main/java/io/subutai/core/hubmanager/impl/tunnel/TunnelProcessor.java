@@ -23,7 +23,7 @@ import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
+// TODO: Replace WebClient with HubRestClient.
 public class TunnelProcessor implements StateLinkProcessor
 {
 

@@ -30,7 +30,8 @@ import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.ProductDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
+
+// TODO: Replace WebClient with HubRestClient.
 public class ProductProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ProductProcessor.class.getName() );

@@ -61,7 +61,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
+// TODO: Replace WebClient with HubRestClient.
 public class HubEnvironmentProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );

@@ -24,7 +24,8 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
+
+// TODO: Replace WebClient with HubRestClient.
 public class SystemConfProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemConfProcessor.class.getName() );

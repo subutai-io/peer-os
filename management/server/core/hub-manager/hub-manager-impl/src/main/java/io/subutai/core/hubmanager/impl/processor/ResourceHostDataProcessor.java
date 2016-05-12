@@ -3,14 +3,10 @@ package io.subutai.core.hubmanager.impl.processor;
 
 import java.util.Date;
 
-import javax.ws.rs.core.Response;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
 
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
@@ -18,36 +14,44 @@ import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.IntegrationImpl;
+import io.subutai.core.hubmanager.impl.HubManagerImpl;
+import io.subutai.core.hubmanager.impl.http.HubRestClient;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostMetricDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
-import io.subutai.hub.share.json.JsonUtil;
+
+import static java.lang.String.format;
 
 
 public class ResourceHostDataProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( ResourceHostDataProcessor.class );
 
-    private ConfigManager configManager;
+    private final HubManagerImpl manager;
 
-    private IntegrationImpl manager;
+    private final PeerManager peerManager;
 
-    private PeerManager peerManager;
+    private final HubRestClient restClient;
 
-    private Monitor monitor;
+    private final Monitor monitor;
+
+    private final String peerId;
 
     private Date p2pLogsEndDate;
 
 
-    public ResourceHostDataProcessor( final IntegrationImpl integration, final PeerManager peerManager,
+    public ResourceHostDataProcessor( final HubManagerImpl integration, final PeerManager peerManager,
                                       final ConfigManager configManager, final Monitor monitor )
     {
         this.peerManager = peerManager;
-        this.configManager = configManager;
         this.manager = integration;
         this.monitor = monitor;
+
+        restClient = new HubRestClient( configManager );
+
+        peerId = configManager.getPeerId();
     }
 
 
@@ -94,29 +98,19 @@ public class ResourceHostDataProcessor implements Runnable
 
     private void processConfigs( ResourceHostMetric rhMetric ) throws Exception
     {
-        log.debug( "Getting resource host configs..." );
+        log.info( "Getting resource host configs..." );
 
-        ResourceHostMetricDto dto = getConfigs( rhMetric );
+        ResourceHostMetricDto metricDto = getConfigs( rhMetric );
 
-        log.debug( "Sending resource host configs to Hub..." );
+        log.info( "Sending resource host configs to Hub..." );
 
-        String path = String.format( "/rest/v1/peers/%s/resource-hosts/%s", configManager.getPeerId(), dto.getHostId() );
+        String path = format( "/rest/v1/peers/%s/resource-hosts/%s", peerId, metricDto.getHostId() );
 
-        WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+        RestResult<Object> restResult = restClient.post( path, metricDto );
 
-        byte[] cborData = JsonUtil.toCbor( dto );
-
-        byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-        Response response = client.post( encryptedData );
-
-        if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+        if ( restResult.isSuccess() )
         {
-            log.debug( "Resource host configs processed successfully" );
-        }
-        else
-        {
-            log.error( "Error response: {}", response.readEntity( String.class ) );
+            log.info( "Resource host configs processed successfully" );
         }
     }
 
@@ -195,34 +189,30 @@ public class ResourceHostDataProcessor implements Runnable
 
     private void processP2PLogs( ResourceHost rh, Date startDate, Date endDate ) throws Exception
     {
-        log.debug( "Getting p2p logs: {} - {}", startDate, endDate );
+        log.info( "Getting p2p logs: {} - {}", startDate, endDate );
 
         P2pLogs p2pLogs = rh.getP2pLogs( JournalCtlLevel.ERROR, startDate, endDate );
 
-        log.debug( "Sending p2p logs to Hub..." );
+        log.info( "logs.size: {}", p2pLogs.getLogs().size() );
 
-        String path = String.format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", configManager.getPeerId(), rh.getId() );
-
-        WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
+        if ( p2pLogs.isEmpty() )
+        {
+            return;
+        }
 
         SystemLogsDto logsDto = new SystemLogsDto();
 
         logsDto.setLogs( p2pLogs.getLogs() );
 
-        byte[] plainData = JsonUtil.toCbor( logsDto );
-        byte[] encryptedData = configManager.getMessenger().produce( plainData );
+        log.info( "Sending p2p logs to Hub..." );
 
-        Response response = client.post( encryptedData );
+        String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", peerId, rh.getId() );
 
-        log.debug( "response.status: {}", response.getStatus() );
+        RestResult<Object> restResult = restClient.post( path, logsDto );
 
-        if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+        if ( restResult.isSuccess() )
         {
-            log.debug( "Processing p2p logs completed successfully" );
-        }
-        else
-        {
-            log.error( "Error response: {}", response.readEntity( String.class ) );
+            log.info( "Processing p2p logs completed successfully" );
         }
     }
 }

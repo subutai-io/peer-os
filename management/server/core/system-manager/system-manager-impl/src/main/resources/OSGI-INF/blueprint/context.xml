@@ -10,7 +10,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="integration"
-             interface="io.subutai.core.hubmanager.api.Integration" />
+             interface="io.subutai.core.hubmanager.api.HubManager" />
 
   <bean id="systemManagerImpl" scope="singleton"
         class="io.subutai.core.systemmanager.impl.SystemManagerImpl" destroy-method="dispose">

@@ -4,12 +4,8 @@ package io.subutai.core.hubmanager.impl;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.security.KeyStoreException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -19,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
@@ -65,12 +60,12 @@ import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
-public class IntegrationImpl implements Integration
+// TODO: Replace WebClient with HubRestClient.
+public class HubManagerImpl implements HubManager
 {
     private static final long TIME_15_MINUTES = 900;
 
-    private static final Logger LOG = LoggerFactory.getLogger( IntegrationImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( HubManagerImpl.class );
 
     private SecurityManager securityManager;
 
@@ -123,7 +118,7 @@ public class IntegrationImpl implements Integration
     private String checksum = "";
 
 
-    public IntegrationImpl( DaoManager daoManager )
+    public HubManagerImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -238,7 +233,14 @@ public class IntegrationImpl implements Integration
         {
             public void run()
             {
-                heartbeatProcessor.sendHeartbeat();
+                try
+                {
+                    heartbeatProcessor.sendHeartbeat();
+                }
+                catch ( HubPluginException e )
+                {
+                    e.printStackTrace();
+                }
             }
         } );
     }
@@ -265,6 +267,15 @@ public class IntegrationImpl implements Integration
 
 
     @Override
+    public void unregisterPeer() throws HubPluginException
+    {
+        RegistrationManager registrationManager = new RegistrationManager( this, configManager, null );
+
+        registrationManager.unregister();
+    }
+
+
+    @Override
     public String getHubDns() throws HubPluginException
     {
         Config config = getConfigDataService().getHubConfig( configManager.getPeerId() );
@@ -285,12 +296,10 @@ public class IntegrationImpl implements Integration
     {
         try
         {
-            //String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
             WebClient client = configManager
                     .getTrustedWebClientWithAuth( "/rest/v1.2/marketplace/products/public", "hub.subut.ai" );
 
             Response r = client.get();
-
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
@@ -307,7 +316,7 @@ public class IntegrationImpl implements Integration
             ProductsDto productsDto = new ProductsDto( result );
             return JsonUtil.toJson( productsDto );
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException e )
+        catch ( Exception e )
         {
             e.printStackTrace();
             throw new HubPluginException( "Could not retrieve product data", e );
@@ -372,52 +381,6 @@ public class IntegrationImpl implements Integration
 
 
     @Override
-    public void unregisterPeer() throws HubPluginException
-    {
-        try
-        {
-            String hubIp = configDataService.getHubConfig( configManager.getPeerId() ).getHubIp();
-
-            String path = String.format( "/rest/v1/peers/%s/delete", configManager.getPeerId() );
-
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
-
-            Response r = client.delete();
-
-            LOG.debug( "Response status: {} - {}", r.getStatus(), r.getStatusInfo().getReasonPhrase() );
-
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                LOG.debug( "Peer unregistered successfully" );
-
-                configDataService.deleteConfig( configManager.getPeerId() );
-            }
-            else
-            {
-                String error = r.readEntity( String.class );
-
-                LOG.debug( "Error: {}", error );
-
-                if ( r.getStatus() == HttpStatus.SC_FORBIDDEN )
-                {
-                    LOG.debug( "Got 'peer not found' error but unregistered anyway" );
-
-                    configDataService.deleteConfig( configManager.getPeerId() );
-                }
-                else
-                {
-                    throw new HubPluginException( "Could not unregister peer" );
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new HubPluginException( "Could not unregister peer", e );
-        }
-    }
-
-
-    @Override
     public boolean getRegistrationState()
     {
         return getConfigDataService().getHubConfig( configManager.getPeerId() ) != null;
@@ -446,8 +409,7 @@ public class IntegrationImpl implements Integration
                 LOG.debug( "PeerDto: " + result.toString() );
             }
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( Exception e )
         {
             throw new HubPluginException( "Could not retrieve Peer info", e );
         }
@@ -553,7 +515,7 @@ public class IntegrationImpl implements Integration
             checksum = hexString.toString();
             LOG.info( "Checksum generated: " + checksum );
         }
-        catch ( NoSuchAlgorithmException | UnsupportedEncodingException | HubPluginException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
             e.printStackTrace();
@@ -595,8 +557,7 @@ public class IntegrationImpl implements Integration
                     LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
                 }
             }
-            catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
-                    NoSuchAlgorithmException e )
+            catch ( Exception e )
             {
                 LOG.error( "Could not send SS configuration to Hub", e );
             }
