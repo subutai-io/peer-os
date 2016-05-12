@@ -33,6 +33,10 @@ public interface RestService
 {
 
     @GET
+    @Path( "/mhpresent" )
+    public Response isMhPresent();
+
+    @GET
     @Path( "/inited" )
     public Response isInited();
 
