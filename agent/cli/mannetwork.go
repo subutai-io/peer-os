@@ -81,6 +81,10 @@ func P2P(c, d, u, l, p bool, args []string) {
 	}
 }
 
+func P2Pversion() {
+	p2p.Version()
+}
+
 func LxcManagementNetwork(args []string) {
 	if len(args) < 3 {
 		log.Error("Not enough arguments")

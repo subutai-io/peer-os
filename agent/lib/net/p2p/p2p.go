@@ -57,7 +57,13 @@ func IptablesCleanUp(name string) {
 
 func UpdateKey(hash, newkey, ttl string) {
 	err := exec.Command("p2p", "set", "-key", newkey, "-ttl", ttl, "-hash", hash).Run()
-	log.Check(log.FatalLevel, "Updating p2p key: ", err)
+	log.Check(log.FatalLevel, "Updating p2p key", err)
+}
+
+func Version() {
+	out, err := exec.Command("p2p", "version").CombinedOutput()
+	fmt.Printf("%s", out)
+	log.Check(log.FatalLevel, "Getting p2p version", err)
 }
 
 func Peers(hash string) {
