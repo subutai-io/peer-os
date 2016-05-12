@@ -90,7 +90,7 @@ func checkSS() (status bool) {
 	resp, err := client.Get("https://" + config.Management.Host + ":8443/rest/v1/peer/inited")
 	if err == nil {
 		resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusOK {
 			return true
 		}
 	}
