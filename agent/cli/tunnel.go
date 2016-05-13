@@ -61,6 +61,7 @@ func TunAdd(socket, timeout string, global bool) {
 }
 
 func TunList() {
+	TunCheck()
 	f := getList()
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
