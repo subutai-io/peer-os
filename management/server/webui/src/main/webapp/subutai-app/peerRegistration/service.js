@@ -42,7 +42,7 @@ function peerRegistrationService($http) {
 	}
 
 	function rejectPeerRequest(peerId, force) {
-		var postData = 'peerId=' + peerId + '/' + force;
+		var postData = 'peerId=' + peerId + '&force=' + force;
 		return $http.put(
 			PEERS_URL + 'reject/',
 			postData, 
@@ -51,7 +51,7 @@ function peerRegistrationService($http) {
 	}
 
 	function unregisterPeerRequest(peerId, force) {
-		var postData = 'peerId=' + peerId + '/' + force;
+		var postData = 'peerId=' + peerId + '&force=' + force;
 		return $http.put(
 			PEERS_URL + 'unregister/',
 			postData, 
@@ -60,7 +60,7 @@ function peerRegistrationService($http) {
 	}
 
 	function cancelPeerRequest(peerId, force) {
-		var postData = 'peerId=' + peerId + '/' + force;
+		var postData = 'peerId=' + peerId + '&force=' + force;
 		return $http.put(
 			PEERS_URL + 'cancel/',
 			postData, 
