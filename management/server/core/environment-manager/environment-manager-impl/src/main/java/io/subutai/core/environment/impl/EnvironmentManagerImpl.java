@@ -1280,7 +1280,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     Common.CONTAINER_SSH_TIMEOUT_SEC );
 
             operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshTunnel ) );
+                    String.format( "Ssh for container %s is ready on tunnel %s", containerHostId, sshTunnel ) );
 
             return sshTunnel;
         }

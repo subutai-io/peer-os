@@ -1,6 +1,7 @@
 package io.subutai.common.network;
 
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -31,5 +32,12 @@ public class SshTunnel
     public int getPort()
     {
         return port;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return MoreObjects.toStringHelper( this ).add( "ip", ip ).add( "port", port ).toString();
     }
 }
