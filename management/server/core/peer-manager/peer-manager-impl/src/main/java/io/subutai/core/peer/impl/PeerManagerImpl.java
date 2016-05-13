@@ -753,7 +753,20 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     @Override
     public void doCancelRequest( final RegistrationData request , boolean forceAction ) throws PeerException
     {
-        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
+        //********forceAction ********************
+        try
+        {
+            getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        }
+        catch ( Exception e )
+        {
+            if(!forceAction)
+            {
+                throw new PeerException("Remote peer is not accessible:" + e.getMessage());
+            }
+        }
+        //***************************************
 
         try
         {
@@ -808,7 +821,21 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     @Override
     public void doRejectRequest( final RegistrationData request , boolean forceAction  ) throws PeerException
     {
-        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
+        //********forceAction ********************
+        try
+        {
+            getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        }
+        catch ( Exception e )
+        {
+            if(!forceAction)
+            {
+                throw new PeerException("Remote peer is not accessible:" + e.getMessage());
+            }
+        }
+        //***************************************
+
         try
         {
             final RegistrationData r = buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED );
@@ -832,12 +859,28 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     @Override
     public void doUnregisterRequest( final RegistrationData request , boolean forceAction  ) throws PeerException
     {
-        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
 
+        //********forceAction ********************
+        try
+        {
+            getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        }
+        catch ( Exception e )
+        {
+            if(!forceAction)
+            {
+                throw new PeerException("Remote peer is not accessible:" + e.getMessage());
+            }
+        }
+
+        //***************************************
         if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) )
                 .succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer in use." );
+            if(!forceAction)
+            {
+                throw new PeerException( "Could not unregister peer. Peer in use." );
+            }
         }
 
         try
