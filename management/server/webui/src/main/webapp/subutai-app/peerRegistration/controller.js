@@ -9,8 +9,13 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 	var vm = this;
 	vm.peerId = null;
+<<<<<<< HEAD
 	vm.peerToAction = '';
 	vm.action = '';
+=======
+	vm.test = 'lolololol';
+	vm.peerStatusIco = "";
+>>>>>>> e620e02628548b6a8b8cb90611d44dd8dd36a279
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
@@ -25,7 +30,11 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	vm.cancelPeerRequest = cancelPeerRequest;
 	vm.addPeer = addPeer;
 	vm.approvePeerRequest = approvePeerRequest;
+<<<<<<< HEAD
 	vm.confirmPopup = confirmPopup;
+=======
+	vm.checkResourceHost = checkResourceHost;
+>>>>>>> e620e02628548b6a8b8cb90611d44dd8dd36a279
 
 	vm.dtInstance = {};
 	vm.users = {};
@@ -101,6 +110,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function peerFrom() {
+		vm.peerStatusIco = '';
 		ngDialog.open({
 			template: 'subutai-app/peerRegistration/partials/peerForm.html',
 			scope: $scope
@@ -162,30 +172,36 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		});
 	}
 
-	function cancelPeerRequest(peerId, force) {
-		var previousWindowKeyDown = window.onkeydown;
-		SweetAlert.swal({
-			title: "Are you sure?",
-			text: "Your cancel peer request!",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#ff3f3c",
-			confirmButtonText: "Cancel request",
-			cancelButtonText: "No",
-			closeOnConfirm: false,
-			closeOnCancel: true,
-			showLoaderOnConfirm: true
-		},
-		function (isConfirm) {
-			window.onkeydown = previousWindowKeyDown;
-			if (isConfirm) {
-				peerRegistrationService.cancelPeerRequest(peerId).success(function (data) {
-					SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");
-					vm.dtInstance.reloadData(null, false);
-				}).error(function (error) {
-					SweetAlert.swal("ERROR!", error, "error");
+	function checkResourceHost( info ) {
+
+		if( info.ip )
+		{
+			LOADING_SCREEN();
+			peerRegistrationService.checkPeer( info.ip )
+				.success( function (data) {
+					vm.peerStatusIco = "check";
+					LOADING_SCREEN("none");
+				})
+				.error( function (data) {
+					vm.peerStatusIco = "times";
+					LOADING_SCREEN("none");
+
+					SweetAlert.swal({
+						title: "ERROR!",
+						text: data,
+						type: "error",
+						confirmButtonColor: "#ff3f3c"
+					});
 				});
-			}
+		}
+	}
+
+	function cancelPeerRequest(peerId, force) {
+		peerRegistrationService.cancelPeerRequest(peerId).success(function (data) {
+			SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");
+			vm.dtInstance.reloadData(null, false);
+		}).error(function (error) {
+			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}	
 

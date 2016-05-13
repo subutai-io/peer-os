@@ -3034,7 +3034,7 @@ td.b-main-table__status-col {
 }
 
 .b-switcher_login .b-toggle_cloud {
-    width: 160px;
+    width: 210px;
 }
 
 .b-check {
@@ -3112,7 +3112,7 @@ td.b-main-table__status-col {
     line-height: 10px;
 }
 .b-switcher_login .b-toggle_cloud .b-toggle-bg:after {
-    content: "Sptoken";
+    content: "PGP signature";
 	right: 10px;
 }
 .b-toggle_cloud .b-check:checked ~ .b-toggle-bg:after  {

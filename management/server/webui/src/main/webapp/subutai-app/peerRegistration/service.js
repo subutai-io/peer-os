@@ -19,6 +19,7 @@ function peerRegistrationService($http) {
 		unregisterPeerRequest: unregisterPeerRequest,
 
 		getResourceHosts: getResourceHosts,
+		checkPeer: checkPeer,
 
 
 		getPeersUrl : function() { return PEERS_URL; }
@@ -79,5 +80,10 @@ function peerRegistrationService($http) {
 
 	function getResourceHosts() {
 		return $http.get(RH_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function checkPeer( ip )
+	{
+		return $http.get( PEERS_URL + "check/" + ip, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 }

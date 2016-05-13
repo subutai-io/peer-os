@@ -20,7 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.core.Response;
 
+import io.subutai.common.util.RestUtil;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -685,29 +688,8 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     @Override
     public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
     {
-        Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
-        URL destinationUrl;
-        try
-        {
-            destinationUrl = buildDestinationUrl( destinationHost );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new PeerException( "Invalid URL." );
-        }
-
-        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
-                .getPeerInfo().getPublicSecurePort() )
-        {
-            throw new PeerException( "Could not send registration request to ourselves." );
-        }
-
-        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
-        {
-            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
-                    localPeer.getPeerInfo().getPublicUrl() ) );
-        }
+        URL destinationUrl = checkDestinationHostConstraints(destinationHost);
 
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
@@ -733,6 +715,56 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             LOG.error( e.getMessage(), e );
             throw new PeerException( e.getMessage() );
         }
+    }
+
+    public boolean checkHostAvailability( final String destinationHost ) throws PeerException
+    {
+        URL url = checkDestinationHostConstraints( destinationHost );
+
+        try
+        {
+            WebClient client = RestUtil.createTrustedWebClient( url.toString() + "/rest/v1/handshake/info" );
+            Response response = client.get();
+
+            if( response.hasEntity() )
+            {
+                return true;
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.error("checkHostAvailability", e);
+        }
+
+        return false;
+    }
+
+    private URL checkDestinationHostConstraints( String destinationHost ) throws PeerException
+    {
+        Preconditions.checkNotNull( destinationHost );
+        URL destinationUrl;
+        try
+        {
+            destinationUrl = buildDestinationUrl( destinationHost );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new PeerException( "Invalid URL." );
+        }
+
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
+                .getPeerInfo().getPublicSecurePort() )
+        {
+            throw new PeerException( "Could not send registration request to ourselves." );
+        }
+
+        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
+        }
+
+        return destinationUrl;
     }
 
 
