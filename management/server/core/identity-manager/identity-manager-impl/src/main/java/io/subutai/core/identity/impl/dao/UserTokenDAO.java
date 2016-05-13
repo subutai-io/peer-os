@@ -261,7 +261,7 @@ public class UserTokenDAO
         {
             List<UserToken> result = null;
             Query qr = em.createQuery(
-                    "select h from UserTokenEntity h where h.user.id=:userId and h.validDate>=:validDate",
+                    "select h from UserTokenEntity h where h.userId=:userId and h.validDate>=:validDate",
                     UserToken.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "validDate", new Date( System.currentTimeMillis() ) );
