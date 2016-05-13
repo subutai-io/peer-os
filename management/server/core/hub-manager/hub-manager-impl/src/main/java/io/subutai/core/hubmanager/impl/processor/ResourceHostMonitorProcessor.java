@@ -18,23 +18,24 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.IntegrationImpl;
+import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostMonitorDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
+
+// TODO: Replace WebClient with HubRestClient.
 public class ResourceHostMonitorProcessor implements Runnable
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostMonitorProcessor.class );
     private ConfigManager configManager;
-    private IntegrationImpl manager;
+    private HubManagerImpl manager;
     private PeerManager peerManager;
     private Monitor monitor;
 
 
-    public ResourceHostMonitorProcessor( final IntegrationImpl integration, final PeerManager peerManager,
+    public ResourceHostMonitorProcessor( final HubManagerImpl integration, final PeerManager peerManager,
                                          final ConfigManager configManager, final Monitor monitor )
     {
         this.peerManager = peerManager;

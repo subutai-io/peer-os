@@ -28,7 +28,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = "4.0.0-RC10"
+	app.Version = "4.0.0-RC12-SNAPSHOT"
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
@@ -119,6 +119,15 @@ func main() {
 			lib.LxcImport(c.Args().Get(0), c.String("v"), c.String("t"))
 		}}, {
 
+		Name: "hostname", Usage: "Set hostname of container or host",
+		Action: func(c *cli.Context) {
+			if len(c.Args().Get(1)) != 0 {
+				lib.LxcHostname(c.Args().Get(0), c.Args().Get(1))
+			} else {
+				lib.Hostname(c.Args().Get(0))
+			}
+		}}, {
+
 		Name: "list", Usage: "list Subutai container",
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "c", Usage: "containers only"},
@@ -162,9 +171,14 @@ func main() {
 				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
 				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
 				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
-				cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"}},
+				cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"},
+				cli.BoolFlag{Name: "v", Usage: "print p2p version (p2p -v)"}},
 			Action: func(c *cli.Context) {
-				lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+				if c.Bool("v") {
+					lib.P2Pversion()
+				} else {
+					lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+				}
 			}}},
 
 		Action: func(c *cli.Context) {
@@ -275,11 +289,26 @@ func main() {
 			lib.LxcStop(c.Args().Get(0))
 		}}, {
 
-		Name: "tunnel", Usage: "create SSH tunnel",
-		Flags: []cli.Flag{
-			cli.BoolFlag{Name: "g", Usage: "global accessible tunnel"}},
+		Name: "tunnel", Usage: "SSH tunnel management",
+		// Adding subcommand somehow breaks c.Bool flag passing, so c.Args().Get(3) is our bool for now :(
+		// Flags: []cli.Flag{
+		// 	cli.BoolFlag{Name: "g", Usage: "create tunnel to global proxy"}},
 		Action: func(c *cli.Context) {
-			lib.Tunnel(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2), c.Bool("g"))
+			lib.Tunnel(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
+		},
+		Subcommands: []cli.Command{
+			{
+				Name:  "list",
+				Usage: "list active ssh tunnels",
+				Action: func(c *cli.Context) {
+					lib.TunList(false)
+				}},
+			{
+				Name:  "del",
+				Usage: "delete tunnel",
+				Action: func(c *cli.Context) {
+					lib.TunDel(c.Args().Get(0))
+				}},
 		}}, {
 
 		Name: "unregister", Usage: "unregister Subutai container",
