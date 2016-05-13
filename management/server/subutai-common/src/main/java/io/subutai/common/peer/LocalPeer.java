@@ -4,7 +4,7 @@ package io.subutai.common.peer;
 import java.util.List;
 import java.util.Set;
 
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.protocol.TemplateKurjun;
@@ -120,11 +120,11 @@ public interface LocalPeer extends Peer
      *
      * @param vni - vni
      * @param domain -  domain to assign
-     * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
+     * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
      * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
 
-    public void setVniDomain( Long vni, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+    public void setVniDomain( Long vni, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                               String sslCertPath ) throws PeerException;
 
 

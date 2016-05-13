@@ -13,7 +13,7 @@ import com.google.common.base.Strings;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.network.SshTunnel;
@@ -243,16 +243,16 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public void setVlanDomain( final int vLanId, final String domain,
-                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
+                               final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
-        Preconditions.checkNotNull( domainLoadBalanceStrategy, "Invalid strategy" );
+        Preconditions.checkNotNull( proxyLoadBalanceStrategy, "Invalid strategy" );
 
         execute( getManagementHost(),
-                commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
+                commands.getSetVlanDomainCommand( vLanId, domain, proxyLoadBalanceStrategy, sslCertPath ) );
     }
 
 

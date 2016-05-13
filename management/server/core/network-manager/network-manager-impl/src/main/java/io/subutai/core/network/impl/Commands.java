@@ -9,7 +9,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 
 
 /**
@@ -82,16 +82,23 @@ public class Commands
 
 
     public RequestBuilder getSetVlanDomainCommand( final int vLanId, final String domain,
-                                                   final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                                   final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                                    final String sslCertPath )
     {
-        List<String> args = Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain, "-p",
-                domainLoadBalanceStrategy.getValue() );
+        List<String> args = Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain );
+
+        if ( proxyLoadBalanceStrategy != ProxyLoadBalanceStrategy.NONE )
+        {
+            args.add( "-p" );
+            args.add( proxyLoadBalanceStrategy.getValue() );
+        }
+
         if ( !Strings.isNullOrEmpty( sslCertPath ) )
         {
             args.add( "-f" );
             args.add( sslCertPath );
         }
+
         return new RequestBuilder( MANAGEMENT_PROXY_BINDING ).withCmdArgs( args );
     }
 

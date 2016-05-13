@@ -42,7 +42,7 @@ import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
@@ -1077,21 +1077,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     @RolesAllowed( "Environment-Management|Update" )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
-        Preconditions.checkNotNull( domainLoadBalanceStrategy );
+        Preconditions.checkNotNull( proxyLoadBalanceStrategy );
 
-        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, sslCertPath );
+        modifyEnvironmentDomain( environmentId, newDomain, proxyLoadBalanceStrategy, sslCertPath );
     }
 
 
     public void modifyEnvironmentDomain( final String environmentId, final String domain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -1117,7 +1117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             if ( assign )
             {
                 peerManager.getLocalPeer()
-                           .setVniDomain( environment.getVni(), domain, domainLoadBalanceStrategy, sslCertPath );
+                           .setVniDomain( environment.getVni(), domain, proxyLoadBalanceStrategy, sslCertPath );
             }
             else
             {

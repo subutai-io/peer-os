@@ -26,7 +26,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
@@ -519,7 +519,7 @@ public class EnvironmentManagerSecureProxy
     @Override
     @RolesAllowed( "Environment-Management|Update" )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -532,7 +532,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
-        environmentManager.assignEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, sslCertPath );
+        environmentManager.assignEnvironmentDomain( environmentId, newDomain, proxyLoadBalanceStrategy, sslCertPath );
     }
 
 

@@ -3,7 +3,7 @@ package io.subutai.core.network.api;
 
 import java.util.Date;
 
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.network.SshTunnel;
@@ -74,10 +74,10 @@ public interface NetworkManager
      * Assigns reverse proxy domain to vlan
      *
      * @param vLanId - vlan id
-     * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
+     * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
      * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
-    public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+    public void setVlanDomain( int vLanId, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                String sslCertPath ) throws NetworkManagerException;
 
 
