@@ -82,7 +82,7 @@ func Start(c *cli.Context) {
 			time.Sleep(5 * time.Second)
 		}
 		container.ContainersRestoreState(pool)
-		lib.TunList(true)
+		lib.TunCheck()
 	}
 }
 
