@@ -9,7 +9,8 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 	var vm = this;
 	vm.peerId = null;
-	vm.test = 'lolololol';
+	vm.peerToAction = '';
+	vm.action = '';
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
@@ -24,6 +25,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	vm.cancelPeerRequest = cancelPeerRequest;
 	vm.addPeer = addPeer;
 	vm.approvePeerRequest = approvePeerRequest;
+	vm.confirmPopup = confirmPopup;
 
 	vm.dtInstance = {};
 	vm.users = {};
@@ -73,12 +75,14 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	function actionButton(data, type, full, meta) {
 		var result = '';
 		if(data.registrationData.status == 'APPROVED') {
-			result += '<a href class="b-btn b-btn_red subt_button__peer-unregister" ng-click="peerRegistrationCtrl.unregisterPeer(\'' + data.registrationData.peerInfo.id + '\')">Unregister</a>';
+			result += '<a href class="b-btn b-btn_red subt_button__peer-unregister" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Unregister\')">Unregister</a>';
 		} else if(data.registrationData.status == 'WAIT') {
-			result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.cancelPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Cancel</a>';
+			//result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.cancelPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Cancel</a>';
+			result += '<a href class="b-btn b-btn_blue subt_button__peer-cancel" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Cancel\')">Cancel</a>';
 		} else if(data.registrationData.status == 'REQUESTED') {
 			result += '<a href class="b-btn b-btn_green subt_button__peer-approve" ng-click="peerRegistrationCtrl.approvePeerRequestForm(\'' + data.registrationData.peerInfo.id + '\')">Approve</a>';
-			result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.rejectPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Reject</a>';
+			//result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.rejectPeerRequest(\'' + data.registrationData.peerInfo.id + '\')">Reject</a>';
+			result += '<a href class="b-btn b-btn_red subt_button__peer-reject" ng-click="peerRegistrationCtrl.confirmPopup(\'' + data.registrationData.peerInfo.id + '\', \'Reject\')">Reject</a>';
 		}
 
 		return result;
@@ -140,34 +144,25 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		});
 	}
 
-	function unregisterPeer(peerId) {
-		var previousWindowKeyDown = window.onkeydown;
-		SweetAlert.swal({
-			title: "Are you sure?",
-			text: "Your unregister peer request!",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonColor: "#ff3f3c",
-			confirmButtonText: "Unregister",
-			cancelButtonText: "Cancel",
-			closeOnConfirm: false,
-			closeOnCancel: true,
-			showLoaderOnConfirm: true
-		},
-		function (isConfirm) {
-			window.onkeydown = previousWindowKeyDown;
-			if (isConfirm) {
-				peerRegistrationService.unregisterPeerRequest(peerId).success(function (data) {
-					SweetAlert.swal("Unregistered!", "Your peer request has been unregistered.", "success");
-					vm.dtInstance.reloadData(null, false);
-				}).error(function (error) {
-					SweetAlert.swal("ERROR!", error, "error");
-				});
-			}
+	function confirmPopup(peerId, action) {
+		vm.peerToAction = peerId;
+		vm.action = action;
+		ngDialog.open({
+			template: 'subutai-app/peerRegistration/partials/confirmPopup.html',
+			scope: $scope
 		});
 	}
 
-	function cancelPeerRequest(peerId) {
+	function unregisterPeer(peerId, force) {
+		peerRegistrationService.unregisterPeerRequest(peerId, force).success(function (data) {
+			SweetAlert.swal("Unregistered!", "Your peer request has been unregistered.", "success");
+			vm.dtInstance.reloadData(null, false);
+		}).error(function (error) {
+			SweetAlert.swal("ERROR!", error, "error");
+		});
+	}
+
+	function cancelPeerRequest(peerId, force) {
 		var previousWindowKeyDown = window.onkeydown;
 		SweetAlert.swal({
 			title: "Are you sure?",
