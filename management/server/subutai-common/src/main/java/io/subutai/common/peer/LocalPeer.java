@@ -163,6 +163,14 @@ public interface LocalPeer extends Peer
 
     public ReservedNetworkResources getReservedNetworkResources() throws PeerException;
 
+    /**
+     * Returns true if peer in initialized
+     */
     boolean isInitialized();
+
+    /**
+     * Returns true if MH is connected
+     */
+    boolean isMHPresent();
 }
 

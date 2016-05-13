@@ -243,6 +243,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    @Override
+    public boolean isMHPresent()
+    {
+        try
+        {
+            ResourceHost mh = getManagementHost();
+
+            return mh.isConnected();
+        }
+        catch ( HostNotFoundException ignore )
+        {
+            return false;
+        }
+    }
+
+
     protected void initPeerInfo()
     {
         peerInfo = new PeerInfo();
