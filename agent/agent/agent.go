@@ -63,7 +63,8 @@ func initAgent() {
 func Start(c *cli.Context) {
 	initAgent()
 	for !checkSS() {
-		time.Sleep(time.Second * 3)
+		container.ContainersRestoreState(pool)
+		time.Sleep(time.Second * 10)
 	}
 
 	http.HandleFunc("/trigger", trigger)
