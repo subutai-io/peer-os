@@ -9,13 +9,9 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 	var vm = this;
 	vm.peerId = null;
-<<<<<<< HEAD
 	vm.peerToAction = '';
 	vm.action = '';
-=======
-	vm.test = 'lolololol';
 	vm.peerStatusIco = "";
->>>>>>> e620e02628548b6a8b8cb90611d44dd8dd36a279
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
@@ -30,11 +26,8 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	vm.cancelPeerRequest = cancelPeerRequest;
 	vm.addPeer = addPeer;
 	vm.approvePeerRequest = approvePeerRequest;
-<<<<<<< HEAD
 	vm.confirmPopup = confirmPopup;
-=======
 	vm.checkResourceHost = checkResourceHost;
->>>>>>> e620e02628548b6a8b8cb90611d44dd8dd36a279
 
 	vm.dtInstance = {};
 	vm.users = {};
