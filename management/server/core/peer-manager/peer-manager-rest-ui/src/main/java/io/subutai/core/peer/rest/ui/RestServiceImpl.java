@@ -226,4 +226,23 @@ public class RestServiceImpl implements RestService {
     {
         return new ExecutorCompletionService<>( executor );
     }
+
+    @Override
+    public Response checkPeer( String destinationHost )
+    {
+        try
+        {
+            if( !peerManager.checkHostAvailability( destinationHost ) )
+            {
+                return Response.serverError().entity( JsonUtil.toJson( "No response, possibly wrong address" ) )
+                        .build();
+            }
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( JsonUtil.toJson( e.getMessage() ) ).build();
+        }
+
+        return Response.ok().build();
+    }
 }

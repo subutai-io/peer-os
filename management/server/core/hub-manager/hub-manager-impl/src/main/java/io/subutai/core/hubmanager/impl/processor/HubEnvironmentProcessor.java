@@ -26,7 +26,7 @@ import org.apache.http.HttpStatus;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.ContainerId;
@@ -498,7 +498,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             assert environmentDto != null;
             if ( assign )
             {
-                DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
+                ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
                 localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
                 for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
                 {

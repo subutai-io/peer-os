@@ -6,7 +6,7 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
@@ -40,7 +40,7 @@ public class AddDomainToEnvironmentCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
 
-        environmentManager.assignEnvironmentDomain( envId, domain, DomainLoadBalanceStrategy.ROUND_ROBIN, null );
+        environmentManager.assignEnvironmentDomain( envId, domain, ProxyLoadBalanceStrategy.ROUND_ROBIN, null );
 
         System.out.println( "Domain is added to environment" );
 

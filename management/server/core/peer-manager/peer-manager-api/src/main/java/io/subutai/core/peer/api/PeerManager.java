@@ -73,4 +73,6 @@ public interface PeerManager
     Set<Peer> resolve( Set<String> peers ) throws PeerException;
 
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
+
+    boolean checkHostAvailability( final String destinationHost ) throws PeerException;
 }
