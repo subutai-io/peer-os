@@ -34,6 +34,7 @@ public class ReverseProxyConfig
         this.containerId = containerId;
         this.domainName = domainName;
         this.sslCertPath = sslCertPath;
+        this.loadBalanceStrategy = loadBalanceStrategy;
     }
 
 
