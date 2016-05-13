@@ -43,6 +43,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -150,7 +151,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
 
         this.environmentService = environmentService;
-
     }
 
 
@@ -433,7 +433,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
-        operationTracker.addLog("Logger initialized");
+        operationTracker.addLog( "Logger initialized" );
 
         createEnvironment( topology, async, operationTracker );
 
@@ -559,7 +559,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Modifying environment %s", environment.getId() ) );
 
-        operationTracker.addLog("Logger initialized");
+        operationTracker.addLog( "Logger initialized" );
 
         Set<Peer> allPeers = new HashSet<>();
 
@@ -1250,7 +1250,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public int setupSshTunnelForContainer( final String containerHostId, final String environmentId )
+    public SshTunnel setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
 
@@ -1275,14 +1275,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            int sshPort = peerManager.getLocalPeer().setupSshTunnelForContainer(
+            SshTunnel sshTunnel = peerManager.getLocalPeer().setupSshTunnelForContainer(
                     environmentContainer.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                     Common.CONTAINER_SSH_TIMEOUT_SEC );
 
             operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
+                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshTunnel ) );
 
-            return sshPort;
+            return sshTunnel;
         }
         catch ( Exception e )
         {
@@ -1837,5 +1837,4 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             LOG.warn( e.getMessage() );
         }
     }
-
 }

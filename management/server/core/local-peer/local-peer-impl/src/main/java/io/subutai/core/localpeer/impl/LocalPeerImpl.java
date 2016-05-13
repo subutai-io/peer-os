@@ -53,6 +53,7 @@ import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.ReservedNetworkResources;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
@@ -1605,7 +1606,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public int setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout ) throws PeerException
+    public SshTunnel setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout )
+            throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
@@ -1614,7 +1616,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            return getNetworkManager().setupContainerSsh( containerIp, sshIdleTimeout );
+            return getNetworkManager().setupContainerSshTunnel( containerIp, sshIdleTimeout );
         }
         catch ( NetworkManagerException e )
         {

@@ -117,9 +117,9 @@ public class Commands
     }
 
 
-    public RequestBuilder getSetupContainerSshCommand( final String containerIp, final int sshIdleTimeout )
+    public RequestBuilder getSetupContainerSshTunnelCommand( final String containerIp, final int sshIdleTimeout )
     {
-        return new RequestBuilder( String.format( "subutai tunnel %s %d", containerIp, sshIdleTimeout ) );
+        return new RequestBuilder( String.format( "subutai tunnel add %s %d", containerIp, sshIdleTimeout ) );
     }
 
 

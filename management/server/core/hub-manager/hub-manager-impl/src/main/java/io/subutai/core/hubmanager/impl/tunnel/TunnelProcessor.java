@@ -29,7 +29,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
     private final Logger LOG = LoggerFactory.getLogger( getClass() );
 
-    private static final String TUNNEL_COMMAND = "subutai tunnel %s:%s %s -g";
+    private static final String TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
 
     private PeerManager peerManager;
 

@@ -27,6 +27,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -609,7 +610,7 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    public int setupSshTunnelForContainer( final String containerHostId, final String environmentId )
+    public SshTunnel setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );

@@ -15,6 +15,7 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
@@ -239,7 +240,7 @@ public interface EnvironmentManager
      *
      * @return port for ssh connection
      */
-    int setupSshTunnelForContainer( String containerHostId, String environmentId )
+    SshTunnel setupSshTunnelForContainer( String containerHostId, String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 
     void removeContainerFromEnvironmentDomain( String containerHostId, String environmentId )

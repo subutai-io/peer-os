@@ -6,6 +6,7 @@ import java.util.Date;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnels;
@@ -114,6 +115,6 @@ public interface NetworkManager
      *
      * @return - port to which clients should connect to access the container via ssh
      */
-    int setupContainerSsh( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
+    SshTunnel setupContainerSshTunnel( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
 }
 

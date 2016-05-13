@@ -16,6 +16,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.network.DomainLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConnection;
@@ -306,18 +307,23 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public int setupContainerSsh( final String containerIp, final int sshIdleTimeout ) throws NetworkManagerException
+    public SshTunnel setupContainerSshTunnel( final String containerIp, final int sshIdleTimeout )
+            throws NetworkManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ), "Invalid container IP" );
         Preconditions.checkArgument( sshIdleTimeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkArgument( containerIp.matches( Common.HOSTNAME_REGEX ), "Invalid container IP" );
 
         CommandResult result =
-                execute( getManagementHost(), commands.getSetupContainerSshCommand( containerIp, sshIdleTimeout ) );
+                execute( getManagementHost(), commands.getSetupContainerSshTunnelCommand( containerIp, sshIdleTimeout ) );
 
         try
         {
-            return Integer.parseInt( result.getStdOut().trim() );
+            String output = result.getStdOut().trim();
+
+            String[] tunnelParts = output.split( ":" );
+
+            return new SshTunnel( tunnelParts[0], Integer.parseInt( tunnelParts[1] ) );
         }
         catch ( Exception e )
         {
