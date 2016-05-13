@@ -22,7 +22,7 @@ public interface RegistrationManager
 
     public void removeRequest( String requestId ) throws HostRegistrationException;
 
-    public ContainerToken generateContainerTTLToken( Long ttlInMs ) throws HostRegistrationException;
+    public ContainerToken generateContainerTTLToken( long ttlInMs ) throws HostRegistrationException;
 
     public ContainerToken verifyToken( String token, String containerHostId, String publicKey )
             throws HostRegistrationException;

@@ -170,26 +170,33 @@ public class TunnelProcessor implements StateLinkProcessor
     private TunnelInfoDto getData( String link )
     {
         LOG.debug( "Getting tunnel data from Hub: {}", link );
+
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
+
             Response res = client.get();
+
             LOG.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
 
             if ( res.getStatus() != HttpStatus.SC_OK )
             {
                 LOG.error( "Error to get tunnel  data from Hub: HTTP {} - {}", res.getStatus(),
                         res.getStatusInfo().getReasonPhrase() );
+
                 return null;
             }
 
             byte[] encryptedContent = configManager.readContent( res );
+
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
             return JsonUtil.fromCbor( plainContent, TunnelInfoDto.class );
         }
         catch ( Exception e )
         {
             LOG.error( "Error to get TunnelInfoDto data from Hub: ", e );
+
             return null;
         }
     }
