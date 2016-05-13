@@ -49,10 +49,11 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.network.ReservedNetworkResources;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
@@ -240,6 +241,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public boolean isInitialized()
     {
         return initialized;
+    }
+
+
+    @Override
+    public boolean isMHPresent()
+    {
+        try
+        {
+            ResourceHost mh = getManagementHost();
+
+            return mh.isConnected();
+        }
+        catch ( HostNotFoundException ignore )
+        {
+            return false;
+        }
     }
 
 
@@ -1470,11 +1487,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     //    @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void setVniDomain( final Long vni, final String domain,
-                              final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
+                              final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
             throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ) );
-        Preconditions.checkNotNull( domainLoadBalanceStrategy );
+        Preconditions.checkNotNull( proxyLoadBalanceStrategy );
 
         NetworkResource reservedNetworkResource = getReservedNetworkResources().findByVni( vni );
 
@@ -1482,7 +1499,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             try
             {
-                getNetworkManager().setVlanDomain( reservedNetworkResource.getVlan(), domain, domainLoadBalanceStrategy,
+                getNetworkManager().setVlanDomain( reservedNetworkResource.getVlan(), domain, proxyLoadBalanceStrategy,
                         sslCertPath );
             }
             catch ( NetworkManagerException e )
@@ -1589,7 +1606,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public int setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout ) throws PeerException
+    public SshTunnel setupSshTunnelForContainer( final String containerIp, final int sshIdleTimeout )
+            throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ) );
         Preconditions.checkArgument( containerIp.matches( Common.IP_REGEX ) );
@@ -1598,7 +1616,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         try
         {
-            return getNetworkManager().setupContainerSsh( containerIp, sshIdleTimeout );
+            return getNetworkManager().setupContainerSshTunnel( containerIp, sshIdleTimeout );
         }
         catch ( NetworkManagerException e )
         {
@@ -2305,7 +2323,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             getNetworkManager().removeVlanDomain( networkResource.getVlan() );
             getNetworkManager().setVlanDomain( networkResource.getVlan(), reverseProxyConfig.getDomainName(),
-                    DomainLoadBalanceStrategy.LOAD_BALANCE, reverseProxyConfig.getSslCertPath() );
+                    reverseProxyConfig.getLoadBalanceStrategy(), reverseProxyConfig.getSslCertPath() );
             getNetworkManager().addIpToVlanDomain( netInterface.getIp(), networkResource.getVlan() );
         }
         catch ( Exception e )

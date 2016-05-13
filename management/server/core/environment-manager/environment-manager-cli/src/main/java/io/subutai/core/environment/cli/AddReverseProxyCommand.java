@@ -11,6 +11,7 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
@@ -53,7 +54,8 @@ public class AddReverseProxyCommand extends SubutaiShellCommandSupport
         {
             sslCert = readFile( certPath, Charset.defaultCharset() );
         }
-        final ReverseProxyConfig config = new ReverseProxyConfig( environmentId, containerId, domainName, sslCert );
+        final ReverseProxyConfig config = new ReverseProxyConfig( environmentId, containerId, domainName, sslCert,
+                ProxyLoadBalanceStrategy.NONE );
         environmentManager.addReverseProxy( environment, config );
         return null;
     }

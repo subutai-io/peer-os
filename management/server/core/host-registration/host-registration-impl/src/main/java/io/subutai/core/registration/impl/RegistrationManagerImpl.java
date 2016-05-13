@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import com.google.common.collect.Lists;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ServiceLocator;
@@ -45,6 +47,9 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
     {
+        Preconditions.checkNotNull( securityManager );
+        Preconditions.checkNotNull( daoManager );
+
         this.securityManager = securityManager;
         this.daoManager = daoManager;
     }
@@ -92,8 +97,15 @@ public class RegistrationManagerImpl implements RegistrationManager
     @Override
     public synchronized void queueRequest( final RequestedHost requestedHost ) throws HostRegistrationException
     {
+        Preconditions.checkNotNull( requestedHost, "'Invalid registration request" );
+
         try
         {
+            //try to convert
+            PGPPublicKeyRing testKeyRing = PGPKeyUtil.readPublicKeyRing( requestedHost.getPublicKey() );
+
+            Preconditions.checkNotNull( testKeyRing, "Invalid public key" );
+
             RequestedHostImpl requestedHostImpl = requestDataService.find( requestedHost.getId() );
 
             if ( requestedHostImpl != null )
@@ -213,8 +225,10 @@ public class RegistrationManagerImpl implements RegistrationManager
 
 
     @Override
-    public ContainerToken generateContainerTTLToken( final Long ttlInMs ) throws HostRegistrationException
+    public ContainerToken generateContainerTTLToken( final long ttlInMs ) throws HostRegistrationException
     {
+        Preconditions.checkArgument( ttlInMs > 0, "Invalid ttl" );
+
         ContainerTokenImpl token =
                 new ContainerTokenImpl( UUID.randomUUID().toString(), new Timestamp( System.currentTimeMillis() ),
                         ttlInMs );

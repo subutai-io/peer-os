@@ -13,9 +13,10 @@ import com.google.common.base.Strings;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.P2PConnection;
@@ -242,16 +243,16 @@ public class NetworkManagerImpl implements NetworkManager
 
     @Override
     public void setVlanDomain( final int vLanId, final String domain,
-                               final DomainLoadBalanceStrategy domainLoadBalanceStrategy, final String sslCertPath )
+                               final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
             throws NetworkManagerException
     {
         Preconditions.checkArgument( NumUtil.isIntBetween( vLanId, Common.MIN_VLAN_ID, Common.MAX_VLAN_ID ),
                 "Invalid vlan" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domain ), "Invalid domain" );
-        Preconditions.checkNotNull( domainLoadBalanceStrategy, "Invalid strategy" );
+        Preconditions.checkNotNull( proxyLoadBalanceStrategy, "Invalid strategy" );
 
         execute( getManagementHost(),
-                commands.getSetVlanDomainCommand( vLanId, domain, domainLoadBalanceStrategy, sslCertPath ) );
+                commands.getSetVlanDomainCommand( vLanId, domain, proxyLoadBalanceStrategy, sslCertPath ) );
     }
 
 
@@ -306,18 +307,23 @@ public class NetworkManagerImpl implements NetworkManager
 
 
     @Override
-    public int setupContainerSsh( final String containerIp, final int sshIdleTimeout ) throws NetworkManagerException
+    public SshTunnel setupContainerSshTunnel( final String containerIp, final int sshIdleTimeout )
+            throws NetworkManagerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( containerIp ), "Invalid container IP" );
         Preconditions.checkArgument( sshIdleTimeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkArgument( containerIp.matches( Common.HOSTNAME_REGEX ), "Invalid container IP" );
 
         CommandResult result =
-                execute( getManagementHost(), commands.getSetupContainerSshCommand( containerIp, sshIdleTimeout ) );
+                execute( getManagementHost(), commands.getSetupContainerSshTunnelCommand( containerIp, sshIdleTimeout ) );
 
         try
         {
-            return Integer.parseInt( result.getStdOut().trim() );
+            String output = result.getStdOut().trim();
+
+            String[] tunnelParts = output.split( ":" );
+
+            return new SshTunnel( tunnelParts[0], Integer.parseInt( tunnelParts[1] ) );
         }
         catch ( Exception e )
         {
