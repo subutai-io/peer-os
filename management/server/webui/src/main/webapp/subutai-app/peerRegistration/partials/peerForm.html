@@ -14,7 +14,8 @@
 					id="subt_input__peer-ip" 
 					class="b-popup-body-input b-popup-body-input_box" 
 					ng-model="newPeer.ip" required>
-				<i ng-show="peerRegistrationCtrl.peerStatusIco.length > 0" class="g-right fa fa-{{ peerRegistrationCtrl.peerStatusIco }}"></i>
+				<i ng-show="peerRegistrationCtrl.peerStatusIco == 'check'" class="g-right fa fa-check b-tags_green"></i>
+				<i ng-show="peerRegistrationCtrl.peerStatusIco == 'times'" class="g-right fa fa-times b-tags_red"></i>
 				<div class="clear"></div>
 			</div>
 

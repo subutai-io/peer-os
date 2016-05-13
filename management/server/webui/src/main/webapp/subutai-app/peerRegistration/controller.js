@@ -99,6 +99,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function peerFrom() {
+		vm.peerStatusIco = '';
 		ngDialog.open({
 			template: 'subutai-app/peerRegistration/partials/peerForm.html',
 			scope: $scope
@@ -173,12 +174,22 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 
 		if( info.ip )
 		{
+			LOADING_SCREEN();
 			peerRegistrationService.checkPeer( info.ip )
 				.success( function (data) {
-					vm.peerStatusIco = "sign";
+					vm.peerStatusIco = "check";
+					LOADING_SCREEN("none");
 				})
 				.error( function (data) {
-					vm.peerStatusIco = "plus";
+					vm.peerStatusIco = "times";
+					LOADING_SCREEN("none");
+
+					SweetAlert.swal({
+						title: "ERROR!",
+						text: data,
+						type: "error",
+						confirmButtonColor: "#ff3f3c"
+					});
 				});
 		}
 	}
