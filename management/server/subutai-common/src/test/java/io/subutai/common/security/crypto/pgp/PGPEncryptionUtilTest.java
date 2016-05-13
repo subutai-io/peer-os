@@ -397,40 +397,98 @@ public class PGPEncryptionUtilTest
                 }
             }
         }
-        catch(Exception e) {
+        catch(Exception e)
+        {
             e.printStackTrace();
         }
 
-        String clearSign =
-                "-----BEGIN PGP SIGNED MESSAGE-----\n" + "Hash: SHA256\n" + "\n" + "-----BEGIN PGP MESSAGE-----\n"
-                        + "Version: BCPG v1.52\n" + "\n"
-                        + "hQEMA2Y9gO5nrCSvAQf9FpDCWPQFDgT42/o1yKb6kmFz1Q5scHR6pbp68Q4lV6LQ\n"
-                        + "ou fLFKBPIS1qAkAe2oOyzcylUu3pezeJ GlTJqyNrpEjYNPVuwUeLlqxo1s1QxU\n"
-                        + "fZhJ76EPln3csG3EjN9sgjni6sD/3XBLexw0kn9hP OHRtFVvf/vBbi0fyh0 YPu\n"
-                        + "qSfboJQokvR JoJ14TITtUqqqdrt/uEmyu3qK/A8QCyRFbLn8J0lKDcuaAmsJ51W\n"
-                        + "6IvhVaMF4vE8UF9qU4c8qBL6mWaN4B1IImYI2UOrzL8DCNOnijyD1RVINcqCpAFo\n"
-                        + "KhCM8acJE2JHqlEm/tvqARbTBKPUxH3pn9EaXsJ4xNLAqQGWJh97gPswkd2BiadC\n"
-                        + "sDICqHdMTaoPZBo0X4FnXr5ou7 bWunprRJhQfkAF55oWGV9As1ozD2kDXrNIJqy\n"
-                        + "K9NXLVbmDeKRb85kyAsHGBTqxq6cUmK9MvJy9Xynn rfdD r3TkqF6uj6ptmE/VZ\n"
-                        + "Nmhjv3DCe28j102Oj5 aKZtLURjc1qsWEQLzA IdgE08yA68h6bWR2MEPkWVttIA\n"
-                        + "F9ZTAl6dN6bfCCnV/8 b5HMfsh/g0U8e1zAp /C8ubWfhq51tvKbm7XKAj0Zl3t0\n"
-                        + "pHqBA6NVkpqIhOxsc52vFeXZ3G lAr/8UpJvKhNIwSmPx4mm1xkWwLIcRlUm UCV\n"
-                        + "pJeOBd8ShIlEBJxe7EneIwGEHxguE2m/luhn0Q8nRdUHp4NDnHoALqTBgc5MRrXv\n"
-                        + "NQW kiZDnNOLQosu0O4/8ihwgNbV a4emvojXy4zD//5gISJVnKGgw0tDeHflbkF\n" + "0q3UGAvnEZ0rSy8=\n"
-                        + "=PgL/\n" + "- -----END PGP MESSAGE-----\n" + "\n" + "-----BEGIN PGP SIGNATURE-----\n"
-                        + "Version: Subutai Social v1.0.0\n" + "Comment: https://subutai.io/\n" + "\n"
-                        + "wsFcBAEBCAAQBQJWbr2dCRCVh5hg8XTaEAAA8cQP/AzhQd1kKx7TNJfkY/vF\n"
-                        + "otXslh/QVwg9HqgAq710QdWVlim/1AS1Muzy5tLN2p3TeDwKSwEgnkRu3czL\n"
-                        + "2G8ENPRI/nQV1T6NeLhso/oiqdqyttaFpPRgq6pOm0S6CD7hqOS2Brf2ha51\n"
-                        + "SqfOWy6UgI2QEfHyKQ8bc307dW6dj4yLc6GEJuHuj4Lyk8cZTXHbmtQwZEqE\n"
-                        + "xu36G60SzbBJ88BG tp22IHRYxuCUNeDMh/zrIv/c8EHOmRgrG/AeIu3bmI1\n"
-                        + "otEYcbO2nbgpq DXLDKFaDtn2Lak8UJa6v7pZXwhWQYlR//eXPZrmSNG3T N\n"
-                        + "UGeyfZHbAu fp2o4pLCrS0kw2hWUJcoHyl3gcoto QAJRudLM7rNBDjWwvFE\n"
-                        + "WakfqmT4r2kSAckyWKXvrZibEVz0XrNxuIKBjOBo6VUOCfJu zyHxsr0/fEB\n"
-                        + "bAclK3 5eNy7rMNGHoAHBT0gaRb27LhiOlrHaASPzLYzX9iI89pyXRJfcYvm\n"
-                        + "YiAvShvqCbHSECPByFC8xu9xkGm2PgvzgLr vl7ZOgJjqu3qOuopI j3l820\n"
-                        + "2dO4el8mGYoGLkmB0Q18KCvaqkvlnDC94GQKFaI2YeV/a6JC8BxG0xkm PHf\n"
-                        + "w1RevNd8Oge0eCJeQw0aaLwaUbQgdsbY rRyjFQFtWPAcJfxtsRj0pFQRIGM\n" + "ZoSP\n" + "=8OOc\n"
-                        + "-----END PGP SIGNATURE-----";
     }
+
+
+    @Test
+    public void verifySignature() throws Exception
+    {
+        String message = getSignedMessage();
+        PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( getPublicKey());
+
+        assertTrue( PGPEncryptionUtil.verifyClearSign( message.getBytes(), pubKeyRing ) );
+    }
+
+
+
+    private String getSignedMessage()
+    {
+        String messageSigned = "-----BEGIN PGP SIGNED MESSAGE-----\n" + "Hash: SHA1\n" + "\n"
+                + "76bfb0d6-bc3a-4ed3-9078-d64e104aaec8\n" + "-----BEGIN PGP SIGNATURE-----\n"
+                + "Version: GnuPG v2.0.22 (GNU/Linux)\n" + "\n"
+                + "iQIcBAEBAgAGBQJXNC/UAAoJELIbGGHrOj4+8vcP/j1L0YaCnN3aYhSWyWYrHvv8\n"
+                + "Jk83ySuZZ7ngyzqs6mj2Tnv/PFFDO1EDN2F1mNdAX/vOdfie8jL6D60ugteMvbFh\n"
+                + "0OZUklmYCQpJ+9THUpqn0xyJ2BbuPA7eO5socSKSZB67fTzBlYY1kANQdjbGYu7H\n"
+                + "V1n81o3iUQqQE4wwwlaerwFnwgrsOc1Sc9+ELIrjwFveh7gRfTqPx1LY7MnPUQt/\n"
+                + "MCfnCAky6cNjTFIZB6yIJg0C98NFuLn0uk9nE9nxFLrPgRgFOLbAfbhp0Hyyn18/\n"
+                + "embpJHjK+6O7PsmXLqirzw8d22AMHCGpWBPluZGyKXAnnaVVON4qd6k2yoJwZSTB\n"
+                + "C5IaKAKFofudDG1h4vicVBeURF7ZDqR2DCs0LiUHS7kfLfc73RFriH/6GeCVELqV\n"
+                + "8C32BFg0Qq6nGOnzPtzzzJquo4RTWfwmzsNWPtEB30DPzpyKfZKrtPcwl0lcwhEs\n"
+                + "JglD2yU46CT4zoWW9pHQ4AGvwYAqn7nbkig4v5AlEnkTWN75d4bZj4G5b+iCCnm8\n"
+                + "TUQLK6abVOe0JvYcj7stkPlQ8xMsBSZ0j8oVGf+CLw5M6xIMIJF5Xou6Yljvm5Uz\n"
+                + "GdLec+eMzjX7qZbAgsVZUrzYnt7VwvBMS4aPl38uaxtznXWn5wCFyKW7AFoH5Tfh\n" + "oOLTyRYdbjXsjjwSXQqf\n"
+                + "=sIF7\n" + "-----END PGP SIGNATURE-----\n";
+
+        return messageSigned.trim();
+    }
+
+
+    private String getPublicKey()
+    {
+        String pubKeySTR = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n" + "Version: GnuPG v2.0.22 (GNU/Linux)\n" + "\n"
+                + "mQINBFcwIFYBEADHoXrLzLEekfJN1yEeXSawRdXe3KZTtZpaL+8ALCL2nDdPjtDh\n"
+                + "2gavkyMNVnR7YfhJP6YBsGWgfqCJVgkR0kF+Y18qIFI6E+vRwlB+Jq95vZNQuvJK\n"
+                + "iJ+wIdcPET2cGQUrlEwB73skd25TmukDbruZuuyVAIWOAJPoSRV7WYf/t3nBtMkJ\n"
+                + "5ZHJy/jOvhSGptE1xSARcpLc43jHkxHIak57GTsN+CldfGcIPXQfr8yrIUfyzbf9\n"
+                + "qLqB9UpU4We6QXckfSXVUtpp80kg1F2szLzQ+DSHYAEOpq9e+rxd4/61ElZKJHGT\n"
+                + "KjdS/asg4zlMLjEhDnG5Drdj8WrKvHd8CGOjbHW9497qVk3W++E3Q6Yx8kvVZECV\n"
+                + "KvmzlzrGWGxvveuAFhYqH0nnbkdFa/QAkjSibLz10cu4zTHl5utN9cHm6swDmZEJ\n"
+                + "okxdmh5bugZ3rUI3nYmWo7C/yTvRwRDwnmkyCUyr5G73ElBZ5xTnPZWtYWBO+zrb\n"
+                + "6rSqYLw5oR59zSBlcQwQVGbD6Xj+eEgpImNGNf5YvGM18TUN5ODHeDIbGSoltLK0\n"
+                + "1fM/ymMYHI4DOMaoWFoxW0pl2WVN3axfaBje6lYlCecWRChtIybfPCC79YdYwVSr\n"
+                + "eW1eK5OGIMNTYkDZUwAlN6D5BRHuNnV4OBJP+9zFnDociyoGya9sk47wnQARAQAB\n"
+                + "tA9uayA8bmtAb3B0LmNvbT6JAjUEEAEIACkFAlcwIF0GCwkIBwMCCRCyGxhh6zo+\n"
+                + "PgQVCAIKAxYCAQIZAQIbAwIeAQAA1MgP/Rez2jHsFI/x0INYGeTZ/M27U7pMlJ3h\n"
+                + "hzkzjdfnc4bjfE3Ez4oEt5k0IpVXnmtajKZY/yflK66YTt2BfW11sXSWvs1tVSmE\n"
+                + "ib9U+Gw+SpUC+L6Ne19N8ZiqSojBk7m5Y+AqZgzkOG1DzAe+YJbG8oFpOgl7NiJn\n"
+                + "mx/Bw/JkVjscIPYlvDEYXCmbmSNTjRiYpXDP2E+EilbPFVzv8ZDYUVHypDVyXokf\n"
+                + "wtMHVjWVjyCy0LA6hfQRUJDMFUi2Yj95TyAywbEo0CwXNXqSr4FM3F6c6InSWnHv\n"
+                + "UMfsPmxgAByHAjPlfTE25ZhoYxdB7kfjPeA5rjv4aH02WU7EAFItAcxklqpL4xHJ\n"
+                + "yY10nGccc4bqWS6UadPXGVofU+dgPFGBuKWPuE3psZPDUxTeioZ8qtNVgMgaitV6\n"
+                + "IZygpagdVbyPCd1xQ8tUn3REUTP9EoQhVcolm55zMJphDtZkcVoo5GRqpjNFB9ad\n"
+                + "4ZNsAIh0FEyphlzp20ZN5Efz4rguKjWvyGenbJlWWTx4lJ0jRXLiZovgU/3QEJPW\n"
+                + "pJ3I23PaDPjlUkRfBX8iGwkV3z3MaTyQBz+2rgy/Ltr75PpqdzOe5bhJ3FPurYoo\n"
+                + "GKy190VmZf9Zx4M8Fk/fp2LWnbNl4xxJNjwHjxjf75olBdg//gsRFqtGJip53J5O\n"
+                + "tDUgzqrsH+JWuQINBFcwIFYBEADBoXuDBfAYLmBh+tb/6QfnpxLC7QInSIHalIkl\n"
+                + "d1MTCjgzjvzi2YYsacxa92kvFSnNG/pW/owCgCUp8x7QHgebQCX3yTlngC8rRxt5\n"
+                + "oCXmMO89ODxx4GqCu61VyLEHouRUoL0TfIai7H4WX3LL3+uAunzycBgAghOvFnle\n"
+                + "08At426EtfNZI5KPUAa2C61wlMEClN1cAm14csE3DF17XjoVN3BGco5tlkZ9t6Fa\n"
+                + "cBRhfD1ZDnIu2F1PLM2lgtn+dzWUp559I7S72CBKFvzKr/+x4wAt8ALlPrS7uA5o\n"
+                + "3QrwqdAdXtiJc5BbJxI4tXp034IcK8bH5hmtkzjoU0hfc4OAwNOTIRdOlhuP5RnC\n"
+                + "MILBoK7WCE48u+JqyHk2Wq/Q1CwM5qb8+fEUMjJ8o+g2zxuOXj46HFLbXBYznRGL\n"
+                + "rSvpGnjgQQLbovBSHMUthCGdDJNNjDaeqSWrkc+uvGqBSggoCkB91VjvT6ei5qK3\n"
+                + "PGappcVrtZFur50HFYf8eoNaZKKFva0qAY9xWfP07VBLjoZqh7JzIN3g3si6H5Fq\n"
+                + "BqwrQZA3p0bMXmpg+w9nIkr+RZvn0aPJDNrOxtKaobNLe7i9U9OvGoTqWYpVmqcv\n"
+                + "Cy/WPziQpelV3OaP7KCWPWMiXDH9KnTnT+9CWpPv+Wt8MVMgQKCYNTBnrxz/M0rq\n"
+                + "HDbtsQARAQABiQIfBBgBCAATBQJXMCBfCRCyGxhh6zo+PgIbDAAAPVUP/1FOL2+o\n"
+                + "JxQ0L7oBPiSCC1v0jxf7Rrl6kdnxrB16aPEFY0/qGvNUOwGDTi1umYrnVXNmFHTZ\n"
+                + "N8pMHZ8k1cBujd7VeNK5rD3+IopdKXABmaljyl1fFfLADu3BSN+B09zWQDj+0f/F\n"
+                + "GAkWUKZN4EL1GmuESrYqgqUAUdkLWZaQk45NRQfswyLmm94SynKIj/8lEgLK5+7p\n"
+                + "WTw1WGPA1xkcGSTjB2HKyiuHU/5WMmRupQaquA384ePYDROnonxM6nTOrpJXtA9P\n"
+                + "TqZ6vSGKBSmwxs4oXL6N35+FWBL4f1cVf1lpMgvyKYfhuG4sEBDjfDYLRP61vW5n\n"
+                + "1/EY2vLPsF3pVCgNLqvgYt0bGVX8/kP4Nco253gpBJ+rhaqBgTcxlp99FdoG9DpV\n"
+                + "1o+C/bBNaQRM/XFYoVuQTUBx+q7Q0eYs12Np/TQYo8aJta5mamcYNOllmqm1cr51\n"
+                + "ekLN0lhRkt20guHXvMKLHyRxjyognGhMxx2W8fWlZFhyXfWEPkfDSs6x2KflAjY/\n"
+                + "UL7hekA+RmWriRbSXTo1LWorKcWA9j1RNgsWgj00dSTxovpw6VOrWdsOjrTdXMyz\n"
+                + "V8mUkuFQ35xv/nsUzF3xAu2hkzfkay3zY6CvPJjqHNUiVWeKlxFfvcMQ8dN1Jhie\n"
+                + "CD+qSAgWwSKkoxPMTAiBBvzNC9X036GfDXFE\n" + "=lNw/\n" + "-----END PGP PUBLIC KEY BLOCK-----";
+
+        return pubKeySTR;
+    }
+
 }

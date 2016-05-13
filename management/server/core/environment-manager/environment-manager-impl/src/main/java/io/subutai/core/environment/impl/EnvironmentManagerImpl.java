@@ -88,6 +88,7 @@ import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWork
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.peer.api.PeerAction;
@@ -141,7 +142,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.tracker = tracker;
 
         //******************************************
-        systemUser = identityManager.loginSystemUser();
+        Session session = identityManager.loginSystemUser();
+        if(session != null)
+        {
+            systemUser = session.getSubject();
+        }
         //******************************************
 
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();

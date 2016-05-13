@@ -66,7 +66,7 @@ public interface IdentityManager
 
     /* *************************************************
     */
-    User authenticateByAuthSignature( String fingerprint, String signedAuth ) throws SecurityException;
+    User authenticateByAuthSignature( String fingerprint, String signedAuth );
 
 
     /* *************************************************
@@ -242,7 +242,7 @@ public interface IdentityManager
     /* ***********************************
      *  Authenticate Internal User
      */
-    Subject loginSystemUser();
+    Session loginSystemUser();
 
 
     /* *************************************************
