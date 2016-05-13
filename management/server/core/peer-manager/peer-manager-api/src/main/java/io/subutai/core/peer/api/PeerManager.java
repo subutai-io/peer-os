@@ -21,7 +21,7 @@ public interface PeerManager
     void unregisterPeerActionListener( PeerActionListener peerActionListener );
 
 
-    void doUnregisterRequest( RegistrationData request ) throws PeerException;
+    void doUnregisterRequest( RegistrationData request , boolean forceAction  ) throws PeerException;
 
     List<RegistrationData> getRegistrationRequests();
 
@@ -46,9 +46,9 @@ public interface PeerManager
 
     void doApproveRequest( String keyPhrase, RegistrationData request ) throws PeerException;
 
-    void doRejectRequest( RegistrationData request ) throws PeerException;
+    void doRejectRequest( RegistrationData request , boolean forceAction  ) throws PeerException;
 
-    void doCancelRequest( RegistrationData request ) throws PeerException;
+    void doCancelRequest( RegistrationData request , boolean forceAction  ) throws PeerException;
 
     void processCancelRequest( RegistrationData registrationData ) throws PeerException;
 

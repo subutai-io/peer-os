@@ -751,7 +751,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void doCancelRequest( final RegistrationData request ) throws PeerException
+    public void doCancelRequest( final RegistrationData request , boolean forceAction ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
 
@@ -806,7 +806,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void doRejectRequest( final RegistrationData request ) throws PeerException
+    public void doRejectRequest( final RegistrationData request , boolean forceAction  ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
         try
@@ -830,7 +830,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void doUnregisterRequest( final RegistrationData request ) throws PeerException
+    public void doUnregisterRequest( final RegistrationData request , boolean forceAction  ) throws PeerException
     {
         getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
 

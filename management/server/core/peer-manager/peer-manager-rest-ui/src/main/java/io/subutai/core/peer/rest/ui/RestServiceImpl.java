@@ -142,7 +142,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doRejectRequest( data );
+            peerManager.doRejectRequest( data ,true );
         }
         catch ( Exception e )
         {
@@ -184,7 +184,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doCancelRequest( data );
+            peerManager.doCancelRequest( data, true );
         }
         catch ( Exception e )
         {
@@ -205,7 +205,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doUnregisterRequest( data );
+            peerManager.doUnregisterRequest( data, true );
         }
         catch ( Exception e )
         {
