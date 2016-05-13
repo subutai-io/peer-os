@@ -90,8 +90,8 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 		return result;
 	}
 
-	function rejectPeerRequest(peerId) {
-		peerRegistrationService.rejectPeerRequest(peerId).success(function (data) {
+	function rejectPeerRequest(peerId, force) {
+		peerRegistrationService.rejectPeerRequest(peerId, force).success(function (data) {
 			vm.dtInstance.reloadData(null, false);
 		}).error(function(error){
 			if(error.ERROR !== undefined) {
@@ -190,7 +190,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function cancelPeerRequest(peerId, force) {
-		peerRegistrationService.cancelPeerRequest(peerId).success(function (data) {
+		peerRegistrationService.cancelPeerRequest(peerId, force).success(function (data) {
 			SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");
 			vm.dtInstance.reloadData(null, false);
 		}).error(function (error) {
