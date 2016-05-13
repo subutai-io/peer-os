@@ -7,6 +7,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -19,6 +22,7 @@ import io.subutai.core.identity.impl.model.UserTokenEntity;
  */
 public class UserTokenDAO
 {
+    private static final Logger logger = LoggerFactory.getLogger( UserTokenDAO.class );
     private DaoManager daoManager = null;
 
 
@@ -48,6 +52,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {
@@ -76,6 +81,7 @@ public class UserTokenDAO
         }
         catch ( Exception e )
         {
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
 
         return result;
@@ -100,6 +106,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {
@@ -124,6 +131,7 @@ public class UserTokenDAO
         }
         catch ( Exception e )
         {
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {
@@ -149,6 +157,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {
@@ -173,6 +182,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {
@@ -196,6 +206,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {
@@ -214,17 +225,21 @@ public class UserTokenDAO
         try
         {
             List<UserToken> result = null;
-            Query qr = em.createQuery( "select h from UserTokenEntity h where h.user.id=:userId", UserToken.class );
+            Query qr = em.createQuery( "select h from UserTokenEntity h where h.userId=:userId", UserToken.class );
             qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
             if ( result != null )
             {
-                tk = result.get( 0 );
+                if(result.size() > 0)
+                {
+                    tk = result.get( 0 );
+                }
             }
         }
         catch ( Exception e )
         {
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {
@@ -246,7 +261,7 @@ public class UserTokenDAO
         {
             List<UserToken> result = null;
             Query qr = em.createQuery(
-                    "select h from UserTokenEntity h where h.user.id=:userId and h.validDate>=:validDate",
+                    "select h from UserTokenEntity h where h.userId=:userId and h.validDate>=:validDate",
                     UserToken.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "validDate", new Date( System.currentTimeMillis() ) );
@@ -259,6 +274,7 @@ public class UserTokenDAO
         }
         catch ( Exception e )
         {
+            logger.error( "**** Error in UserTokenDAO:" ,e);
         }
         finally
         {

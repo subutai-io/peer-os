@@ -1110,7 +1110,6 @@ tip.description-tooltip {
 
 .b-popup__text {
 	font-size: 14px;
-	color: #22B573;
 	padding: 0 0;
 	margin: 0 0 0 0;
 }
@@ -1140,6 +1139,10 @@ tip.description-tooltip {
 
 .b-popup__footer {
     padding: 0 15px 15px 15px;
+}
+
+.b-popup__footer_right {
+	text-align: right;
 }
 
 .b-popup__footer_undertable {
@@ -3859,5 +3862,11 @@ a[disabled] {
     pointer-events: none;
     background-color: #EAEAEA;
     color: #333333;
+}
+
+.b-text-message {
+	text-align: center;
+	color: #04346E;
+	font-size: 14px;
 }
 
