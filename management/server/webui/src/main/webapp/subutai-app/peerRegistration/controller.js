@@ -10,6 +10,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	var vm = this;
 	vm.peerId = null;
 	vm.test = 'lolololol';
+	vm.peerStatusIco = "";
 
 	cfpLoadingBar.start();
 	angular.element(document).ready(function () {
@@ -24,6 +25,7 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	vm.cancelPeerRequest = cancelPeerRequest;
 	vm.addPeer = addPeer;
 	vm.approvePeerRequest = approvePeerRequest;
+	vm.checkResourceHost = checkResourceHost;
 
 	vm.dtInstance = {};
 	vm.users = {};
@@ -165,6 +167,20 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 				});
 			}
 		});
+	}
+
+	function checkResourceHost( info ) {
+
+		if( info.ip )
+		{
+			peerRegistrationService.checkPeer( info.ip )
+				.success( function (data) {
+					vm.peerStatusIco = "sign";
+				})
+				.error( function (data) {
+					vm.peerStatusIco = "plus";
+				});
+		}
 	}
 
 	function cancelPeerRequest(peerId) {
