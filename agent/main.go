@@ -290,24 +290,26 @@ func main() {
 		}}, {
 
 		Name: "tunnel", Usage: "SSH tunnel management",
-		// Adding subcommand somehow breaks c.Bool flag passing, so c.Args().Get(3) is our bool for now :(
-		// Flags: []cli.Flag{
-		// 	cli.BoolFlag{Name: "g", Usage: "create tunnel to global proxy"}},
-		Action: func(c *cli.Context) {
-			lib.Tunnel(c.Args().Get(0), c.Args().Get(1), c.Args().Get(2))
-		},
 		Subcommands: []cli.Command{
 			{
-				Name:  "list",
-				Usage: "list active ssh tunnels",
+				Name:  "add",
+				Usage: "add ssh tunnel",
+				Flags: []cli.Flag{
+					cli.BoolFlag{Name: "g", Usage: "create tunnel to global proxy"}},
 				Action: func(c *cli.Context) {
-					lib.TunList(false)
+					lib.TunAdd(c.Args().Get(0), c.Args().Get(1), c.Bool("g"))
 				}},
 			{
 				Name:  "del",
 				Usage: "delete tunnel",
 				Action: func(c *cli.Context) {
 					lib.TunDel(c.Args().Get(0))
+				}},
+			{
+				Name:  "list",
+				Usage: "list active ssh tunnels",
+				Action: func(c *cli.Context) {
+					lib.TunList()
 				}},
 		}}, {
 

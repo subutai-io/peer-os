@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -17,14 +17,14 @@ import io.subutai.core.peer.api.PeerManager;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
-    private Integration integration;
+    private HubManager integration;
     private CommandExecutor commandExecutor;
     private PeerManager peerManager;
 
 
-    public void setIntegration( final Integration integration )
+    public void setIntegration( final HubManager hubManager )
     {
-        this.integration = integration;
+        this.integration = hubManager;
     }
 
 

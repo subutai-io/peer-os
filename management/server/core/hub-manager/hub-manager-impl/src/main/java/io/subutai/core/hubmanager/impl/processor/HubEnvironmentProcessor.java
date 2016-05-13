@@ -26,7 +26,7 @@ import org.apache.http.HttpStatus;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.ContainerId;
@@ -40,7 +40,7 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
@@ -61,8 +61,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
-public class HubEnvironmentProcessor implements StateLinkProccessor
+// TODO: Replace WebClient with HubRestClient.
+public class HubEnvironmentProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
 
@@ -498,7 +498,7 @@ public class HubEnvironmentProcessor implements StateLinkProccessor
             assert environmentDto != null;
             if ( assign )
             {
-                DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
+                ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
                 localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
                 for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
                 {

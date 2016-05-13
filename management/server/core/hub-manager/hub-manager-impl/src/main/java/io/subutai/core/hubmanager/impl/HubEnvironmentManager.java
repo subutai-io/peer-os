@@ -69,7 +69,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 import io.subutai.hub.share.dto.environment.SSHKeyDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
+
+// TODO: Replace WebClient with HubRestClient.
 public class HubEnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentManager.class.getName() );

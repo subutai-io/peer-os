@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -125,6 +126,7 @@ public class RegistrationManagerImplTest
 
 
     @Test
+    @Ignore
     public void testQueueRequest() throws Exception
     {
         RequestedHost temp = mock( RequestedHost.class );

@@ -19,7 +19,7 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.core.hubmanager.api.Integration;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -46,7 +46,7 @@ public class SystemManagerImpl implements SystemManager
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
-    private Integration integration;
+    private HubManager hubManager;
 
     protected Set<SettingsListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
@@ -102,10 +102,10 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final Integration integration )
+    public SystemManagerImpl( final HubManager hubManager )
 
     {
-        this.integration = integration;
+        this.hubManager = hubManager;
     }
 
 
@@ -279,7 +279,7 @@ public class SystemManagerImpl implements SystemManager
         dto.setAgentPort( networkSettings.getAgentPort() );
 
 
-        integration.sendSystemConfiguration( dto );
+        hubManager.sendSystemConfiguration( dto );
     }
 
 
