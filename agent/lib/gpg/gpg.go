@@ -197,7 +197,7 @@ func sendData(c string) {
 	os.Remove(config.Agent.LxcPrefix + c + "/stdin.txt")
 	log.Check(log.FatalLevel, "Sending registration request to management", err)
 
-	if resp.Status != "200 OK" {
+	if resp.StatusCode != 200 && resp.StatusCode != 202 {
 		log.Error("Failed to exchange GPG Public Keys. StatusCode: " + resp.Status)
 	}
 
