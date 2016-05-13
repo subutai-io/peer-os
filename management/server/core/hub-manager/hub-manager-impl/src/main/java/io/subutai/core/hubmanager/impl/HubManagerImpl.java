@@ -48,6 +48,7 @@ import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
+import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
@@ -87,6 +88,8 @@ public class HubManagerImpl implements HubManager
 
     private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
+    private ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
+
     private HeartbeatProcessor heartbeatProcessor;
 
     private ResourceHostDataProcessor resourceHostDataProcessor;
@@ -110,6 +113,8 @@ public class HubManagerImpl implements HubManager
     private ContainerEventProcessor containerEventProcessor;
 
     private ProductProcessor productProccessor;
+
+    private TunnelEventProcessor tunnelEventProcessor;
 
     private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
@@ -146,6 +151,8 @@ public class HubManagerImpl implements HubManager
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
             productProccessor = new ProductProcessor( configManager );
+
+            tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
 
             StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
 
@@ -188,6 +195,8 @@ public class HubManagerImpl implements HubManager
                     .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+
+            tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 30, TimeUnit.SECONDS );
 
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {

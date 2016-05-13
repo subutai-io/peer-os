@@ -7,7 +7,9 @@ public class TunnelInfoDto
     public enum TunnelStatus
     {
         PENDING,
-        READY
+        READY,
+        ERROR,
+        DELETE
     }
 
 
