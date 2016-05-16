@@ -3,10 +3,10 @@ package io.subutai.core.registration.rest;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.core.registration.api.exception.HostRegistrationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -29,38 +29,34 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     public RegistrationRestServiceImpl( final SecurityManager securityManager,
                                         final RegistrationManager registrationManager )
     {
+        Preconditions.checkNotNull( securityManager );
+        Preconditions.checkNotNull( registrationManager );
+
         this.securityManager = securityManager;
         this.registrationManager = registrationManager;
     }
 
 
     @Override
-    public Response getPublicKey()
-    {
-        return Response.ok( securityManager.getKeyManager().getPublicKeyRingAsASCII( null ) ).build();
-    }
-
-
-    @Override
     public Response registerPublicKey( final String message )
     {
-        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-
         try
         {
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
             byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
             String decryptedMessage = new String( decrypted, "UTF-8" );
             RequestedHost requestedHost = JsonUtil.fromJson( decryptedMessage, RequestedHostJson.class );
 
             registrationManager.queueRequest( requestedHost );
+
+            return Response.accepted().build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error registering public key", e );
             return Response.serverError().build();
         }
-
-        return Response.ok().build();
     }
 
 
@@ -75,7 +71,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         catch ( Exception e )
         {
             LOGGER.error( "Error approving registration request", e );
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 
@@ -86,11 +82,11 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         try
         {
             registrationManager.rejectRequest( requestId );
-            return Response.ok( ).build();
+            return Response.ok().build();
         }
-        catch (HostRegistrationException e)
+        catch ( Exception e )
         {
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 
@@ -101,11 +97,11 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
         try
         {
             registrationManager.removeRequest( requestId );
-            return Response.ok( ).build();
+            return Response.ok().build();
         }
-        catch (HostRegistrationException e)
+        catch ( Exception e )
         {
-            return Response.serverError().entity(e.getMessage()).build();
+            return Response.serverError().entity( e.getMessage() ).build();
         }
     }
 
@@ -113,10 +109,10 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
     @Override
     public Response verifyContainerToken( final String message )
     {
-        EncryptionTool encryptionTool = securityManager.getEncryptionTool();
-
         try
         {
+            EncryptionTool encryptionTool = securityManager.getEncryptionTool();
+
             byte[] decrypted = encryptionTool.decrypt( message.getBytes() );
             String decryptedMessage = new String( decrypted, "UTF-8" );
             String lineSeparator = System.getProperty( "line.separator" );
@@ -129,14 +125,14 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
             String publicKey = decryptedMessage.substring( decryptedMessage.indexOf( lineSeparator ) + 1 );
 
             registrationManager.verifyToken( token, containerId, publicKey );
+
+            return Response.accepted().build();
         }
         catch ( Exception e )
         {
             LOGGER.error( "Error verifying container token", e );
             return Response.serverError().build();
         }
-
-        return Response.ok( "Accepted" ).build();
     }
 
 

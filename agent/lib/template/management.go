@@ -39,12 +39,15 @@ func MngInit() {
 	container.Start("management")
 	exec.Command("dhclient", "mng-net").Run()
 
-	wan, err := net.InterfaceByName("wan")
-	log.Check(log.ErrorLevel, "Getting WAN interface info", err)
-	wanIP, err := wan.Addrs()
-	log.Check(log.ErrorLevel, "Getting WAN interface addresses", err)
-	if len(wanIP) > 0 {
-		ip := strings.Split(wanIP[0].String(), "/")
+	nic, err := net.InterfaceByName("eth1")
+	if err != nil {
+		nic, err = net.InterfaceByName("wan")
+		log.Check(log.ErrorLevel, "Getting interface info", err)
+	}
+	mngIp, err := nic.Addrs()
+	log.Check(log.ErrorLevel, "Getting interface addresses", err)
+	if len(mngIp) > 0 {
+		ip := strings.Split(mngIp[0].String(), "/")
 		if len(ip) > 0 {
 			log.Info("******************************")
 			log.Info("Subutai Management UI will shortly be available at https://" + ip[0] + ":8443 (admin/secret)")

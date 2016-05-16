@@ -17,10 +17,11 @@ public class ChannelSettings
 
     public static final String[] URL_ACCESS_PX1 = {
 
-            "/rest/v1/identity/gettoken", "/rest/v1/peer/id", "/rest/v1/peer/inited", "/rest/v1/pks/{$}",
-            "/rest/v1/security/keyman/getpublickeyring", "/rest/v1/security/keyman/getpublickey",
+            "/rest/v1/identity/gettoken", "/rest/v1/peer/id", "/rest/v1/peer/inited", "/rest/v1/peer/mhpresent",
+            "/rest/v1/pks/{$}", "/rest/v1/security/keyman/getpublickeyring", "/rest/v1/security/keyman/getpublickey",
             "/rest/v1/handshake/info", "/rest/v1/handshake/register", "/rest/v1/handshake/approve",
-            "/rest/v1/handshake/cancel", "/rest/v1/handshake/reject", "/rest/v1/handshake/unregister"
+            "/rest/v1/handshake/cancel", "/rest/v1/handshake/reject", "/rest/v1/handshake/unregister",
+            "/rest/v1/registration/public-key"
     };
 
 

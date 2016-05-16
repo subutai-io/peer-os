@@ -1,8 +1,9 @@
 package io.subutai.common.network;
 
 
-public enum DomainLoadBalanceStrategy
+public enum ProxyLoadBalanceStrategy
 {
+    NONE( "none" ),
     ROUND_ROBIN( "rr" ),
     LOAD_BALANCE( "lb" ),
     STICKY_SESSION( "hash" );
@@ -10,7 +11,7 @@ public enum DomainLoadBalanceStrategy
     private final String value;
 
 
-    DomainLoadBalanceStrategy( final String value )
+    ProxyLoadBalanceStrategy( final String value )
     {
         this.value = value;
     }

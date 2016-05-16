@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
+// TODO: Replace WebClient with HubRestClient.
 public class EnvironmentUserHelper
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );

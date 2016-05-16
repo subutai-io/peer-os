@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl;
 
 
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.security.auth.Subject;
 import javax.ws.rs.WebApplicationException;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -40,7 +42,8 @@ import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -115,6 +118,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
     private final Map<String, CancellableWorkflow> activeWorkflows = Maps.newConcurrentMap();
+    Subject systemUser = null;
 
     private EnvironmentAdapter environmentAdapter;
     private EnvironmentService environmentService;
@@ -136,6 +140,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.identityManager = identityManager;
         this.relationManager = relationManager;
         this.tracker = tracker;
+
+        //******************************************
+        systemUser = identityManager.loginSystemUser();
+        //******************************************
+
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
         backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
@@ -424,6 +433,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
+        operationTracker.addLog( "Logger initialized" );
+
         createEnvironment( topology, async, operationTracker );
 
         return operationTracker.getId();
@@ -547,6 +558,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Modifying environment %s", environment.getId() ) );
+
+        operationTracker.addLog( "Logger initialized" );
 
         Set<Peer> allPeers = new HashSet<>();
 
@@ -1064,21 +1077,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     @RolesAllowed( "Environment-Management|Update" )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( newDomain ), "Invalid domain" );
         Preconditions.checkArgument( newDomain.matches( Common.HOSTNAME_REGEX ), "Invalid domain" );
-        Preconditions.checkNotNull( domainLoadBalanceStrategy );
+        Preconditions.checkNotNull( proxyLoadBalanceStrategy );
 
-        modifyEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, sslCertPath );
+        modifyEnvironmentDomain( environmentId, newDomain, proxyLoadBalanceStrategy, sslCertPath );
     }
 
 
     public void modifyEnvironmentDomain( final String environmentId, final String domain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -1104,7 +1117,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             if ( assign )
             {
                 peerManager.getLocalPeer()
-                           .setVniDomain( environment.getVni(), domain, domainLoadBalanceStrategy, sslCertPath );
+                           .setVniDomain( environment.getVni(), domain, proxyLoadBalanceStrategy, sslCertPath );
             }
             else
             {
@@ -1237,7 +1250,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public int setupSshTunnelForContainer( final String containerHostId, final String environmentId )
+    public SshTunnel setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
 
@@ -1262,14 +1275,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         try
         {
-            int sshPort = peerManager.getLocalPeer().setupSshTunnelForContainer(
+            SshTunnel sshTunnel = peerManager.getLocalPeer().setupSshTunnelForContainer(
                     environmentContainer.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                     Common.CONTAINER_SSH_TIMEOUT_SEC );
 
             operationTracker.addLogDone(
-                    String.format( "Ssh for container %s is ready on port %d", containerHostId, sshPort ) );
+                    String.format( "Ssh for container %s is ready on tunnel %s", containerHostId, sshTunnel ) );
 
-            return sshPort;
+            return sshTunnel;
         }
         catch ( Exception e )
         {
@@ -1783,11 +1796,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.debug( "Environment background tasks started..." );
 
-            resetP2Pkey();
+            //**************************************************
+            Subject.doAs( systemUser, new PrivilegedAction<Void>()
+            {
+                @Override
+                public Void run()
+                {
+                    resetP2Pkey();
+                    return null;
+                }
+            } );
+            //**************************************************
 
+            uploadEnvironmentsToHub();
             // workaround for now,
             // todo should not run if all environments already uploaded
-            uploadEnvironmentsToHub();
 
             LOG.debug( "Environment background tasks finished." );
         }

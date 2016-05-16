@@ -9,27 +9,68 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
+
+	"github.com/cheggaaa/pb"
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/log"
 )
 
-type update struct {
-	id        string
-	name      string
-	timestamp int
+type snap struct {
+	Version string `json:"version"`
 }
 
-func getList(kurjun *http.Client) (list []map[string]interface{}) {
-	resp, err := kurjun.Get(config.Cdn.Kurjun + "/file/list")
-	log.Check(log.FatalLevel, "GET: "+config.Cdn.Kurjun+"/file/list", err)
+func getAvailable(name string) string {
+	var update snap
+	client := &http.Client{}
+	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/info?name=" + name)
+	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/info?name="+name, err)
 	defer resp.Body.Close()
-	jsonlist, err := ioutil.ReadAll(resp.Body)
+	js, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
-	log.Check(log.FatalLevel, "Parsing file list", json.Unmarshal(jsonlist, &list))
-	return
+	log.Check(log.FatalLevel, "Parsing file list", json.Unmarshal(js, &update))
+	log.Debug("Available: " + update.Version)
+	return update.Version
+}
+
+func getInstalled() string {
+	f, err := ioutil.ReadFile(config.Agent.AppPrefix + "/meta/package.yaml")
+	if !log.Check(log.DebugLevel, "Reading file package.yaml", err) {
+		lines := strings.Split(string(f), "\n")
+		for _, v := range lines {
+			if strings.HasPrefix(v, "version: ") {
+				if version := strings.Split(strings.TrimPrefix(v, "version: "), "-"); len(version) > 1 {
+					log.Debug("Installed: " + version[1])
+					return version[1]
+				}
+			}
+		}
+	}
+	return "0"
+}
+
+func upgradeRh(packet string) {
+	log.Info("Updating Resource host")
+	file, err := os.Create("/tmp/" + packet)
+	log.Check(log.FatalLevel, "Creating update file", err)
+	defer file.Close()
+	client := &http.Client{}
+	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?name=" + packet)
+	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?name="+packet, err)
+	defer resp.Body.Close()
+	log.Info("Downloading snap package")
+	bar := pb.New(int(resp.ContentLength)).SetUnits(pb.U_BYTES)
+	bar.Start()
+	rd := bar.NewProxyReader(resp.Body)
+
+	_, err = io.Copy(file, rd)
+	log.Check(log.FatalLevel, "Writing response to file", err)
+
+	log.Check(log.FatalLevel, "Installing update /tmp/"+packet,
+		exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+packet).Run())
+	log.Check(log.FatalLevel, "Removing update file /tmp/"+packet, os.Remove("/tmp/"+packet))
+
 }
 
 func Update(name string, check bool) {
@@ -40,66 +81,29 @@ func Update(name string, check bool) {
 		}
 		defer unlockSubutai()
 
-		kurjun := config.CheckKurjun()
-		var lcl int
-		var rmt update
-		var date int64
-
-		f, err := ioutil.ReadFile(config.Agent.AppPrefix + "/meta/package.yaml")
-		if !log.Check(log.DebugLevel, "Reading file package.yaml", err) {
-			lines := strings.Split(string(f), "\n")
-			for _, v := range lines {
-				if strings.HasPrefix(v, "version: ") {
-					if version := strings.Split(strings.TrimPrefix(v, "version: "), "-"); len(version) > 1 {
-						lcl, err = strconv.Atoi(version[1])
-						log.Check(log.FatalLevel, "Converting timestamp to int", err)
-					}
-				}
-			}
+		packet := "subutai_" + config.Template.Version + "_" + config.Template.Arch + ".snap"
+		if len(config.Template.Branch) != 0 {
+			packet = "subutai_" + config.Template.Version + "_" + config.Template.Arch + "-" + config.Template.Branch + ".snap"
 		}
 
-		for _, v := range getList(kurjun) {
-			item := v["name"].(string)
-			if strings.HasPrefix(item, "subutai") && strings.HasSuffix(item, ".snap") {
-				if version := strings.Split(strings.Trim(item, "subutai_ _amd64.snap"), "-"); len(version) > 1 {
-					tmp, err := strconv.Atoi(version[1])
-					log.Check(log.FatalLevel, "Converting timestamp to int", err)
-					if tmp > rmt.timestamp {
-						rmt.id = v["id"].(string)
-						rmt.name = item
-						rmt.timestamp = tmp
-						date, err = strconv.ParseInt(version[1], 10, 64)
-						log.Check(log.FatalLevel, "Getting update info", err)
-					}
-				}
-			}
-		}
+		installed, err := strconv.Atoi(getInstalled())
+		log.Check(log.FatalLevel, "Converting installed package timestamp to int", err)
+		available, err := strconv.Atoi(getAvailable(packet))
+		log.Check(log.FatalLevel, "Converting available package timestamp to int", err)
 
-		if lcl >= rmt.timestamp {
+		if installed >= available {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update from " + time.Unix(date, 0).String() + " is avalable")
+			log.Info("Update is avalable")
 			os.Exit(0)
 		}
 
-		log.Info("Updating Resource host")
-		file, err := os.Create("/tmp/" + rmt.name)
-		log.Check(log.FatalLevel, "Creating update file", err)
-		defer file.Close()
-		resp, err := kurjun.Get(config.Cdn.Kurjun + "/file/get?id=" + rmt.id)
-		log.Check(log.FatalLevel, "GET: "+config.Cdn.Kurjun+"/file/get?id="+rmt.id, err)
-		defer resp.Body.Close()
-		_, err = io.Copy(file, resp.Body)
-		log.Check(log.FatalLevel, "Writing response to file", err)
-
-		log.Check(log.FatalLevel, "Installing update /tmp/"+rmt.name,
-			exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+rmt.name).Run())
-		log.Check(log.FatalLevel, "Removing update file /tmp/"+rmt.name, os.Remove("/tmp/"+rmt.name))
+		upgradeRh(packet)
 
 	default:
 		if !container.IsContainer(name) {
-			log.Error(name + " - no such instance")
+			log.Error("no such instance \"" + name + "\"")
 		}
 		_, err := container.AttachExec(name, []string{"apt-get", "update", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5", "-qq"})
 		log.Check(log.FatalLevel, "Updating apt index", err)

@@ -19,6 +19,7 @@ function peerRegistrationService($http) {
 		unregisterPeerRequest: unregisterPeerRequest,
 
 		getResourceHosts: getResourceHosts,
+		checkPeer: checkPeer,
 
 
 		getPeersUrl : function() { return PEERS_URL; }
@@ -40,8 +41,8 @@ function peerRegistrationService($http) {
 		);
 	}
 
-	function rejectPeerRequest(peerId) {
-		var postData = 'peerId=' + peerId;
+	function rejectPeerRequest(peerId, force) {
+		var postData = 'peerId=' + peerId + '&force=' + force;
 		return $http.put(
 			PEERS_URL + 'reject/',
 			postData, 
@@ -49,8 +50,8 @@ function peerRegistrationService($http) {
 		);		
 	}
 
-	function unregisterPeerRequest(peerId) {
-		var postData = 'peerId=' + peerId;
+	function unregisterPeerRequest(peerId, force) {
+		var postData = 'peerId=' + peerId + '&force=' + force;
 		return $http.put(
 			PEERS_URL + 'unregister/',
 			postData, 
@@ -58,8 +59,8 @@ function peerRegistrationService($http) {
 		);		
 	}
 
-	function cancelPeerRequest(peerId) {
-		var postData = 'peerId=' + peerId;
+	function cancelPeerRequest(peerId, force) {
+		var postData = 'peerId=' + peerId + '&force=' + force;
 		return $http.put(
 			PEERS_URL + 'cancel/',
 			postData, 
@@ -79,5 +80,10 @@ function peerRegistrationService($http) {
 
 	function getResourceHosts() {
 		return $http.get(RH_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function checkPeer( ip )
+	{
+		return $http.get( PEERS_URL + "check/" + ip, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 }

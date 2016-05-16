@@ -1,13 +1,18 @@
 package io.subutai.hub.share.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 public class TunnelInfoDto
 {
 
     public enum TunnelStatus
     {
         PENDING,
-        READY
+        READY,
+        ERROR,
+        DELETE
     }
 
 
@@ -19,6 +24,9 @@ public class TunnelInfoDto
 
     private String openedPort;
     private String openedIp;
+
+    @JsonIgnore
+    private String errorLogs;
 
 
     public TunnelInfoDto()
@@ -104,5 +112,17 @@ public class TunnelInfoDto
     public void setTunnelStatus( final TunnelStatus tunnelStatus )
     {
         this.tunnelStatus = tunnelStatus;
+    }
+
+
+    public String getErrorLogs()
+    {
+        return errorLogs;
+    }
+
+
+    public void setErrorLogs( final String errorLogs )
+    {
+        this.errorLogs = errorLogs;
     }
 }

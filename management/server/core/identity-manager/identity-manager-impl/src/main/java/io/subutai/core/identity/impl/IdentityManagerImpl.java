@@ -89,6 +89,8 @@ public class IdentityManagerImpl implements IdentityManager
 
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
+    private static final  String SYSTEM_USERNAME = "internal";
+
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
     private DaoManager daoManager = null;
@@ -144,7 +146,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             //***Create User ********************************************
-            User internal = createUser( "internal", "secretSubutai", "System User", "internal@subutai.io", 1, 3, false, false );
+            User internal = createUser( SYSTEM_USERNAME, "secretSubutai", "System User", "internal@subutai.io", 1, 3, false, false );
             User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
             User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, 3, true, true );
             //***********************************************************
@@ -261,6 +263,26 @@ public class IdentityManagerImpl implements IdentityManager
         };
 
         return callbackHandler;
+    }
+
+
+
+    /* ***********************************
+     *  Authenticate Internal User
+     */
+    @PermitAll
+    @Override
+    public Subject loginSystemUser()
+    {
+        String sptoken  = getSystemUserToken();
+        Session session = login( "token", sptoken );
+
+        if( session != null )
+        {
+            return session.getSubject();
+        }
+
+        else return null;
     }
 
 
@@ -448,7 +470,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         String token = "";
 
-        User user = identityDataService.getUserByUsername( "internal" );
+        User user = identityDataService.getUserByUsername( SYSTEM_USERNAME );
 
         if ( user != null )
         {
@@ -560,7 +582,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else if ( userName.length() == 40 )
         {
-            user = authenticateByAuthSignature( userName ,password );
+            user = authenticateByAuthSignature( userName, password.trim() );
         }
         else
         {
@@ -753,6 +775,16 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
+    public User getSystemUser()
+    {
+        return getUserByUsername( SYSTEM_USERNAME );
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
     public User getActiveUser()
     {
         Session session = getActiveSession();
@@ -818,6 +850,34 @@ public class IdentityManagerImpl implements IdentityManager
                     try
                     {
                         action.call();
+                    }
+                    catch ( Exception ex )
+                    {
+                        LOGGER.error( "**** Error!! Error running privileged action.", ex );
+                    }
+                    return null;
+                }
+            } );
+        }
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public void runAs( Session userSession, final Runnable action )
+    {
+        if ( userSession != null )
+        {
+            Subject.doAs( userSession.getSubject(), new PrivilegedAction<Void>()
+            {
+                @Override
+                public Void run()
+                {
+                    try
+                    {
+                        action.run();
                     }
                     catch ( Exception ex )
                     {

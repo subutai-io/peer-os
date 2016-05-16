@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -17,17 +17,18 @@ import io.subutai.core.peer.api.PeerManager;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
-    private Integration integration;
+    private HubManager integration;
     private CommandExecutor commandExecutor;
     private PeerManager peerManager;
 
 
-    public void setIntegration( final Integration integration )
+    public void setIntegration( final HubManager hubManager )
     {
-        this.integration = integration;
+        this.integration = hubManager;
     }
 
 
+    @Override
     public Response sendHeartbeat( final String hubIp )
     {
         try
@@ -44,22 +45,16 @@ public class RestServiceImpl implements RestService
     }
 
 
-    public Response resendHeartbeat()
+    @Override
+    public Response triggerHeartbeat()
     {
-        try
-        {
-            integration.sendOnlyHeartbeat();
-            return Response.ok().build();
-        }
-        catch ( HubPluginException e )
-        {
-            LOG.error( e.getMessage() );
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
-        }
+        integration.triggerHeartbeat();
+
+        return Response.noContent().build();
     }
 
 
+    @Override
     public Response register( final String hubIp, final String email, final String password )
     {
         try
@@ -76,6 +71,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
     public Response sendRHConfigurations( final String hubIp )
     {
         try
@@ -92,6 +88,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
     public Response getHubDns()
     {
         try

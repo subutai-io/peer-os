@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import javax.ws.rs.core.Response;
@@ -14,24 +14,25 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.IntegrationImpl;
+import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ContainerEventDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
+
+// TODO: Replace WebClient with HubRestClient.
 public class ContainerEventProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private IntegrationImpl manager;
+    private HubManagerImpl manager;
 
     private ConfigManager configManager;
 
     private PeerManager peerManager;
 
 
-    public ContainerEventProcessor( IntegrationImpl integration, ConfigManager configManager, PeerManager peerManager )
+    public ContainerEventProcessor( HubManagerImpl integration, ConfigManager configManager, PeerManager peerManager )
     {
         this.manager = integration;
         this.configManager = configManager;

@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -39,10 +39,10 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
-public class VehsProccessor implements StateLinkProccessor
+// TODO: Replace WebClient with HubRestClient.
+public class VehsProcessor implements StateLinkProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
 
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
@@ -59,9 +59,9 @@ public class VehsProccessor implements StateLinkProccessor
     private final EnvironmentUserHelper environmentUserHelper;
 
 
-    public VehsProccessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager hConfigManager,
-                           PeerManager peerManager, CommandExecutor commandExecutor,
-                           EnvironmentUserHelper environmentUserHelper )
+    public VehsProcessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager hConfigManager,
+                          PeerManager peerManager, CommandExecutor commandExecutor,
+                          EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
 
