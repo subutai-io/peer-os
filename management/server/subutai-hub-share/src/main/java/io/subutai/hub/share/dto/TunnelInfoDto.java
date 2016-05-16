@@ -1,6 +1,9 @@
 package io.subutai.hub.share.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 public class TunnelInfoDto
 {
 
@@ -21,6 +24,8 @@ public class TunnelInfoDto
 
     private String openedPort;
     private String openedIp;
+
+    @JsonIgnore
     private String errorLogs;
 
 
