@@ -80,7 +80,7 @@ func TLSConfig() *http.Client {
 	}
 
 	transport := &http.Transport{TLSClientConfig: tlsconfig}
-	return &http.Client{Transport: transport, Timeout: time.Second * 30}
+	return &http.Client{Transport: transport, Timeout: time.Second * 10}
 }
 
 func x509generate() {
