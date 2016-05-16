@@ -23,63 +23,6 @@ public class HttpClient
     private static int defaultMaxRetransmits = 3;
 
 
-//    public static WebClient createTrustedWebClient( String url )
-//    {
-//        WebClient client = WebClient.create( url );
-//        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
-//
-//        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-//        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
-//        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
-//        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
-//
-//
-//        httpConduit.setClient( httpClientPolicy );
-//
-//        SSLManager sslManager = new SSLManager( null, null, null, null );
-//
-//        TLSClientParameters tlsClientParameters = new TLSClientParameters();
-//        tlsClientParameters.setDisableCNCheck( true );
-//        tlsClientParameters.setTrustManagers( sslManager.getClientFullTrustManagers() );
-//        httpConduit.setTlsClientParameters( tlsClientParameters );
-//
-//        return client;
-//    }
-
-
-//    public static WebClient createTrustedWebClientWithAuth( String url, KeyStore keyStore, char[] keyStorePassword,
-//                                                            byte[] serverFingerprint, final List<Object> providers )
-//            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
-//    {
-//        WebClient client = WebClient.create( url, providers );
-//        HTTPConduit httpConduit = ( HTTPConduit ) WebClient.getConfig( client ).getConduit();
-//
-//        HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-//        httpClientPolicy.setConnectionTimeout( defaultConnectionTimeout );
-//        httpClientPolicy.setReceiveTimeout( defaultReceiveTimeout );
-//        httpClientPolicy.setMaxRetransmits( defaultMaxRetransmits );
-//
-//        httpConduit.setClient( httpClientPolicy );
-//
-//        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
-//        keyManagerFactory.init( keyStore, keyStorePassword );
-//
-//
-//        //        SSLManager sslManager = new SSLManager( keyStore, keyStoreData, trustStore, trustStoreData );
-//
-//
-//        TrustManager trustManager;
-//        TLSClientParameters tlsClientParameters = new TLSClientParameters();
-//        tlsClientParameters.setDisableCNCheck( true );
-//        tlsClientParameters.setTrustManagers( new TrustManager[] { new FingerprintTrustManager( serverFingerprint ) } );
-//        tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
-//        //        tlsClientParameters.setCertAlias( alias );
-//        httpConduit.setTlsClientParameters( tlsClientParameters );
-//
-//        return client;
-//    }
-
-
     public static WebClient createTrustedWebClientWithAuth( String url, KeyStore keyStore, char[] keyStorePassword,
                                                             byte[] serverFingerprint )
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException

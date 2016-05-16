@@ -196,24 +196,7 @@ public class ConfigManager
     }
 
 
-//    public WebClient getTrustedWebClient( final String hubIp )
-//    {
-//        String baseUrl = String.format( "https://%s:" + HUB_PORT, hubIp );
-//
-//        try
-//        {
-//            return HttpClient.createTrustedWebClientWithAuth( baseUrl, keyStore,
-//                    SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(), hPublicKey.getFingerprint() );
-//        }
-//        catch ( Exception e )
-//        {
-//            LOG.error( "Error to create WebClient: ", e );
-//
-//            return null;
-//        }
-//    }
-
-
+    @Deprecated
     public void addHubConfig( final String hubIp )
     {
 //        this.hubIp = hubIp;
