@@ -21,30 +21,31 @@ import io.subutai.hub.share.dto.TunnelInfoDto;
 
 public class TunnelEventProcessor implements Runnable
 {
-
-    private static final Logger LOG = LoggerFactory.getLogger( TunnelEventProcessor.class );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final String REST_TUNNEL_URL = "/rest/v1/tunnel/update/";
     private static final String TUNNEL_LIST_CMD = "subutai tunnel list | grep 8443";
     private static String OPENED_IP_PORT;
 
     private PeerManager peerManager;
+
     private ConfigManager configManager;
-    private HubManager manager;
+
+    private HubManager hubManager;
 
 
-    public TunnelEventProcessor( final HubManager integration, PeerManager peerManager, ConfigManager configManager )
+    public TunnelEventProcessor( final HubManager hubManager, PeerManager peerManager, ConfigManager configManager )
     {
         this.peerManager = peerManager;
         this.configManager = configManager;
-        this.manager = integration;
+        this.hubManager = hubManager;
     }
 
 
     @Override
     public void run()
     {
-        if ( manager.getRegistrationState() )
+        if ( hubManager.isRegistered() )
         {
             startProccess();
         }
@@ -77,7 +78,7 @@ public class TunnelEventProcessor implements Runnable
         catch ( Exception e )
         {
             TunnelHelper.sendError( REST_TUNNEL_URL + configManager.getPeerId(), e.getMessage(), configManager );
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
         }
     }
 

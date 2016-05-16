@@ -22,16 +22,16 @@ public class HeartbeatProcessor implements Runnable
 
     private final Set<StateLinkProcessor> processors = new HashSet<>();
 
-    private final HubManagerImpl integrationManager;
+    private final HubManagerImpl hubManager;
 
     private final String path;
 
     private final HubRestClient restClient;
 
 
-    public HeartbeatProcessor( HubManagerImpl integrationManager, ConfigManager configManager )
+    public HeartbeatProcessor( HubManagerImpl hubManager, ConfigManager configManager )
     {
-        this.integrationManager = integrationManager;
+        this.hubManager = hubManager;
 
         path = String.format( "/rest/v1.2/peers/%s/heartbeat", configManager.getPeerId() );
 
@@ -61,7 +61,7 @@ public class HeartbeatProcessor implements Runnable
 
     public void sendHeartbeat() throws HubPluginException
     {
-        if ( !integrationManager.getRegistrationState() )
+        if ( !hubManager.isRegistered() )
         {
             return;
         }
