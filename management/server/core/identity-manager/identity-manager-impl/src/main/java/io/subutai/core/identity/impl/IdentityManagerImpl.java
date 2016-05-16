@@ -582,7 +582,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         else if ( userName.length() == 40 )
         {
-            user = authenticateByAuthSignature( userName ,password );
+            user = authenticateByAuthSignature( userName, password.trim() );
         }
         else
         {
