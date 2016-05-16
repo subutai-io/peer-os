@@ -9,13 +9,17 @@ import io.subutai.hub.share.dto.SystemConfDto;
 
 public interface HubManager
 {
+    void registerPeer( String hupIp, String email, String password ) throws HubPluginException;
+
+    void unregisterPeer() throws HubPluginException;
+
+    boolean isRegistered();
+
     void sendHeartbeat() throws HubPluginException;
 
     void triggerHeartbeat();
 
     void sendResourceHostInfo() throws HubPluginException;
-
-    void registerPeer( String hupIp, String email, String password ) throws HubPluginException;
 
     String getHubDns() throws HubPluginException;
 
@@ -25,9 +29,7 @@ public interface HubManager
 
     void uninstallPlugin( String name );
 
-    void unregisterPeer() throws HubPluginException;
 
-    boolean getRegistrationState();
 
     Map<String, String> getPeerInfo() throws HubPluginException;
 

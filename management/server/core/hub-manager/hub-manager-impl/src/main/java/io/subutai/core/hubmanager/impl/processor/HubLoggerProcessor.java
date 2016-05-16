@@ -27,16 +27,19 @@ import io.subutai.hub.share.json.JsonUtil;
 // TODO: Replace WebClient with HubRestClient.
 public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubLoggerProcessor.class.getName() );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
+
     private ConfigManager configManager;
-    private HubManagerImpl manager;
+
+    private HubManagerImpl hubManager;
+
     private final Map<String, String> errLogs = new LinkedHashMap<>();
 
 
-    public HubLoggerProcessor( final ConfigManager configManager, final HubManagerImpl integration )
+    public HubLoggerProcessor( final ConfigManager configManager, final HubManagerImpl hubManager )
     {
         this.configManager = configManager;
-        this.manager = integration;
+        this.hubManager = hubManager;
     }
 
 
@@ -56,7 +59,7 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
             errLogs.clear();
         }
 
-        if ( !logs.isEmpty() && manager.getRegistrationState() )
+        if ( !logs.isEmpty() && hubManager.isRegistered() )
         {
             WebClient client = null;
             try
@@ -69,25 +72,25 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
                 byte[] plainData = JsonUtil.toCbor( logsDto );
                 byte[] encryptedData = configManager.getMessenger().produce( plainData );
 
-                LOG.debug( "Sending System logs to HUB:" );
+                log.debug( "Sending System logs to HUB:" );
 
                 Response r = client.post( encryptedData );
 
                 if ( r.getStatus() != HttpStatus.SC_NO_CONTENT )
                 {
-                    LOG.warn( "Could not send logs to Hub {}", r.readEntity( String.class ) );
+                    log.warn( "Could not send logs to Hub {}", r.readEntity( String.class ) );
                 }
                 else
                 {
 
-                    LOG.debug( "System logs sent to HUB successfully." );
+                    log.debug( "System logs sent to HUB successfully." );
                 }
 
                 r.close();
             }
             catch ( Exception e )
             {
-                LOG.warn( "Could not send logs to Hub {}", e.getMessage() );
+                log.warn( "Could not send logs to Hub {}", e.getMessage() );
             }
             finally
             {
@@ -103,7 +106,7 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
     @Override
     public void onEvent( final SubutaiErrorEvent event )
     {
-        LOG.info( String.format( "RECEIVED:%n:%s", event.toString() ) );
+        log.info( String.format( "RECEIVED:%n:%s", event.toString() ) );
 
         try
         {
@@ -127,7 +130,7 @@ public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
         }
         catch ( Exception e )
         {
-            LOG.warn( "Error in #onEvent {}", e.getMessage() );
+            log.warn( "Error in #onEvent {}", e.getMessage() );
         }
     }
 }
