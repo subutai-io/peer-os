@@ -789,8 +789,8 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //todo UI should receive SshTunnel instead of port
-            return Response.ok( environmentManager.setupSshTunnelForContainer( containerId, environmentId ).getPort() )
+
+            return Response.ok( JsonUtil.toJson( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ) )
                            .build();
         }
         catch ( Exception e )

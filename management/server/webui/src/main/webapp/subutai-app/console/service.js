@@ -27,7 +27,7 @@ function consoleService($http, environmentService) {
 			environmentId = null;
 		}
 		return $http.get(
-			SERVER_URL + 'rest/ui/environments/' + environmentId + '/containers/' + hostId + '/ssh', 
+			environmentService.getServerUrl() + environmentId + '/containers/' + hostId + '/ssh',
 			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
 		);		
 	}
