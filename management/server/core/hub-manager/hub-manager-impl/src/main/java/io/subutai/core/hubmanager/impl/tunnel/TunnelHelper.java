@@ -11,23 +11,31 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
+
+import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.ERROR;
 
 
 public class TunnelHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger( TunnelHelper.class );
 
+    private static String COMMAND = "";
+
 
     public static CommandResult execute( ResourceHost resourceHost, String cmd )
     {
+        COMMAND = cmd;
         boolean exec = true;
         int tryCount = 0;
 
@@ -66,46 +74,12 @@ public class TunnelHelper
     }
 
 
-    public static void sendLogs( Set<String> logs, ConfigManager configManager )
+    public static void sendError( String link, String errorLog, ConfigManager configManager )
     {
-        WebClient client = null;
-        try
-        {
-            client = configManager.getTrustedWebClientWithAuth( "/rest/v1/system-bugs", configManager.getHubIp() );
-
-            SystemLogsDto logsDto = new SystemLogsDto();
-            logsDto.setLogs( logs );
-
-            byte[] plainData = JsonUtil.toCbor( logsDto );
-            byte[] encryptedData = configManager.getMessenger().produce( plainData );
-
-            LOG.debug( "Sending System logs to HUB:" );
-
-            Response response = client.post( encryptedData );
-
-            if ( response.getStatus() != HttpStatus.SC_NO_CONTENT )
-            {
-                LOG.warn( "Could not send logs to Hub {}", response.readEntity( String.class ) );
-            }
-            else
-            {
-
-                LOG.debug( "System logs sent to HUB successfully." );
-            }
-
-            response.close();
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "Could not send logs to Hub {}", e.getMessage() );
-        }
-        finally
-        {
-            if ( client != null )
-            {
-                client.close();
-            }
-        }
+        TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
+        tunnelInfoDto.setTunnelStatus( ERROR );
+        tunnelInfoDto.setErrorLogs( errorLog );
+        updateTunnelStatus( link, tunnelInfoDto, configManager );
     }
 
 
@@ -132,5 +106,24 @@ public class TunnelHelper
                 client.close();
             }
         }
+    }
+
+
+    public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager )
+    {
+        TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
+        String[] data = result.split( ":" );
+
+        try
+        {
+            tunnelInfoDto.setOpenedIp( data[0] );
+            tunnelInfoDto.setOpenedPort( data[1] );
+        }
+        catch ( Exception e )
+        {
+            TunnelHelper.sendError( link, "Executed: " + COMMAND + "   output: " + result, configManager );
+            return null;
+        }
+        return tunnelInfoDto;
     }
 }

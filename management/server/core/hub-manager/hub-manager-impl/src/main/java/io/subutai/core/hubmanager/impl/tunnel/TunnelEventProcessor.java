@@ -2,7 +2,6 @@ package io.subutai.core.hubmanager.impl.tunnel;
 
 
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.ws.rs.core.Response;
@@ -11,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.http.HttpStatus;
-
-import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.ResourceHost;
@@ -36,8 +33,7 @@ public class TunnelEventProcessor implements Runnable
     private HubManager manager;
 
 
-    public TunnelEventProcessor( final HubManager integration, PeerManager peerManager,
-                                 ConfigManager configManager )
+    public TunnelEventProcessor( final HubManager integration, PeerManager peerManager, ConfigManager configManager )
     {
         this.peerManager = peerManager;
         this.configManager = configManager;
@@ -74,20 +70,13 @@ public class TunnelEventProcessor implements Runnable
 
             if ( !result.hasSucceeded() && !result.getStdErr().isEmpty() )
             {
-                Set<String> logs = Sets.newHashSet();
-
-                TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
-                tunnelInfoDto.setTunnelStatus( null );
-                TunnelHelper.updateTunnelStatus( REST_TUNNEL_URL + configManager.getPeerId(), tunnelInfoDto,
-                        configManager );
-
-                logs.add( "Executed: " + TUNNEL_LIST_CMD + " |  Result: " + result.getStdErr() );
-                TunnelHelper.sendLogs( logs, configManager );
+                TunnelHelper.sendError( REST_TUNNEL_URL + configManager.getPeerId(),
+                        "Executed: " + TUNNEL_LIST_CMD + " |  Result: " + result.getStdErr(), configManager );
             }
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            TunnelHelper.sendError( REST_TUNNEL_URL + configManager.getPeerId(), e.getMessage(), configManager );
             LOG.error( e.getMessage() );
         }
     }
@@ -96,16 +85,24 @@ public class TunnelEventProcessor implements Runnable
     private void sendDataToHub( Map<Long, String> map )
     {
         String result = "";
-        for ( long key : map.keySet() )
+
+        if ( map.containsKey( -1L ) )
         {
-            result = map.get( key );
+            result = map.get( -1L );
         }
+
+        else
+        {
+            for ( long key : map.keySet() )
+            {
+                result = map.get( key );
+            }
+        }
+
         OPENED_IP_PORT = result;
 
-        TunnelInfoDto tunnelInfoDto = new TunnelInfoDto();
-        String[] data = result.split( ":" );
-        tunnelInfoDto.setOpenedIp( data[0] );
-        tunnelInfoDto.setOpenedPort( data[1] );
+        TunnelInfoDto tunnelInfoDto =
+                TunnelHelper.parseResult( REST_TUNNEL_URL + configManager.getPeerId(), result, configManager );
 
         Response response = TunnelHelper
                 .updateTunnelStatus( REST_TUNNEL_URL + configManager.getPeerId(), tunnelInfoDto, configManager );

@@ -196,7 +196,7 @@ public class HubManagerImpl implements HubManager
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
 
-            tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 30, TimeUnit.SECONDS );
+            tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {

@@ -21,6 +21,7 @@ public class TunnelInfoDto
 
     private String openedPort;
     private String openedIp;
+    private String errorLogs;
 
 
     public TunnelInfoDto()
@@ -106,5 +107,17 @@ public class TunnelInfoDto
     public void setTunnelStatus( final TunnelStatus tunnelStatus )
     {
         this.tunnelStatus = tunnelStatus;
+    }
+
+
+    public String getErrorLogs()
+    {
+        return errorLogs;
+    }
+
+
+    public void setErrorLogs( final String errorLogs )
+    {
+        this.errorLogs = errorLogs;
     }
 }
