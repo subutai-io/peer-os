@@ -88,6 +88,7 @@
         </executions>
 
         <configuration>
+          <injectAllReactorProjects>true</injectAllReactorProjects>
           <dotGitDirectory>../../${project.basedir}/.git</dotGitDirectory>
           <generateGitPropertiesFile>true</generateGitPropertiesFile>
           <generateGitPropertiesFilename>${project.basedir}/src/main/assembly/etc/git.properties
@@ -235,7 +236,7 @@
                   </resources>
                 </configuration>
               </execution>
-	      <execution>
+              <execution>
                 <id>copy-system-content</id>
                 <phase>prepare-package</phase>
                 <goals>
@@ -315,11 +316,11 @@
                   <packageName>management-${git.branch}</packageName>
                   <packageVersion>${project.version}</packageVersion>
                   <maintainerName>Subutai Social</maintainerName>
-		   <packageDependencies>
-                        <packageDependencies>openjdk-8-jre-headless</packageDependencies>
-                        <packageDependencies>subutai-dnsmasq</packageDependencies>
-                        <packageDependencies>subutai-influxdb</packageDependencies>
-                        <packageDependencies>curl</packageDependencies>
+                  <packageDependencies>
+                    <packageDependencies>openjdk-8-jre-headless</packageDependencies>
+                    <packageDependencies>subutai-dnsmasq</packageDependencies>
+                    <packageDependencies>subutai-influxdb</packageDependencies>
+                    <packageDependencies>curl</packageDependencies>
                   </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
                 </configuration>
