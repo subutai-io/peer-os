@@ -25,16 +25,16 @@ public class ContainerEventProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private HubManagerImpl manager;
+    private HubManagerImpl hubManager;
 
     private ConfigManager configManager;
 
     private PeerManager peerManager;
 
 
-    public ContainerEventProcessor( HubManagerImpl integration, ConfigManager configManager, PeerManager peerManager )
+    public ContainerEventProcessor( HubManagerImpl hubManager, ConfigManager configManager, PeerManager peerManager )
     {
-        this.manager = integration;
+        this.hubManager = hubManager;
         this.configManager = configManager;
         this.peerManager = peerManager;
     }
@@ -56,7 +56,7 @@ public class ContainerEventProcessor implements Runnable
 
     public void process() throws HubPluginException
     {
-        if ( !manager.getRegistrationState() )
+        if ( !hubManager.isRegistered() )
         {
             return;
         }

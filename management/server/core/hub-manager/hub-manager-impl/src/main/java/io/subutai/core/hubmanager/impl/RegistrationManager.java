@@ -143,13 +143,13 @@ public class RegistrationManager
         if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
         {
             log.info( "Peer or its pubic key not found on Hub. Unregistered anyway." );
-
-            hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
         }
         else if ( !restResult.isSuccess() )
         {
             throw new HubPluginException( "Error to unregister peer: " + restResult.getError() );
         }
+
+        hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
 
         log.info( "Uregistered successfully" );
     }

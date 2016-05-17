@@ -66,7 +66,7 @@ public class HubManagerImpl implements HubManager
 {
     private static final long TIME_15_MINUTES = 900;
 
-    private static final Logger LOG = LoggerFactory.getLogger( HubManagerImpl.class );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private SecurityManager securityManager;
 
@@ -203,14 +203,14 @@ public class HubManagerImpl implements HubManager
                 @Override
                 public void run()
                 {
-                    LOG.info( "Starting sumchecker" );
+                    log.info( "Starting sumchecker" );
                     generateChecksum();
                 }
             }, 1, 600000, TimeUnit.MILLISECONDS );
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
         }
     }
 
@@ -317,7 +317,7 @@ public class HubManagerImpl implements HubManager
 
             if ( r.getStatus() != HttpStatus.SC_OK )
             {
-                LOG.error( r.readEntity( String.class ) );
+                log.error( r.readEntity( String.class ) );
                 return null;
             }
 
@@ -347,7 +347,7 @@ public class HubManagerImpl implements HubManager
         {
             throw new HubPluginException( "Could not install plugin", e );
         }
-        LOG.debug( "Product installed successfully..." );
+        log.debug( "Product installed successfully..." );
     }
 
 
@@ -355,7 +355,7 @@ public class HubManagerImpl implements HubManager
     public void uninstallPlugin( final String name )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-        LOG.info( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        log.info( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
         File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
@@ -369,11 +369,11 @@ public class HubManagerImpl implements HubManager
         {
             for ( File f : dirs )
             {
-                LOG.info( f.getAbsolutePath() );
+                log.info( f.getAbsolutePath() );
                 try
                 {
                     FileUtils.deleteDirectory( f );
-                    LOG.debug( f.getName() + " is removed." );
+                    log.debug( f.getName() + " is removed." );
                 }
                 catch ( IOException e )
                 {
@@ -383,16 +383,16 @@ public class HubManagerImpl implements HubManager
         }
         if ( file.delete() )
         {
-            LOG.debug( file.getName() + " is removed." );
+            log.debug( file.getName() + " is removed." );
         }
-        LOG.debug( "Product uninstalled successfully..." );
+        log.debug( "Product uninstalled successfully..." );
     }
 
 
     @Override
-    public boolean getRegistrationState()
+    public boolean isRegistered()
     {
-        return getConfigDataService().getHubConfig( configManager.getPeerId() ) != null;
+        return configDataService.getHubConfig( configManager.getPeerId() ) != null;
     }
 
 
@@ -415,7 +415,7 @@ public class HubManagerImpl implements HubManager
                 PeerDto dto = JsonUtil.fromCbor( plainContent, PeerDto.class );
                 result.put( "OwnerId", dto.getOwnerId() );
 
-                LOG.debug( "PeerDto: " + result.toString() );
+                log.debug( "PeerDto: " + result.toString() );
             }
         }
         catch ( Exception e )
@@ -505,7 +505,7 @@ public class HubManagerImpl implements HubManager
     {
         try
         {
-            LOG.info( "Generating plugins list md5 checksum" );
+            log.info( "Generating plugins list md5 checksum" );
             String productList = getProducts();
             MessageDigest md = MessageDigest.getInstance( "MD5" );
             byte[] bytes = md.digest( productList.getBytes( "UTF-8" ) );
@@ -522,11 +522,11 @@ public class HubManagerImpl implements HubManager
             }
 
             checksum = hexString.toString();
-            LOG.info( "Checksum generated: " + checksum );
+            log.info( "Checksum generated: " + checksum );
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
             e.printStackTrace();
         }
     }
@@ -542,7 +542,7 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendSystemConfiguration( final SystemConfDto dto )
     {
-        if ( getRegistrationState() )
+        if ( isRegistered() )
         {
             try
             {
@@ -553,22 +553,22 @@ public class HubManagerImpl implements HubManager
 
                 byte[] encryptedData = configManager.getMessenger().produce( cborData );
 
-                LOG.info( "Sending Configuration of SS to Hub..." );
+                log.info( "Sending Configuration of SS to Hub..." );
 
                 Response r = client.post( encryptedData );
 
                 if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
                 {
-                    LOG.info( "SS configuration sent successfully." );
+                    log.info( "SS configuration sent successfully." );
                 }
                 else
                 {
-                    LOG.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
+                    log.error( "Could not send SS configuration to Hub: ", r.readEntity( String.class ) );
                 }
             }
             catch ( Exception e )
             {
-                LOG.error( "Could not send SS configuration to Hub", e );
+                log.error( "Could not send SS configuration to Hub", e );
             }
         }
     }
