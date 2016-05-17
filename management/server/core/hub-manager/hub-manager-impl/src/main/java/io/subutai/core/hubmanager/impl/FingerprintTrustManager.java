@@ -9,11 +9,8 @@ import javax.net.ssl.X509TrustManager;
 
 public class FingerprintTrustManager implements X509TrustManager
 {
-    private byte[] serverFingerprint;
-
     public FingerprintTrustManager( final byte[] serverFingerprint )
     {
-        this.serverFingerprint = serverFingerprint;
     }
 
 

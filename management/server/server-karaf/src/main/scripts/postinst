@@ -1,3 +1,12 @@
 #!/bin/bash
 
-service management start
+if [ -f /tmp/.mng-firstrun ]; then
+	echo "Etc/UTC" > /etc/timezone
+	sed -i /etc/shadow -e '1 s/^.*$/root:$6$s095rK7.$0bqNwLNnABaQ8LKR\/mSFJfHTlW24Xg.6uUv5Wt50NaV3b\/xAH6kYJyx7vaOrAZzsBTH1t1iU2WvQ2buCrVDL50:16928:0:99999:7:::/g'
+	sed -i /etc/ssh/sshd_config -e 's/PermitRootLogin without-password/PermitRootLogin yes/g'
+	echo -e "nameserver 10.10.10.254\ndomain intra.lan\nsearch intra.lan\n" > /etc/resolvconf/resolv.conf.d/original 
+	sed -i /etc/network/interfaces -e 's/iface eth0 inet dhcp/iface eth0 inet static\naddress 10.10.10.1\nnetmask 255.255.255.0\ngateway 10.10.10.254\n/g'
+	rm /tmp/.mng-firstrun
+else
+	service management start
+fi

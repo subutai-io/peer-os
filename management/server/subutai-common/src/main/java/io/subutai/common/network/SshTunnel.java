@@ -34,6 +34,11 @@ public class SshTunnel
         return port;
     }
 
+    public String getTunelAddress()
+    {
+        return ip + ":" + port;
+    }
+
 
     @Override
     public String toString()

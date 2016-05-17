@@ -27,9 +27,9 @@ import static java.lang.String.format;
 
 public class ResourceHostDataProcessor implements Runnable
 {
-    private final Logger log = LoggerFactory.getLogger( ResourceHostDataProcessor.class );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private final HubManagerImpl manager;
+    private final HubManagerImpl hubManager;
 
     private final PeerManager peerManager;
 
@@ -42,11 +42,11 @@ public class ResourceHostDataProcessor implements Runnable
     private Date p2pLogsEndDate;
 
 
-    public ResourceHostDataProcessor( final HubManagerImpl integration, final PeerManager peerManager,
+    public ResourceHostDataProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
                                       final ConfigManager configManager, final Monitor monitor )
     {
         this.peerManager = peerManager;
-        this.manager = integration;
+        this.hubManager = hubManager;
         this.monitor = monitor;
 
         restClient = new HubRestClient( configManager );
@@ -71,7 +71,7 @@ public class ResourceHostDataProcessor implements Runnable
 
     public void process() throws HubPluginException
     {
-        if ( manager.getRegistrationState() )
+        if ( hubManager.isRegistered() )
         {
             processConfigs();
 
