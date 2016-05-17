@@ -31,9 +31,7 @@ if [ -f "$DIRNAME/setenv" ]; then
 fi
 
 #Generate certificates before any configuration is applied
-export JAVA_HOME=/opt/subutai-mng/java
-export PATH=$PATH:$JAVA_HOME/bin
-
+/opt/subutai-mng/bin/influxdbinit.sh &
 /opt/subutai-mng/bin/certgen
 
 #Function to generate self signed certificate for peer

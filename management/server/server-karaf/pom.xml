@@ -88,6 +88,7 @@
         </executions>
 
         <configuration>
+          <injectAllReactorProjects>true</injectAllReactorProjects>
           <dotGitDirectory>../../${project.basedir}/.git</dotGitDirectory>
           <generateGitPropertiesFile>true</generateGitPropertiesFile>
           <generateGitPropertiesFilename>${project.basedir}/src/main/assembly/etc/git.properties
@@ -236,6 +237,23 @@
                 </configuration>
               </execution>
               <execution>
+                <id>copy-system-content</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <!-- Copying install scripts to deb source folder -->
+                  <outputDirectory>target/deb</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/system</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <execution>
                 <id>copy-deb-scripts</id>
                 <phase>prepare-package</phase>
                 <goals>
@@ -295,9 +313,15 @@
                   <goal>package</goal>
                 </goals>
                 <configuration>
-                  <packageName>management</packageName>
+                  <packageName>management-${git.branch}</packageName>
                   <packageVersion>${project.version}</packageVersion>
                   <maintainerName>Subutai Social</maintainerName>
+                  <packageDependencies>
+                    <packageDependencies>openjdk-8-jre-headless</packageDependencies>
+                    <packageDependencies>subutai-dnsmasq</packageDependencies>
+                    <packageDependencies>subutai-influxdb</packageDependencies>
+                    <packageDependencies>curl</packageDependencies>
+                  </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
                 </configuration>
               </execution>

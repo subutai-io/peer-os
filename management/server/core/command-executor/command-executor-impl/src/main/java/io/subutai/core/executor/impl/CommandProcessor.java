@@ -276,7 +276,7 @@ public class CommandProcessor implements RestProcessor
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
-        return resourceHostInfo.getHostInterfaces().findByName( SystemSettings.getMgmtInterface() ).getIp();
+        return resourceHostInfo.getHostInterfaces().findByName( Common.RH_INTERFACE ).getIp();
     }
 
 

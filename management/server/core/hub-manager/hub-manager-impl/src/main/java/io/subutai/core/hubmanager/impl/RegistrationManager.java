@@ -140,16 +140,16 @@ public class RegistrationManager
 
         RestResult<Object> restResult = restClient.delete( path );
 
-        if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN && restResult.getError().contains( "peer not found" ) )
+        if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
         {
-            log.info( "Peer not found on Hub. Unregistered anyway." );
-
-            hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
+            log.info( "Peer or its pubic key not found on Hub. Unregistered anyway." );
         }
         else if ( !restResult.isSuccess() )
         {
             throw new HubPluginException( "Error to unregister peer: " + restResult.getError() );
         }
+
+        hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
 
         log.info( "Uregistered successfully" );
     }

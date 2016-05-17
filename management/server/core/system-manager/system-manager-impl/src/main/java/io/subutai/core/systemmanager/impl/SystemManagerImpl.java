@@ -200,14 +200,20 @@ public class SystemManagerImpl implements SystemManager
                                     final String publicUrl, final String agentPort, final String publicSecurePort )
             throws ConfigurationException
     {
-        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-        SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
-        SystemSettings.setPublicUrl( publicUrl );
-        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
-        SystemSettings.setPublicSecurePort( Integer.parseInt( publicSecurePort ) );
+        try
+        {
+            SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
+            SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
+            SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
+            SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
+            peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
+                    Integer.parseInt( publicSecurePort ) );
+        }
+        catch ( Exception e )
+        {
+            throw new ConfigurationException( e );
+        }
 
-        notifyListeners();
     }
 
 
