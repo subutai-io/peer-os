@@ -34,11 +34,15 @@ public class PeerInfo implements Serializable
     @JsonProperty( "publicSecurePort" )
     private int publicSecurePort = SystemSettings.getSecurePortX2();
 
+    @JsonProperty( "manualSetting" )
+    private boolean manualSetting;
+
 
     public PeerInfo( @JsonProperty( "id" ) final String id, @JsonProperty( "ownerId" ) final String ownerId,
                      @JsonProperty( "publicUrl" ) final String publicUrl, @JsonProperty( "ip" ) final String ip,
                      @JsonProperty( "name" ) final String name,
-                     @JsonProperty( "publicSecurePort" ) final int publicSecurePort )
+                     @JsonProperty( "publicSecurePort" ) final int publicSecurePort,
+                     @JsonProperty( "manualSetting" ) final boolean manualSetting )
     {
         this.id = id;
         this.ownerId = ownerId;
@@ -46,6 +50,7 @@ public class PeerInfo implements Serializable
         this.ip = ip;
         this.name = name;
         this.publicSecurePort = publicSecurePort;
+        this.manualSetting = manualSetting;
     }
 
 
@@ -138,6 +143,18 @@ public class PeerInfo implements Serializable
     public void setPublicSecurePort( final int publicSecurePort )
     {
         this.publicSecurePort = publicSecurePort;
+    }
+
+
+    public boolean isManualSetting()
+    {
+        return manualSetting;
+    }
+
+
+    public void setManualSetting( final boolean manualSetting )
+    {
+        this.manualSetting = manualSetting;
     }
 
 
