@@ -91,6 +91,13 @@ public class UsedHostNetResourcesTask extends HostUtil.Task<Object>
                 usedNetworkResources.addContainerSubnet( iface.getIp() );
                 usedNetworkResources.addP2pSubnet( iface.getIp() );
             }
+
+            //add all supplementary network interfaces to exclusion list
+            if ( iface.getName().startsWith( "eth" ) )
+            {
+                usedNetworkResources.addContainerSubnet( iface.getIp() );
+                usedNetworkResources.addP2pSubnet( iface.getIp() );
+            }
         }
 
         return null;
