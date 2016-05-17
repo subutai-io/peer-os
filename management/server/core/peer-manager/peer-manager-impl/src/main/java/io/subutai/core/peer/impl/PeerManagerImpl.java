@@ -22,13 +22,12 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.util.RestUtil;
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -58,6 +57,7 @@ import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -689,7 +689,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
     {
         Preconditions.checkNotNull( keyPhrase );
-        URL destinationUrl = checkDestinationHostConstraints(destinationHost);
+        URL destinationUrl = checkDestinationHostConstraints( destinationHost );
 
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
@@ -717,6 +717,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         }
     }
 
+
     public boolean checkHostAvailability( final String destinationHost ) throws PeerException
     {
         URL url = checkDestinationHostConstraints( destinationHost );
@@ -726,18 +727,19 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             WebClient client = RestUtil.createTrustedWebClient( url.toString() + "/rest/v1/handshake/info" );
             Response response = client.get();
 
-            if( response.hasEntity() )
+            if ( response.hasEntity() )
             {
                 return true;
             }
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
-            LOG.error("checkHostAvailability", e);
+            LOG.error( "checkHostAvailability", e );
         }
 
         return false;
     }
+
 
     private URL checkDestinationHostConstraints( String destinationHost ) throws PeerException
     {
@@ -1179,25 +1181,41 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         }
 
 
+        private boolean isIpValid( HostInterface hostInterface )
+        {
+            return hostInterface != null && !( hostInterface instanceof NullHostInterface ) && !Strings
+                    .isNullOrEmpty( hostInterface.getIp() );
+        }
+
+
         @Override
         public void run()
         {
             try
             {
-                if ( localPeer.getPeerInfo() == null )
+                if ( !localPeer.isInitialized() )
                 {
-                    //local peer info not initialized yet
+                    //local peer not initialized yet
                     return;
                 }
                 else if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
                 {
-                    //local peer ip is default, obtain lan ip from MH and set it as local peer ip
-                    HostInterface externalInterface =
-                            localPeer.getManagementHost().getInterfaceByName( SystemSettings.getExternalIpInterface() );
+                    //local peer ip is default, obtain external ip from MH and set it as local peer ip
+                    HostInterface externalInterface = localPeer.getManagementHost().getInterfaceByName( "eth2" );
 
-                    if ( externalInterface == null || externalInterface instanceof NullHostInterface )
+                    if ( !isIpValid( externalInterface ) )
                     {
-                        return;
+                        externalInterface = localPeer.getManagementHost().getInterfaceByName( "eth1" );
+
+                        if ( !isIpValid( externalInterface ) )
+                        {
+                            externalInterface = localPeer.getManagementHost().getInterfaceByName( "wan" );
+
+                            if ( !isIpValid( externalInterface ) )
+                            {
+                                return;
+                            }
+                        }
                     }
 
                     //modify local peer info
