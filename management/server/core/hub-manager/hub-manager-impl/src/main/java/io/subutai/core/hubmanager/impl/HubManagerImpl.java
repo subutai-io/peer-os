@@ -38,10 +38,11 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.hubmanager.impl.environment.HubEnvironmentManager;
+import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
@@ -169,8 +170,8 @@ public class HubManagerImpl implements HubManager
 
     private void initHeartbeatProcessor()
     {
-        EnvironmentUserHelper environmentUserHelper =
-                new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
+        EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
+                environmentManager );
 
         HubEnvironmentManager hubEnvironmentManager = new HubEnvironmentManager( configManager, peerManager );
 

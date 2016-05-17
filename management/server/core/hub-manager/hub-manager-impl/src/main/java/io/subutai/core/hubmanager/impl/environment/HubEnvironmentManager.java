@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl;
+package io.subutai.core.hubmanager.impl.environment;
 
 
 import java.util.HashSet;
@@ -51,6 +51,8 @@ import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.hubmanager.impl.CreatePeerTemplatePrepareTask;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;

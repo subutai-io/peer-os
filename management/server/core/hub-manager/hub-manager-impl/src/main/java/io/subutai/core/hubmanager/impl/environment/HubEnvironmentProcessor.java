@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.processor;
+package io.subutai.core.hubmanager.impl.environment;
 
 
 import java.io.IOException;
@@ -9,8 +9,6 @@ import java.security.UnrecoverableKeyException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
 import javax.ws.rs.core.Response;
@@ -41,7 +39,7 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
+import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -65,9 +63,8 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
-            "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
-                    + "[a-zA-z0-9]{1,100}" );
+    private static final String LINK_PATTERN = "/rest/v1/environments/.*/peers/.*";
+
 
     private final ConfigManager configManager;
 
@@ -79,11 +76,13 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
     private final IdentityManager identityManager;
 
+    private final String peerId;
 
-    public HubEnvironmentProcessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager hConfigManager, PeerManager peerManager,
+
+    public HubEnvironmentProcessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager configManager, PeerManager peerManager,
                                     IdentityManager identityManager, EnvironmentUserHelper environmentUserHelper )
     {
-        this.configManager = hConfigManager;
+        this.configManager = configManager;
 
         this.peerManager = peerManager;
 
@@ -92,77 +91,81 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         this.environmentUserHelper = environmentUserHelper;
 
         this.identityManager = identityManager;
+
+        peerId = peerManager.getLocalPeer().getId();
     }
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( Set<String> stateLinks ) throws HubPluginException
     {
         for ( String link : stateLinks )
         {
-            // Environment Data     GET /rest/v1/environments/{environment-id}/peers/{peer-id}
-            Matcher environmentDataMatcher = ENVIRONMENT_PEER_DATA_PATTERN.matcher( link );
-            if ( environmentDataMatcher.matches() )
+            if ( !link.matches( LINK_PATTERN ) && link.endsWith( "/" + peerId ) )
             {
-                final EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
-                UserDto userDto = getUserDataFromHub( envPeerDto.getOwnerId() );
-                Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
+                continue;
+            }
 
-                if ( isTrustedUser )
+            final EnvironmentPeerDto envPeerDto = getEnvPeerDto( link );
+            UserDto userDto = getUserDataFromHub( envPeerDto.getOwnerId() );
+            Boolean isTrustedUser = getUserTrustLevel( userDto.getFingerprint() );
+
+            if ( !isTrustedUser )
+            {
+                hubEnvironmentManager.sendLogToHub( envPeerDto, "User is not trusted.", null, LogEvent.HUB, LogType.ERROR, null );
+
+                continue;
+            }
+
+            if ( envPeerDto.getEnvOwnerToken() == null )
+            {
+                final Session session = identityManager.login( "token", envPeerDto.getPeerToken() );
+
+                Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
                 {
-                    if ( envPeerDto.getEnvOwnerToken() == null )
-                    {
-                        final Session session = identityManager.login( "token", envPeerDto.getPeerToken() );
-                        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
-                        {
 
-                            @Override
-                            public Void run()
-                            {
-                                try
-                                {
-                                    User user = environmentUserHelper.handleEnvironmentOwnerCreation( envPeerDto );
-                                    java.util.Calendar cal = Calendar.getInstance();
-                                    cal.setTime( new Date() );
-                                    cal.add( Calendar.YEAR, 3 );
-                                    UserToken token =
-                                            identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
-                                    envPeerDto.setEnvOwnerToken( token.getFullToken() );
-                                    updateEnvironmentPeerData( envPeerDto );
-                                }
-                                catch ( Exception ex )
-                                {
-                                    log.error( ex.getMessage() );
-                                }
-                                return null;
-                            }
-                        } );
+                    @Override
+                    public Void run()
+                    {
+                        try
+                        {
+                            User user = environmentUserHelper.handleEnvironmentOwnerCreation( envPeerDto );
+                            java.util.Calendar cal = Calendar.getInstance();
+                            cal.setTime( new Date() );
+                            cal.add( Calendar.YEAR, 3 );
+                            UserToken token = identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
+                            envPeerDto.setEnvOwnerToken( token.getFullToken() );
+                            updateEnvironmentPeerData( envPeerDto );
+                        }
+                        catch ( Exception ex )
+                        {
+                            log.error( ex.getMessage() );
+                        }
+
+                        return null;
+                    }
+                } );
+            }
+
+            final Session session = identityManager.login( "token", envPeerDto.getEnvOwnerToken() );
+
+            Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
+            {
+                @Override
+                public Void run()
+                {
+                    try
+                    {
+                        environmentBuildProcess( envPeerDto );
+                    }
+                    catch ( Exception ex )
+                    {
+                        log.error( ex.getMessage() );
                     }
 
-                    final Session session = identityManager.login( "token", envPeerDto.getEnvOwnerToken() );
-                    Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
-                    {
-                        @Override
-                        public Void run()
-                        {
-                            try
-                            {
-                                environmentBuildProcess( envPeerDto );
-                            }
-                            catch ( Exception ex )
-                            {
-                                log.error( ex.getMessage() );
-                            }
-                            return null;
-                        }
-                    } );
+                    return null;
                 }
-                else
-                {
-                    String msg = "User is not trusted.";
-                    hubEnvironmentManager.sendLogToHub( envPeerDto, msg, null, LogEvent.HUB, LogType.ERROR, null );
-                }
-            }
+            } );
         }
     }
 
@@ -666,7 +669,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
     }
 
 
-    private Boolean getUserTrustLevel( String fingerprint )
+    private boolean getUserTrustLevel( String fingerprint )
     {
         String path = "/rest/v1/keyserver/hub/trust/" + fingerprint;
         try
@@ -675,6 +678,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
             Response r = client.get();
             client.close();
+
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
                 byte[] encryptedContent = configManager.readContent( r );
@@ -682,10 +686,12 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
 
                 TrustDataDto userTrustDto = JsonUtil.fromCbor( plainContent, TrustDataDto.class );
+
                 if ( userTrustDto.getTrustLevel().equals( TrustDataDto.TrustLevel.FULL ) )
                 {
                     return true;
                 }
+
                 return false;
             }
         }
@@ -693,6 +699,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         {
             log.error( "Error to get user data: ", e );
         }
+
         return false;
     }
 }
