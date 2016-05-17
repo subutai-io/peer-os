@@ -55,7 +55,6 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.SecurityUtilities;
@@ -81,7 +80,7 @@ import io.subutai.core.security.api.SecurityManager;
  * PeerManager implementation
  */
 @PermitAll
-public class PeerManagerImpl implements PeerManager, SettingsListener
+public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
@@ -1124,48 +1123,17 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
             peerInfo.setPublicUrl( publicUrl.toLowerCase() );
             peerInfo.setPublicSecurePort( securePort );
+            peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
             peerData.setInfo( toJson( peerInfo ) );
 
             peerDataService.saveOrUpdate( peerData );
 
             Peer peer = constructPeerPojo( peerData );
             addPeerToRegistry( peer );
-
-            //update settings
-            if ( getLocalPeer().getId().equalsIgnoreCase( peerId ) )
-            {
-                SystemSettings.setPublicUrl( peerInfo.getPublicUrl() );
-                SystemSettings.setPublicSecurePort( peerInfo.getPublicSecurePort() );
-            }
         }
         catch ( Exception e )
         {
             throw new PeerException( "Error setting public url ", e );
-        }
-    }
-
-
-    @Override
-    public void settingsChanged()
-    {
-        try
-        {
-            if ( localPeer.getPeerInfo().getPublicSecurePort() != SystemSettings.getPublicSecurePort() || !localPeer
-                    .getPeerInfo().getPublicUrl().equals( SystemSettings.getPublicUrl() ) )
-            {
-                //modify local peer info
-                localPeer.getPeerInfo().setPublicUrl( SystemSettings.getPublicUrl() );
-                localPeer.getPeerInfo().setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-
-                //update db
-                PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-                peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
-                updatePeerData( peerData );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error updating local peer info", e );
         }
     }
 
@@ -1193,23 +1161,22 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         {
             try
             {
-                if ( !localPeer.isInitialized() )
-                {
-                    //local peer not initialized yet
-                    return;
-                }
-                else if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
+                if ( localPeer.isInitialized() && SystemSettings.DEFAULT_PUBLIC_URL
+                        .equals( localPeer.getPeerInfo().getPublicUrl() ) )
                 {
                     //local peer ip is default, obtain external ip from MH and set it as local peer ip
-                    HostInterface externalInterface = localPeer.getManagementHost().getInterfaceByName( "eth2" );
+                    HostInterface externalInterface =
+                            localPeer.getManagementHost().getInterfaceByName( Common.BRIDGED_INTERFACE );
 
                     if ( !isIpValid( externalInterface ) )
                     {
-                        externalInterface = localPeer.getManagementHost().getInterfaceByName( "eth1" );
+                        externalInterface =
+                                localPeer.getManagementHost().getInterfaceByName( Common.HOST_ONLY_INTERFACE );
 
                         if ( !isIpValid( externalInterface ) )
                         {
-                            externalInterface = localPeer.getManagementHost().getInterfaceByName( "wan" );
+                            externalInterface =
+                                    localPeer.getManagementHost().getInterfaceByName( Common.NAT_INTERFACE );
 
                             if ( !isIpValid( externalInterface ) )
                             {
@@ -1218,40 +1185,9 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
                         }
                     }
 
-                    //modify local peer info
-                    localPeer.getPeerInfo().setPublicUrl( externalInterface.getIp() );
-                    localPeer.getPeerInfo()
-                             .setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
+                    setPublicUrl( localPeerId, externalInterface.getIp(),
+                            localPeer.getPeerInfo().getPublicSecurePort() );
 
-                    //update db
-                    PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-                    peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
-                    updatePeerData( peerData );
-
-                    //modify settings
-                    SystemSettings.setPublicUrl( localPeer.getPeerInfo().getPublicUrl() );
-
-                    localIpSetter.shutdown();
-                }
-                else
-                {
-                    if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( SystemSettings.getPublicUrl() )
-                            && !SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
-                    {
-                        //probably config file was overwritten by deb installation
-                        //restore public url setting
-                        SystemSettings.setPublicUrl( localPeer.getPeerInfo().getPublicUrl() );
-                    }
-
-                    if ( SystemSettings.DEFAULT_PUBLIC_SECURE_PORT == SystemSettings.getPublicSecurePort()
-                            && SystemSettings.DEFAULT_PUBLIC_SECURE_PORT != localPeer.getPeerInfo()
-                                                                                     .getPublicSecurePort() )
-                    {
-
-                        //probably config file was overwritten by deb installation
-                        //restore public secure port setting
-                        SystemSettings.setPublicSecurePort( localPeer.getPeerInfo().getPublicSecurePort() );
-                    }
 
                     localIpSetter.shutdown();
                 }
