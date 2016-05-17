@@ -18,7 +18,6 @@ public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
 
-    public static final String DEFAULT_MGMT_INTERFACE = "mng-net";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final int DEFAULT_PUBLIC_PORT = ChannelSettings.SECURE_PORT_X1;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
@@ -135,18 +134,6 @@ public class SystemSettings
 
 
     // Network Settings
-
-
-    public static String getMgmtInterface()
-    {
-        return PROPERTIES.getString( "mgmtInterfaceName", DEFAULT_MGMT_INTERFACE );
-    }
-
-
-    public static void setMgmtInterface( String mgmtInterfaceName )
-    {
-        saveProperty( "mgmtInterfaceName", mgmtInterfaceName );
-    }
 
 
     public static int getOpenPort()

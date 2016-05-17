@@ -18,6 +18,7 @@ public class Common
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
     public static final String BRIDGED_INTERFACE = "eth2";
     public static final String HOST_ONLY_INTERFACE = "eth1";
+    public static final String RH_INTERFACE = "mng-net";
     public static final String NAT_INTERFACE = "wan";
     public static final String LOCAL_HOST_IP = "127.0.0.1";
     public static final String LOCAL_HOST_NAME = "localhost";
