@@ -163,14 +163,6 @@ public class EnvironmentUserHelper
     }
 
 
-    //    public void test()
-    //    {
-    //        UserDto dto = getUserDataFromHub( "43163772-a8c2-459f-bfcb-4d0bcc5759f6" );
-    //
-    //        createNewUser( dto );
-    //    }
-
-
     private User createNewUser( UserDto userDto )
     {
         log.debug( "Creating new user: {}", userDto.getEmail() );
