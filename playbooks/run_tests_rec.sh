@@ -106,9 +106,6 @@ function choice_stories(){
 
 function run_tests(){
     cd /home/ubuntu/playbooks-newui
-    Xvfb :10 -ac &
-    export DISPLAY=:10
-    firefox &
     mvn clean
     recordmydesktop -o ~/base/playbooks/src/test/resources/video/playbooks.ogv &
     mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF

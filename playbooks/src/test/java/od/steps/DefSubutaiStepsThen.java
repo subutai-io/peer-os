@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 public class DefSubutaiStepsThen {
 
     @Steps
-    SubutaiSteps subutaiSteps;
+    private SubutaiSteps subutaiSteps;
 
     @Then("the user should observe web elements on: Login page")
     public void user_observe_login_page(){

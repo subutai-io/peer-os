@@ -92,8 +92,8 @@ public class SubutaiSteps extends ScenarioSteps {
     }
 
     @Step
-    public void inputNewUserFullName(String fullname) {
-        userManagementPage.fieldFullName.type(fullname);
+    public void inputNewUserFullName(String fullName) {
+        userManagementPage.fieldFullName.type(fullName);
     }
 
     @Step

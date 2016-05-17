@@ -36,7 +36,7 @@ public class UserManagementPage extends PageObject {
     public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
     public String sikuliButtonChooseRoles = "src/test/resources/imgs/buttons/buttonRemoveRoles.png";
 
-    @FindBy(xpath = "*//tr[@class=\"even b-midletrusted-user\"]//a[@class=\"b-icon b-icon_remove\"]")
+    @FindBy(xpath = "*//td[text()=\"test@test.com\"]/..//a[@class=\"b-icon b-icon_remove\"]")
     public WebElementFacade buttonRemoveUser;
 
     @FindBy(xpath = "*//i[@class=\"fa fa-angle-double-down\"]")
