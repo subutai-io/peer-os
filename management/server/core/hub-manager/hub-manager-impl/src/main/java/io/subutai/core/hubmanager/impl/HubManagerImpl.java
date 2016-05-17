@@ -8,6 +8,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,10 +27,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -111,12 +115,32 @@ public class HubManagerImpl implements HubManager
 
     private ContainerEventProcessor containerEventProcessor;
 
+    private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
+
     private String checksum = "";
 
 
     public HubManagerImpl( DaoManager daoManager )
     {
         this.daoManager = daoManager;
+    }
+
+
+    public void addListener( HubEventListener listener )
+    {
+        if ( listener != null )
+        {
+            hubEventListeners.add( listener );
+        }
+    }
+
+
+    public void removeListener( HubEventListener listener )
+    {
+        if ( listener != null )
+        {
+            hubEventListeners.remove( listener );
+        }
     }
 
 
@@ -258,6 +282,38 @@ public class HubManagerImpl implements HubManager
         registrationManager.registerPeer( email, password );
 
         generateChecksum();
+
+        notifyRegistrationListeners();
+    }
+
+
+    private void notifyRegistrationListeners()
+    {
+        if ( !CollectionUtil.isCollectionEmpty( hubEventListeners ) )
+        {
+            ExecutorService notifier = Executors.newFixedThreadPool( hubEventListeners.size() );
+
+            for ( final HubEventListener hubEventListener : hubEventListeners )
+            {
+                notifier.execute( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            hubEventListener.onRegistrationSucceeded();
+                        }
+                        catch ( Exception e )
+                        {
+                            //ignore
+                        }
+                    }
+                } );
+            }
+
+            notifier.shutdown();
+        }
     }
 
 

@@ -61,14 +61,12 @@
     <argument ref="templateRegistry" />
     <argument ref="identityManager" />
     <argument ref="jsonProvider" />
-    <property name="relationManager" ref="relationManager"/>
+    <property name="relationManager" ref="relationManager" />
   </bean>
 
   <service ref="messageResponseListener" interface="io.subutai.core.messenger.api.MessageListener" />
 
   <service ref="peerManager" interface="io.subutai.core.peer.api.PeerManager" />
-
-  <service ref="peerManager" interface="io.subutai.common.settings.SettingsListener" />
 
   <reference-list id="peerActionListener"
                   interface="io.subutai.core.peer.api.PeerActionListener"

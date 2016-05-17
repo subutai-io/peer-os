@@ -13,7 +13,6 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.HostUtil;
 
 
@@ -85,8 +84,15 @@ public class UsedHostNetResourcesTask extends HostUtil.Task<Object>
                 usedNetworkResources.addVlan( Integer.parseInt( matcher.group( 1 ) ) );
             }
 
-            //add LAN subnet to prevent collisions
-            if ( iface.getName().equalsIgnoreCase( SystemSettings.getExternalIpInterface() ) )
+            //add WAN subnet to prevent collisions
+            if ( iface.getName().equalsIgnoreCase( "wan" ) )
+            {
+                usedNetworkResources.addContainerSubnet( iface.getIp() );
+                usedNetworkResources.addP2pSubnet( iface.getIp() );
+            }
+
+            //add all supplementary network interfaces to exclusion list
+            if ( iface.getName().startsWith( "eth" ) )
             {
                 usedNetworkResources.addContainerSubnet( iface.getIp() );
                 usedNetworkResources.addP2pSubnet( iface.getIp() );
