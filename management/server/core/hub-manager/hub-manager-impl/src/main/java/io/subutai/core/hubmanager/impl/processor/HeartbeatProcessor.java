@@ -39,9 +39,11 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    public void addProcessor( StateLinkProcessor processor )
+    public HeartbeatProcessor addProcessor( StateLinkProcessor processor )
     {
         processors.add( processor );
+
+        return this;
     }
 
 

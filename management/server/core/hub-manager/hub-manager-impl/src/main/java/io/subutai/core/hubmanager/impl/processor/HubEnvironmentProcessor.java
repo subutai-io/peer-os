@@ -26,8 +26,8 @@ import org.apache.http.HttpStatus;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
@@ -38,7 +38,6 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
@@ -64,7 +63,7 @@ import io.subutai.hub.share.json.JsonUtil;
 // TODO: Replace WebClient with HubRestClient.
 public class HubEnvironmentProcessor implements StateLinkProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
@@ -81,10 +80,8 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
     private final IdentityManager identityManager;
 
 
-    public HubEnvironmentProcessor( final HubEnvironmentManager hubEnvironmentManager,
-                                    final ConfigManager hConfigManager, final PeerManager peerManager,
-                                    final IdentityManager identityManager, CommandExecutor commandExecutor,
-                                    EnvironmentUserHelper environmentUserHelper )
+    public HubEnvironmentProcessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager hConfigManager, PeerManager peerManager,
+                                    IdentityManager identityManager, EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
 
@@ -135,7 +132,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                                 }
                                 catch ( Exception ex )
                                 {
-                                    LOG.error( ex.getMessage() );
+                                    log.error( ex.getMessage() );
                                 }
                                 return null;
                             }
@@ -154,7 +151,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                             }
                             catch ( Exception ex )
                             {
-                                LOG.error( ex.getMessage() );
+                                log.error( ex.getMessage() );
                             }
                             return null;
                         }
@@ -176,7 +173,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
 
-            LOG.debug( "Getting EnvironmentPeerDto from Hub..." );
+            log.debug( "Getting EnvironmentPeerDto from Hub..." );
 
             Response response = client.get();
 
@@ -188,7 +185,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
-            LOG.debug( "Response: {} - {}", response.getStatus(), response.getStatusInfo().getReasonPhrase() );
+            log.debug( "Response: {} - {}", response.getStatus(), response.getStatusInfo().getReasonPhrase() );
 
             return result;
         }
@@ -233,7 +230,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
         }
     }
 
@@ -261,7 +258,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             client.close();
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
-                LOG.debug( "Collected data successfully sent to Hub" );
+                log.debug( "Collected data successfully sent to Hub" );
                 byte[] encryptedContent = configManager.readContent( r );
                 byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
                 EnvironmentPeerDto buildDtoResponse = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
@@ -276,19 +273,19 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             String mgs = "Could not send exchange data to Hub.";
             hubEnvironmentManager
                     .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
         catch ( PeerException e )
         {
             String mgs = "Could not save signed key.";
             hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
         catch ( EnvironmentCreationException e )
         {
             String mgs = "Environment creation exception";
             hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
     }
 
@@ -303,7 +300,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         }
         catch ( EnvironmentCreationException e )
         {
-            LOG.error( e.getMessage() );
+            log.error( e.getMessage() );
         }
     }
 
@@ -330,7 +327,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             String mgs = "Could not get environment data from Hub.";
             hubEnvironmentManager
                     .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
     }
 
@@ -356,11 +353,11 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             Response response = client.put( encryptedData );
             client.close();
 
-            LOG.debug( "response.status: {}", response.getStatus() );
+            log.debug( "response.status: {}", response.getStatus() );
 
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "env_via_hub: Environment successfully build!!!" );
+                log.debug( "env_via_hub: Environment successfully build!!!" );
             }
         }
         catch ( Exception e )
@@ -369,7 +366,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
             hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
 
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
     }
 
@@ -395,13 +392,13 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             clientUpdate.close();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "SSH configuration successfully done" );
+                log.debug( "SSH configuration successfully done" );
             }
         }
         catch ( Exception e )
         {
             String mgs = "Could not configure SSH/Hash";
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
     }
 
@@ -450,7 +447,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                             hubEnvironmentManager
                                     .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.CONTAINER, LogType.ERROR,
                                             containerId.getId() );
-                            LOG.error( mgs, e );
+                            log.error( mgs, e );
                         }
                     }
 
@@ -466,7 +463,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                         clientUpdate.close();
                         if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
                         {
-                            LOG.debug( "Container successfully updated" );
+                            log.debug( "Container successfully updated" );
                         }
                     }
                     catch ( Exception e )
@@ -475,7 +472,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                         hubEnvironmentManager
                                 .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR,
                                         null );
-                        LOG.error( mgs, e );
+                        log.error( mgs, e );
                     }
                 }
             }
@@ -512,7 +509,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                             }
                             catch ( Exception e )
                             {
-                                LOG.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
+                                log.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
                             }
                         }
                     }
@@ -531,14 +528,14 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             clientUpdate.close();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Domain configuration successfully done" );
+                log.debug( "Domain configuration successfully done" );
             }
         }
         catch ( Exception e )
         {
             String mgs = "Could not configure domain name";
             hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
     }
 
@@ -577,14 +574,14 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             client.close();
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                LOG.debug( "Environment data cleaned successfully" );
+                log.debug( "Environment data cleaned successfully" );
             }
         }
         catch ( Exception e )
         {
             String mgs = "Could not clean environment";
             hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
-            LOG.error( mgs, e );
+            log.error( mgs, e );
         }
     }
 
@@ -603,7 +600,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            LOG.error( "Could not get environment data from Hub", e );
+            log.error( "Could not get environment data from Hub", e );
         }
         return null;
     }
@@ -626,7 +623,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             {
                 String mgs = "Environment peer data successfully sent to hub";
                 hubEnvironmentManager.sendLogToHub( peerDto, mgs, null, LogEvent.REQUEST_TO_HUB, LogType.DEBUG, null );
-                LOG.debug( mgs );
+                log.debug( mgs );
             }
         }
         catch ( Exception e )
@@ -634,7 +631,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             String mgs = "Could not sent environment peer data to hub.";
             hubEnvironmentManager
                     .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
-            LOG.error( mgs, e.getMessage() );
+            log.error( mgs, e.getMessage() );
         }
     }
 
@@ -662,7 +659,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            LOG.error( "Error to get user data: ", e );
+            log.error( "Error to get user data: ", e );
         }
 
         return userDto;
@@ -694,7 +691,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            LOG.error( "Error to get user data: ", e );
+            log.error( "Error to get user data: ", e );
         }
         return false;
     }

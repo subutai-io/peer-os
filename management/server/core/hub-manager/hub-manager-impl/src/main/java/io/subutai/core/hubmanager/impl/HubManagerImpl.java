@@ -68,6 +68,22 @@ public class HubManagerImpl implements HubManager
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
+    private final ScheduledExecutorService heartbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+
+    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
+
     private SecurityManager securityManager;
 
     private EnvironmentManager environmentManager;
@@ -78,26 +94,6 @@ public class HubManagerImpl implements HubManager
 
     private CommandExecutor commandExecutor;
 
-    private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
-
-    private HeartbeatProcessor heartbeatProcessor;
-
-    private ResourceHostDataProcessor resourceHostDataProcessor;
-
-    private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
-
-    private HubLoggerProcessor hubLoggerProcessor;
-
     private DaoManager daoManager;
 
     private ConfigDataService configDataService;
@@ -106,19 +102,13 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
-    private HubEnvironmentManager hubEnvironmentManager;
-
     private NetworkManager networkManager;
 
+    private HeartbeatProcessor heartbeatProcessor;
+
+    private ResourceHostDataProcessor resourceHostDataProcessor;
+
     private ContainerEventProcessor containerEventProcessor;
-
-    private ProductProcessor productProccessor;
-
-    private TunnelEventProcessor tunnelEventProcessor;
-
-    private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
-
-    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
 
     private String checksum = "";
 
@@ -137,64 +127,23 @@ public class HubManagerImpl implements HubManager
 
             configManager = new ConfigManager( securityManager, peerManager, configDataService, identityManager );
 
-            hubEnvironmentManager =
-                    new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager,
-                            networkManager );
-
-            heartbeatProcessor = new HeartbeatProcessor( this, configManager );
-
             resourceHostDataProcessor = new ResourceHostDataProcessor( this, peerManager, configManager, monitor );
 
-            hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
+            ResourceHostMonitorProcessor resourceHostMonitorProcessor = new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
-            resourceHostMonitorProcessor =
-                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
+            resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
-            productProccessor = new ProductProcessor( configManager );
-
-            tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
-
-            StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
-
-            EnvironmentUserHelper environmentUserHelper =
-                    new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
-
-            StateLinkProcessor hubEnvironmentProccessor =
-                    new HubEnvironmentProcessor( hubEnvironmentManager, configManager, peerManager, identityManager,
-                            commandExecutor, environmentUserHelper );
-
-            StateLinkProcessor vehsProccessor =
-                    new VehsProcessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
-                            environmentUserHelper );
-
-            StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
-
-            heartbeatProcessor.addProcessor( vehsProccessor );
-            heartbeatProcessor.addProcessor( hubEnvironmentProccessor );
-            heartbeatProcessor.addProcessor( systemConfProcessor );
-            heartbeatProcessor.addProcessor( productProccessor );
-
-            AppScaleProcessor appScaleProcessor =
-                    new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
-
-            heartbeatProcessor.addProcessor( appScaleProcessor );
-
-            heartbeatProcessor.addProcessor( tunnelProcessor );
-
-            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
-
-            resourceHostConfExecutorService
-                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
-
-            resourceHostMonitorExecutorService
-                    .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
+            resourceHostMonitorExecutorService.scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
-            containerEventExecutor
-                    .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+
+            HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+
+            TunnelEventProcessor tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
 
             tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
@@ -207,6 +156,9 @@ public class HubManagerImpl implements HubManager
                     generateChecksum();
                 }
             }, 1, 600000, TimeUnit.MILLISECONDS );
+
+
+            initHeartbeatProcessor();
         }
         catch ( Exception e )
         {
@@ -215,9 +167,42 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    private void initHeartbeatProcessor()
+    {
+        EnvironmentUserHelper environmentUserHelper =
+                new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
+
+        HubEnvironmentManager hubEnvironmentManager = new HubEnvironmentManager( configManager, peerManager );
+
+        StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
+
+        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( hubEnvironmentManager, configManager, peerManager,
+                identityManager, environmentUserHelper );
+
+        StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
+
+        ProductProcessor productProcessor = new ProductProcessor( configManager );
+
+        StateLinkProcessor vehsProccessor = new VehsProcessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
+                environmentUserHelper );
+
+        AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
+
+        heartbeatProcessor = new HeartbeatProcessor( this, configManager )
+                .addProcessor( tunnelProcessor )
+                .addProcessor( hubEnvironmentProcessor )
+                .addProcessor( systemConfProcessor )
+                .addProcessor( productProcessor )
+                .addProcessor( vehsProccessor )
+                .addProcessor( appScaleProcessor );
+
+        heartbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
+    }
+
+
     public void destroy()
     {
-        hearbeatExecutorService.shutdown();
+        heartbeatExecutorService.shutdown();
         resourceHostConfExecutorService.shutdown();
         resourceHostMonitorExecutorService.shutdown();
     }
