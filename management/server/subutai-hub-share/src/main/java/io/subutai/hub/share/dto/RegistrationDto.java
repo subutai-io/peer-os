@@ -14,6 +14,8 @@ public class RegistrationDto
 
     private String tokenId;
 
+    private String temp1;
+
 
     public RegistrationDto()
     {
@@ -100,5 +102,17 @@ public class RegistrationDto
     public void setTokenId( final String tokenId )
     {
         this.tokenId = tokenId;
+    }
+
+
+    public String getTemp1()
+    {
+        return temp1;
+    }
+
+
+    public void setTemp1( final String temp1 )
+    {
+        this.temp1 = temp1;
     }
 }
