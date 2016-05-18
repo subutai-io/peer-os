@@ -89,7 +89,7 @@ public class RepoUrlStore
     ///////////////// Common private methods /////////////////////
     private void addUrl( RepoUrl repoUrl, String mapName ) throws IOException
     {
-        try ( FileDb fileDb = new FileDb( repoFile ) )
+        try ( FileDb fileDb = new FileDb( repoFile, RepoUrl.class.getClassLoader() ) )
         {
             fileDb.put( mapName, makeKey( repoUrl ), repoUrl );
         }
@@ -99,7 +99,7 @@ public class RepoUrlStore
     private RepoUrl removeUrl( RepoUrl repoUrl, String mapName ) throws IOException
     {
         RepoUrl removed = null;
-        try ( FileDb fileDb = new FileDb( repoFile ) )
+        try ( FileDb fileDb = new FileDb( repoFile, RepoUrl.class.getClassLoader() ) )
         {
             Map<String, RepoUrl> map = fileDb.get( mapName );
             Object[] keys = map.keySet().stream().filter( u -> u.startsWith( repoUrl.getUrl().toString() ) ).toArray();
@@ -114,7 +114,7 @@ public class RepoUrlStore
 
     private Set<RepoUrl> getUrls( String mapName ) throws IOException
     {
-        try ( FileDb fileDb = new FileDb( repoFile ) )
+        try ( FileDb fileDb = new FileDb( repoFile, RepoUrl.class.getClassLoader() ) )
         {
             Map<String, RepoUrl> map = fileDb.get( mapName );
             if ( map == null )
@@ -128,7 +128,7 @@ public class RepoUrlStore
 
     private void removeAllUrls( String mapName ) throws IOException
     {
-        try ( FileDb fileDb = new FileDb( repoFile ) )
+        try ( FileDb fileDb = new FileDb( repoFile, RepoUrl.class.getClassLoader() ) )
         {
             Map<String, RepoUrl> map = fileDb.get( mapName );
 
@@ -142,7 +142,6 @@ public class RepoUrlStore
 
     private String makeKey( RepoUrl repoUrl )
     {
-        String url = repoUrl.getUrl().toExternalForm().replaceAll( "/", "@" ).replaceAll( ":", "#" );
-        return url + "_" + repoUrl.getToken();
+        return repoUrl.getUrlString() + "_" + repoUrl.getToken();
     }
 }
