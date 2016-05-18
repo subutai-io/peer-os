@@ -12,6 +12,9 @@ public class RegistrationDto
 
     private String token;
 
+    private String tokenId;
+
+
     public RegistrationDto()
     {
     }
@@ -85,5 +88,17 @@ public class RegistrationDto
     public void setToken( final String token )
     {
         this.token = token;
+    }
+
+
+    public String getTokenId()
+    {
+        return tokenId;
+    }
+
+
+    public void setTokenId( final String tokenId )
+    {
+        this.tokenId = tokenId;
     }
 }
