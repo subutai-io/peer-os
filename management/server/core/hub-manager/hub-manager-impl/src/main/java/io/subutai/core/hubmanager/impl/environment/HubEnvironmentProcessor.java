@@ -26,7 +26,6 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
-import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
@@ -130,9 +129,9 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 //                case EXCHANGE_INFO:
 //                    infoExchange( peerDto );
 //                    break;
-                case RESERVE_NETWORK:
-                    reserveNetwork( peerDto );
-                    break;
+//                case RESERVE_NETWORK:
+//                    reserveNetwork( peerDto );
+//                    break;
                 case SETUP_TUNNEL:
                     setupTunnel( peerDto );
                     break;
@@ -154,21 +153,6 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             }
         }
         catch ( Exception e )
-        {
-            log.error( e.getMessage() );
-        }
-    }
-
-
-    private void reserveNetwork( EnvironmentPeerDto peerDto )
-    {
-        try
-        {
-            hubEnvManager.reserveNetworkResource( peerDto );
-            peerDto = hubEnvManager.setupP2P( peerDto );
-            updateEnvironmentPeerData( peerDto );
-        }
-        catch ( EnvironmentCreationException e )
         {
             log.error( e.getMessage() );
         }
