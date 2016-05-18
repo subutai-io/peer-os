@@ -51,13 +51,13 @@ public abstract class StateHandler
     }
 
 
-    private void runAs( EnvironmentPeerDto envPeerDto )
+    private void runAs( EnvironmentPeerDto peerDto )
     {
         try
         {
-            Object result = doHandle( envPeerDto );
+            Object result = doHandle( peerDto );
 
-            post( envPeerDto, result );
+            post( peerDto, result );
         }
         catch ( Exception e )
         {
@@ -66,9 +66,9 @@ public abstract class StateHandler
     }
 
 
-    protected void post( EnvironmentPeerDto envPeerDto, Object body )
+    protected void post( EnvironmentPeerDto peerDto, Object body )
     {
-        String path = String.format( "/rest/v1/environments/%s/peers/%s", envPeerDto.getEnvironmentInfo().getId(), envPeerDto.getPeerId() );
+        String path = String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
 
         ctx.restClient.post( path, body );
     }
