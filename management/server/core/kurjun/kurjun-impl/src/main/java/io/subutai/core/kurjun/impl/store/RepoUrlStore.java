@@ -142,6 +142,7 @@ public class RepoUrlStore
 
     private String makeKey( RepoUrl repoUrl )
     {
-        return repoUrl.getUrl() + "_" + repoUrl.getToken();
+        String url = repoUrl.getUrl().toExternalForm().replaceAll( "/", "@" ).replaceAll( ":", "#" );
+        return url + "_" + repoUrl.getToken();
     }
 }
