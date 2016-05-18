@@ -17,7 +17,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public class ExchangeInfoStateHandler extends StateHandler
 {
-    public ExchangeInfoStateHandler( IdentityManager identityManager, EnvironmentUserHelper envUserHelper, ConfigManager configManager )
+    public ExchangeInfoStateHandler( IdentityManager identityManager, EnvironmentUserHelper envUserHelper,
+                                     ConfigManager configManager )
     {
         super( identityManager, envUserHelper, configManager );
     }
@@ -26,23 +27,20 @@ public class ExchangeInfoStateHandler extends StateHandler
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto )
     {
-        peerDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ) );
-
+        peerDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ).getFullToken() );
+        peerDto.setEnvOwnerTokenId( getEnvironmentOwnerToken( peerDto ).getTokenId() );
 
 
         return peerDto;
     }
 
 
-    private String getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
+    private UserToken getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
     {
         User user = envUserHelper.handleEnvironmentOwnerCreation( peerDto );
 
         Date validDate = DateUtils.addYears( new Date(), 3 );
 
-        UserToken token = identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
-
-        return token.getFullToken();
+        return identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
     }
-
 }
