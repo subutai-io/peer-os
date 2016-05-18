@@ -39,21 +39,21 @@ func MngInit() {
 	container.Start("management")
 	exec.Command("dhclient", "mng-net").Run()
 
-	nic, err := net.InterfaceByName("eth1")
-	if err != nil {
-		nic, err = net.InterfaceByName("wan")
-		log.Check(log.ErrorLevel, "Getting interface info", err)
-	}
-	mngIp, err := nic.Addrs()
-	log.Check(log.ErrorLevel, "Getting interface addresses", err)
-	if len(mngIp) > 0 {
-		ip := strings.Split(mngIp[0].String(), "/")
-		if len(ip) > 0 {
-			log.Info("******************************")
-			log.Info("Subutai Management UI will shortly be available at https://" + ip[0] + ":8443 (admin/secret)")
-			log.Info("SSH access to Management: ssh root@" + ip[0] + " -p2222 (ubuntu)")
-			log.Info("Don't forget to change default passwords")
-			log.Info("******************************")
+	for _, i := range []string{"eth2", "eth1", "wan"} {
+		if nic, err := net.InterfaceByName(i); err == nil {
+			mngIp, err := nic.Addrs()
+			log.Check(log.ErrorLevel, "Getting interface addresses", err)
+			if len(mngIp) > 0 {
+				ip := strings.Split(mngIp[0].String(), "/")
+				if len(ip) > 0 {
+					log.Info("******************************")
+					log.Info("Subutai Management UI will shortly be available at https://" + ip[0] + ":8443 (admin/secret)")
+					log.Info("SSH access to Management: ssh root@" + ip[0] + " -p2222 (ubuntu)")
+					log.Info("Don't forget to change default passwords")
+					log.Info("******************************")
+				}
+			}
+			break
 		}
 	}
 }
