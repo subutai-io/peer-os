@@ -68,8 +68,14 @@ public abstract class StateHandler
 
     protected void post( EnvironmentPeerDto peerDto, Object body )
     {
-        String path = String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
+        ctx.restClient.post( path( "/rest/v1/environments/%s/peers/%s", peerDto ), body );
+    }
 
-        ctx.restClient.post( path, body );
+
+    protected String path( String format, EnvironmentPeerDto peerDto )
+    {
+        return StringUtils.countMatches( format, "%s" ) == 1
+            ? String.format( format, peerDto.getEnvironmentInfo().getId() )
+            : String.format( format, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
     }
 }

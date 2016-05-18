@@ -46,19 +46,18 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private final ConfigManager configManager;
-
-    private final PeerManager peerManager;
-
-    private final HubEnvironmentManager hubEnvManager;
-
-    private final EnvironmentUserHelper envUserHelper;
-
     private final Context ctx;
 
     private final StateHandlerFactory handlerFactory;
 
     private final String linkPattern;
+
+    // ===
+
+    private final ConfigManager configManager;
+    private final PeerManager peerManager;
+    private final HubEnvironmentManager hubEnvManager;
+    private final EnvironmentUserHelper envUserHelper;
 
 
     public HubEnvironmentProcessor( HubEnvironmentManager hubEnvManager, Context ctx )
@@ -67,15 +66,13 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
         this.ctx = ctx;
 
-        this.configManager = ctx.configManager;
-
-        this.peerManager = ctx.peerManager;
-
-        this.envUserHelper = ctx.envUserHelper;
+        this.configManager = null;
+        this.peerManager = null;
+        this.envUserHelper = null;
 
         handlerFactory = new StateHandlerFactory( ctx );
 
-        linkPattern = "/rest/v1/environments/.*/peers/" + peerManager.getLocalPeer().getId();
+        linkPattern = "/rest/v1/environments/.*/peers/" + ctx.localPeer.getId();
     }
 
 
@@ -94,24 +91,11 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
     private void processStateLink( String link ) throws HubPluginException
     {
-        EnvironmentPeerDto peerDto = getEnvironmentPeerDto( link );
+        EnvironmentPeerDto peerDto = ctx.restClient.getStrict( link, EnvironmentPeerDto.class );
 
         StateHandler handler = handlerFactory.getHandler( peerDto.getState() );
 
         handler.handle( peerDto );
-    }
-
-
-    private EnvironmentPeerDto getEnvironmentPeerDto( String link ) throws HubPluginException
-    {
-        RestResult<EnvironmentPeerDto> restResult = ctx.restClient.get( link, EnvironmentPeerDto.class );
-
-        if ( !restResult.isSuccess() )
-        {
-            throw new HubPluginException( restResult.getError() );
-        }
-
-        return restResult.getEntity();
     }
 
 
@@ -130,9 +114,9 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 //                case SETUP_TUNNEL:
 //                    setupTunnel( peerDto );
 //                    break;
-                case BUILD_CONTAINER:
-                    buildContainers( peerDto );
-                    break;
+//                case BUILD_CONTAINER:
+//                    buildContainers( peerDto );
+//                    break;
                 case CONFIGURE_CONTAINER:
                     configureContainer( peerDto );
                     break;
@@ -150,44 +134,6 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-        }
-    }
-
-
-    private void buildContainers( EnvironmentPeerDto peerDto )
-    {
-        String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow", peerDto.getEnvironmentInfo().getId() );
-        try
-        {
-            WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
-            Response r = client.get();
-            byte[] encryptedContent = configManager.readContent( r );
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            EnvironmentNodesDto envNodes = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
-
-            hubEnvManager.prepareTemplates( peerDto, envNodes, peerDto.getEnvironmentInfo().getId() );
-
-            EnvironmentNodesDto updatedNodes = hubEnvManager.cloneContainers( peerDto, envNodes );
-
-            byte[] cborData = JsonUtil.toCbor( updatedNodes );
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response response = client.put( encryptedData );
-            client.close();
-
-            log.debug( "response.status: {}", response.getStatus() );
-
-            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                log.debug( "env_via_hub: Environment successfully build!!!" );
-            }
-        }
-        catch ( Exception e )
-        {
-            String mgs = "Could not get container creation data from Hub.";
-
-            hubEnvManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
-
-            log.error( mgs, e );
         }
     }
 

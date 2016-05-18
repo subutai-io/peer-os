@@ -61,8 +61,6 @@ public class HubEnvironmentManager
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private CommandUtil commandUtil = new CommandUtil();
-
     private PeerManager peerManager;
 
     private ConfigManager configManager;
@@ -72,148 +70,6 @@ public class HubEnvironmentManager
     {
         this.configManager = configManager;
         this.peerManager = peerManager;
-    }
-
-
-    public void prepareTemplates( EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto, String environmentId )
-            throws EnvironmentCreationException
-    {
-        LocalPeer localPeer = peerManager.getLocalPeer();
-        Set<Node> nodes = new HashSet<>();
-        for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
-        {
-            if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
-            {
-                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-                Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(),
-                        contSize, 0, 0, peerDto.getPeerId(), nodeDto.getHostId() );
-                nodes.add( node );
-            }
-        }
-
-        ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
-        CompletionService<PrepareTemplatesResponse> taskCompletionService = getCompletionService( taskExecutor );
-
-        taskCompletionService.submit( new CreatePeerTemplatePrepareTask( environmentId, localPeer, nodes ) );
-        taskExecutor.shutdown();
-
-        try
-        {
-            Future<PrepareTemplatesResponse> futures = taskCompletionService.take();
-            final PrepareTemplatesResponse prepareTemplatesResponse = futures.get();
-
-            if ( !prepareTemplatesResponse.hasSucceeded() )
-            {
-                for ( String templateResponse : prepareTemplatesResponse.getMessages() )
-                {
-                    String msg =
-                            "Error during preparation template: " + templateResponse + " Peer ID: " + localPeer.getId();
-                    sendLogToHub( peerDto, msg, null, EnvironmentPeerLogDto.LogEvent.SUBUTAI,
-                            EnvironmentPeerLogDto.LogType.ERROR, null );
-                    log.error( msg );
-                    throw new EnvironmentCreationException( msg );
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            String msg = "There were errors during preparation templates. Unexpected error.";
-            sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.SUBUTAI,
-                    EnvironmentPeerLogDto.LogType.ERROR, null );
-            log.error( msg, e.getMessage() );
-            throw new EnvironmentCreationException( msg );
-        }
-    }
-
-
-    public EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
-            throws EnvironmentCreationException
-    {
-        CreateEnvironmentContainersRequest containerGroupRequest =
-                new CreateEnvironmentContainersRequest( peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId(),
-                        peerDto.getOwnerId() );
-
-        Set<EnvironmentNodeDto> failedNodes = new HashSet<>();
-
-        for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
-        {
-            if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
-            {
-                failedNodes.add( nodeDto );
-                ContainerSize contSize = ContainerSize.valueOf( ContainerSize.class, nodeDto.getContainerSize() );
-
-                nodeDto.setState( ContainerStateDto.UNKNOWN );
-                CloneRequest cloneRequest =
-                        new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                                nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
-
-                containerGroupRequest.addRequest( cloneRequest );
-            }
-        }
-
-        final CreateEnvironmentContainersResponse containerCollector;
-
-        try
-        {
-            containerCollector = peerManager.getLocalPeer().createEnvironmentContainers( containerGroupRequest );
-
-            Set<CloneResponse> cloneResponseList = containerCollector.getResponses();
-
-            for ( CloneResponse cloneResponse : cloneResponseList )
-            {
-                for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
-                {
-                    if ( cloneResponse.getHostname().equals( nodeDto.getHostName() ) )
-                    {
-                        failedNodes.remove( nodeDto );
-
-                        nodeDto.setIp( cloneResponse.getIp() );
-                        nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
-                        nodeDto.setContainerId( cloneResponse.getContainerId() );
-                        nodeDto.setElapsedTime( cloneResponse.getElapsedTime() );
-                        nodeDto.setHostName( cloneResponse.getHostname() );
-                        nodeDto.setState( ContainerStateDto.RUNNING );
-
-                        Set<Host> hosts = new HashSet<>();
-                        Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
-                        hosts.add( host );
-
-                        String sshKey = createSshKey( hosts, peerDto.getEnvironmentInfo().getId() );
-                        nodeDto.addSshKey( sshKey );
-                    }
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            String msg = "Failed on cloning container: ";
-
-            for ( EnvironmentNodeDto nodeDto : failedNodes )
-            {
-                msg += nodeDto.getContainerId();
-                sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.CONTAINER,
-                        EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
-                log.error( msg, e.getMessage() );
-            }
-            throw new EnvironmentCreationException( msg );
-        }
-
-        if ( failedNodes.size() != 0 )
-        {
-            String msg = "Failed on cloning container: ";
-
-            for ( EnvironmentNodeDto nodeDto : failedNodes )
-            {
-                sendLogToHub( peerDto, msg + nodeDto.getContainerId(), null, EnvironmentPeerLogDto.LogEvent.CONTAINER,
-                        EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
-
-                log.error( msg + nodeDto.getContainerId() );
-            }
-
-            throw new EnvironmentCreationException( msg );
-        }
-
-        return envNodes;
     }
 
 
@@ -314,44 +170,6 @@ public class HubEnvironmentManager
             log.error( msg, e );
             throw new EnvironmentCreationException( msg );
         }
-    }
-
-
-    public String createSshKey( Set<Host> hosts, String environmentId )
-    {
-
-        CommandUtil.HostCommandResults results =
-                commandUtil.execute( getCreateNReadSSHCommand(), hosts, environmentId );
-
-        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
-        {
-            if ( result.hasSucceeded() && !Strings.isNullOrEmpty( result.getCommandResult().getStdOut() ) )
-            {
-                return result.getCommandResult().getStdOut();
-            }
-            else
-            {
-                log.debug( String.format( "Error: %s, Exit Code %d", result.getCommandResult().getStdErr(),
-                        result.getCommandResult().getExitCode() ) );
-            }
-        }
-        return null;
-    }
-
-
-    public RequestBuilder getCreateNReadSSHCommand()
-    {
-        return new RequestBuilder( String.format( "rm -rf %1$s && " +
-                        "mkdir -p %1$s && " +
-                        "chmod 700 %1$s && " +
-                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
-                Common.CONTAINER_SSH_FOLDER ) );
-    }
-
-
-    protected CompletionService<PrepareTemplatesResponse> getCompletionService( Executor executor )
-    {
-        return new ExecutorCompletionService<>( executor );
     }
 
 

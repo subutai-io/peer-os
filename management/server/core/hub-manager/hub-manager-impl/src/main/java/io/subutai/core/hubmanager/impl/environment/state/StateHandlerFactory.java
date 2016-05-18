@@ -59,7 +59,7 @@ public class StateHandlerFactory
             handler = buildContainerStateHandler;
         }
 
-        Preconditions.checkState( handler != null, "No state handler found for environment state context" );
+        Preconditions.checkState( handler != null, "No proper state handler found for environment state context" );
 
         return handler;
     }
