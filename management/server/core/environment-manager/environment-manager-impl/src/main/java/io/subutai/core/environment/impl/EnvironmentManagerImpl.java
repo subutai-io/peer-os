@@ -88,6 +88,7 @@ import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModifi
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.hubadapter.api.HubAdapter;
+import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -102,7 +103,7 @@ import io.subutai.core.tracker.api.Tracker;
 
 
 @PermitAll
-public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionListener, AlertListener
+public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerImpl.class );
 
@@ -1765,7 +1766,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    private void uploadEnvironmentsToHub()
+    @Override
+    public void onRegistrationSucceeded()
     {
         try
         {
@@ -1773,7 +1775,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
         catch ( Exception e )
         {
-            LOG.warn( "Error uploading environments to Hub: {}", e.getMessage() );
+            LOG.error( "Error uploading environments to Hub: {}", e.getMessage() );
         }
     }
 
@@ -1815,10 +1817,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
             } );
             //**************************************************
-
-            uploadEnvironmentsToHub();
-            // workaround for now,
-            // todo should not run if all environments already uploaded
 
             LOG.debug( "Environment background tasks finished." );
         }

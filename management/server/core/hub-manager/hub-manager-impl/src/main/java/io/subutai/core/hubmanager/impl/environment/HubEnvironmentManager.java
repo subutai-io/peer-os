@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl;
+package io.subutai.core.hubmanager.impl.environment;
 
 
 import java.util.HashSet;
@@ -49,14 +49,12 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
+import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.hubmanager.impl.CreatePeerTemplatePrepareTask;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
-import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PublicKeyContainer;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -73,30 +71,19 @@ import io.subutai.hub.share.json.JsonUtil;
 // TODO: Replace WebClient with HubRestClient.
 public class HubEnvironmentManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentManager.class.getName() );
-    private static final String MANAGEMENT_HOST_NETWORK_BINDING = "subutai management_network";
-    private static final String MANAGEMENT_PROXY_BINDING = "subutai proxy";
-    private static final String SSH_FOLDER = "/root/.ssh";
-    private static final String SSH_FILE = String.format( "%s/authorized_keys", SSH_FOLDER );
-    protected CommandUtil commandUtil = new CommandUtil();
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private SecurityManager securityManager;
+    private CommandUtil commandUtil = new CommandUtil();
+
     private PeerManager peerManager;
+
     private ConfigManager configManager;
-    private IdentityManager identityManager;
-    private EnvironmentManager environmentManager;
-    private NetworkManager networkManager;
 
 
-    public HubEnvironmentManager( final EnvironmentManager environmentManager, final ConfigManager hConfigManager,
-                                  final PeerManager peerManager, final IdentityManager identityManager,
-                                  final NetworkManager networkManager )
+    public HubEnvironmentManager( ConfigManager configManager, PeerManager peerManager )
     {
-        this.environmentManager = environmentManager;
-        this.configManager = hConfigManager;
+        this.configManager = configManager;
         this.peerManager = peerManager;
-        this.identityManager = identityManager;
-        this.networkManager = networkManager;
     }
 
 
@@ -186,7 +173,7 @@ public class HubEnvironmentManager
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.NETWORK,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
 
-            LOG.error( msg, e.getMessage() );
+            log.error( msg, e.getMessage() );
 
             throw new EnvironmentCreationException( msg );
         }
@@ -236,7 +223,7 @@ public class HubEnvironmentManager
             String msg = "Failed to setup P2P connection on Peer ID: " + localPeer.getId();
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.NETWORK,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
-            LOG.error( msg, e.getMessage() );
+            log.error( msg, e.getMessage() );
 
             throw new EnvironmentCreationException( msg );
         }
@@ -278,7 +265,7 @@ public class HubEnvironmentManager
                 String msg = "Failed to setup tunnel on Peer ID: " + localPeer.getId();
                 sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.NETWORK,
                         EnvironmentPeerLogDto.LogType.ERROR, null );
-                LOG.error( msg, e.getMessage() );
+                log.error( msg, e.getMessage() );
             }
         }
         return peerDto;
@@ -320,7 +307,7 @@ public class HubEnvironmentManager
                             "Error during preparation template: " + templateResponse + " Peer ID: " + localPeer.getId();
                     sendLogToHub( peerDto, msg, null, EnvironmentPeerLogDto.LogEvent.SUBUTAI,
                             EnvironmentPeerLogDto.LogType.ERROR, null );
-                    LOG.error( msg );
+                    log.error( msg );
                     throw new EnvironmentCreationException( msg );
                 }
             }
@@ -330,7 +317,7 @@ public class HubEnvironmentManager
             String msg = "There were errors during preparation templates. Unexpected error.";
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.SUBUTAI,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
-            LOG.error( msg, e.getMessage() );
+            log.error( msg, e.getMessage() );
             throw new EnvironmentCreationException( msg );
         }
     }
@@ -403,7 +390,7 @@ public class HubEnvironmentManager
                 msg += nodeDto.getContainerId();
                 sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.CONTAINER,
                         EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
-                LOG.error( msg, e.getMessage() );
+                log.error( msg, e.getMessage() );
             }
             throw new EnvironmentCreationException( msg );
         }
@@ -417,7 +404,7 @@ public class HubEnvironmentManager
                 sendLogToHub( peerDto, msg + nodeDto.getContainerId(), null, EnvironmentPeerLogDto.LogEvent.CONTAINER,
                         EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
 
-                LOG.error( msg + nodeDto.getContainerId() );
+                log.error( msg + nodeDto.getContainerId() );
             }
 
             throw new EnvironmentCreationException( msg );
@@ -475,7 +462,7 @@ public class HubEnvironmentManager
             String msg = "Failed to register ssh keys on peer: " + localPeer.getId();
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.SUBUTAI,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
-            LOG.error( msg, e );
+            log.error( msg, e );
             throw new EnvironmentCreationException( msg );
         }
 
@@ -521,7 +508,7 @@ public class HubEnvironmentManager
             String msg = "Problems registering hosts in peer: " + localPeer.getId();
             sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.SUBUTAI,
                     EnvironmentPeerLogDto.LogType.ERROR, null );
-            LOG.error( msg, e );
+            log.error( msg, e );
             throw new EnvironmentCreationException( msg );
         }
     }
@@ -541,7 +528,7 @@ public class HubEnvironmentManager
             }
             else
             {
-                LOG.debug( String.format( "Error: %s, Exit Code %d", result.getCommandResult().getStdErr(),
+                log.debug( String.format( "Error: %s, Exit Code %d", result.getCommandResult().getStdErr(),
                         result.getCommandResult().getExitCode() ) );
             }
         }
@@ -635,12 +622,12 @@ public class HubEnvironmentManager
             Response r = client.post( encryptedData );
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
-                LOG.debug( "Environment peer log successfully sent to hub" );
+                log.debug( "Environment peer log successfully sent to hub" );
             }
         }
         catch ( Exception e )
         {
-            LOG.error( "Could not sent environment peer log to hub.", e.getMessage() );
+            log.error( "Could not sent environment peer log to hub.", e.getMessage() );
         }
     }
 }

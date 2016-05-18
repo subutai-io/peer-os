@@ -10,14 +10,20 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.ServiceLocator;
+
 
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
 
+<<<<<<< HEAD
     public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_KEY_SERVER = "https://localhost:8443/rest/v1/pks";
     public static final String DEFAULT_MGMT_INTERFACE = "mng-net";
+=======
+>>>>>>> 86b16bcf3058d5918fa1d98da561738492eeb4d1
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final int DEFAULT_PUBLIC_PORT = ChannelSettings.SECURE_PORT_X1;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
@@ -134,30 +140,6 @@ public class SystemSettings
 
 
     // Network Settings
-
-
-    public static String getExternalIpInterface()
-    {
-        return PROPERTIES.getString( "externalInterfaceName", DEFAULT_EXTERNAL_INTERFACE );
-    }
-
-
-    public static void setExternalIpInterface( String externalInterfaceName )
-    {
-        saveProperty( "externalInterfaceName", externalInterfaceName );
-    }
-
-
-    public static String getMgmtInterface()
-    {
-        return PROPERTIES.getString( "mgmtInterfaceName", DEFAULT_MGMT_INTERFACE );
-    }
-
-
-    public static void setMgmtInterface( String mgmtInterfaceName )
-    {
-        saveProperty( "mgmtInterfaceName", mgmtInterfaceName );
-    }
 
 
     public static int getOpenPort()
@@ -301,28 +283,37 @@ public class SystemSettings
     // Peer Settings
 
 
+    private static LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+    }
+
+
     public static String getPublicUrl()
     {
-        return PROPERTIES.getString( "publicURL", DEFAULT_PUBLIC_URL ).toLowerCase();
+        LocalPeer localPeer = getLocalPeer();
+        if ( localPeer != null && localPeer.isInitialized() )
+        {
+            return getLocalPeer().getPeerInfo().getPublicUrl();
+        }
+        else
+        {
+            return SystemSettings.DEFAULT_PUBLIC_URL;
+        }
     }
 
 
     public static int getPublicSecurePort()
     {
-        return PROPERTIES.getInt( "publicSecurePort", DEFAULT_PUBLIC_SECURE_PORT );
-    }
-
-
-    public static void setPublicSecurePort( int port )
-    {
-        saveProperty( "publicSecurePort", port );
-    }
-
-
-    public static void setPublicUrl( String publicUrl ) throws ConfigurationException
-    {
-        validatePublicUrl( publicUrl );
-        saveProperty( "publicURL", publicUrl.toLowerCase() );
+        LocalPeer localPeer = getLocalPeer();
+        if ( localPeer != null && localPeer.isInitialized() )
+        {
+            return getLocalPeer().getPeerInfo().getPublicSecurePort();
+        }
+        else
+        {
+            return SystemSettings.DEFAULT_PUBLIC_SECURE_PORT;
+        }
     }
 
 

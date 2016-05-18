@@ -39,9 +39,11 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    public void addProcessor( StateLinkProcessor processor )
+    public HeartbeatProcessor addProcessor( StateLinkProcessor processor )
     {
         processors.add( processor );
+
+        return this;
     }
 
 
@@ -68,7 +70,7 @@ public class HeartbeatProcessor implements Runnable
 
         try
         {
-            RestResult<HeartbeatResponseDto> restResult = restClient.put( path, null, HeartbeatResponseDto.class );
+            RestResult<HeartbeatResponseDto> restResult = restClient.post( path, null, HeartbeatResponseDto.class );
 
             if ( !restResult.isSuccess() )
             {

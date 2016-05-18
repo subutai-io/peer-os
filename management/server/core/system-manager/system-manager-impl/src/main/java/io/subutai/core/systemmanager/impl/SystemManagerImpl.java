@@ -201,6 +201,7 @@ public class SystemManagerImpl implements SystemManager
                                     final String keyServer )
             throws ConfigurationException
     {
+<<<<<<< HEAD
         SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
         SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
         SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
@@ -210,6 +211,22 @@ public class SystemManagerImpl implements SystemManager
         SystemSettings.setKeyServer( keyServer );
 
         notifyListeners();
+=======
+        try
+        {
+            SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
+            SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
+            SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
+            SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
+            peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
+                    Integer.parseInt( publicSecurePort ) );
+        }
+        catch ( Exception e )
+        {
+            throw new ConfigurationException( e );
+        }
+
+>>>>>>> 86b16bcf3058d5918fa1d98da561738492eeb4d1
     }
 
 

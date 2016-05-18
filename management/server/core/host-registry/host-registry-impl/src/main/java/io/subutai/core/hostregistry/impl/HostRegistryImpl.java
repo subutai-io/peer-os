@@ -30,6 +30,7 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
@@ -374,7 +375,7 @@ public class HostRegistryImpl implements HostRegistry
         {
             for ( HostInterface hostInterface : ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces() )
             {
-                if ( SystemSettings.getMgmtInterface().equals( hostInterface.getName() ) )
+                if ( Common.RH_INTERFACE.equals( hostInterface.getName() ) )
                 {
                     return hostInterface.getIp();
                 }
@@ -384,8 +385,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         else
         {
-            HostInterface hostInterface =
-                    resourceHostInfo.getHostInterfaces().findByName( SystemSettings.getMgmtInterface() );
+            HostInterface hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.RH_INTERFACE );
 
             if ( hostInterface instanceof NullHostInterface )
             {
