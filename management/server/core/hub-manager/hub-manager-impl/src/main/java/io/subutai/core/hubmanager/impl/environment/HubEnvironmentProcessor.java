@@ -156,8 +156,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
     private void buildContainers( EnvironmentPeerDto peerDto )
     {
-        String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow",
-                peerDto.getEnvironmentInfo().getId() );
+        String containerDataURL = String.format( "/rest/v1/environments/%s/container-build-workflow", peerDto.getEnvironmentInfo().getId() );
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( containerDataURL, configManager.getHubIp() );
