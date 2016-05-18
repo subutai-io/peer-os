@@ -2,14 +2,15 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.time.DateUtils;
 
+import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.security.objects.TokenType;
-import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
-import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.hubmanager.impl.util.AsyncUtil;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
@@ -17,18 +18,39 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public class ExchangeInfoStateHandler extends StateHandler
 {
-    public ExchangeInfoStateHandler( IdentityManager identityManager, EnvironmentUserHelper envUserHelper, ConfigManager configManager )
+    public ExchangeInfoStateHandler( Context ctx )
     {
-        super( identityManager, envUserHelper, configManager );
+        super( ctx );
     }
 
 
     @Override
-    protected Object doHandle( EnvironmentPeerDto peerDto )
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
-        peerDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ) );
+        EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
+
+        resultDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ) );
+
+        return resultDto;
+    }
 
 
+    public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto ) throws Exception
+    {
+        UsedNetworkResources usedNetworkResources = AsyncUtil.execute( new Callable<UsedNetworkResources>()
+        {
+            @Override
+            public UsedNetworkResources call() throws Exception
+            {
+                return ctx.peerManager.getLocalPeer().getUsedNetworkResources();
+            }
+        } );
+
+        peerDto.setVnis( usedNetworkResources.getVnis() );
+
+        peerDto.setContainerSubnets( usedNetworkResources.getContainerSubnets() );
+
+        peerDto.setP2pSubnets( usedNetworkResources.getP2pSubnets() );
 
         return peerDto;
     }
@@ -36,11 +58,11 @@ public class ExchangeInfoStateHandler extends StateHandler
 
     private String getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
     {
-        User user = envUserHelper.handleEnvironmentOwnerCreation( peerDto );
+        User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
 
         Date validDate = DateUtils.addYears( new Date(), 3 );
 
-        UserToken token = identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
+        UserToken token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
 
         return token.getFullToken();
     }
