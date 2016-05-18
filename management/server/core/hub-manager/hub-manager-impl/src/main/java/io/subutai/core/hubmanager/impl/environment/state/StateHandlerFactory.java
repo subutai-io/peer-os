@@ -3,10 +3,7 @@ package io.subutai.core.hubmanager.impl.environment.state;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.environment.state.build.ExchangeInfoStateHandler;
-import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState;
 
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.EXCHANGE_INFO;
@@ -17,9 +14,9 @@ public class StateHandlerFactory
     private final StateHandler exchangeInfoStateHandler;
 
 
-    public StateHandlerFactory( IdentityManager identityManager, EnvironmentUserHelper envUserHelper, ConfigManager configManager )
+    public StateHandlerFactory( Context ctx )
     {
-        exchangeInfoStateHandler = new ExchangeInfoStateHandler( identityManager, envUserHelper, configManager );
+        exchangeInfoStateHandler = new ExchangeInfoStateHandler( ctx );
     }
 
 

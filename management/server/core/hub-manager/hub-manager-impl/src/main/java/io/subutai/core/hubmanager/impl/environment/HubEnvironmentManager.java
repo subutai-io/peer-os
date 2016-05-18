@@ -23,7 +23,6 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
@@ -35,7 +34,6 @@ import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.network.NetworkResourceImpl;
-import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -84,52 +82,6 @@ public class HubEnvironmentManager
     {
         this.configManager = configManager;
         this.peerManager = peerManager;
-    }
-
-
-    public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto )
-            throws EnvironmentCreationException
-    {
-        final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
-        final LocalPeer localPeer = peerManager.getLocalPeer();
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        ExecutorCompletionService<Peer> completionService = new ExecutorCompletionService<>( executorService );
-
-        completionService.submit( new Callable<Peer>()
-        {
-            @Override
-            public Peer call() throws Exception
-            {
-                reservedNetResources.put( localPeer, localPeer.getUsedNetworkResources() );
-                return localPeer;
-            }
-        } );
-
-        executorService.shutdown();
-        try
-        {
-            Future<Peer> f = completionService.take();
-            f.get();
-        }
-        catch ( Exception e )
-        {
-            throw new EnvironmentCreationException( "Failed to obtain reserved network resources from local peer" );
-        }
-
-        Set<String> allP2pSubnets = Sets.newHashSet();
-        Set<String> allContainerSubnets = Sets.newHashSet();
-        Set<Long> allVnis = Sets.newHashSet();
-
-        for ( UsedNetworkResources netResources : reservedNetResources.values() )
-        {
-            allContainerSubnets.addAll( netResources.getContainerSubnets() );
-            allP2pSubnets.addAll( netResources.getP2pSubnets() );
-            allVnis.addAll( netResources.getVnis() );
-        }
-        peerDto.setVnis( allVnis );
-        peerDto.setContainerSubnets( allContainerSubnets );
-        peerDto.setP2pSubnets( allP2pSubnets );
-        return peerDto;
     }
 
 
