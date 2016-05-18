@@ -1,15 +1,10 @@
 package io.subutai.core.hubmanager.impl.environment;
 
 
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,9 +127,9 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 //                case RESERVE_NETWORK:
 //                    reserveNetwork( peerDto );
 //                    break;
-                case SETUP_TUNNEL:
-                    setupTunnel( peerDto );
-                    break;
+//                case SETUP_TUNNEL:
+//                    setupTunnel( peerDto );
+//                    break;
                 case BUILD_CONTAINER:
                     buildContainers( peerDto );
                     break;
@@ -155,33 +150,6 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-        }
-    }
-
-
-    private void setupTunnel( EnvironmentPeerDto peerDto )
-    {
-        String setupTunnelDataURL = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
-        try
-        {
-            WebClient client =
-                    configManager.getTrustedWebClientWithAuth( setupTunnelDataURL, configManager.getHubIp() );
-            Response r = client.get();
-            client.close();
-            byte[] encryptedContent = configManager.readContent( r );
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            EnvironmentDto environmentDto = JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
-            peerDto.setSetupTunnel( false );
-            hubEnvManager.setupTunnel( peerDto, environmentDto );
-            updateEnvironmentPeerData( peerDto );
-        }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
-        {
-            String mgs = "Could not get environment data from Hub.";
-            hubEnvManager
-                    .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
-            log.error( mgs, e );
         }
     }
 
@@ -457,35 +425,5 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             log.error( "Could not get environment data from Hub", e );
         }
         return null;
-    }
-
-
-    private void updateEnvironmentPeerData( EnvironmentPeerDto peerDto )
-    {
-        try
-        {
-            String envPeerDataUrl =
-                    String.format( "/rest/v1/environments/%s/peers/%s", peerDto.getEnvironmentInfo().getId(),
-                            peerManager.getLocalPeer().getId() );
-            WebClient client = configManager.getTrustedWebClientWithAuth( envPeerDataUrl, configManager.getHubIp() );
-
-            byte[] cborData = JsonUtil.toCbor( peerDto );
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response r = client.put( encryptedData );
-            client.close();
-            if ( r.getStatus() == HttpStatus.SC_OK )
-            {
-                String mgs = "Environment peer data successfully sent to hub";
-                hubEnvManager.sendLogToHub( peerDto, mgs, null, LogEvent.REQUEST_TO_HUB, LogType.DEBUG, null );
-                log.debug( mgs );
-            }
-        }
-        catch ( Exception e )
-        {
-            String mgs = "Could not sent environment peer data to hub.";
-            hubEnvManager
-                    .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
-            log.error( mgs, e.getMessage() );
-        }
     }
 }

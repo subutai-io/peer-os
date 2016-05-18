@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -31,14 +30,12 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesResponse;
-import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
-import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
@@ -47,7 +44,6 @@ import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.CreatePeerTemplatePrepareTask;
-import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -56,7 +52,6 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto;
-import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 import io.subutai.hub.share.dto.environment.SSHKeyDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -77,47 +72,6 @@ public class HubEnvironmentManager
     {
         this.configManager = configManager;
         this.peerManager = peerManager;
-    }
-
-
-    public EnvironmentPeerDto setupTunnel( EnvironmentPeerDto peerDto, EnvironmentDto environmentDto )
-    {
-        LocalPeer localPeer = peerManager.getLocalPeer();
-        Set<RhP2pIp> setOfP2PIps = new HashSet<>();
-        P2pIps p2pIps = new P2pIps();
-
-        for ( EnvironmentPeerDto peerDt : environmentDto.getPeers() )
-        {
-            for ( EnvironmentPeerRHDto rhDto : peerDt.getRhs() )
-            {
-                setOfP2PIps.add( new RhP2PIpEntity( rhDto.getId(), rhDto.getP2pIp() ) );
-            }
-        }
-        p2pIps.addP2pIps( setOfP2PIps );
-        if ( !p2pIps.isEmpty() )
-        {
-            ExecutorService tunnelExecutor = Executors.newSingleThreadExecutor();
-            ExecutorCompletionService<Boolean> tunnelCompletionService =
-                    new ExecutorCompletionService<>( tunnelExecutor );
-
-            tunnelCompletionService.submit( new SetupTunnelTask( localPeer, environmentDto.getId(), p2pIps ) );
-
-            try
-            {
-                final Future<Boolean> f = tunnelCompletionService.take();
-                f.get();
-                peerDto.setSetupTunnel( true );
-                tunnelExecutor.shutdown();
-            }
-            catch ( ExecutionException | InterruptedException e )
-            {
-                String msg = "Failed to setup tunnel on Peer ID: " + localPeer.getId();
-                sendLogToHub( peerDto, msg, e.getMessage(), EnvironmentPeerLogDto.LogEvent.NETWORK,
-                        EnvironmentPeerLogDto.LogType.ERROR, null );
-                log.error( msg, e.getMessage() );
-            }
-        }
-        return peerDto;
     }
 
 
@@ -392,30 +346,6 @@ public class HubEnvironmentManager
                         "chmod 700 %1$s && " +
                         "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
                 Common.CONTAINER_SSH_FOLDER ) );
-    }
-
-
-    private class SetupTunnelTask implements Callable<Boolean>
-    {
-        private final Peer peer;
-        private final String environmentId;
-        private final P2pIps p2pIps;
-
-
-        public SetupTunnelTask( final Peer peer, final String environmentId, P2pIps p2pIps )
-        {
-            this.peer = peer;
-            this.environmentId = environmentId;
-            this.p2pIps = p2pIps;
-        }
-
-
-        @Override
-        public Boolean call() throws Exception
-        {
-            peer.setupTunnels( p2pIps, new EnvironmentId( environmentId ) );
-            return true;
-        }
     }
 
 
