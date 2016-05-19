@@ -3034,7 +3034,7 @@ td.b-main-table__status-col {
 }
 
 .b-switcher_login .b-toggle_cloud {
-    width: 210px;
+    width: 190px;
 }
 
 .b-check {
@@ -3059,9 +3059,6 @@ td.b-main-table__status-col {
 .b-toggle_cloud .b-check:checked ~ .b-switch {
     right: -1px;
     left: 44%;
-}
-.b-switcher_login .b-toggle_cloud .b-check:checked ~ .b-switch {
-    left: 54%;
 }
 .b-check:checked ~ .b-toggle-bg {
     background-color: #4bbc6e;
@@ -3144,10 +3141,6 @@ td.b-main-table__status-col {
     position: absolute;
     right: 56%;
     border-radius: 2px;
-}
-
-.b-switcher_login .b-toggle_cloud .b-switch {
-    right: 46%;
 }
 
 .b-pgp-page-row {
