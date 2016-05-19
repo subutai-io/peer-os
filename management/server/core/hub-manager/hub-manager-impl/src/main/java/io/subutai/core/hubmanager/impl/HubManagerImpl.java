@@ -51,7 +51,6 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.environment.HubEnvironmentManager;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
@@ -207,20 +206,17 @@ public class HubManagerImpl implements HubManager
         EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
                 environmentManager );
 
-        HubEnvironmentManager hubEnvironmentManager = new HubEnvironmentManager( configManager, peerManager );
-
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
         Context ctx = new Context( identityManager, environmentUserHelper, configManager, peerManager );
 
-        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( hubEnvironmentManager, ctx );
+        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
         StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
 
         ProductProcessor productProcessor = new ProductProcessor( configManager );
 
-        StateLinkProcessor vehsProccessor = new VehsProcessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
-                environmentUserHelper );
+        StateLinkProcessor vehsProccessor = new VehsProcessor( configManager, peerManager );
 
         AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
