@@ -29,8 +29,10 @@ public class ExchangeInfoStateHandler extends StateHandler
     {
         EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
 
-        resultDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ).getFullToken() );
-        resultDto.setEnvOwnerTokenId( getEnvironmentOwnerToken( peerDto ).getTokenId() );
+        UserToken token = getEnvironmentOwnerToken( peerDto );
+
+        resultDto.setEnvOwnerToken( token.getFullToken() );
+        resultDto.setEnvOwnerTokenId( token.getTokenId() );
 
         return resultDto;
     }
