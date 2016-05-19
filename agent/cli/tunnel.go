@@ -144,7 +144,6 @@ func getArgs(global bool, socket string) ([]string, string) {
 		tunsrv = cdn[0].String()
 		args = []string{"-i", config.Agent.AppPrefix + "etc/ssh.pem", "-N", "-p", "8022", "-R", "0:" + socket, "-o", "StrictHostKeyChecking=no", "tunnel@" + tunsrv}
 	} else {
-
 		for _, i := range []string{"eth2", "eth1", "wan"} {
 			if nic, err := net.InterfaceByName(i); err == nil {
 				nicAddrs, err := nic.Addrs()
@@ -158,8 +157,8 @@ func getArgs(global bool, socket string) ([]string, string) {
 				break
 			}
 		}
+		args = []string{"-N", "-R", "0:" + socket, "-o", "StrictHostKeyChecking=no", "ubuntu@" + tunsrv}
 	}
-	args = []string{"-N", "-R", "0:" + socket, "-o", "StrictHostKeyChecking=no", "ubuntu@" + tunsrv}
 	return args, tunsrv
 }
 
