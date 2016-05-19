@@ -16,6 +16,7 @@ public class SystemConfDto
     public String publicUrl;
     public int agentPort;
     public int publicSecurePort;
+    public String keyServer;
 
 
     public SystemConfDto()
@@ -166,5 +167,17 @@ public class SystemConfDto
     public void setPublicSecurePort( final int publicSecurePort )
     {
         this.publicSecurePort = publicSecurePort;
+    }
+
+
+    public String getKeyServer()
+    {
+        return keyServer;
+    }
+
+
+    public void setKeyServer( final String keyServer )
+    {
+        this.keyServer = keyServer;
     }
 }

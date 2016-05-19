@@ -1037,6 +1037,7 @@ public class PGPEncryptionUtil
     public static boolean verifyClearSign( byte[] message, PGPPublicKeyRing pgpRings ) throws Exception
     {
         ArmoredInputStream aIn = new ArmoredInputStream( new ByteArrayInputStream( message ) );
+        ArmoredInputStream saIn = new ArmoredInputStream( new ByteArrayInputStream( message ) );
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
 
@@ -1060,7 +1061,7 @@ public class PGPEncryptionUtil
             }
         }
 
-        JcaPGPObjectFactory pgpFact = new JcaPGPObjectFactory( aIn );
+        JcaPGPObjectFactory pgpFact = new JcaPGPObjectFactory( saIn );
         PGPSignatureList p3 = ( PGPSignatureList ) pgpFact.nextObject();
         PGPSignature sig = p3.get( 0 );
 
