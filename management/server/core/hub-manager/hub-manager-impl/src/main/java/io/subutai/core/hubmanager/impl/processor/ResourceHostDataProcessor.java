@@ -12,7 +12,6 @@ import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
@@ -69,7 +68,7 @@ public class ResourceHostDataProcessor implements Runnable
     }
 
 
-    public void process() throws HubPluginException
+    public void process() throws Exception
     {
         if ( hubManager.isRegistered() )
         {

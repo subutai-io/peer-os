@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.impl.environment;
 
 import java.util.Set;
 
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
@@ -31,7 +30,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( Set<String> stateLinks ) throws Exception
     {
         for ( String link : stateLinks )
         {
@@ -43,7 +42,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
     }
 
 
-    private void processStateLink( String link ) throws HubPluginException
+    private void processStateLink( String link ) throws Exception
     {
         EnvironmentPeerDto peerDto = ctx.restClient.getStrict( link, EnvironmentPeerDto.class );
 

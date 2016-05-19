@@ -12,7 +12,6 @@ import io.subutai.core.bazaar.api.dao.ConfigDataService;
 import io.subutai.core.bazaar.api.model.Plugin;
 import io.subutai.core.bazaar.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.api.HubManager;
-import io.subutai.core.hubmanager.api.HubPluginException;
 
 
 public class BazaarImpl implements Bazaar
@@ -46,7 +45,7 @@ public class BazaarImpl implements Bazaar
             String result = this.hubManager.getProducts();
             return result;
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             e.printStackTrace();
         }
@@ -62,7 +61,7 @@ public class BazaarImpl implements Bazaar
 
 
     @Override
-    public void installPlugin( String name, String version, String kar, String url, String uid ) throws HubPluginException
+    public void installPlugin( String name, String version, String kar, String url, String uid ) throws Exception
     {
 		this.hubManager.installPlugin(kar, name );
         this.configDataService.savePlugin( name, version, kar, url, uid );
@@ -77,7 +76,7 @@ public class BazaarImpl implements Bazaar
     }
 
 	@Override
-	public void restorePlugin (Long id, String name, String version, String kar, String url, String uid) throws HubPluginException
+	public void restorePlugin (Long id, String name, String version, String kar, String url, String uid) throws Exception
 	{
 		this.hubManager.uninstallPlugin(name );
 		this.hubManager.installPlugin(kar, name );

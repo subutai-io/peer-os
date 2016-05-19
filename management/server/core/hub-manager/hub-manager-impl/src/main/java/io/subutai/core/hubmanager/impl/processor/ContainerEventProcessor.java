@@ -12,7 +12,6 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
@@ -54,7 +53,7 @@ public class ContainerEventProcessor implements Runnable
     }
 
 
-    public void process() throws HubPluginException
+    public void process() throws Exception
     {
         if ( !hubManager.isRegistered() )
         {

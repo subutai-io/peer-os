@@ -23,7 +23,6 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.PeerProductDataDto;
@@ -50,7 +49,7 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String link : stateLinks )
         {
@@ -72,7 +71,7 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    private PeerProductDataDto getPeerProductDto( final String link ) throws HubPluginException
+    private PeerProductDataDto getPeerProductDto( final String link ) throws Exception
     {
         try
         {
@@ -105,13 +104,13 @@ public class ProductProcessor implements StateLinkProcessor
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            throw new HubPluginException( "Could not retrieve environment data", e );
+            throw new Exception( "Could not retrieve environment data", e );
         }
     }
 
 
     private void processPeerProductData( final PeerProductDataDto peerProductDataDTO )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, HubPluginException,
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception,
             IOException
     {
         switch ( peerProductDataDTO.getState() )
@@ -130,7 +129,7 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     private void installingProcess( final PeerProductDataDto peerProductDataDTO )
-            throws IOException, HubPluginException, UnrecoverableKeyException, NoSuchAlgorithmException,
+            throws IOException, Exception, UnrecoverableKeyException, NoSuchAlgorithmException,
             KeyStoreException
     {
         LOG.debug( "Installing Product to Local Peer..." );
@@ -164,7 +163,7 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     private void removingProcess( final PeerProductDataDto peerProductDataDTO )
-            throws HubPluginException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+            throws Exception, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
         // remove file from deploy package
         LOG.debug( "Removing product from Local Peer..." );
@@ -208,7 +207,7 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    private ProductDto getProductDataDTO( final String productId ) throws HubPluginException
+    private ProductDto getProductDataDTO( final String productId ) throws Exception
     {
         ProductDto result = null;
         String path = String.format( "/rest/v1/marketplace/products/%s", productId );
@@ -240,13 +239,13 @@ public class ProductProcessor implements StateLinkProcessor
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            throw new HubPluginException( "Could not retrieve product data", e );
+            throw new Exception( "Could not retrieve product data", e );
         }
     }
 
 
     private void updatePeerProductData( final PeerProductDataDto peerProductDataDTO )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, HubPluginException
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception
     {
         LOG.debug( "Sending update : " + peerProductDataDTO );
         String updatePath = String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(),
@@ -267,7 +266,7 @@ public class ProductProcessor implements StateLinkProcessor
         catch ( PGPException |
                 JsonProcessingException e )
         {
-            throw new HubPluginException( "Could not send product data.", e );
+            throw new Exception( "Could not send product data.", e );
         }
     }
 

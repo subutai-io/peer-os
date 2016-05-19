@@ -8,12 +8,9 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandUtil;
@@ -26,24 +23,17 @@ import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.security.PublicKeyContainer;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.util.CollectionUtil;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.hubmanager.impl.util.AsyncUtil;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
-import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;

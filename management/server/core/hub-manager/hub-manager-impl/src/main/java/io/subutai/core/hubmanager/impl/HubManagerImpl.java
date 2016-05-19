@@ -44,7 +44,6 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.hubmanager.api.HubManager;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
@@ -241,7 +240,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void sendHeartbeat() throws HubPluginException
+    public void sendHeartbeat() throws Exception
     {
         resourceHostDataProcessor.process();
         heartbeatProcessor.sendHeartbeat();
@@ -263,7 +262,7 @@ public class HubManagerImpl implements HubManager
                 {
                     heartbeatProcessor.sendHeartbeat();
                 }
-                catch ( HubPluginException e )
+                catch ( Exception e )
                 {
                     e.printStackTrace();
                 }
@@ -273,14 +272,14 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void sendResourceHostInfo() throws HubPluginException
+    public void sendResourceHostInfo() throws Exception
     {
         resourceHostDataProcessor.process();
     }
 
 
     @Override
-    public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
+    public void registerPeer( String hupIp, String email, String password ) throws Exception
     {
         configManager.addHubConfig( hupIp );
 
@@ -325,7 +324,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void unregisterPeer() throws HubPluginException
+    public void unregisterPeer() throws Exception
     {
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, null );
 
@@ -334,7 +333,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public String getHubDns() throws HubPluginException
+    public String getHubDns() throws Exception
     {
         Config config = getConfigDataService().getHubConfig( configManager.getPeerId() );
 
@@ -350,7 +349,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public String getProducts() throws HubPluginException
+    public String getProducts() throws Exception
     {
         try
         {
@@ -377,13 +376,13 @@ public class HubManagerImpl implements HubManager
         catch ( Exception e )
         {
             e.printStackTrace();
-            throw new HubPluginException( "Could not retrieve product data", e );
+            throw new Exception( "Could not retrieve product data", e );
         }
     }
 
 
     @Override
-    public void installPlugin( String url, String name ) throws HubPluginException
+    public void installPlugin( String url, String name ) throws Exception
     {
         try
         {
@@ -425,7 +424,7 @@ public class HubManagerImpl implements HubManager
         }
         catch ( IOException e )
         {
-            throw new HubPluginException( "Could not install plugin", e );
+            throw new Exception( "Could not install plugin", e );
         }
         log.debug( "Product installed successfully..." );
     }
@@ -477,7 +476,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public Map<String, String> getPeerInfo() throws HubPluginException
+    public Map<String, String> getPeerInfo() throws Exception
     {
         Map<String, String> result = new HashMap<>();
         try
@@ -500,7 +499,7 @@ public class HubManagerImpl implements HubManager
         }
         catch ( Exception e )
         {
-            throw new HubPluginException( "Could not retrieve Peer info", e );
+            throw new Exception( "Could not retrieve Peer info", e );
         }
         return result;
     }
