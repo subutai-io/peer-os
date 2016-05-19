@@ -14,11 +14,7 @@ import org.apache.http.HttpStatus;
 import com.google.common.base.Strings;
 
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
-import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerId;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
@@ -27,7 +23,6 @@ import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandlerFactory;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
@@ -102,9 +97,6 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         {
             switch ( peerDto.getState() )
             {
-                case CHANGE_CONTAINER_STATE:
-                    controlContainer( peerDto );
-                    break;
                 case CONFIGURE_DOMAIN:
                     configureDomain( peerDto );
                     break;
@@ -113,83 +105,6 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-        }
-    }
-
-
-    private void controlContainer( EnvironmentPeerDto peerDto )
-    {
-        String controlContainerPath =
-                String.format( "/rest/v1/environments/%s/peers/%s/container", peerDto.getEnvironmentInfo().getId(),
-                        peerDto.getPeerId() );
-        LocalPeer localPeer = peerManager.getLocalPeer();
-
-        EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
-        if ( environmentDto != null )
-        {
-            for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
-            {
-                PeerId peerId = new PeerId( nodesDto.getPeerId() );
-                EnvironmentId envId = new EnvironmentId( nodesDto.getEnvironmentId() );
-                if ( nodesDto.getPeerId().equals( localPeer.getId() ) )
-                {
-                    for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
-                    {
-                        ContainerId containerId =
-                                new ContainerId( nodeDto.getContainerId(), nodeDto.getHostName(), peerId, envId );
-                        try
-                        {
-                            if ( nodeDto.getState().equals( ContainerStateDto.STOPPING ) )
-                            {
-                                localPeer.stopContainer( containerId );
-                                nodeDto.setState( ContainerStateDto.STOPPED );
-                            }
-                            if ( nodeDto.getState().equals( ContainerStateDto.STARTING ) )
-                            {
-                                localPeer.startContainer( containerId );
-                                nodeDto.setState( ContainerStateDto.RUNNING );
-                            }
-                            if ( nodeDto.getState().equals( ContainerStateDto.ABORTING ) )
-                            {
-                                localPeer.destroyContainer( containerId );
-                                nodeDto.setState( ContainerStateDto.FROZEN );
-                            }
-                        }
-                        catch ( PeerException e )
-                        {
-                            String mgs = "Could not change container state";
-                            hubEnvManager
-                                    .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.CONTAINER, LogType.ERROR,
-                                            containerId.getId() );
-                            log.error( mgs, e );
-                        }
-                    }
-
-                    try
-                    {
-                        WebClient clientUpdate = configManager
-                                .getTrustedWebClientWithAuth( controlContainerPath, configManager.getHubIp() );
-
-                        byte[] cborData = JsonUtil.toCbor( nodesDto );
-                        byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-                        Response response = clientUpdate.put( encryptedData );
-                        clientUpdate.close();
-                        if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
-                        {
-                            log.debug( "Container successfully updated" );
-                        }
-                    }
-                    catch ( Exception e )
-                    {
-                        String mgs = "Could not send containers state to hub";
-                        hubEnvManager
-                                .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR,
-                                        null );
-                        log.error( mgs, e );
-                    }
-                }
-            }
         }
     }
 
