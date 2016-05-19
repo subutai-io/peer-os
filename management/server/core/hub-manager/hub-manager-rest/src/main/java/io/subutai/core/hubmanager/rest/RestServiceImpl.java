@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.CommandExecutor;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.Integration;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -17,23 +17,27 @@ import io.subutai.core.peer.api.PeerManager;
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
-    private Integration integration;
+
+    private HubManager hubManager;
+
     private CommandExecutor commandExecutor;
+
     private PeerManager peerManager;
 
 
-    public void setIntegration( final Integration integration )
+    public void setIntegration( HubManager hubManager )
     {
-        this.integration = integration;
+        this.hubManager = hubManager;
     }
 
 
     @Override
-    public Response sendHeartbeat( final String hubIp )
+    public Response sendHeartbeat( String hubIp )
     {
         try
         {
-            integration.sendHeartbeat();
+            hubManager.sendHeartbeat();
+
             return Response.ok().build();
         }
         catch ( HubPluginException e )
@@ -48,7 +52,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response triggerHeartbeat()
     {
-        integration.triggerHeartbeat();
+        hubManager.triggerHeartbeat();
 
         return Response.noContent().build();
     }
@@ -59,7 +63,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            integration.registerPeer( hubIp, email, password );
+            hubManager.registerPeer( hubIp, email, password );
             return Response.ok().build();
         }
         catch ( HubPluginException e )
@@ -76,7 +80,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            integration.sendResourceHostInfo();
+            hubManager.sendResourceHostInfo();
             return Response.ok().build();
         }
         catch ( HubPluginException e )
@@ -93,7 +97,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( integration.getHubDns() ).build();
+            return Response.ok( hubManager.getHubDns() ).build();
         }
         catch ( HubPluginException e )
         {
@@ -109,7 +113,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            integration.unregisterPeer();
+            hubManager.unregisterPeer();
         }
         catch ( HubPluginException e )
         {
@@ -126,14 +130,14 @@ public class RestServiceImpl implements RestService
     {
         RegistrationPojo pojo = new RegistrationPojo();
 
-        if ( integration.getRegistrationState() )
+        if ( hubManager.isRegistered() )
         {
-            pojo.setOwnerId( integration.getHubConfiguration().getOwnerId() );
+            pojo.setOwnerId( hubManager.getHubConfiguration().getOwnerId() );
 
-            pojo.setOwnerEmail( integration.getHubConfiguration().getOwnerEmail() );
+            pojo.setOwnerEmail( hubManager.getHubConfiguration().getOwnerEmail() );
         }
 
-        pojo.setRegisteredToHub( integration.getRegistrationState() );
+        pojo.setRegisteredToHub( hubManager.isRegistered() );
 
         String hubRegistrationInfo = JsonUtil.GSON.toJson( pojo );
 

@@ -26,7 +26,6 @@
   <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor" />
   <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
 
-
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
 
@@ -45,7 +44,6 @@
   <reference id="networkManager"
              interface="io.subutai.core.network.api.NetworkManager" />
 
-
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />
 
@@ -56,7 +54,7 @@
   <!-- ***************************************************************** -->
 
   <bean id="hubImpl" scope="singleton" init-method="init" destroy-method="destroy" activation="eager"
-        class="io.subutai.core.hubmanager.impl.IntegrationImpl">
+        class="io.subutai.core.hubmanager.impl.HubManagerImpl">
     <property name="securityManager" ref="securityManager" />
     <property name="peerManager" ref="peerManager" />
     <property name="environmentManager" ref="environmentManager" />
@@ -65,6 +63,13 @@
     <property name="commandExecutor" ref="commandExecutor" />
     <argument ref="daoManagerHub" />
   </bean>
-  <service ref="hubImpl" interface="io.subutai.core.hubmanager.api.Integration" />
+  <service ref="hubImpl" interface="io.subutai.core.hubmanager.api.HubManager" />
+
+  <reference-list id="hubEventLstnr"
+                  interface="io.subutai.core.hubmanager.api.HubEventListener"
+                  availability="optional">
+    <reference-listener ref="hubImpl"
+                        bind-method="addListener" unbind-method="removeListener" />
+  </reference-list>
 
 </blueprint>

@@ -16,6 +16,9 @@ public interface RelationManager
      * Method for constructing relation parameters
      *
      * @deprecated use Challenge {@link io.subutai.common.security.relation.model.RelationChallenge} approach instead.
+     * @param signedMessage - signed message
+     * @param secretKeyId - keyId to verify signed message
+     * @throws RelationVerificationException
      */
     @Deprecated
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;

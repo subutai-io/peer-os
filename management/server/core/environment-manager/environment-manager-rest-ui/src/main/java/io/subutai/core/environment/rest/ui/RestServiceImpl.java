@@ -41,7 +41,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -404,7 +404,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listDomainLoadBalanceStrategies()
     {
-        return Response.ok( JsonUtil.toJson( DomainLoadBalanceStrategy.values() ) ).build();
+        return Response.ok( JsonUtil.toJson( ProxyLoadBalanceStrategy.values() ) ).build();
     }
 
 
@@ -414,7 +414,7 @@ public class RestServiceImpl implements RestService
         try
         {
             String path = null;
-            DomainLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, DomainLoadBalanceStrategy.class );
+            ProxyLoadBalanceStrategy strategy = JsonUtil.fromJson( strategyJson, ProxyLoadBalanceStrategy.class );
 
             try
             {
@@ -789,7 +789,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ).build();
+
+            return Response.ok( JsonUtil.toJson( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ) )
+                           .build();
         }
         catch ( Exception e )
         {

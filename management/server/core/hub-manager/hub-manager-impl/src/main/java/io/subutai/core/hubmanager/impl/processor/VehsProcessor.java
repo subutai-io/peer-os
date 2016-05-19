@@ -27,9 +27,10 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
+import io.subutai.core.hubmanager.impl.environment.HubEnvironmentManager;
+import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.VehsDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -39,8 +40,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
-public class VehsProccessor implements StateLinkProccessor
+// TODO: Replace WebClient with HubRestClient.
+public class VehsProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
 
@@ -59,9 +60,9 @@ public class VehsProccessor implements StateLinkProccessor
     private final EnvironmentUserHelper environmentUserHelper;
 
 
-    public VehsProccessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager hConfigManager,
-                           PeerManager peerManager, CommandExecutor commandExecutor,
-                           EnvironmentUserHelper environmentUserHelper )
+    public VehsProcessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager hConfigManager,
+                          PeerManager peerManager, CommandExecutor commandExecutor,
+                          EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
 

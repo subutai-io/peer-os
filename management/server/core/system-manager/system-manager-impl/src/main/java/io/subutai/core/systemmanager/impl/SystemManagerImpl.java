@@ -19,7 +19,7 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.core.hubmanager.api.Integration;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -46,7 +46,7 @@ public class SystemManagerImpl implements SystemManager
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
-    private Integration integration;
+    private HubManager hubManager;
 
     protected Set<SettingsListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
@@ -102,10 +102,10 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final Integration integration )
+    public SystemManagerImpl( final HubManager hubManager )
 
     {
-        this.integration = integration;
+        this.hubManager = hubManager;
     }
 
 
@@ -200,14 +200,20 @@ public class SystemManagerImpl implements SystemManager
                                     final String publicUrl, final String agentPort, final String publicSecurePort )
             throws ConfigurationException
     {
-        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-        SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
-        SystemSettings.setPublicUrl( publicUrl );
-        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
-        SystemSettings.setPublicSecurePort( Integer.parseInt( publicSecurePort ) );
+        try
+        {
+            SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
+            SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
+            SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
+            SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
+            peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
+                    Integer.parseInt( publicSecurePort ) );
+        }
+        catch ( Exception e )
+        {
+            throw new ConfigurationException( e );
+        }
 
-        notifyListeners();
     }
 
 
@@ -279,7 +285,7 @@ public class SystemManagerImpl implements SystemManager
         dto.setAgentPort( networkSettings.getAgentPort() );
 
 
-        integration.sendSystemConfiguration( dto );
+        hubManager.sendSystemConfiguration( dto );
     }
 
 

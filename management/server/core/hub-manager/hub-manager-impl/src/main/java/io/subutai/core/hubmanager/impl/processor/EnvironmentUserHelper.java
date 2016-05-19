@@ -27,7 +27,7 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
+// TODO: Replace WebClient with HubRestClient.
 public class EnvironmentUserHelper
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -161,14 +161,6 @@ public class EnvironmentUserHelper
 
         return null;
     }
-
-
-    //    public void test()
-    //    {
-    //        UserDto dto = getUserDataFromHub( "43163772-a8c2-459f-bfcb-4d0bcc5759f6" );
-    //
-    //        createNewUser( dto );
-    //    }
 
 
     private User createNewUser( UserDto userDto )

@@ -1,291 +1,156 @@
 package io.subutai.core.hubmanager.impl;
 
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
-import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
-import io.subutai.common.settings.SecuritySettings;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.model.Config;
+import io.subutai.core.hubmanager.impl.http.HubRestClient;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
-import io.subutai.hub.share.dto.TrustDataDto;
-import io.subutai.hub.share.dto.UserDto;
-import io.subutai.hub.share.json.JsonUtil;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
-//TODO close web clients and responses
+import static java.lang.String.format;
+
+
 public class RegistrationManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManager.class );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private ConfigManager configManager;
-    private IntegrationImpl manager;
-    private String hubIp;
+    private final HubManagerImpl hubManager;
+
+    private final ConfigManager configManager;
+
+    private final String hubIp;
+
+    private final String peerId;
+
+    private final HubRestClient restClient;
 
 
-    public RegistrationManager( final IntegrationImpl manager, final ConfigManager configManager, final String hupIp )
+    public RegistrationManager( HubManagerImpl hubManager, ConfigManager configManager, String hupIp )
     {
+        this.hubManager = hubManager;
         this.configManager = configManager;
-        this.manager = manager;
         this.hubIp = hupIp;
+        this.peerId = configManager.getPeerId();
+
+        restClient = new HubRestClient( configManager );
     }
 
 
     public void registerPeer( String email, String password ) throws HubPluginException
     {
         registerPeerPubKey();
-        registerOwnerPubKey();
 
-        RegistrationDto registrationData =
-                new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
+        register( email, password );
+    }
 
-        registrationData.setOwnerEmail( email );
-        registrationData.setOwnerPassword( password );
 
-        String ssVersion = String.valueOf( SubutaiInfo.getVersion() );
+    private String readKeyText( PGPPublicKey key ) throws HubPluginException
+    {
+        try
+        {
+            return PGPEncryptionUtil.armorByteArrayToString( key.getEncoded() );
+        }
+        catch ( PGPException | IOException e )
+        {
+            throw new HubPluginException( "Error to read PGP key as text", e );
+        }
+    }
+
+
+    private void registerPeerPubKey() throws HubPluginException
+    {
+        log.info( "Registering peer public key to Hub..." );
+
+        Form form = new Form( "keytext", readKeyText( configManager.getPeerPublicKey() ) );
+
+        RestResult<Object> restResult = restClient.postPlain( "/pks/add", form );
+
+        if ( !restResult.isSuccess() )
+        {
+            throw new HubPluginException( "Error to register peer public to Hub: " + restResult.getError() );
+        }
+
+        log.info( "Public key successfully registered" );
+    }
+
+
+    private RegistrationDto getRegistrationDto( String email, String password )
+    {
         PeerInfoDto peerInfoDto = new PeerInfoDto();
+
         peerInfoDto.setId( configManager.getPeerId() );
-        peerInfoDto.setVersion( ssVersion );
+        peerInfoDto.setVersion( String.valueOf( SubutaiInfo.getVersion() ) );
         peerInfoDto.setName( configManager.getPeerManager().getLocalPeer().getName() );
-        registrationData.setPeerInfo( peerInfoDto );
-        registrationData.setToken( configManager.getPermanentToken() );
 
-        register( configManager.getPeerId(), registrationData );
-        sentTrustData( configManager.getPeerPublicKey(), configManager.getOwnerPublicKey() );
+        RegistrationDto dto = new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
+
+        dto.setOwnerEmail( email );
+        dto.setOwnerPassword( password );
+        dto.setPeerInfo( peerInfoDto );
+        dto.setToken( configManager.getPermanentToken() );
+
+        return dto;
     }
 
 
-    private void sentTrustData( final PGPPublicKey peerPublicKey, final PGPPublicKey ownerPublicKey )
-            throws HubPluginException
+    private void register( String email, String password ) throws HubPluginException
     {
-        try
+        log.info( "Registering peer to Hub..." );
+
+        String path = format( "/rest/v1/peers/%s", peerId );
+
+        RegistrationDto regDto = getRegistrationDto( email, password );
+
+        RestResult<Object> restResult = restClient.post( path, regDto );
+
+        if ( !restResult.isSuccess() )
         {
-            String path = String.format( "/rest/v1/keyserver/keys/%s/trust/%s",
-                    PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
-                    PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ) );
-
-            TrustDataDto trustDataDto = new TrustDataDto( PGPKeyUtil.getKeyId( peerPublicKey.getFingerprint() ),
-                    PGPKeyUtil.getKeyId( ownerPublicKey.getFingerprint() ), TrustDataDto.TrustLevel.FULL );
-
-            KeyStore keyStore = KeyStore.getInstance( "JKS" );
-
-            keyStore.load( new FileInputStream( ConfigManager.PEER_KEYSTORE ),
-                    SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
-
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
-
-            byte[] cborData = JsonUtil.toCbor( trustDataDto );
-
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-            LOG.debug( "Sending Trust data to Hub..." );
-
-            Response r = client.post( encryptedData );
-
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                LOG.debug( "Trust data sent successfully." );
-            }
-            else
-            {
-                throw new HubPluginException( "Could not send trust data: " + r.readEntity( String.class ) );
-            }
+            throw new HubPluginException( "Error to register peer: " + restResult.getError() );
         }
-        catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException | NoSuchAlgorithmException |
-                CertificateException e )
-        {
-            throw new HubPluginException( e.toString(), e );
-        }
+
+        Config config = new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ), email );
+
+        hubManager.getConfigDataService().saveHubConfig( config );
+
+        log.info( "Peer registered successfully" );
     }
 
 
-    private void register( final String peerId, RegistrationDto registrationData ) throws HubPluginException
+    public void unregister() throws HubPluginException
     {
-        try
+        log.info( "Unregistering peer..." );
+
+        String path = format( "/rest/v1/peers/%s/delete", peerId );
+
+        RestResult<Object> restResult = restClient.delete( path );
+
+        if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
         {
-            String path = String.format( "/rest/v1/peers/%s", peerId );
-
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, hubIp );
-
-            LOG.info( JsonUtil.toJson( registrationData ) );
-            LOG.info( registrationData.getOwnerFingerprint() );
-            LOG.error( registrationData.getOwnerFingerprint() );
-
-            byte[] cborData = JsonUtil.toCbor( registrationData );
-
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-            LOG.info( "Registering Peer. Sending RegistrationDTO to Hub..." );
-
-            client.header( "fingerprint", PGPKeyHelper.getFingerprint( configManager.getPeerPublicKey() ) );
-            Response r = client.post( encryptedData );
-
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                Config config = new ConfigEntity();
-                config.setHubIp( hubIp );
-                config.setPeerId( configManager.getPeerId() );
-                config.setOwnerId( manager.getPeerInfo().get( "OwnerId" ) );
-
-                //
-                // Get user email
-                //
-
-                UserDto userDto = getUserDataFromHub( config.getOwnerId() );
-
-                if ( userDto != null )
-                {
-                    config.setOwnerEmail( userDto.getEmail() );
-                }
-
-                manager.getConfigDataService().saveHubConfig( config );
-
-                LOG.info( "Peer registered successfully." );
-            }
-            else
-            {
-                String error = r.readEntity( String.class );
-
-                LOG.error( "Error to register peer: {}", error );
-
-                throw new HubPluginException( "Error to register peer: " + error );
-            }
+            log.info( "Peer or its pubic key not found on Hub. Unregistered anyway." );
         }
-        catch ( Exception e )
+        else if ( !restResult.isSuccess() )
         {
-            LOG.error( "Error to register peer: ", e );
-
-            throw new HubPluginException( e.toString(), e );
-        }
-    }
-
-
-    private UserDto getUserDataFromHub( String userId )
-    {
-        String path = "/rest/v1/users/" + userId;
-
-        UserDto userDto = null;
-
-        try
-        {
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
-
-            Response r = client.get();
-
-            if ( r.getStatus() == HttpStatus.SC_OK )
-            {
-                byte[] encryptedContent = configManager.readContent( r );
-
-                byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-
-                userDto = JsonUtil.fromCbor( plainContent, UserDto.class );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error to get user data: ", e );
+            throw new HubPluginException( "Error to unregister peer: " + restResult.getError() );
         }
 
-        return userDto;
-    }
+        hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
 
-    public void registerOwnerPubKey() throws HubPluginException
-    {
-        WebClient client = configManager.getTrustedWebClient( hubIp );
-        client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
-
-        Form form = new Form();
-        try
-        {
-            form.param( "keytext",
-                    PGPEncryptionUtil.armorByteArrayToString( configManager.getOwnerPublicKey().getEncoded() ) );
-        }
-        catch ( PGPException | IOException e )
-        {
-            throw new HubPluginException( "Could not read owner pub key", e );
-        }
-
-        LOG.debug( "Sending Owner public key to Hub..." );
-
-        Response response = client.path( "pks/add" ).post( form );
-
-        if ( response.getStatus() == HttpStatus.SC_CREATED )
-        {
-            LOG.debug( "Owner pub key successfully registered." );
-            LOG.debug( String.format( "Owner fingerprint: %s",
-                    PGPKeyUtil.getFingerprint( configManager.getOwnerPublicKey().getFingerprint() ) ) );
-        }
-        else
-        {
-            LOG.error( "Owner pub key registration failed!" );
-        }
-    }
-
-
-    public void registerPeerPubKey() throws HubPluginException
-    {
-        WebClient client = configManager.getTrustedWebClient( hubIp );
-        client.type( MediaType.APPLICATION_FORM_URLENCODED ).accept( MediaType.APPLICATION_JSON );
-
-        Form form = new Form();
-        try
-        {
-            form.param( "keytext",
-                    PGPEncryptionUtil.armorByteArrayToString( configManager.getPeerPublicKey().getEncoded() ) );
-        }
-        catch ( PGPException | IOException e )
-        {
-            throw new HubPluginException( "Could not read peer pub key", e );
-        }
-
-        LOG.debug( "Sending Peer public key to Hub..." );
-
-        Response response = client.path( "pks/add" ).post( form );
-
-        if ( response.getStatus() == HttpStatus.SC_CREATED )
-        {
-            LOG.debug( "Peer public key successfully registered." );
-            LOG.debug( String.format( "Peer fingerprint: %s",
-                    PGPKeyUtil.getFingerprint( configManager.getPeerPublicKey().getFingerprint() ) ) );
-        }
-        else
-        {
-            LOG.error( "Peer pub key registration failed!" );
-        }
-    }
-
-
-    private static ObjectMapper createMapper( JsonFactory factory )
-    {
-        ObjectMapper mapper = new ObjectMapper( factory );
-        mapper.setVisibility( PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY );
-        return mapper;
+        log.info( "Uregistered successfully" );
     }
 }

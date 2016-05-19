@@ -18,23 +18,28 @@ import org.apache.http.HttpStatus;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.IntegrationImpl;
+import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostMonitorDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
+
+// TODO: Replace WebClient with HubRestClient.
 public class ResourceHostMonitorProcessor implements Runnable
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ResourceHostMonitorProcessor.class );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
+
     private ConfigManager configManager;
-    private IntegrationImpl manager;
+
+    private HubManagerImpl manager;
+
     private PeerManager peerManager;
+
     private Monitor monitor;
 
 
-    public ResourceHostMonitorProcessor( final IntegrationImpl integration, final PeerManager peerManager,
+    public ResourceHostMonitorProcessor( final HubManagerImpl integration, final PeerManager peerManager,
                                          final ConfigManager configManager, final Monitor monitor )
     {
         this.peerManager = peerManager;
@@ -53,15 +58,16 @@ public class ResourceHostMonitorProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            LOG.debug( "Sending resource hosts monitoring data failed." );
-            LOG.error( e.getMessage(), e );
+            log.debug( "Sending resource hosts monitoring data failed." );
+
+            log.error( e.getMessage(), e );
         }
     }
 
 
     public void sendResourceHostMonitoringData() throws HubPluginException
     {
-        if ( manager.getRegistrationState() )
+        if ( manager.isRegistered() )
         {
             try
             {
@@ -80,7 +86,7 @@ public class ResourceHostMonitorProcessor implements Runnable
                     catch ( Exception e )
                     {
                         resourceHostMonitorDto.setAvailableRam( 0.0 );
-                        LOG.info( e.getMessage(), "No info about available RAM" );
+                        log.info( e.getMessage(), "No info about available RAM" );
                     }
 
                     try
@@ -90,7 +96,7 @@ public class ResourceHostMonitorProcessor implements Runnable
                     catch ( Exception e )
                     {
                         resourceHostMonitorDto.setAvailableSpace( 0.0 );
-                        LOG.info( e.getMessage(), "No info about available Space" );
+                        log.info( e.getMessage(), "No info about available Space" );
                     }
 
                     try
@@ -100,7 +106,7 @@ public class ResourceHostMonitorProcessor implements Runnable
                     catch ( Exception e )
                     {
                         resourceHostMonitorDto.setFreeRam( 0.0 );
-                        LOG.info( e.getMessage(), "No info about free RAM" );
+                        log.info( e.getMessage(), "No info about free RAM" );
                     }
 
                     try
@@ -110,7 +116,7 @@ public class ResourceHostMonitorProcessor implements Runnable
                     catch ( Exception e )
                     {
                         resourceHostMonitorDto.setTotalRam( 0.0 );
-                        LOG.info( e.getMessage(), "No info about total RAM" );
+                        log.info( e.getMessage(), "No info about total RAM" );
                     }
                     try
                     {
@@ -119,7 +125,7 @@ public class ResourceHostMonitorProcessor implements Runnable
                     catch ( Exception e )
                     {
                         resourceHostMonitorDto.setTotalSpace( 0.0 );
-                        LOG.info( e.getMessage(), "No info about total Space" );
+                        log.info( e.getMessage(), "No info about total Space" );
                     }
                     try
                     {
@@ -128,7 +134,7 @@ public class ResourceHostMonitorProcessor implements Runnable
                     catch ( Exception e )
                     {
                         resourceHostMonitorDto.setUsedCpu( 0.0 );
-                        LOG.info( e.getMessage(), "No info about used CPU" );
+                        log.info( e.getMessage(), "No info about used CPU" );
                     }
 
                     String path =
@@ -145,7 +151,7 @@ public class ResourceHostMonitorProcessor implements Runnable
 
                     if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
                     {
-                        LOG.debug( "Resource hosts monitoring data sent successfully." );
+                        log.debug( "Resource hosts monitoring data sent successfully." );
                     }
                     else
                     {
@@ -157,7 +163,7 @@ public class ResourceHostMonitorProcessor implements Runnable
             catch ( PGPException | IOException | KeyStoreException | UnrecoverableKeyException |
                     NoSuchAlgorithmException e )
             {
-                LOG.error( "Could not send resource hosts monitoring data.", e );
+                log.error( "Could not send resource hosts monitoring data.", e );
             }
         }
     }

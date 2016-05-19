@@ -20,12 +20,14 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -53,8 +55,8 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -78,7 +80,7 @@ import io.subutai.core.security.api.SecurityManager;
  * PeerManager implementation
  */
 @PermitAll
-public class PeerManagerImpl implements PeerManager, SettingsListener
+public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
     private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
@@ -160,7 +162,7 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             }
 
             localIpSetter = Executors.newSingleThreadScheduledExecutor();
-            localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 1, 1, TimeUnit.SECONDS );
+            localIpSetter.scheduleWithFixedDelay( new IpDetectionTask(), 1, 5, TimeUnit.SECONDS );
         }
         catch ( Exception e )
         {
@@ -685,29 +687,8 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     @Override
     public void doRegistrationRequest( final String destinationHost, final String keyPhrase ) throws PeerException
     {
-        Preconditions.checkNotNull( destinationHost );
         Preconditions.checkNotNull( keyPhrase );
-        URL destinationUrl;
-        try
-        {
-            destinationUrl = buildDestinationUrl( destinationHost );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new PeerException( "Invalid URL." );
-        }
-
-        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
-                .getPeerInfo().getPublicSecurePort() )
-        {
-            throw new PeerException( "Could not send registration request to ourselves." );
-        }
-
-        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
-        {
-            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
-                    localPeer.getPeerInfo().getPublicUrl() ) );
-        }
+        URL destinationUrl = checkDestinationHostConstraints( destinationHost );
 
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
@@ -733,6 +714,58 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
             LOG.error( e.getMessage(), e );
             throw new PeerException( e.getMessage() );
         }
+    }
+
+
+    public boolean checkHostAvailability( final String destinationHost ) throws PeerException
+    {
+        URL url = checkDestinationHostConstraints( destinationHost );
+
+        try
+        {
+            WebClient client = RestUtil.createTrustedWebClient( url.toString() + "/rest/v1/handshake/info" );
+            Response response = client.get();
+
+            if ( response.hasEntity() )
+            {
+                return true;
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "checkHostAvailability", e );
+        }
+
+        return false;
+    }
+
+
+    private URL checkDestinationHostConstraints( String destinationHost ) throws PeerException
+    {
+        Preconditions.checkNotNull( destinationHost );
+        URL destinationUrl;
+        try
+        {
+            destinationUrl = buildDestinationUrl( destinationHost );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new PeerException( "Invalid URL." );
+        }
+
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
+                .getPeerInfo().getPublicSecurePort() )
+        {
+            throw new PeerException( "Could not send registration request to ourselves." );
+        }
+
+        if ( Common.LOCAL_HOST_IP.equals( localPeer.getPeerInfo().getIp() ) )
+        {
+            throw new PeerException( String.format( "Invalid public URL %s. Please set proper public URL.",
+                    localPeer.getPeerInfo().getPublicUrl() ) );
+        }
+
+        return destinationUrl;
     }
 
 
@@ -1072,6 +1105,13 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     @Override
     public void setPublicUrl( final String peerId, final String publicUrl, final int securePort ) throws PeerException
     {
+        setPublicUrl( peerId, publicUrl, securePort, true );
+    }
+
+
+    private synchronized void setPublicUrl( final String peerId, final String publicUrl, final int securePort,
+                                            boolean manualSetting ) throws PeerException
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( publicUrl ) );
         Preconditions.checkArgument( securePort > 0 );
@@ -1090,19 +1130,15 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
 
             peerInfo.setPublicUrl( publicUrl.toLowerCase() );
             peerInfo.setPublicSecurePort( securePort );
+            peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
+            peerInfo.setManualSetting( manualSetting );
+
             peerData.setInfo( toJson( peerInfo ) );
 
             peerDataService.saveOrUpdate( peerData );
 
             Peer peer = constructPeerPojo( peerData );
             addPeerToRegistry( peer );
-
-            //update settings
-            if ( getLocalPeer().getId().equalsIgnoreCase( peerId ) )
-            {
-                SystemSettings.setPublicUrl( peerInfo.getPublicUrl() );
-                SystemSettings.setPublicSecurePort( peerInfo.getPublicSecurePort() );
-            }
         }
         catch ( Exception e )
         {
@@ -1111,39 +1147,14 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
     }
 
 
-    @Override
-    public void settingsChanged()
+    private class IpDetectionTask implements Runnable
     {
-        try
+
+
+        private boolean isIpValid( HostInterface hostInterface )
         {
-            if ( localPeer.getPeerInfo().getPublicSecurePort() != SystemSettings.getPublicSecurePort() || !localPeer
-                    .getPeerInfo().getPublicUrl().equals( SystemSettings.getPublicUrl() ) )
-            {
-                //modify local peer info
-                localPeer.getPeerInfo().setPublicUrl( SystemSettings.getPublicUrl() );
-                localPeer.getPeerInfo().setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-
-                //update db
-                PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-                peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
-                updatePeerData( peerData );
-            }
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error updating local peer info", e );
-        }
-    }
-
-
-    private class LocalIpSetterTask implements Runnable
-    {
-        private final ScheduledExecutorService localIpSetter;
-
-
-        public LocalIpSetterTask( final ScheduledExecutorService localIpSetter )
-        {
-            this.localIpSetter = localIpSetter;
+            return hostInterface != null && !( hostInterface instanceof NullHostInterface ) && !Strings
+                    .isNullOrEmpty( hostInterface.getIp() );
         }
 
 
@@ -1152,58 +1163,37 @@ public class PeerManagerImpl implements PeerManager, SettingsListener
         {
             try
             {
-                if ( localPeer.getPeerInfo() == null )
+                if ( localPeer.isInitialized() && (
+                        SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
+                                .getPeerInfo().isManualSetting() ) )
                 {
-                    //local peer info not initialized yet
-                    return;
-                }
-                else if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
-                {
-                    //local peer ip is default, obtain lan ip from MH and set it as local peer ip
+                    //local peer ip is default, obtain external ip from MH and set it as local peer ip
                     HostInterface externalInterface =
-                            localPeer.getManagementHost().getInterfaceByName( SystemSettings.getExternalIpInterface() );
+                            localPeer.getManagementHost().getInterfaceByName( Common.BRIDGED_INTERFACE );
 
-                    if ( externalInterface == null || externalInterface instanceof NullHostInterface )
+                    if ( !isIpValid( externalInterface ) )
                     {
-                        return;
+                        externalInterface =
+                                localPeer.getManagementHost().getInterfaceByName( Common.HOST_ONLY_INTERFACE );
+
+                        if ( !isIpValid( externalInterface ) )
+                        {
+                            externalInterface =
+                                    localPeer.getManagementHost().getInterfaceByName( Common.NAT_INTERFACE );
+
+                            if ( !isIpValid( externalInterface ) )
+                            {
+                                return;
+                            }
+                        }
                     }
 
-                    //modify local peer info
-                    localPeer.getPeerInfo().setPublicUrl( externalInterface.getIp() );
-                    localPeer.getPeerInfo()
-                             .setName( String.format( "Peer %s on %s", localPeerId, externalInterface.getIp() ) );
+                    if ( !externalInterface.getIp().equals( localPeer.getPeerInfo().getIp() ) )
 
-                    //update db
-                    PeerData peerData = peerDataService.find( localPeer.getPeerInfo().getId() );
-                    peerData.setInfo( toJson( localPeer.getPeerInfo() ) );
-                    updatePeerData( peerData );
-
-                    //modify settings
-                    SystemSettings.setPublicUrl( localPeer.getPeerInfo().getPublicUrl() );
-
-                    localIpSetter.shutdown();
-                }
-                else
-                {
-                    if ( SystemSettings.DEFAULT_PUBLIC_URL.equals( SystemSettings.getPublicUrl() )
-                            && !SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) )
                     {
-                        //probably config file was overwritten by deb installation
-                        //restore public url setting
-                        SystemSettings.setPublicUrl( localPeer.getPeerInfo().getPublicUrl() );
+                        setPublicUrl( localPeerId, externalInterface.getIp(),
+                                localPeer.getPeerInfo().getPublicSecurePort(), false );
                     }
-
-                    if ( SystemSettings.DEFAULT_PUBLIC_SECURE_PORT == SystemSettings.getPublicSecurePort()
-                            && SystemSettings.DEFAULT_PUBLIC_SECURE_PORT != localPeer.getPeerInfo()
-                                                                                     .getPublicSecurePort() )
-                    {
-
-                        //probably config file was overwritten by deb installation
-                        //restore public secure port setting
-                        SystemSettings.setPublicSecurePort( localPeer.getPeerInfo().getPublicSecurePort() );
-                    }
-
-                    localIpSetter.shutdown();
                 }
             }
             catch ( HostNotFoundException e )

@@ -26,7 +26,8 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
@@ -60,6 +61,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hubadapter.api.HubAdapter;
+import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -72,7 +74,7 @@ import io.subutai.core.tracker.api.Tracker;
 
 
 public class EnvironmentManagerSecureProxy
-        implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager
+        implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerSecureProxy.class );
     private final EnvironmentManagerImpl environmentManager;
@@ -518,7 +520,7 @@ public class EnvironmentManagerSecureProxy
     @Override
     @RolesAllowed( "Environment-Management|Update" )
     public void assignEnvironmentDomain( final String environmentId, final String newDomain,
-                                         final DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                          final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
@@ -531,7 +533,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
-        environmentManager.assignEnvironmentDomain( environmentId, newDomain, domainLoadBalanceStrategy, sslCertPath );
+        environmentManager.assignEnvironmentDomain( environmentId, newDomain, proxyLoadBalanceStrategy, sslCertPath );
     }
 
 
@@ -609,7 +611,7 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Update" )
-    public int setupSshTunnelForContainer( final String containerHostId, final String environmentId )
+    public SshTunnel setupSshTunnelForContainer( final String containerHostId, final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
@@ -829,5 +831,12 @@ public class EnvironmentManagerSecureProxy
     public PeerActionResponse onPeerAction( final PeerAction peerAction )
     {
         return environmentManager.onPeerAction( peerAction );
+    }
+
+
+    @Override
+    public void onRegistrationSucceeded()
+    {
+        environmentManager.onRegistrationSucceeded();
     }
 }
