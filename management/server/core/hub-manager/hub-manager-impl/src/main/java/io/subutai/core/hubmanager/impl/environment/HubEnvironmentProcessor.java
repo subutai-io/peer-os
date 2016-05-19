@@ -13,9 +13,7 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.base.Strings;
 
-import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
-import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -27,7 +25,6 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandlerFactory;
-import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
@@ -126,9 +123,9 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
                 case CONFIGURE_DOMAIN:
                     configureDomain( peerDto );
                     break;
-                case DELETE_PEER:
-                    deletePeer( peerDto );
-                    break;
+//                case DELETE_PEER:
+//                    deletePeer( peerDto );
+//                    break;
             }
         }
         catch ( Exception e )
@@ -301,52 +298,6 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         catch ( Exception e )
         {
             String mgs = "Could not configure domain name";
-            hubEnvManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
-            log.error( mgs, e );
-        }
-    }
-
-
-    private void deletePeer( EnvironmentPeerDto peerDto )
-    {
-        String urlFormat = "/rest/v1/environments/%s/peers/%s";
-
-        String containerDestroyStateURL =
-                String.format( urlFormat, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
-
-        LocalPeer localPeer = peerManager.getLocalPeer();
-
-        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-
-        try
-        {
-            EnvironmentId envId = new EnvironmentId( env.getId() );
-
-            localPeer.cleanupEnvironment( envId );
-            ReservedNetworkResources reservedNetworkResources = localPeer.getReservedNetworkResources();
-            for ( NetworkResource networkResource : reservedNetworkResources.getNetworkResources() )
-            {
-                if ( networkResource.getEnvironmentId().equals( env.getId() ) )
-                {
-                    throw new Exception( "Environment network resources are not cleaned yet." );
-                }
-            }
-
-            envUserHelper.handleEnvironmentOwnerDeletion( peerDto );
-
-            WebClient client =
-                    configManager.getTrustedWebClientWithAuth( containerDestroyStateURL, configManager.getHubIp() );
-
-            Response response = client.delete();
-            client.close();
-            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                log.debug( "Environment data cleaned successfully" );
-            }
-        }
-        catch ( Exception e )
-        {
-            String mgs = "Could not clean environment";
             hubEnvManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
             log.error( mgs, e );
         }
