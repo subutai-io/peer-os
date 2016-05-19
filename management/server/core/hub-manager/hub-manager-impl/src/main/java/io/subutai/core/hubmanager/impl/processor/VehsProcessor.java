@@ -25,7 +25,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -60,7 +59,7 @@ public class VehsProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String link : stateLinks )
         {
@@ -78,7 +77,7 @@ public class VehsProcessor implements StateLinkProcessor
     }
 
 
-    private EnvironmentPeerDto getEnvPeerDto( String link ) throws HubPluginException
+    private EnvironmentPeerDto getEnvPeerDto( String link ) throws Exception
     {
         try
         {
@@ -95,7 +94,7 @@ public class VehsProcessor implements StateLinkProcessor
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            throw new HubPluginException( "Could not retrieve environment peer data", e );
+            throw new Exception( "Could not retrieve environment peer data", e );
         }
     }
 

@@ -7,9 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
-import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -24,18 +22,17 @@ public class HeartbeatProcessor implements Runnable
 
     private final HubManagerImpl hubManager;
 
-    private final String path;
-
     private final HubRestClient restClient;
 
+    private final String path;
 
-    public HeartbeatProcessor( HubManagerImpl hubManager, ConfigManager configManager )
+
+    public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
+        this.restClient = restClient;
 
-        path = String.format( "/rest/v1.2/peers/%s/heartbeat", configManager.getPeerId() );
-
-        restClient = new HubRestClient( configManager );
+        path = String.format( "/rest/v1.2/peers/%s/heartbeat", peerId );
     }
 
 
@@ -54,14 +51,14 @@ public class HeartbeatProcessor implements Runnable
         {
             sendHeartbeat();
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             log.error( "Error to process heartbeat: ", e );
         }
     }
 
 
-    public void sendHeartbeat() throws HubPluginException
+    public void sendHeartbeat() throws Exception
     {
         if ( !hubManager.isRegistered() )
         {
@@ -74,7 +71,7 @@ public class HeartbeatProcessor implements Runnable
 
             if ( !restResult.isSuccess() )
             {
-                throw new HubPluginException( restResult.getError() );
+                throw new Exception( restResult.getError() );
             }
 
             HeartbeatResponseDto dto = restResult.getEntity();
@@ -83,7 +80,7 @@ public class HeartbeatProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            throw new HubPluginException( e.getMessage(), e );
+            throw new Exception( e.getMessage(), e );
         }
     }
 
@@ -98,7 +95,7 @@ public class HeartbeatProcessor implements Runnable
             {
                 processor.processStateLinks( stateLinks );
             }
-            catch ( HubPluginException e )
+            catch ( Exception e )
             {
                 log.error( "Error to process state links: ", e );
             }
