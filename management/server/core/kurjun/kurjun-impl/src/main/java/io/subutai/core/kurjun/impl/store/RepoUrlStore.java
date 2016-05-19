@@ -102,7 +102,7 @@ public class RepoUrlStore
         try ( FileDb fileDb = new FileDb( repoFile, RepoUrl.class.getClassLoader() ) )
         {
             Map<String, RepoUrl> map = fileDb.get( mapName );
-            Object[] keys = map.keySet().stream().filter( u -> u.startsWith( repoUrl.getUrl().toString() ) ).toArray();
+            Object[] keys = map.keySet().stream().filter( u -> u.startsWith( repoUrl.getUrlString() ) ).toArray();
             for ( Object key : keys )
             {
                 removed = fileDb.remove( mapName, key );
@@ -142,6 +142,6 @@ public class RepoUrlStore
 
     private String makeKey( RepoUrl repoUrl )
     {
-        return repoUrl.getUrlString() + "_" + repoUrl.getToken();
+        return repoUrl.getUrlString();
     }
 }
