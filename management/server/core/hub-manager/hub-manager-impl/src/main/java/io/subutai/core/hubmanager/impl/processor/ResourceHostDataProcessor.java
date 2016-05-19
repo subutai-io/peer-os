@@ -11,13 +11,12 @@ import org.apache.commons.lang3.time.DateUtils;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.ResourceHostMetricDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 
@@ -30,27 +29,22 @@ public class ResourceHostDataProcessor implements Runnable
 
     private final HubManagerImpl hubManager;
 
-    private final PeerManager peerManager;
+    private final LocalPeer localPeer;
 
     private final HubRestClient restClient;
 
     private final Monitor monitor;
 
-    private final String peerId;
-
     private Date p2pLogsEndDate;
 
 
-    public ResourceHostDataProcessor( final HubManagerImpl hubManager, final PeerManager peerManager,
-                                      final ConfigManager configManager, final Monitor monitor )
+    public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor, HubRestClient restClient )
     {
-        this.peerManager = peerManager;
         this.hubManager = hubManager;
+        this.localPeer = localPeer;
         this.monitor = monitor;
 
-        restClient = new HubRestClient( configManager );
-
-        peerId = configManager.getPeerId();
+        this.restClient = restClient;
     }
 
 
@@ -103,7 +97,7 @@ public class ResourceHostDataProcessor implements Runnable
 
         log.info( "Sending resource host configs to Hub..." );
 
-        String path = format( "/rest/v1/peers/%s/resource-hosts/%s", peerId, metricDto.getHostId() );
+        String path = format( "/rest/v1/peers/%s/resource-hosts/%s", localPeer.getId(), metricDto.getHostId() );
 
         RestResult<Object> restResult = restClient.post( path, metricDto );
 
@@ -118,7 +112,7 @@ public class ResourceHostDataProcessor implements Runnable
     {
         ResourceHostMetricDto dto = new ResourceHostMetricDto();
 
-        dto.setPeerId( peerManager.getLocalPeer().getId() );
+        dto.setPeerId( localPeer.getId() );
         dto.setName( rhMetric.getHostInfo().getHostname() );
         dto.setHostId( rhMetric.getHostInfo().getId() );
 
@@ -172,7 +166,7 @@ public class ResourceHostDataProcessor implements Runnable
 
         p2pLogsEndDate = currentDate;
 
-        for ( ResourceHost rh : peerManager.getLocalPeer().getResourceHosts() )
+        for ( ResourceHost rh : localPeer.getResourceHosts() )
         {
             try
             {
@@ -205,7 +199,7 @@ public class ResourceHostDataProcessor implements Runnable
 
         log.info( "Sending p2p logs to Hub..." );
 
-        String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", peerId, rh.getId() );
+        String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", localPeer.getId(), rh.getId() );
 
         RestResult<Object> restResult = restClient.post( path, logsDto );
 

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
-import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -23,18 +22,17 @@ public class HeartbeatProcessor implements Runnable
 
     private final HubManagerImpl hubManager;
 
-    private final String path;
-
     private final HubRestClient restClient;
 
+    private final String path;
 
-    public HeartbeatProcessor( HubManagerImpl hubManager, ConfigManager configManager )
+
+    public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
+        this.restClient = restClient;
 
-        path = String.format( "/rest/v1.2/peers/%s/heartbeat", configManager.getPeerId() );
-
-        restClient = new HubRestClient( configManager );
+        path = String.format( "/rest/v1.2/peers/%s/heartbeat", peerId );
     }
 
 
