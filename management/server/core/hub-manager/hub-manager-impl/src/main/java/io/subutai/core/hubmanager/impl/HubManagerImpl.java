@@ -3,8 +3,12 @@ package io.subutai.core.hubmanager.impl;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +18,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -382,10 +391,41 @@ public class HubManagerImpl implements HubManager
     {
         try
         {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+
+            // Activate the new trust manager
+            try {
+                SSLContext sc = SSLContext.getInstance("SSL" );
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory() );
+            } catch (Exception e) {
+            }
+
+            // And as before now you can use URL and URLConnection
+
+
             File file =
                     new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
             URL website = new URL( url );
-            FileUtils.copyURLToFile( website, file );
+            URLConnection connection = website.openConnection();
+            InputStream in = connection.getInputStream();
+            OutputStream out = new FileOutputStream( file );
+            IOUtils.copy (in, out);
+            in.close();
+            out.close();
+//            FileUtils.copyURLToFile( website, file );
         }
         catch ( IOException e )
         {
