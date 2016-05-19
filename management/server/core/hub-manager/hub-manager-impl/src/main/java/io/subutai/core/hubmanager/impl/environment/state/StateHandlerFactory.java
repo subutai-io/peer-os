@@ -8,10 +8,12 @@ import io.subutai.core.hubmanager.impl.environment.state.build.ConfigureContaine
 import io.subutai.core.hubmanager.impl.environment.state.build.ExchangeInfoStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ReserveNetworkStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.SetupTunnelStateHandler;
+import io.subutai.core.hubmanager.impl.environment.state.change.ContainerStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.destroy.DeletePeerStateHandler;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState;
 
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.BUILD_CONTAINER;
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CHANGE_CONTAINER_STATE;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_CONTAINER;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.DELETE_PEER;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.EXCHANGE_INFO;
@@ -33,6 +35,8 @@ public class StateHandlerFactory
 
     private final StateHandler deletePeerStateHandler;
 
+    private final StateHandler containerStateHandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -47,6 +51,8 @@ public class StateHandlerFactory
         configureContainerStateHandler = new ConfigureContainerStateHandler( ctx );
 
         deletePeerStateHandler = new DeletePeerStateHandler( ctx );
+
+        containerStateHandler = new ContainerStateHandler( ctx );
     }
 
 
@@ -77,6 +83,10 @@ public class StateHandlerFactory
         else if ( state == DELETE_PEER )
         {
             handler = deletePeerStateHandler;
+        }
+        else if ( state == CHANGE_CONTAINER_STATE )
+        {
+            handler = containerStateHandler;
         }
 
         Preconditions.checkState( handler != null, "No proper state handler found for environment state context" );
