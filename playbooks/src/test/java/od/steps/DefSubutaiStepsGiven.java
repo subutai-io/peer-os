@@ -23,6 +23,11 @@ public class DefSubutaiStepsGiven {
         subutaiSteps.open_mng_h2();
     }
 
+    @Given("the second user open domain test")
+    public void second_user_open_domain_test() throws FileNotFoundException {
+        subutaiSteps.open_domain_test();
+    }
+
     @Given("the user enters login and password: '$login', '$password'")
     public void enter_login_and_password(String login, String password) throws FileNotFoundException {
 
