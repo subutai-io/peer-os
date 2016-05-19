@@ -42,7 +42,7 @@ public class ExchangeInfoStateHandler extends StateHandler
             @Override
             public UsedNetworkResources call() throws Exception
             {
-                return ctx.peerManager.getLocalPeer().getUsedNetworkResources();
+                return ctx.localPeer.getUsedNetworkResources();
             }
         } );
 

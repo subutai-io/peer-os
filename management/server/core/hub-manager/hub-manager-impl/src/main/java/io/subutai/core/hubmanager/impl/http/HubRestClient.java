@@ -18,6 +18,7 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -40,6 +41,22 @@ public class HubRestClient
     public <T> RestResult<T> get( String url, Class<T> clazz )
     {
         return execute( "GET", url, null, clazz, true );
+    }
+
+
+    /**
+     * Throws exception if result is not successful
+     */
+    public <T> T getStrict( String url, Class<T> clazz ) throws HubPluginException
+    {
+        RestResult<T> restResult = get( url, clazz );
+
+        if ( !restResult.isSuccess() )
+        {
+            throw new HubPluginException( restResult.getError() );
+        }
+
+        return restResult.getEntity();
     }
 
 
