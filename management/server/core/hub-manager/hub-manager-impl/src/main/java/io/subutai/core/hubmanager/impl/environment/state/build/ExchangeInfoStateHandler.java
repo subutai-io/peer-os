@@ -8,9 +8,9 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.security.objects.TokenType;
+import io.subutai.common.util.AsyncUtil;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.util.AsyncUtil;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;

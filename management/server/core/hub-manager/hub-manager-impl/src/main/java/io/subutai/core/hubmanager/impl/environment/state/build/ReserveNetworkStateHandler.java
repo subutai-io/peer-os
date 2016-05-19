@@ -5,10 +5,10 @@ import java.util.concurrent.Callable;
 
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.protocol.P2PConfig;
+import io.subutai.common.util.AsyncUtil;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.util.AsyncUtil;
 import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
