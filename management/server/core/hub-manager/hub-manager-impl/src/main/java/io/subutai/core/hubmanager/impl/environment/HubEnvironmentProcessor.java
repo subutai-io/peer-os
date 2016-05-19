@@ -3,64 +3,26 @@ package io.subutai.core.hubmanager.impl.environment;
 
 import java.util.Set;
 
-import javax.ws.rs.core.Response;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
-
-import com.google.common.base.Strings;
-
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
-import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandlerFactory;
-import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.dto.environment.EnvironmentDto;
-import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
-import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
-import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogEvent;
-import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
-import io.subutai.hub.share.json.JsonUtil;
 
 
-// TODO: Replace WebClient with HubRestClient.
 public class HubEnvironmentProcessor implements StateLinkProcessor
 {
-    private final Logger log = LoggerFactory.getLogger( getClass() );
-
     private final Context ctx;
 
     private final StateHandlerFactory handlerFactory;
 
     private final String linkPattern;
 
-    // ===
 
-    private final ConfigManager configManager;
-    private final PeerManager peerManager;
-    private final HubEnvironmentManager hubEnvManager;
-    private final EnvironmentUserHelper envUserHelper;
-
-
-    public HubEnvironmentProcessor( HubEnvironmentManager hubEnvManager, Context ctx )
+    public HubEnvironmentProcessor( Context ctx )
     {
-        this.hubEnvManager = hubEnvManager;
-
         this.ctx = ctx;
-
-        this.configManager = null;
-        this.peerManager = null;
-        this.envUserHelper = null;
 
         handlerFactory = new StateHandlerFactory( ctx );
 
@@ -91,100 +53,36 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
     }
 
 
-    private void environmentBuildProcess( final EnvironmentPeerDto peerDto )
+/*    public void sendLogToHub( EnvironmentPeerDto peerDto, String msg, String exMsg, EnvironmentPeerLogDto.LogEvent logE,
+                              EnvironmentPeerLogDto.LogType logType, String contId )
     {
         try
         {
-            switch ( peerDto.getState() )
-            {
-                case CONFIGURE_DOMAIN:
-                    configureDomain( peerDto );
-                    break;
-            }
-        }
-        catch ( Exception e )
-        {
-            log.error( e.getMessage() );
-        }
-    }
+            String envPeerLogPath =
+                    String.format( "/rest/v1/environments/%s/peers/%s/log", peerDto.getEnvironmentInfo().getId(),
+                            peerManager.getLocalPeer().getId() );
+            WebClient client = configManager.getTrustedWebClientWithAuth( envPeerLogPath, configManager.getHubIp() );
 
+            EnvironmentPeerLogDto peerLogDto = new EnvironmentPeerLogDto( peerDto.getPeerId(), peerDto.getState(),
+                    peerDto.getEnvironmentInfo().getId(), logType );
+            peerLogDto.setMessage( msg );
+            peerLogDto.setExceptionMessage( exMsg );
+            peerLogDto.setLogEvent( logE );
+            peerLogDto.setContainerId( contId );
+            peerLogDto.setLogCode( null );
 
-    private void configureDomain( EnvironmentPeerDto peerDto )
-    {
-        LocalPeer localPeer = peerManager.getLocalPeer();
-        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
-        String domainUpdatePath =
-                String.format( "/rest/v1/environments/%s/peers/%s/domain", peerDto.getEnvironmentInfo().getId(),
-                        peerDto.getPeerId() );
-        try
-        {
-            //TODO balanceStrategy should come from HUB
-            EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
-            boolean assign = !Strings.isNullOrEmpty( env.getDomainName() );
-            assert environmentDto != null;
-            if ( assign )
-            {
-                ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
-                localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
-                for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
-                {
-                    if ( nodesDto.getPeerId().equals( localPeer.getId() ) )
-                    {
-                        for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
-                        {
-                            try
-                            {
-                                localPeer.addIpToVniDomain( nodeDto.getIp(), env.getVni() );
-                            }
-                            catch ( Exception e )
-                            {
-                                log.error( "Could not add container IP to domain: " + nodeDto.getContainerName() );
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                localPeer.removeVniDomain( env.getVni() );
-            }
-
-            WebClient clientUpdate =
-                    configManager.getTrustedWebClientWithAuth( domainUpdatePath, configManager.getHubIp() );
-            byte[] cborData = JsonUtil.toCbor( peerDto );
+            byte[] cborData = JsonUtil.toCbor( peerLogDto );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response response = clientUpdate.put( encryptedData );
-            clientUpdate.close();
-            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
+            Response r = client.post( encryptedData );
+            if ( r.getStatus() == HttpStatus.SC_OK )
             {
-                log.debug( "Domain configuration successfully done" );
+                log.debug( "Environment peer log successfully sent to hub" );
             }
         }
         catch ( Exception e )
         {
-            String mgs = "Could not configure domain name";
-            hubEnvManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.SUBUTAI, LogType.ERROR, null );
-            log.error( mgs, e );
+            log.error( "Could not sent environment peer log to hub.", e.getMessage() );
         }
-    }
+    }*/
 
-
-    private EnvironmentDto getEnvironmentDto( String envId )
-    {
-        String envDataPath = String.format( "/rest/v1/environments/%s", envId );
-        try
-        {
-            WebClient client = configManager.getTrustedWebClientWithAuth( envDataPath, configManager.getHubIp() );
-            Response r = client.get();
-            client.close();
-            byte[] encryptedContent = configManager.readContent( r );
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            return JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
-        }
-        catch ( Exception e )
-        {
-            log.error( "Could not get environment data from Hub", e );
-        }
-        return null;
-    }
 }
