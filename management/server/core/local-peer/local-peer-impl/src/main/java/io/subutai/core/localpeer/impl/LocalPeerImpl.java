@@ -49,9 +49,9 @@ import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetrics;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.network.UsedNetworkResources;
@@ -272,13 +272,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public PeerInfo getPeerInfo()
+    {
+        return peerInfo;
+    }
+
+
+    @Override
     public void setPeerInfo( final PeerInfo peerInfo )
     {
-        this.peerInfo.setId( peerInfo.getId() );
-        this.peerInfo.setName( peerInfo.getName() );
-        this.peerInfo.setOwnerId( peerInfo.getOwnerId() );
-        this.peerInfo.setPublicUrl( peerInfo.getPublicUrl() );
-        this.peerInfo.setPublicSecurePort( peerInfo.getPublicSecurePort() );
+        this.peerInfo = peerInfo;
     }
 
 
@@ -329,13 +332,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public String getOwnerId()
     {
         return peerInfo.getOwnerId();
-    }
-
-
-    @Override
-    public PeerInfo getPeerInfo()
-    {
-        return peerInfo;
     }
 
 
