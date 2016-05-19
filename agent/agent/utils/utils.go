@@ -30,12 +30,11 @@ func GetInterfaces() []Iface {
 
 	l_ifaces := []Iface{}
 	for _, ifac := range n_ifaces {
-		if ifac.Name == "lo0" || ifac.Name == "lo" {
+		if ifac.Name == "lo0" || ifac.Name == "lo" || !strings.Contains(ifac.Flags.String(), "up") {
 			continue
 		}
 		inter := new(Iface)
 		inter.InterfaceName = ifac.Name
-
 		addrs, _ := ifac.Addrs()
 		for _, addr := range addrs {
 			switch v := addr.(type) {
@@ -80,7 +79,7 @@ func TLSConfig() *http.Client {
 	}
 
 	transport := &http.Transport{TLSClientConfig: tlsconfig}
-	return &http.Client{Transport: transport, Timeout: time.Second * 30}
+	return &http.Client{Transport: transport, Timeout: time.Second * 10}
 }
 
 func x509generate() {

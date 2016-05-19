@@ -11,6 +11,12 @@ public class CommonPages extends PageObject {
     @FindBy(xpath = "*//input[@type=\"search\"]")
     public WebElementFacade fieldSearch;
 
+    @FindBy(xpath = "*//div[contains(text(), \"Login\")]/..//input")
+    public WebElementFacade fieldLogin;
+
+    @FindBy(xpath = "*//div[contains(text(), \"Password\")]/..//input")
+    public WebElementFacade fieldPassword;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
@@ -21,10 +27,18 @@ public class CommonPages extends PageObject {
     @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green b-btn_search-field-level\"]")
     public WebElementFacade buttonGreen;
 
+    @FindBy(xpath = "*//a[contains(text(), \"Go to HUB\")]")
+    public WebElementFacade buttonGoToHUB;
+
+    @FindBy(xpath = "*//button[contains(text(), \"Send Heartbeat\")]")
+    public WebElementFacade buttonSendHeartbeat;
+
     //endregion
     //region SIKULI IMAGES: Buttons
 
     public String sikuliButtonLogin = "src/test/resources/imgs/buttons/buttonLogin.png";
+    public String sikuliButtonGoToHUBGreen = "src/test/resources/imgs/buttons/buttonGoToHub.png";
+    public String sikuliButtonSendHearbeat = "src/test/resources/imgs/buttons/buttonSendHeartbeat.png";
 
     //endregion
 
@@ -117,6 +131,13 @@ public class CommonPages extends PageObject {
     public String sikuliMenuItemNetworkSettings = "src/test/resources/imgs/menuItems/menuItemNetworkSettings.png";
     public String sikuliMenuItemAdvanced = "src/test/resources/imgs/menuItems/menuItemAdvanced.png";
     public String sikuliMenuItemAbout = "src/test/resources/imgs/menuItems/menuItemAbout.png";
+    public String sikuliButtonRegister = "src/test/resources/imgs/buttons/buttonRegister.png";
+    public String sikuliButtonClose = "src/test/resources/imgs/buttons/buttonClosePopupHUBMessage.png";
+    public String sikuliButtonPeerRegistrationOnline = "src/test/resources/imgs/buttons/buttonRegisterPeerOnline.png";
+    public String sikuliButtonOk = "src/test/resources/imgs/buttons/buttonOk.png";
+    public String sikuliButtonGoToHUBWhite = "src/test/resources/imgs/buttons/buttonGoToHubWhite.png";
+    public String sikuliButtonOpen = "src/test/resources/imgs/buttons/buttonOpen.png";
+    public String sikuliButtonAdd = "src/test/resources/imgs/buttons/buttonAdd.png";
 
 //    public String sikuliTest = returnAbsoluteFilePath.GetPath("src/test/resources/imgs/menuItems/menuItemEnvironment.png");
 
@@ -147,6 +168,8 @@ public class CommonPages extends PageObject {
     //region WEB ELEMENTS: Icons
 
     public String sikuliIconNotifications = "src/test/resources/imgs/icons/iconNotification.png";
+    public String sikuliIconAdmin = "src/test/resources/imgs/icons/iconAdmin.png";
+    public String sikuliIconTest = "src/test/resources/imgs/icons/iconTest.png";
 
     //endregion
 
@@ -164,5 +187,9 @@ public class CommonPages extends PageObject {
 
     @FindBy(xpath = "*//div[@class=\"b-hub-status__dropdown b-hub-status__dropdown_open\"]//div[contains(text(),\"Register Peer\")]")
     public WebElementFacade titleUpperMenuRegisterPeer;
+
+    @FindBy(xpath = "*//p[contains(text(), \"Heartbeat sent successfully.\")]")
+    public WebElementFacade textHeartbeatSentSuccessfully;
+
     //endregion
 }
