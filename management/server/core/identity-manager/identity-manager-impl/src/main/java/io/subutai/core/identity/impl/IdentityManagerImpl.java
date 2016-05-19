@@ -267,19 +267,21 @@ public class IdentityManagerImpl implements IdentityManager
 
 
 
+
+
     /* ***********************************
      *  Authenticate Internal User
      */
     @PermitAll
     @Override
-    public Subject loginSystemUser()
+    public Session loginSystemUser()
     {
         String sptoken  = getSystemUserToken();
         Session session = login( "token", sptoken );
 
         if( session != null )
         {
-            return session.getSubject();
+            return session;
         }
 
         else return null;
@@ -400,7 +402,7 @@ public class IdentityManagerImpl implements IdentityManager
                         .addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
             }
 
-            userToken.setToken( token );
+            userToken.setTokenId( token );
             userToken.setHashAlgorithm( "HS256" );
             userToken.setIssuer( issuer );
             userToken.setSecret( secret );
@@ -494,7 +496,6 @@ public class IdentityManagerImpl implements IdentityManager
     @PermitAll
     @Override
     public User authenticateByAuthSignature( final String fingerprint, final String signedAuth )
-            throws SecurityException
     {
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
@@ -503,7 +504,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            if ( !encryptionTool.verifyClearSign( signedAuth.getBytes(), publicKeyRing ) )
+            if ( !encryptionTool.verifyClearSign( signedAuth.trim().getBytes(), publicKeyRing ) )
             {
                 throw new SecurityException( "Signed Auth verification failed." );
             }
@@ -533,9 +534,10 @@ public class IdentityManagerImpl implements IdentityManager
                 throw new SecurityException( "User associated with signed document doesn't match" );
             }
         }
-        catch ( PGPException e )
+        catch ( Exception e )
         {
-            throw new SecurityException( e );
+            LOGGER.error(" **** Error authenticating user by signed Message ****" ,e);
+            return null;
         }
     }
 

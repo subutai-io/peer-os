@@ -49,7 +49,7 @@ public class UnregisterPeerCommand extends SubutaiShellCommandSupport
 
         if ( request != null )
         {
-            peerManager.doUnregisterRequest( request );
+            peerManager.doUnregisterRequest( request , true);
         }
         else
         {
