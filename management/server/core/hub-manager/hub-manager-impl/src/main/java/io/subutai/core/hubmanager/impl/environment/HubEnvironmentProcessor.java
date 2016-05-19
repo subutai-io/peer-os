@@ -102,67 +102,17 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         {
             switch ( peerDto.getState() )
             {
-//                case EXCHANGE_INFO:
-//                    infoExchange( peerDto );
-//                    break;
-//                case RESERVE_NETWORK:
-//                    reserveNetwork( peerDto );
-//                    break;
-//                case SETUP_TUNNEL:
-//                    setupTunnel( peerDto );
-//                    break;
-//                case BUILD_CONTAINER:
-//                    buildContainers( peerDto );
-//                    break;
-                case CONFIGURE_CONTAINER:
-                    configureContainer( peerDto );
-                    break;
                 case CHANGE_CONTAINER_STATE:
                     controlContainer( peerDto );
                     break;
                 case CONFIGURE_DOMAIN:
                     configureDomain( peerDto );
                     break;
-//                case DELETE_PEER:
-//                    deletePeer( peerDto );
-//                    break;
             }
         }
         catch ( Exception e )
         {
             log.error( e.getMessage() );
-        }
-    }
-
-
-    private void configureContainer( EnvironmentPeerDto peerDto )
-    {
-        String configContainer = String.format( "/rest/v1/environments/%s/container-configuration",
-                peerDto.getEnvironmentInfo().getId() );
-        try
-        {
-            EnvironmentDto environmentDto = getEnvironmentDto( peerDto.getEnvironmentInfo().getId() );
-
-            peerDto = hubEnvManager.configureSsh( peerDto, environmentDto );
-            hubEnvManager.configureHash( peerDto, environmentDto );
-
-            WebClient clientUpdate =
-                    configManager.getTrustedWebClientWithAuth( configContainer, configManager.getHubIp() );
-
-            byte[] cborData = JsonUtil.toCbor( peerDto );
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-
-            Response response = clientUpdate.put( encryptedData );
-            clientUpdate.close();
-            if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                log.debug( "SSH configuration successfully done" );
-            }
-        }
-        catch ( Exception e )
-        {
-            String mgs = "Could not configure SSH/Hash";
-            log.error( mgs, e );
         }
     }
 
