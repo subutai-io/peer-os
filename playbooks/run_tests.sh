@@ -110,9 +110,7 @@ function run_tests(){
     export DISPLAY=:10
     firefox &
     mvn clean
-    recordmydesktop -o ~/base/playbooks/src/test/resources/video/playbooks.ogv &
     mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
-    pkill recordmydesktop &
     mvn serenity:aggregate
 }
 

@@ -30,24 +30,9 @@ public class SetupTunnelStateHandler extends StateHandler
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
-        EnvironmentDto envDto = getEnvironmentDto( peerDto );
+        EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
         return setupTunnel( peerDto, envDto );
-    }
-
-
-    private EnvironmentDto getEnvironmentDto( EnvironmentPeerDto peerDto ) throws HubPluginException
-    {
-        String path = String.format( "/rest/v1/environments/%s", peerDto.getEnvironmentInfo().getId() );
-
-        RestResult<EnvironmentDto> restResult = ctx.restClient.get( path, EnvironmentDto.class );
-
-        if ( !restResult.isSuccess() )
-        {
-            throw new HubPluginException( restResult.getError() );
-        }
-
-        return restResult.getEntity();
     }
 
 
@@ -74,7 +59,7 @@ public class SetupTunnelStateHandler extends StateHandler
             @Override
             public Void call() throws Exception
             {
-                ctx.peerManager.getLocalPeer().setupTunnels( p2pIps, new EnvironmentId( envDto.getId() ) );
+                ctx.localPeer.setupTunnels( p2pIps, new EnvironmentId( envDto.getId() ) );
 
                 peerDto.setSetupTunnel( true );
 

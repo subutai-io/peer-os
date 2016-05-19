@@ -11,11 +11,20 @@ public class AccountSettings extends PageObject {
     @FindBy(xpath = "*//textarea[@class=\"b-form-input b-form-input_textarea bp-set-pub-key ng-pristine ng-untouched ng-valid\"]")
     public WebElementFacade fieldPGP;
 
+    @FindBy(ngModel = "changePassCtrl.pass.oldPassword")
+    public WebElementFacade fieldOldPassword;
+
+    @FindBy(ngModel = "changePassCtrl.pass.newPassword")
+    public WebElementFacade fieldNewPassword;
+
+    @FindBy(ngModel = "changePassCtrl.pass.confirmPass")
+    public WebElementFacade fieldConfirmPassword;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
 
-    @FindBy(xpath = "*//button[contains(text(),\"Set public key\")]")
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_blue e2e-plugin-btn\"]")
     public WebElementFacade buttonSetPublicKey;
 
     @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green\"]")

@@ -44,7 +44,7 @@ public class ReserveNetworkStateHandler extends StateHandler
             @Override
             public Void call() throws Exception
             {
-                ctx.peerManager.getLocalPeer().reserveNetworkResource( networkResource );
+                ctx.localPeer.reserveNetworkResource( networkResource );
 
                 return null;
             }
@@ -68,7 +68,7 @@ public class ReserveNetworkStateHandler extends StateHandler
             @Override
             public Void call() throws Exception
             {
-                ctx.peerManager.getLocalPeer().joinP2PSwarm( p2pConfig );
+                ctx.localPeer.joinP2PSwarm( p2pConfig );
 
                 return null;
             }
