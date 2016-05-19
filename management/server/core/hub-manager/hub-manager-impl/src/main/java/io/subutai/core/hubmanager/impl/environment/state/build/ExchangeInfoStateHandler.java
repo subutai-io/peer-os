@@ -29,7 +29,8 @@ public class ExchangeInfoStateHandler extends StateHandler
     {
         EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
 
-        resultDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ) );
+        resultDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ).getFullToken() );
+        resultDto.setEnvOwnerTokenId( getEnvironmentOwnerToken( peerDto ).getTokenId() );
 
         return resultDto;
     }
@@ -56,15 +57,12 @@ public class ExchangeInfoStateHandler extends StateHandler
     }
 
 
-    private String getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
+    private UserToken getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
     {
         User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
 
         Date validDate = DateUtils.addYears( new Date(), 3 );
 
-        UserToken token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
-
-        return token.getFullToken();
+        return ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
     }
-
 }

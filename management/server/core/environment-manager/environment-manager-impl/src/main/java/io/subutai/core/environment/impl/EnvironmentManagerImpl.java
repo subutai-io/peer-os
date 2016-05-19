@@ -90,6 +90,7 @@ import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkf
 import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.peer.api.PeerAction;
@@ -143,11 +144,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.tracker = tracker;
 
         //******************************************
-        systemUser = identityManager.loginSystemUser();
+        Session session = identityManager.loginSystemUser();
+        if(session != null)
+        {
+            systemUser = session.getSubject();
+        }
         //******************************************
 
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 3, TimeUnit.MINUTES );
 
         environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
 
@@ -796,7 +801,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
+    @RolesAllowed( {"Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
     @Override
     public void resetP2PSecretKey( final String environmentId, final String newP2pSecretKey,
                                    final long p2pSecretKeyTtlSec, final boolean async )
@@ -1797,6 +1802,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         public void run()
         {
             LOG.debug( "Environment background tasks started..." );
+
+            User user = identityManager.getActiveUser();
+
 
             //**************************************************
             Subject.doAs( systemUser, new PrivilegedAction<Void>()

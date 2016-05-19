@@ -449,7 +449,7 @@ public class RestServiceImpl implements RestService
             List<UserTokenDto> list = identityManager.getAllUserTokens().stream()
                                                       .map( p -> new UserTokenDto( p.getUserId(),
                                                               identityManager.getUser( p.getUserId() ).getUserName(),
-                                                              p.getToken(), p.getFullToken(), p.getType(),
+                                                              p.getTokenId(), p.getFullToken(), p.getType(),
                                                               p.getHashAlgorithm(), p.getIssuer(), p.getValidDate() ) )
                                                       .collect( Collectors.toList() );
 

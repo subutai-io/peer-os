@@ -24,8 +24,8 @@ import io.subutai.core.identity.api.model.UserToken;
 public class UserTokenEntity implements UserToken
 {
     @Id
-    @Column( name = "token" )
-    private String token;
+    @Column( name = "token_id" )
+    private String tokenId;
 
     @Column( name = "secret" )
     private String secret;
@@ -73,7 +73,7 @@ public class UserTokenEntity implements UserToken
         else
             str += "\"exp\":" + validDate.getTime() + ",";
 
-        str += "\"sub\":\"" + token + "\"}";
+        str += "\"sub\":\"" + tokenId + "\"}";
 
         return str;
     }
@@ -89,16 +89,16 @@ public class UserTokenEntity implements UserToken
 
 
     @Override
-    public String getToken()
+    public String getTokenId()
     {
-        return token;
+        return tokenId;
     }
 
 
     @Override
-    public void setToken( final String token )
+    public void setTokenId( final String tokenId )
     {
-        this.token = token;
+        this.tokenId = tokenId;
     }
 
 

@@ -26,4 +26,8 @@ public interface NetworkSettings
     public int getPublicSecurePort();
 
     public void setPublicSecurePort( final int publicSecurePort );
+
+    public String getKeyServer();
+
+    public void setKeyServer( final String keyServer );
 }
