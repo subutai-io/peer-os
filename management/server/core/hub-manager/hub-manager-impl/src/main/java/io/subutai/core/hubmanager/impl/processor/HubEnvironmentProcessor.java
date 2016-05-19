@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ import org.apache.http.HttpStatus;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.peer.ContainerId;
@@ -40,7 +40,7 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubPluginException;
-import io.subutai.core.hubmanager.api.StateLinkProccessor;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubEnvironmentManager;
 import io.subutai.core.identity.api.IdentityManager;
@@ -61,10 +61,10 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerLogDto.LogType;
 import io.subutai.hub.share.json.JsonUtil;
 
 
-//TODO close web clients and responses
-public class HubEnvironmentProccessor implements StateLinkProccessor
+// TODO: Replace WebClient with HubRestClient.
+public class HubEnvironmentProcessor implements StateLinkProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProccessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
 
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
@@ -76,25 +76,21 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
 
     private final HubEnvironmentManager hubEnvironmentManager;
 
-    private final CommandExecutor commandExecutor;
-
     private final EnvironmentUserHelper environmentUserHelper;
 
     private final IdentityManager identityManager;
 
 
-    public HubEnvironmentProccessor( final HubEnvironmentManager hubEnvironmentManager,
-                                     final ConfigManager hConfigManager, final PeerManager peerManager,
-                                     final IdentityManager identityManager, CommandExecutor commandExecutor,
-                                     EnvironmentUserHelper environmentUserHelper )
+    public HubEnvironmentProcessor( final HubEnvironmentManager hubEnvironmentManager,
+                                    final ConfigManager hConfigManager, final PeerManager peerManager,
+                                    final IdentityManager identityManager, CommandExecutor commandExecutor,
+                                    EnvironmentUserHelper environmentUserHelper )
     {
         this.configManager = hConfigManager;
 
         this.peerManager = peerManager;
 
         this.hubEnvironmentManager = hubEnvironmentManager;
-
-        this.commandExecutor = commandExecutor;
 
         this.environmentUserHelper = environmentUserHelper;
 
@@ -352,28 +348,28 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             EnvironmentNodesDto envNodes = JsonUtil.fromCbor( plainContent, EnvironmentNodesDto.class );
 
             hubEnvironmentManager.prepareTemplates( peerDto, envNodes, peerDto.getEnvironmentInfo().getId() );
+
             EnvironmentNodesDto updatedNodes = hubEnvironmentManager.cloneContainers( peerDto, envNodes );
 
             byte[] cborData = JsonUtil.toCbor( updatedNodes );
             byte[] encryptedData = configManager.getMessenger().produce( cborData );
             Response response = client.put( encryptedData );
             client.close();
+
+            LOG.debug( "response.status: {}", response.getStatus() );
+
             if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
                 LOG.debug( "env_via_hub: Environment successfully build!!!" );
             }
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
-                e )
+        catch ( Exception e )
         {
             String mgs = "Could not get container creation data from Hub.";
-            hubEnvironmentManager
-                    .sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
+
+            hubEnvironmentManager.sendLogToHub( peerDto, mgs, e.getMessage(), LogEvent.REQUEST_TO_HUB, LogType.ERROR, null );
+
             LOG.error( mgs, e );
-        }
-        catch ( EnvironmentCreationException e )
-        {
-            LOG.error( e.getMessage() );
         }
     }
 
@@ -502,7 +498,7 @@ public class HubEnvironmentProccessor implements StateLinkProccessor
             assert environmentDto != null;
             if ( assign )
             {
-                DomainLoadBalanceStrategy balanceStrategy = DomainLoadBalanceStrategy.LOAD_BALANCE;
+                ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
                 localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
                 for ( EnvironmentNodesDto nodesDto : environmentDto.getNodes() )
                 {

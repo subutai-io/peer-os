@@ -17,7 +17,6 @@ func IsRegistered(templateName string) bool {
 	returnValue := true
 	restTemplateURL := config.Cdn.Kurjun + templateName
 
-	// token := gpg.GetToken()
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}

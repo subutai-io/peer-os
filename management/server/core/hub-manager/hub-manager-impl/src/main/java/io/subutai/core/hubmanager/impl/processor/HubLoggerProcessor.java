@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.proccessors;
+package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.security.MessageDigest;
@@ -19,20 +19,21 @@ import org.apache.http.HttpStatus;
 import io.subutai.core.appender.SubutaiErrorEvent;
 import io.subutai.core.appender.SubutaiErrorEventListener;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.IntegrationImpl;
+import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
+// TODO: Replace WebClient with HubRestClient.
 public class HubLoggerProcessor implements Runnable, SubutaiErrorEventListener
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubLoggerProcessor.class.getName() );
     private ConfigManager configManager;
-    private IntegrationImpl manager;
+    private HubManagerImpl manager;
     private final Map<String, String> errLogs = new LinkedHashMap<>();
 
 
-    public HubLoggerProcessor( final ConfigManager configManager, final IntegrationImpl integration )
+    public HubLoggerProcessor( final ConfigManager configManager, final HubManagerImpl integration )
     {
         this.configManager = configManager;
         this.manager = integration;

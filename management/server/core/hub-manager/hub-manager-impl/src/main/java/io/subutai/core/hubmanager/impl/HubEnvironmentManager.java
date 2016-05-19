@@ -69,7 +69,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 import io.subutai.hub.share.dto.environment.SSHKeyDto;
 import io.subutai.hub.share.json.JsonUtil;
 
-//TODO close web clients and responses
+
+// TODO: Replace WebClient with HubRestClient.
 public class HubEnvironmentManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentManager.class.getName() );
@@ -343,6 +344,7 @@ public class HubEnvironmentManager
                         peerDto.getOwnerId() );
 
         Set<EnvironmentNodeDto> failedNodes = new HashSet<>();
+
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
             if ( nodeDto.getState().equals( ContainerStateDto.BUILDING ) )
@@ -360,10 +362,13 @@ public class HubEnvironmentManager
         }
 
         final CreateEnvironmentContainersResponse containerCollector;
+
         try
         {
             containerCollector = peerManager.getLocalPeer().createEnvironmentContainers( containerGroupRequest );
+
             Set<CloneResponse> cloneResponseList = containerCollector.getResponses();
+
             for ( CloneResponse cloneResponse : cloneResponseList )
             {
                 for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
@@ -371,6 +376,7 @@ public class HubEnvironmentManager
                     if ( cloneResponse.getHostname().equals( nodeDto.getHostName() ) )
                     {
                         failedNodes.remove( nodeDto );
+
                         nodeDto.setIp( cloneResponse.getIp() );
                         nodeDto.setTemplateArch( cloneResponse.getTemplateArch().name() );
                         nodeDto.setContainerId( cloneResponse.getContainerId() );
@@ -381,15 +387,17 @@ public class HubEnvironmentManager
                         Set<Host> hosts = new HashSet<>();
                         Host host = peerManager.getLocalPeer().getContainerHostById( nodeDto.getContainerId() );
                         hosts.add( host );
+
                         String sshKey = createSshKey( hosts, peerDto.getEnvironmentInfo().getId() );
                         nodeDto.addSshKey( sshKey );
                     }
                 }
             }
         }
-        catch ( PeerException e )
+        catch ( Exception e )
         {
             String msg = "Failed on cloning container: ";
+
             for ( EnvironmentNodeDto nodeDto : failedNodes )
             {
                 msg += nodeDto.getContainerId();
@@ -403,14 +411,18 @@ public class HubEnvironmentManager
         if ( failedNodes.size() != 0 )
         {
             String msg = "Failed on cloning container: ";
+
             for ( EnvironmentNodeDto nodeDto : failedNodes )
             {
                 sendLogToHub( peerDto, msg + nodeDto.getContainerId(), null, EnvironmentPeerLogDto.LogEvent.CONTAINER,
                         EnvironmentPeerLogDto.LogType.ERROR, nodeDto.getContainerId() );
+
                 LOG.error( msg + nodeDto.getContainerId() );
             }
+
             throw new EnvironmentCreationException( msg );
         }
+
         return envNodes;
     }
 

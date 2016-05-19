@@ -30,13 +30,27 @@ public class ConfigEntity implements Config
     private String ownerEmail;
 
 
+    public ConfigEntity()
+    {
+    }
+
+    
+    public ConfigEntity( String peerId, String serverIp, String ownerId, String ownerEmail )
+    {
+        this.peerId = peerId;
+        this.serverIp = serverIp;
+        this.ownerId = ownerId;
+        this.ownerEmail = ownerEmail;
+    }
+
+
     public String getPeerId()
     {
         return peerId;
     }
 
 
-    public void setPeerId( final String peerId )
+    public void setPeerId( String peerId )
     {
         this.peerId = peerId;
     }
@@ -48,7 +62,7 @@ public class ConfigEntity implements Config
     }
 
 
-    public void setHubIp( final String serverIp )
+    public void setHubIp( String serverIp )
     {
         this.serverIp = serverIp;
     }

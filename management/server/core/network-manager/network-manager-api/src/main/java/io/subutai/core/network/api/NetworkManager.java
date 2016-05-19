@@ -3,9 +3,10 @@ package io.subutai.core.network.api;
 
 import java.util.Date;
 
-import io.subutai.common.network.DomainLoadBalanceStrategy;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnels;
@@ -73,13 +74,12 @@ public interface NetworkManager
      * Assigns reverse proxy domain to vlan
      *
      * @param vLanId - vlan id
-     * @param domainLoadBalanceStrategy - strategy to load balance requests to the domain
+     * @param proxyLoadBalanceStrategy - strategy to load balance requests to the domain
      * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
-    public void setVlanDomain( int vLanId, String domain, DomainLoadBalanceStrategy domainLoadBalanceStrategy,
+    public void setVlanDomain( int vLanId, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                String sslCertPath ) throws NetworkManagerException;
 
-    void setVlanDomain( int vLanId, String domain, String host, String sslCertPath ) throws NetworkManagerException;
 
     /**
      * Checks if IP is in vlan reverse proxy domain
@@ -115,6 +115,6 @@ public interface NetworkManager
      *
      * @return - port to which clients should connect to access the container via ssh
      */
-    int setupContainerSsh( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
+    SshTunnel setupContainerSshTunnel( String containerIp, int sshIdleTimeout ) throws NetworkManagerException;
 }
 
