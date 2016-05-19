@@ -62,10 +62,6 @@ func initAgent() {
 
 func Start(c *cli.Context) {
 	initAgent()
-	for !checkSS() {
-		container.ContainersRestoreState(pool)
-		time.Sleep(time.Second * 10)
-	}
 
 	http.HandleFunc("/trigger", trigger)
 	http.HandleFunc("/ping", ping)
@@ -84,6 +80,9 @@ func Start(c *cli.Context) {
 		}
 		container.ContainersRestoreState(pool)
 		lib.TunCheck()
+		for !checkSS() {
+			time.Sleep(time.Second * 10)
+		}
 	}
 }
 
@@ -101,7 +100,7 @@ func checkSS() (status bool) {
 func connectionMonitor() {
 	for {
 		if !checkSS() {
-			time.Sleep(time.Second * 3)
+			time.Sleep(time.Second * 10)
 			continue
 		}
 

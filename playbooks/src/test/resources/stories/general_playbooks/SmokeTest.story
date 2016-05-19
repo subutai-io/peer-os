@@ -5,7 +5,7 @@ As a QA team
 We want to verify Subutai web elements
 So that We create smoke test for it
 
-Scenario: The User should observe Subutai web elements
+Scenario: The User should observe Subutai web elements (part 1)
 Given the first user is on the Home page of Subutai
 Then the user should observe web elements on: Login page
 Given the user enters login and password: 'admin', 'secret'
@@ -19,9 +19,15 @@ Then the user should observe web elements on drop down menu: Notifications
 And the user should observe user name: admin
 When the user clicks on the menu item: Environment
 And the user clicks on the menu item: Environments
-Then the user should observe web elements on: Environments page
+
+Scenario: the user should create the Local Environment
+When the user should find template: Master
+And the user creates environment using template: Master
+Then the user destroys created environment
 When the user clicks on the Environment's mode: Advanced
 Then the user should observe web elements on: Advanced mode page
+
+Scenario: the user should observe Subutai web Elements (part 2)
 When the user clicks on the menu item: Containers
 Then the user should observe web elements on: Containers page
 When the user clicks on the menu item: Kurjun
@@ -30,6 +36,8 @@ When the user clicks on the menu item: Console
 And the user chooses: Management host
 And the user enters console command: 'pwd'
 Then the user should observe output of the pwd command
+
+Scenario: the user should observe Web elements from User Identity
 When the user clicks on the menu item: User Identity
 And the user clicks on the menu item: User management
 Then the user should observe web elements on: User management page
@@ -39,6 +47,8 @@ When the user clicks on the menu item: Account Settings
 Then the user should observe web elements on: Account Settings page
 When the user clicks on the menu item: Tokens
 Then the user should observe web elements on: Tokens page
+
+Scenario: the user should observe Subutai web Elements (part 3)
 When the user clicks on the menu item: Peer Registration
 Then the user should observe web elements on: Peer Registration page
 When the user clicks on the menu item: Resource Hosts
@@ -47,6 +57,8 @@ When the user clicks on the menu item: Tracker
 Then the user should observe web elements on: Tracker page
 When the user clicks on the menu item: Bazaar
 Then the user should observe web elements on: Bazaar page
+
+Scenario: the user should observe Subutai web Elements from System Settings
 When the user clicks on the menu item: System Settings
 And the user clicks on the menu item: Peer Settings
 Then the user should observe web elements on: Peer Settings page

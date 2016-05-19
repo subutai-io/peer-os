@@ -44,6 +44,7 @@ import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentManager;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
+import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
@@ -201,8 +202,9 @@ public class HubManagerImpl implements HubManager
 
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
-        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( hubEnvironmentManager, configManager, peerManager,
-                identityManager, environmentUserHelper );
+        Context ctx = new Context( identityManager, environmentUserHelper, configManager, peerManager );
+
+        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( hubEnvironmentManager, ctx );
 
         StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
 

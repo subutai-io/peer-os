@@ -10,10 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.http.HubRestClient;
-import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
@@ -22,19 +18,12 @@ public abstract class StateHandler
 {
     protected final Logger log = LoggerFactory.getLogger( getClass() );
 
-    protected final IdentityManager identityManager;
-
-    protected final EnvironmentUserHelper envUserHelper;
-
-    private final HubRestClient restClient;
+    protected final Context ctx;
 
 
-    protected StateHandler( IdentityManager identityManager, EnvironmentUserHelper envUserHelper, ConfigManager configManager )
+    protected StateHandler( Context ctx )
     {
-        this.identityManager = identityManager;
-        this.envUserHelper = envUserHelper;
-
-        restClient = new HubRestClient( configManager );
+        this.ctx = ctx;
     }
 
 
@@ -47,7 +36,7 @@ public abstract class StateHandler
 
         String token = StringUtils.defaultIfEmpty( peerDto.getEnvOwnerToken(), peerDto.getPeerToken() );
 
-        Session session = identityManager.login( "token", token );
+        Session session = ctx.identityManager.login( "token", token );
 
         Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
         {
@@ -62,13 +51,13 @@ public abstract class StateHandler
     }
 
 
-    private void runAs( EnvironmentPeerDto envPeerDto )
+    private void runAs( EnvironmentPeerDto peerDto )
     {
         try
         {
-            Object result = doHandle( envPeerDto );
+            Object result = doHandle( peerDto );
 
-            post( envPeerDto, result );
+            post( peerDto, result );
         }
         catch ( Exception e )
         {
@@ -77,10 +66,16 @@ public abstract class StateHandler
     }
 
 
-    protected void post( EnvironmentPeerDto envPeerDto, Object body )
+    protected void post( EnvironmentPeerDto peerDto, Object body )
     {
-        String path = String.format( "/rest/v1/environments/%s/peers/%s", envPeerDto.getEnvironmentInfo().getId(), envPeerDto.getPeerId() );
+        ctx.restClient.post( path( "/rest/v1/environments/%s/peers/%s", peerDto ), body );
+    }
 
-        restClient.post( path, body );
+
+    protected String path( String format, EnvironmentPeerDto peerDto )
+    {
+        return StringUtils.countMatches( format, "%s" ) == 1
+            ? String.format( format, peerDto.getEnvironmentInfo().getId() )
+            : String.format( format, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
     }
 }
