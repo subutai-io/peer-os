@@ -49,7 +49,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response isMhPresent()
     {
-        return ( localPeer.isInitialized() && localPeer.isMHPresent() ) ? Response.ok().build() :
+        return localPeer.isMHPresent() ? Response.ok().build() :
                Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
     }
 

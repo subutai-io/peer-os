@@ -144,18 +144,22 @@ func getArgs(global bool, socket string) ([]string, string) {
 		tunsrv = cdn[0].String()
 		args = []string{"-i", config.Agent.AppPrefix + "etc/ssh.pem", "-N", "-p", "8022", "-R", "0:" + socket, "-o", "StrictHostKeyChecking=no", "tunnel@" + tunsrv}
 	} else {
-		wan, err := net.InterfaceByName("wan")
-		log.Check(log.ErrorLevel, "Getting WAN interface info", err)
-		wanIP, err := wan.Addrs()
-		log.Check(log.ErrorLevel, "Getting WAN interface addresses", err)
-		if len(wanIP) > 0 {
-			ip := strings.Split(wanIP[0].String(), "/")
-			if len(ip) > 0 {
-				tunsrv = ip[0]
+
+		for _, i := range []string{"eth2", "eth1", "wan"} {
+			if nic, err := net.InterfaceByName(i); err == nil {
+				nicAddrs, err := nic.Addrs()
+				log.Check(log.ErrorLevel, "Getting interface addresses", err)
+				if len(nicAddrs) > 0 {
+					ip := strings.Split(nicAddrs[0].String(), "/")
+					if len(ip) > 0 {
+						tunsrv = ip[0]
+					}
+				}
+				break
 			}
 		}
-		args = []string{"-N", "-R", "0:" + socket, "-o", "StrictHostKeyChecking=no", "ubuntu@" + tunsrv}
 	}
+	args = []string{"-N", "-R", "0:" + socket, "-o", "StrictHostKeyChecking=no", "ubuntu@" + tunsrv}
 	return args, tunsrv
 }
 

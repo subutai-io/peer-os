@@ -162,7 +162,7 @@ public class PeerManagerImpl implements PeerManager
             }
 
             localIpSetter = Executors.newSingleThreadScheduledExecutor();
-            localIpSetter.scheduleWithFixedDelay( new LocalIpSetterTask( localIpSetter ), 1, 1, TimeUnit.SECONDS );
+            localIpSetter.scheduleWithFixedDelay( new IpDetectionTask(), 1, 5, TimeUnit.SECONDS );
         }
         catch ( Exception e )
         {
@@ -784,9 +784,22 @@ public class PeerManagerImpl implements PeerManager
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void doCancelRequest( final RegistrationData request ) throws PeerException
+    public void doCancelRequest( final RegistrationData request , boolean forceAction ) throws PeerException
     {
-        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
+        //********forceAction ********************
+        try
+        {
+            getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        }
+        catch ( Exception e )
+        {
+            if(!forceAction)
+            {
+                throw new PeerException("Remote peer is not accessible:" + e.getMessage());
+            }
+        }
+        //***************************************
 
         try
         {
@@ -839,9 +852,23 @@ public class PeerManagerImpl implements PeerManager
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void doRejectRequest( final RegistrationData request ) throws PeerException
+    public void doRejectRequest( final RegistrationData request , boolean forceAction  ) throws PeerException
     {
-        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+
+        //********forceAction ********************
+        try
+        {
+            getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        }
+        catch ( Exception e )
+        {
+            if(!forceAction)
+            {
+                throw new PeerException("Remote peer is not accessible:" + e.getMessage());
+            }
+        }
+        //***************************************
+
         try
         {
             final RegistrationData r = buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED );
@@ -863,14 +890,30 @@ public class PeerManagerImpl implements PeerManager
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void doUnregisterRequest( final RegistrationData request ) throws PeerException
+    public void doUnregisterRequest( final RegistrationData request , boolean forceAction  ) throws PeerException
     {
-        getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
 
+        //********forceAction ********************
+        try
+        {
+            getRemotePeerInfo( request.getPeerInfo().getPublicUrl() );
+        }
+        catch ( Exception e )
+        {
+            if(!forceAction)
+            {
+                throw new PeerException("Remote peer is not accessible:" + e.getMessage());
+            }
+        }
+
+        //***************************************
         if ( !notifyPeerActionListeners( new PeerAction( PeerActionType.UNREGISTER, request.getPeerInfo().getId() ) )
                 .succeeded() )
         {
-            throw new PeerException( "Could not unregister peer. Peer in use." );
+            if(!forceAction)
+            {
+                throw new PeerException( "Could not unregister peer. Peer in use." );
+            }
         }
 
         try
@@ -1105,6 +1148,13 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void setPublicUrl( final String peerId, final String publicUrl, final int securePort ) throws PeerException
     {
+        setPublicUrl( peerId, publicUrl, securePort, true );
+    }
+
+
+    private synchronized void setPublicUrl( final String peerId, final String publicUrl, final int securePort,
+                                            boolean manualSetting ) throws PeerException
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( publicUrl ) );
         Preconditions.checkArgument( securePort > 0 );
@@ -1124,6 +1174,8 @@ public class PeerManagerImpl implements PeerManager
             peerInfo.setPublicUrl( publicUrl.toLowerCase() );
             peerInfo.setPublicSecurePort( securePort );
             peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
+            peerInfo.setManualSetting( manualSetting );
+
             peerData.setInfo( toJson( peerInfo ) );
 
             peerDataService.saveOrUpdate( peerData );
@@ -1138,15 +1190,8 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    private class LocalIpSetterTask implements Runnable
+    private class IpDetectionTask implements Runnable
     {
-        private final ScheduledExecutorService localIpSetter;
-
-
-        public LocalIpSetterTask( final ScheduledExecutorService localIpSetter )
-        {
-            this.localIpSetter = localIpSetter;
-        }
 
 
         private boolean isIpValid( HostInterface hostInterface )
@@ -1161,8 +1206,9 @@ public class PeerManagerImpl implements PeerManager
         {
             try
             {
-                if ( localPeer.isInitialized() && SystemSettings.DEFAULT_PUBLIC_URL
-                        .equals( localPeer.getPeerInfo().getPublicUrl() ) )
+                if ( localPeer.isInitialized() && (
+                        SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
+                                .getPeerInfo().isManualSetting() ) )
                 {
                     //local peer ip is default, obtain external ip from MH and set it as local peer ip
                     HostInterface externalInterface =
@@ -1185,11 +1231,12 @@ public class PeerManagerImpl implements PeerManager
                         }
                     }
 
-                    setPublicUrl( localPeerId, externalInterface.getIp(),
-                            localPeer.getPeerInfo().getPublicSecurePort() );
+                    if ( !externalInterface.getIp().equals( localPeer.getPeerInfo().getIp() ) )
 
-
-                    localIpSetter.shutdown();
+                    {
+                        setPublicUrl( localPeerId, externalInterface.getIp(),
+                                localPeer.getPeerInfo().getPublicSecurePort(), false );
+                    }
                 }
             }
             catch ( HostNotFoundException e )

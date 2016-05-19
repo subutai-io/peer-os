@@ -14,4 +14,6 @@ When the user clicks on the menu item: User Identity
 When the user sets pgp Key
 And the user clicks on the menu item: Environment
 And the user clicks on the menu item: Environments
-And the user creates environment using template: Mongo
+And the user should find template: Master
+And the user creates environment using template: Master
+Then the user destroys created environment

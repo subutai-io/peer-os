@@ -3,8 +3,12 @@ package io.subutai.core.hubmanager.impl;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +18,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -42,10 +51,12 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
+import io.subutai.core.hubmanager.impl.environment.HubEnvironmentManager;
+import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
+import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
-import io.subutai.core.hubmanager.impl.processor.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
@@ -72,6 +83,22 @@ public class HubManagerImpl implements HubManager
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
+    private final ScheduledExecutorService heartbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
+
+    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
+
     private SecurityManager securityManager;
 
     private EnvironmentManager environmentManager;
@@ -82,26 +109,6 @@ public class HubManagerImpl implements HubManager
 
     private CommandExecutor commandExecutor;
 
-    private ScheduledExecutorService hearbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
-
-    private ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
-
-    private HeartbeatProcessor heartbeatProcessor;
-
-    private ResourceHostDataProcessor resourceHostDataProcessor;
-
-    private ResourceHostMonitorProcessor resourceHostMonitorProcessor;
-
-    private HubLoggerProcessor hubLoggerProcessor;
-
     private DaoManager daoManager;
 
     private ConfigDataService configDataService;
@@ -110,19 +117,13 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
-    private HubEnvironmentManager hubEnvironmentManager;
-
     private NetworkManager networkManager;
 
+    private HeartbeatProcessor heartbeatProcessor;
+
+    private ResourceHostDataProcessor resourceHostDataProcessor;
+
     private ContainerEventProcessor containerEventProcessor;
-
-    private ProductProcessor productProccessor;
-
-    private TunnelEventProcessor tunnelEventProcessor;
-
-    private ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
-
-    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
@@ -161,64 +162,23 @@ public class HubManagerImpl implements HubManager
 
             configManager = new ConfigManager( securityManager, peerManager, configDataService, identityManager );
 
-            hubEnvironmentManager =
-                    new HubEnvironmentManager( environmentManager, configManager, peerManager, identityManager,
-                            networkManager );
-
-            heartbeatProcessor = new HeartbeatProcessor( this, configManager );
-
             resourceHostDataProcessor = new ResourceHostDataProcessor( this, peerManager, configManager, monitor );
 
-            hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
+            ResourceHostMonitorProcessor resourceHostMonitorProcessor = new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
-            resourceHostMonitorProcessor =
-                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
+            resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
-            productProccessor = new ProductProcessor( configManager );
-
-            tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
-
-            StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
-
-            EnvironmentUserHelper environmentUserHelper =
-                    new EnvironmentUserHelper( configManager, identityManager, configDataService, environmentManager );
-
-            StateLinkProcessor hubEnvironmentProccessor =
-                    new HubEnvironmentProcessor( hubEnvironmentManager, configManager, peerManager, identityManager,
-                            commandExecutor, environmentUserHelper );
-
-            StateLinkProcessor vehsProccessor =
-                    new VehsProcessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
-                            environmentUserHelper );
-
-            StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
-
-            heartbeatProcessor.addProcessor( vehsProccessor );
-            heartbeatProcessor.addProcessor( hubEnvironmentProccessor );
-            heartbeatProcessor.addProcessor( systemConfProcessor );
-            heartbeatProcessor.addProcessor( productProccessor );
-
-            AppScaleProcessor appScaleProcessor =
-                    new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
-
-            heartbeatProcessor.addProcessor( appScaleProcessor );
-
-            heartbeatProcessor.addProcessor( tunnelProcessor );
-
-            hearbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
-
-            resourceHostConfExecutorService
-                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
-
-            resourceHostMonitorExecutorService
-                    .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
+            resourceHostMonitorExecutorService.scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
-            containerEventExecutor
-                    .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+
+            HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
             hubLoggerExecutorService.scheduleWithFixedDelay( hubLoggerProcessor, 40, 3600, TimeUnit.SECONDS );
+
+            TunnelEventProcessor tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
 
             tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
@@ -231,6 +191,9 @@ public class HubManagerImpl implements HubManager
                     generateChecksum();
                 }
             }, 1, 600000, TimeUnit.MILLISECONDS );
+
+
+            initHeartbeatProcessor();
         }
         catch ( Exception e )
         {
@@ -239,9 +202,43 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    private void initHeartbeatProcessor()
+    {
+        EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
+                environmentManager );
+
+        HubEnvironmentManager hubEnvironmentManager = new HubEnvironmentManager( configManager, peerManager );
+
+        StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
+
+        Context ctx = new Context( identityManager, environmentUserHelper, configManager, peerManager );
+
+        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( hubEnvironmentManager, ctx );
+
+        StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
+
+        ProductProcessor productProcessor = new ProductProcessor( configManager );
+
+        StateLinkProcessor vehsProccessor = new VehsProcessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
+                environmentUserHelper );
+
+        AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
+
+        heartbeatProcessor = new HeartbeatProcessor( this, configManager )
+                .addProcessor( tunnelProcessor )
+                .addProcessor( hubEnvironmentProcessor )
+                .addProcessor( systemConfProcessor )
+                .addProcessor( productProcessor )
+                .addProcessor( vehsProccessor )
+                .addProcessor( appScaleProcessor );
+
+        heartbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
+    }
+
+
     public void destroy()
     {
-        hearbeatExecutorService.shutdown();
+        heartbeatExecutorService.shutdown();
         resourceHostConfExecutorService.shutdown();
         resourceHostMonitorExecutorService.shutdown();
     }
@@ -394,10 +391,41 @@ public class HubManagerImpl implements HubManager
     {
         try
         {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+
+            // Activate the new trust manager
+            try {
+                SSLContext sc = SSLContext.getInstance("SSL" );
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory() );
+            } catch (Exception e) {
+            }
+
+            // And as before now you can use URL and URLConnection
+
+
             File file =
                     new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
             URL website = new URL( url );
-            FileUtils.copyURLToFile( website, file );
+            URLConnection connection = website.openConnection();
+            InputStream in = connection.getInputStream();
+            OutputStream out = new FileOutputStream( file );
+            IOUtils.copy (in, out);
+            in.close();
+            out.close();
+//            FileUtils.copyURLToFile( website, file );
         }
         catch ( IOException e )
         {

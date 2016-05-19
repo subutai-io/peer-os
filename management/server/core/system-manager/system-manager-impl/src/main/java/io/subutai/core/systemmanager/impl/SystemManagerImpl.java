@@ -197,9 +197,17 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     public void setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                    final String publicUrl, final String agentPort, final String publicSecurePort )
+                                    final String publicUrl, final String agentPort, final String publicSecurePort,
+                                    final String keyServer )
             throws ConfigurationException
     {
+        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
+        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
+        SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
+        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
+        SystemSettings.setKeyServer( keyServer );
+
+        notifyListeners();
         try
         {
             SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
@@ -283,6 +291,7 @@ public class SystemManagerImpl implements SystemManager
         dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
         dto.setPublicUrl( networkSettings.getPublicUrl() );
         dto.setAgentPort( networkSettings.getAgentPort() );
+        dto.setKeyServer( networkSettings.getKeyServer() );
 
 
         hubManager.sendSystemConfiguration( dto );
@@ -300,6 +309,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setPublicUrl( SystemSettings.getPublicUrl() );
         pojo.setAgentPort( SystemSettings.getAgentPort() );
         pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+        pojo.setKeyServer( SystemSettings.getKeyServer() );
 
         return pojo;
     }

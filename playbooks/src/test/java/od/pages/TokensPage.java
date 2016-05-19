@@ -8,12 +8,29 @@ public class TokensPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
+    @FindBy(xpath = "*//div[@class=\"b-logs-view b-logs-view_token ng-binding\"]")
+    public WebElementFacade token;
+
+    @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre")
+    public WebElementFacade peerID;
+
+    @FindBy(xpath = "*//*[contains(text(),\"BEGIN PGP PUBLIC KEY BLOCK\")]")
+    public WebElementFacade remotePGPKey;
+
+    @FindBy(xpath = "xhtml:html/xhtml:body/xhtml:pre")
+    public WebElementFacade environmentData;
+
+    @FindBy(xpath = "*//*[contains(text(),\"BEGIN PGP PUBLIC KEY BLOCK\")]")
+    public WebElementFacade environmentPGPKey;
+
     //endregion
 
     //region WEB ELEMENTS: Buttons
 
     @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green\"]")
     public WebElementFacade buttonAddToken;
+
+    public String sikuliButtonShowToken = "src/test/resources/imgs/buttons/buttonShowToken.png";
     //endregion
 
     //region WEB ELEMENTS: Checkboxes

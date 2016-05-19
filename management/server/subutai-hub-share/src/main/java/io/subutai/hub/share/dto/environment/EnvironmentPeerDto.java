@@ -54,7 +54,11 @@ public class EnvironmentPeerDto
 
     private String peerToken;
 
+    private String peerTokenId;
+
     private String envOwnerToken;
+
+    private String envOwnerTokenId;
 
     public EnvironmentPeerDto()
     {
@@ -286,5 +290,29 @@ public class EnvironmentPeerDto
     public void setEnvOwnerToken( final String envOwnerToken )
     {
         this.envOwnerToken = envOwnerToken;
+    }
+
+
+    public String getPeerTokenId()
+    {
+        return peerTokenId;
+    }
+
+
+    public void setPeerTokenId( final String peerTokenId )
+    {
+        this.peerTokenId = peerTokenId;
+    }
+
+
+    public String getEnvOwnerTokenId()
+    {
+        return envOwnerTokenId;
+    }
+
+
+    public void setEnvOwnerTokenId( final String envOwnerTokenId )
+    {
+        this.envOwnerTokenId = envOwnerTokenId;
     }
 }
