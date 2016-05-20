@@ -25,12 +25,8 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.hubmanager.impl.environment.HubEnvironmentManager;
-import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.VehsDto;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -43,7 +39,7 @@ import io.subutai.hub.share.json.JsonUtil;
 // TODO: Replace WebClient with HubRestClient.
 public class VehsProcessor implements StateLinkProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( HubEnvironmentProcessor.class.getName() );
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final Pattern ENVIRONMENT_PEER_DATA_PATTERN = Pattern.compile(
             "/rest/v1/environments/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/peers/"
@@ -53,31 +49,17 @@ public class VehsProcessor implements StateLinkProcessor
 
     private final PeerManager peerManager;
 
-    private final HubEnvironmentManager hubEnvironmentManager;
 
-    private final CommandExecutor commandExecutor;
-
-    private final EnvironmentUserHelper environmentUserHelper;
-
-
-    public VehsProcessor( HubEnvironmentManager hubEnvironmentManager, ConfigManager hConfigManager,
-                          PeerManager peerManager, CommandExecutor commandExecutor,
-                          EnvironmentUserHelper environmentUserHelper )
+    public VehsProcessor( ConfigManager configManager, PeerManager peerManager )
     {
-        this.configManager = hConfigManager;
+        this.configManager = configManager;
 
         this.peerManager = peerManager;
-
-        this.hubEnvironmentManager = hubEnvironmentManager;
-
-        this.commandExecutor = commandExecutor;
-
-        this.environmentUserHelper = environmentUserHelper;
     }
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String link : stateLinks )
         {
@@ -95,7 +77,7 @@ public class VehsProcessor implements StateLinkProcessor
     }
 
 
-    private EnvironmentPeerDto getEnvPeerDto( String link ) throws HubPluginException
+    private EnvironmentPeerDto getEnvPeerDto( String link ) throws Exception
     {
         try
         {
@@ -106,13 +88,13 @@ public class VehsProcessor implements StateLinkProcessor
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
-            LOG.debug( "EnvironmentPeerDto: " + result.toString() );
+            log.debug( "EnvironmentPeerDto: " + result.toString() );
             return result;
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            throw new HubPluginException( "Could not retrieve environment peer data", e );
+            throw new Exception( "Could not retrieve environment peer data", e );
         }
     }
 
@@ -151,14 +133,14 @@ public class VehsProcessor implements StateLinkProcessor
                             break;
                     }
                 }
-                LOG.info( vehsDto.getProjectName() );
+                log.info( vehsDto.getProjectName() );
             }
             catch ( Exception e )
             {
-                LOG.error( e.getMessage() );
+                log.error( e.getMessage() );
             }
 
-            LOG.info( peerDto.toString() );
+            log.info( peerDto.toString() );
         }
     }
 
@@ -208,7 +190,7 @@ public class VehsProcessor implements StateLinkProcessor
                             vehsDto.getUserPassword() );
             CommandResult commandResult = execute( containerHost, cmd );
 
-            LOG.info( commandResult.getStdOut().toString() );
+            log.info( commandResult.getStdOut().toString() );
         }
         String vehsPeerDataUrl = String.format( "/rest/v1/vehs/%s", peerDto.getEnvironmentInfo().getId() );
         sendPutRequest( vehsPeerDataUrl, vehsDto, peerDto, VehsDto.VehsState.READY );
@@ -229,13 +211,13 @@ public class VehsProcessor implements StateLinkProcessor
             if ( r.getStatus() == HttpStatus.SC_OK )
             {
                 String mgs = "VEHS peer data successfully sent to hub";
-                LOG.debug( mgs );
+                log.debug( mgs );
             }
         }
         catch ( Exception e )
         {
             String mgs = "Could not sent environment peer data to hub.";
-            LOG.error( mgs, e.getMessage() );
+            log.error( mgs, e.getMessage() );
         }
     }
 
@@ -322,7 +304,7 @@ public class VehsProcessor implements StateLinkProcessor
         }
         catch ( Exception e )
         {
-            LOG.error( "Could not  get environment data from Hub", e );
+            log.error( "Could not  get environment data from Hub", e );
         }
         return null;
     }

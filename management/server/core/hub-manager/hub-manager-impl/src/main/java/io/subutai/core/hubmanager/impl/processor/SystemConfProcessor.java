@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.SystemConfDto;
@@ -41,7 +40,7 @@ public class SystemConfProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public void processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String link : stateLinks )
         {
@@ -62,7 +61,7 @@ public class SystemConfProcessor implements StateLinkProcessor
     }
 
 
-    private SystemConfDto getSystemInfo( final String link ) throws HubPluginException
+    private SystemConfDto getSystemInfo( final String link ) throws Exception
     {
         try
         {
@@ -95,13 +94,13 @@ public class SystemConfProcessor implements StateLinkProcessor
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
                 e )
         {
-            throw new HubPluginException( "Could not retrieve system configurations", e );
+            throw new Exception( "Could not retrieve system configurations", e );
         }
     }
 
 
     private void processSystemConf( final SystemConfDto systemConfDto )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, HubPluginException,
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception,
             IOException
     {
         switch ( systemConfDto.getKey() )

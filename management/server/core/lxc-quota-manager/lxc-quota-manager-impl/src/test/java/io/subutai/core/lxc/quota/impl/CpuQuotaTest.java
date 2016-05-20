@@ -10,8 +10,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import io.subutai.common.resource.CpuResource;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -32,7 +34,7 @@ public class CpuQuotaTest
     {
         assertNotNull( cpuQuota.getResourceValue() );
         assertEquals( 55.00, cpuQuota.getResourceValue().getValue().doubleValue(), 0.0 );
-        assertEquals( "55.00", cpuQuota.getWriteValue() );
-        assertEquals( "55.00%", cpuQuota.getPrintValue() );
+        assertThat( cpuQuota.getWriteValue(), containsString( "55" ) );
+        assertThat( cpuQuota.getPrintValue(), containsString( "55" ) );
     }
 }

@@ -2767,6 +2767,7 @@ td.b-main-table__status-col {
 }
 .b-progress-cloud {
     border: 1px solid #ccceee;
+    background-color: #078DD0;
     border-radius: 4px;
     height: 5px;
     width: 100%;
@@ -2777,7 +2778,7 @@ td.b-main-table__status-col {
     position: absolute;
     left: 0;
     height: 100%;
-    background-color: #078DD0;
+    background-color: #FFF;
 }
 .b-progress-text {
     font-size: 11px;

@@ -16,7 +16,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
 import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.metric.api.Monitor;
@@ -65,7 +64,7 @@ public class ResourceHostMonitorProcessor implements Runnable
     }
 
 
-    public void sendResourceHostMonitoringData() throws HubPluginException
+    public void sendResourceHostMonitoringData() throws Exception
     {
         if ( manager.isRegistered() )
         {
@@ -155,7 +154,7 @@ public class ResourceHostMonitorProcessor implements Runnable
                     }
                     else
                     {
-                        throw new HubPluginException(
+                        throw new Exception(
                                 "Could not send resource hosts monitoring data: " + r.readEntity( String.class ) );
                     }
                 }

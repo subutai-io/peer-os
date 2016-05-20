@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.impl.util;
+package io.subutai.common.util;
 
 
 import java.util.concurrent.Callable;

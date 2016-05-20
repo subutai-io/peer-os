@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.bazaar.api.Bazaar;
-import io.subutai.core.hubmanager.api.HubPluginException;
 
 public class RestServiceImpl implements RestService
 {
@@ -34,7 +33,7 @@ public class RestServiceImpl implements RestService
 		{
 			bazaar.installPlugin (name, version, kar, url, uid);
 		}
-		catch (HubPluginException e)
+		catch ( Exception e )
 		{
 			e.printStackTrace();
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
@@ -56,7 +55,7 @@ public class RestServiceImpl implements RestService
 		{
 			bazaar.restorePlugin (id, name, version, kar, url, uid);
 		}
-		catch (HubPluginException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
