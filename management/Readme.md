@@ -68,7 +68,7 @@ To build the project, you need to have the following tools:
       ------------------------------------------------------------
       0            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      auto mode
       1            /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java   1071      manual mode
-   * 2            /usr/lib/jvm/jdk1.7.0/bin/java                   1         manual mode
+      2            /usr/lib/jvm/jdk1.7.0/bin/java                   1         manual mode
       3            /usr/lib/jvm/jdk1.8.0/bin/java                   1         manual mode
 
    Press enter to keep the current choice[*], or type selection number: 3
@@ -129,6 +129,12 @@ To build the project, you need to have the following tools:
   cd UnlimitedJCEPolicyJDK8
   sudo cp local_policy.jar US_export_policy.jar $JAVA_HOME/jre/lib/security
   ```
+
+  OR
+
+  ```bash
+  sudo apt-get install oracle-java8-unlimited-jce-policy
+  ```
   
 - Maven version 3.2.2 or later
 
@@ -168,9 +174,9 @@ To build the project, you need to have the following tools:
   sudo apt-get install maven3
   ```
   
-  ###### Verifify mvn installation
+  ###### Verify mvn installation
   
-  ```bash
+```bash
   mvn --version
   
   Apache Maven 3.3.3 (12a6b3acb947671f09b81f49094c53f426d8cea1; 2014-12-14T17:29:23+00:00)
@@ -179,7 +185,7 @@ To build the project, you need to have the following tools:
   Java home: /usr/lib/jvm/java-7-oracle/jre
   Default locale: en_US, platform encoding: UTF-8
   OS name: "linux", version: "3.13.0-48-generic", arch: "amd64", family: "unix"
-  ```
+```
 
 ###Build steps
 
