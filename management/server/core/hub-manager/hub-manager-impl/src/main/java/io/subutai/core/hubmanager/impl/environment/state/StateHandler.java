@@ -16,6 +16,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public abstract class StateHandler
 {
+    private static final String PATH = "/rest/v1/environments/%s/peers/%s";
+
     protected final Logger log = LoggerFactory.getLogger( getClass() );
 
     protected final Context ctx;
@@ -62,15 +64,24 @@ public abstract class StateHandler
         catch ( Exception e )
         {
             log.error( "Error to handle environment peer data: ", e );
+
+            handleError( peerDto, e );
         }
     }
 
 
     protected void post( EnvironmentPeerDto peerDto, Object body )
     {
-        ctx.restClient.post( path( "/rest/v1/environments/%s/peers/%s", peerDto ), body );
+        ctx.restClient.post( path( PATH, peerDto ), body );
     }
 
+
+    protected void handleError( EnvironmentPeerDto peerDto, Exception e )
+    {
+        peerDto.setError( e.getMessage() );
+
+        ctx.restClient.post( path( PATH, peerDto ), peerDto );
+    }
 
     protected String path( String format, EnvironmentPeerDto peerDto )
     {

@@ -20,7 +20,8 @@ public class EnvironmentPeerDto
         CHANGE_CONTAINER_STATE,
         DELETE_PEER,
         WAIT,
-        READY
+        READY,
+        ERROR
     }
 
 
@@ -59,6 +60,9 @@ public class EnvironmentPeerDto
     private String envOwnerToken;
 
     private String envOwnerTokenId;
+
+    private String message;
+
 
     public EnvironmentPeerDto()
     {
@@ -314,5 +318,24 @@ public class EnvironmentPeerDto
     public void setEnvOwnerTokenId( final String envOwnerTokenId )
     {
         this.envOwnerTokenId = envOwnerTokenId;
+    }
+
+
+    public String getMessage()
+    {
+        return message;
+    }
+
+
+    public void setMessage( String message )
+    {
+        this.message = message;
+    }
+
+
+    public void setError( String message )
+    {
+        setState( PeerState.ERROR );
+        setMessage( message );
     }
 }
