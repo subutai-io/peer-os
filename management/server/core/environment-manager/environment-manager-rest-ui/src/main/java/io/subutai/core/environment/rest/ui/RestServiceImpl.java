@@ -881,5 +881,9 @@ public class RestServiceImpl implements RestService
         {
             throw new Exception( "Duplicated environment name" );
         }
+        if( name.length() > 50 )
+        {
+            throw new Exception( "Environment name is too long, it should be 50 chars max" );
+        }
     }
 }
