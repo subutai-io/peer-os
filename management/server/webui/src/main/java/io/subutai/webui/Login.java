@@ -82,7 +82,7 @@ public class Login extends HttpServlet
             else
             {
                 request.setAttribute( "error", "Wrong Auth Credentials !!!" );
-                response.getWriter().write( "Error, Wrong Auth Credentials" );
+                response.getWriter().write( "Wrong Auth Credentials" );
                 response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
             }
         }
@@ -90,7 +90,7 @@ public class Login extends HttpServlet
         {
             request.setAttribute( "error", "karaf exceptions !!!" );
             response.getWriter().write( "Error: " + e.getMessage() );
-            response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
     }
 
