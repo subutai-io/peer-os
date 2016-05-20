@@ -1,11 +1,9 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
-import java.util.concurrent.Callable;
-
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.util.AsyncUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
@@ -39,7 +37,7 @@ public class ReserveNetworkStateHandler extends StateHandler
 
         final NetworkResourceImpl networkResource = new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), subnetWithoutMask );
 
-        AsyncUtil.execute( new Callable<Void>()
+        TaskUtil.execute( new TaskUtil.Task<Void>()
         {
             @Override
             public Void call() throws Exception
@@ -63,7 +61,7 @@ public class ReserveNetworkStateHandler extends StateHandler
             p2pConfig.addRhP2pIp( new RhP2PIpEntity( rhDto.getId(), rhDto.getP2pIp() ) );
         }
 
-        AsyncUtil.execute( new Callable<Void>()
+        TaskUtil.execute( new TaskUtil.Task<Void>()
         {
             @Override
             public Void call() throws Exception

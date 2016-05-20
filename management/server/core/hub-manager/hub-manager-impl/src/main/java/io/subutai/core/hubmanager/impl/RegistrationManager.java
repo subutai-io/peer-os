@@ -18,6 +18,7 @@ import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
@@ -102,8 +103,11 @@ public class RegistrationManager
         dto.setOwnerEmail( email );
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
-        dto.setToken( configManager.getPermanentToken().getFullToken() );
-        dto.setTokenId( configManager.getPermanentToken().getTokenId() );
+
+        UserToken token = configManager.getPermanentToken();
+
+        dto.setToken( token.getFullToken() );
+        dto.setTokenId( token.getTokenId() );
 
         return dto;
     }
