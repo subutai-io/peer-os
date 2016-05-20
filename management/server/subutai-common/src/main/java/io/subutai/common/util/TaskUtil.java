@@ -25,7 +25,6 @@ public class TaskUtil<T>
 
     private static final Logger LOG = LoggerFactory.getLogger( TaskUtil.class );
 
-
     private final Set<Task<T>> tasks = Sets.newHashSet();
 
 
@@ -51,22 +50,6 @@ public class TaskUtil<T>
         return new TaskResults<>( results );
     }
 
-
-    /**
-     * Executes tasks in parallel. Fails fast if any execution failed
-     *
-     * Returns results of tasks completed so far
-     */
-    public TaskResults<T> executeParallelFailFast()
-    {
-        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No task found for execution" );
-
-        Set<TaskResult<T>> results = executeParallel( tasks, true );
-
-        tasks.clear();
-
-        return new TaskResults<>( results );
-    }
 
 
     protected Set<TaskResult<T>> executeParallel( Set<Task<T>> tasks, boolean failFast )
@@ -141,9 +124,21 @@ public class TaskUtil<T>
     }
 
 
+    public static <T> TaskResult<T> execute( Task<T> task )
+    {
+        TaskUtil<T> taskUtil = new TaskUtil<>();
+
+        taskUtil.addTask( task );
+
+        TaskUtil.TaskResults<T> taskResults = taskUtil.executeParallel();
+
+        return taskResults.getTaskResults().iterator().next();
+    }
+
+
     public static abstract class Task<T> implements Callable<T>
     {
-        //reserved for future
+        // Reserved for future
     }
 
 
@@ -247,7 +242,7 @@ public class TaskUtil<T>
         }
         catch ( InterruptedException e )
         {
-            //ignore
+            LOG.error( e.getMessage() );
         }
     }
 }

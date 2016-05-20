@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.bouncycastle.openpgp.PGPException;
 
@@ -30,7 +29,7 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.util.AsyncUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
@@ -114,15 +113,16 @@ public class BuildContainerStateHandler extends StateHandler
             templates.add( node.getTemplateName() );
         }
 
-        PrepareTemplatesResponse prepareTemplatesResponse = AsyncUtil.execute( new Callable<PrepareTemplatesResponse>()
+        TaskUtil.TaskResult<PrepareTemplatesResponse> taskResult = TaskUtil.execute( new TaskUtil.Task<PrepareTemplatesResponse>()
         {
+            @Override
             public PrepareTemplatesResponse call() throws Exception
             {
                 return ctx.localPeer.prepareTemplates( new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
             }
         } );
 
-        if ( !prepareTemplatesResponse.hasSucceeded() )
+        if ( !taskResult.getResult().hasSucceeded() )
         {
             log.error( "Error to prepare templates" );
         }

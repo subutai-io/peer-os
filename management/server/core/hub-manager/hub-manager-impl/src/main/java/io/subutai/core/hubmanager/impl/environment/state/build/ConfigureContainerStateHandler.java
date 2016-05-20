@@ -2,14 +2,13 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.security.SshKeys;
-import io.subutai.common.util.AsyncUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -65,8 +64,9 @@ public class ConfigureContainerStateHandler extends StateHandler
 
         final EnvironmentId envId = new EnvironmentId( envDto.getId() );
 
-        AsyncUtil.execute( new Callable<Void>()
+        TaskUtil.execute( new TaskUtil.Task<Void>()
         {
+            @Override
             public Void call() throws Exception
             {
                 ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
@@ -99,8 +99,9 @@ public class ConfigureContainerStateHandler extends StateHandler
 
         final EnvironmentId envId = new EnvironmentId( envDto.getId() );
 
-        AsyncUtil.execute( new Callable<Void>()
+        TaskUtil.execute( new TaskUtil.Task<Void>()
         {
+            @Override
             public Void call() throws Exception
             {
                 ctx.localPeer.configureHostsInEnvironment( envId, new HostAddresses( hostAddresses ) );

@@ -3,12 +3,11 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.util.AsyncUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
@@ -52,7 +51,7 @@ public class SetupTunnelStateHandler extends StateHandler
 
         peerDto.setSetupTunnel( false );
 
-        AsyncUtil.execute( new Callable<Void>()
+        TaskUtil.execute( new TaskUtil.Task<Void>()
         {
             @Override
             public Void call() throws Exception
