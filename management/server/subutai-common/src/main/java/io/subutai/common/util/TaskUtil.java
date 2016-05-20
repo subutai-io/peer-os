@@ -51,6 +51,22 @@ public class TaskUtil<T>
     }
 
 
+    /**
+     * Executes tasks in parallel. Fails fast if any execution failed
+     *
+     * Returns results of tasks completed so far
+     */
+    public TaskResults<T> executeParallelFailFast()
+    {
+        Preconditions.checkArgument( !CollectionUtil.isCollectionEmpty( tasks ), "No task found for execution" );
+
+        Set<TaskResult<T>> results = executeParallel( tasks, true );
+
+        tasks.clear();
+
+        return new TaskResults<>( results );
+    }
+
 
     protected Set<TaskResult<T>> executeParallel( Set<Task<T>> tasks, boolean failFast )
     {
@@ -242,7 +258,7 @@ public class TaskUtil<T>
         }
         catch ( InterruptedException e )
         {
-            LOG.error( e.getMessage() );
+            LOG.warn( e.getMessage() );
         }
     }
 }
