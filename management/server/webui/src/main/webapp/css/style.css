@@ -3863,3 +3863,7 @@ a[disabled] {
 	font-size: 14px;
 }
 
+.b-word-break-all {
+	word-break: break-all;
+}
+
