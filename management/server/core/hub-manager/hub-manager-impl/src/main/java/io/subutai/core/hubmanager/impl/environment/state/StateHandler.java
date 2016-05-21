@@ -37,7 +37,7 @@ public abstract class StateHandler
 
     public void handle( final EnvironmentPeerDto peerDto )
     {
-        String token = StringUtils.defaultIfEmpty( peerDto.getEnvOwnerToken(), peerDto.getPeerToken() );
+        String token = getToken( peerDto );
 
         Session session = ctx.identityManager.login( "token", token );
 
@@ -54,11 +54,22 @@ public abstract class StateHandler
     }
 
 
+    /**
+     * Most of operations are performed with a Hub user account, i.e. using its token. But for some operations a peer token may be required.
+     * For example, removing a user account after an environment destroy.
+     */
+    protected String getToken( EnvironmentPeerDto peerDto )
+    {
+        return StringUtils.defaultIfEmpty( peerDto.getEnvOwnerToken(), peerDto.getPeerToken() );
+    }
+
+
     private void runAs( EnvironmentPeerDto peerDto )
     {
         try
         {
             Object result = doHandle( peerDto );
+//            result = doHandle( peerDto );
 
             post( peerDto, result );
         }

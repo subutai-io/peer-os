@@ -32,6 +32,16 @@ public class DeletePeerStateHandler extends StateHandler
     }
 
 
+    /**
+     * A peer token is needed to remove a Hub user.
+     */
+    @Override
+    protected String getToken( EnvironmentPeerDto peerDto )
+    {
+        return peerDto.getPeerToken();
+    }
+
+
     @Override
     protected void post( EnvironmentPeerDto peerDto, Object body )
     {
