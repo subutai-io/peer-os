@@ -106,7 +106,7 @@ public class EnvironmentUserHelper
 
         if ( user != null )
         {
-            log.info( "User already created: username={}, email={}", user.getUserName(), user.getEmail() );
+            log.info( "User already exists: username={}, email={}", user.getUserName(), user.getEmail() );
 
             return user;
         }

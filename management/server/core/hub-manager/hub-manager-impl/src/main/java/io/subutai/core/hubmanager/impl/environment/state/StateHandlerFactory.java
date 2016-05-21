@@ -1,8 +1,6 @@
 package io.subutai.core.hubmanager.impl.environment.state;
 
 
-import com.google.common.base.Preconditions;
-
 import io.subutai.core.hubmanager.impl.environment.state.build.BuildContainerStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ConfigureContainerStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ExchangeInfoStateHandler;
@@ -41,6 +39,8 @@ public class StateHandlerFactory
 
     private final StateHandler domainStateHandler;
 
+    private final StateHandler nullStateHandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -59,12 +59,14 @@ public class StateHandlerFactory
         containerStateHandler = new ContainerStateHandler( ctx );
 
         domainStateHandler = new DomainStateHandler( ctx );
+
+        nullStateHandler = new NotFoundStateHandler( ctx );
     }
 
 
     public StateHandler getHandler( PeerState state )
     {
-        StateHandler handler = null;
+        StateHandler handler = nullStateHandler;
 
         if ( state == EXCHANGE_INFO )
         {
@@ -86,10 +88,6 @@ public class StateHandlerFactory
         {
             handler = configureContainerStateHandler;
         }
-        else if ( state == DELETE_PEER )
-        {
-            handler = deletePeerStateHandler;
-        }
         else if ( state == CHANGE_CONTAINER_STATE )
         {
             handler = containerStateHandler;
@@ -98,8 +96,10 @@ public class StateHandlerFactory
         {
             handler = domainStateHandler;
         }
-
-        Preconditions.checkState( handler != null, "No proper state handler found for environment state context" );
+        else if ( state == DELETE_PEER )
+        {
+            handler = deletePeerStateHandler;
+        }
 
         return handler;
     }

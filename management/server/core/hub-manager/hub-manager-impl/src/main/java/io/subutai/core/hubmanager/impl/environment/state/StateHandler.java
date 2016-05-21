@@ -69,7 +69,6 @@ public abstract class StateHandler
         try
         {
             Object result = doHandle( peerDto );
-//            result = doHandle( peerDto );
 
             post( peerDto, result );
         }
