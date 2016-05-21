@@ -209,8 +209,7 @@ public class HubManagerImpl implements HubManager
 
     private void initHeartbeatProcessor()
     {
-        EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
-                environmentManager );
+        EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( identityManager, configDataService, environmentManager, restClient );
 
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 

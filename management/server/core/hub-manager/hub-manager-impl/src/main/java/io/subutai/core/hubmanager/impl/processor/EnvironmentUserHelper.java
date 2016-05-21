@@ -1,38 +1,26 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
-import java.io.IOException;
-
-import javax.ws.rs.core.Response;
-
-import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.UserType;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
-import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.hubmanager.impl.http.HubRestClient;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
-import io.subutai.hub.share.json.JsonUtil;
 
 
-// TODO: Replace WebClient with HubRestClient.
 public class EnvironmentUserHelper
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
-
-    private final ConfigManager configManager;
 
     private final IdentityManager identityManager;
 
@@ -40,17 +28,19 @@ public class EnvironmentUserHelper
 
     private final EnvironmentManager environmentManager;
 
+    private final HubRestClient restClient;
 
-    public EnvironmentUserHelper( ConfigManager configManager, IdentityManager identityManager,
-                                  ConfigDataService configDataService, EnvironmentManager environmentManager )
+
+    public EnvironmentUserHelper( IdentityManager identityManager, ConfigDataService configDataService, EnvironmentManager environmentManager,
+                                  HubRestClient restClient )
     {
-        this.configManager = configManager;
-
         this.identityManager = identityManager;
 
         this.configDataService = configDataService;
 
         this.environmentManager = environmentManager;
+
+        this.restClient = restClient;
     }
 
 
@@ -65,8 +55,7 @@ public class EnvironmentUserHelper
             return;
         }
 
-        log.debug( "Deleting environment owner: id={}, name={}, email={}", user.getId(), user.getUserName(),
-                user.getEmail() );
+        log.debug( "Deleting environment owner: id={}, name={}, email={}", user.getId(), user.getUserName(), user.getEmail() );
 
         boolean hasLocalEnvironments = environmentManager.getEnvironmentsByOwnerId( user.getId() ).size() > 0;
 
@@ -92,24 +81,16 @@ public class EnvironmentUserHelper
 
     private boolean hasUserEnvironmentsForPeerOnHub( String userId )
     {
-        String urlFormat = "/rest/v1/adapter/users/%s/environments";
+        String path = String.format( "/rest/v1/adapter/users/%s/environments", userId );
 
-        String url = String.format( urlFormat, userId );
+        RestResult<String> restResult = restClient.get( path, String.class );
 
-        String json = null;
-
-        try
+        if ( !restResult.isSuccess() )
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( url, configManager.getHubIp() );
-
-            Response res = client.get();
-
-            json = handleResponse( res, String.class );
+            log.error( "Error to get user environments from Hub: " + restResult.getError() );
         }
-        catch ( Exception e )
-        {
-            log.error( "Error to get user environments from hub: ", e );
-        }
+
+        String json = restResult.getEntity();
 
         return json != null && json.contains( "id" );
     }
@@ -119,18 +100,26 @@ public class EnvironmentUserHelper
     {
         String envOwnerId = peerDto.getOwnerId();
 
-        Config config = configDataService.getHubConfig( configManager.getPeerId() );
+        Config config = configDataService.getHubConfig( peerDto.getPeerId() );
 
-        if ( envOwnerId.equals( config.getOwnerId() ) || getUserByHubId( envOwnerId ) != null )
+        User user = getUserByHubId( envOwnerId );
+
+        if ( user != null )
         {
-            log.debug( "No need to create new user for environment" );
+            log.info( "User already created: username={}, email={}", user.getUserName(), user.getEmail() );
+
+            return user;
+        }
+        else if ( envOwnerId.equals( config.getOwnerId() ) )
+        {
+            log.info( "No need to create a user: peer owner is environment owner. For example, admin." );
 
             return identityManager.getActiveUser();
         }
 
         UserDto userDto = getUserDataFromHub( envOwnerId );
 
-        return createNewUser( userDto );
+        return createUser( userDto );
     }
 
 
@@ -163,12 +152,13 @@ public class EnvironmentUserHelper
     }
 
 
-    private User createNewUser( UserDto userDto )
+    private User createUser( UserDto userDto )
     {
-        log.debug( "Creating new user: {}", userDto.getEmail() );
+        log.info( "Creating new user: {}", userDto.getEmail() );
 
         // Trick to get later the user id in Hub
         String email = userDto.getId() + "@hub.subut.ai";
+
         try
         {
             User user = identityManager.createUser( userDto.getFingerprint(), null, "[Hub] " + userDto.getName(), email,
@@ -178,13 +168,15 @@ public class EnvironmentUserHelper
             identityManager.assignUserRole( user, getRole( "Environment-Manager" ) );
             identityManager.assignUserRole( user, getRole( "Template-Management" ) );
 
-            log.debug( "User created successfully" );
+            log.info( "User created successfully" );
+
             return user;
         }
         catch ( Exception e )
         {
             log.error( "Error to create user: ", e );
         }
+
         return null;
     }
 
@@ -193,45 +185,13 @@ public class EnvironmentUserHelper
     {
         String path = "/rest/v1/users/" + userId;
 
-        UserDto userDto = null;
+        RestResult<UserDto> restResult = restClient.get( path, UserDto.class );
 
-        try
+        if ( !restResult.isSuccess() )
         {
-            WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
-
-            Response res = client.get();
-
-            userDto = handleResponse( res, UserDto.class );
-        }
-        catch ( Exception e )
-        {
-            log.error( "Error to get user data: ", e );
+            log.error( "Error to get user data from Hub: " + restResult.getError() );
         }
 
-        return userDto;
-    }
-
-
-    private <T> T handleResponse( Response response, Class<T> clazz ) throws IOException, PGPException
-    {
-        if ( response.getStatus() != HttpStatus.SC_OK && response.getStatus() != HttpStatus.SC_NO_CONTENT )
-        {
-            String content = response.readEntity( String.class );
-
-            log.error( "HTTP {}: {}", response.getStatus(), StringUtils.abbreviate( content, 250 ) );
-
-            return null;
-        }
-
-        if ( response.getStatus() == HttpStatus.SC_NO_CONTENT )
-        {
-            return null;
-        }
-
-        byte[] encryptedContent = configManager.readContent( response );
-
-        byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-
-        return JsonUtil.fromCbor( plainContent, clazz );
+        return restResult.getEntity();
     }
 }
