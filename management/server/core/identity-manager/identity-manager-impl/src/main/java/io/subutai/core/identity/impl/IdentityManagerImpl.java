@@ -27,7 +27,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
@@ -96,8 +95,6 @@ public class IdentityManagerImpl implements IdentityManager
     private DaoManager daoManager = null;
     private SecurityManager securityManager = null;
     private SessionManager sessionManager = null;
-    private boolean inited = false;
-
 
     /* *************************************************
      */
@@ -123,8 +120,6 @@ public class IdentityManagerImpl implements IdentityManager
         {
             LOGGER.error( "***** Error! Error creating users:" + e.toString(), e );
         }
-
-        inited = true;
     }
 
 
@@ -449,19 +444,24 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( user != null )
         {
-            UserToken uToken = identityDataService.getUserToken( user.getId() );
+            UserToken userToken = getUserToken( user.getId() );
 
-            if ( uToken == null )
+            if ( userToken == null )
             {
-                uToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
             }
 
-            token = uToken.getFullToken();
+            token = userToken.getFullToken();
         }
 
         return token;
     }
 
+
+    public UserToken getUserToken( long userId )
+    {
+        return identityDataService.getUserToken( userId );
+    }
 
 
     /* *************************************************
@@ -470,23 +470,11 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public String getSystemUserToken()
     {
-        String token = "";
-
         User user = identityDataService.getUserByUsername( SYSTEM_USERNAME );
 
-        if ( user != null )
-        {
-            UserToken uToken = identityDataService.getUserToken( user.getId() );
+        UserToken userToken = getUserToken( user.getId() );
 
-            if ( uToken == null )
-            {
-                uToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
-            }
-
-            token = uToken.getFullToken();
-        }
-
-        return token;
+        return userToken != null ? userToken.getFullToken() : null;
     }
 
 

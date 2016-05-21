@@ -57,6 +57,15 @@ public class ExchangeInfoStateHandler extends StateHandler
     {
         User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
 
+        UserToken userToken = ctx.identityManager.getUserToken( user.getId() );
+
+        if ( userToken != null )
+        {
+            log.info( "User token already exists" );
+
+            return userToken;
+        }
+
         Date validDate = DateUtils.addYears( new Date(), 3 );
 
         return ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
