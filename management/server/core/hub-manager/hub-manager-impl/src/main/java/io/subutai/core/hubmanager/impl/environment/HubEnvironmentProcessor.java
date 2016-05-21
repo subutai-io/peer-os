@@ -1,7 +1,11 @@
 package io.subutai.core.hubmanager.impl.environment;
 
 
+import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -12,6 +16,10 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public class HubEnvironmentProcessor implements StateLinkProcessor
 {
+    private static final HashSet<String> LINKS_IN_PROGRESS = new HashSet<>();
+
+    private final Logger log = LoggerFactory.getLogger( getClass() );
+
     private final Context ctx;
 
     private final StateHandlerFactory handlerFactory;
@@ -44,11 +52,26 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
     private void processStateLink( String link ) throws Exception
     {
-        EnvironmentPeerDto peerDto = ctx.restClient.getStrict( link, EnvironmentPeerDto.class );
+        if ( LINKS_IN_PROGRESS.contains( link ) )
+        {
+            log.info( "This link is in progress: {}", link );
+            return;
+        }
 
-        StateHandler handler = handlerFactory.getHandler( peerDto.getState() );
+        LINKS_IN_PROGRESS.add( link );
 
-        handler.handle( peerDto );
+        try
+        {
+            EnvironmentPeerDto peerDto = ctx.restClient.getStrict( link, EnvironmentPeerDto.class );
+
+            StateHandler handler = handlerFactory.getHandler( peerDto.getState() );
+
+            handler.handle( peerDto );
+        }
+        finally
+        {
+            LINKS_IN_PROGRESS.remove( link );
+        }
     }
 
 

@@ -88,7 +88,6 @@ public class VehsProcessor implements StateLinkProcessor
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
             EnvironmentPeerDto result = JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
 
-            log.debug( "EnvironmentPeerDto: " + result.toString() );
             return result;
         }
         catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
@@ -139,8 +138,6 @@ public class VehsProcessor implements StateLinkProcessor
             {
                 log.error( e.getMessage() );
             }
-
-            log.info( peerDto.toString() );
         }
     }
 

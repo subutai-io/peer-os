@@ -18,13 +18,15 @@ public class ContainerStateHandler extends StateHandler
 {
     public ContainerStateHandler( Context ctx )
     {
-        super( ctx );
+        super( ctx, "Container state" );
     }
 
 
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
+        logStart();
+
         EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
         EnvironmentNodesDto resultDto = null;
@@ -68,6 +70,8 @@ public class ContainerStateHandler extends StateHandler
                 break;
             }
         }
+
+        logEnd();
 
         return resultDto;
     }

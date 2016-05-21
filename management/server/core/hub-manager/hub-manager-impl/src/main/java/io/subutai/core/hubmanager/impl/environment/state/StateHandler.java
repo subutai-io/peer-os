@@ -22,10 +22,13 @@ public abstract class StateHandler
 
     protected final Context ctx;
 
+    private String description;
 
-    protected StateHandler( Context ctx )
+
+    protected StateHandler( Context ctx, String description )
     {
         this.ctx = ctx;
+        this.description = description;
     }
 
 
@@ -34,8 +37,6 @@ public abstract class StateHandler
 
     public void handle( final EnvironmentPeerDto peerDto )
     {
-        log.info( "envPeerDto.state: {}", peerDto.getState() );
-
         String token = StringUtils.defaultIfEmpty( peerDto.getEnvOwnerToken(), peerDto.getPeerToken() );
 
         Session session = ctx.identityManager.login( "token", token );
@@ -63,7 +64,7 @@ public abstract class StateHandler
         }
         catch ( Exception e )
         {
-            log.error( "Error to handle environment peer data: ", e );
+            log.error( "Failed to handle environment peer data: ", e );
 
             handleError( peerDto, e );
         }
@@ -78,7 +79,7 @@ public abstract class StateHandler
 
     protected void handleError( EnvironmentPeerDto peerDto, Exception e )
     {
-        peerDto.setError( e.getMessage() );
+        peerDto.setError( description + ". " + e.getMessage() );
 
         ctx.restClient.post( path( PATH, peerDto ), peerDto );
     }
@@ -88,5 +89,17 @@ public abstract class StateHandler
         return StringUtils.countMatches( format, "%s" ) == 1
             ? String.format( format, peerDto.getEnvironmentInfo().getId() )
             : String.format( format, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
+    }
+
+
+    protected void logStart()
+    {
+        log.info( "{} - START", description );
+    }
+
+
+    protected void logEnd()
+    {
+        log.info( "{} - END", description );
     }
 }

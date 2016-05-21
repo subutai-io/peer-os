@@ -8,10 +8,7 @@ import java.util.Set;
 
 import org.bouncycastle.openpgp.PGPException;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.collect.Sets;
-
+import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
@@ -19,7 +16,6 @@ import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
-import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
@@ -29,7 +25,6 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.task.CloneResponse;
-import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
@@ -38,7 +33,6 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
-// TODO refactor
 public class BuildContainerStateHandler extends StateHandler
 {
     private static final String PATH = "/rest/v1/environments/%s/containers";
@@ -48,20 +42,26 @@ public class BuildContainerStateHandler extends StateHandler
 
     public BuildContainerStateHandler( Context ctx )
     {
-        super( ctx );
+        super( ctx, "Building containers" );
     }
 
 
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
+        logStart();
+
         EnvironmentNodesDto nodesDto = ctx.restClient.getStrict( path( PATH, peerDto ), EnvironmentNodesDto.class );
 
         prepareTemplates( peerDto, nodesDto );
 
         setupPeerEnvironmentKey( peerDto );
 
-        return cloneContainers( peerDto, nodesDto );
+        Object result = cloneContainers( peerDto, nodesDto );
+
+        logEnd();
+
+        return result;
     }
 
 
@@ -70,8 +70,8 @@ public class BuildContainerStateHandler extends StateHandler
      */
     private void setupPeerEnvironmentKey( EnvironmentPeerDto peerDto ) throws PeerException, PGPException
     {
-        RelationLinkDto envLink = new RelationLinkDto( peerDto.getEnvironmentInfo().getId(),
-                Environment.class.getSimpleName(), PermissionObject.EnvironmentManagement.getName(), "" );
+        RelationLinkDto envLink = new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
+                PermissionObject.EnvironmentManagement.getName(), "" );
 
         ctx.localPeer.createPeerEnvironmentKeyPair( envLink );
     }
@@ -86,7 +86,7 @@ public class BuildContainerStateHandler extends StateHandler
 
     private void prepareTemplates( final EnvironmentPeerDto peerDto, EnvironmentNodesDto nodesDto ) throws Exception
     {
-        final Set<Node> nodes = new HashSet<>();
+        Set<Node> nodes = new HashSet<>();
 
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
@@ -99,7 +99,7 @@ public class BuildContainerStateHandler extends StateHandler
         }
 
         // <hostId, templates>
-        final Map<String, Set<String>> rhTemplates = new HashMap<>();
+        Map<String, Set<String>> rhTemplates = new HashMap<>();
 
         for ( Node node : nodes )
         {
@@ -113,19 +113,7 @@ public class BuildContainerStateHandler extends StateHandler
             templates.add( node.getTemplateName() );
         }
 
-        TaskUtil.TaskResult<PrepareTemplatesResponse> taskResult = TaskUtil.execute( new TaskUtil.Task<PrepareTemplatesResponse>()
-        {
-            @Override
-            public PrepareTemplatesResponse call() throws Exception
-            {
-                return ctx.localPeer.prepareTemplates( new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
-            }
-        } );
-
-        if ( !taskResult.getResult().hasSucceeded() )
-        {
-            log.error( "Error to prepare templates" );
-        }
+        ctx.localPeer.prepareTemplates( new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
     }
 
 
@@ -133,7 +121,7 @@ public class BuildContainerStateHandler extends StateHandler
     {
         String envId = peerDto.getEnvironmentInfo().getId();
 
-        CreateEnvironmentContainersRequest createRequest = new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
+        CreateEnvironmentContainersRequest createRequests = new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
 
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
@@ -142,10 +130,10 @@ public class BuildContainerStateHandler extends StateHandler
             CloneRequest cloneRequest = new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
                             nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
 
-            createRequest.addRequest( cloneRequest );
+            createRequests.addRequest( cloneRequest );
         }
 
-        CreateEnvironmentContainersResponse createResponse = ctx.localPeer.createEnvironmentContainers( createRequest );
+        CreateEnvironmentContainersResponse createResponse = ctx.localPeer.createEnvironmentContainers( createRequests );
 
         for ( CloneResponse cloneResponse : createResponse.getResponses() )
         {
@@ -153,13 +141,12 @@ public class BuildContainerStateHandler extends StateHandler
             {
                 if ( cloneResponse.getHostname().equals( nodeDto.getHostName() ) )
                 {
-                    Host host = ctx.localPeer.getContainerHostById( cloneResponse.getContainerId() );
-
-                    String sshKey = createSshKey( Sets.newHashSet( host ), envId );
-                    nodeDto.addSshKey( sshKey );
+                    nodeDto.addSshKey( createSshKey( cloneResponse.getContainerId() ) );
 
                     nodeDto.setContainerId( cloneResponse.getContainerId() );
+
                     nodeDto.setHostName( cloneResponse.getHostname() );
+
                     nodeDto.setState( ContainerStateDto.RUNNING );
                 }
             }
@@ -169,28 +156,23 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private String createSshKey( Set<Host> hosts, String environmentId )
+    private String createSshKey( String containerId ) throws Exception
     {
+        Host host = ctx.localPeer.getContainerHostById( containerId );
+
         RequestBuilder rb = new RequestBuilder( String.format( "rm -rf %1$s && " +
                         "mkdir -p %1$s && " +
                         "chmod 700 %1$s && " +
                         "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
                 Common.CONTAINER_SSH_FOLDER ) );
 
-        CommandUtil.HostCommandResults results = commandUtil.execute( rb, hosts, environmentId );
+        CommandResult result = commandUtil.execute( rb, host );
 
-        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        if ( !result.hasSucceeded() )
         {
-            if ( result.hasSucceeded() && StringUtils.isNotBlank( result.getCommandResult().getStdOut() ) )
-            {
-                return result.getCommandResult().getStdOut();
-            }
-            else
-            {
-                log.error( "Error to create SSH key" );
-            }
+            throw new Exception( "Failed to create SSH key: " + result.getStdErr() );
         }
 
-        return null;
+        return result.getStdOut();
     }
 }

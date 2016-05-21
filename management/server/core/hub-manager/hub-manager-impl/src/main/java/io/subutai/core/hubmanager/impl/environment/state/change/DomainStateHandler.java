@@ -18,7 +18,7 @@ public class DomainStateHandler extends StateHandler
 {
     public DomainStateHandler( Context ctx )
     {
-        super( ctx );
+        super( ctx, "Domain configuration" );
     }
 
 
@@ -28,6 +28,8 @@ public class DomainStateHandler extends StateHandler
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
+        logStart();
+
         EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
@@ -60,6 +62,8 @@ public class DomainStateHandler extends StateHandler
         {
             ctx.localPeer.removeVniDomain( env.getVni() );
         }
+
+        logEnd();
 
         return peerDto;
     }
