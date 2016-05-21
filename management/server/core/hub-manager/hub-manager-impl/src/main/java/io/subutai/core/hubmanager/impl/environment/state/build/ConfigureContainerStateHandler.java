@@ -8,7 +8,6 @@ import com.google.common.collect.Maps;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.security.SshKeys;
-import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
@@ -18,23 +17,26 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.SSHKeyDto;
 
 
-// todo refactor
 public class ConfigureContainerStateHandler extends StateHandler
 {
     public ConfigureContainerStateHandler( Context ctx )
     {
-        super( ctx );
+        super( ctx, "Containers configuration");
     }
 
 
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
+        logStart();
+
         EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
         peerDto = configureSsh( peerDto, envDto );
 
         configureHosts( envDto );
+
+        logEnd();
 
         return peerDto;
     }
@@ -49,7 +51,7 @@ public class ConfigureContainerStateHandler extends StateHandler
 
     public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws Exception
     {
-        final SshKeys sshKeys = new SshKeys();
+        SshKeys sshKeys = new SshKeys();
 
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
@@ -62,18 +64,7 @@ public class ConfigureContainerStateHandler extends StateHandler
             }
         }
 
-        final EnvironmentId envId = new EnvironmentId( envDto.getId() );
-
-        TaskUtil.execute( new TaskUtil.Task<Void>()
-        {
-            @Override
-            public Void call() throws Exception
-            {
-                ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
-
-                return null;
-            }
-        } );
+        ctx.localPeer.configureSshInEnvironment( new EnvironmentId( envDto.getId() ), sshKeys );
 
         for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )
         {
@@ -97,17 +88,6 @@ public class ConfigureContainerStateHandler extends StateHandler
             }
         }
 
-        final EnvironmentId envId = new EnvironmentId( envDto.getId() );
-
-        TaskUtil.execute( new TaskUtil.Task<Void>()
-        {
-            @Override
-            public Void call() throws Exception
-            {
-                ctx.localPeer.configureHostsInEnvironment( envId, new HostAddresses( hostAddresses ) );
-
-                return null;
-            }
-        } );
+        ctx.localPeer.configureHostsInEnvironment( new EnvironmentId( envDto.getId() ), new HostAddresses( hostAddresses ) );
     }
 }

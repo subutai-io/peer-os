@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 import io.subutai.common.network.NetworkResourceImpl;
 import io.subutai.common.protocol.P2PConfig;
-import io.subutai.common.util.TaskUtil;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
@@ -11,21 +10,26 @@ import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 
-
 public class ReserveNetworkStateHandler extends StateHandler
 {
     public ReserveNetworkStateHandler( Context ctx )
     {
-        super( ctx );
+        super( ctx, "Setting up networking" );
     }
 
 
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
+        logStart();
+
         reserveNetwork( peerDto );
 
-        return setupP2P( peerDto );
+        EnvironmentPeerDto resultDto = setupP2P( peerDto );
+
+        logEnd();
+
+        return resultDto;
     }
 
 
@@ -35,18 +39,9 @@ public class ReserveNetworkStateHandler extends StateHandler
 
         String subnetWithoutMask = env.getSubnetCidr().replace( "/24", "" );
 
-        final NetworkResourceImpl networkResource = new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), subnetWithoutMask );
+        NetworkResourceImpl networkResource = new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), subnetWithoutMask );
 
-        TaskUtil.execute( new TaskUtil.Task<Void>()
-        {
-            @Override
-            public Void call() throws Exception
-            {
-                ctx.localPeer.reserveNetworkResource( networkResource );
-
-                return null;
-            }
-        } );
+        ctx.localPeer.reserveNetworkResource( networkResource );
     }
 
 
@@ -54,23 +49,14 @@ public class ReserveNetworkStateHandler extends StateHandler
     {
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
-        final P2PConfig p2pConfig = new P2PConfig( peerDto.getPeerId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
+        P2PConfig p2pConfig = new P2PConfig( peerDto.getPeerId(), env.getId(), env.getP2pHash(), env.getP2pKey(), env.getP2pTTL() );
 
         for ( EnvironmentPeerRHDto rhDto : peerDto.getRhs() )
         {
             p2pConfig.addRhP2pIp( new RhP2PIpEntity( rhDto.getId(), rhDto.getP2pIp() ) );
         }
 
-        TaskUtil.execute( new TaskUtil.Task<Void>()
-        {
-            @Override
-            public Void call() throws Exception
-            {
-                ctx.localPeer.joinP2PSwarm( p2pConfig );
-
-                return null;
-            }
-        } );
+        ctx.localPeer.joinP2PSwarm( p2pConfig );
 
         return peerDto;
     }
