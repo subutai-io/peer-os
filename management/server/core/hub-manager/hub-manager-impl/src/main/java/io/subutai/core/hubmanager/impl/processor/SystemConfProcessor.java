@@ -40,7 +40,7 @@ public class SystemConfProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String link : stateLinks )
         {
@@ -58,6 +58,8 @@ public class SystemConfProcessor implements StateLinkProcessor
                 }
             }
         }
+
+        return false;
     }
 
 

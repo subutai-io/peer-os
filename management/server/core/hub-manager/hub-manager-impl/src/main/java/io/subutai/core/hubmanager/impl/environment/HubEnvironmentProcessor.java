@@ -38,15 +38,21 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( Set<String> stateLinks ) throws Exception
     {
+        boolean fastMode = false;
+
         for ( String link : stateLinks )
         {
             if ( link.matches( linkPattern ) )
             {
+                fastMode = true;
+
                 processStateLink( link );
             }
         }
+
+        return fastMode;
     }
 
 
@@ -55,6 +61,7 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
         if ( LINKS_IN_PROGRESS.contains( link ) )
         {
             log.info( "This link is in progress: {}", link );
+
             return;
         }
 
@@ -73,38 +80,4 @@ public class HubEnvironmentProcessor implements StateLinkProcessor
             LINKS_IN_PROGRESS.remove( link );
         }
     }
-
-
-/*    public void sendLogToHub( EnvironmentPeerDto peerDto, String msg, String exMsg, EnvironmentPeerLogDto.LogEvent logE,
-                              EnvironmentPeerLogDto.LogType logType, String contId )
-    {
-        try
-        {
-            String envPeerLogPath =
-                    String.format( "/rest/v1/environments/%s/peers/%s/log", peerDto.getEnvironmentInfo().getId(),
-                            peerManager.getLocalPeer().getId() );
-            WebClient client = configManager.getTrustedWebClientWithAuth( envPeerLogPath, configManager.getHubIp() );
-
-            EnvironmentPeerLogDto peerLogDto = new EnvironmentPeerLogDto( peerDto.getPeerId(), peerDto.getState(),
-                    peerDto.getEnvironmentInfo().getId(), logType );
-            peerLogDto.setMessage( msg );
-            peerLogDto.setExceptionMessage( exMsg );
-            peerLogDto.setLogEvent( logE );
-            peerLogDto.setContainerId( contId );
-            peerLogDto.setLogCode( null );
-
-            byte[] cborData = JsonUtil.toCbor( peerLogDto );
-            byte[] encryptedData = configManager.getMessenger().produce( cborData );
-            Response r = client.post( encryptedData );
-            if ( r.getStatus() == HttpStatus.SC_OK )
-            {
-                log.debug( "Environment peer log successfully sent to hub" );
-            }
-        }
-        catch ( Exception e )
-        {
-            log.error( "Could not sent environment peer log to hub.", e.getMessage() );
-        }
-    }*/
-
 }
