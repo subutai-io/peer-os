@@ -42,7 +42,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String stateLink : stateLinks )
         {
@@ -51,6 +51,8 @@ public class TunnelProcessor implements StateLinkProcessor
                 processLink( stateLink );
             }
         }
+
+        return false;
     }
 
 

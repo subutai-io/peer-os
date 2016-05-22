@@ -49,12 +49,13 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws Exception
+    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String link : stateLinks )
         {
             // PeerProduct Data GET /rest/v1/peers/{peer-id}/products/{product-id}
             Matcher productDataMatcher = PRODUCT_DATA_PATTERN.matcher( link );
+
             if ( productDataMatcher.matches() )
             {
                 PeerProductDataDto peerProductDataDTO = getPeerProductDto( link );
@@ -68,6 +69,8 @@ public class ProductProcessor implements StateLinkProcessor
                 }
             }
         }
+
+        return false;
     }
 
 

@@ -43,12 +43,14 @@ public class AppScaleProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks )
+    public boolean processStateLinks( final Set<String> stateLinks )
     {
         for ( String stateLink : stateLinks )
         {
             processLink( stateLink );
         }
+
+        return false;
     }
 
 

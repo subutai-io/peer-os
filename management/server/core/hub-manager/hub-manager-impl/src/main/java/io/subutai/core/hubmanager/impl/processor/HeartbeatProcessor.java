@@ -16,6 +16,12 @@ import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 public class HeartbeatProcessor implements Runnable
 {
+    private static final int FAST_MODE_MAX = 30; // For 5 min
+
+    private static final int BIG_INTERVAL_SECONDS = 60;
+
+    public static final int SMALL_INTERVAL_SECONDS = 10;
+
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final Set<StateLinkProcessor> processors = new HashSet<>();
@@ -25,6 +31,10 @@ public class HeartbeatProcessor implements Runnable
     private final HubRestClient restClient;
 
     private final String path;
+
+    private long lastSentMillis = 0;
+
+    private int fastModeLeft = 0;
 
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
@@ -49,7 +59,7 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            sendHeartbeat();
+            sendHeartbeat( false );
         }
         catch ( Exception e )
         {
@@ -58,12 +68,36 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    public void sendHeartbeat() throws Exception
+    /**
+     * @param force is true if a heartbeat is sent not by scheduler, e.g. manually or triggered from Hub.
+     *
+     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option
+     * is used to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor
+     * sets this option. See HubEnvironmentProcessor for example.
+     */
+    public void sendHeartbeat( boolean force ) throws Exception
     {
         if ( !hubManager.isRegistered() )
         {
             return;
         }
+
+        long interval = ( System.currentTimeMillis() - lastSentMillis ) / 1000;
+
+        if ( interval >= BIG_INTERVAL_SECONDS || force || fastModeLeft > 0 )
+        {
+            log.info( "Sending heartbeat: interval={}, force={}, fastModeLeft={}", interval, force, fastModeLeft );
+
+            doHeartbeat();
+        }
+    }
+
+
+    private void doHeartbeat() throws Exception
+    {
+        lastSentMillis = System.currentTimeMillis();
+
+        fastModeLeft--;
 
         try
         {
@@ -71,7 +105,7 @@ public class HeartbeatProcessor implements Runnable
 
             if ( !restResult.isSuccess() )
             {
-                throw new Exception( restResult.getError() );
+                throw new Exception( "Error to send heartbeat: " + restResult.getError() );
             }
 
             HeartbeatResponseDto dto = restResult.getEntity();
@@ -93,7 +127,12 @@ public class HeartbeatProcessor implements Runnable
         {
             try
             {
-                processor.processStateLinks( stateLinks );
+                boolean fastModeAsked = processor.processStateLinks( stateLinks );
+
+                if ( fastModeAsked )
+                {
+                    fastModeLeft = FAST_MODE_MAX;
+                }
             }
             catch ( Exception e )
             {

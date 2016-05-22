@@ -96,7 +96,7 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
-    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
+    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
 
     private SecurityManager securityManager;
 
@@ -233,7 +233,7 @@ public class HubManagerImpl implements HubManager
                 .addProcessor( vehsProccessor )
                 .addProcessor( appScaleProcessor );
 
-        heartbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
+        heartbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS, TimeUnit.SECONDS );
     }
 
 
@@ -249,7 +249,7 @@ public class HubManagerImpl implements HubManager
     public void sendHeartbeat() throws Exception
     {
         resourceHostDataProcessor.process();
-        heartbeatProcessor.sendHeartbeat();
+        heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
 
@@ -266,11 +266,11 @@ public class HubManagerImpl implements HubManager
             {
                 try
                 {
-                    heartbeatProcessor.sendHeartbeat();
+                    heartbeatProcessor.sendHeartbeat( true );
                 }
                 catch ( Exception e )
                 {
-                    e.printStackTrace();
+                    log.error( "Error on triggering heartbeat: ", e );
                 }
             }
         } );
