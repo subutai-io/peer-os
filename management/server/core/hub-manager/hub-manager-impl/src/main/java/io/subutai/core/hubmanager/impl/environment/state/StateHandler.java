@@ -74,7 +74,7 @@ public abstract class StateHandler
         }
         catch ( Exception e )
         {
-            log.error( "Failed to handle environment peer data: ", e );
+            log.error( "Failed to process environment state: ", e );
 
             handleError( peerDto, e );
         }

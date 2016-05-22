@@ -2,6 +2,7 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
 import io.subutai.common.network.NetworkResourceImpl;
+import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -35,11 +36,19 @@ public class ReserveNetworkStateHandler extends StateHandler
 
     private void reserveNetwork( EnvironmentPeerDto peerDto ) throws Exception
     {
-        EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
+        EnvironmentInfoDto envInfo = peerDto.getEnvironmentInfo();
 
-        String subnetWithoutMask = env.getSubnetCidr().replace( "/24", "" );
+        ReservedNetworkResources networkResources = ctx.localPeer.getReservedNetworkResources();
 
-        NetworkResourceImpl networkResource = new NetworkResourceImpl( env.getId(), env.getVni(), env.getP2pSubnet(), subnetWithoutMask );
+        if ( networkResources.findByEnvironmentId( envInfo.getId() ) != null )
+        {
+            // Already done. For example, duplicated request.
+            return;
+        }
+
+        String subnetWithoutMask = envInfo.getSubnetCidr().replace( "/24", "" );
+
+        NetworkResourceImpl networkResource = new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(), subnetWithoutMask );
 
         ctx.localPeer.reserveNetworkResource( networkResource );
     }
