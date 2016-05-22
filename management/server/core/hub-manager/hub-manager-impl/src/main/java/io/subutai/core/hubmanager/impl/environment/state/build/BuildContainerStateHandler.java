@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.bouncycastle.openpgp.PGPException;
 
+import org.apache.commons.lang3.EnumUtils;
+
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
@@ -27,6 +29,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
+import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
@@ -144,14 +147,22 @@ public class BuildContainerStateHandler extends StateHandler
 
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
-            ContainerHost ch = findContainerByHostname( envContainers, nodeDto.getHostName() );
-
-            String contId = ch.getContainerId().getId();
-
-            nodeDto.addSshKey( createSshKey( contId ) );
-
-            nodeDto.setContainerId( contId );
+            updateNodeDto( nodeDto, envContainers );
         }
+    }
+
+
+    private void updateNodeDto( EnvironmentNodeDto nodeDto, Set<ContainerHost> envContainers ) throws Exception
+    {
+        ContainerHost ch = findContainerByHostname( envContainers, nodeDto.getHostName() );
+
+        String contId = ch.getContainerId().getId();
+
+        nodeDto.addSshKey( createSshKey( contId ) );
+
+        nodeDto.setContainerId( contId );
+
+        nodeDto.setState( EnumUtils.getEnum( ContainerStateDto.class, ch.getState().toString() ) );
     }
 
 
