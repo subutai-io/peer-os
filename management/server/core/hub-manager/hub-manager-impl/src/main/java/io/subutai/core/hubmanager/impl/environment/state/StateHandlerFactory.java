@@ -39,7 +39,7 @@ public class StateHandlerFactory
 
     private final StateHandler domainStateHandler;
 
-    private final StateHandler nullStateHandler;
+    private final StateHandler notFoundStateHandler;
 
 
     public StateHandlerFactory( Context ctx )
@@ -60,13 +60,13 @@ public class StateHandlerFactory
 
         domainStateHandler = new DomainStateHandler( ctx );
 
-        nullStateHandler = new NotFoundStateHandler( ctx );
+        notFoundStateHandler = new NotFoundStateHandler( ctx );
     }
 
 
     public StateHandler getHandler( PeerState state )
     {
-        StateHandler handler = nullStateHandler;
+        StateHandler handler = notFoundStateHandler;
 
         if ( state == EXCHANGE_INFO )
         {
