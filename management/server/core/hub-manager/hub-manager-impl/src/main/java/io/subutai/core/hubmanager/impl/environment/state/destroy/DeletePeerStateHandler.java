@@ -33,7 +33,7 @@ public class DeletePeerStateHandler extends StateHandler
 
 
     /**
-     * A peer token is needed to remove a Hub user.
+     * Instead of environment owner token, a peer token is needed to remove a Hub user.
      */
     @Override
     protected String getToken( EnvironmentPeerDto peerDto )
