@@ -20,6 +20,12 @@ public interface RestService
     @GET
     @Path( "gettoken" )
     @Produces( MediaType.TEXT_PLAIN )
-    public String createTokenGET( @QueryParam( "username" ) String userName, @QueryParam( "password" ) String password );
+    public String createTokenGET( @QueryParam( "username" ) String userName,
+                                  @QueryParam( "password" ) String password );
 
+    @POST
+    @Path( "auth" )
+    @Produces( MediaType.TEXT_PLAIN )
+    public String authenticate( @FormParam( "type" ) int type, @FormParam( "username" ) String userName,
+                                @FormParam( "password" ) String password );
 }

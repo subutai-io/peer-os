@@ -1,6 +1,7 @@
 package io.subutai.core.identity.rest;
 
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Strings;
@@ -41,4 +42,20 @@ public class RestServiceImpl implements RestService
         return createTokenPOST( userName, password );
     }
 
+
+    @Override
+    public String authenticate( @FormParam( "type" ) final int type, @FormParam( "username" ) final String userName,
+                                @FormParam( "password" ) final String password )
+    {
+        String token = identityManager.getUserToken( userName, password );
+
+        if ( !Strings.isNullOrEmpty( token ) )
+        {
+            return token;
+        }
+        else
+        {
+            return "Access Denied to the resource!";
+        }
+    }
 }
