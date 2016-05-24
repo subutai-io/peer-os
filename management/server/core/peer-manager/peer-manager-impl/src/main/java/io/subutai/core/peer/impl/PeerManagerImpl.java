@@ -1200,7 +1200,7 @@ public class PeerManagerImpl implements PeerManager
         private boolean isIpValid( HostInterface hostInterface )
         {
             return hostInterface != null && !( hostInterface instanceof NullHostInterface ) && !Strings
-                    .isNullOrEmpty( hostInterface.getIp() );
+                    .isNullOrEmpty( hostInterface.getIp().trim() );
         }
 
 
@@ -1215,32 +1215,19 @@ public class PeerManagerImpl implements PeerManager
                             SystemSettings.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() )
                                     || !localPeer.getPeerInfo().isManualSetting() ) )
                     {
-                        //local peer ip is default, obtain external ip from MH and set it as local peer ip
-                        HostInterface externalInterface =
-                                localPeer.getManagementHost().getInterfaceByName( Common.BRIDGED_INTERFACE );
 
-                        if ( !isIpValid( externalInterface ) )
+                        HostInterface eth1 = localPeer.getManagementHost().getInterfaceByName( "eth1" );
+
+                        if ( isIpValid( eth1 ) )
                         {
-                            externalInterface =
-                                    localPeer.getManagementHost().getInterfaceByName( Common.HOST_ONLY_INTERFACE );
+                            HostInterface wan = localPeer.getManagementHost().getInterfaceByName( "wan" );
 
-                            if ( !isIpValid( externalInterface ) )
+                            if ( !wan.getIp().equals( localPeer.getPeerInfo().getIp() ) )
+
                             {
-                                externalInterface =
-                                        localPeer.getManagementHost().getInterfaceByName( Common.NAT_INTERFACE );
-
-                                if ( !isIpValid( externalInterface ) )
-                                {
-                                    return;
-                                }
+                                setPublicUrl( localPeerId, wan.getIp(), localPeer.getPeerInfo().getPublicSecurePort(),
+                                        false );
                             }
-                        }
-
-                        if ( !externalInterface.getIp().equals( localPeer.getPeerInfo().getIp() ) )
-
-                        {
-                            setPublicUrl( localPeerId, externalInterface.getIp(),
-                                    localPeer.getPeerInfo().getPublicSecurePort(), false );
                         }
                     }
                 }
