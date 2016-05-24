@@ -3,14 +3,13 @@ package template
 import (
 	"crypto/rand"
 	"fmt"
-	"net"
 	"os/exec"
-	"strings"
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/fs"
 	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/lib/net"
 	"github.com/subutai-io/base/agent/log"
 )
 
@@ -39,23 +38,13 @@ func MngInit() {
 	container.Start("management")
 	exec.Command("dhclient", "mng-net").Run()
 
-	for _, i := range []string{"eth2", "eth1", "wan"} {
-		if nic, err := net.InterfaceByName(i); err == nil {
-			mngIp, err := nic.Addrs()
-			log.Check(log.ErrorLevel, "Getting interface addresses", err)
-			if len(mngIp) > 0 {
-				ip := strings.Split(mngIp[0].String(), "/")
-				if len(ip) > 0 {
-					log.Info("******************************")
-					log.Info("Subutai Management UI will shortly be available at https://" + ip[0] + ":8443 (admin/secret)")
-					log.Info("SSH access to Management: ssh root@" + ip[0] + " -p2222 (ubuntu)")
-					log.Info("Don't forget to change default passwords")
-					log.Info("******************************")
-				}
-			}
-			break
-		}
-	}
+	ip := net.GetIp()
+
+	log.Info("******************************")
+	log.Info("Subutai Management UI will shortly be available at https://" + ip + ":8443 (admin/secret)")
+	log.Info("SSH access to Management: ssh root@" + ip + " -p2222 (ubuntu)")
+	log.Info("Don't forget to change default passwords")
+	log.Info("******************************")
 }
 
 func MngStop() {
