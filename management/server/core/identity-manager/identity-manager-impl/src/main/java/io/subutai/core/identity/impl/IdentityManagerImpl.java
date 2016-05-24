@@ -27,7 +27,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 
-import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
@@ -96,8 +95,6 @@ public class IdentityManagerImpl implements IdentityManager
     private DaoManager daoManager = null;
     private SecurityManager securityManager = null;
     private SessionManager sessionManager = null;
-    private boolean inited = false;
-
 
     /* *************************************************
      */
@@ -123,8 +120,6 @@ public class IdentityManagerImpl implements IdentityManager
         {
             LOGGER.error( "***** Error! Error creating users:" + e.toString(), e );
         }
-
-        inited = true;
     }
 
 
@@ -267,19 +262,21 @@ public class IdentityManagerImpl implements IdentityManager
 
 
 
+
+
     /* ***********************************
      *  Authenticate Internal User
      */
     @PermitAll
     @Override
-    public Subject loginSystemUser()
+    public Session loginSystemUser()
     {
         String sptoken  = getSystemUserToken();
         Session session = login( "token", sptoken );
 
         if( session != null )
         {
-            return session.getSubject();
+            return session;
         }
 
         else return null;
@@ -400,7 +397,7 @@ public class IdentityManagerImpl implements IdentityManager
                         .addMinutes( new Date( System.currentTimeMillis() ), sessionManager.getSessionTimeout() );
             }
 
-            userToken.setToken( token );
+            userToken.setTokenId( token );
             userToken.setHashAlgorithm( "HS256" );
             userToken.setIssuer( issuer );
             userToken.setSecret( secret );
@@ -447,19 +444,24 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( user != null )
         {
-            UserToken uToken = identityDataService.getUserToken( user.getId() );
+            UserToken userToken = getUserToken( user.getId() );
 
-            if ( uToken == null )
+            if ( userToken == null )
             {
-                uToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
             }
 
-            token = uToken.getFullToken();
+            token = userToken.getFullToken();
         }
 
         return token;
     }
 
+
+    public UserToken getUserToken( long userId )
+    {
+        return identityDataService.getUserToken( userId );
+    }
 
 
     /* *************************************************
@@ -468,23 +470,11 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public String getSystemUserToken()
     {
-        String token = "";
-
         User user = identityDataService.getUserByUsername( SYSTEM_USERNAME );
 
-        if ( user != null )
-        {
-            UserToken uToken = identityDataService.getUserToken( user.getId() );
+        UserToken userToken = getUserToken( user.getId() );
 
-            if ( uToken == null )
-            {
-                uToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
-            }
-
-            token = uToken.getFullToken();
-        }
-
-        return token;
+        return userToken != null ? userToken.getFullToken() : null;
     }
 
 
@@ -494,7 +484,6 @@ public class IdentityManagerImpl implements IdentityManager
     @PermitAll
     @Override
     public User authenticateByAuthSignature( final String fingerprint, final String signedAuth )
-            throws SecurityException
     {
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
@@ -503,7 +492,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            if ( !encryptionTool.verifyClearSign( signedAuth.getBytes(), publicKeyRing ) )
+            if ( !encryptionTool.verifyClearSign( signedAuth.trim().getBytes(), publicKeyRing ) )
             {
                 throw new SecurityException( "Signed Auth verification failed." );
             }
@@ -533,9 +522,10 @@ public class IdentityManagerImpl implements IdentityManager
                 throw new SecurityException( "User associated with signed document doesn't match" );
             }
         }
-        catch ( PGPException e )
+        catch ( Exception e )
         {
-            throw new SecurityException( e );
+            LOGGER.error(" **** Error authenticating user by signed Message ****" ,e);
+            return null;
         }
     }
 

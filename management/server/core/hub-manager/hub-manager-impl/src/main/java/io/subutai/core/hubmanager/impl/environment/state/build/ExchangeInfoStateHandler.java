@@ -2,7 +2,6 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -10,26 +9,31 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.util.AsyncUtil;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
-
 
 public class ExchangeInfoStateHandler extends StateHandler
 {
     public ExchangeInfoStateHandler( Context ctx )
     {
-        super( ctx );
+        super( ctx, "Preparing initial data" );
     }
 
 
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
+        logStart();
+
         EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
 
-        resultDto.setEnvOwnerToken( getEnvironmentOwnerToken( peerDto ) );
+        UserToken token = getEnvironmentOwnerToken( peerDto );
+
+        resultDto.setEnvOwnerToken( token.getFullToken() );
+        resultDto.setEnvOwnerTokenId( token.getTokenId() );
+
+        logEnd();
 
         return resultDto;
     }
@@ -37,14 +41,7 @@ public class ExchangeInfoStateHandler extends StateHandler
 
     public EnvironmentPeerDto getReservedNetworkResource( EnvironmentPeerDto peerDto ) throws Exception
     {
-        UsedNetworkResources usedNetworkResources = AsyncUtil.execute( new Callable<UsedNetworkResources>()
-        {
-            @Override
-            public UsedNetworkResources call() throws Exception
-            {
-                return ctx.localPeer.getUsedNetworkResources();
-            }
-        } );
+        UsedNetworkResources usedNetworkResources = ctx.localPeer.getUsedNetworkResources();
 
         peerDto.setVnis( usedNetworkResources.getVnis() );
 
@@ -56,15 +53,21 @@ public class ExchangeInfoStateHandler extends StateHandler
     }
 
 
-    private String getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
+    private UserToken getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
     {
         User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
 
+        UserToken userToken = ctx.identityManager.getUserToken( user.getId() );
+
+        if ( userToken != null )
+        {
+            log.info( "User token already exists" );
+
+            return userToken;
+        }
+
         Date validDate = DateUtils.addYears( new Date(), 3 );
 
-        UserToken token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
-
-        return token.getFullToken();
+        return ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
     }
-
 }

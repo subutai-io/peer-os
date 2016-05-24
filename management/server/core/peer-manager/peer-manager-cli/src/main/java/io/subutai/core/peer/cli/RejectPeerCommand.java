@@ -49,7 +49,7 @@ public class RejectPeerCommand extends SubutaiShellCommandSupport
 
         if ( request != null )
         {
-            peerManager.doRejectRequest( request );
+            peerManager.doRejectRequest( request, true );
         }
         else
         {

@@ -16,14 +16,19 @@ import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 public abstract class StateHandler
 {
+    private static final String PATH = "/rest/v1/environments/%s/peers/%s";
+
     protected final Logger log = LoggerFactory.getLogger( getClass() );
 
     protected final Context ctx;
 
+    private String description;
 
-    protected StateHandler( Context ctx )
+
+    protected StateHandler( Context ctx, String description )
     {
         this.ctx = ctx;
+        this.description = description;
     }
 
 
@@ -32,9 +37,7 @@ public abstract class StateHandler
 
     public void handle( final EnvironmentPeerDto peerDto )
     {
-        log.info( "envPeerDto.state: {}", peerDto.getState() );
-
-        String token = StringUtils.defaultIfEmpty( peerDto.getEnvOwnerToken(), peerDto.getPeerToken() );
+        String token = getToken( peerDto );
 
         Session session = ctx.identityManager.login( "token", token );
 
@@ -51,6 +54,16 @@ public abstract class StateHandler
     }
 
 
+    /**
+     * Most of operations are performed with a Hub user account, i.e. using its token. But for some operations a peer token may be required.
+     * For example, removing a user account after an environment destroy.
+     */
+    protected String getToken( EnvironmentPeerDto peerDto )
+    {
+        return StringUtils.defaultIfEmpty( peerDto.getEnvOwnerToken(), peerDto.getPeerToken() );
+    }
+
+
     private void runAs( EnvironmentPeerDto peerDto )
     {
         try
@@ -61,21 +74,42 @@ public abstract class StateHandler
         }
         catch ( Exception e )
         {
-            log.error( "Error to handle environment peer data: ", e );
+            log.error( "Failed to process environment state: ", e );
+
+            handleError( peerDto, e );
         }
     }
 
 
     protected void post( EnvironmentPeerDto peerDto, Object body )
     {
-        ctx.restClient.post( path( "/rest/v1/environments/%s/peers/%s", peerDto ), body );
+        ctx.restClient.post( path( PATH, peerDto ), body );
     }
 
+
+    protected void handleError( EnvironmentPeerDto peerDto, Exception e )
+    {
+        peerDto.setError( description + ". " + e.getMessage() );
+
+        ctx.restClient.post( path( PATH, peerDto ), peerDto );
+    }
 
     protected String path( String format, EnvironmentPeerDto peerDto )
     {
         return StringUtils.countMatches( format, "%s" ) == 1
             ? String.format( format, peerDto.getEnvironmentInfo().getId() )
             : String.format( format, peerDto.getEnvironmentInfo().getId(), peerDto.getPeerId() );
+    }
+
+
+    protected void logStart()
+    {
+        log.info( "{} - START", description );
+    }
+
+
+    protected void logEnd()
+    {
+        log.info( "{} - END", description );
     }
 }

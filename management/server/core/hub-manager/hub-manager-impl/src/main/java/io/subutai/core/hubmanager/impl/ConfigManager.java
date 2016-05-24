@@ -224,7 +224,7 @@ public class ConfigManager
         return bos.toByteArray();
     }
 
-    public String getPermanentToken()
+    public UserToken getPermanentToken()
     {
         Date newDate = new Date();
         java.util.Calendar cal = Calendar.getInstance();
@@ -233,9 +233,7 @@ public class ConfigManager
 
         User user = identityManager.getActiveUser();
 
-        UserToken token = identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
-
-        return token.getFullToken();
+        return identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
     }
 
 

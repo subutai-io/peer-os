@@ -51,7 +51,7 @@ public class HostInterfaceEntity implements HostInterface, Serializable
     public HostInterfaceEntity( final HostInterface s )
     {
         this.interfaceName = s.getName();
-        this.ip = s.getIp().replace( "addr:", "" );
+        this.ip = s.getIp();
     }
 
 

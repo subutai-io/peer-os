@@ -25,7 +25,6 @@ public class TaskUtil<T>
 
     private static final Logger LOG = LoggerFactory.getLogger( TaskUtil.class );
 
-
     private final Set<Task<T>> tasks = Sets.newHashSet();
 
 
@@ -141,9 +140,21 @@ public class TaskUtil<T>
     }
 
 
+    public static <T> TaskResult<T> execute( Task<T> task )
+    {
+        TaskUtil<T> taskUtil = new TaskUtil<>();
+
+        taskUtil.addTask( task );
+
+        TaskUtil.TaskResults<T> taskResults = taskUtil.executeParallel();
+
+        return taskResults.getTaskResults().iterator().next();
+    }
+
+
     public static abstract class Task<T> implements Callable<T>
     {
-        //reserved for future
+        // Reserved for future
     }
 
 
@@ -247,7 +258,7 @@ public class TaskUtil<T>
         }
         catch ( InterruptedException e )
         {
-            //ignore
+            LOG.warn( e.getMessage() );
         }
     }
 }

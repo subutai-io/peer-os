@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.security.auth.Subject;
-
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -58,6 +56,8 @@ public interface IdentityManager
      */
     String getUserToken( String userName, String password );
 
+    UserToken getUserToken( long userId );
+
 
     /* *************************************************
      */
@@ -66,7 +66,7 @@ public interface IdentityManager
 
     /* *************************************************
     */
-    User authenticateByAuthSignature( String fingerprint, String signedAuth ) throws SecurityException;
+    User authenticateByAuthSignature( String fingerprint, String signedAuth );
 
 
     /* *************************************************
@@ -242,7 +242,7 @@ public interface IdentityManager
     /* ***********************************
      *  Authenticate Internal User
      */
-    Subject loginSystemUser();
+    Session loginSystemUser();
 
 
     /* *************************************************

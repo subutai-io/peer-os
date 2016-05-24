@@ -3,8 +3,12 @@ package io.subutai.core.hubmanager.impl;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,12 +18,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -30,21 +39,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.hubmanager.api.HubManager;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleManager;
 import io.subutai.core.hubmanager.impl.appscale.AppScaleProcessor;
 import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
-import io.subutai.core.hubmanager.impl.environment.HubEnvironmentManager;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
+import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
@@ -58,7 +67,6 @@ import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
-import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.dto.PeerDto;
@@ -88,7 +96,7 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
-    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 10 );
+    private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
 
     private SecurityManager securityManager;
 
@@ -108,8 +116,6 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
-    private NetworkManager networkManager;
-
     private HeartbeatProcessor heartbeatProcessor;
 
     private ResourceHostDataProcessor resourceHostDataProcessor;
@@ -119,6 +125,10 @@ public class HubManagerImpl implements HubManager
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
     private String checksum = "";
+
+    private HubRestClient restClient;
+
+    private LocalPeer localPeer;
 
 
     public HubManagerImpl( DaoManager daoManager )
@@ -149,11 +159,15 @@ public class HubManagerImpl implements HubManager
     {
         try
         {
+            localPeer = peerManager.getLocalPeer();
+
             configDataService = new ConfigDataServiceImpl( daoManager );
 
             configManager = new ConfigManager( securityManager, peerManager, configDataService, identityManager );
 
-            resourceHostDataProcessor = new ResourceHostDataProcessor( this, peerManager, configManager, monitor );
+            restClient = new HubRestClient( configManager );
+
+            resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
 
             ResourceHostMonitorProcessor resourceHostMonitorProcessor = new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
@@ -195,27 +209,23 @@ public class HubManagerImpl implements HubManager
 
     private void initHeartbeatProcessor()
     {
-        EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( configManager, identityManager, configDataService,
-                environmentManager );
-
-        HubEnvironmentManager hubEnvironmentManager = new HubEnvironmentManager( configManager, peerManager );
+        EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( identityManager, configDataService, environmentManager, restClient );
 
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
-        Context ctx = new Context( identityManager, environmentUserHelper, configManager, peerManager );
+        Context ctx = new Context( identityManager, environmentUserHelper, localPeer, restClient );
 
-        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( hubEnvironmentManager, ctx );
+        StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
         StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
 
         ProductProcessor productProcessor = new ProductProcessor( configManager );
 
-        StateLinkProcessor vehsProccessor = new VehsProcessor( hubEnvironmentManager, configManager, peerManager, commandExecutor,
-                environmentUserHelper );
+        StateLinkProcessor vehsProccessor = new VehsProcessor( configManager, peerManager );
 
         AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
-        heartbeatProcessor = new HeartbeatProcessor( this, configManager )
+        heartbeatProcessor = new HeartbeatProcessor( this, restClient, localPeer.getId() )
                 .addProcessor( tunnelProcessor )
                 .addProcessor( hubEnvironmentProcessor )
                 .addProcessor( systemConfProcessor )
@@ -223,7 +233,7 @@ public class HubManagerImpl implements HubManager
                 .addProcessor( vehsProccessor )
                 .addProcessor( appScaleProcessor );
 
-        heartbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, 60, TimeUnit.SECONDS );
+        heartbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS, TimeUnit.SECONDS );
     }
 
 
@@ -236,10 +246,10 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void sendHeartbeat() throws HubPluginException
+    public void sendHeartbeat() throws Exception
     {
         resourceHostDataProcessor.process();
-        heartbeatProcessor.sendHeartbeat();
+        heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
 
@@ -256,11 +266,11 @@ public class HubManagerImpl implements HubManager
             {
                 try
                 {
-                    heartbeatProcessor.sendHeartbeat();
+                    heartbeatProcessor.sendHeartbeat( true );
                 }
-                catch ( HubPluginException e )
+                catch ( Exception e )
                 {
-                    e.printStackTrace();
+                    log.error( "Error on triggering heartbeat: ", e );
                 }
             }
         } );
@@ -268,14 +278,14 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void sendResourceHostInfo() throws HubPluginException
+    public void sendResourceHostInfo() throws Exception
     {
         resourceHostDataProcessor.process();
     }
 
 
     @Override
-    public void registerPeer( String hupIp, String email, String password ) throws HubPluginException
+    public void registerPeer( String hupIp, String email, String password ) throws Exception
     {
         configManager.addHubConfig( hupIp );
 
@@ -320,7 +330,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void unregisterPeer() throws HubPluginException
+    public void unregisterPeer() throws Exception
     {
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, null );
 
@@ -329,7 +339,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public String getHubDns() throws HubPluginException
+    public String getHubDns() throws Exception
     {
         Config config = getConfigDataService().getHubConfig( configManager.getPeerId() );
 
@@ -345,7 +355,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public String getProducts() throws HubPluginException
+    public String getProducts() throws Exception
     {
         try
         {
@@ -372,24 +382,55 @@ public class HubManagerImpl implements HubManager
         catch ( Exception e )
         {
             e.printStackTrace();
-            throw new HubPluginException( "Could not retrieve product data", e );
+            throw new Exception( "Could not retrieve product data", e );
         }
     }
 
 
     @Override
-    public void installPlugin( String url, String name ) throws HubPluginException
+    public void installPlugin( String url, String name ) throws Exception
     {
         try
         {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+
+            // Activate the new trust manager
+            try {
+                SSLContext sc = SSLContext.getInstance("SSL" );
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory() );
+            } catch (Exception e) {
+            }
+
+            // And as before now you can use URL and URLConnection
+
+
             File file =
                     new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
             URL website = new URL( url );
-            FileUtils.copyURLToFile( website, file );
+            URLConnection connection = website.openConnection();
+            InputStream in = connection.getInputStream();
+            OutputStream out = new FileOutputStream( file );
+            IOUtils.copy (in, out);
+            in.close();
+            out.close();
+//            FileUtils.copyURLToFile( website, file );
         }
         catch ( IOException e )
         {
-            throw new HubPluginException( "Could not install plugin", e );
+            throw new Exception( "Could not install plugin", e );
         }
         log.debug( "Product installed successfully..." );
     }
@@ -441,7 +482,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public Map<String, String> getPeerInfo() throws HubPluginException
+    public Map<String, String> getPeerInfo() throws Exception
     {
         Map<String, String> result = new HashMap<>();
         try
@@ -464,7 +505,7 @@ public class HubManagerImpl implements HubManager
         }
         catch ( Exception e )
         {
-            throw new HubPluginException( "Could not retrieve Peer info", e );
+            throw new Exception( "Could not retrieve Peer info", e );
         }
         return result;
     }
@@ -536,12 +577,6 @@ public class HubManagerImpl implements HubManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
-    }
-
-
-    public void setNetworkManager( final NetworkManager networkManager )
-    {
-        this.networkManager = networkManager;
     }
 
 

@@ -1,18 +1,20 @@
 package io.subutai.core.hubmanager.impl.environment.state;
 
 
-import com.google.common.base.Preconditions;
-
 import io.subutai.core.hubmanager.impl.environment.state.build.BuildContainerStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ConfigureContainerStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ExchangeInfoStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.ReserveNetworkStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.build.SetupTunnelStateHandler;
+import io.subutai.core.hubmanager.impl.environment.state.change.ContainerStateHandler;
+import io.subutai.core.hubmanager.impl.environment.state.change.DomainStateHandler;
 import io.subutai.core.hubmanager.impl.environment.state.destroy.DeletePeerStateHandler;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState;
 
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.BUILD_CONTAINER;
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CHANGE_CONTAINER_STATE;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_CONTAINER;
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.CONFIGURE_DOMAIN;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.DELETE_PEER;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.EXCHANGE_INFO;
 import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.RESERVE_NETWORK;
@@ -33,6 +35,12 @@ public class StateHandlerFactory
 
     private final StateHandler deletePeerStateHandler;
 
+    private final StateHandler containerStateHandler;
+
+    private final StateHandler domainStateHandler;
+
+    private final StateHandler notFoundStateHandler;
+
 
     public StateHandlerFactory( Context ctx )
     {
@@ -47,12 +55,18 @@ public class StateHandlerFactory
         configureContainerStateHandler = new ConfigureContainerStateHandler( ctx );
 
         deletePeerStateHandler = new DeletePeerStateHandler( ctx );
+
+        containerStateHandler = new ContainerStateHandler( ctx );
+
+        domainStateHandler = new DomainStateHandler( ctx );
+
+        notFoundStateHandler = new NotFoundStateHandler( ctx );
     }
 
 
     public StateHandler getHandler( PeerState state )
     {
-        StateHandler handler = null;
+        StateHandler handler = notFoundStateHandler;
 
         if ( state == EXCHANGE_INFO )
         {
@@ -74,12 +88,18 @@ public class StateHandlerFactory
         {
             handler = configureContainerStateHandler;
         }
+        else if ( state == CHANGE_CONTAINER_STATE )
+        {
+            handler = containerStateHandler;
+        }
+        else if ( state == CONFIGURE_DOMAIN )
+        {
+            handler = domainStateHandler;
+        }
         else if ( state == DELETE_PEER )
         {
             handler = deletePeerStateHandler;
         }
-
-        Preconditions.checkState( handler != null, "No proper state handler found for environment state context" );
 
         return handler;
     }

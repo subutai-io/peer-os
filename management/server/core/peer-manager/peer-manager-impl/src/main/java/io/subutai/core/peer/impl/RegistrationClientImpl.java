@@ -16,6 +16,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.common.util.IPUtil;
 import io.subutai.core.peer.api.RegistrationClient;
 
 
@@ -209,4 +210,5 @@ public class RegistrationClientImpl implements RegistrationClient
             throw new PeerException( "Invalid URL." );
         }
     }
+
 }

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.rest.pojo.RegistrationPojo;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -40,7 +39,7 @@ public class RestServiceImpl implements RestService
 
             return Response.ok().build();
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
@@ -66,7 +65,7 @@ public class RestServiceImpl implements RestService
             hubManager.registerPeer( hubIp, email, password );
             return Response.ok().build();
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
@@ -83,7 +82,7 @@ public class RestServiceImpl implements RestService
             hubManager.sendResourceHostInfo();
             return Response.ok().build();
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
@@ -99,7 +98,7 @@ public class RestServiceImpl implements RestService
         {
             return Response.ok( hubManager.getHubDns() ).build();
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.BAD_REQUEST ).
@@ -115,7 +114,7 @@ public class RestServiceImpl implements RestService
         {
             hubManager.unregisterPeer();
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).

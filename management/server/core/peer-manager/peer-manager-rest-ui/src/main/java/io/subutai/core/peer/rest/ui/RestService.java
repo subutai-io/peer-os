@@ -19,7 +19,7 @@ public interface RestService
     @PUT
     @Path( "reject" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response rejectForRegistrationRequest( @FormParam( "peerId" ) String peerId );
+    Response rejectForRegistrationRequest( @FormParam( "peerId" ) String peerId, @FormParam( "force" ) Boolean force );
 
     @PUT
     @Path( "approve" )
@@ -30,12 +30,12 @@ public interface RestService
     @PUT
     @Path( "cancel" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response cancelForRegistrationRequest( @FormParam( "peerId" ) String peerId );
+    Response cancelForRegistrationRequest( @FormParam( "peerId" ) String peerId, @FormParam( "force" ) Boolean force );
 
     @PUT
     @Path( "unregister" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId );
+    Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId, @FormParam( "force" ) Boolean force );
 
 
     @GET
