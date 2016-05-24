@@ -161,40 +161,48 @@ func main() {
 			cli.StringFlag{Name: "createvnimap, m", Usage: "-m TUNNELPORTNAME VNI VLANID ENV_ID"},
 		},
 
-		Subcommands: []cli.Command{{
-			Name:  "tunnel",
-			Usage: "tunnels operation",
-			Flags: []cli.Flag{
-				cli.StringFlag{Name: "create", Usage: "create tunnel (tunnel -c)"},
-				cli.StringFlag{Name: "delete", Usage: "delete tunnel (tunnel -d)"},
-				cli.BoolFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
+		Subcommands: []cli.Command{
+			{
+				Name:  "tunnel",
+				Usage: "tunnels operation",
+				Flags: []cli.Flag{
+					cli.StringFlag{Name: "create", Usage: "create tunnel (tunnel -c)"},
+					cli.StringFlag{Name: "delete", Usage: "delete tunnel (tunnel -d)"},
+					cli.BoolFlag{Name: "list", Usage: "list of tunnels (tunnel -l)"},
 
-				cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
-				cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
-				cli.StringFlag{Name: "vni", Usage: "vni"},
-			},
-			Action: func(c *cli.Context) error {
-				lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
-				return nil
-			}}, {
+					cli.StringFlag{Name: "remoteip", Usage: "remote ip"},
+					cli.StringFlag{Name: "vlan", Usage: "tunnel vlan"},
+					cli.StringFlag{Name: "vni", Usage: "vni"},
+				},
+				Action: func(c *cli.Context) error {
+					lib.VxlanTunnel(c.String("create"), c.String("delete"), c.String("remoteip"), c.String("vlan"), c.String("vni"), c.Bool("list"))
+					return nil
+				}}, {
 
-			Name:  "p2p",
-			Usage: "p2p network operation",
-			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr)"},
-				cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
-				cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
-				cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
-				cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"},
-				cli.BoolFlag{Name: "v", Usage: "print p2p version (p2p -v)"}},
-			Action: func(c *cli.Context) error {
-				if c.Bool("v") {
-					lib.P2Pversion()
-				} else {
-					lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
-				}
-				return nil
-			}}},
+				Name:  "detect",
+				Usage: "detect resource host IP",
+				Action: func(c *cli.Context) error {
+					lib.DetectIp()
+					return nil
+				}}, {
+
+				Name:  "p2p",
+				Usage: "p2p network operation",
+				Flags: []cli.Flag{
+					cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr)"},
+					cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
+					cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
+					cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
+					cli.BoolFlag{Name: "p", Usage: "list of p2p participants (p2p -p hash)"},
+					cli.BoolFlag{Name: "v", Usage: "print p2p version (p2p -v)"}},
+				Action: func(c *cli.Context) error {
+					if c.Bool("v") {
+						lib.P2Pversion()
+					} else {
+						lib.P2P(c.Bool("c"), c.Bool("d"), c.Bool("u"), c.Bool("l"), c.Bool("p"), os.Args)
+					}
+					return nil
+				}}},
 
 		Action: func(c *cli.Context) error {
 			lib.LxcManagementNetwork(os.Args)
