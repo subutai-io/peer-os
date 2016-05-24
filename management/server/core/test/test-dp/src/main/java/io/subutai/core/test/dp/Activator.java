@@ -5,35 +5,64 @@
 package io.subutai.core.test.dp;
 
 
-import org.osgi.framework.BundleActivator;
+import java.io.FileOutputStream;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.hooks.service.EventListenerHook;
-import org.osgi.framework.hooks.service.FindHook;
 
 
 /**
  * @author slim ouertani
  */
-public class Activator implements BundleActivator
+public class Activator
 {
-
-    @Override
-    public void start( BundleContext context ) throws Exception
+    public void start()
     {
+
+        URL website = null;
         try
         {
-            LoggerHooks loggerHooks = new LoggerHooks( context );
-            context.registerService( new String[] { FindHook.class.getName(), EventListenerHook.class.getName() },
-                    loggerHooks, null );
+            website = new URL("http://bndtools.org/installation.html");
+
+            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+
+            ByteBuffer byteBuffer = ByteBuffer.allocate(512);
+            FileOutputStream fos = new FileOutputStream("information.html");
+            FileChannel fChannel = fos.getChannel();
+
+            int bytesRead = rbc.read(byteBuffer);
+
+            while(bytesRead > 0){
+
+                //limit is set to current position and position is set to zero
+                byteBuffer.flip();
+
+                while(byteBuffer.hasRemaining()){
+                    fChannel.write( byteBuffer );
+//                    char ch = (char) byteBuffer.get();
+//                    System.out.print(ch);
+                }
+
+//                fos.write( bytesRead );
+                byteBuffer.clear();
+                bytesRead = rbc.read(byteBuffer);
+            }
+
+            fChannel.close();
+//            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
         }
-        catch ( Exception ex )
-        {
-            // ignore
+        catch (Exception ex) {
+            ex.printStackTrace();
         }
+
+        //        WSClient customWSClient = new AhcWSClient(ahcBuilder.build(), materializer);
     }
 
 
-    @Override
     public void stop( BundleContext context ) throws Exception
     {
     }

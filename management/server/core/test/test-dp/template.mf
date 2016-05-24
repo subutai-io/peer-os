@@ -1,6 +1,0 @@
-Bundle-ManifestVersion: 2
-Bundle-SymbolicName: Logger.Service
-Bundle-Name: Logger.Service
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-Activator: io.subutai.core.test.dp.Activator
-DynamicImport-Package: *

@@ -1,4 +1,6 @@
 <blueprint default-activation="eager"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <!--*****************************************************************-->
@@ -16,5 +18,20 @@
   <!--</service>-->
 
   <!--*****************************************************************-->
+
+  <bean id="activator" class="io.subutai.core.test.dp.Activator" init-method="start"/>
+  <bean id="restService" class="io.subutai.core.test.dp.SampleRest"/>
+
+  <jaxrs:server address="/v1/test" id="testRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="restService" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
+  <cxf:bus id="cxfBusSecurityManager">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
 
 </blueprint>
