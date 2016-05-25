@@ -7,11 +7,11 @@
   <div class="b-workspace__content">
     <div class="b-workspace-content__row">
 
-      <!--<div ng-hide="settingsUpdatesCtrl.config.isUpdatesAvailable" >-->
-      <!--<p>Your system is already up-to-date</p>-->
-      <!--</div>-->
+      <div ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == false" >
+      <p>Your system is already up-to-date</p>
+      </div>
 
-      <!--<div ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable">-->
+      <div ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == true">
         <p>Updates available:</p>
 
         <br>
@@ -23,7 +23,7 @@
             style="margin-top: 15px">
           <i class="fa fa-refresh"></i>&#160;&#160;Update
         </button>
-      <!--</div>-->
+      </div>
 
 
     </div>
