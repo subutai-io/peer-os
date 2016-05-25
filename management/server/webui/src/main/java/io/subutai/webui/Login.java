@@ -34,6 +34,7 @@ public class Login extends HttpServlet
         String username = request.getParameter( "username" );
         String password = request.getParameter( "password" );
         String sptoken = request.getParameter( "sptoken" );
+        String newpassword = request.getParameter( "newpassword" );
         User user = null;
 
         try
@@ -90,13 +91,13 @@ public class Login extends HttpServlet
         catch ( IdentityExpiredException e )
         {
             request.setAttribute( "error", "Your credentials are expired  !!!" );
-            response.getWriter().write( "Error, Wrong Auth Credentials" );
-            response.setStatus( HttpServletResponse.SC_FORBIDDEN );
+            response.getWriter().write( "Error, Auth Credentials are expired" );
+            response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
         }
         catch ( SessionBlockedException e )
         {
             request.setAttribute( "error", "Account is blocked !!!" );
-            response.getWriter().write( "Error, Wrong Auth Credentials" );
+            response.getWriter().write( "Error, Account is blocked" );
             response.setStatus( HttpServletResponse.SC_FORBIDDEN );
         }
         catch ( InvalidLoginException e )
