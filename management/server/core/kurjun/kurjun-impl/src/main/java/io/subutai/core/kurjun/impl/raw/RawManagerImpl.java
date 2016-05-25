@@ -26,6 +26,7 @@ import ai.subut.kurjun.metadata.common.raw.RawMetadata;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
+import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.repo.LocalRawRepository;
 import ai.subut.kurjun.repo.RepositoryFactory;
@@ -261,7 +262,8 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public InputStream getFile( final String repository, final String md5 ) throws IOException
+    public InputStream getFile( final String repository, final String md5,
+                                Repository.PackageProgressListener progressListener  ) throws IOException
     {
         RawMetadata rawMetadata = new RawMetadata();
         rawMetadata.setMd5Sum( md5 );
@@ -281,7 +283,7 @@ public class RawManagerImpl implements RawManager
 
         rawInSync.put( md5, md5 );
 
-        InputStream inputStream = unifiedRepository.getPackageStream( rawMetadata );
+        InputStream inputStream = unifiedRepository.getPackageStream( rawMetadata, progressListener );
 
         rawInSync.remove( md5 );
 

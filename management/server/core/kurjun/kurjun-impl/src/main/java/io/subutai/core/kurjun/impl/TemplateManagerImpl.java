@@ -187,7 +187,8 @@ public class TemplateManagerImpl implements TemplateManager
 
 
     @Override
-    public InputStream getTemplateData( String repository, String md5, String templateOwner, boolean isKurjunClient )
+    public InputStream getTemplateData( String repository, String md5, String templateOwner, boolean isKurjunClient,
+                                        Repository.PackageProgressListener progressListener )
             throws IOException
     {
 
@@ -225,7 +226,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         try
         {
-            is = unifiedRepository.getPackageStream( m );
+            is = unifiedRepository.getPackageStream( m, progressListener );
         }
         catch ( Exception ex )
         {

@@ -43,6 +43,7 @@ import ai.subut.kurjun.model.metadata.Architecture;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
 import ai.subut.kurjun.model.repository.LocalRepository;
+import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.quota.DataUnit;
 import ai.subut.kurjun.quota.QuotaInfoStore;
@@ -241,7 +242,8 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public InputStream getPackageByFilename( String filename ) throws IllegalArgumentException
+    public InputStream getPackageByFilename( String filename, Repository.PackageProgressListener progressListener  )
+            throws IllegalArgumentException
     {
         SerializableMetadata meta = getPackageInfoByFilename( filename );
         while ( debsInSync.get( filename ) != null )
@@ -260,7 +262,7 @@ public class AptManagerImpl implements AptManager
         if ( meta != null )
         {
             debsInSync.remove( filename );
-            return unifiedRepository.getPackageStream( meta );
+            return unifiedRepository.getPackageStream( meta, progressListener );
         }
         else
         {
@@ -382,7 +384,7 @@ public class AptManagerImpl implements AptManager
 
 
     @Override
-    public InputStream getPackage( String md5 )
+    public InputStream getPackage( String md5, Repository.PackageProgressListener progressListener  )
     {
         if ( md5 == null )
         {
@@ -396,7 +398,7 @@ public class AptManagerImpl implements AptManager
         SerializableMetadata meta = unifiedRepository.getPackageInfo( m );
         if ( meta != null )
         {
-            return unifiedRepository.getPackageStream( meta );
+            return unifiedRepository.getPackageStream( meta, progressListener );
         }
         return null;
     }
