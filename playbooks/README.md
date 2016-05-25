@@ -35,7 +35,7 @@ mvn clean;
 ``` 
 ***for clean test project***
 ```
-mvn integration-tests; 
+mvn integration-test; 
 ```
 ***for run tests, which is inside directory tests_run***
 ```
