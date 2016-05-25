@@ -14,9 +14,13 @@ sudo apt-get libcv-dev
 sudo apt-get install libtesseract3 
 ```
 
-You are can run tests usign following script and parameters:
+At first you need go to playbooks directory
 
-``` run_tests_qa.sh [-m] [-M] [-l] [-L] [-s] [-r] [-h]```
+``` cd playbooks ```
+
+Then You can run tests usign following script and parameters:
+
+``` ./run_tests_qa.sh [-m] [-M] [-l] [-L] [-s] [-r] [-h]```
 
 Parameter       | Description 
 ----------------|----------------------
