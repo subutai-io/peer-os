@@ -31,14 +31,16 @@ Parameter       | Description
 Also you can start tests using maven commands:
 
 ``` 
-mvn clean;  ***for clean test project***
+mvn clean;  
 ``` 
+***for clean test project***
 ```
-mvn integration-tests; ***for run tests, which is inside directory tests_run***
+mvn integration-tests; 
 ```
+***for run tests, which is inside directory tests_run***
 ```
-mvn serenity:aggregate;  ***for create html with reports about running tests***
+mvn serenity:aggregate;  
 ```
-
+***for create html with reports about running tests***
 
 .... to be continue 
