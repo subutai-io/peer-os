@@ -86,7 +86,7 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
 			}
 			else {
-				postData += 'newpassword=' + vm.newPass;
+				postData += '&newpassword=' + vm.newPass;
 
 				loginSrv.login( postData ).success(function(data){
 					localStorage.setItem('currentUser', vm.name);

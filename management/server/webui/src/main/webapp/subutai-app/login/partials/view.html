@@ -70,8 +70,11 @@
 						</div>
 
 						<div class="b-login-form-btn">
-							<button type="submit" class="b-btn b-btn_green b-btn_full-width" id="subt-button__login" tabindex=3>
+							<button ng-hide="loginCtrl.passExpired" type="submit" class="b-btn b-btn_green b-btn_full-width" id="subt-button__login" tabindex=3>
 								Login
+							</button>
+							<button ng-show="loginCtrl.passExpired" type="submit" class="b-btn b-btn_green b-btn_full-width" tabindex=3>
+								Save and login
 							</button>
 						</div>
 					</form>
