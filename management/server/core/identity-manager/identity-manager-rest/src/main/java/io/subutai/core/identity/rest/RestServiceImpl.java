@@ -2,10 +2,7 @@ package io.subutai.core.identity.rest;
 
 
 import javax.ws.rs.FormParam;
-import javax.ws.rs.core.Response;
-
 import com.google.common.base.Strings;
-
 import io.subutai.core.identity.api.IdentityManager;
 
 
@@ -43,6 +40,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+
     @Override
     public String authenticate( @FormParam( "type" ) final int type, @FormParam( "username" ) final String userName,
                                 @FormParam( "password" ) final String password )
@@ -57,5 +55,12 @@ public class RestServiceImpl implements RestService
         {
             return "Access Denied to the resource!";
         }
+    }
+
+    @Override
+    public String getAuthID( @FormParam( "fingerprint" ) final String fingerprint,
+                             @FormParam( "signature" ) final String signature )
+    {
+        return null;
     }
 }

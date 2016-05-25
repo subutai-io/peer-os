@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.security.exception.IdentityExpiredException;
+import io.subutai.common.security.exception.InvalidLoginException;
+import io.subutai.common.security.exception.SessionBlockedException;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -81,10 +84,26 @@ public class Login extends HttpServlet
             }
             else
             {
-                request.setAttribute( "error", "Wrong Auth Credentials !!!" );
-                response.getWriter().write( "Error, Wrong Auth Credentials" );
-                response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                throw new InvalidLoginException();
             }
+        }
+        catch ( IdentityExpiredException e )
+        {
+            request.setAttribute( "error", "Your credentials are expired  !!!" );
+            response.getWriter().write( "Error, Wrong Auth Credentials" );
+            response.setStatus( HttpServletResponse.SC_FORBIDDEN );
+        }
+        catch ( SessionBlockedException e )
+        {
+            request.setAttribute( "error", "Account is blocked !!!" );
+            response.getWriter().write( "Error, Wrong Auth Credentials" );
+            response.setStatus( HttpServletResponse.SC_FORBIDDEN );
+        }
+        catch ( InvalidLoginException e )
+        {
+            request.setAttribute( "error", "Wrong Auth Credentials !!!" );
+            response.getWriter().write( "Error, Wrong Auth Credentials" );
+            response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
         }
         catch ( Exception e )
         {
