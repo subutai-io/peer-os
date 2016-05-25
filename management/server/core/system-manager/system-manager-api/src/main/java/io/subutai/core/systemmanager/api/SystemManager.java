@@ -36,4 +36,8 @@ public interface SystemManager
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 
     void sendSystemConfigToHub() throws ConfigurationException;
+
+    SystemInfo getManagementUpdates();
+
+    boolean updateManagement();
 }

@@ -92,4 +92,18 @@ public interface RestService
     @Path( "advanced_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getAdvancedSettings();
+
+
+    @GET
+    @Path( "management_updates" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getManagementUpdates();
+
+
+    @POST
+    @Path( "update_management" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response update();
+
+
 }
