@@ -4,7 +4,9 @@ Dependencies:
 
 Your system must has: ***Ubuntu 14*** and above, **Maven 3** and above, **Java 7/8**  
 Also need additional packages **OpenCV**
+
 Install next packages:
+
 ```
 sudo add-apt-repository ppa:gijzelaar/opencv2.4
 sudo apt-get update
