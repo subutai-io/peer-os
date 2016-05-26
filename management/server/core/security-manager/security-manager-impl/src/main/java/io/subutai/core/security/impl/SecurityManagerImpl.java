@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import com.google.common.base.Strings;
+
 import io.subutai.common.command.EncryptedRequestWrapper;
 import io.subutai.common.command.EncryptedResponseWrapper;
 import io.subutai.common.dao.DaoManager;
@@ -54,11 +56,11 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( Object provider )
+    public SecurityManagerImpl( Object provider ) throws ConfigurationException
     {
         keyData = new SecurityKeyData();
 
-        if ( SystemSettings.getPeerSecretKeyringPwd() == null )
+        if ( Strings.isNullOrEmpty(SystemSettings.getPeerSecretKeyringPwd()) )
         {
             try
             {
@@ -66,7 +68,8 @@ public class SecurityManagerImpl implements SecurityManager
             }
             catch ( ConfigurationException e )
             {
-                LOG.error( "Error in getting value from subutaisystem.cfg" );
+                LOG.error( " ***** Error in getting value from subutaisystem.cfg",e );
+                throw new ConfigurationException(e);
             }
         }
 
