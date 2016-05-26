@@ -54,6 +54,8 @@ mvn serenity:aggregate;
 After running tests you can find report in the ```target/site/serenity/``` directory.
 For it, you need open ```index.html``` in your browser.
 
+How it works?
+
 Examples:
 
 ***Observe List of All Playbooks***
