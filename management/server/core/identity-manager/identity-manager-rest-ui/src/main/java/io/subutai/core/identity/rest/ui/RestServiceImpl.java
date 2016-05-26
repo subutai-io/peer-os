@@ -111,6 +111,7 @@ public class RestServiceImpl implements RestService
 
             keyData.setFingerprint( PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint()));
             keyData.setKey( PGPEncryptionUtil.armorByteArrayToString( pubRing.getEncoded() ) );
+            keyData.setAuthId( user.getAuthId() );
 
             for (Iterator<String> iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
             {

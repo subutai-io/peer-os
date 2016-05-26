@@ -101,6 +101,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
         vm.activeUser = data;
 
         identitySrv.getPublicKeyData(vm.activeUser.id).success(function (data) {
+            console.log(data)
             vm.publicKeyInfo = data;
         });
 
