@@ -57,10 +57,11 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
             if ( raw != null )
             {
-                final String finalRepository = repository;
+                raw.setFingerprint( repository );
+                raw.setMd5Sum( md5 );
                 StreamingOutput sout = output -> {
                     final WritableByteChannel outChannel = Channels.newChannel(output);
-                    rawManager.getFile( finalRepository, md5, byteBuffer -> {
+                    rawManager.getFile( raw, byteBuffer -> {
                         try
                         {
                             while ( byteBuffer.hasRemaining() )
