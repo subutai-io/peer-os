@@ -92,7 +92,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private static final String SYSTEM_USERNAME = "internal";
-    private static final int  IDENTITY_LIFETIME =  3; //hours
+    private static final int  IDENTITY_LIFETIME =  10; //hours
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -1198,7 +1198,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setFullName( fullName );
             user.setType( type );
             user.setTrustLevel( trustLevel );
-            user.setAuthId( UUID.randomUUID().toString() );
+            user.setAuthId( userName );
             user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
 
             identityDataService.persistUser( user );
