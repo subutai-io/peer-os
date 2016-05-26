@@ -37,11 +37,19 @@ public class Login extends HttpServlet
         String newPassword = request.getParameter( "newpassword" );
         User user = null;
 
+
         try
         {
             IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
-            try {
+
+            if( !Strings.isNullOrEmpty( newPassword ))
+            {
+                identityManager.changeUserPassword( username, password, newPassword );
+            }
+
+            try
+            {
                 if ( !Strings.isNullOrEmpty( username ) )
                 {
                     if ( identityManager != null )
@@ -63,16 +71,11 @@ public class Login extends HttpServlet
                     response.getWriter().write( "Error, Please enter username or password" );
                     response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
                 }
+
+                authenticateUser( request, response, user, sptoken );
             }
             catch ( IdentityExpiredException e )
             {
-                if( !Strings.isNullOrEmpty( newPassword ))
-                {
-                    identityManager.changeUserPassword( username, password, newPassword );
-                    sptoken = identityManager.getUserToken( username, password );
-                    user = identityManager.authenticateByToken( sptoken );
-                }
-
                 request.setAttribute( "error", "Your credentials are expired  !!!" );
                 response.getWriter().write( "Auth Credentials are expired" );
                 response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
@@ -82,17 +85,6 @@ public class Login extends HttpServlet
                 request.setAttribute( "error", "Account is blocked !!!" );
                 response.getWriter().write( "Account is blocked" );
                 response.setStatus( HttpServletResponse.SC_FORBIDDEN );
-            }
-            catch ( InvalidLoginException e )
-            {
-                request.setAttribute( "error", "Wrong Auth Credentials !!!" );
-                response.getWriter().write( "Wrong Auth Credentials" );
-                response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
-            }
-
-            try
-            {
-                authenticateUser( request, response, user, sptoken );
             }
             catch ( InvalidLoginException e )
             {
@@ -112,27 +104,24 @@ public class Login extends HttpServlet
     private void authenticateUser( HttpServletRequest request, HttpServletResponse response, User user, String sptoken )
             throws InvalidLoginException
     {
-        if ( user != null )
-        {
-            request.getSession().setAttribute( "userSessionData", sptoken );
-            Cookie ctoken = new Cookie( "sptoken", sptoken );
-            //                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
-
-            logger.info( user.getFingerprint() );
-            logger.info( user.getEmail() );
-            logger.info( user.getFullName() );
-            logger.info( user.getSecurityKeyId() );
-            logger.info( user.getUserName() );
-            Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
-            //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
-
-            response.addCookie( ctoken );
-            response.addCookie( fingerprint );
-        }
-        else
+        if ( user == null )
         {
             throw new InvalidLoginException();
         }
+        request.getSession().setAttribute( "userSessionData", sptoken );
+        Cookie ctoken = new Cookie( "sptoken", sptoken );
+        //                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+
+        logger.info( user.getFingerprint() );
+        logger.info( user.getEmail() );
+        logger.info( user.getFullName() );
+        logger.info( user.getSecurityKeyId() );
+        logger.info( user.getUserName() );
+        Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+        //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+
+        response.addCookie( ctoken );
+        response.addCookie( fingerprint );
     }
 
     @Override
