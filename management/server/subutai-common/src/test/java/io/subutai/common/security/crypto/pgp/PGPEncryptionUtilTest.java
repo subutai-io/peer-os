@@ -36,7 +36,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
 //TODO this is for temporary period
-@Ignore
+
 public class PGPEncryptionUtilTest
 {
     private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtilTest.class );

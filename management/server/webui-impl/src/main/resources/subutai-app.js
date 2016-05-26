@@ -744,6 +744,28 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                 }]
             }
         })
+        .state('settings-updates', {
+            url: '/settings-updates',
+            templateUrl: 'subutai-app/settingsUpdates/partials/view.html',
+            data: {
+                bodyClass: '',
+                layout: 'default'
+            },
+            resolve: {
+                loadPlugin: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'subutai.settings-updates',
+                            files: [
+                                'subutai-app/settingsUpdates/settingsUpdates.js',
+                                'subutai-app/settingsUpdates/controller.js',
+                                'subutai-app/settingsUpdates/service.js'
+                            ]
+                        }
+                    ]);
+                }]
+            }
+        })
         .state('settings-advanced', {
             url: '/settings-advanced',
             templateUrl: 'subutai-app/settingsAdvanced/partials/view.html',
