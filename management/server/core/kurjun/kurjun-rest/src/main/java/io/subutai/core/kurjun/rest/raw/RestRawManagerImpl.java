@@ -3,11 +3,13 @@ package io.subutai.core.kurjun.rest.raw;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +57,30 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
 
             if ( raw != null )
             {
-                InputStream is = rawManager.getFile( repository, md5 );
+                raw.setFingerprint( repository );
+                raw.setMd5Sum( md5 );
+                StreamingOutput sout = output -> {
+                    final WritableByteChannel outChannel = Channels.newChannel(output);
+                    rawManager.getFile( raw, byteBuffer -> {
+                        try
+                        {
+                            while ( byteBuffer.hasRemaining() )
+                            {
+                                outChannel.write( byteBuffer );
+                            }
+                        }
+                        catch ( IOException e )
+                        {
+                            LOGGER.error("Error writing to channel");
+                        }
+                    });
+                };
 
-                if ( is != null )
-                {
-                    return Response.ok( is ).header( "Content-Disposition", "attachment; filename=" + raw.getName() )
-                                   .header( "Content-Type", "application/octet-stream" )
-                                   .header( "Content-Length", raw.getSize() ).build();
-                }
+                Response.ResponseBuilder responseBuilder = Response.ok( sout );
+                responseBuilder.header( "Content-Disposition", "attachment; filename=" + raw.getName() );
+                responseBuilder.header( "Content-Length", raw.getSize() );
+                responseBuilder.header( "Content-Type", "application/octet-stream" );
+                return responseBuilder.build();
             }
         }
         catch ( IllegalArgumentException ex )
@@ -70,12 +88,6 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
             LOGGER.error( "", ex );
 
             return badRequest( ex.getMessage() );
-        }
-        catch ( IOException ex )
-        {
-            String msg = "Failed to get file info";
-            LOGGER.error( msg, ex );
-            return Response.serverError().entity( msg ).build();
         }
         return packageNotFoundResponse();
     }

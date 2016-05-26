@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import ai.subut.kurjun.model.repository.Repository;
 import io.subutai.common.protocol.TemplateKurjun;
 
 
@@ -72,7 +73,7 @@ public interface TemplateManager extends QuotaManagedRepository
      *
      * @return input stream to read package data
      */
-    InputStream getTemplateData( String repository, String md5, String templateOwner, boolean isKurjunClient ) throws IOException;
+    InputStream getTemplateData( String repository, String md5, String templateOwner, boolean isKurjunClient, Repository.PackageProgressListener progressListener ) throws IOException;
 
 
     /**

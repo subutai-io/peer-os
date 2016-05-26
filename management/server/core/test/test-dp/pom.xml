@@ -12,69 +12,133 @@
   <artifactId>test-dp</artifactId>
   <name>Subutai Test Dynamic Proxies</name>
   <description>Sample test to intercept proxies</description>
-  <packaging>jar</packaging>
+  <packaging>bundle</packaging>
 
   <properties>
     <!-- Export package versions are maintained in packageinfo files -->
-    <bundle.export.pkg>javax.annotation.security</bundle.export.pkg>
-    <bundle.import.pkg>javax.annotation.security,*</bundle.import.pkg>
-    <bundle.private.pkg>io.subutai.core.blueprint.auth</bundle.private.pkg>
     <bundle.activator>io.subutai.core.test.dp.Activator</bundle.activator>
-
-    <!-- Not exporting any packages -->
-    <aries.skip.version.check>true</aries.skip.version.check>
   </properties>
 
-  <!--<dependencies>-->
+  <dependencies>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <version>2.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <!-- http://mvnrepository.com/artifact/com.typesafe.play/play-ws_2.11 -->
     <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>slf4j-api</artifactId>-->
+      <!--<groupId>com.typesafe.play</groupId>-->
+      <!--<artifactId>play-ws_2.11</artifactId>-->
+      <!--<version>2.5.3</version>-->
     <!--</dependency>-->
+
+    <!-- http://mvnrepository.com/artifact/io.netty/netty-transport -->
     <!--<dependency>-->
-      <!--<groupId>org.slf4j</groupId>-->
-      <!--<artifactId>slf4j-simple</artifactId>-->
+      <!--<groupId>io.netty</groupId>-->
+      <!--<artifactId>netty-transport</artifactId>-->
+      <!--<version>4.0.36.Final</version>-->
     <!--</dependency>-->
-  <!--</dependencies>-->
+
+    <!-- http://mvnrepository.com/artifact/org.asynchttpclient/async-http-client -->
+    <!--<dependency>-->
+      <!--<groupId>org.asynchttpclient</groupId>-->
+      <!--<artifactId>async-http-client</artifactId>-->
+      <!--<version>2.0.2</version>-->
+    <!--</dependency>-->
+
+    <!-- http://mvnrepository.com/artifact/io.netty/netty-buffer -->
+    <!--<dependency>-->
+      <!--<groupId>io.netty</groupId>-->
+      <!--<artifactId>netty-buffer</artifactId>-->
+      <!--<version>4.0.36.Final</version>-->
+    <!--</dependency>-->
+
+    <!-- http://mvnrepository.com/artifact/io.netty/netty-common -->
+    <!--<dependency>-->
+      <!--<groupId>io.netty</groupId>-->
+      <!--<artifactId>netty-common</artifactId>-->
+      <!--<version>4.0.36.Final</version>-->
+    <!--</dependency>-->
+
+
+  </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
         <configuration>
-          <source>8</source>
-          <target>8</target>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.core.test.dp</Bundle-SymbolicName>
+            <!--<Bundle-Activator>${bundle.activator}</Bundle-Activator>-->
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+            <Import-Package>*</Import-Package>
+          </instructions>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.springsource.bundlor</groupId>
-        <artifactId>com.springsource.bundlor.maven</artifactId>
-        <version>1.0.0.M6</version>
-        <executions>
-          <execution>
-            <id>bundlor</id>
-            <goals>
-              <goal>transform</goal>
-              <!--   <goal>bundlor</goal> -->
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
+      <!--<plugin>-->
+        <!--<artifactId>maven-dependency-plugin</artifactId>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<id>copy-play-dependency</id>-->
+            <!--<goals>-->
+              <!--<goal>copy-dependencies</goal>-->
+            <!--</goals>-->
+            <!--<configuration>-->
+              <!--<includeArtifactIds/>-->
+              <!--<excludeArtifactIds>aopalliance,-->
+                <!--build-link,-->
+                <!--commons-codec,-->
+                <!--commons-lang3,-->
+                <!--commons-logging,-->
+                <!--config,-->
+                <!--guava,-->
+                <!--guice,-->
+                <!--guice-assistedinject,-->
+                <!--httpclient,-->
+                <!--httpcore,-->
+                <!--jackson-annotations,-->
+                <!--jackson-ccore,-->
+                <!--jackson-databind,-->
+                <!--jackson-datatype-jdk8,-->
+                <!--jackson-datatype-jsr310,-->
+                <!--javassist,javax-inject,-->
+                <!--jcl-over-slf4j,-->
+                <!--joda-convert,-->
+                <!--joda-time,-->
+                <!--jta,-->
+                <!--jul-to-slf4j,-->
+                <!--org.osgi.core,-->
+                <!--play-datacommons_2.11,-->
+                <!--play-exceptions,-->
+                <!--play-functional_2.11,-->
+                <!--play-iteratees_2.11,-->
+                <!--play-json_2.11,-->
+                <!--play-netty-utils,-->
+                <!--play-streams_2.11,-->
+                <!--play_2.11,-->
+                <!--signpost-commonshttp4,-->
+                <!--signpost-core,-->
+                <!--twirl-api,-->
+                <!--xercesImpl,-->
+                <!--xml-apis-->
+              <!--</excludeArtifactIds>-->
+              <!--<outputDirectory>${project.build.directory}</outputDirectory>-->
+            <!--</configuration>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>com.springsource.repository.bundles.milestone</id>
-      <url>http://repository.springsource.com/maven/bundles/milestone</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>com.springsource.repository.bundles.milestone</id>
-      <name>SpringSource Enterprise Bundle Repository</name>
-      <url>http://repository.springsource.com/maven/bundles/milestone</url>
-    </pluginRepository>
-  </pluginRepositories>
 
 </project>
