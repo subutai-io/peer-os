@@ -214,6 +214,32 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @Override
+    public Response getManagementUpdates()
+    {
+        SystemInfo pojo = systemManager.getManagementUpdates();
+        String subutaiInfo = JsonUtil.GSON.toJson( pojo );
+
+        return Response.status( Response.Status.OK ).entity( subutaiInfo ).build();
+    }
+
+
+    @Override
+    public Response update()
+    {
+        boolean isSuccessful = systemManager.updateManagement();
+
+        if ( isSuccessful )
+        {
+            return Response.status( Response.Status.OK ).build();
+        }
+        else
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+    }
+
+
     public void setSystemManager( final SystemManager systemManager )
     {
         this.systemManager = systemManager;

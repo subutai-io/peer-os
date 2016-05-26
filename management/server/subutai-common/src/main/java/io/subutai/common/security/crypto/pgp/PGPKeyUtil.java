@@ -40,7 +40,6 @@ public class PGPKeyUtil
 
     private static final Logger LOGGER = LoggerFactory.getLogger( PGPKeyUtil.class );
 
-
     /**************************************************************************************
      *
      */
@@ -48,7 +47,6 @@ public class PGPKeyUtil
     {
         Security.addProvider( provider );
     }
-
 
     /**
      * ***********************************************************************************
@@ -371,6 +369,21 @@ public class PGPKeyUtil
 
 
         return pgpPub;
+    }
+
+
+    public static boolean isValidPublicKeyring( String publicKey )
+    {
+        try
+        {
+            readPublicKeyRing( new ByteArrayInputStream( publicKey.getBytes( StandardCharsets.UTF_8 ) ) );
+
+            return true;
+        }
+        catch ( Exception e )
+        {
+            return false;
+        }
     }
 
 
