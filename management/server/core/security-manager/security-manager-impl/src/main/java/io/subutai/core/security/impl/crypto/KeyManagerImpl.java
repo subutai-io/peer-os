@@ -729,10 +729,10 @@ public class KeyManagerImpl implements KeyManager
                 return PGPKeyUtil.readPublicKeyRing( keyData );
             }
         }
-        catch ( PGPException e )
+        catch ( Exception e )
         {
+            return null;
         }
-
         return null;
     }
 

@@ -85,7 +85,7 @@ public class RestServiceImpl implements RestService
         }
         catch(Exception e)
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
 
     }
@@ -124,7 +124,7 @@ public class RestServiceImpl implements RestService
         }
         catch(Exception e)
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
 
     }
@@ -152,7 +152,7 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
-            return Response.status( Response.Status.NOT_FOUND ).build();
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
 

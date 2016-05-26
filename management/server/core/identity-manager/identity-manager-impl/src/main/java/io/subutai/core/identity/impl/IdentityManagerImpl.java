@@ -92,7 +92,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private static final String SYSTEM_USERNAME = "internal";
-    private static final int  IDENTITY_LIFETIME =  10; //hours
+    private static final int  IDENTITY_LIFETIME =  4; //hours
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -463,6 +463,8 @@ public class IdentityManagerImpl implements IdentityManager
     }
 
 
+    /* *************************************************
+     */
     public UserToken getUserToken( long userId )
     {
         return identityDataService.getUserToken( userId );
@@ -564,7 +566,7 @@ public class IdentityManagerImpl implements IdentityManager
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
-        PGPPublicKeyRing publicKeyRing = keyManager.getPublicKeyRingByFingerprint( fingerprint );
+        PGPPublicKeyRing publicKeyRing = keyManager.getPublicKeyRingByFingerprint( fingerprint.toUpperCase() );
 
         try
         {
@@ -593,7 +595,7 @@ public class IdentityManagerImpl implements IdentityManager
         catch ( Exception e )
         {
             LOGGER.error( " **** Error authenticating user by signed Message ****", e );
-            throw new SystemSecurityException( e );
+            throw new SystemSecurityException( e.getMessage() );
         }
     }
 
