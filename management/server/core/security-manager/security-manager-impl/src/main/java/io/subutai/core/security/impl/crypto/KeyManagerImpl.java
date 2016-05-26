@@ -2,7 +2,6 @@ package io.subutai.core.security.impl.crypto;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -27,7 +26,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;

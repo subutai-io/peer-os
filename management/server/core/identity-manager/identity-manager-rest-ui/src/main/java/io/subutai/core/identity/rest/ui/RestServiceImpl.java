@@ -32,7 +32,6 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.rest.ui.entity.KeyDataDto;
 import io.subutai.core.identity.rest.ui.entity.PermissionDto;
-import io.subutai.core.identity.rest.ui.entity.UserTokenDto;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.model.SecurityKey;
 
