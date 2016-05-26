@@ -1,7 +1,6 @@
 package io.subutai.core.identity.rest;
 
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Strings;
