@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.annotation.security.PermitAll;
+
+import io.subutai.common.security.exception.SystemSecurityException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -56,6 +59,9 @@ public interface IdentityManager
      */
     String getUserToken( String userName, String password );
 
+
+    /* *************************************************
+     */
     UserToken getUserToken( long userId );
 
 
@@ -65,13 +71,23 @@ public interface IdentityManager
 
 
     /* *************************************************
-    */
+     */
+    @PermitAll
+    String updateUserAuthId( User user, String authId ) throws SystemSecurityException;
+
+    /* *************************************************
+         */
+    String getEncryptedUserAuthId( User user ) throws SystemSecurityException;
+
+
+    /* *************************************************
+     */
     User authenticateByAuthSignature( String fingerprint, String signedAuth );
 
 
     /* *************************************************
      */
-    User authenticateByToken( String token );
+    User authenticateByToken( String token )  throws SystemSecurityException;
 
 
     /* *************************************************
@@ -209,11 +225,21 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
+    boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws Exception;
+
+    /* *************************************************
+         */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception;
 
 
     /* *************************************************
      */
+    @PermitAll
+    boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws Exception;
+
+    /* *************************************************
+         */
     void updateUser( User user );
 
     /*

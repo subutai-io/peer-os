@@ -1,10 +1,16 @@
 package io.subutai.core.security.impl;
 
 
+import java.util.UUID;
+
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.commons.configuration.ConfigurationException;
+
+import com.google.common.base.Strings;
 
 import io.subutai.common.command.EncryptedRequestWrapper;
 import io.subutai.common.command.EncryptedResponseWrapper;
@@ -50,9 +56,23 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( Object provider )
+    public SecurityManagerImpl( Object provider ) throws ConfigurationException
     {
         keyData = new SecurityKeyData();
+
+        if ( Strings.isNullOrEmpty(SystemSettings.getPeerSecretKeyringPwd()) )
+        {
+            try
+            {
+                SystemSettings.setPeerSecretKeyringPwd( UUID.randomUUID().toString() );
+            }
+            catch ( ConfigurationException e )
+            {
+                LOG.error( " ***** Error in getting value from subutaisystem.cfg",e );
+                throw new ConfigurationException(e);
+            }
+        }
+
         keyData.setSecretKeyringPwd( SystemSettings.getPeerSecretKeyringPwd() );
         keyData.setJsonProvider( provider );
 
