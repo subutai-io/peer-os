@@ -5,7 +5,7 @@ Dependencies:
 Your system must has: ***Ubuntu 14*** and above, **Maven 3** and above, **Java 7/8**  
 Also need additional packages **OpenCV**
 
-Install next packages:
+Install next additional packages:
 
 ```
 sudo add-apt-repository ppa:gijzelaar/opencv2.4
@@ -22,11 +22,14 @@ Then You can run tests usign following script and parameters:
 
 ``` ./run_tests_qa.sh [-m] [-M] [-l] [-L] [-s] [-r] [-h]```
 
+You can easily combine all parameters in one comand!
+
 Parameter       | Description 
 ----------------|----------------------
--m              | Set Management Host First:  IP
--M              | Set Management Host Second: IP
+-m              | Set Management Host First:  IP, domain
+-M              | Set Management Host Second: IP, domain
 -l              | Observe List of All Playbooks
+-L              | Observe List Playbooks for current run
 -s              | Choice of Playbooks for run
                 | “playbook1.story, playbook2.story” ...  Start a few Playbooks
 -r              | Start acceptance tests
@@ -34,17 +37,58 @@ Parameter       | Description
 
 Also you can start tests using maven commands:
 
+***For clean test project***
 ``` 
 mvn clean;  
 ``` 
-***for clean test project***
+***For run tests, which is inside directory tests_run***
 ```
 mvn integration-test; 
 ```
-***for run tests, which is inside directory tests_run***
+
+***For create html with reports about running tests***
 ```
 mvn serenity:aggregate;  
 ```
-***for create html with reports about running tests***
 
-.... to be continue 
+Examples:
+
+***Observe List of All Playbooks***
+``` 
+./run_tests_qa.sh -l 
+
+AddRole.story
+CassandraTemplate.story
+ChangePassword.story
+ChooseTheSizeOfContainers.story
+CrossPeerEnviOnRemotePeer.story
+CrossPeerWithTwoHosts.story
+GrowContainer.story
+KurjunAddTemplate.story
+LocalEnvironment.story
+PeerRegistration.story
+PluginAppScale.story
+PluginGeneric.story
+SetDomainToContainer.story
+ShareEnvironment.story
+SmokeTest.story
+StopRemoveContainer.story
+TokensEnvironmentPgpKey.story
+TokensOwnPgpKey.story
+UserRegistration.story
+```
+***Choice of Playbooks for run***
+```
+./run_tests_qa.sh -s "AddRole.story, CassandraTemplate.story"
+```
+Set Management Hosts, First and Second:  IP, domain
+```
+./run_tests_qa.sh - m 192.168.0.119 -M domain.ddns.com
+```
+Start acceptance tests
+```
+./run_tests_qa.sh -r
+
+SERENITY 
+TEST STARTED ....
+```
