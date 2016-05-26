@@ -3,6 +3,7 @@ package io.subutai.core.kurjun.impl.raw;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -14,8 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.cxf.helpers.IOUtils;
 
 import com.google.inject.Injector;
 
@@ -40,6 +39,7 @@ import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.core.kurjun.api.Utils;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.impl.TemplateManagerImpl;
 import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
@@ -301,7 +301,8 @@ public class RawManagerImpl implements RawManager
     {
         InputStream inputStream = getFile( rawMetadata.getFingerprint(), rawMetadata.getMd5Sum(), progressListener );
         File tempFile = Files.createTempFile( null, null ).toFile();
-        IOUtils.transferTo(inputStream, tempFile);
+
+        Utils.fastCopy(inputStream, new FileOutputStream( tempFile ));
 
         put( tempFile, rawMetadata.getName(), rawMetadata.getFingerprint());
         return inputStream;

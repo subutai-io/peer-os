@@ -224,7 +224,7 @@ public class AptManagerImpl implements AptManager
                     .buildIndex( packagesProviderFactory.create( unifiedRepository, component, architecture ), os,
                             compressionType );
             InputStream is = new ByteArrayInputStream( os.toByteArray() );
-            upload( is );
+//            upload( is );
             return is;
         }
         catch ( IOException ex )
@@ -265,7 +265,7 @@ public class AptManagerImpl implements AptManager
         {
             debsInSync.remove( filename );
             InputStream is = unifiedRepository.getPackageStream( meta, progressListener );
-            upload( is );
+//            upload( is );
             return is;
         }
         else
@@ -403,7 +403,7 @@ public class AptManagerImpl implements AptManager
         if ( meta != null )
         {
             InputStream is = unifiedRepository.getPackageStream( meta, progressListener );
-            upload( is );
+//            upload( is );
             return is;
         }
         return null;
