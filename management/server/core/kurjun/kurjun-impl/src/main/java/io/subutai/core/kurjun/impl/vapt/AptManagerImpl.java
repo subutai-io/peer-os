@@ -223,7 +223,9 @@ public class AptManagerImpl implements AptManager
             packagesIndexBuilder
                     .buildIndex( packagesProviderFactory.create( unifiedRepository, component, architecture ), os,
                             compressionType );
-            return new ByteArrayInputStream( os.toByteArray() );
+            InputStream is = new ByteArrayInputStream( os.toByteArray() );
+            upload( is );
+            return is;
         }
         catch ( IOException ex )
         {
@@ -262,7 +264,9 @@ public class AptManagerImpl implements AptManager
         if ( meta != null )
         {
             debsInSync.remove( filename );
-            return unifiedRepository.getPackageStream( meta, progressListener );
+            InputStream is = unifiedRepository.getPackageStream( meta, progressListener );
+            upload( is );
+            return is;
         }
         else
         {
@@ -398,7 +402,9 @@ public class AptManagerImpl implements AptManager
         SerializableMetadata meta = unifiedRepository.getPackageInfo( m );
         if ( meta != null )
         {
-            return unifiedRepository.getPackageStream( meta, progressListener );
+            InputStream is = unifiedRepository.getPackageStream( meta, progressListener );
+            upload( is );
+            return is;
         }
         return null;
     }
