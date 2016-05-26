@@ -59,6 +59,9 @@ public interface IdentityManager
      */
     String getUserToken( String userName, String password );
 
+
+    /* *************************************************
+     */
     UserToken getUserToken( long userId );
 
 
@@ -68,7 +71,17 @@ public interface IdentityManager
 
 
     /* *************************************************
-    */
+     */
+    @PermitAll
+    String updateUserAuthId( User user, String authId ) throws SystemSecurityException;
+
+    /* *************************************************
+         */
+    String getEncryptedUserAuthId( User user ) throws SystemSecurityException;
+
+
+    /* *************************************************
+     */
     User authenticateByAuthSignature( String fingerprint, String signedAuth );
 
 

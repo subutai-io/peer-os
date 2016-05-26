@@ -82,7 +82,7 @@ import io.subutai.core.security.api.model.SecurityKey;
 
 
 /**
- *
+ * Overall Subutai Identity Management
  *
  */
 @PermitAll
@@ -92,7 +92,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private static final String SYSTEM_USERNAME = "internal";
-    private static final int  IDENTITY_LIFETIME =  4; //hours
+    private static final int  IDENTITY_LIFETIME =  3; //hours
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -144,17 +144,15 @@ public class IdentityManagerImpl implements IdentityManager
             Role role = null;
             Permission per = null;
 
-
             //***Create User ********************************************
-            User internal =
-                    createUser( SYSTEM_USERNAME, "secretSubutai", "System User", "internal@subutai.io", 1, 3, false,
-                            false );
+
+            User internal = createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", 1, 3, false, false );
             //User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
             User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, 3, true, true );
             //***********************************************************
 
             //***Create Token *******************************************
-            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 10 );
+            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 100 );
             createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
             //***********************************************************
 
@@ -489,6 +487,77 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
+    public String updateUserAuthId( User user , String authId ) throws SystemSecurityException
+    {
+        if(user != null)
+        {
+            if(Strings.isNullOrEmpty( authId ))
+                authId = UUID.randomUUID().toString();
+
+            if( authId.length() < 4 )
+            {
+                throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
+            }
+
+            if(user.getAuthId() .equals( authId ) )
+            {
+                throw new IllegalArgumentException( "NewPassword cannot be the same as old one." );
+            }
+
+
+            user.setAuthId( authId );
+            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            identityDataService.updateUser( user );
+
+            return authId;
+        }
+
+        return "";
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
+    public String getEncryptedUserAuthId( User user ) throws SystemSecurityException
+    {
+        try
+        {
+            if(user != null)
+            {
+                String authId = user.getAuthId();
+                PGPPublicKey pubKey = securityManager.getKeyManager().getPublicKey( user.getSecurityKeyId() );
+
+                if(pubKey != null)
+                {
+                    byte enc[] = securityManager.getEncryptionTool().encrypt( authId.getBytes(), pubKey, true );
+
+                    return new String( enc );
+                }
+                else
+                {
+                    throw new InvalidLoginException( "User Public Key not found." );
+                }
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found." );
+            }
+        }
+        catch(Exception e)
+        {
+            LOGGER.error( " **** Error creating encrypted userAuth message ****", e );
+        }
+
+        return "";
+    }
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    @Override
     public User authenticateByAuthSignature( final String fingerprint, final String signedAuth )
             throws SystemSecurityException
     {
@@ -505,34 +574,26 @@ public class IdentityManagerImpl implements IdentityManager
             }
 
             User user = getUserByFingerprint( fingerprint );
+
             if ( user == null )
             {
                 throw new InvalidLoginException( "User not found associated with fingerprint: " + fingerprint );
             }
 
-            String userToken = new String( encryptionTool.extractClearSignContent( signedAuth.getBytes() ) );
-            UserToken token = identityDataService.getUserToken( userToken );
+            String authId = new String( encryptionTool.extractClearSignContent( signedAuth.getBytes() ) );
 
-            Date now = new Date( System.currentTimeMillis() );
-            if ( now.compareTo( token.getValidDate() ) >= 0 )
+            if ( !user.isIdentityValid() || !user.getAuthId().equals( authId.trim()))
             {
-                throw new IdentityExpiredException( "Token lifetime expired" );
+                throw new IdentityExpiredException( "User Credentials are expired" );
             }
 
-            User tokenUser = identityDataService.getUser( token.getUserId() );
-            if ( tokenUser != null && tokenUser.equals( user ) )
-            {
-                return tokenUser;
-            }
-            else
-            {
-                throw new InvalidLoginException( "User associated with signed document doesn't match" );
-            }
+            return user;
+
         }
         catch ( Exception e )
         {
             LOGGER.error( " **** Error authenticating user by signed Message ****", e );
-            return null;
+            throw new SystemSecurityException( e );
         }
     }
 
@@ -956,6 +1017,8 @@ public class IdentityManagerImpl implements IdentityManager
             user.setEmail( email );
             user.setFullName( fullName );
             user.setType( type );
+            user.setAuthId( UUID.randomUUID().toString() );
+
         }
         catch ( NoSuchAlgorithmException e )
         {
@@ -1135,6 +1198,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setFullName( fullName );
             user.setType( type );
             user.setTrustLevel( trustLevel );
+            user.setAuthId( UUID.randomUUID().toString() );
             user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
 
             identityDataService.persistUser( user );
@@ -1266,6 +1330,12 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws Exception
     {
         String salt;
+
+        if(oldPassword.equals( newPassword ))
+        {
+            throw new IllegalArgumentException( "NewPassword cannot be the same as old one." );
+        }
+
         //******Cannot update Internal User *************
         if ( user.getType() == UserType.System.getId() )
         {
@@ -1287,7 +1357,8 @@ public class IdentityManagerImpl implements IdentityManager
             newPassword = SecurityUtil.generateSecurePassword( newPassword, salt );
             user.setSalt( salt );
             user.setPassword( newPassword );
-            user.setValidDate( DateUtils.addHours( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            //user.setAuthId( UUID.randomUUID().toString() ); //Update AuthID also
+            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
             identityDataService.updateUser( user );
         }
         catch ( NoSuchAlgorithmException | NoSuchProviderException e )

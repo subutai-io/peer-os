@@ -68,5 +68,9 @@ public interface User extends RelationLink
 
     void setValidDate( Date validDate );
 
+    String getAuthId();
+
+    void setAuthId( String authId );
+
     boolean isIdentityValid();
 }

@@ -240,6 +240,11 @@ public interface IdentityDataService
     /* *************************************************
      *
      */
+    UserToken getUserTokenByDetails( long userId, int tokenType );
+
+    /* *************************************************
+         *
+         */
     UserToken getValidUserToken( long userId );
 
 

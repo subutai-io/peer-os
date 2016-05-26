@@ -2,8 +2,15 @@ package io.subutai.core.identity.rest;
 
 
 import javax.ws.rs.FormParam;
+import javax.ws.rs.core.Response;
+
 import com.google.common.base.Strings;
+
+import io.subutai.common.security.exception.IdentityExpiredException;
+import io.subutai.common.security.exception.InvalidLoginException;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.rest.model.AuthMessage;
 
 
 public class RestServiceImpl implements RestService
@@ -42,25 +49,111 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public String authenticate( @FormParam( "type" ) final int type, @FormParam( "username" ) final String userName,
-                                @FormParam( "password" ) final String password )
+    public Response authenticate( int type, final String userName, final String password )
     {
-        String token = identityManager.getUserToken( userName, password );
+        try
+        {
+            String token = identityManager.getUserToken( userName, password );
 
-        if ( !Strings.isNullOrEmpty( token ) )
-        {
-            return token;
+            if ( !Strings.isNullOrEmpty( token ) )
+            {
+                AuthMessage authM = new AuthMessage();
+                authM.setToken( token );
+                return Response.ok( authM ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.FORBIDDEN ).build();
+            }
+
         }
-        else
+        catch(IdentityExpiredException e)
         {
-            return "Access Denied to the resource!";
+            User user = identityManager.getUserByUsername( userName );
+
+            if(user != null)
+            {
+                AuthMessage authM = new AuthMessage();
+                authM.setStatus( 1 );
+                authM.setAuthId( identityManager.updateUserAuthId( user, null ) );
+                return Response.ok( authM ).build();
+            }
+            else
+            {
+                return Response.status( Response.Status.NOT_FOUND ).build();
+            }
         }
+        catch(Exception e)
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+
     }
+
 
     @Override
-    public String getAuthID( @FormParam( "fingerprint" ) final String fingerprint,
-                             @FormParam( "signature" ) final String signature )
+    public Response updateAuthId( int type,String userName,String password ,String authId  )
     {
-        return null;
+        try
+        {
+            User user = identityManager.authenticateByAuthSignature( userName, password );
+
+            if(user != null)
+            {
+                identityManager.updateUserAuthId( user, authId );
+                return Response.ok().build();
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found" );
+            }
+        }
+        catch(IdentityExpiredException e)
+        {
+            User user = identityManager.getUserByUsername( userName );
+
+            if(user != null)
+            {
+                identityManager.updateUserAuthId( user, authId );
+                return Response.ok().build();
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found" );
+            }
+        }
+        catch(Exception e)
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+
     }
+
+
+    @Override
+    public Response getAuthId( int type, final String userName, final String password )
+    {
+        try
+        {
+            User user = identityManager.authenticateByAuthSignature( userName, password );
+
+            if ( user != null )
+            {
+                return Response.ok(user.getAuthId()).build();
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found" );
+            }
+        }
+        catch ( IdentityExpiredException e )
+        {
+            return Response.ok( "User credentials are expired" ).build();
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.NOT_FOUND ).build();
+        }
+    }
+
 }
