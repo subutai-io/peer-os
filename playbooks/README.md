@@ -81,11 +81,11 @@ UserRegistration.story
 ```
 ./run_tests_qa.sh -s "AddRole.story, CassandraTemplate.story"
 ```
-Set Management Hosts, First and Second:  IP, domain
+***Set Management Hosts, First and Second:  IP, domain***
 ```
 ./run_tests_qa.sh - m 192.168.0.119 -M domain.ddns.com
 ```
-Start acceptance tests
+***Start acceptance tests***
 ```
 ./run_tests_qa.sh -r
 
