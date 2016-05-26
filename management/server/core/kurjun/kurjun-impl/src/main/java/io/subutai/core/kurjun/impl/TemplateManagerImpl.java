@@ -243,6 +243,7 @@ public class TemplateManagerImpl implements TemplateManager
             //remove from map after template is downloaded and cached
             templatesInSync.remove( String.valueOf( m.getId() ) );
 
+            upload( repository, is );
             return qm.createManagedStream( is );
         }
 
