@@ -51,8 +51,8 @@ mvn integration-test;
 mvn serenity:aggregate;  
 ```
 
-After running tests you can find report in the ```target``` directory
-For it you need open ```index.html``` in your browser.
+After running tests you can find report in the ```target/site/serenity/``` directory
+For it, you need open ```index.html``` in your browser.
 
 Examples:
 
