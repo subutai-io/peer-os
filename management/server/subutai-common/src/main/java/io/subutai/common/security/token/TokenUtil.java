@@ -7,6 +7,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -23,6 +24,11 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
 import net.minidev.json.JSONObject;
+
+import io.subutai.common.security.exception.IdentityExpiredException;
+import io.subutai.common.security.exception.InvalidLoginException;
+import io.subutai.common.security.exception.SystemSecurityException;
+
 
 /**
  * Token management Utility with JOSE library
@@ -105,14 +111,14 @@ public class TokenUtil
 
 
     //************************************************
-    public static boolean verifyToken(String token, String sharedKey)
+    public static boolean verifyToken(String token, String sharedKey) throws SystemSecurityException
     {
         return verifySignatureAndDate(token, sharedKey);
     }
 
 
     //************************************************
-    public static boolean verifySignatureAndDate(String token, String sharedKey)
+    public static boolean verifySignatureAndDate(String token, String sharedKey) throws SystemSecurityException
     {
         try
         {
@@ -122,16 +128,22 @@ public class TokenUtil
             if(jwsObject.verify( verifier ))
             {
                 long date = getDate(token,jwsObject);
-                return System.currentTimeMillis() <= date;
+
+                if(date == 0)
+                    return true;
+                else if(System.currentTimeMillis() <= date)
+                    return true;
+                else
+                    throw new IdentityExpiredException();
             }
             else
             {
-                return false;
+                throw new InvalidLoginException();
             }
         }
-        catch ( Exception ex )
+        catch ( JOSEException |ParseException ex )
         {
-            return false;
+            throw new InvalidLoginException();
         }
     }
 

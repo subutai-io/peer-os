@@ -321,7 +321,6 @@ public class SystemSettings
 
     public static void setPeerSecretKeyringPwd( String pwd ) throws ConfigurationException
     {
-        validatePublicUrl( pwd );
         saveProperty( "peerSecretKeyringPwd", pwd );
     }
 

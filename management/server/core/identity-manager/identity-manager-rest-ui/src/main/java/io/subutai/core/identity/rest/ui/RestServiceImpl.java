@@ -111,6 +111,7 @@ public class RestServiceImpl implements RestService
 
             keyData.setFingerprint( PGPKeyUtil.getFingerprint( pubRing.getPublicKey().getFingerprint()));
             keyData.setKey( PGPEncryptionUtil.armorByteArrayToString( pubRing.getEncoded() ) );
+            keyData.setAuthId( user.getAuthId() );
 
             for (Iterator<String> iter = pubRing.getPublicKey().getUserIDs(); iter.hasNext(); )
             {
@@ -446,6 +447,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            /*
             List<UserTokenDto> list = identityManager.getAllUserTokens().stream()
                                                       .map( p -> new UserTokenDto( p.getUserId(),
                                                               identityManager.getUser( p.getUserId() ).getUserName(),
@@ -454,6 +456,8 @@ public class RestServiceImpl implements RestService
                                                       .collect( Collectors.toList() );
 
             return Response.ok( JsonUtil.toJson( list ) ).build();
+            */
+            return Response.ok( "Tokens").build();
         }
         catch ( Exception e )
         {
@@ -477,8 +481,8 @@ public class RestServiceImpl implements RestService
             cal.setTime( newDate );
             cal.add( Calendar.HOUR_OF_DAY, period );
 
-            identityManager
-                    .createUserToken( identityManager.getUser( userId ), token, null, "subutai.io", 2, cal.getTime() );
+            //identityManager
+              //      .createUserToken( identityManager.getUser( userId ), token, null, "subutai.io", 2, cal.getTime() );
         }
         catch ( Exception e )
         {
@@ -500,6 +504,7 @@ public class RestServiceImpl implements RestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( token ), "Invalid token id to be replaced" );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( newToken ), "Invalid newToken" );
             Preconditions.checkNotNull( period, "Invalid period" );
+            /*
 
             Date newDate = new Date();
             java.util.Calendar cal = Calendar.getInstance();
@@ -508,6 +513,7 @@ public class RestServiceImpl implements RestService
 
             identityManager.updateUserToken( token, identityManager.getUser( userId ), newToken, null, "issuer", 1,
                     cal.getTime() );
+                    */
         }
         catch ( Exception e )
         {
@@ -524,9 +530,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( tokenId ), "Invalid tokenId" );
+            //Preconditions.checkArgument( !Strings.isNullOrEmpty( tokenId ), "Invalid tokenId" );
 
-            identityManager.removeUserToken( tokenId );
+            //identityManager.removeUserToken( tokenId );
         }
         catch ( Exception e )
         {

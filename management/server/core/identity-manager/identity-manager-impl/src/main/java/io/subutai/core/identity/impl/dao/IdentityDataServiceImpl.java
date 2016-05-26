@@ -458,6 +458,16 @@ public class IdentityDataServiceImpl implements IdentityDataService
      *
      */
     @Override
+    public UserToken getUserTokenByDetails( long userId , int tokenType )
+    {
+        return userTokenDAOService.findByDetails( userId, tokenType );
+    }
+
+
+    /* *************************************************
+     *
+     */
+    @Override
     public UserToken getValidUserToken( long userId )
     {
         return userTokenDAOService.findValidByUserId( userId );

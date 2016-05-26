@@ -2,6 +2,7 @@ package io.subutai.core.identity.impl.model;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Access;
@@ -61,11 +62,20 @@ public class UserEntity implements User
     @Column( name = "security_key_id" )
     private String securityKeyId = ""; // PGP KeyID
 
+
     @Column( name = "trust_level" )
     private int trustLevel = 3; //Default Full Trust
 
+
     @Column( name = "fingerprint" )
     private String fingerprint = ""; // User key fingerprint
+
+    @Column( name = "auth_id" )
+    private String authId = ""; // Authorization ID
+
+
+    @Column( name = "valid_date" )
+    private Date validDate = null;
 
 
     //*********************************************
@@ -298,4 +308,43 @@ public class UserEntity implements User
     {
         return getSecurityKeyId();
     }
+
+
+    @Override
+    public Date getValidDate()
+    {
+        return validDate;
+    }
+
+
+    @Override
+    public void setValidDate( final Date validDate )
+    {
+        this.validDate = validDate;
+    }
+
+
+    @Override
+    public String getAuthId()
+    {
+        return authId;
+    }
+
+
+    @Override
+    public void setAuthId( final String authId )
+    {
+        this.authId = authId;
+    }
+
+
+    @Override
+    public boolean isIdentityValid()
+    {
+        if(validDate == null)
+            return true;
+        else
+            return System.currentTimeMillis() <= validDate.getTime();
+    }
+
 }

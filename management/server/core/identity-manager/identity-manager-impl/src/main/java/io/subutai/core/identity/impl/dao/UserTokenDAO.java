@@ -52,7 +52,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {
@@ -81,7 +81,7 @@ public class UserTokenDAO
         }
         catch ( Exception e )
         {
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
 
         return result;
@@ -98,7 +98,7 @@ public class UserTokenDAO
         {
             daoManager.startTransaction( em );
             Query query = null;
-            query = em.createQuery( "delete from UserTokenEntity ut where ut.type=1 and ut.validDate<:CurrentDate");
+            query = em.createQuery( "delete from UserTokenEntity ut where ut.type=1 and ut.validDate<:CurrentDate" );
             query.setParameter( "CurrentDate", new Date( System.currentTimeMillis() ) );
             query.executeUpdate();
             daoManager.commitTransaction( em );
@@ -106,7 +106,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {
@@ -131,7 +131,7 @@ public class UserTokenDAO
         }
         catch ( Exception e )
         {
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {
@@ -157,7 +157,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {
@@ -182,7 +182,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {
@@ -194,7 +194,7 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public void update( final UserToken item)
+    public void update( final UserToken item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -206,7 +206,7 @@ public class UserTokenDAO
         catch ( Exception e )
         {
             daoManager.rollBackTransaction( em );
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {
@@ -231,7 +231,7 @@ public class UserTokenDAO
 
             if ( result != null )
             {
-                if(result.size() > 0)
+                if ( result.size() > 0 )
                 {
                     tk = result.get( 0 );
                 }
@@ -239,7 +239,45 @@ public class UserTokenDAO
         }
         catch ( Exception e )
         {
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+
+        return tk;
+    }
+
+
+    /* *************************************************
+     *
+     */
+    public UserToken findByDetails( final long userId, final int tokenType )
+    {
+        EntityManager em = daoManager.getEntityManagerFromFactory();
+        UserToken tk = null;
+        try
+        {
+            List<UserToken> result = null;
+            Query qr = em.createQuery( "select h from UserTokenEntity h where h.userId=:userId and h.type=:tokenType",
+                    UserToken.class );
+            qr.setParameter( "userId", userId );
+            qr.setParameter( "tokenType", tokenType );
+
+            result = qr.getResultList();
+
+            if ( result != null )
+            {
+                if ( result.size() > 0 )
+                {
+                    tk = result.get( 0 );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {
@@ -274,7 +312,7 @@ public class UserTokenDAO
         }
         catch ( Exception e )
         {
-            logger.error( "**** Error in UserTokenDAO:" ,e);
+            logger.error( "**** Error in UserTokenDAO:", e );
         }
         finally
         {

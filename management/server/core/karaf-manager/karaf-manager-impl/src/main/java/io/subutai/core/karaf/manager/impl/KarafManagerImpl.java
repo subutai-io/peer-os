@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
@@ -26,6 +28,7 @@ import io.subutai.core.karaf.manager.api.KarafManager;
 /**
  * Manages/Executes Karaf Commands
  */
+@PermitAll
 public class KarafManagerImpl implements KarafManager
 {
 
@@ -33,6 +36,10 @@ public class KarafManagerImpl implements KarafManager
     protected ExecutorService executor = SubutaiExecutors.newCachedThreadPool();
 
 
+    /* ***********************************************
+     */
+    @RolesAllowed( {"Karaf-Server-Administration|Write","Karaf-Server-Administration|Read",
+            "System-Management|Write", "System-Management|Update" } )
     @Override
     public String executeShellCommand( final String commandStr )
     {
@@ -82,8 +89,12 @@ public class KarafManagerImpl implements KarafManager
     }
 
 
-    /* *************
-    */
+    /* ***********************************************
+     */
+    @RolesAllowed( {"Karaf-Server-Administration|Write","Karaf-Server-Administration|Read",
+                    "System-Management|Write", "System-Management|Update"
+    } )
+    @Override
     public String executeJMXCommand( final String commandStr )
     {
         String result = "No Result";
