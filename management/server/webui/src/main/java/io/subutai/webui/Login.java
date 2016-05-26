@@ -46,6 +46,7 @@ public class Login extends HttpServlet
             if( !Strings.isNullOrEmpty( newPassword ))
             {
                 identityManager.changeUserPassword( username, password, newPassword );
+                password = newPassword;
             }
 
             try
