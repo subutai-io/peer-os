@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.cxf.helpers.IOUtils;
 
 import com.google.inject.Injector;
 
@@ -287,6 +290,20 @@ public class RawManagerImpl implements RawManager
 
         rawInSync.remove( md5 );
 
+        return inputStream;
+    }
+
+
+    @Override
+    public InputStream getFile( final RawMetadata rawMetadata, final Repository.PackageProgressListener
+            progressListener )
+            throws IOException
+    {
+        InputStream inputStream = getFile( rawMetadata.getFingerprint(), rawMetadata.getMd5Sum(), progressListener );
+        File tempFile = Files.createTempFile( null, null ).toFile();
+        IOUtils.transferTo(inputStream, tempFile);
+
+        put( tempFile, rawMetadata.getName(), rawMetadata.getFingerprint());
         return inputStream;
     }
 
