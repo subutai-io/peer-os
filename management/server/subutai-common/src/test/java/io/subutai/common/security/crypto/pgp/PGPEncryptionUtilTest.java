@@ -46,10 +46,8 @@ public class PGPEncryptionUtilTest
     private static final String SECRET_KEYRING = "dummy.skr";
 
     private static final String PLUGIN_PUBLIC_KEY = "public.asc";
-    private static final String PLUGIN_PUBLIC_KEY_ID = "8DD661979B15E409";
     private static final String PLUGIN_PUBLIC_KEY_FINGERPRINT = "FC1F3E708FD85E7431FA996D8DD661979B15E409";
     private static final String PLUGIN_PRIVATE_KEY = "private.asc";
-    private static final String PLUGIN_PRIVATE_KEY_ID = "8dd661979b15e409";
     private static final String PLUGIN_PRIVATE_KEY_FINGERPRINT = "FC1F3E708FD85E7431FA996D8DD661979B15E409";
 
     private static final String SECRET_PWD = "12345678";
@@ -257,7 +255,7 @@ public class PGPEncryptionUtilTest
                         new JcaKeyFingerprintCalculator() );
 
         PGPSecretKeyRing secretKeyRing =
-                secretKeyRingCollection.getSecretKeyRing( new BigInteger( PLUGIN_PRIVATE_KEY_ID, 16 ).longValue() );
+                secretKeyRingCollection.getSecretKeyRing( secretKeyRingCollection.iterator().next().getSecretKey().getKeyID() );
 
         PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
 
@@ -267,11 +265,11 @@ public class PGPEncryptionUtilTest
 
 
         PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
-                .getPublicKeyRing( new BigInteger( PLUGIN_PUBLIC_KEY_ID, 16 ).longValue() );
+                .getPublicKeyRing( secondPublicKeyRingCollection.iterator().next().getPublicKey().getKeyID() );
 
 
         byte[] encryptedMessage =
-                PGPEncryptionUtil.encrypt( "Time is the most luxurious thing we have.".getBytes(), pgpKeyring.getPublicKey(), true );
+                PGPEncryptionUtil.encrypt( "Test message.\n".getBytes(), pgpKeyring.getPublicKey(), true );
 
         byte[] signedMessageArmor =
                 PGPEncryptionUtil.clearSign( encryptedMessage, secondSecretKey, "123".toCharArray(), "" );
@@ -279,8 +277,9 @@ public class PGPEncryptionUtilTest
         String signedMessage = new String( signedMessageArmor, "UTF-8" );
 
         logger.info( "\n" + signedMessage );
+        logger.info( "\n======================");
 
-        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessage.getBytes(), pgpKeyring );
+        boolean result = PGPEncryptionUtil.verifyClearSign( signedMessageArmor, pgpKeyring );
         if ( result )
         {
             logger.info( "signature verified." );
@@ -309,7 +308,7 @@ public class PGPEncryptionUtilTest
                         new JcaKeyFingerprintCalculator() );
 
         PGPSecretKeyRing secretKeyRing =
-                secretKeyRingCollection.getSecretKeyRing( new BigInteger( PLUGIN_PRIVATE_KEY_ID, 16 ).longValue() );
+                secretKeyRingCollection.getSecretKeyRing( secretKeyRingCollection.iterator().next().getPublicKey().getKeyID() );
 
         PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
 
@@ -319,7 +318,7 @@ public class PGPEncryptionUtilTest
 
 
         PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
-                .getPublicKeyRing( new BigInteger( PLUGIN_PUBLIC_KEY_ID, 16 ).longValue() );
+                .getPublicKeyRing( secondPublicKeyRingCollection.iterator().next().getPublicKey().getKeyID() );
 
         byte[] signedMessageArmor =
                 PGPEncryptionUtil.clearSign( IOUtils.toString( findFile( "message.txt" ) ).getBytes(), secondSecretKey, "123".toCharArray(), "" );
@@ -350,7 +349,7 @@ public class PGPEncryptionUtilTest
                         new JcaKeyFingerprintCalculator() );
 
         PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
-                .getPublicKeyRing( new BigInteger( PLUGIN_PUBLIC_KEY_ID, 16 ).longValue() );
+                .getPublicKeyRing( secondPublicKeyRingCollection.iterator().next().getPublicKey().getKeyID() );
 
         String signedMessage = IOUtils.toString( findFile( "signedMessage.txt" ) );
 

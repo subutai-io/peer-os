@@ -6,10 +6,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,14 +92,29 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
 
             if ( serialized != null )
             {
-                InputStream is = aptManager.getPackageByFilename( filename );
-                if ( is != null )
-                {
-                    DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
-                    return Response.ok( is )
-                                   .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                                   .header( "Content-Type", "application/octet-stream" ).build();
-                }
+                StreamingOutput sout = output -> {
+                    final WritableByteChannel outChannel = Channels.newChannel(output);
+                    aptManager.getPackageByFilename( filename, byteBuffer -> {
+                        try
+                        {
+                            while ( byteBuffer.hasRemaining() )
+                            {
+                                outChannel.write( byteBuffer );
+                            }
+                        }
+                        catch ( IOException e )
+                        {
+                            LOGGER.error( "Error writing apt bytes", e );
+                        }
+                    } );
+                };
+
+
+                DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
+                Response.ResponseBuilder responseBuilder = Response.ok( sout );
+                responseBuilder.header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) );
+                responseBuilder.header( "Content-Type", "application/octet-stream" );
+                return responseBuilder.build();
             }
         }
         catch ( IllegalArgumentException e )
@@ -160,15 +178,27 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
 
         if ( serialized != null )
         {
-            InputStream is = aptManager.getPackage( md5 );
+            final StreamingOutput sout = output -> aptManager.getPackage( md5, byteBuffer -> {
+                while ( byteBuffer.hasRemaining() )
+                {
+                    try
+                    {
+                        output.write( byteBuffer.get() );
+                        output.flush();
+                    }
+                    catch ( IOException e )
+                    {
+                        LOGGER.error( "Error writing apt file bytes", e );
+                    }
+                }
+            } );
 
-            if ( is != null )
-            {
-                DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
-                return Response.ok( is )
-                               .header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) )
-                               .header( "Content-Type", "application/octet-stream" ).build();
-            }
+            DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
+            Response.ResponseBuilder responseBuilder = Response.ok( sout );
+            responseBuilder.header( "Content-Disposition", "attachment; filename=" + makePackageFilename( pm ) );
+            //                responseBuilder.header( "Content-Length", 0 );
+            responseBuilder.header( "Content-Type", "application/octet-stream" );
+            return responseBuilder.build();
         }
         return packageNotFoundResponse();
     }

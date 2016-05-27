@@ -3,8 +3,10 @@ package io.subutai.core.kurjun.impl.raw;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import ai.subut.kurjun.metadata.common.raw.RawMetadata;
 import ai.subut.kurjun.metadata.factory.PackageMetadataStoreModule;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
+import ai.subut.kurjun.model.repository.Repository;
 import ai.subut.kurjun.model.repository.UnifiedRepository;
 import ai.subut.kurjun.repo.LocalRawRepository;
 import ai.subut.kurjun.repo.RepositoryFactory;
@@ -36,6 +39,7 @@ import ai.subut.kurjun.storage.factory.FileStoreModule;
 import ai.subut.kurjun.subutai.SubutaiTemplateParserModule;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
+import io.subutai.core.kurjun.api.Utils;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.impl.TemplateManagerImpl;
 import io.subutai.core.kurjun.impl.TrustedWebClientFactoryModule;
@@ -261,7 +265,8 @@ public class RawManagerImpl implements RawManager
 
 
     @Override
-    public InputStream getFile( final String repository, final String md5 ) throws IOException
+    public InputStream getFile( final String repository, final String md5,
+                                Repository.PackageProgressListener progressListener  ) throws IOException
     {
         RawMetadata rawMetadata = new RawMetadata();
         rawMetadata.setMd5Sum( md5 );
@@ -281,10 +286,25 @@ public class RawManagerImpl implements RawManager
 
         rawInSync.put( md5, md5 );
 
-        InputStream inputStream = unifiedRepository.getPackageStream( rawMetadata );
+        InputStream inputStream = unifiedRepository.getPackageStream( rawMetadata, progressListener );
 
         rawInSync.remove( md5 );
 
+        return inputStream;
+    }
+
+
+    @Override
+    public InputStream getFile( final RawMetadata rawMetadata, final Repository.PackageProgressListener
+            progressListener )
+            throws IOException
+    {
+        InputStream inputStream = getFile( rawMetadata.getFingerprint(), rawMetadata.getMd5Sum(), progressListener );
+        File tempFile = Files.createTempFile( null, null ).toFile();
+
+        Utils.fastCopy(inputStream, new FileOutputStream( tempFile ));
+
+        put( tempFile, rawMetadata.getName(), rawMetadata.getFingerprint());
         return inputStream;
     }
 

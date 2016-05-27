@@ -88,7 +88,7 @@ import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModifi
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.hubadapter.api.HubAdapter;
-import io.subutai.core.hubmanager.api.HubEventListener;
+import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -145,14 +145,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //******************************************
         Session session = identityManager.loginSystemUser();
-        if(session != null)
+        if ( session != null )
         {
             systemUser = session.getSubject();
         }
         //******************************************
 
         backgroundTasksExecutorService = Executors.newSingleThreadScheduledExecutor();
-        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 3, TimeUnit.MINUTES );
+        backgroundTasksExecutorService.scheduleWithFixedDelay( new BackgroundTasksRunner(), 1, 60, TimeUnit.MINUTES );
 
         environmentAdapter = new EnvironmentAdapter( this, peerManager, hubAdapter );
 
@@ -801,7 +801,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( {"Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
+    @RolesAllowed( { "Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
     @Override
     public void resetP2PSecretKey( final String environmentId, final String newP2pSecretKey,
                                    final long p2pSecretKeyTtlSec, final boolean async )

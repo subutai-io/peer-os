@@ -12,6 +12,7 @@ public class KeyDataDto
     private String id = "";
     private String userId = "";
     private String expiryDate = "";
+    private String authId = "";
 
 
     public int getKeyType()
@@ -83,5 +84,17 @@ public class KeyDataDto
     public void setExpiryDate( final String expiryDate )
     {
         this.expiryDate = expiryDate;
+    }
+
+
+    public String getAuthId()
+    {
+        return authId;
+    }
+
+
+    public void setAuthId( final String authId )
+    {
+        this.authId = authId;
     }
 }

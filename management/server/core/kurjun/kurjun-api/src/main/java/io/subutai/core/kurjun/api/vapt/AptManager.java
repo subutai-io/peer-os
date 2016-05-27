@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
+import ai.subut.kurjun.model.repository.Repository;
 import io.subutai.common.protocol.AptPackage;
 import io.subutai.core.kurjun.api.QuotaManagedRepository;
 
@@ -17,16 +18,18 @@ public interface AptManager extends QuotaManagedRepository
     String getRelease( String release, String component, String arch );
 
 
-    InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex ) throws IllegalArgumentException;
+    InputStream getPackagesIndex( String release, String component, String arch, String packagesIndex )
+            throws IllegalArgumentException;
 
 
-    InputStream getPackageByFilename( String filename ) throws IllegalArgumentException;
+    InputStream getPackageByFilename( String filename, Repository.PackageProgressListener progressListener )
+            throws IllegalArgumentException;
 
 
     String getPackageInfo( String md5, String name, String version );
 
 
-    InputStream getPackage( String md5 );
+    InputStream getPackage( String md5, Repository.PackageProgressListener progressListener  );
 
 
     URI upload( InputStream is );

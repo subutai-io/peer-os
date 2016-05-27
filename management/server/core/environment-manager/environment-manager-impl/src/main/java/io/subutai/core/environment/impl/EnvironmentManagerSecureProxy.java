@@ -61,7 +61,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hubadapter.api.HubAdapter;
-import io.subutai.core.hubmanager.api.HubEventListener;
+import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;

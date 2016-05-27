@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,14 +97,11 @@ public class RegistrationManagerImpl implements RegistrationManager
     public synchronized void queueRequest( final RequestedHost requestedHost ) throws HostRegistrationException
     {
         Preconditions.checkNotNull( requestedHost, "'Invalid registration request" );
+        Preconditions
+                .checkArgument( PGPKeyUtil.isValidPublicKeyring( requestedHost.getPublicKey() ), "Invalid public key" );
 
         try
         {
-            //try to convert
-            PGPPublicKeyRing testKeyRing = PGPKeyUtil.readPublicKeyRing( requestedHost.getPublicKey() );
-
-            Preconditions.checkNotNull( testKeyRing, "Invalid public key" );
-
             RequestedHostImpl requestedHostImpl = requestDataService.find( requestedHost.getId() );
 
             if ( requestedHostImpl != null )

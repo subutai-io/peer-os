@@ -5,36 +5,10 @@
 package io.subutai.core.test.dp;
 
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.hooks.service.EventListenerHook;
-import org.osgi.framework.hooks.service.FindHook;
-
-
-/**
- * @author slim ouertani
- */
-public class Activator implements BundleActivator
+public class Activator
 {
-
-    @Override
-    public void start( BundleContext context ) throws Exception
+    public void start()
     {
-        try
-        {
-            LoggerHooks loggerHooks = new LoggerHooks( context );
-            context.registerService( new String[] { FindHook.class.getName(), EventListenerHook.class.getName() },
-                    loggerHooks, null );
-        }
-        catch ( Exception ex )
-        {
-            // ignore
-        }
-    }
 
-
-    @Override
-    public void stop( BundleContext context ) throws Exception
-    {
     }
 }

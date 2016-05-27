@@ -19,8 +19,10 @@ public class P2PCredentials
     private long p2pTtlSeconds;
 
 
-    public P2PCredentials( final String environmentId, final String p2pHash, final String p2pSecretKey,
-                           final long p2pTtlSeconds )
+    public P2PCredentials( @JsonProperty( "environmentId" ) final String environmentId,
+                           @JsonProperty( "p2pHash" ) final String p2pHash,
+                           @JsonProperty( "p2pSecretKey" ) final String p2pSecretKey,
+                           @JsonProperty( "p2pTtlSeconds" ) final long p2pTtlSeconds )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pHash ), "Invalid p2p hash" );

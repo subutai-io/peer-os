@@ -40,7 +40,7 @@ public class UserTokenEntity implements UserToken
     private String issuer;
 
     @Column( name = "valid_date" )
-    private Date validDate;
+    private Date validDate = null;
 
 
     @Column( name = "user_id" )
