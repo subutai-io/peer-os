@@ -3,9 +3,7 @@ Acceptance tests for Subutai Social
 Dependencies:
 
 Your system must has: ***Ubuntu 14*** and above, **Maven 3** and above, **Java 8**  
-Also need additional packages **OpenCV**
-
-Install next additional packages:
+Also need additional packages:
 
 ```
 sudo add-apt-repository ppa:gijzelaar/opencv2.4
