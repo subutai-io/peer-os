@@ -1,4 +1,4 @@
-package io.subutai.core.hubmanager.api;
+package io.subutai.hub.share.common;
 
 
 /**

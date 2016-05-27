@@ -64,7 +64,7 @@
   <service ref="hubImpl" interface="io.subutai.core.hubmanager.api.HubManager" />
 
   <reference-list id="hubEventLstnr"
-                  interface="io.subutai.core.hubmanager.api.HubEventListener"
+                  interface="io.subutai.hub.share.common.HubEventListener"
                   availability="optional">
     <reference-listener ref="hubImpl"
                         bind-method="addListener" unbind-method="removeListener" />
