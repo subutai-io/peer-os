@@ -34,6 +34,7 @@ func MngInit() {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + "management/var var none bind,rw 0 0"},
 	})
 	container.SetApt("management")
+	container.SetContainerUid("management")
 	gpg.GenerateKey("management")
 	container.Start("management")
 	exec.Command("dhclient", "mng-net").Run()
