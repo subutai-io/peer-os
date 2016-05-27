@@ -2,7 +2,7 @@ Acceptance tests for Subutai Social
 ===================================
 Dependencies:
 
-Your system must has: ***Ubuntu 14*** and above, **Maven 3** and above, **Java 7/8**  
+Your system must has: ***Ubuntu 14*** and above, **Maven 3** and above, **Java 8**  
 Also need additional packages **OpenCV**
 
 Install next additional packages:
@@ -10,6 +10,15 @@ Install next additional packages:
 ```
 sudo add-apt-repository ppa:gijzelaar/opencv2.4
 sudo apt-get update
+sudo apt-get install maven
+sudo apt-get install xvfb
+sudo apt-get install openjdk-8-jdk
+sudo apt-get install recordmydesktop
+sudo apt-get install wmctrl
+sudo apt-get install xdotool
+sudo apt-get install build-essentials
+sudo apt-get build-essentials
+sudo apt-get install libopencv2.4-java
 sudo apt-get libcv-dev
 sudo apt-get install libtesseract3 
 ```
