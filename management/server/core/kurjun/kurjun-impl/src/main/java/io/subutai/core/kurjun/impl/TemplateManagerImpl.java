@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Injector;
 
 import ai.subut.kurjun.ar.CompressionType;
@@ -84,6 +86,7 @@ public class TemplateManagerImpl implements TemplateManager
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
     private static Map<String, String> templatesInSync = new ConcurrentHashMap();
+    private Map<String, PackageProgress> progressMap = Maps.newHashMap();
 
 
     public TemplateManagerImpl( LocalPeer localPeer )
@@ -226,7 +229,38 @@ public class TemplateManagerImpl implements TemplateManager
 
         try
         {
-            is = unifiedRepository.getPackageStream( m, progressListener );
+            is = unifiedRepository.getPackageStream( m, new Repository.PackageProgressListener()
+            {
+                @Override
+                public String downloadFileId()
+                {
+                    return progressListener.downloadFileId();
+                }
+
+
+                @Override
+                public void writeBytes( final ByteBuffer byteBuffer )
+                {
+                    PackageProgress packageProgress = progressMap.get( progressListener.downloadFileId() );
+                    if ( packageProgress == null )
+                    {
+                        progressMap.put( progressListener.downloadFileId(), new PackageProgress(progressListener.getSize(), 0) );
+                    }
+                    else
+                    {
+                        packageProgress.addReceivedBytesCount( byteBuffer.arrayOffset());
+                        progressMap.put( progressListener.downloadFileId(), packageProgress );
+                    }
+                    progressListener.writeBytes( byteBuffer );
+                }
+
+
+                @Override
+                public long getSize()
+                {
+                    return progressListener.getSize();
+                }
+            } );
         }
         catch ( Exception ex )
         {
@@ -250,6 +284,21 @@ public class TemplateManagerImpl implements TemplateManager
         templatesInSync.remove( tid.get() );
 
         return null;
+    }
+
+
+    @Override
+    public int getDownloadPercent( final String templateId )
+    {
+        PackageProgress packageProgress = progressMap.get( templateId );
+        if ( packageProgress != null )
+        {
+            return (int) packageProgress.getPercentage();
+        }
+        else
+        {
+            return 0;
+        }
     }
 
 
