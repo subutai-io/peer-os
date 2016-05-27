@@ -86,7 +86,7 @@ public class TemplateManagerImpl implements TemplateManager
     private final RepoUrlStore repoUrlStore = new RepoUrlStore( Common.SUBUTAI_APP_DATA_PATH );
 
     private static Map<String, String> templatesInSync = new ConcurrentHashMap();
-    private Map<String, PackageProgress> progressMap = Maps.newHashMap();
+    private Map<String, PackageProgress> progressMap = Maps.newConcurrentMap();
 
 
     public TemplateManagerImpl( LocalPeer localPeer )
@@ -229,6 +229,7 @@ public class TemplateManagerImpl implements TemplateManager
 
         try
         {
+            progressMap.put( progressListener.downloadFileId(), new PackageProgress(progressListener.getSize(), 0) );
             is = unifiedRepository.getPackageStream( m, new Repository.PackageProgressListener()
             {
                 @Override
