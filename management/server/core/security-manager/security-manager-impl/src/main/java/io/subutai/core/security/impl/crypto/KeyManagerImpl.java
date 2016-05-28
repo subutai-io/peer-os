@@ -5,15 +5,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.jms.IllegalStateException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -38,6 +34,7 @@ import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.DateUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
@@ -90,30 +87,19 @@ public class KeyManagerImpl implements KeyManager
     }
 
 
-    /* *****************************
-     * First time generate peer pgp keys and save the fingerprint to file system.
-     * Next time if fingerprint exists just use it to fetch peer pgp keys from database.
-     */
     private void init()
     {
 
         try
         {
+            List<SecurityKey> peerKeyList = securityDataService.getKeyDataByType( SecurityKeyType.PeerKey.getId() );
 
-            Path peerIdFilePath = Paths.get( PEER_ID_FILE );
-
-            if ( Files.exists( peerIdFilePath ) )
+            if ( !CollectionUtil.isCollectionEmpty( peerKeyList ) )
             {
-                String peerId = new String( Files.readAllBytes( peerIdFilePath ) ).trim();
+                //assume there is always one Peer Key
+                SecurityKey peerKey = peerKeyList.get( 0 );
 
-                if ( getKeyDataByFingerprint( peerId ) == null )
-                {
-                    throw new IllegalStateException( String.format(
-                            "Peer Key not found in database by Peer Id %s. Please, make sure that '%s' file is "
-                                    + "valid", peerId, PEER_ID_FILE ) );
-                }
-
-                keyData.setManHostId( peerId );
+                keyData.setManHostId( peerKey.getPublicKeyFingerprint() );
             }
             else
             {
@@ -130,8 +116,6 @@ public class KeyManagerImpl implements KeyManager
 
                 saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
                 savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
-
-                Files.write( peerIdFilePath, peerId.getBytes() );
             }
         }
         catch ( Exception ex )
