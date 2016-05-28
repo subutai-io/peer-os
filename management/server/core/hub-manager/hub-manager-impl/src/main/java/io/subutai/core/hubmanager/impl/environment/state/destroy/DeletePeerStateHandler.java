@@ -8,6 +8,7 @@ import javax.security.auth.Subject;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
@@ -48,8 +49,8 @@ public class DeletePeerStateHandler extends StateHandler
 
 
     @Override
-    protected void post( EnvironmentPeerDto peerDto, Object body )
+    protected RestResult<Object> post( EnvironmentPeerDto peerDto, Object body )
     {
-        ctx.restClient.delete( path( "/rest/v1/environments/%s/peers/%s", peerDto ) );
+        return ctx.restClient.delete( path( "/rest/v1/environments/%s/peers/%s", peerDto ) );
     }
 }
