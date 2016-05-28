@@ -46,6 +46,7 @@ class HttpClient
 
     private static final String HUB_ADDRESS = "https://hub.subut.ai:444";
 
+
     private final PGPMessenger messenger;
 
 
@@ -53,9 +54,7 @@ class HttpClient
     {
         PGPPrivateKey senderKey = securityManager.getKeyManager().getPrivateKey( null );
 
-        String hubPublicKey = Common.SUBUTAI_APP_DATA_PATH + "/keystores/h.public.gpg";
-
-        PGPPublicKey receiverKey = PGPKeyHelper.readPublicKey( hubPublicKey );
+        PGPPublicKey receiverKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
 
         messenger = new PGPMessenger( senderKey, receiverKey );
     }
@@ -238,10 +237,16 @@ class HttpClient
         X509TrustManager tm = new X509TrustManager()
         {
             @Override
-            public void checkClientTrusted( X509Certificate[] x509Certificates, String s ) throws CertificateException {}
+            public void checkClientTrusted( X509Certificate[] x509Certificates, String s ) throws CertificateException
+            {
+            }
+
 
             @Override
-            public void checkServerTrusted( X509Certificate[] chain, String authType ) throws CertificateException {}
+            public void checkServerTrusted( X509Certificate[] chain, String authType ) throws CertificateException
+            {
+            }
+
 
             @Override
             public X509Certificate[] getAcceptedIssuers()
