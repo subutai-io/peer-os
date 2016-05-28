@@ -29,9 +29,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.http.HttpStatus;
 
-import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
-import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.core.security.api.SecurityManager;
@@ -48,6 +46,19 @@ class HttpClient
 
 
     private final PGPMessenger messenger;
+
+    private static KeyStore peerKeyStore;
+
+
+    private static synchronized KeyStore getPeerKeyStore() throws Exception
+    {
+        if ( peerKeyStore == null )
+        {
+            peerKeyStore = loadKeyStore();
+        }
+
+        return peerKeyStore;
+    }
 
 
     HttpClient( SecurityManager securityManager ) throws IOException, PGPException, KeyStoreException
@@ -156,21 +167,12 @@ class HttpClient
     }
 
 
-    private static KeyStore loadKeyStore() throws KeyStoreException
+    private static KeyStore loadKeyStore() throws Exception
     {
-        KeyStoreData keyStoreData = new KeyStoreData();
+        KeyStoreTool keyStoreTool = new KeyStoreTool();
 
-        String peerKeystore = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.jks";
-
-        keyStoreData.setKeyStoreFile( peerKeystore );
-
-        keyStoreData.setAlias( "peer_cert" );
-
-        keyStoreData.setPassword( SecuritySettings.KEYSTORE_PX1_PSW );
-
-        keyStoreData.setKeyStoreType( KeyStoreType.JKS );
-
-        return new KeyStoreTool().load( keyStoreData );
+        return keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS,
+                PGPKeyHelper.getFingerprint( PGPKeyHelper.readPublicKey( Common.H_PUB_KEY ) ) );
     }
 
 
@@ -210,7 +212,7 @@ class HttpClient
 
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
 
-        keyManagerFactory.init( loadKeyStore(), SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
+        keyManagerFactory.init( getPeerKeyStore(), SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
 
         tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
 
