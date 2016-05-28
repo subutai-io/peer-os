@@ -3,6 +3,7 @@ package io.subutai.core.kurjun.rest.raw;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
@@ -23,6 +24,7 @@ import com.google.gson.GsonBuilder;
 import ai.subut.kurjun.metadata.common.raw.RawMetadata;
 import ai.subut.kurjun.model.metadata.Metadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
+import ai.subut.kurjun.model.repository.Repository;
 import io.subutai.core.kurjun.api.raw.RawManager;
 import io.subutai.core.kurjun.rest.RestManagerBase;
 
@@ -61,19 +63,38 @@ public class RestRawManagerImpl extends RestManagerBase implements RestRawManage
                 raw.setMd5Sum( md5 );
                 StreamingOutput sout = output -> {
                     final WritableByteChannel outChannel = Channels.newChannel(output);
-                    rawManager.getFile( raw, byteBuffer -> {
-                        try
+                    rawManager.getFile( raw, new Repository.PackageProgressListener()
+                    {
+                        @Override
+                        public long getSize()
                         {
-                            while ( byteBuffer.hasRemaining() )
+                            return raw.getSize();
+                        }
+
+
+                        @Override
+                        public String downloadFileId()
+                        {
+                            return String.valueOf( raw.getId());
+                        }
+
+
+                        @Override
+                        public void writeBytes( final ByteBuffer byteBuffer )
+                        {
+                            try
                             {
-                                outChannel.write( byteBuffer );
+                                while ( byteBuffer.hasRemaining() )
+                                {
+                                    outChannel.write( byteBuffer );
+                                }
+                            }
+                            catch ( IOException e )
+                            {
+                                LOGGER.error("Error writing to channel");
                             }
                         }
-                        catch ( IOException e )
-                        {
-                            LOGGER.error("Error writing to channel");
-                        }
-                    });
+                    } );
                 };
 
                 Response.ResponseBuilder responseBuilder = Response.ok( sout );

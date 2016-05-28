@@ -76,6 +76,8 @@ public interface TemplateManager extends QuotaManagedRepository
     InputStream getTemplateData( String repository, String md5, String templateOwner, boolean isKurjunClient, Repository.PackageProgressListener progressListener ) throws IOException;
 
 
+    int getDownloadPercent(String templateId);
+
     /**
      * Lists packages in supplied repository.
      *
@@ -157,11 +159,11 @@ public interface TemplateManager extends QuotaManagedRepository
      * @return
      */
 //    Set<String> getRepositories();
-    
-    
+
+
     /**
      * Create repository for the user with the given user name
-     * @param userName 
+     * @param userName
      */
 //    void createUserRepository( String userName );
 
@@ -182,5 +184,5 @@ public interface TemplateManager extends QuotaManagedRepository
      * @param targetUserName target username
      */
 //    void unshareTemplate( String templateId, String targetUserName );
-    
+
 }

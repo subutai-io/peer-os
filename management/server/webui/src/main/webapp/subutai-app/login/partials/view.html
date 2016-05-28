@@ -30,8 +30,7 @@
 						<div class="b-form__wrapper g-margin-bottom-half">
 							<label class="b-form-label">Username</label>
 							<input
-								class="b-form-input b-form-input_full" 
-								id="subt-input__login"
+								class="b-form-input b-form-input_full"
 								ng-model="loginCtrl.name"
 								name="login"
 								focus-input="true"
@@ -82,6 +81,7 @@
 						<div class="b-form__wrapper g-margin-bottom-half">
 							<label class="b-form-label">Fingerprint</label>
 							<input
+								id="subt-input__login"
 								class="b-form-input b-form-input_full" 
 								ng-model="loginCtrl.fingerprint"
 								name="fingerprint"
@@ -89,7 +89,7 @@
 						</div>
 						<div class="b-form__wrapper g-margin-bottom">
 							<label class="b-form-label">Signed message</label>
-							<textarea class="b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.sptoken">
+							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.sptoken">
 							</textarea>
 						</div>
 						<div class="b-login-form-btn">
