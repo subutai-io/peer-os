@@ -245,11 +245,12 @@ public class TemplateManagerImpl implements TemplateManager
                     PackageProgress packageProgress = progressMap.get( progressListener.downloadFileId() );
                     if ( packageProgress == null )
                     {
-                        progressMap.put( progressListener.downloadFileId(), new PackageProgress(progressListener.getSize(), 0) );
+                        progressMap.put( progressListener.downloadFileId(),
+                                new PackageProgress(progressListener.getSize(), 0) );
                     }
                     else
                     {
-                        packageProgress.addReceivedBytesCount( byteBuffer.arrayOffset());
+                        packageProgress.addReceivedBytesCount( byteBuffer.limit() );
                         progressMap.put( progressListener.downloadFileId(), packageProgress );
                     }
                     progressListener.writeBytes( byteBuffer );
