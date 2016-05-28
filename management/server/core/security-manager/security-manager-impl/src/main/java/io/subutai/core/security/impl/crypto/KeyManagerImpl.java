@@ -5,11 +5,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.jms.IllegalStateException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -33,7 +37,7 @@ import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.DateUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
@@ -55,14 +59,12 @@ public class KeyManagerImpl implements KeyManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( KeyManagerImpl.class );
 
+    private static final String PEER_ID_FILE = String.format( "%s/%s", Common.SUBUTAI_APP_KEYSTORES_PATH, "peer.id" );
+
     private SecurityDataService securityDataService = null;
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
     private EncryptionTool encryptionTool = null;
-    //private static final String PEER_PUBLIC_KEY_FILE =
-            //System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.public.key";
-    //private static final String PEER_PRIVATE_KEY_FILE =
-            //System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.secret.key";
 
 
     /* *****************************
@@ -89,40 +91,48 @@ public class KeyManagerImpl implements KeyManager
 
 
     /* *****************************
-     *
-     * just save fingerprint to file system and store keys in db.
+     * First time generate peer pgp keys and save the fingerprint to file system.
      * Next time if fingerprint exists just use it to fetch peer pgp keys from database.
-     * No need to store pgp keys in the file system
      */
     private void init()
     {
 
         try
         {
-            //InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( PEER_PRIVATE_KEY_FILE );
-            //InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( PEER_PUBLIC_KEY_FILE );
 
-            PGPPublicKeyRing peerPubRing;
-            PGPSecretKeyRing peerSecRing;
+            Path peerIdFilePath = Paths.get( PEER_ID_FILE );
 
-            KeyPair keyPair = PGPEncryptionUtil
-                    .generateKeyPair( String.format( "subutai%d@subutai.io", DateUtil.getUnixTimestamp() ),
-                            SystemSettings.getPeerSecretKeyringPwd(), true );
+            if ( Files.exists( peerIdFilePath ) )
+            {
+                String peerId = new String( Files.readAllBytes( peerIdFilePath ) ).trim();
 
-            //Files.write( keyPair.getPubKeyring(), new File( PEER_PUBLIC_KEY_FILE ) );
-            //Files.write( keyPair.getSecKeyring(), new File( PEER_PRIVATE_KEY_FILE ) );
+                if ( getKeyDataByFingerprint( peerId ) == null )
+                {
+                    throw new IllegalStateException( String.format(
+                            "Peer Key not found in database by Peer Id %s. Please, make sure that '%s' file is "
+                                    + "valid", peerId, PEER_ID_FILE ) );
+                }
 
-            peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-            peerSecRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
+                keyData.setManHostId( peerId );
+            }
+            else
+            {
+                KeyPair keyPair = PGPEncryptionUtil
+                        .generateKeyPair( String.format( "subutai%d@subutai.io", DateUtil.getUnixTimestamp() ),
+                                keyData.getSecretKeyringPwd(), true );
 
-            String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
+                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+                PGPSecretKeyRing peerSecRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
 
-            keyData.setManHostId( peerId );
+                String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
 
-            saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
-            savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
-            //************************************************************
-            //************************************************************
+                keyData.setManHostId( peerId );
+
+                saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
+                savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
+
+                Files.write( peerIdFilePath, peerId.getBytes() );
+            }
         }
         catch ( Exception ex )
         {
