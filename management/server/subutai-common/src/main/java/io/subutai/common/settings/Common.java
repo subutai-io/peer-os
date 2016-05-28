@@ -19,6 +19,7 @@ public class Common
     public static final String RH_INTERFACE = "mng-net";
     public static final String LOCAL_HOST_IP = "127.0.0.1";
     public static final String LOCAL_HOST_NAME = "localhost";
+    public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keys/h.public.gpg";
     //10 min including possible template download
     public static final int WAIT_CONTAINER_CONNECTION_SEC = 30;
     public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 30;

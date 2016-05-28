@@ -76,11 +76,6 @@
       <artifactId>hub-adapter-api</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hub-manager-api</artifactId>
-    </dependency>
-
     <!-- Testing -->
 
     <dependency>
