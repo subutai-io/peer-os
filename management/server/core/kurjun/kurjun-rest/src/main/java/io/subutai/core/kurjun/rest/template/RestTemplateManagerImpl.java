@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
@@ -27,6 +28,7 @@ import ai.subut.kurjun.metadata.common.subutai.DefaultTemplate;
 import ai.subut.kurjun.metadata.common.subutai.TemplateId;
 import ai.subut.kurjun.metadata.common.utils.IdValidators;
 import ai.subut.kurjun.model.metadata.Architecture;
+import ai.subut.kurjun.model.repository.Repository;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.kurjun.rest.RestManagerBase;
@@ -73,21 +75,41 @@ public class RestTemplateManagerImpl extends RestManagerBase implements RestTemp
                         final String finalRepository = repository;
 
                         StreamingOutput sout = output -> {
-                            final WritableByteChannel outChannel = Channels.newChannel(output);
+                            final WritableByteChannel outChannel = Channels.newChannel( output );
                             templateManager.getTemplateData( finalRepository, md5bytes, tid.getOwnerFprint(),
-                                            isKurjunClient, byteBuffer -> {
-                                try
+                                    isKurjunClient, new Repository.PackageProgressListener()
+                            {
+
+                                @Override
+                                public long getSize()
                                 {
-                                    while ( byteBuffer.hasRemaining() )
+                                    return template.getSize();
+                                }
+
+
+                                @Override
+                                public String downloadFileId()
+                                {
+                                    return tid.getMd5();
+                                }
+
+
+                                @Override
+                                public void writeBytes( final ByteBuffer byteBuffer )
+                                {
+                                    try
                                     {
-                                        outChannel.write( byteBuffer );
+                                        while ( byteBuffer.hasRemaining() )
+                                        {
+                                            outChannel.write( byteBuffer );
+                                        }
+                                    }
+                                    catch ( IOException e )
+                                    {
+                                        LOGGER.error( "Error writing to channel" );
                                     }
                                 }
-                                catch ( IOException e )
-                                {
-                                    LOGGER.error("Error writing to channel");
-                                }
-                            });
+                            } );
                         };
 
                         Response.ResponseBuilder responseBuilder = Response.ok( sout );

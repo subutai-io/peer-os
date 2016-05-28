@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
@@ -23,6 +24,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import ai.subut.kurjun.metadata.common.apt.DefaultPackageMetadata;
 import ai.subut.kurjun.metadata.common.utils.MetadataUtils;
 import ai.subut.kurjun.model.metadata.apt.PackageMetadata;
+import ai.subut.kurjun.model.repository.Repository;
 import io.subutai.core.kurjun.api.vapt.AptManager;
 import io.subutai.core.kurjun.rest.RestManagerBase;
 
@@ -94,17 +96,36 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
             {
                 StreamingOutput sout = output -> {
                     final WritableByteChannel outChannel = Channels.newChannel(output);
-                    aptManager.getPackageByFilename( filename, byteBuffer -> {
-                        try
+                    aptManager.getPackageByFilename( filename, new Repository.PackageProgressListener()
+                    {
+                        @Override
+                        public String downloadFileId()
                         {
-                            while ( byteBuffer.hasRemaining() )
+                            return filename;
+                        }
+
+
+                        @Override
+                        public void writeBytes( final ByteBuffer byteBuffer )
+                        {
+                            try
                             {
-                                outChannel.write( byteBuffer );
+                                while ( byteBuffer.hasRemaining() )
+                                {
+                                    outChannel.write( byteBuffer );
+                                }
+                            }
+                            catch ( IOException e )
+                            {
+                                LOGGER.error( "Error writing apt bytes", e );
                             }
                         }
-                        catch ( IOException e )
+
+
+                        @Override
+                        public long getSize()
                         {
-                            LOGGER.error( "Error writing apt bytes", e );
+                            return 0;
                         }
                     } );
                 };
@@ -178,20 +199,41 @@ public class RestAptManagerImpl extends RestManagerBase implements RestAptManage
 
         if ( serialized != null )
         {
-            final StreamingOutput sout = output -> aptManager.getPackage( md5, byteBuffer -> {
-                while ( byteBuffer.hasRemaining() )
+            final StreamingOutput sout = output -> {
+                final WritableByteChannel outChannel = Channels.newChannel(output);
+                aptManager.getPackage( md5, new Repository.PackageProgressListener()
                 {
-                    try
+                    @Override
+                    public String downloadFileId()
                     {
-                        output.write( byteBuffer.get() );
-                        output.flush();
+                        return md5;
                     }
-                    catch ( IOException e )
+
+
+                    @Override
+                    public void writeBytes( final ByteBuffer byteBuffer )
                     {
-                        LOGGER.error( "Error writing apt file bytes", e );
+                        while ( byteBuffer.hasRemaining() )
+                        {
+                            try
+                            {
+                                outChannel.write( byteBuffer );
+                            }
+                            catch ( IOException e )
+                            {
+                                LOGGER.error( "Error writing apt file bytes", e );
+                            }
+                        }
                     }
-                }
-            } );
+
+
+                    @Override
+                    public long getSize()
+                    {
+                        return 0;
+                    }
+                } );
+            };
 
             DefaultPackageMetadata pm = MetadataUtils.JSON.fromJson( serialized, DefaultPackageMetadata.class );
             Response.ResponseBuilder responseBuilder = Response.ok( sout );
