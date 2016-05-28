@@ -37,7 +37,6 @@ func MngInit() {
 	container.SetContainerUid("management")
 	gpg.GenerateKey("management")
 	container.Start("management")
-	exec.Command("dhclient", "mng-net").Run()
 
 	ip := net.GetIp()
 
