@@ -48,8 +48,6 @@ public class ConfigManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( ConfigManager.class.getName() );
 
-    public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keystores/h.public.gpg";
-
     public static final String PEER_KEYSTORE = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.jks";
 
     private static final String PEER_CERT_ALIAS = "peer_cert";
@@ -93,7 +91,7 @@ public class ConfigManager
 
         this.peerId = peerManager.getLocalPeer().getId();
 
-        this.hPublicKey = PGPKeyHelper.readPublicKey( H_PUB_KEY );
+        this.hPublicKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
         LOG.debug( "Getting hPublicKey from keystores folder: " + hPublicKey.toString() );
 
         this.ownerPublicKey =
@@ -199,15 +197,16 @@ public class ConfigManager
     @Deprecated
     public void addHubConfig( final String hubIp )
     {
-//        this.hubIp = hubIp;
+        //        this.hubIp = hubIp;
     }
 
 
     public String getHubIp()
     {
-//        return configDataService.getHubConfig( peerId ).getHubIp();
+        //        return configDataService.getHubConfig( peerId ).getHubIp();
         return "hub.subut.ai";
     }
+
 
     public byte[] readContent( Response response ) throws IOException
     {
@@ -223,6 +222,7 @@ public class ConfigManager
         IOUtils.copy( is, bos );
         return bos.toByteArray();
     }
+
 
     public UserToken getPermanentToken()
     {
