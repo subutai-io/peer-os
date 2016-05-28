@@ -3612,6 +3612,11 @@ td.b-main-table__status-col {
     height: 100px;
 }
 
+.e2e-sign-message {
+    /*width: 370px;*/
+    height: 160px;
+}
+
 .b-text-logs {
 	background-color: #f8fbfd;
     padding: 10px 14px;
