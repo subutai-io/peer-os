@@ -2,7 +2,6 @@ package io.subutai.core.security.impl.crypto;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -27,7 +26,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.security.crypto.pgp.KeyPair;
@@ -61,10 +59,10 @@ public class KeyManagerImpl implements KeyManager
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
     private EncryptionTool encryptionTool = null;
-    private static final String PEER_PUBLIC_KEY_FILE =
-            System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.public.key";
-    private static final String PEER_PRIVATE_KEY_FILE =
-            System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.secret.key";
+    //private static final String PEER_PUBLIC_KEY_FILE =
+            //System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.public.key";
+    //private static final String PEER_PRIVATE_KEY_FILE =
+            //System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.secret.key";
 
 
     /* *****************************
@@ -91,7 +89,7 @@ public class KeyManagerImpl implements KeyManager
 
 
     /* *****************************
-     * TODO if peer pgp keys are absent (fingerprint file is missing or db is missing), then generate new ones and
+     *
      * just save fingerprint to file system and store keys in db.
      * Next time if fingerprint exists just use it to fetch peer pgp keys from database.
      * No need to store pgp keys in the file system
@@ -101,29 +99,21 @@ public class KeyManagerImpl implements KeyManager
 
         try
         {
-            InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( PEER_PRIVATE_KEY_FILE );
-            InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( PEER_PUBLIC_KEY_FILE );
+            //InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( PEER_PRIVATE_KEY_FILE );
+            //InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( PEER_PUBLIC_KEY_FILE );
 
             PGPPublicKeyRing peerPubRing;
             PGPSecretKeyRing peerSecRing;
 
-            if ( peerPubStream == null || peerSecStream == null )
-            {
-                KeyPair keyPair = PGPEncryptionUtil
-                        .generateKeyPair( String.format( "subutai%d@subutai.io", DateUtil.getUnixTimestamp() ),
-                                SystemSettings.getPeerSecretKeyringPwd(), true );
+            KeyPair keyPair = PGPEncryptionUtil
+                    .generateKeyPair( String.format( "subutai%d@subutai.io", DateUtil.getUnixTimestamp() ),
+                            SystemSettings.getPeerSecretKeyringPwd(), true );
 
-                Files.write( keyPair.getPubKeyring(), new File( PEER_PUBLIC_KEY_FILE ) );
-                Files.write( keyPair.getSecKeyring(), new File( PEER_PRIVATE_KEY_FILE ) );
+            //Files.write( keyPair.getPubKeyring(), new File( PEER_PUBLIC_KEY_FILE ) );
+            //Files.write( keyPair.getSecKeyring(), new File( PEER_PRIVATE_KEY_FILE ) );
 
-                peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-                peerSecRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
-            }
-            else
-            {
-                peerPubRing = PGPKeyUtil.readPublicKeyRing( peerPubStream );
-                peerSecRing = PGPKeyUtil.readSecretKeyRing( peerSecStream );
-            }
+            peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+            peerSecRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
 
             String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
 
@@ -737,10 +727,10 @@ public class KeyManagerImpl implements KeyManager
                 return PGPKeyUtil.readPublicKeyRing( keyData );
             }
         }
-        catch ( PGPException e )
+        catch ( Exception e )
         {
+            return null;
         }
-
         return null;
     }
 

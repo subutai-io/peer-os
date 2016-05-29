@@ -17,7 +17,9 @@ import io.subutai.common.util.ServiceLocator;
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
-
+    public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
+    public static final String DEFAULT_KEY_SERVER = "https://localhost:8443/rest/v1/pks";
+    public static final String DEFAULT_MGMT_INTERFACE = "mng-net";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final int DEFAULT_PUBLIC_PORT = ChannelSettings.SECURE_PORT_X1;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
@@ -139,6 +141,18 @@ public class SystemSettings
     public static int getOpenPort()
     {
         return PROPERTIES.getInt( "openPort", ChannelSettings.OPEN_PORT );
+    }
+
+
+    public static String getKeyServer()
+    {
+        return PROPERTIES.getString( "keyServer", DEFAULT_KEY_SERVER );
+    }
+
+
+    public static void setKeyServer( String keyServer )
+    {
+        saveProperty( "keyServer", keyServer );
     }
 
 
@@ -307,7 +321,6 @@ public class SystemSettings
 
     public static void setPeerSecretKeyringPwd( String pwd ) throws ConfigurationException
     {
-        validatePublicUrl( pwd );
         saveProperty( "peerSecretKeyringPwd", pwd );
     }
 

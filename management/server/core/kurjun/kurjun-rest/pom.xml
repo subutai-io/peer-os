@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>kurjun</artifactId>
-    <version>4.0.0-RC12-SNAPSHOT</version>
+    <version>4.0.0-RC13</version>
   </parent>
   <artifactId>kurjun-rest</artifactId>
   <name>Subutai Kurjun REST</name>
@@ -44,6 +44,11 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
 
   </dependencies>

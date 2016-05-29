@@ -8,12 +8,33 @@ public class PeerRegistrationPage extends PageObject {
 
     //region WEB ELEMENTS: Fields
 
+    @FindBy(id="subt_input__peer-ip")
+    public WebElementFacade fieldPeerIp;
+
+    @FindBy(id="subt_input__peer-key-phrase")
+    public WebElementFacade fieldPeerKeyPhrase;
+
+    @FindBy(id="subt_input__peer-approve-keyphrase")
+    public WebElementFacade fieldPeerApprove;
     //endregion
 
     //region WEB ELEMENTS: Buttons
 
     @FindBy(id = "subt_link__create-peer")
     public WebElementFacade buttonCreatePeer;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_blue subt_button__peer-cancel\"]")
+    public WebElementFacade buttonCancelPeerRequest;
+
+    @FindBy(xpath = "*//a[@class=\"b-btn b-btn_red subt_button__peer-unregister\"]")
+    public WebElementFacade buttonUnregister;
+
+    public String sikuliButtonCreatePeer = "src/test/resources/imgs/buttons/buttonCreatePeer.png";
+    public String sikuliButtonCreate = "src/test/resources/imgs/buttons/buttonCreate.png";
+    public String sikuliButtonApprove = "src/test/resources/imgs/buttons/buttonApprove.png";
+    public String sikuliButtonApprovePopUp = "src/test/resources/imgs/buttons/buttonApprovePopUp.png";
+    public String sikuliButtonUnregister = "src/test/resources/imgs/buttons/buttonUnregister.png";
+    public String sikuliButtonUnregisterPopup = "src/test/resources/imgs/buttons/buttonUnregisterPopup.png";
 
     //endregion
 
@@ -49,6 +70,14 @@ public class PeerRegistrationPage extends PageObject {
 
     @FindBy(xpath = "*//h1[contains(text(),\"Peer registration\")]")
     public WebElementFacade headerPeerRegistration;
+
+    //endregion
+
+    //region WEB ELEMENTS: wait for
+
+    public void waitButtonUnregister(){
+        waitFor(buttonUnregister);
+    }
 
     //endregion
 }

@@ -25,6 +25,8 @@ public class SystemInfoPojo implements SystemInfo
     private String gitClosestTagCommitCount;
     private String gitCommitIdDescribe;
 
+    private boolean isUpdatesAvailable;
+
 
     public String getProjectVersion()
     {
@@ -215,5 +217,17 @@ public class SystemInfoPojo implements SystemInfo
     public void setP2pVersion( final String p2pVersion )
     {
         this.p2pVersion = p2pVersion;
+    }
+
+
+    public boolean isUpdatesAvailable()
+    {
+        return isUpdatesAvailable;
+    }
+
+
+    public void setUpdatesAvailable( final boolean updatesAvailable )
+    {
+        isUpdatesAvailable = updatesAvailable;
     }
 }

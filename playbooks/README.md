@@ -1,120 +1,107 @@
 Acceptance tests for Subutai Social
 ===================================
+Dependencies:
 
-In our tests we are using two testing libraries: **Serenity** + **Sikuli**
+Your system must has: ***Ubuntu 14*** and above, **Maven 3** and above, **Java 8**  
+Also need additional packages:
 
-**Serenity** is an open source library that helps us write higher quality automated acceptance tests faster.
+```
+sudo add-apt-repository ppa:gijzelaar/opencv2.4
+sudo apt-get update
+sudo apt-get install maven
+sudo apt-get install xvfb
+sudo apt-get install openjdk-8-jdk
+sudo apt-get install recordmydesktop
+sudo apt-get install wmctrl
+sudo apt-get install xdotool
+sudo apt-get install build-essentials
+sudo apt-get build-essentials
+sudo apt-get install libopencv2.4-java
+sudo apt-get libcv-dev
+sudo apt-get install libtesseract3 
+```
 
-[http://thucydides.info](http://thucydides.info) based on JAVA.
+At first you need go to playbooks directory
 
-**Sikuli** automates anything we are see on the screen. It uses image recognition to identify and control GUI components.
+``` cd playbooks ```
 
-Open source too. 
+Then You can run tests usign following script and parameters:
 
-[http://www.sikuli.org/](http://www.sikuli.org/) supporting JAVA.
+``` ./run_tests_qa.sh [-m] [-M] [-l] [-L] [-s] [-r] [-h]```
 
-For clicks by elements and testing plugins we using **Sikuli**, all another places we are verifying with **Serenity**.
-
-Main blocks into Serenity: **Pages**, **Steps**, **DefSteps**, **Stories**
-
-**Pages:** This is Java classes extended from PageObject class. Here we are writing all web elements for next work.
-
-Base Pages          |                      |
---------------------|-----------------------
-AboutPage           |  LoginPage
-AccountSettings     |  MonitoringPage
-AdvancedPage        |  NetworkSettings
-BazaarPage          |  PeerRegistrationPage
-BlueprintsPage      |  PeerSettingsPage
-CommonPages         |  PgpPlugin
-ConsolePage         |  PluginIntegratorPage
-ContainersPage      |  PluginsPage
-EnvironmentsPage    |  ResourceHostsPage
-HomePage            |  ResourceNodesPage
-KurjunPage          |  RoleManagementPage
-KurjunSettingsPage  | TokensPage
-TrackerPage         | UserManagementPage
-
-**Steps:** Using Web Elements from Pages we creating base steps: clicks, enters, waits, types, etc.
-
-**DefSteps:** Here we are using our Steps and concatenating them with JBehave high language level specification. 
- (looks like as cucumber)
-
-**Stories:** Using DefSteps we are creating testing story and scenarios for any verifications.
-
-You are can run test on the local machines.
-For this you need clone directory playbooks and run script 
-`./run_test_qa.sh` with parameters: `-h; -r; -s; -S; -m; -M; -l; -L `
+You can easily combine all parameters in one comand!
 
 Parameter       | Description 
 ----------------|----------------------
--m              | Set Management Host First:  IP
--M              | Set Management Host Second: IP
+-m              | Set Management Host First:  IP, domain
+-M              | Set Management Host Second: IP, domain
 -l              | Observe List of All Playbooks
+-L              | Observe List Playbooks for current run
 -s              | Choice of Playbooks for run
                 | “playbook1.story, playbook2.story” ...  Start a few Playbooks
 -r              | Start acceptance tests
 -h              | Get Help info
 
-Dependencies: **Maven3**, **Java7/8** also need additional packages **OpenCV**
+Also you can start tests using maven commands:
 
-For Ubuntu need install next packages:
-```scss
-sudo add-apt-repository ppa:gijzelaar/opencv2.4
-sudo apt-get update
-sudo apt-get libcv-dev
-sudo apt-get install libtesseract3 
+***For clean test project***
+``` 
+mvn clean;  
+``` 
+***For run tests, which is inside directory tests_run***
 ```
-What is Serenity
--------------------------------------------
+mvn integration-test; 
+```
 
-Define your requirements and acceptance criteria
-When you use Serenity, you start with the requirements you need to implement.
-These are often expressed as user stories with acceptance criteria that help clarify the requirements.
-It is these Acceptance Criteria that we automate with Serenity.
+***For create html with reports about running tests***
+```
+mvn serenity:aggregate;  
+```
 
-Automate your acceptance criteria
-Next, you describe your acceptance criteria in high-level business terms.
-Developers record these acceptance criteria using either a BDD tool such as Cucumber or JBehave,
-or simply in Java using JUnit, so that Serenity can run them.
+After running tests you can find report in the ```target/site/serenity/``` directory.
+For it, you need open ```index.html``` in your browser.
 
-Implement the tests
-Developers now implement the acceptance criteria, so that they can run against the actual application.
-Under the hood, tests are broken down into nested steps for better readability and easier maintenance.
-If you are testing a web application,
-Serenity provides great built-in support for the popular open source Selenium 2/WebDriver library.
+How it works?
 
-Report on test results
-Serenity provides detailed reports on the test results and execution, including:
-A narrative for each test
-Screen shots for each step in the test
-Test results including execution times and error messages if a test failed
+Examples:
 
-What is Sikuli
--------------------------------------------
+***Observe List of All Playbooks***
+``` 
+./run_tests_qa.sh -l 
 
-SikuliX automates anything you see on the screen of your desktop computer running Windows, Mac or some Linux/Unix.
-It uses image recognition powered by OpenCV to identify and control GUI components. 
+AddRole.story
+CassandraTemplate.story
+ChangePassword.story
+ChooseTheSizeOfContainers.story
+CrossPeerEnviOnRemotePeer.story
+CrossPeerWithTwoHosts.story
+GrowContainer.story
+KurjunAddTemplate.story
+LocalEnvironment.story
+PeerRegistration.story
+PluginAppScale.story
+PluginGeneric.story
+SetDomainToContainer.story
+ShareEnvironment.story
+SmokeTest.story
+StopRemoveContainer.story
+TokensEnvironmentPgpKey.story
+TokensOwnPgpKey.story
+UserRegistration.story
+```
+***Choice of Playbooks for run***
+```
+./run_tests_qa.sh -s "AddRole.story, CassandraTemplate.story"
+```
+***Set Management Hosts, First and Second:  IP, domain***
+```
+./run_tests_qa.sh - m 192.168.0.119 -M domain.ddns.com
+```
+***Start acceptance tests***
+```
+./run_tests_qa.sh -r
 
-This is handy in cases when there is no easy access to a GUI's internals or the source code of the application 
-or web page you want to act on.
-
-SikuliX supports as scripting languages
-Python language level 2.7 (supported by Jython)
-Ruby language level 1.9 and 2.0 (supported by JRuby)
-… and you can use it in Java programming and programming/scripting with any Java aware programming/scripting 
-language (Jython, JRuby, Scala, Clojure, …).
-
-Though SikuliX is currently not available on any mobile device,
-it can be used with the respective emulators on a desktop computer or based on VNC solutions.
-
-Besides locating images on a screen SikuliX can run the mouse and the keyboard to interact 
-with the identified GUI elements. This is available for multi monitor environments and even 
-for remote systems with some restrictions.
-
-SikuliX comes with basic text recognition (OCR) and can be used to search text in images. 
-This feature is powered by Tesseract.
-
-SikuliX is a Java application, that works on Windows XP+, Mac 10.6+ and most Linux/Unix systems.
-For Windows, Mac and Ubuntu 12.04+ it is complete and should normally work out of the box.
-For other Linux/Unix systems there usually are a few prerequisites to be setup.
+SERENITY 
+TEST STARTED ....
+```
+To be continue ...

@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import ai.subut.kurjun.metadata.common.raw.RawMetadata;
 import ai.subut.kurjun.model.metadata.SerializableMetadata;
+import ai.subut.kurjun.model.repository.Repository;
 //import ai.subut.kurjun.model.metadata.Metadata;
 
 
@@ -14,7 +16,9 @@ public interface RawManager
 {
 
 
-    InputStream getFile( String repository, String md5 ) throws IOException;
+    InputStream getFile( String repository, String md5, Repository.PackageProgressListener progressListener  ) throws IOException;
+
+    InputStream getFile( RawMetadata rawMetadata, Repository.PackageProgressListener progressListener  ) throws IOException;
 
     List<SerializableMetadata> list( String repository ) throws IOException;
 

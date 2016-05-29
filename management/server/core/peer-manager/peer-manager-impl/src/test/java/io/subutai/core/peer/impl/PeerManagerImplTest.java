@@ -103,7 +103,6 @@ public class PeerManagerImplTest
 
 
         peerManager.commandResponseListener = commandResponseListener;
-        peerManager.localPeer = localPeer;
 
 
         peerManager.addPeerToRegistry( localPeer );

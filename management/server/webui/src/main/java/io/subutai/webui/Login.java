@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.security.exception.IdentityExpiredException;
+import io.subutai.common.security.exception.InvalidLoginException;
+import io.subutai.common.security.exception.SessionBlockedException;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -31,58 +34,63 @@ public class Login extends HttpServlet
         String username = request.getParameter( "username" );
         String password = request.getParameter( "password" );
         String sptoken = request.getParameter( "sptoken" );
+        String newPassword = request.getParameter( "newpassword" );
         User user = null;
+
 
         try
         {
-            if ( !Strings.isNullOrEmpty( username ) )
-            {
-                IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
+            IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
 
-                if ( identityManager != null )
+
+            if( !Strings.isNullOrEmpty( newPassword ))
+            {
+                identityManager.changeUserPassword( username, password, newPassword );
+                password = newPassword;
+            }
+
+            try
+            {
+                if ( !Strings.isNullOrEmpty( username ) )
                 {
-                    sptoken = identityManager.getUserToken( username, password );
-                    user = identityManager.authenticateByToken( sptoken );
+                    if ( identityManager != null )
+                    {
+                        sptoken = identityManager.getUserToken( username, password );
+                        user = identityManager.authenticateByToken( sptoken );
+                    }
                 }
-            }
-            else if ( !Strings.isNullOrEmpty( sptoken ) )
-            {
-                IdentityManager identityManager = ServiceLocator.getServiceNoCache( IdentityManager.class );
-
-                if ( identityManager != null )
+                else if ( !Strings.isNullOrEmpty( sptoken ) )
                 {
-                    user = identityManager.authenticateByToken( sptoken );
+                    if ( identityManager != null )
+                    {
+                        user = identityManager.authenticateByToken( sptoken );
+                    }
                 }
+                else
+                {
+                    request.setAttribute( "error", "Please enter username or password" );
+                    response.getWriter().write( "Error, Please enter username or password" );
+                    response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                }
+
+                authenticateUser( request, response, user, sptoken );
             }
-            else
+            catch ( IdentityExpiredException e )
             {
-                request.setAttribute( "error", "Please enter username or password" );
-                response.getWriter().write( "Error, Please enter username or password" );
-                response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                request.setAttribute( "error", "Your credentials are expired  !!!" );
+                response.getWriter().write( "Auth Credentials are expired" );
+                response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
             }
-
-
-            if ( user != null )
+            catch ( SessionBlockedException e )
             {
-                request.getSession().setAttribute( "userSessionData", sptoken );
-                Cookie ctoken = new Cookie( "sptoken", sptoken );
-                //                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
-
-                logger.info( user.getFingerprint() );
-                logger.info( user.getEmail() );
-                logger.info( user.getFullName() );
-                logger.info( user.getSecurityKeyId() );
-                logger.info( user.getUserName() );
-                Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
-                //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
-
-                response.addCookie( ctoken );
-                response.addCookie( fingerprint );
+                request.setAttribute( "error", "Account is blocked !!!" );
+                response.getWriter().write( "Account is blocked" );
+                response.setStatus( HttpServletResponse.SC_FORBIDDEN );
             }
-            else
+            catch ( InvalidLoginException e )
             {
                 request.setAttribute( "error", "Wrong Auth Credentials !!!" );
-                response.getWriter().write( "Error, Wrong Auth Credentials" );
+                response.getWriter().write( "Wrong Auth Credentials" );
                 response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
             }
         }
@@ -94,6 +102,28 @@ public class Login extends HttpServlet
         }
     }
 
+    private void authenticateUser( HttpServletRequest request, HttpServletResponse response, User user, String sptoken )
+            throws InvalidLoginException
+    {
+        if ( user == null )
+        {
+            throw new InvalidLoginException();
+        }
+        request.getSession().setAttribute( "userSessionData", sptoken );
+        Cookie ctoken = new Cookie( "sptoken", sptoken );
+        //                    sptoken.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+
+        logger.info( user.getFingerprint() );
+        logger.info( user.getEmail() );
+        logger.info( user.getFullName() );
+        logger.info( user.getSecurityKeyId() );
+        logger.info( user.getUserName() );
+        Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
+        //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
+
+        response.addCookie( ctoken );
+        response.addCookie( fingerprint );
+    }
 
     @Override
     protected void doGet( final HttpServletRequest req, final HttpServletResponse resp )

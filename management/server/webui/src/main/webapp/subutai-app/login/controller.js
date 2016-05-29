@@ -52,6 +52,10 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 	vm.errorMessage = false;
 	vm.activeMode = 'username';
 
+	vm.passExpired = false;
+	vm.newPass = "";
+	vm.passConf = "";
+
 	//functions
 	vm.login = login;
 	vm.changeMode = changeMode;
@@ -77,15 +81,37 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 				'&password=' + vm.pass;
 		}
 
-		loginSrv.login( postData ).success(function(data){
-			localStorage.setItem('currentUser', vm.name);
-			$rootScope.currentUser = vm.name;
-			$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
-			//$state.go('home');
-			window.location = '/';
-		}).error(function(error){
-			console.log(error);
-			vm.errorMessage = error;
-		});
+		if( vm.newPass.length > 0 ) {
+			if( vm.newPass !== vm.passConf ) {
+				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
+			}
+			else {
+				postData += '&newpassword=' + vm.newPass;
+
+				loginSrv.login( postData ).success(function(data){
+					localStorage.setItem('currentUser', vm.name);
+					$rootScope.currentUser = vm.name;
+					$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+					//$state.go('home');
+					window.location = '/';
+				}).error(function(error){
+					vm.errorMessage = error;
+				});
+			}
+		}
+		else {
+			loginSrv.login( postData ).success(function(data){
+				localStorage.setItem('currentUser', vm.name);
+				$rootScope.currentUser = vm.name;
+				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+				//$state.go('home');
+				window.location = '/';
+			}).error(function(error, status){
+				vm.errorMessage = error;
+
+				if( status == 412 )
+					vm.passExpired = true;
+			});
+		}
 	}
 }

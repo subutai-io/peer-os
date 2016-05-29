@@ -85,10 +85,25 @@ public interface RestService
                                         @FormParam( "securePortX3" ) String securePortX3,
                                         @FormParam( "publicUrl" ) String publicUrl,
                                         @FormParam( "agentPort" ) String agentPort,
-                                        @FormParam( "publicSecurePort" ) String publicSecurePort ) throws ConfigurationException;
+                                        @FormParam( "publicSecurePort" ) String publicSecurePort,
+                                        @FormParam( "keyServer" ) String keyServer) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getAdvancedSettings();
+
+
+    @GET
+    @Path( "management_updates" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response getManagementUpdates();
+
+
+    @POST
+    @Path( "update_management" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    public Response update();
+
+
 }

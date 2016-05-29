@@ -25,7 +25,7 @@ public interface SystemManager
     PeerSettings getPeerSettings();
 
     void setNetworkSettings( String securePortX1, String securePortX2, String securePortX3, final String publicUrl,
-                             final String agentPort, final String publicSecurePort ) throws ConfigurationException;
+                             final String agentPort, final String publicSecurePort, final String keyServer ) throws ConfigurationException;
 
     AdvancedSettings getAdvancedSettings();
 
@@ -36,4 +36,8 @@ public interface SystemManager
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 
     void sendSystemConfigToHub() throws ConfigurationException;
+
+    SystemInfo getManagementUpdates();
+
+    boolean updateManagement();
 }

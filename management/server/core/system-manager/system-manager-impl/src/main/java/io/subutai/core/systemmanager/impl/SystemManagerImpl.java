@@ -13,6 +13,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -197,9 +200,16 @@ public class SystemManagerImpl implements SystemManager
 
     @Override
     public void setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                    final String publicUrl, final String agentPort, final String publicSecurePort )
-            throws ConfigurationException
+                                    final String publicUrl, final String agentPort, final String publicSecurePort,
+                                    final String keyServer ) throws ConfigurationException
     {
+        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
+        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
+        SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
+        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
+        SystemSettings.setKeyServer( keyServer );
+
+        notifyListeners();
         try
         {
             SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
@@ -213,7 +223,6 @@ public class SystemManagerImpl implements SystemManager
         {
             throw new ConfigurationException( e );
         }
-
     }
 
 
@@ -283,9 +292,72 @@ public class SystemManagerImpl implements SystemManager
         dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
         dto.setPublicUrl( networkSettings.getPublicUrl() );
         dto.setAgentPort( networkSettings.getAgentPort() );
+        dto.setKeyServer( networkSettings.getKeyServer() );
 
 
         hubManager.sendSystemConfiguration( dto );
+    }
+
+
+    @Override
+    public SystemInfo getManagementUpdates()
+    {
+        SystemInfo info = getSystemInfo();
+
+        try
+        {
+            ResourceHost host = peerManager.getLocalPeer().getManagementHost();
+
+            CommandResult result = host.execute( new RequestBuilder( "subutai update management -c" ) );
+
+            if ( result.getExitCode() == 0 )
+            {
+                info.setUpdatesAvailable( true );
+            }
+            else
+            {
+                info.setUpdatesAvailable( false );
+            }
+        }
+        catch ( HostNotFoundException e )
+        {
+            e.printStackTrace();
+            info.setRhVersion( "No RH connected" );
+            return info;
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+        }
+
+        return info;
+    }
+
+
+    @Override
+    public boolean updateManagement()
+    {
+        try
+        {
+            ResourceHost host = peerManager.getLocalPeer().getManagementHost();
+
+            CommandResult result =
+                    host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
+
+            //            return result.hasSucceeded();
+            result.getExitCode();
+            return true;
+        }
+        catch ( HostNotFoundException e )
+        {
+            e.printStackTrace();
+            return false;
+        }
+        catch ( CommandException e )
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -300,6 +372,7 @@ public class SystemManagerImpl implements SystemManager
         pojo.setPublicUrl( SystemSettings.getPublicUrl() );
         pojo.setAgentPort( SystemSettings.getAgentPort() );
         pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+        pojo.setKeyServer( SystemSettings.getKeyServer() );
 
         return pojo;
     }

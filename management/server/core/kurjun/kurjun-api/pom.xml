@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>kurjun</artifactId>
-    <version>4.0.0-RC12-SNAPSHOT</version>
+    <version>4.0.0-RC13</version>
   </parent>
   <artifactId>kurjun-api</artifactId>
   <name>Subutai Kurjun Api</name>
@@ -86,6 +86,10 @@
       <version>${ai.subut.kurjun.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -115,7 +119,7 @@
             <Embed-Transitive>true</Embed-Transitive>
             <Import-Package>
               io.subutai*, org.apache.commons.logging*, org.apache.commons.codec*,
-              org.apache.commons.io, org.apache.commons.lang*, com.google.common*,
+              org.apache.commons.io.*, org.apache.commons.lang*, com.google.common*,
               com.google.gson*, org.slf4j, org.apache.cxf.*, javax.ws.rs*,
               javax.annotation.*, javax.persistence*, javax.security*, !*
             </Import-Package>

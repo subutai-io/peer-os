@@ -15,16 +15,20 @@ public class KurjunSettingsPage extends PageObject {
     @FindBy(xpath = "*//button[@ng-click=\"settingsKurjunCtrl.updateConfigUrls()\"]")
     public WebElementFacade buttonSave;
 
-    @FindBy(xpath = "*//button[@ng-click=\"settingsKurjunCtrl.addUrl()\"]")
+    @FindBy(xpath = "*//button[@class=\"b-btn b-btn_green\" and contains(text(),\"Add\")]")
     public WebElementFacade buttonAdd;
 
     @FindBy(xpath = "*//button[@ng-click=\"settingsKurjunCtrl.updateConfigQuotas()\"]")
     public WebElementFacade buttonSaveQuotas;
+
+    @FindBy(id = "subt_link__create-peer")
+    public WebElementFacade buttonAddUrl;
     //endregion
 
     //region WEB ELEMENTS: sikuli Title
 
     public String sikuliTitleQuotas = "src/test/resources/imgs/titles/titleQuotas.png";
+    public String sikuliTitleUrlsList = "src/test/resources/imgs/titles/titleUrlsList.png";
     //endregion
 
     //region WEB ELEMENTS: Checkboxes

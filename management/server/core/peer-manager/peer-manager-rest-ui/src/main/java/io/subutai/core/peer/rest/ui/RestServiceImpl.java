@@ -133,7 +133,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response rejectForRegistrationRequest( final String peerId )
+    public Response rejectForRegistrationRequest( final String peerId, Boolean force )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -142,7 +142,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doRejectRequest( data );
+            peerManager.doRejectRequest( data ,force );
         }
         catch ( Exception e )
         {
@@ -175,7 +175,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response cancelForRegistrationRequest( final String peerId )
+    public Response cancelForRegistrationRequest( final String peerId, Boolean force )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -184,7 +184,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doCancelRequest( data );
+            peerManager.doCancelRequest( data, force );
         }
         catch ( Exception e )
         {
@@ -196,7 +196,7 @@ public class RestServiceImpl implements RestService {
 
 
     @Override
-    public Response unregisterForRegistrationRequest( final String peerId )
+    public Response unregisterForRegistrationRequest( final String peerId, Boolean force )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
 
@@ -205,7 +205,7 @@ public class RestServiceImpl implements RestService {
 
         try
         {
-            peerManager.doUnregisterRequest( data );
+            peerManager.doUnregisterRequest( data, force );
         }
         catch ( Exception e )
         {

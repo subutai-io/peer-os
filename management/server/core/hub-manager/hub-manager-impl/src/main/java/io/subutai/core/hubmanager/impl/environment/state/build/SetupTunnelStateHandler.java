@@ -3,17 +3,13 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.impl.entity.RhP2PIpEntity;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.hubmanager.impl.http.RestResult;
-import io.subutai.core.hubmanager.impl.util.AsyncUtil;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
@@ -23,16 +19,22 @@ public class SetupTunnelStateHandler extends StateHandler
 {
     public SetupTunnelStateHandler( Context ctx )
     {
-        super( ctx );
+        super( ctx, "Setting up tunnel" );
     }
 
 
     @Override
     protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
+        logStart();
+
         EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
-        return setupTunnel( peerDto, envDto );
+        EnvironmentPeerDto resultDto = setupTunnel( peerDto, envDto );
+
+        logEnd();
+
+        return resultDto;
     }
 
 
@@ -48,24 +50,13 @@ public class SetupTunnelStateHandler extends StateHandler
             }
         }
 
-        final P2pIps p2pIps = new P2pIps();
+        P2pIps p2pIps = new P2pIps();
 
         p2pIps.addP2pIps( setOfP2PIps );
 
-        peerDto.setSetupTunnel( false );
+        ctx.localPeer.setupTunnels( p2pIps, new EnvironmentId( envDto.getId() ) );
 
-        AsyncUtil.execute( new Callable<Void>()
-        {
-            @Override
-            public Void call() throws Exception
-            {
-                ctx.localPeer.setupTunnels( p2pIps, new EnvironmentId( envDto.getId() ) );
-
-                peerDto.setSetupTunnel( true );
-
-                return null;
-            }
-        } );
+        peerDto.setSetupTunnel( true );
 
         return peerDto;
     }

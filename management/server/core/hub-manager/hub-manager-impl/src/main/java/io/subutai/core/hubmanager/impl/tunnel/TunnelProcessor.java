@@ -11,12 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
@@ -45,7 +42,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
 
     @Override
-    public void processStateLinks( final Set<String> stateLinks ) throws HubPluginException
+    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
     {
         for ( String stateLink : stateLinks )
         {
@@ -54,6 +51,8 @@ public class TunnelProcessor implements StateLinkProcessor
                 processLink( stateLink );
             }
         }
+
+        return false;
     }
 
 

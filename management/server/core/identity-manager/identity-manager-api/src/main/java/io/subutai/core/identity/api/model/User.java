@@ -1,6 +1,7 @@
 package io.subutai.core.identity.api.model;
 
 
+import java.util.Date;
 import java.util.List;
 
 import io.subutai.common.security.relation.RelationLink;
@@ -63,4 +64,13 @@ public interface User extends RelationLink
     String getTypeName();
 
 
+    Date getValidDate();
+
+    void setValidDate( Date validDate );
+
+    String getAuthId();
+
+    void setAuthId( String authId );
+
+    boolean isIdentityValid();
 }

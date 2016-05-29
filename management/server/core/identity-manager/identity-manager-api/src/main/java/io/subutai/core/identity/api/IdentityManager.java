@@ -5,8 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.security.auth.Subject;
+import javax.annotation.security.PermitAll;
 
+import io.subutai.common.security.exception.SystemSecurityException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.PermissionOperation;
 import io.subutai.common.security.objects.PermissionScope;
@@ -61,17 +62,32 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    String getSystemUserToken();
-
-
-    /* *************************************************
-    */
-    User authenticateByAuthSignature( String fingerprint, String signedAuth ) throws SecurityException;
+    UserToken getUserToken( long userId );
 
 
     /* *************************************************
      */
-    User authenticateByToken( String token );
+    String getSystemUserToken();
+
+
+    /* *************************************************
+     */
+    @PermitAll
+    String updateUserAuthId( User user, String authId ) throws SystemSecurityException;
+
+    /* *************************************************
+         */
+    String getEncryptedUserAuthId( User user ) throws SystemSecurityException;
+
+
+    /* *************************************************
+     */
+    User authenticateByAuthSignature( String fingerprint, String signedAuth );
+
+
+    /* *************************************************
+     */
+    User authenticateByToken( String token )  throws SystemSecurityException;
 
 
     /* *************************************************
@@ -209,11 +225,21 @@ public interface IdentityManager
 
     /* *************************************************
      */
+    @PermitAll
+    boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws Exception;
+
+    /* *************************************************
+         */
     boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception;
 
 
     /* *************************************************
      */
+    @PermitAll
+    boolean changeUserPassword( User user, String oldPassword, String newPassword ) throws Exception;
+
+    /* *************************************************
+         */
     void updateUser( User user );
 
     /*
@@ -242,7 +268,7 @@ public interface IdentityManager
     /* ***********************************
      *  Authenticate Internal User
      */
-    Subject loginSystemUser();
+    Session loginSystemUser();
 
 
     /* *************************************************

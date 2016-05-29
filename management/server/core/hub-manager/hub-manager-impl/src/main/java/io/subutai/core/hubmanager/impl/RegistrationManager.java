@@ -14,11 +14,11 @@ import org.apache.http.HttpStatus;
 
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.settings.SubutaiInfo;
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.model.Config;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.hubmanager.impl.model.ConfigEntity;
+import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.PeerInfoDto;
 import io.subutai.hub.share.dto.RegistrationDto;
 import io.subutai.hub.share.pgp.key.PGPKeyHelper;
@@ -52,7 +52,7 @@ public class RegistrationManager
     }
 
 
-    public void registerPeer( String email, String password ) throws HubPluginException
+    public void registerPeer( String email, String password ) throws Exception
     {
         registerPeerPubKey();
 
@@ -60,7 +60,7 @@ public class RegistrationManager
     }
 
 
-    private String readKeyText( PGPPublicKey key ) throws HubPluginException
+    private String readKeyText( PGPPublicKey key ) throws Exception
     {
         try
         {
@@ -68,12 +68,12 @@ public class RegistrationManager
         }
         catch ( PGPException | IOException e )
         {
-            throw new HubPluginException( "Error to read PGP key as text", e );
+            throw new Exception( "Error to read PGP key as text", e );
         }
     }
 
 
-    private void registerPeerPubKey() throws HubPluginException
+    private void registerPeerPubKey() throws Exception
     {
         log.info( "Registering peer public key to Hub..." );
 
@@ -83,7 +83,7 @@ public class RegistrationManager
 
         if ( !restResult.isSuccess() )
         {
-            throw new HubPluginException( "Error to register peer public to Hub: " + restResult.getError() );
+            throw new Exception( "Error to register peer public to Hub: " + restResult.getError() );
         }
 
         log.info( "Public key successfully registered" );
@@ -103,13 +103,17 @@ public class RegistrationManager
         dto.setOwnerEmail( email );
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
-        dto.setToken( configManager.getPermanentToken() );
+
+        UserToken token = configManager.getPermanentToken();
+
+        dto.setToken( token.getFullToken() );
+        dto.setTokenId( token.getTokenId() );
 
         return dto;
     }
 
 
-    private void register( String email, String password ) throws HubPluginException
+    private void register( String email, String password ) throws Exception
     {
         log.info( "Registering peer to Hub..." );
 
@@ -121,7 +125,7 @@ public class RegistrationManager
 
         if ( !restResult.isSuccess() )
         {
-            throw new HubPluginException( "Error to register peer: " + restResult.getError() );
+            throw new Exception( "Error to register peer: " + restResult.getError() );
         }
 
         Config config = new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ), email );
@@ -132,7 +136,7 @@ public class RegistrationManager
     }
 
 
-    public void unregister() throws HubPluginException
+    public void unregister() throws Exception
     {
         log.info( "Unregistering peer..." );
 
@@ -146,7 +150,7 @@ public class RegistrationManager
         }
         else if ( !restResult.isSuccess() )
         {
-            throw new HubPluginException( "Error to unregister peer: " + restResult.getError() );
+            throw new Exception( "Error to unregister peer: " + restResult.getError() );
         }
 
         hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );

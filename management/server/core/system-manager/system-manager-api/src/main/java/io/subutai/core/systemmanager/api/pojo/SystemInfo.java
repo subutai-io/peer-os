@@ -96,4 +96,10 @@ public interface SystemInfo
 
 
     public void setP2pVersion( final String p2pVersion );
+
+
+    public boolean isUpdatesAvailable();
+
+
+    public void setUpdatesAvailable( final boolean updatesAvailable );
 }

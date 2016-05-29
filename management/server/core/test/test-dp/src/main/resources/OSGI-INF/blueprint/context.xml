@@ -1,20 +1,22 @@
 <blueprint default-activation="eager"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <!--*****************************************************************-->
-  <!--<bean id="loggerHook" scope="singleton" activation="eager"-->
-        <!--class="io.subutai.core.test.dp.LoggerHooks">-->
-  <!--</bean>-->
 
-  <!--<service ref="loggerHook" activation="eager"-->
-           <!--interface="org.osgi.framework.hooks.service.FindHook">-->
-  <!--</service>-->
-  <!--*****************************************************************-->
+  <bean id="activator" class="io.subutai.core.test.dp.Activator" init-method="start"/>
+  <bean id="restService" class="io.subutai.core.test.dp.SampleRest"/>
 
-  <!--<service ref="loggerHook" activation="eager"-->
-           <!--interface="org.osgi.framework.hooks.service.EventListenerHook">-->
-  <!--</service>-->
+  <jaxrs:server address="/v1/test" id="testRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="restService" />
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
 
-  <!--*****************************************************************-->
+  <cxf:bus id="cxfBusSecurityManager">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
 
 </blueprint>

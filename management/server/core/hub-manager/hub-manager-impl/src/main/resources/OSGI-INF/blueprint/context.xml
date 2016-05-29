@@ -41,9 +41,6 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
-  <reference id="networkManager"
-             interface="io.subutai.core.network.api.NetworkManager" />
-
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />
 
@@ -63,6 +60,7 @@
     <property name="commandExecutor" ref="commandExecutor" />
     <argument ref="daoManagerHub" />
   </bean>
+
   <service ref="hubImpl" interface="io.subutai.core.hubmanager.api.HubManager" />
 
   <reference-list id="hubEventLstnr"

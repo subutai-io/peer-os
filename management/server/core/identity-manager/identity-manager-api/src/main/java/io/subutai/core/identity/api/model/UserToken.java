@@ -15,41 +15,54 @@ public interface UserToken
     //***********************************
     String getClaims();
 
+
     //***********************************
     String getFullToken();
 
-    //***********************************
-    String getToken();
 
     //***********************************
-    void setToken( String token );
+    String getTokenId();
+
+
+    //***********************************
+    void setTokenId( String tokenId );
+
 
     //***********************************
     String getSecret();
 
+
     //***********************************
     void setSecret( String secret );
+
 
     //***********************************
     int getType();
 
+
     //***********************************
     void setType( int type );
+
 
     //***********************************
     String getHashAlgorithm();
 
+
     //***********************************
     void setHashAlgorithm( String hashAlgorithm );
+
 
     //***********************************
     String getIssuer();
 
+
     //***********************************
     void setIssuer( String issuer );
 
+
     //***********************************
     Date getValidDate();
+
 
     //***********************************
     void setValidDate( Date validDate );

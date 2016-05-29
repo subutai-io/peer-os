@@ -7,9 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.core.hubmanager.api.HubPluginException;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
-import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -18,24 +16,33 @@ import io.subutai.hub.share.dto.HeartbeatResponseDto;
 
 public class HeartbeatProcessor implements Runnable
 {
+    private static final int FAST_MODE_MAX = 30; // For 5 min
+
+    private static final int BIG_INTERVAL_SECONDS = 60;
+
+    public static final int SMALL_INTERVAL_SECONDS = 10;
+
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final Set<StateLinkProcessor> processors = new HashSet<>();
 
     private final HubManagerImpl hubManager;
 
-    private final String path;
-
     private final HubRestClient restClient;
 
+    private final String path;
 
-    public HeartbeatProcessor( HubManagerImpl hubManager, ConfigManager configManager )
+    private long lastSentMillis = 0;
+
+    private int fastModeLeft = 0;
+
+
+    public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
+        this.restClient = restClient;
 
-        path = String.format( "/rest/v1.2/peers/%s/heartbeat", configManager.getPeerId() );
-
-        restClient = new HubRestClient( configManager );
+        path = String.format( "/rest/v1.2/peers/%s/heartbeat", peerId );
     }
 
 
@@ -52,21 +59,45 @@ public class HeartbeatProcessor implements Runnable
     {
         try
         {
-            sendHeartbeat();
+            sendHeartbeat( false );
         }
-        catch ( HubPluginException e )
+        catch ( Exception e )
         {
             log.error( "Error to process heartbeat: ", e );
         }
     }
 
 
-    public void sendHeartbeat() throws HubPluginException
+    /**
+     * @param force is true if a heartbeat is sent not by scheduler, e.g. manually or triggered from Hub.
+     *
+     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option
+     * is used to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor
+     * sets this option. See HubEnvironmentProcessor for example.
+     */
+    public void sendHeartbeat( boolean force ) throws Exception
     {
         if ( !hubManager.isRegistered() )
         {
             return;
         }
+
+        long interval = ( System.currentTimeMillis() - lastSentMillis ) / 1000;
+
+        if ( interval >= BIG_INTERVAL_SECONDS || force || fastModeLeft > 0 )
+        {
+            log.info( "Sending heartbeat: interval={}, force={}, fastModeLeft={}", interval, force, fastModeLeft );
+
+            doHeartbeat();
+        }
+    }
+
+
+    private void doHeartbeat() throws Exception
+    {
+        lastSentMillis = System.currentTimeMillis();
+
+        fastModeLeft--;
 
         try
         {
@@ -74,7 +105,7 @@ public class HeartbeatProcessor implements Runnable
 
             if ( !restResult.isSuccess() )
             {
-                throw new HubPluginException( restResult.getError() );
+                throw new Exception( "Error to send heartbeat: " + restResult.getError() );
             }
 
             HeartbeatResponseDto dto = restResult.getEntity();
@@ -83,7 +114,7 @@ public class HeartbeatProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            throw new HubPluginException( e.getMessage(), e );
+            throw new Exception( e.getMessage(), e );
         }
     }
 
@@ -96,9 +127,14 @@ public class HeartbeatProcessor implements Runnable
         {
             try
             {
-                processor.processStateLinks( stateLinks );
+                boolean fastModeAsked = processor.processStateLinks( stateLinks );
+
+                if ( fastModeAsked )
+                {
+                    fastModeLeft = FAST_MODE_MAX;
+                }
             }
-            catch ( HubPluginException e )
+            catch ( Exception e )
             {
                 log.error( "Error to process state links: ", e );
             }
