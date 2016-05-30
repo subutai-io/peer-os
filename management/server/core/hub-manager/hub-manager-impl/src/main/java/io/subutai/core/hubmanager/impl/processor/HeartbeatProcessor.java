@@ -7,6 +7,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.http.HttpStatus;
+
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
@@ -36,11 +38,14 @@ public class HeartbeatProcessor implements Runnable
 
     private int fastModeLeft = 0;
 
+    private String peerId;
+
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
         this.restClient = restClient;
+        this.peerId = peerId;
 
         path = String.format( "/rest/v1.2/peers/%s/heartbeat", peerId );
     }
@@ -71,9 +76,9 @@ public class HeartbeatProcessor implements Runnable
     /**
      * @param force is true if a heartbeat is sent not by scheduler, e.g. manually or triggered from Hub.
      *
-     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option
-     * is used to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor
-     * sets this option. See HubEnvironmentProcessor for example.
+     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option is used
+     * to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor sets this option.
+     * See HubEnvironmentProcessor for example.
      */
     public void sendHeartbeat( boolean force ) throws Exception
     {
@@ -105,7 +110,14 @@ public class HeartbeatProcessor implements Runnable
 
             if ( !restResult.isSuccess() )
             {
-                throw new Exception( "Error to send heartbeat: " + restResult.getError() );
+                if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
+                {
+                    hubManager.getConfigDataService().deleteConfig( peerId );
+                }
+                else
+                {
+                    throw new Exception( "Error to send heartbeat: " + restResult.getError() );
+                }
             }
 
             HeartbeatResponseDto dto = restResult.getEntity();
