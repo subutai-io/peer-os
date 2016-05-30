@@ -44,13 +44,14 @@ class HttpClient
 
     private static final String HUB_ADDRESS = "https://hub.subut.ai:444";
 
-
     private final PGPMessenger messenger;
 
     private static KeyStore peerKeyStore;
 
+    private final String PEER_KEY_FINGERPRINT;
 
-    private static synchronized KeyStore getPeerKeyStore() throws Exception
+
+    private synchronized KeyStore getPeerKeyStore() throws Exception
     {
         if ( peerKeyStore == null )
         {
@@ -68,6 +69,8 @@ class HttpClient
         PGPPublicKey receiverKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
 
         messenger = new PGPMessenger( senderKey, receiverKey );
+
+        PEER_KEY_FINGERPRINT = PGPKeyHelper.getFingerprint( securityManager.getKeyManager().getPublicKey( null ) );
     }
 
 
@@ -150,7 +153,7 @@ class HttpClient
     }
 
 
-    private static byte[] readContent( Response response ) throws IOException
+    private byte[] readContent( Response response ) throws IOException
     {
         if ( response.getEntity() == null )
         {
@@ -167,12 +170,11 @@ class HttpClient
     }
 
 
-    private static KeyStore loadKeyStore() throws Exception
+    private KeyStore loadKeyStore() throws Exception
     {
         KeyStoreTool keyStoreTool = new KeyStoreTool();
 
-        return keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS,
-                PGPKeyHelper.getFingerprint( PGPKeyHelper.readPublicKey( Common.H_PUB_KEY ) ) );
+        return keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS, PEER_KEY_FINGERPRINT );
     }
 
 
@@ -194,7 +196,7 @@ class HttpClient
 
     // A client certificate is not provided in SSL context if async connection is used.
     // See details: #311 - Registration failure due to inability to find fingerprint.
-    private static void fixAsyncHttp( WebClient client )
+    private void fixAsyncHttp( WebClient client )
     {
         Map<String, Object> requestContext = WebClient.getConfig( client ).getRequestContext();
 
@@ -202,7 +204,7 @@ class HttpClient
     }
 
 
-    private static TLSClientParameters getTLSClientParameters() throws Exception
+    private TLSClientParameters getTLSClientParameters() throws Exception
     {
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
 
@@ -220,7 +222,7 @@ class HttpClient
     }
 
 
-    private static HTTPClientPolicy getHTTPClientPolicy()
+    private HTTPClientPolicy getHTTPClientPolicy()
     {
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
 
@@ -234,7 +236,7 @@ class HttpClient
     }
 
 
-    private static TrustManager[] getTrustManagers()
+    private TrustManager[] getTrustManagers()
     {
         X509TrustManager tm = new X509TrustManager()
         {
