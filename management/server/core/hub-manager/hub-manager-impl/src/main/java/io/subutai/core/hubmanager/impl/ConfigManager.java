@@ -64,6 +64,7 @@ public class ConfigManager
                           final IdentityManager identityManager ) throws Exception
     {
         this.identityManager = identityManager;
+
         this.peerManager = peerManager;
 
         this.sender = securityManager.getKeyManager().getPrivateKey( null );
@@ -71,7 +72,6 @@ public class ConfigManager
         this.peerId = peerManager.getLocalPeer().getId();
 
         this.hPublicKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
-        LOG.debug( "Getting hPublicKey from keystores folder: " + hPublicKey.toString() );
 
         this.ownerPublicKey =
                 securityManager.getKeyManager().getPublicKeyRing( securityManager.getKeyManager().getPeerOwnerId() )
