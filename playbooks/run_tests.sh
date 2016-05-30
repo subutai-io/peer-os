@@ -105,13 +105,14 @@ function choice_stories(){
 }
 
 function run_tests(){
-    cd /home/ubuntu/playbooks-newui
-    Xvfb :10 -ac &
-    export DISPLAY=:10
-    firefox &
+    cd /home/ubuntu/base/playbooks/
     mvn clean
+    Xvfb :10 -ac -screen scrn 2000x2000x24+32 &
+    export DISPLAY=:10
+    firefox --display=:10 &
     mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
     mvn serenity:aggregate
+    pkill -f Xvfb
 }
 
 function copy_results(){

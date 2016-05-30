@@ -105,7 +105,7 @@ function choice_stories(){
 }
 
 function run_tests(){
-    cd /home/ubuntu/playbooks-newui
+    cd /home/ubuntu/base/playbooks/
     mvn clean
     recordmydesktop -o ~/base/playbooks/src/test/resources/video/playbooks.ogv &
     mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
