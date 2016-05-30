@@ -34,6 +34,8 @@ func queryInfluxDB(clnt client.Client, cmd string) (res []client.Result, err err
 			return res, response.Error()
 		}
 		res = response.Results
+	} else {
+		return res, err
 	}
 	return res, nil
 }
