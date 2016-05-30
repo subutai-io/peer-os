@@ -61,7 +61,7 @@ func GetActiveContainers(details bool) []Container {
 		container := Container{
 			Id:         gpg.GetFingerprint(c),
 			Name:       c,
-			Hostname:   string(hostname),
+			Hostname:   strings.TrimSpace(string(hostname)),
 			Status:     cont.State(c),
 			Arch:       strings.ToUpper(cont.GetConfigItem(configpath, "lxc.arch")),
 			Interfaces: GetContainerIfaces(c),
