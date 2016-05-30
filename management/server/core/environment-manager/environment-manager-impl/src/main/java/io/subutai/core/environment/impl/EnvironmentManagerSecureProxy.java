@@ -61,7 +61,6 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hubadapter.api.HubAdapter;
-import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -71,6 +70,7 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.common.HubEventListener;
 
 
 public class EnvironmentManagerSecureProxy
@@ -378,7 +378,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    @RolesAllowed( {"Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
+    @RolesAllowed( { "Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
     public void resetP2PSecretKey( final String environmentId, final String newP2pSecretKey,
                                    final long p2pSecretKeyTtlSec, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
@@ -578,7 +578,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentManagerException( e.getMessage(), e );
         }
-        return environmentManager.isContainerInEnvironmentDomain( environmentId, containerHostId );
+        return environmentManager.isContainerInEnvironmentDomain( containerHostId, environmentId );
     }
 
 
