@@ -2,26 +2,28 @@ package container
 
 import (
 	"bufio"
+	"io/ioutil"
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/config"
 	cont "github.com/subutai-io/base/agent/lib/container"
 	"github.com/subutai-io/base/agent/lib/gpg"
 	lxc "gopkg.in/lxc/go-lxc.v2"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type Container struct {
-	Hostname   string        `json:"hostname"`
 	Id         string        `json:"id"`
+	Name       string        `json:"name"`
+	Hostname   string        `json:"hostname"`
+	Status     string        `json:"status,omitempty"`
 	Arch       string        `json:"arch"`
 	Interfaces []utils.Iface `json:"interfaces"`
-	Status     string        `json:"status,omitempty"`
 	Parent     string        `json:"templateName,omitempty"`
 	Vlan       int           `json:"vlan,omitempty"`
 	Pk         string        `json:"publicKey,omitempty"`
-	Name       string        `json:"name"`
 }
 
 func GetCredentials(name, container string) (uid int, gid int) {
@@ -53,20 +55,23 @@ func GetActiveContainers(details bool) []Container {
 	contArr := []Container{}
 
 	for _, c := range cont.Containers() {
-		container := new(Container)
-		container.Id = gpg.GetFingerprint(c)
+		hostname, _ := ioutil.ReadFile(config.Agent.LxcPrefix + c + "/rootfs/etc/hostname")
+		configpath := config.Agent.LxcPrefix + c + "/config"
+
+		container := Container{
+			Id:         gpg.GetFingerprint(c),
+			Name:       c,
+			Hostname:   string(hostname),
+			Status:     cont.State(c),
+			Arch:       strings.ToUpper(cont.GetConfigItem(configpath, "lxc.arch")),
+			Interfaces: GetContainerIfaces(c),
+			Parent:     cont.GetConfigItem(configpath, "subutai.parent"),
+		}
 		if details {
 			container.Pk = gpg.GetContainerPk(c)
 		}
-		configpath := config.Agent.LxcPrefix + c + "/config"
-		container.Name = c
-		container.Arch = strings.ToUpper(cont.GetConfigItem(configpath, "lxc.arch"))
-		container.Parent = cont.GetConfigItem(configpath, "subutai.parent")
-		container.Status = cont.State(c)
-		container.Hostname = c
-		container.Interfaces = GetContainerIfaces(c)
 
-		contArr = append(contArr, *container)
+		contArr = append(contArr, container)
 	}
 	return contArr
 }
