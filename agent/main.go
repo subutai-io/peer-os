@@ -11,7 +11,7 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-var TIMESTAMP string = "-unknown"
+var Version string = "unknown"
 
 func init() {
 	if os.Getuid() != 0 {
@@ -28,7 +28,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = "4.0.0-RC14-SNAPSHOT"
+	app.Version = Version
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
