@@ -1,18 +1,18 @@
 var app = angular.module('subutai-app', [
-        'ui.router',
-        'ngCookies',
-        'ngResource',
-        'oc.lazyLoad',
-        'oitozero.ngSweetAlert',
-        'ngDialog',
-        'datatables',
-        '720kb.tooltips',
-        'ngTagsInput',
-        'nvd3',
-        'cfp.loadingBar',
-        'uiSwitch',
-        'ngFileUpload'
-    ])
+    'ui.router',
+    'ngCookies',
+    'ngResource',
+    'oc.lazyLoad',
+    'oitozero.ngSweetAlert',
+    'ngDialog',
+    'datatables',
+    '720kb.tooltips',
+    'ngTagsInput',
+    'nvd3',
+    'cfp.loadingBar',
+    'uiSwitch',
+    'ngFileUpload'
+])
     .config(routesConf)
 
     .controller('SubutaiController', SubutaiController)
@@ -21,7 +21,7 @@ var app = angular.module('subutai-app', [
     .controller('AccountCtrl', AccountCtrl)
     .factory('identitySrv', identitySrv)
 
-	.factory('trackerSrv', trackerSrv)
+    .factory('trackerSrv', trackerSrv)
 
     .run(startup);
 
@@ -38,50 +38,56 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.notifications = [];
     vm.notificationsCount = 0;
     vm.notificationNew = false;
-	vm.notificationsLogs = [];
-	vm.currentLogTitle = '';
-	vm.currentLog = [];
+    vm.notificationsLogs = [];
+    vm.currentLogTitle = '';
+    vm.currentLog = [];
     vm.currentUserRoles = [];
     $rootScope.notifications = {};
     vm.hubRegisterError = false;
     vm.isRegistrationFormVisible = false;
 
     vm.getRegistrationFormVisibilityStatus = function () {
-		return vm.isRegistrationFormVisible;
+        return vm.isRegistrationFormVisible;
     };
 
 
     function checkIfRegistered(afterRegistration) {
-		if(afterRegistration === undefined || afterRegistration === null) afterRegistration = false;
-		$http.get(SERVER_URL + "rest/v1/hub/registration_state", {
-			withCredentials: true,
-			headers: {'Content-Type': 'application/json'}
-		}).success(function (data) {
+        if (afterRegistration === undefined || afterRegistration === null) afterRegistration = false;
+        $http.get(SERVER_URL + "rest/v1/hub/registration_state", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        }).success(function (data) {
 
-			vm.hubStatus = data.isRegisteredToHub;
-			vm.userId = data.ownerId;
-			vm.userEmail = data.ownerEmail;
+            vm.hubStatus = data.isRegisteredToHub;
+            vm.userId = data.ownerId;
+            vm.userEmail = data.ownerEmail;
 
-			if (vm.hubStatus != "true" && vm.hubStatus != true) {
-				vm.hubStatus = false;
-			} else {
-				vm.hubStatus = true;
-			}
+            if (vm.hubStatus != "true" && vm.hubStatus != true) {
+                vm.hubStatus = false;
+            } else {
+                vm.hubStatus = true;
+            }
 
-			if(afterRegistration) {
-				hubPopupLoadScreen();
-				ngDialog.open({
-					template: 'subutai-app/common/partials/hubSuccessMessage.html',
-					scope: $scope
-				});
-			}
-		});
-	}
+            if (afterRegistration) {
+                hubPopupLoadScreen();
+                ngDialog.open({
+                    template: 'subutai-app/common/partials/hubSuccessMessage.html',
+                    scope: $scope
+                });
+            }
+        });
+    }
+
     checkIfRegistered();
 
+    setInterval(function () {
+        checkIfRegistered();
+    }, 30000);
+
+
     vm.hub = {
-		login: "",
-		password: ""
+        login: "",
+        password: ""
     };
 
 
@@ -91,7 +97,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     vm.hubUnregister = hubUnregister;
     vm.hubHeartbeat = hubHeartbeat;
     vm.clearLogs = clearLogs;
-	vm.viewLogs = viewLogs;
+    vm.viewLogs = viewLogs;
 
 
     function hubPopupLoadScreen(show) {
@@ -105,42 +111,42 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
 
     function hubRegister() {
-		vm.hubRegisterError = false;
-		hubPopupLoadScreen(true);
-		var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + vm.hub.password;
-		$http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
-				withCredentials: true,
-				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-			})
-			.success(function () {
+        vm.hubRegisterError = false;
+        hubPopupLoadScreen(true);
+        var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + vm.hub.password;
+        $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        })
+            .success(function () {
 
-				checkIfRegistered(true);
+                checkIfRegistered(true);
 
-				$http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {
-						withCredentials: true,
-						headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-					})
-					.success(function () {
-					}).error(function (error) {
-						console.log('hub/register error: ', error);
-						vm.hubRegisterError = error;
-					});
+                $http.post(SERVER_URL + 'rest/v1/hub/send-heartbeat?hubIp=hub.subut.ai', {
+                    withCredentials: true,
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                })
+                    .success(function () {
+                    }).error(function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                });
 
-				$http.post(SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {
-						withCredentials: true,
-						headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-					})
-					.success(function () {
-					}).error(function (error) {
-						console.log('hub/register error: ', error);
-						vm.hubRegisterError = error;
-					});
+                $http.post(SERVER_URL + 'rest/v1/hub/send-rh-configurations?hubIp=hub.subut.ai', {
+                    withCredentials: true,
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                })
+                    .success(function () {
+                    }).error(function (error) {
+                    console.log('hub/register error: ', error);
+                    vm.hubRegisterError = error;
+                });
 
-			}).error(function (error) {
-				console.log('hub/register error: ', error);
-				vm.hubRegisterError = error;
-				hubPopupLoadScreen();
-			});
+            }).error(function (error) {
+            console.log('hub/register error: ', error);
+            vm.hubRegisterError = error;
+            hubPopupLoadScreen();
+        });
     }
 
 
@@ -186,123 +192,128 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         }
     });
 
-	function getNotificationsFromServer() {
-		vm.notificationsLogs = [];
-		trackerSrv.getNotifications().success(function(data) {
-			for(var i = 0; i < data.length; i++) {
-				var log = data[i];
-				var notification = {
-					"message": log.description,
-					"date": moment(log.timestamp).format('HH:mm:ss'),
-					"type": log.state,
-					"logId": log.id
-				};
-				addNewNotification(notification);
-				vm.notificationsLogs[log.id] = log;
-			}
-		}).error(function(error) {
-			console.log(error);
-		});
-	}
-	getNotificationsFromServer();
+    function getNotificationsFromServer() {
+        vm.notificationsLogs = [];
+        trackerSrv.getNotifications().success(function (data) {
+            for (var i = 0; i < data.length; i++) {
+                var log = data[i];
+                var notification = {
+                    "message": log.description,
+                    "date": moment(log.timestamp).format('HH:mm:ss'),
+                    "type": log.state,
+                    "logId": log.id
+                };
+                addNewNotification(notification);
+                vm.notificationsLogs[log.id] = log;
+            }
+        }).error(function (error) {
+            console.log(error);
+        });
+    }
 
-	$rootScope.$watch('notificationsUpdate', function () {
-		getNotificationsFromServer();
-	});
+    getNotificationsFromServer();
 
-	function viewLogs(logId) {
-		vm.currentLog = [];
-		vm.currentLogTitle = '';
+    $rootScope.$watch('notificationsUpdate', function () {
+        getNotificationsFromServer();
+    });
 
-		if(vm.notificationsLogs[logId].log.length > 0) {
-			var logsArray = vm.notificationsLogs[logId].log.split(/(?:\r\n|\r|\n)/g);
-			vm.currentLogTitle = vm.notificationsLogs[logId].description;
-			var logs = [];
-			for(var i = 0; i < logsArray.length; i++) {
-				var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
-				currentLog.date = moment(currentLog.date).format('HH:mm:ss');
-				logs.push(currentLog);
-			}
-			vm.currentLog = logs;
+    function viewLogs(logId) {
+        vm.currentLog = [];
+        vm.currentLogTitle = '';
 
-			ngDialog.open({
-				template: 'subutai-app/common/popups/logsPopup.html',
-				scope: $scope
-			});
-		}
-	}
+        if (vm.notificationsLogs[logId].log.length > 0) {
+            var logsArray = vm.notificationsLogs[logId].log.split(/(?:\r\n|\r|\n)/g);
+            vm.currentLogTitle = vm.notificationsLogs[logId].description;
+            var logs = [];
+            for (var i = 0; i < logsArray.length; i++) {
+                var currentLog = JSON.parse(logsArray[i].substring(0, logsArray[i].length - 1));
+                currentLog.date = moment(currentLog.date).format('HH:mm:ss');
+                logs.push(currentLog);
+            }
+            vm.currentLog = logs;
 
-	$rootScope.$watch('notifications', function () {
-		addNewNotification($rootScope.notifications);
-	});
+            ngDialog.open({
+                template: 'subutai-app/common/popups/logsPopup.html',
+                scope: $scope
+            });
+        }
+    }
 
-	setInterval(function() {
-		getNotificationsFromServer();
-	}, 15000);
+    $rootScope.$watch('notifications', function () {
+        addNewNotification($rootScope.notifications);
+    });
 
-	function addNewNotification(notification) {
-		var notifications = localStorage.getItem('notifications');
-		if (
-			notifications == null ||
-			notifications == undefined ||
-			notifications == 'null' ||
-			notifications.length <= 0
-		) {
-			notifications = [];
-			localStorage.setItem('notifications', notifications);
-		} else {
-			notifications = JSON.parse(notifications);
-			vm.notificationsCount = notifications.length;
-		}
+    setInterval(function () {
+        getNotificationsFromServer();
+    }, 15000);
 
-		if (notification.message) {
-			if (!localStorage.getItem('notifications').includes(JSON.stringify(notification.message))) {
-				notifications.push(notification);
-				vm.notificationsCount++;
-				localStorage.setItem('notifications', JSON.stringify(notifications));
-			} else {
-				for(var i = 0; i < notifications.length; i++) {
-					if(notifications[i].message == notification.message && notification.type !== undefined) {
-						notifications[i].type = notification.type;
-						break;
-					}
-				}
-			}
-			vm.notificationNew = true;
-		}
-		vm.notifications = notifications;
-	}
+    function addNewNotification(notification) {
+        var notifications = localStorage.getItem('notifications');
+        if (
+            notifications == null ||
+            notifications == undefined ||
+            notifications == 'null' ||
+            notifications.length <= 0
+        ) {
+            notifications = [];
+            localStorage.setItem('notifications', notifications);
+        } else {
+            notifications = JSON.parse(notifications);
+            vm.notificationsCount = notifications.length;
+        }
 
-	function clearLogs() {
-		vm.notifications = [];
-		vm.notificationsCount = 0;
-		localStorage.removeItem('notifications');
+        if (notification.message) {
+            if (!localStorage.getItem('notifications').includes(JSON.stringify(notification.message))) {
+                notifications.push(notification);
+                vm.notificationsCount++;
+                localStorage.setItem('notifications', JSON.stringify(notifications));
+            } else {
+                for (var i = 0; i < notifications.length; i++) {
+                    if (notifications[i].message == notification.message && notification.type !== undefined) {
+                        notifications[i].type = notification.type;
+                        break;
+                    }
+                }
+            }
+            vm.notificationNew = true;
+        }
+        vm.notifications = notifications;
+    }
 
-		trackerSrv.deleteAllNotifications().success(function(data) {
-		}).error(function(error) {
-			console.log(error);
-		});
-	}
+    function clearLogs() {
+        vm.notifications = [];
+        vm.notificationsCount = 0;
+        localStorage.removeItem('notifications');
+
+        trackerSrv.deleteAllNotifications().success(function (data) {
+        }).error(function (error) {
+            console.log(error);
+        });
+    }
 
 
     function checkSum() {
-        $http.get (SERVER_URL + "rest/v1/bazaar/products/checksum", {withCredentials: true, headers: {'Content-Type': 'application/json'}}).success (function (data) {
-            if (localStorage.getItem ("bazaarMD5") === null) {
-                localStorage.setItem ("bazaarMD5", data);
+        $http.get(SERVER_URL + "rest/v1/bazaar/products/checksum", {
+            withCredentials: true,
+            headers: {'Content-Type': 'application/json'}
+        }).success(function (data) {
+            if (localStorage.getItem("bazaarMD5") === null) {
+                localStorage.setItem("bazaarMD5", data);
                 bazaarUpdate = true;
             }
             else {
-                if (localStorage.getItem ("bazaarMD5") !== data) {;
-                    localStorage.setItem ("bazaarMD5", data);
+                if (localStorage.getItem("bazaarMD5") !== data) {
+                    ;
+                    localStorage.setItem("bazaarMD5", data);
                     bazaarUpdate = true;
                 }
             }
         });
     }
+
     checkSum();
 
 }
-
 
 
 function SubutaiController($rootScope) {
@@ -469,7 +480,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                                 'subutai-app/kurjun/controller.js',
                                 'subutai-app/kurjun/service.js',
                                 'subutai-app/identity/service.js',
-								'subutai-app/settingsKurjun/service.js'
+                                'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
@@ -631,7 +642,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
             }
         })
         .state('console', {
-			url: '/console:environmentId?containerId',
+            url: '/console:environmentId?containerId',
             templateUrl: 'subutai-app/console/partials/view.html',
             data: {
                 bodyClass: '',
@@ -715,7 +726,7 @@ function routesConf($httpProvider, $stateProvider, $urlRouterProvider, $ocLazyLo
                             files: [
                                 'subutai-app/settingsKurjun/settingsKurjun.js',
                                 'subutai-app/settingsKurjun/controller.js',
-								'subutai-app/settingsKurjun/service.js'
+                                'subutai-app/settingsKurjun/service.js'
                             ]
                         }
                     ]);
@@ -1090,7 +1101,7 @@ function toggle(source, name) {
 
 function hasPGPplugin() {
     if ($('#bp-plugin-version').val().length > 0) {
-		return $('#bp-plugin-version').val();
+        return $('#bp-plugin-version').val();
     } else {
         return false;
     }
