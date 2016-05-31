@@ -40,6 +40,17 @@ func queryInfluxDB(clnt client.Client, cmd string) (res []client.Result, err err
 	return res, nil
 }
 
+func CleanupNetStat(vlan string) {
+	c, _ := client.NewHTTPClient(client.HTTPConfig{
+		Addr:               "https://" + config.Influxdb.Server + ":8086",
+		Username:           config.Influxdb.User,
+		Password:           config.Influxdb.Pass,
+		InsecureSkipVerify: true,
+	})
+	queryInfluxDB(c, `drop series from host_net where iface = 'p2p`+vlan+`'`)
+	queryInfluxDB(c, `drop series from host_net where iface = 'gw-`+vlan+`'`)
+}
+
 func HostMetrics(host, start, end string) {
 	// Make client
 	c, _ := client.NewHTTPClient(client.HTTPConfig{
