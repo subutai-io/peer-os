@@ -105,10 +105,10 @@ func Update(name string, check bool) {
 		if !container.IsContainer(name) {
 			log.Error("no such instance \"" + name + "\"")
 		}
-		_, err := container.AttachExec(name, []string{"apt-get", "update", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5", "-qq"})
+		_, err := container.AttachExec(name, []string{"apt-get", "-qq", "update", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5"})
 		log.Check(log.FatalLevel, "Updating apt index", err)
-		output, err := container.AttachExec(name, []string{"apt-get", "upgrade", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5", "-s", "-qq"})
-		log.Check(log.FatalLevel, "Checking for available updade", err)
+		output, err := container.AttachExec(name, []string{"apt-get", "-qq", "upgrade", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5", "-s"})
+		log.Check(log.FatalLevel, "Checking for available update", err)
 		if len(output) == 0 {
 			log.Info("No update is available")
 			os.Exit(1)
@@ -116,7 +116,7 @@ func Update(name string, check bool) {
 			log.Info("Update is avalable")
 			os.Exit(0)
 		}
-		_, err = container.AttachExec(name, []string{"apt-get", "upgrade", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5", "-qq"})
+		_, err = container.AttachExec(name, []string{"apt-get", "-qq", "upgrade", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5"})
 		log.Check(log.FatalLevel, "Updating container", err)
 	}
 }

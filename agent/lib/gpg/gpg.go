@@ -125,13 +125,11 @@ func GenerateKey(name string) {
 
 func GetFingerprint(email string) string {
 	var out []byte
-	var err error
 	if email == config.Agent.GpgUser {
-		out, err = exec.Command("gpg", "--fingerprint", email).Output()
+		out, _ = exec.Command("gpg", "--fingerprint", email).Output()
 	} else {
-		out, err = exec.Command("gpg", "--fingerprint", "--keyring", config.Agent.LxcPrefix+email+"/public.pub", email).Output()
+		out, _ = exec.Command("gpg", "--fingerprint", "--keyring", config.Agent.LxcPrefix+email+"/public.pub", email).Output()
 	}
-	log.Check(log.WarnLevel, "Getting fingerptring for "+email, err)
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), "fingerprint") {

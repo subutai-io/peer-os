@@ -25,7 +25,6 @@ public class SystemSettings
     public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
     public static final String DEFAULT_LOCAL_KURJUN_REPO = "http://localhost:8081/kurjun";
-    public static final String DEFAULT_PEER_PWD = "12345678";
 
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
@@ -310,18 +309,6 @@ public class SystemSettings
         {
             return SystemSettings.DEFAULT_PUBLIC_SECURE_PORT;
         }
-    }
-
-
-    public static String getPeerSecretKeyringPwd()
-    {
-        return PROPERTIES.getString( "peerSecretKeyringPwd", DEFAULT_PEER_PWD );
-    }
-
-
-    public static void setPeerSecretKeyringPwd( String pwd ) throws ConfigurationException
-    {
-        saveProperty( "peerSecretKeyringPwd", pwd );
     }
 
 

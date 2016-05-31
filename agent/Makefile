@@ -1,9 +1,8 @@
 APP=subutai
 CC=go
-TIMESTAMP=-$(shell date +%s)
+VERSION=4.0.0-RC14-SNAPSHOT
+LDFLAGS=-ldflags "-r /apps/subutai/current/lib -w -s -X main.Version=${VERSION}"
 
-$(APP): main.go
-	$(CC) build -ldflags="-r /apps/subutai/current/lib -w -s -X main.TIMESTAMP=$(TIMESTAMP)" -o $@ $^
+all:
+	$(CC) build ${LDFLAGS} -o $(APP)
 
-clean:
-	-rm -f $(APP)

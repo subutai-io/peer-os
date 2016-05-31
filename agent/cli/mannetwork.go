@@ -24,6 +24,10 @@ func VxlanTunnel(create, del, remoteip, vlan, vni string, list bool) {
 	}
 }
 
+func DetectIp() {
+	fmt.Println(net.GetIp())
+}
+
 func tunnelCreate(tunnel, addr, vlan, vni string) {
 	log.Check(log.WarnLevel, "Creating bridge ", exec.Command("ovs-vsctl", "--may-exist", "add-br", "gw-"+vlan).Run())
 

@@ -41,6 +41,10 @@ public interface RestService
     public Response isInited();
 
     @GET
+    @Path( "/ready" )
+    public Response isReady();
+
+    @GET
     @Path( "/ping" )
     public Response ping();
 
