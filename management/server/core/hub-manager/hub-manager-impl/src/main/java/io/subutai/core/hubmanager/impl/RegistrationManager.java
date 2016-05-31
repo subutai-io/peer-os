@@ -155,6 +155,6 @@ public class RegistrationManager
 
         hubManager.getConfigDataService().deleteConfig( configManager.getPeerId() );
 
-        log.info( "Uregistered successfully" );
+        log.info( "Unregistered successfully" );
     }
 }

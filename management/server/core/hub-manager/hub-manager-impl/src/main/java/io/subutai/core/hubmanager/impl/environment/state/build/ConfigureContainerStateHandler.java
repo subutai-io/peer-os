@@ -10,6 +10,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.security.SshKeys;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.hub.share.dto.environment.EnvironmentDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
@@ -43,9 +44,9 @@ public class ConfigureContainerStateHandler extends StateHandler
 
 
     @Override
-    protected void post( EnvironmentPeerDto peerDto, Object body )
+    protected RestResult<Object> post( EnvironmentPeerDto peerDto, Object body )
     {
-        ctx.restClient.post( path( "/rest/v1/environments/%s/container", peerDto ), body );
+        return ctx.restClient.post( path( "/rest/v1/environments/%s/container", peerDto ), body );
     }
 
 

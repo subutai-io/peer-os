@@ -7,7 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.http.HttpStatus;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -38,16 +38,15 @@ public class HeartbeatProcessor implements Runnable
 
     private int fastModeLeft = 0;
 
-    private String peerId;
+    private volatile boolean inProgress = false;
 
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
         this.restClient = restClient;
-        this.peerId = peerId;
 
-        path = String.format( "/rest/v1.2/peers/%s/heartbeat", peerId );
+        path = String.format( "/rest/v1.3/peers/%s/heartbeat/", peerId );
     }
 
 
@@ -59,6 +58,9 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
+    /**
+     * Called by scheduler.
+     */
     @Override
     public void run()
     {
@@ -76,9 +78,9 @@ public class HeartbeatProcessor implements Runnable
     /**
      * @param force is true if a heartbeat is sent not by scheduler, e.g. manually or triggered from Hub.
      *
-     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option is used
-     * to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor sets this option.
-     * See HubEnvironmentProcessor for example.
+     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option
+     * is used to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor
+     * sets this option. See HubEnvironmentProcessor for example.
      */
     public void sendHeartbeat( boolean force ) throws Exception
     {
@@ -89,7 +91,9 @@ public class HeartbeatProcessor implements Runnable
 
         long interval = ( System.currentTimeMillis() - lastSentMillis ) / 1000;
 
-        if ( interval >= BIG_INTERVAL_SECONDS || force || fastModeLeft > 0 )
+        boolean canSend = ( interval >= BIG_INTERVAL_SECONDS || force || fastModeLeft > 0 ) && !inProgress;
+
+        if ( canSend )
         {
             log.info( "Sending heartbeat: interval={}, force={}, fastModeLeft={}", interval, force, fastModeLeft );
 
@@ -98,26 +102,25 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    private void doHeartbeat() throws Exception
+    private synchronized void doHeartbeat() throws Exception
     {
+        log.info( "Heartbeat - START" );
+
+        inProgress = true;
+
         lastSentMillis = System.currentTimeMillis();
 
         fastModeLeft--;
 
         try
         {
-            RestResult<HeartbeatResponseDto> restResult = restClient.post( path, null, HeartbeatResponseDto.class );
+            String url = path + RandomStringUtils.randomNumeric( 7 );
+
+            RestResult<HeartbeatResponseDto> restResult = restClient.post( url, null, HeartbeatResponseDto.class );
 
             if ( !restResult.isSuccess() )
             {
-                if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
-                {
-                    hubManager.getConfigDataService().deleteConfig( peerId );
-                }
-                else
-                {
-                    throw new Exception( "Error to send heartbeat: " + restResult.getError() );
-                }
+                throw new Exception( "Error to send heartbeat: " + restResult.getError() );
             }
 
             HeartbeatResponseDto dto = restResult.getEntity();
@@ -128,6 +131,12 @@ public class HeartbeatProcessor implements Runnable
         {
             throw new Exception( e.getMessage(), e );
         }
+        finally
+        {
+            inProgress = false;
+        }
+
+        log.info( "Heartbeat - END" );
     }
 
 
