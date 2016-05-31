@@ -31,7 +31,8 @@ public class DomainStateHandler extends StateHandler
     {
         logStart();
 
-        EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
+        EnvironmentDto envDto =
+                ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
         EnvironmentInfoDto env = peerDto.getEnvironmentInfo();
 
@@ -49,7 +50,7 @@ public class DomainStateHandler extends StateHandler
                     {
                         try
                         {
-                            ctx.localPeer.addIpToVniDomain( nodeDto.getIp(), env.getVni() );
+                            ctx.localPeer.addIpToVniDomain( nodeDto.getIp().replace( "/24", "" ), env.getVni() );
                         }
                         catch ( Exception e )
                         {
