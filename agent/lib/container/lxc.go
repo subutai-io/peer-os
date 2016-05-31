@@ -153,15 +153,20 @@ func AttachExec(name string, command []string) (output []string, err error) {
 	}
 
 	buf_r, buf_w, _ := os.Pipe()
+	buf_r_err, buf_w_err, _ := os.Pipe()
 	container.RunCommand(command, lxc.AttachOptions{
 		Namespaces: -1,
 		UID:        0,
 		GID:        0,
 		StdoutFd:   buf_w.Fd(),
+		StderrFd:   buf_w_err.Fd(),
 	})
 
 	buf_w.Close()
 	defer buf_r.Close()
+
+	buf_w_err.Close()
+	defer buf_r_err.Close()
 
 	out := bufio.NewScanner(buf_r)
 	for out.Scan() {

@@ -20,8 +20,6 @@ public class AboutPage extends PageObject {
 
     //region WEB ELEMENTS: Links
 
-
-
     //endregion
 
     //region WEB ELEMENTS: Tables

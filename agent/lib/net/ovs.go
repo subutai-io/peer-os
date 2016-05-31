@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"github.com/subutai-io/base/agent/log"
+	"net"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -42,4 +43,27 @@ func UpdateNetwork(iface, vlan string) {
 func ConfigureOVS(iface string) {
 	exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-int", iface).Run()
 	exec.Command("ovs-vsctl", "--if-exists", "del-port", "br-mng", iface).Run()
+}
+
+func GetIp() string {
+	out, err := exec.Command("ovs-vsctl", "list-ports", "wan").Output()
+	log.Check(log.ErrorLevel, "Getting WAN ports", err)
+
+	scanner := bufio.NewScanner(bytes.NewReader(out))
+	iface := "wan"
+	for scanner.Scan() {
+		if scanner.Text() == "eth1" {
+			iface = "eth2"
+			break
+		}
+	}
+
+	if nic, err := net.InterfaceByName(iface); err == nil {
+		addrs, err := nic.Addrs()
+		log.Check(log.ErrorLevel, "Getting interface addresses", err)
+		if len(addrs) > 0 {
+			return strings.Split(addrs[0].String(), "/")[0]
+		}
+	}
+	return ""
 }

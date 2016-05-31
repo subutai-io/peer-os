@@ -29,9 +29,7 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.http.HttpStatus;
 
-import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
-import io.subutai.common.security.crypto.keystore.KeyStoreType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.core.security.api.SecurityManager;
@@ -46,8 +44,22 @@ class HttpClient
 
     private static final String HUB_ADDRESS = "https://hub.subut.ai:444";
 
-
     private final PGPMessenger messenger;
+
+    private static KeyStore peerKeyStore;
+
+    private final String PEER_KEY_FINGERPRINT;
+
+
+    private synchronized KeyStore getPeerKeyStore() throws Exception
+    {
+        if ( peerKeyStore == null )
+        {
+            peerKeyStore = loadKeyStore();
+        }
+
+        return peerKeyStore;
+    }
 
 
     HttpClient( SecurityManager securityManager ) throws IOException, PGPException, KeyStoreException
@@ -57,6 +69,8 @@ class HttpClient
         PGPPublicKey receiverKey = PGPKeyHelper.readPublicKey( Common.H_PUB_KEY );
 
         messenger = new PGPMessenger( senderKey, receiverKey );
+
+        PEER_KEY_FINGERPRINT = PGPKeyHelper.getFingerprint( securityManager.getKeyManager().getPublicKey( null ) );
     }
 
 
@@ -139,7 +153,7 @@ class HttpClient
     }
 
 
-    private static byte[] readContent( Response response ) throws IOException
+    private byte[] readContent( Response response ) throws IOException
     {
         if ( response.getEntity() == null )
         {
@@ -156,21 +170,11 @@ class HttpClient
     }
 
 
-    private static KeyStore loadKeyStore() throws KeyStoreException
+    private KeyStore loadKeyStore() throws Exception
     {
-        KeyStoreData keyStoreData = new KeyStoreData();
+        KeyStoreTool keyStoreTool = new KeyStoreTool();
 
-        String peerKeystore = Common.SUBUTAI_APP_DATA_PATH + "/keystores/peer.jks";
-
-        keyStoreData.setKeyStoreFile( peerKeystore );
-
-        keyStoreData.setAlias( "peer_cert" );
-
-        keyStoreData.setPassword( SecuritySettings.KEYSTORE_PX1_PSW );
-
-        keyStoreData.setKeyStoreType( KeyStoreType.JKS );
-
-        return new KeyStoreTool().load( keyStoreData );
+        return keyStoreTool.createPeerCertKeystore( Common.PEER_CERT_ALIAS, PEER_KEY_FINGERPRINT );
     }
 
 
@@ -192,7 +196,7 @@ class HttpClient
 
     // A client certificate is not provided in SSL context if async connection is used.
     // See details: #311 - Registration failure due to inability to find fingerprint.
-    private static void fixAsyncHttp( WebClient client )
+    private void fixAsyncHttp( WebClient client )
     {
         Map<String, Object> requestContext = WebClient.getConfig( client ).getRequestContext();
 
@@ -200,7 +204,7 @@ class HttpClient
     }
 
 
-    private static TLSClientParameters getTLSClientParameters() throws Exception
+    private TLSClientParameters getTLSClientParameters() throws Exception
     {
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
 
@@ -210,7 +214,7 @@ class HttpClient
 
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance( KeyManagerFactory.getDefaultAlgorithm() );
 
-        keyManagerFactory.init( loadKeyStore(), SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
+        keyManagerFactory.init( getPeerKeyStore(), SecuritySettings.KEYSTORE_PX1_PSW.toCharArray() );
 
         tlsClientParameters.setKeyManagers( keyManagerFactory.getKeyManagers() );
 
@@ -218,7 +222,7 @@ class HttpClient
     }
 
 
-    private static HTTPClientPolicy getHTTPClientPolicy()
+    private HTTPClientPolicy getHTTPClientPolicy()
     {
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
 
@@ -232,7 +236,7 @@ class HttpClient
     }
 
 
-    private static TrustManager[] getTrustManagers()
+    private TrustManager[] getTrustManagers()
     {
         X509TrustManager tm = new X509TrustManager()
         {
