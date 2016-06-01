@@ -61,13 +61,11 @@ public class AppScaleManager
     {
         Map<String, String> ipList = config.getContainerAddresses();
 
-        String masterIP = ipList.get( config.getClusterName() );
+        String masterIP = ipList.get( config.getClusterName() ).replace( "/24", "" );
 
-        String cmd = format( "sudo /var/lib/appscale/create-appscalefile.sh -master %s -appengine %s -database %s -zookeeper %s", masterIP,
-            formatIps( ipList, config.getAppenList() ),
-            formatIps( ipList, config.getCassList() ),
-            formatIps( ipList, config.getZooList() )
-                           );
+        String cmd = format( "sudo /var/lib/appscale/create-appscalefile.sh -master %s -appengine %s -database %s "
+                        + "-zookeeper %s", masterIP, formatIps( ipList, config.getAppenList() ),
+                formatIps( ipList, config.getCassList() ), formatIps( ipList, config.getZooList() ) );
 
         execute( containerHost, cmd );
     }
@@ -90,7 +88,7 @@ public class AppScaleManager
             }
         }
 
-        String cmd =  format( "sudo /var/lib/appscale/setup.sh %s %s %s", config.getUserDomain(), email, password );
+        String cmd = format( "sudo /var/lib/appscale/setup.sh %s %s %s", config.getUserDomain(), email, password );
 
         execute( containerHost, cmd );
     }
@@ -105,33 +103,33 @@ public class AppScaleManager
             s += ipList.get( hostname ) + " ";
         }
 
-        return s;
+        return s.replace( "/24", "" );
     }
 
 
     private void setupRevproxy( ContainerHost containerHost, AppScaleConfigDto config )
     {
-        String ipAddress = config.getContainerAddresses().get( config.getClusterName() );
+        String ipAddress = config.getContainerAddresses().get( config.getClusterName() ).replace( "/24","" );
 
         try
         {
             ResourceHost resourceHostByContainerId = localPeer.getResourceHostByContainerId( containerHost.getId() );
 
             CommandResult resultStr = resourceHostByContainerId
-                    .execute ( new RequestBuilder ( "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" ) );
+                    .execute( new RequestBuilder( "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" ) );
 
-            String stdOut = resultStr.getStdOut ();
+            String stdOut = resultStr.getStdOut();
 
-            String vlanString = stdOut.substring ( 11, 14 );
+            String vlanString = stdOut.substring( 11, 14 );
 
-            resourceHostByContainerId.execute ( new RequestBuilder ( "subutai proxy del " + vlanString + " -d" ) );
+            resourceHostByContainerId.execute( new RequestBuilder( "subutai proxy del " + vlanString + " -d" ) );
 
-            resourceHostByContainerId.execute ( new RequestBuilder (
-                    "subutai proxy add " + vlanString + " -d \"*." + config.getUserDomain () + "\" -f /mnt/lib/lxc/"
+            resourceHostByContainerId.execute( new RequestBuilder(
+                    "subutai proxy add " + vlanString + " -d \"*." + config.getUserDomain() + "\" -f /mnt/lib/lxc/"
                             + config.getClusterName() + "/rootfs/etc/nginx/ssl.pem" ) );
 
             resourceHostByContainerId
-                    .execute ( new RequestBuilder ( "subutai proxy add " + vlanString + " -h " + ipAddress ) );
+                    .execute( new RequestBuilder( "subutai proxy add " + vlanString + " -h " + ipAddress ) );
         }
         catch ( Exception e )
         {
@@ -159,12 +157,43 @@ public class AppScaleManager
 
     private void execute( ContainerHost ch, String command ) throws CommandException
     {
-        CommandResult result = ch.execute( new RequestBuilder ( command ).withTimeout( 10000 ) );
-
-        if ( result.getExitCode() != 0 )
+        if ( isChConnected( ch ) )
         {
-            throw new CommandException( format( "Error to execute command: %s. %s", command, result.getStdErr() ) );
+            CommandResult result = ch.execute( new RequestBuilder( command ).withTimeout( 10000 ) );
+
+            if ( result.getExitCode() != 0 )
+            {
+                throw new CommandException( format( "Error to execute command: %s. %s", command, result.getStdErr() ) );
+            }
         }
     }
 
+
+    private boolean isChConnected( final ContainerHost ch )
+    {
+        boolean exec = true;
+        int tryCount = 0;
+
+        while ( exec )
+        {
+            tryCount++;
+            exec = tryCount > 3 ? false : true;
+
+            if ( !ch.isConnected() )
+            {
+                return true;
+            }
+
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+            }
+        }
+
+        return true;
+    }
 }
