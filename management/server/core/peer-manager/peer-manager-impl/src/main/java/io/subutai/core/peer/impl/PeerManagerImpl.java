@@ -33,8 +33,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.exception.NetworkException;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.NullHostInterface;
+import io.subutai.common.network.SocketUtil;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -243,6 +245,8 @@ public class PeerManagerImpl implements PeerManager
         Encrypted encryptedData = registrationData.getData();
         try
         {
+            SocketUtil.check( registrationData.getPeerInfo().getIp(), 3,
+                    registrationData.getPeerInfo().getPublicSecurePort() );
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
             String decryptedCert = encryptedData.decrypt( key, String.class );
             securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(),
@@ -269,6 +273,10 @@ public class PeerManagerImpl implements PeerManager
         catch ( GeneralSecurityException e )
         {
             throw new PeerException( "Invalid keyphrase or general security exception." );
+        }
+        catch ( NetworkException e )
+        {
+            throw new PeerException( e.getMessage() );
         }
         catch ( Exception e )
         {
