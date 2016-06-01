@@ -103,11 +103,12 @@ public class RegistrationManager
         dto.setOwnerEmail( email );
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
+        dto.setTemp1( configManager.getActiveUser().getFingerprint() );
 
         UserToken token = configManager.getPermanentToken();
 
         dto.setToken( token.getFullToken() );
-        dto.setTokenId( token.getTokenId() );
+        dto.setTokenId( configManager.getActiveUser().getAuthId() );
 
         return dto;
     }
@@ -128,7 +129,9 @@ public class RegistrationManager
             throw new Exception( "Error to register peer: " + restResult.getError() );
         }
 
-        Config config = new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ), email );
+        Config config =
+                new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ),
+                        email );
 
         hubManager.getConfigDataService().saveHubConfig( config );
 
