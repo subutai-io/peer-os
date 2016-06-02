@@ -159,7 +159,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
                 //SweetAlert.swal ("Success!", "Your peer was unregistered from Hub.", "success");
             }).error(function (error) {
             hubPopupLoadScreen();
-            SweetAlert.swal("ERROR!", "Error while registering to Hub.\nPlease check your credentials and try again.", "error");
+            SweetAlert.swal("ERROR!", error, "error");
         });
     }
 
