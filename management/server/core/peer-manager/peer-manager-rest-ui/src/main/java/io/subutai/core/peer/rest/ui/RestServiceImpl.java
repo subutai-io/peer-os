@@ -232,11 +232,7 @@ public class RestServiceImpl implements RestService {
     {
         try
         {
-            if( !peerManager.checkHostAvailability( destinationHost ) )
-            {
-                return Response.serverError().entity( JsonUtil.toJson( "No response, possibly wrong address" ) )
-                        .build();
-            }
+            peerManager.checkHostAvailability( destinationHost );
         }
         catch (Exception e)
         {
