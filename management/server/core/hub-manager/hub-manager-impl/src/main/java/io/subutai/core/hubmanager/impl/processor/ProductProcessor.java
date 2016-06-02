@@ -139,8 +139,9 @@ public class ProductProcessor implements StateLinkProcessor
             throws IOException, Exception, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
         LOG.debug( "Installing Product to Local Peer..." );
-
+        boolean isSuccess = false;
         ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
+
 
         // downloading plugin files
         for ( String url : productDTO.getMetadata() )
@@ -159,18 +160,21 @@ public class ProductProcessor implements StateLinkProcessor
             URL website = new URL( url );
 
             //FileUtils.copyURLToFile( website, file ); throws ssl exception
-            saveUrlToFile( url, file  );
+            isSuccess = saveUrlToFile( url, file );
         }
 
-        LOG.debug( "Product installed successfully..." );
+        if ( isSuccess )
+        {
+            LOG.debug( "Product installed successfully..." );
 
-        // update status
-        peerProductDataDTO.setState( PeerProductDataDto.State.INSTALLED );
-        updatePeerProductData( peerProductDataDTO );
+            // update status
+            peerProductDataDTO.setState( PeerProductDataDto.State.INSTALLED );
+            updatePeerProductData( peerProductDataDTO );
+        }
     }
 
 
-    public void saveUrlToFile( String productUrl, File file  )
+    public boolean saveUrlToFile( String productUrl, File file )
     {
         URL url;
         try
@@ -185,14 +189,12 @@ public class ProductProcessor implements StateLinkProcessor
             }
             in.close();
             out.close();
+            return true;
         }
-        catch ( MalformedURLException e )
+        catch ( Exception e )
         {
-            e.printStackTrace();
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
+            LOG.error( e.getMessage() );
+            return false;
         }
     }
 
