@@ -103,11 +103,12 @@ public class RegistrationManager
         dto.setOwnerEmail( email );
         dto.setOwnerPassword( password );
         dto.setPeerInfo( peerInfoDto );
+        dto.setTemp1( configManager.getActiveUser().getFingerprint() );
 
         UserToken token = configManager.getPermanentToken();
 
         dto.setToken( token.getFullToken() );
-        dto.setTokenId( token.getTokenId() );
+        dto.setTokenId( configManager.getActiveUser().getAuthId() );
 
         return dto;
     }

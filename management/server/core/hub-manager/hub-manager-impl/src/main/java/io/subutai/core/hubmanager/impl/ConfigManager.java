@@ -155,4 +155,10 @@ public class ConfigManager
 
         return identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
     }
+
+
+    public User getActiveUser()
+    {
+        return identityManager.getActiveUser();
+    }
 }

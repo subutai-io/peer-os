@@ -3,6 +3,7 @@ package io.subutai.core.identity.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
@@ -83,7 +84,6 @@ import io.subutai.core.security.api.model.SecurityKey;
 
 /**
  * Overall Subutai Identity Management
- *
  */
 @PermitAll
 public class IdentityManagerImpl implements IdentityManager
@@ -563,6 +563,15 @@ public class IdentityManagerImpl implements IdentityManager
     public User authenticateByAuthSignature( final String fingerprint, final String signedAuth )
             throws SystemSecurityException
     {
+        String msg = null;
+        try
+        {
+            msg = URLDecoder.decode( signedAuth, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            LOGGER.error( e.getMessage() );
+        }
         KeyManager keyManager = securityManager.getKeyManager();
         EncryptionTool encryptionTool = securityManager.getEncryptionTool();
 
@@ -570,7 +579,7 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            if ( !encryptionTool.verifyClearSign( signedAuth.trim().getBytes(), publicKeyRing ) )
+            if ( msg==null || !encryptionTool.verifyClearSign( msg.trim().getBytes(), publicKeyRing ) )
             {
                 throw new InvalidLoginException( "Signed Auth verification failed." );
             }
@@ -630,7 +639,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public User authenticateUser( String userName, String password )  throws SystemSecurityException
+    public User authenticateUser( String userName, String password ) throws SystemSecurityException
     {
         User user = null;
 
