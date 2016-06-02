@@ -481,7 +481,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setContainerDomain( final String environmentId, final String containerId )
+    public Response setContainerDomain( final String environmentId, final String containerId, final Boolean state )
     {
         try
         {
