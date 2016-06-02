@@ -1,6 +1,8 @@
 package io.subutai.core.identity.rest;
 
 
+import java.net.URLDecoder;
+
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Strings;
@@ -48,10 +50,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response authenticate( int type, final String userName, final String password )
+    public Response authenticate( int type, String userName, String password )
     {
         try
         {
+            password = URLDecoder.decode( password, "UTF-8" );
             String token = identityManager.getUserToken( userName, password );
 
             if ( !Strings.isNullOrEmpty( token ) )
@@ -95,6 +98,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            password = URLDecoder.decode( password, "UTF-8" );
             User user = identityManager.authenticateByAuthSignature( userName, password );
 
             if(user != null)
@@ -130,10 +134,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getAuthId( int type, final String userName, final String password )
+    public Response getAuthId( int type, String userName, String password )
     {
         try
         {
+            password = URLDecoder.decode( password, "UTF-8" );
             User user = identityManager.authenticateByAuthSignature( userName, password );
 
             if ( user != null )
