@@ -485,7 +485,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            if ( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            if ( !state )
             {
                 environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId );
             }
