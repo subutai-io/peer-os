@@ -481,11 +481,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setContainerDomain( final String environmentId, final String containerId )
+    public Response setContainerDomain( final String environmentId, final String containerId, final Boolean state )
     {
         try
         {
-            if ( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            if ( !state )
             {
                 environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId );
             }
@@ -880,6 +880,10 @@ public class RestServiceImpl implements RestService
         if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
         {
             throw new Exception( "Duplicated environment name" );
+        }
+        if( name.length() > 50 )
+        {
+            throw new Exception( "Environment name is too long, it should be 50 chars max" );
         }
     }
 }

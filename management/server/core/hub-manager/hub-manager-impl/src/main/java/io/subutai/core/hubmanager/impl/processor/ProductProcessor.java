@@ -1,8 +1,13 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -113,8 +118,7 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     private void processPeerProductData( final PeerProductDataDto peerProductDataDTO )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception,
-            IOException
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception, IOException
     {
         switch ( peerProductDataDTO.getState() )
         {
@@ -132,12 +136,12 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     private void installingProcess( final PeerProductDataDto peerProductDataDTO )
-            throws IOException, Exception, UnrecoverableKeyException, NoSuchAlgorithmException,
-            KeyStoreException
+            throws IOException, Exception, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
         LOG.debug( "Installing Product to Local Peer..." );
-
+        boolean isSuccess = false;
         ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
+
 
         // downloading plugin files
         for ( String url : productDTO.getMetadata() )
@@ -154,14 +158,44 @@ public class ProductProcessor implements StateLinkProcessor
             }
             File file = new File( PATH_TO_DEPLOY + "/" + fileName );
             URL website = new URL( url );
-            FileUtils.copyURLToFile( website, file );
+
+            //FileUtils.copyURLToFile( website, file ); throws ssl exception
+            isSuccess = saveUrlToFile( url, file );
         }
 
-        LOG.debug( "Product installed successfully..." );
+        if ( isSuccess )
+        {
+            LOG.debug( "Product installed successfully..." );
 
-        // update status
-        peerProductDataDTO.setState( PeerProductDataDto.State.INSTALLED );
-        updatePeerProductData( peerProductDataDTO );
+            // update status
+            peerProductDataDTO.setState( PeerProductDataDto.State.INSTALLED );
+            updatePeerProductData( peerProductDataDTO );
+        }
+    }
+
+
+    public boolean saveUrlToFile( String productUrl, File file )
+    {
+        URL url;
+        try
+        {
+            url = new URL( productUrl );
+            BufferedReader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
+            BufferedWriter out = new BufferedWriter( new FileWriter( file ) );
+            char[] cbuf = new char[255];
+            while ( ( in.read( cbuf ) ) != -1 )
+            {
+                out.write( cbuf );
+            }
+            in.close();
+            out.close();
+            return true;
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+            return false;
+        }
     }
 
 
@@ -272,7 +306,4 @@ public class ProductProcessor implements StateLinkProcessor
             throw new Exception( "Could not send product data.", e );
         }
     }
-
-
-
 }
