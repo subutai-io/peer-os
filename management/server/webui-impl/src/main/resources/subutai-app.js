@@ -113,7 +113,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     function hubRegister() {
         vm.hubRegisterError = false;
         hubPopupLoadScreen(true);
-        var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + vm.hub.password;
+        var postData = 'hubIp=hub.subut.ai&email=' + vm.hub.login + '&password=' + encodeURIComponent( vm.hub.password );
         $http.post(SERVER_URL + 'rest/v1/hub/register', postData, {
             withCredentials: true,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
