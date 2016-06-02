@@ -127,7 +127,8 @@ public interface RestService
     @PUT
     @Path( "{environmentId}/containers/{containerId}/domain" )
     Response setContainerDomain( @PathParam( "environmentId" ) String environmentId,
-                                 @PathParam( "containerId" ) String containerId );
+                                 @PathParam( "containerId" ) String containerId,
+                                 @QueryParam( "state" ) Boolean state );
 
 
     /** Containers **************************************************** */
