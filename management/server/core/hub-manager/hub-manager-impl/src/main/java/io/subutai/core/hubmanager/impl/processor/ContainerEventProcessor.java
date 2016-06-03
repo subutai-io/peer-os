@@ -15,6 +15,7 @@ import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.container.ContainerEventDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -100,10 +101,9 @@ public class ContainerEventProcessor implements Runnable
             return;
         }
 
-        ContainerEventDto.Type type = ContainerEventDto.Type.valueOf( ch.getState().name() );
+        ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
 
-        ContainerEventDto dto =
-                new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), type, ch.getState().toString() );
+        ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
         Response res = doRequest( dto );
 

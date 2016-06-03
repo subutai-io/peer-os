@@ -12,12 +12,6 @@ import io.subutai.hub.share.dto.environment.ContainerStateDto;
 
 public class ContainerEventDto
 {
-    public enum Type
-    {
-        RUNNING
-    }
-
-
     private String id;
 
     private Date time;
@@ -25,8 +19,6 @@ public class ContainerEventDto
     private String containerId;
 
     private String envId;
-
-    private Type type;
 
     private ContainerStateDto state;
 
@@ -36,15 +28,14 @@ public class ContainerEventDto
     }
 
 
-    public ContainerEventDto( String containerId, String envId, Type type, String state )
+    public ContainerEventDto( String containerId, String envId, ContainerStateDto state )
     {
         id = RandomStringUtils.randomAlphabetic( 12 );
         time = new Date();
 
         this.containerId = containerId;
         this.envId = envId;
-        this.type = type;
-        this.state = ContainerStateDto.valueOf( state );
+        this.state = state;
     }
 
 
@@ -66,18 +57,6 @@ public class ContainerEventDto
     }
 
 
-    public Type getType()
-    {
-        return type;
-    }
-
-
-    public Date getTime()
-    {
-        return time;
-    }
-
-
     public ContainerStateDto getState()
     {
         return state;
@@ -90,13 +69,19 @@ public class ContainerEventDto
     }
 
 
+    public Date getTime()
+    {
+        return time;
+    }
+
+
     @Override
     public String toString()
     {
         return new ToStringBuilder( this, ToStringStyle.SHORT_PREFIX_STYLE ).append( "id", id ).append( "time", time )
                                                                             .append( "containerId", containerId )
                                                                             .append( "envId", envId )
-                                                                            .append( "type", type ).toString();
+                                                                            .append( "state", state ).toString();
     }
 }
 
