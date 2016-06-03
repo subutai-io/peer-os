@@ -5,6 +5,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +62,29 @@ public class RestServiceImpl implements RestService
     {
         return localPeer.isInitialized() ? Response.ok().build() :
                Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
+    }
+
+
+    @Override
+    public Response isReady()
+    {
+        boolean ready = true;
+
+        BundleContext ctx = FrameworkUtil.getBundle( RestServiceImpl.class ).getBundleContext();
+
+        Bundle[] bundles = ctx.getBundles();
+
+        for ( Bundle bundle : bundles )
+        {
+            if ( !( ( bundle.getState() == Bundle.ACTIVE ) || ( bundle.getState() == Bundle.RESOLVED ) ) )
+            {
+                ready = false;
+
+                break;
+            }
+        }
+
+        return ready ? Response.ok().build() : Response.status( Response.Status.SERVICE_UNAVAILABLE ).build();
     }
 
 

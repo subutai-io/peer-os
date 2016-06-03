@@ -7,6 +7,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
@@ -36,13 +38,15 @@ public class HeartbeatProcessor implements Runnable
 
     private int fastModeLeft = 0;
 
+    private volatile boolean inProgress = false;
+
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
         this.restClient = restClient;
 
-        path = String.format( "/rest/v1.2/peers/%s/heartbeat", peerId );
+        path = String.format( "/rest/v1.3/peers/%s/heartbeat/", peerId );
     }
 
 
@@ -54,6 +58,9 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
+    /**
+     * Called by scheduler.
+     */
     @Override
     public void run()
     {
@@ -84,7 +91,9 @@ public class HeartbeatProcessor implements Runnable
 
         long interval = ( System.currentTimeMillis() - lastSentMillis ) / 1000;
 
-        if ( interval >= BIG_INTERVAL_SECONDS || force || fastModeLeft > 0 )
+        boolean canSend = ( interval >= BIG_INTERVAL_SECONDS || force || fastModeLeft > 0 ) && !inProgress;
+
+        if ( canSend )
         {
             log.info( "Sending heartbeat: interval={}, force={}, fastModeLeft={}", interval, force, fastModeLeft );
 
@@ -93,15 +102,21 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    private void doHeartbeat() throws Exception
+    private synchronized void doHeartbeat() throws Exception
     {
+        log.info( "Heartbeat - START" );
+
+        inProgress = true;
+
         lastSentMillis = System.currentTimeMillis();
 
         fastModeLeft--;
 
         try
         {
-            RestResult<HeartbeatResponseDto> restResult = restClient.post( path, null, HeartbeatResponseDto.class );
+            String url = path + RandomStringUtils.randomNumeric( 7 );
+
+            RestResult<HeartbeatResponseDto> restResult = restClient.post( url, null, HeartbeatResponseDto.class );
 
             if ( !restResult.isSuccess() )
             {
@@ -116,6 +131,12 @@ public class HeartbeatProcessor implements Runnable
         {
             throw new Exception( e.getMessage(), e );
         }
+        finally
+        {
+            inProgress = false;
+        }
+
+        log.info( "Heartbeat - END" );
     }
 
 

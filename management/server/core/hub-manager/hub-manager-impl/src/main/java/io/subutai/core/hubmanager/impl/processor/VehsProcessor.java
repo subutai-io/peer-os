@@ -238,8 +238,7 @@ public class VehsProcessor implements StateLinkProcessor
                         List<ContainerHost> containerHosts = localPeer.getPeerContainers( nodesDto.getPeerId() );
                         for ( ContainerHost containerHost : containerHosts )
                         {
-                            if ( nodeDto.getTemplateName().equals( containerHost.getTemplateName() ) && nodeDto
-                                    .getContainerName().equals( containerHost.getContainerName() ) )
+                            if ( nodeDto.getTemplateName().equals( containerHost.getTemplateName() ) )
                             {
                                 cs.add( containerHost );
                             }

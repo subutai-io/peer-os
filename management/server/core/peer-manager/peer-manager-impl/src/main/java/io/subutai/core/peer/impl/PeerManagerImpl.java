@@ -33,8 +33,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.exception.NetworkException;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.NullHostInterface;
+import io.subutai.common.network.SocketUtil;
 import io.subutai.common.peer.Encrypted;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
@@ -243,6 +245,8 @@ public class PeerManagerImpl implements PeerManager
         Encrypted encryptedData = registrationData.getData();
         try
         {
+            SocketUtil.check( registrationData.getPeerInfo().getIp(), 3,
+                    registrationData.getPeerInfo().getPublicSecurePort() );
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
             String decryptedCert = encryptedData.decrypt( key, String.class );
             securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(),
@@ -269,6 +273,10 @@ public class PeerManagerImpl implements PeerManager
         catch ( GeneralSecurityException e )
         {
             throw new PeerException( "Invalid keyphrase or general security exception." );
+        }
+        catch ( NetworkException e )
+        {
+            throw new PeerException( e.getMessage() );
         }
         catch ( Exception e )
         {
@@ -516,11 +524,17 @@ public class PeerManagerImpl implements PeerManager
         try
         {
             getRemotePeerInfo( registrationData.getPeerInfo().getPublicUrl() );
+            SocketUtil.check( registrationData.getPeerInfo().getIp(), 3,
+                    registrationData.getPeerInfo().getPublicSecurePort() );
         }
         catch ( PeerException e )
         {
             throw new PeerException( String.format( "Registration request rejected. Provided URL %s not accessible.",
                     registrationData.getPeerInfo().getPublicUrl() ) );
+        }
+        catch ( NetworkException e )
+        {
+            throw new PeerException( e.getMessage() );
         }
 
         addRequest( registrationData );
@@ -692,6 +706,15 @@ public class PeerManagerImpl implements PeerManager
 
         PeerInfo peerInfo = getRemotePeerInfo( destinationUrl.toString() );
 
+        try
+        {
+            SocketUtil.check( peerInfo.getIp(), 3, peerInfo.getPublicSecurePort() );
+        }
+        catch ( NetworkException e )
+        {
+            throw new PeerException( e.getMessage() );
+        }
+
         if ( getRequest( peerInfo.getId() ) != null )
         {
             throw new PeerException( "Registration record already exists." );
@@ -717,26 +740,23 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    public boolean checkHostAvailability( final String destinationHost ) throws PeerException
+    public void checkHostAvailability( final String destinationHost ) throws PeerException
     {
         URL url = checkDestinationHostConstraints( destinationHost );
 
         try
         {
-            WebClient client = RestUtil.createTrustedWebClient( url.toString() + "/rest/v1/handshake/info" );
-            Response response = client.get();
-
-            if ( response.hasEntity() )
-            {
-                return true;
-            }
+            PeerInfo peerInfo = getRemotePeerInfo( url.toString() );
+            SocketUtil.check( peerInfo.getIp(), 3, peerInfo.getPublicSecurePort() );
+        }
+        catch ( NetworkException ne )
+        {
+            throw new PeerException( ne.getMessage() );
         }
         catch ( Exception e )
         {
-            LOG.error( "checkHostAvailability", e );
+            throw new PeerException( "No response, possibly wrong address" );
         }
-
-        return false;
     }
 
 
@@ -753,8 +773,7 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Invalid URL." );
         }
 
-        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
-                .getPeerInfo().getPublicSecurePort() )
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
         {
             throw new PeerException( "Could not send registration request to ourselves." );
         }

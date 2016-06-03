@@ -1,8 +1,14 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -23,6 +29,7 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.hub.share.dto.PeerProductDataDto;
@@ -113,8 +120,7 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     private void processPeerProductData( final PeerProductDataDto peerProductDataDTO )
-            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception,
-            IOException
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception, IOException
     {
         switch ( peerProductDataDTO.getState() )
         {
@@ -132,12 +138,12 @@ public class ProductProcessor implements StateLinkProcessor
 
 
     private void installingProcess( final PeerProductDataDto peerProductDataDTO )
-            throws IOException, Exception, UnrecoverableKeyException, NoSuchAlgorithmException,
-            KeyStoreException
+            throws IOException, Exception, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
         LOG.debug( "Installing Product to Local Peer..." );
-
+        boolean isSuccess = false;
         ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
+
 
         // downloading plugin files
         for ( String url : productDTO.getMetadata() )
@@ -152,9 +158,13 @@ public class ProductProcessor implements StateLinkProcessor
             {
                 fileName = productDTO.getId() + ".kar";
             }
-            File file = new File( PATH_TO_DEPLOY + "/" + fileName );
-            URL website = new URL( url );
-            FileUtils.copyURLToFile( website, file );
+
+            WebClient webClient = RestUtil.createTrustedWebClient( url );
+
+            File product = webClient.get( File.class );
+            InputStream initialStream = FileUtils.openInputStream( product );
+            File targetFile = new File( PATH_TO_DEPLOY + "/" + fileName );
+            FileUtils.copyInputStreamToFile( initialStream, targetFile );
         }
 
         LOG.debug( "Product installed successfully..." );
@@ -272,7 +282,4 @@ public class ProductProcessor implements StateLinkProcessor
             throw new Exception( "Could not send product data.", e );
         }
     }
-
-
-
 }

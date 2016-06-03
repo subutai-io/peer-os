@@ -1,14 +1,17 @@
 package io.subutai.core.security.impl;
 
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
+
+import javax.jms.IllegalStateException;
 
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.configuration.ConfigurationException;
 
 import com.google.common.base.Strings;
 
@@ -16,7 +19,7 @@ import io.subutai.common.command.EncryptedRequestWrapper;
 import io.subutai.common.command.EncryptedResponseWrapper;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.SecurityManager;
@@ -42,6 +45,9 @@ public class SecurityManagerImpl implements SecurityManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( SecurityManagerImpl.class );
 
+    private static final String PEER_SECRET_KEY_PWD_FILE =
+            String.format( "%s/%s", Common.SUBUTAI_APP_DATA_PATH, "peer.pwd" );
+
     private KeyManager keyManager = null;
     private DaoManager daoManager = null;
     private EncryptionTool encryptionTool = null;
@@ -56,24 +62,32 @@ public class SecurityManagerImpl implements SecurityManager
     /* *****************************
      *
      */
-    public SecurityManagerImpl( Object provider ) throws ConfigurationException
+    public SecurityManagerImpl( Object provider ) throws Exception
     {
         keyData = new SecurityKeyData();
 
-        if ( Strings.isNullOrEmpty(SystemSettings.getPeerSecretKeyringPwd()) )
+        Path secretKeyPwdFile = Paths.get( PEER_SECRET_KEY_PWD_FILE );
+
+        String secretPwd;
+
+        if ( Files.exists( secretKeyPwdFile ) )
         {
-            try
+            secretPwd = new String( Files.readAllBytes( secretKeyPwdFile ) );
+
+            if ( Strings.isNullOrEmpty( secretPwd ) )
             {
-                SystemSettings.setPeerSecretKeyringPwd( UUID.randomUUID().toString() );
-            }
-            catch ( ConfigurationException e )
-            {
-                LOG.error( " ***** Error in getting value from subutaisystem.cfg",e );
-                throw new ConfigurationException(e);
+                throw new IllegalStateException( "Peer secret key pwd is invalid" );
             }
         }
+        else
+        {
+            secretPwd = UUID.randomUUID().toString();
 
-        keyData.setSecretKeyringPwd( SystemSettings.getPeerSecretKeyringPwd() );
+            Files.write( secretKeyPwdFile, secretPwd.getBytes() );
+        }
+
+        keyData.setSecretKeyringPwd( secretPwd );
+
         keyData.setJsonProvider( provider );
 
         httpContextManager = new HttpContextManagerImpl();

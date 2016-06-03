@@ -15,7 +15,8 @@
 					placeholder="Environment name" 
 					ng-model="advEnvCtrl.environment2BuildName" 
 					ng-readonly="advEnvCtrl.editingEnv" 
-					required>
+					required
+					maxlength="50">
 			</div>
 
 			<div ng-if="advEnvCtrl.containers2Remove.length > 0">

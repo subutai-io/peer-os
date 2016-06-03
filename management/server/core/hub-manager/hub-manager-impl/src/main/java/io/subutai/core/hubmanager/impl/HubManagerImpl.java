@@ -43,7 +43,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
-import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.api.dao.ConfigDataService;
@@ -69,6 +68,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
 import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
@@ -84,9 +84,11 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService heartbeatExecutorService = Executors.newSingleThreadScheduledExecutor();
 
-    private final ScheduledExecutorService resourceHostConfExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService resourceHostConfExecutorService =
+            Executors.newSingleThreadScheduledExecutor();
 
-    private final ScheduledExecutorService resourceHostMonitorExecutorService = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService resourceHostMonitorExecutorService =
+            Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService hubLoggerExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -163,21 +165,25 @@ public class HubManagerImpl implements HubManager
 
             configDataService = new ConfigDataServiceImpl( daoManager );
 
-            configManager = new ConfigManager( securityManager, peerManager, configDataService, identityManager );
+            configManager = new ConfigManager( securityManager, peerManager, identityManager );
 
             restClient = new HubRestClient( configManager );
 
             resourceHostDataProcessor = new ResourceHostDataProcessor( this, localPeer, monitor, restClient );
 
-            ResourceHostMonitorProcessor resourceHostMonitorProcessor = new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
+            ResourceHostMonitorProcessor resourceHostMonitorProcessor =
+                    new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
-            resourceHostConfExecutorService.scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+            resourceHostConfExecutorService
+                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
-            resourceHostMonitorExecutorService.scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
+            resourceHostMonitorExecutorService
+                    .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
-            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+            containerEventExecutor
+                    .scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
             HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
@@ -209,7 +215,8 @@ public class HubManagerImpl implements HubManager
 
     private void initHeartbeatProcessor()
     {
-        EnvironmentUserHelper environmentUserHelper = new EnvironmentUserHelper( identityManager, configDataService, environmentManager, restClient );
+        EnvironmentUserHelper environmentUserHelper =
+                new EnvironmentUserHelper( identityManager, configDataService, environmentManager, restClient );
 
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
@@ -223,17 +230,20 @@ public class HubManagerImpl implements HubManager
 
         StateLinkProcessor vehsProccessor = new VehsProcessor( configManager, peerManager );
 
-        AppScaleProcessor appScaleProcessor = new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
+        AppScaleProcessor appScaleProcessor =
+                new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
-        heartbeatProcessor = new HeartbeatProcessor( this, restClient, localPeer.getId() )
-                .addProcessor( tunnelProcessor )
-                .addProcessor( hubEnvironmentProcessor )
-                .addProcessor( systemConfProcessor )
-                .addProcessor( productProcessor )
-                .addProcessor( vehsProccessor )
-                .addProcessor( appScaleProcessor );
+        heartbeatProcessor =
+                new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
+                                                                             .addProcessor( hubEnvironmentProcessor )
+                                                                             .addProcessor( systemConfProcessor )
+                                                                             .addProcessor( productProcessor )
+                                                                             .addProcessor( vehsProccessor )
+                                                                             .addProcessor( appScaleProcessor );
 
-        heartbeatExecutorService.scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS, TimeUnit.SECONDS );
+        heartbeatExecutorService
+                .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
+                        TimeUnit.SECONDS );
     }
 
 
@@ -287,8 +297,6 @@ public class HubManagerImpl implements HubManager
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws Exception
     {
-        configManager.addHubConfig( hupIp );
-
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
         registrationManager.registerPeer( email, password );
@@ -392,26 +400,35 @@ public class HubManagerImpl implements HubManager
     {
         try
         {
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            TrustManager[] trustAllCerts = new TrustManager[] {
+                    new X509TrustManager()
+                    {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                        {
                             return null;
                         }
-                        public void checkClientTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
+
+
+                        public void checkClientTrusted( java.security.cert.X509Certificate[] certs, String authType )
+                        {
                         }
-                        public void checkServerTrusted(
-                                java.security.cert.X509Certificate[] certs, String authType) {
+
+
+                        public void checkServerTrusted( java.security.cert.X509Certificate[] certs, String authType )
+                        {
                         }
                     }
             };
 
             // Activate the new trust manager
-            try {
-                SSLContext sc = SSLContext.getInstance("SSL" );
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory() );
-            } catch (Exception e) {
+            try
+            {
+                SSLContext sc = SSLContext.getInstance( "SSL" );
+                sc.init( null, trustAllCerts, new java.security.SecureRandom() );
+                HttpsURLConnection.setDefaultSSLSocketFactory( sc.getSocketFactory() );
+            }
+            catch ( Exception e )
+            {
             }
 
             // And as before now you can use URL and URLConnection
@@ -423,10 +440,10 @@ public class HubManagerImpl implements HubManager
             URLConnection connection = website.openConnection();
             InputStream in = connection.getInputStream();
             OutputStream out = new FileOutputStream( file );
-            IOUtils.copy (in, out);
+            IOUtils.copy( in, out );
             in.close();
             out.close();
-//            FileUtils.copyURLToFile( website, file );
+            //            FileUtils.copyURLToFile( website, file );
         }
         catch ( IOException e )
         {

@@ -98,7 +98,7 @@ public class Login extends HttpServlet
         {
             request.setAttribute( "error", "karaf exceptions !!!" );
             response.getWriter().write( "Error: " + e.getMessage() );
-            response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
     }
 

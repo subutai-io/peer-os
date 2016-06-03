@@ -131,6 +131,7 @@ func heartbeat() bool {
 		return false
 	}
 
+	hostname, _ = os.Hostname()
 	pool = container.GetActiveContainers(false)
 	beat := Heartbeat{
 		Type:       "HEARTBEAT",

@@ -55,7 +55,4 @@ public class DefSubutaiStepsGiven {
     public void recordStartVideo() throws FileNotFoundException {
         subutaiSteps.run_bash_script("src/test/resources/files/recordScreenStart.sh");
     }
-
-
-
 }

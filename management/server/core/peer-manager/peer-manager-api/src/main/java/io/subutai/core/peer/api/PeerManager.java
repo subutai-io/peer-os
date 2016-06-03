@@ -74,5 +74,5 @@ public interface PeerManager
 
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
 
-    boolean checkHostAvailability( final String destinationHost ) throws PeerException;
+    void checkHostAvailability( final String destinationHost ) throws PeerException;
 }

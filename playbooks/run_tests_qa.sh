@@ -101,12 +101,8 @@ function choice_stories(){
 
 function run_tests(){
      mvn clean
-     Xvfb :10 -ac -screen scrn 2000x2000x24+32 &
-     export DISPLAY=:10
-     firefox --display=:10 &
      mvn integration-test -Dwebdriver.firefox.profile=src/test/resources/profilePgpFF
      mvn serenity:aggregate
-     pkill -f Xvfb
 }
 
 if [ $# = 0 ]; then

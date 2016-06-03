@@ -73,10 +73,6 @@ generate_keystore (){
        generate_keystore_certificate "root_special_px1" $folder"/keystore_special_px1.jks"
        generate_truststore_certificate "root_server_px2" $folder"/keystore_server_px2.jks" $folder"/truststore_server_px2.jks"
 
-       cp $DIRNAME/../data/certs/test.*kr $folder
-       cp $DIRNAME/../keys/h.public.gpg $folder
-
-
     fi
 }
 

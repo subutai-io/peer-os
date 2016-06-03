@@ -2,6 +2,9 @@ package io.subutai.core.hubmanager.impl.environment.state;
 
 
 import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.security.auth.Subject;
 
@@ -10,13 +13,23 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState;
+
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.READY;
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.WAIT;
 
 
 public abstract class StateHandler
 {
     private static final String PATH = "/rest/v1/environments/%s/peers/%s";
+
+    /**
+     * Map of <envId, state>. Used to prevent duplicated handling of states.
+     */
+    private static final Map<String, PeerState> envLastStates = Collections.synchronizedMap( new HashMap<String, PeerState>() );
 
     protected final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -66,11 +79,23 @@ public abstract class StateHandler
 
     private void runAs( EnvironmentPeerDto peerDto )
     {
+        if ( canIgnoreState( peerDto ) )
+        {
+            log.info( "Ignoring state: {}", peerDto.getState() );
+
+            return;
+        }
+
         try
         {
             Object result = doHandle( peerDto );
 
-            post( peerDto, result );
+            RestResult<Object> restResult = post( peerDto, result );
+
+            if ( restResult.isSuccess() )
+            {
+                onSuccess( peerDto );
+            }
         }
         catch ( Exception e )
         {
@@ -81,9 +106,23 @@ public abstract class StateHandler
     }
 
 
-    protected void post( EnvironmentPeerDto peerDto, Object body )
+    private boolean canIgnoreState( EnvironmentPeerDto peerDto )
     {
-        ctx.restClient.post( path( PATH, peerDto ), body );
+        PeerState state = peerDto.getState();
+
+        return state == WAIT || state == READY || envLastStates.get( peerDto.getEnvironmentInfo().getId() ) == state;
+    }
+
+
+    protected void onSuccess( EnvironmentPeerDto peerDto )
+    {
+        envLastStates.put( peerDto.getEnvironmentInfo().getId(), peerDto.getState() );
+    }
+
+
+    protected RestResult<Object> post( EnvironmentPeerDto peerDto, Object body )
+    {
+        return ctx.restClient.post( path( PATH, peerDto ), body );
     }
 
 
