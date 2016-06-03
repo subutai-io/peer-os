@@ -73,7 +73,7 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 		var postData = '';
 		if(vm.activeMode == 'sptoken') {
 			postData =
-				'username=' + vm.fingerprint +
+				'username=' + $("#subt-input__login").val() +
 				'&password=' + encodeURIComponent(vm.sptoken);
 		} else {
 			postData =
