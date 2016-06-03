@@ -773,8 +773,7 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Invalid URL." );
         }
 
-        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
-                .getPeerInfo().getPublicSecurePort() )
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
         {
             throw new PeerException( "Could not send registration request to ourselves." );
         }
