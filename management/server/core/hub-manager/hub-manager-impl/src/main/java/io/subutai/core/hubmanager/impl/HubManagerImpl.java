@@ -183,7 +183,7 @@ public class HubManagerImpl implements HubManager
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
             containerEventExecutor
-                    .scheduleWithFixedDelay( containerEventProcessor, 30, TIME_15_MINUTES, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
             HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
