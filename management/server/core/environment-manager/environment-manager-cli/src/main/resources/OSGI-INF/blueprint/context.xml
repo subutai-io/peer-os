@@ -118,4 +118,12 @@
       </action>
     </command>
   </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/rename-container">
+      <action class="io.subutai.core.environment.cli.RenameContainerCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
 </blueprint>
