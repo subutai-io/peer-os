@@ -228,8 +228,9 @@ function environmentService($http, $q) {
 		);
 	}
 
-	function checkDomain(container) {
-		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain');
+	function checkDomain(container, state) {
+		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain' +
+			'?state=' + state);
 	}
 
 

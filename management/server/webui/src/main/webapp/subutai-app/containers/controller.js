@@ -69,7 +69,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function checkDomain() {
-		environmentService.checkDomain(vm.domainContainer).success(function (data) {
+		environmentService.checkDomain(vm.domainContainer, vm.currentDomainStatus).success(function (data) {
 			vm.currentDomainStatus = data;
 		});
 		ngDialog.closeAll();
