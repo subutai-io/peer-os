@@ -715,7 +715,7 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( e.getMessage() );
         }
 
-        if ( getRequest( peerInfo.getId() ) != null )
+        if ( getRequest( peerInfo.getId() ) != null || localPeerId.equals( peerInfo.getId()))
         {
             throw new PeerException( "Registration record already exists." );
         }
