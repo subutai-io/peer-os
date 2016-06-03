@@ -715,7 +715,7 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( e.getMessage() );
         }
 
-        if ( getRequest( peerInfo.getId() ) != null || localPeerId.equals( peerInfo.getId()))
+        if ( getRequest( peerInfo.getId() ) != null || localPeerId.equals( peerInfo.getId() ) )
         {
             throw new PeerException( "Registration record already exists." );
         }
@@ -814,17 +814,28 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
-            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
-            }
+            else
+                LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !" , e );
         }
         //***************************************
 
         try
         {
-            registrationClient.sendCancelRequest( request.getPeerInfo().getPublicUrl(),
-                    buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.CANCELLED ) );
+            try
+            {
+                registrationClient.sendCancelRequest( request.getPeerInfo().getPublicUrl(),
+                        buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.CANCELLED ) );
+            }
+            catch ( Exception e )
+            {
+                if ( !forceAction )
+                    throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+                else
+                    LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !" , e );
+            }
 
+            //**********************************************
             removeRequest( request.getPeerInfo().getId() );
         }
         catch ( Exception e )
@@ -882,9 +893,9 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
-            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
-            }
+            else
+                LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !" , e );
         }
         //***************************************
 
@@ -895,7 +906,17 @@ public class PeerManagerImpl implements PeerManager
             // return received data
             r.setData( request.getData() );
 
-            registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(), r );
+            try
+            {
+                registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(), r );
+            }
+            catch(Exception e)
+            {
+                if ( !forceAction )
+                    throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+                else
+                    LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !" , e );
+            }
         }
         catch ( Exception e )
         {
@@ -920,9 +941,9 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
-            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
-            }
+            else
+                LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !" , e );
         }
 
         //***************************************
@@ -930,17 +951,30 @@ public class PeerManagerImpl implements PeerManager
                 .succeeded() )
         {
             if ( !forceAction )
-            {
                 throw new PeerException( "Could not unregister peer. Peer in use." );
-            }
+            else
+                LOG.error( "***** Error, Peer in use, but proceeding (forcing) !");
         }
 
         try
         {
             RegistrationClient registrationClient = new RegistrationClientImpl( provider );
             PeerData peerData = loadPeerData( request.getPeerInfo().getId() );
-            registrationClient.sendUnregisterRequest( request.getPeerInfo().getPublicUrl(),
-                    buildRegistrationData( peerData.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
+
+            try
+            {
+                registrationClient.sendUnregisterRequest( request.getPeerInfo().getPublicUrl(),
+                        buildRegistrationData( peerData.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
+            }
+            catch(Exception e)
+            {
+                if ( !forceAction )
+                {
+                    throw new PeerException( "Could not unregister peer. Peer in use." );
+                }
+                else
+                    LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !" , e );
+            }
         }
         catch ( Exception e )
         {
