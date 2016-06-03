@@ -134,14 +134,22 @@ public class RestServiceImpl implements RestService
         Set<Environment> environments = environmentManager.getEnvironments();
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
+
         for ( Environment environment : environments )
         {
-            EnvironmentDto environmentDto =
-                    new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ),
-                            environment.getRelationDeclaration(), environment.getClass().getName() );
+            try
+            {
+                EnvironmentDto environmentDto =
+                        new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                                convertContainersToContainerJson( environment.getContainerHosts() ),
+                                environment.getRelationDeclaration(), environment.getClass().getName() );
 
-            environmentDtos.add( environmentDto );
+                environmentDtos.add( environmentDto );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error jsonifying environment {}", environment.getId() );
+            }
         }
 
         return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
@@ -790,8 +798,8 @@ public class RestServiceImpl implements RestService
         try
         {
 
-            return Response.ok( JsonUtil.toJson( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ) )
-                           .build();
+            return Response.ok( JsonUtil
+                    .toJson( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ) ).build();
         }
         catch ( Exception e )
         {
