@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
@@ -94,12 +93,6 @@ public class ContainerEventProcessor implements Runnable
     {
         log.info( "- ContainerHost: id={}, name={}, environmentId={}, state={}", ch.getId(), ch.getContainerName(),
                 ch.getEnvironmentId(), ch.getState() );
-
-        // For now Hub needs RUNNING only
-        if ( ch.getState() != ContainerHostState.RUNNING )
-        {
-            return;
-        }
 
         ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
 
