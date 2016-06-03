@@ -8,14 +8,14 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
-import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.dto.ContainerEventDto;
+import io.subutai.hub.share.dto.environment.ContainerStateDto;
+import io.subutai.hub.share.dto.environment.container.ContainerEventDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -94,15 +94,9 @@ public class ContainerEventProcessor implements Runnable
         log.info( "- ContainerHost: id={}, name={}, environmentId={}, state={}", ch.getId(), ch.getContainerName(),
                 ch.getEnvironmentId(), ch.getState() );
 
-        // For now Hub needs RUNNING only
-        if ( ch.getState() != ContainerHostState.RUNNING )
-        {
-            return;
-        }
+        ContainerStateDto state = ContainerStateDto.valueOf( ch.getState().name() );
 
-        ContainerEventDto.Type type = ContainerEventDto.Type.valueOf( ch.getState().name() );
-
-        ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), type );
+        ContainerEventDto dto = new ContainerEventDto( ch.getId(), ch.getEnvironmentId().getId(), state );
 
         Response res = doRequest( dto );
 
@@ -112,7 +106,7 @@ public class ContainerEventProcessor implements Runnable
 
     private Response doRequest( ContainerEventDto dto ) throws Exception
     {
-        String path = String.format( "/rest/v1/containers/%s/events", dto.getContainerId() );
+        String path = String.format( "/rest/v2/containers/%s/events", dto.getContainerId() );
 
         WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
 
