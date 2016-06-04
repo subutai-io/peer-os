@@ -35,6 +35,8 @@ import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
+import static io.subutai.hub.share.dto.environment.ContainerStateDto.BUILDING;
+
 
 public class BuildContainerStateHandler extends StateHandler
 {
@@ -148,7 +150,11 @@ public class BuildContainerStateHandler extends StateHandler
 
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
-            updateNodeDto( nodeDto, envContainers );
+            // Update for just cloned containers only. Containers with RUNNING state were created in previous builds.
+            if ( nodeDto.getState() == BUILDING )
+            {
+                updateNodeDto( nodeDto, envContainers );
+            }
         }
     }
 
@@ -177,8 +183,11 @@ public class BuildContainerStateHandler extends StateHandler
 
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
-            // Exclude existing containers. This may happen as a result of duplicated requests.
-            if ( !containerExists( nodeDto.getHostName(), envContainers ) )
+            log.info( "noteDto: containerId={}, containerName={}, hostname={}, state={}",
+                    nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+
+            // Exclude existing containers. This may happen as a result of duplicated requests or adding a new container to existing peer in env.
+            if ( !containerExists( nodeDto.getHostName(), envContainers ) && nodeDto.getState() == BUILDING )
             {
                 createRequests.addRequest( createCloneRequest( nodeDto ) );
             }
