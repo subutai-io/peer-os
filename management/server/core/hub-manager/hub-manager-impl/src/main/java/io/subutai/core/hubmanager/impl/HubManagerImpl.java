@@ -102,7 +102,7 @@ public class HubManagerImpl implements HubManager
 
     private SecurityManager securityManager;
 
-    private EnvironmentManager environmentManager;
+    private EnvironmentManager envManager;
 
     private PeerManager peerManager;
 
@@ -215,12 +215,12 @@ public class HubManagerImpl implements HubManager
 
     private void initHeartbeatProcessor()
     {
-        EnvironmentUserHelper environmentUserHelper =
-                new EnvironmentUserHelper( identityManager, configDataService, environmentManager, restClient );
+        EnvironmentUserHelper envUserHelper =
+                new EnvironmentUserHelper( identityManager, configDataService, envManager, restClient );
 
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
-        Context ctx = new Context( identityManager, environmentUserHelper, localPeer, restClient );
+        Context ctx = new Context( identityManager, envManager, envUserHelper, localPeer, restClient );
 
         StateLinkProcessor hubEnvironmentProcessor = new HubEnvironmentProcessor( ctx );
 
@@ -549,7 +549,7 @@ public class HubManagerImpl implements HubManager
 
     public void setEnvironmentManager( final EnvironmentManager environmentManager )
     {
-        this.environmentManager = environmentManager;
+        this.envManager = environmentManager;
     }
 
 
