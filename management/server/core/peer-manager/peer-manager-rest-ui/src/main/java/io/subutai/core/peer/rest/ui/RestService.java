@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response;
 public interface RestService
 {
     @POST
-    @Produces( { MediaType.TEXT_PLAIN} )
+    @Produces( { MediaType.TEXT_PLAIN } )
     Response processRegisterRequest( @FormParam( "ip" ) String ip, @FormParam( "key_phrase" ) String keyPhrase );
 
     @GET
@@ -35,16 +35,17 @@ public interface RestService
     @PUT
     @Path( "unregister" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId, @FormParam( "force" ) Boolean force );
+    Response unregisterForRegistrationRequest( @FormParam( "peerId" ) String peerId,
+                                               @FormParam( "force" ) Boolean force );
 
 
     @GET
     @Path( "resource_hosts" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getResourceHosts( );
+    Response getResourceHosts();
 
     @GET
-    @Path( "check/{dest}" )
+    @Path( "check" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response checkPeer(@PathParam("dest") String destinationHost);
+    Response checkPeer( @FormParam( "ip" ) String ip );
 }
