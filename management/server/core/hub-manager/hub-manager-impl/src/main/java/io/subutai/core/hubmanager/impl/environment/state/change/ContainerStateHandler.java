@@ -83,13 +83,4 @@ public class ContainerStateHandler extends StateHandler
     {
         return ctx.restClient.post( path( "/rest/v1/environments/%s/peers/%s/container", peerDto ), body );
     }
-
-
-    /**
-     * This state is allowed to have duplicated handling.
-     */
-    @Override
-    protected void onSuccess( EnvironmentPeerDto peerDto )
-    {
-    }
 }
