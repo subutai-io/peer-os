@@ -2,9 +2,6 @@ package io.subutai.core.hubmanager.impl.environment.state;
 
 
 import java.security.PrivilegedAction;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.security.auth.Subject;
 
@@ -25,11 +22,6 @@ import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.
 public abstract class StateHandler
 {
     private static final String PATH = "/rest/v1/environments/%s/peers/%s";
-
-    /**
-     * Map of <envId, state>. Used to prevent duplicated handling of states.
-     */
-    private static final Map<String, PeerState> envLastStates = Collections.synchronizedMap( new HashMap<String, PeerState>() );
 
     protected final Logger log = LoggerFactory.getLogger( getClass() );
 
@@ -90,12 +82,7 @@ public abstract class StateHandler
         {
             Object result = doHandle( peerDto );
 
-            RestResult<Object> restResult = post( peerDto, result );
-
-            if ( restResult.isSuccess() )
-            {
-                onSuccess( peerDto );
-            }
+            post( peerDto, result );
         }
         catch ( Exception e )
         {
@@ -106,17 +93,11 @@ public abstract class StateHandler
     }
 
 
-    private boolean canIgnoreState( EnvironmentPeerDto peerDto )
+    protected boolean canIgnoreState( EnvironmentPeerDto peerDto )
     {
         PeerState state = peerDto.getState();
 
-        return state == WAIT || state == READY || envLastStates.get( peerDto.getEnvironmentInfo().getId() ) == state;
-    }
-
-
-    protected void onSuccess( EnvironmentPeerDto peerDto )
-    {
-        envLastStates.put( peerDto.getEnvironmentInfo().getId(), peerDto.getState() );
+        return state == WAIT || state == READY;
     }
 
 

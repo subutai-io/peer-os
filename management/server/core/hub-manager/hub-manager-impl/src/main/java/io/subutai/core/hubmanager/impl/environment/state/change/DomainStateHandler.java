@@ -76,13 +76,4 @@ public class DomainStateHandler extends StateHandler
     {
         return ctx.restClient.post( path( "/rest/v1/environments/%s/peers/%s/domain", peerDto ), body );
     }
-
-
-    /**
-     * This state is allowed to have duplicated handling.
-     */
-    @Override
-    protected void onSuccess( EnvironmentPeerDto peerDto )
-    {
-    }
 }
