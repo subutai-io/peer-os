@@ -474,7 +474,7 @@ input[type=checkbox] {
 }
 
 .b-main-table__controls {
-    width: 82px;
+    width: 85px;
 }
 
 .b-main-table__node-one {
@@ -1459,7 +1459,7 @@ input.b-popup-body-checkbox {
 }
 
 .b-main-form__wrapper_min {
-    margin-right: 20px;
+    margin-right: 15px;
     line-height: 24px;
 	vertical-align: top;
 }
