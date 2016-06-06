@@ -205,17 +205,7 @@ public class ProductProcessor implements StateLinkProcessor
         if ( deleteFileCounter == productDTO.getMetadata().size() )
         {
             LOG.debug( " Product uninstalled successfully." );
-            String removePath = String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(),
-                    peerProductDataDTO.getProductId() );
-
-            WebClient client = configManager.getTrustedWebClientWithAuth( removePath, configManager.getHubIp() );
-
-            Response r = client.delete();
-
-            if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
-            {
-                LOG.debug( "Status: " + "no content" );
-            }
+            deletePeerProductData( peerProductDataDTO );
         }
     }
 
@@ -257,12 +247,16 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    private void updatePeerProductData( final PeerProductDataDto peerProductDataDTO )
+    public String getProductProcessUrl( String peerId, String productId )
+    {
+        return String.format( "/rest/v1/peers/%s/products/%s", peerId, productId );
+    }
+
+    public void updatePeerProductData( final PeerProductDataDto peerProductDataDTO )
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception
     {
         LOG.debug( "Sending update : " + peerProductDataDTO );
-        String updatePath = String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(),
-                peerProductDataDTO.getProductId() );
+        String updatePath = getProductProcessUrl( configManager.getPeerId(), peerProductDataDTO.getProductId() );
 
         try
         {
@@ -280,6 +274,21 @@ public class ProductProcessor implements StateLinkProcessor
                 JsonProcessingException e )
         {
             throw new Exception( "Could not send product data.", e );
+        }
+    }
+
+    public void deletePeerProductData( final PeerProductDataDto peerProductDataDto )
+            throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
+    {
+        String removePath = getProductProcessUrl( configManager.getPeerId(), peerProductDataDto.getProductId() );
+
+        WebClient client = configManager.getTrustedWebClientWithAuth( removePath, configManager.getHubIp() );
+
+        Response r = client.delete();
+
+        if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
+        {
+            LOG.debug( "Status: " + "no content" );
         }
     }
 }

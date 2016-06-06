@@ -1,7 +1,10 @@
 package io.subutai.core.bazaar.impl;
 
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +66,7 @@ public class BazaarImpl implements Bazaar
     @Override
     public void installPlugin( String name, String version, String kar, String url, String uid ) throws Exception
     {
-		this.hubManager.installPlugin(kar, name );
+        this.hubManager.installPlugin(kar, name, uid );
         this.configDataService.savePlugin( name, version, kar, url, uid );
     }
 
@@ -71,15 +74,21 @@ public class BazaarImpl implements Bazaar
     @Override
     public void uninstallPlugin( Long id, String name )
     {
-        this.hubManager.uninstallPlugin( name );
+        Iterator<Plugin> iterator = this.configDataService.getPlugins().iterator();
+        String uid = null;
+
+        if ( iterator.hasNext() )
+            uid = iterator.next().getUid();
+
+        this.hubManager.uninstallPlugin( name, uid );
         this.configDataService.deletePlugin( id );
     }
 
 	@Override
 	public void restorePlugin (Long id, String name, String version, String kar, String url, String uid) throws Exception
 	{
-		this.hubManager.uninstallPlugin(name );
-		this.hubManager.installPlugin(kar, name );
+		this.hubManager.uninstallPlugin(name, uid );
+		this.hubManager.installPlugin(kar, name, uid );
 		this.configDataService.deletePlugin (id);
 		this.configDataService.savePlugin( name, version, kar, url, uid );
 	}
