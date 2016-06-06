@@ -20,14 +20,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -58,7 +56,6 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -404,12 +401,6 @@ public class PeerManagerImpl implements PeerManager
 
     private void unregister( final RegistrationData registrationData ) throws PeerException
     {
-
-        if ( !notifyPeerActionListeners(
-                new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
-        {
-            throw new PeerException( "Could not unregister peer." );
-        }
 
         try
         {
@@ -814,9 +805,13 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+            }
             else
-                LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !" , e );
+            {
+                LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !", e );
+            }
         }
         //***************************************
 
@@ -830,9 +825,13 @@ public class PeerManagerImpl implements PeerManager
             catch ( Exception e )
             {
                 if ( !forceAction )
+                {
                     throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+                }
                 else
-                    LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !" , e );
+                {
+                    LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !", e );
+                }
             }
 
             //**********************************************
@@ -893,9 +892,13 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+            }
             else
-                LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !" , e );
+            {
+                LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !", e );
+            }
         }
         //***************************************
 
@@ -910,12 +913,16 @@ public class PeerManagerImpl implements PeerManager
             {
                 registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(), r );
             }
-            catch(Exception e)
+            catch ( Exception e )
             {
                 if ( !forceAction )
+                {
                     throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+                }
                 else
-                    LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !" , e );
+                {
+                    LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !", e );
+                }
             }
         }
         catch ( Exception e )
@@ -941,9 +948,13 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+            }
             else
-                LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !" , e );
+            {
+                LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !", e );
+            }
         }
 
         //***************************************
@@ -951,9 +962,13 @@ public class PeerManagerImpl implements PeerManager
                 .succeeded() )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Could not unregister peer. Peer in use." );
+            }
             else
-                LOG.error( "***** Error, Peer in use, but proceeding (forcing) !");
+            {
+                LOG.error( "***** Error, Peer in use, but proceeding (forcing) !" );
+            }
         }
 
         try
@@ -966,14 +981,16 @@ public class PeerManagerImpl implements PeerManager
                 registrationClient.sendUnregisterRequest( request.getPeerInfo().getPublicUrl(),
                         buildRegistrationData( peerData.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
             }
-            catch(Exception e)
+            catch ( Exception e )
             {
                 if ( !forceAction )
                 {
                     throw new PeerException( "Could not unregister peer. Peer in use." );
                 }
                 else
-                    LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !" , e );
+                {
+                    LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !", e );
+                }
             }
         }
         catch ( Exception e )
