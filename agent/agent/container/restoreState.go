@@ -16,8 +16,8 @@ func init() {
 	contsStatus = make(map[string]int)
 }
 
-func ContainersRestoreState(pool []Container) {
-	for _, cont := range pool {
+func ContainersRestoreState() {
+	for _, cont := range GetActiveContainers(false) {
 		var start, stop bool
 
 		switch contsStatus[cont.Name] {
