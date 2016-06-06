@@ -56,7 +56,6 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
                 notifications = JSON.parse(notifications);
                 for (var i = 0; i < notifications.length; i++) {
                     if (notifications[i].browserPluginMessage !== undefined && notifications[i].browserPluginMessage) {
-                        console.log(notifications[i].browserPluginMessage);
                         notifications.splice(i, 1);
                         localStorage.setItem('notifications', JSON.stringify(notifications));
                         $rootScope.notifications = {};
@@ -101,7 +100,6 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
         vm.activeUser = data;
 
         identitySrv.getPublicKeyData(vm.activeUser.id).success(function (data) {
-            console.log(data)
             vm.publicKeyInfo = data;
         });
 
