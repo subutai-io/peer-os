@@ -78,7 +78,6 @@ func Start(c *cli.Context) {
 		} else {
 			time.Sleep(5 * time.Second)
 		}
-		container.ContainersRestoreState(pool)
 		lib.TunCheck()
 		for !checkSS() {
 			time.Sleep(time.Second * 10)
@@ -99,6 +98,8 @@ func checkSS() (status bool) {
 
 func connectionMonitor() {
 	for {
+		container.ContainersRestoreState()
+
 		if !checkSS() {
 			time.Sleep(time.Second * 10)
 			continue
@@ -130,7 +131,6 @@ func heartbeat() bool {
 	if len(lastHeartbeat) > 0 && time.Since(lastHeartbeatTime) < time.Second*5 {
 		return false
 	}
-
 	hostname, _ = os.Hostname()
 	pool = container.GetActiveContainers(false)
 	beat := Heartbeat{
