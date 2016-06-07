@@ -13,7 +13,10 @@ import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,9 +32,14 @@ import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import io.subutai.common.dao.DaoManager;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
+import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.hubmanager.impl.HubManagerImpl;
+import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.ProductDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -42,6 +50,7 @@ public class ProductProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ProductProcessor.class.getName() );
     private ConfigManager configManager;
+    private Set<HubEventListener> hubEventListeners = new HashSet<>();
 
     private static final Pattern PRODUCT_DATA_PATTERN = Pattern.compile( "/rest/v1/peers/[a-zA-z0-9]{1,100}/products/"
             + "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})" );
@@ -49,9 +58,10 @@ public class ProductProcessor implements StateLinkProcessor
     private static final String PATH_TO_DEPLOY = String.format( "%s/deploy", System.getProperty( "karaf.home" ) );
 
 
-    public ProductProcessor( final ConfigManager hConfigManager )
+    public ProductProcessor( final ConfigManager hConfigManager, final Set<HubEventListener> hubEventListeners )
     {
         this.configManager = hConfigManager;
+        this.hubEventListeners = hubEventListeners != null? hubEventListeners : new HashSet<HubEventListener>();
     }
 
 
@@ -172,6 +182,9 @@ public class ProductProcessor implements StateLinkProcessor
         // update status
         peerProductDataDTO.setState( PeerProductDataDto.State.INSTALLED );
         updatePeerProductData( peerProductDataDTO );
+
+        // save info about installation into DB
+        notifyPluginEventListeners( peerProductDataDTO.getProductId(), peerProductDataDTO.getState() );
     }
 
 
@@ -206,6 +219,9 @@ public class ProductProcessor implements StateLinkProcessor
         {
             LOG.debug( " Product uninstalled successfully." );
             deletePeerProductData( peerProductDataDTO );
+
+            // remove info about installation into DB
+            notifyPluginEventListeners( peerProductDataDTO.getProductId(), peerProductDataDTO.getState() );
         }
     }
 
@@ -289,6 +305,35 @@ public class ProductProcessor implements StateLinkProcessor
         if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
         {
             LOG.debug( "Status: " + "no content" );
+        }
+    }
+
+    public void notifyPluginEventListeners( final String pluginUid, final PeerProductDataDto.State state )
+    {
+        if ( !CollectionUtil.isCollectionEmpty( hubEventListeners ) )
+        {
+            ExecutorService notifier = Executors.newFixedThreadPool( hubEventListeners.size() );
+
+            for ( final HubEventListener hubEventListener : hubEventListeners )
+            {
+                notifier.execute( new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            hubEventListener.onPluginEvent( pluginUid, state );
+                        }
+                        catch ( Exception e )
+                        {
+                            //ignore
+                        }
+                    }
+                } );
+            }
+
+            notifier.shutdown();
         }
     }
 }

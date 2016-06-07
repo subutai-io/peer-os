@@ -229,7 +229,7 @@ public class HubManagerImpl implements HubManager
 
         StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
 
-        ProductProcessor productProcessor = new ProductProcessor( configManager );
+        ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners );
 
         StateLinkProcessor vehsProccessor = new VehsProcessor( configManager, peerManager );
 
@@ -455,7 +455,7 @@ public class HubManagerImpl implements HubManager
 
         if ( isRegistered() )
         {
-            ProductProcessor productProcessor = new ProductProcessor( this.configManager );
+            ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
             Set<String> links = new HashSet<>();
             links.add( productProcessor.getProductProcessUrl( configManager.getPeerId(), uid ) );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
@@ -514,7 +514,7 @@ public class HubManagerImpl implements HubManager
 
         if ( isRegistered() )
         {
-            ProductProcessor productProcessor = new ProductProcessor( this.configManager );
+            ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
             peerProductDataDto.setProductId( uid );
             peerProductDataDto.setState( PeerProductDataDto.State.REMOVE );
