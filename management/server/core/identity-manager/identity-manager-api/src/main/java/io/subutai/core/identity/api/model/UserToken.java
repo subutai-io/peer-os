@@ -71,8 +71,8 @@ public interface UserToken
     String getTypeName();
 
 
-    public long getUserId();
+    long getUserId();
 
 
-    public void setUserId( long userId );
+    void setUserId( long userId );
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ import io.subutai.core.identity.impl.model.UserTokenEntity;
 /**
  *
  */
-public class UserTokenDAO
+class UserTokenDAO
 {
     private static final Logger logger = LoggerFactory.getLogger( UserTokenDAO.class );
     private DaoManager daoManager = null;
@@ -29,7 +30,7 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public UserTokenDAO( final DaoManager daoManager )
+    UserTokenDAO( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -38,7 +39,7 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public UserToken find( String token )
+    UserToken find( String token )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -65,7 +66,7 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public UserToken findValid( String token )
+    UserToken findValid( String token )
     {
         UserToken result = find( token );
         try
@@ -91,14 +92,14 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public void removeInvalid()
+    void removeInvalid()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
             daoManager.startTransaction( em );
-            Query query = null;
-            query = em.createQuery( "delete from UserTokenEntity ut where ut.type=1 and ut.validDate<:CurrentDate" );
+            Query query =
+                    em.createQuery( "delete from UserTokenEntity ut where ut.type=1 and ut.validDate<:CurrentDate" );
             query.setParameter( "CurrentDate", new Date( System.currentTimeMillis() ) );
             query.executeUpdate();
             daoManager.commitTransaction( em );
@@ -118,16 +119,16 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public List<UserToken> getAll()
+    List<UserToken> getAll()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
         List<UserToken> result = Lists.newArrayList();
-        Query query = null;
         try
         {
-            query = em.createQuery( "select h from UserTokenEntity h", UserTokenEntity.class );
-            result = ( List<UserToken> ) query.getResultList();
+            TypedQuery<UserTokenEntity> query =
+                    em.createQuery( "select h from UserTokenEntity h", UserTokenEntity.class );
+            result.addAll( query.getResultList() );
         }
         catch ( Exception e )
         {
@@ -144,7 +145,7 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public void persist( UserToken item )
+    void persist( UserToken item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -169,7 +170,7 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public void remove( final String id )
+    void remove( final String id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -218,14 +219,15 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public UserToken findByUserId( final long userId )
+    UserToken findByUserId( final long userId )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         UserToken tk = null;
         try
         {
-            List<UserToken> result = null;
-            Query qr = em.createQuery( "select h from UserTokenEntity h where h.userId=:userId", UserToken.class );
+            List<UserTokenEntity> result;
+            TypedQuery<UserTokenEntity> qr =
+                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId", UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
@@ -253,15 +255,16 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public UserToken findByDetails( final long userId, final int tokenType )
+    UserToken findByDetails( final long userId, final int tokenType )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         UserToken tk = null;
         try
         {
-            List<UserToken> result = null;
-            Query qr = em.createQuery( "select h from UserTokenEntity h where h.userId=:userId and h.type=:tokenType",
-                    UserToken.class );
+            List<UserTokenEntity> result;
+            TypedQuery<UserTokenEntity> qr =
+                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId and h.type=:tokenType",
+                            UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "tokenType", tokenType );
 
@@ -291,16 +294,16 @@ public class UserTokenDAO
     /* *************************************************
      *
      */
-    public UserToken findValidByUserId( final long userId )
+    UserToken findValidByUserId( final long userId )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         UserToken tk = null;
         try
         {
-            List<UserToken> result = null;
-            Query qr = em.createQuery(
+            List<UserTokenEntity> result;
+            TypedQuery<UserTokenEntity> qr = em.createQuery(
                     "select h from UserTokenEntity h where h.userId=:userId and h.validDate>=:validDate",
-                    UserToken.class );
+                    UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "validDate", new Date( System.currentTimeMillis() ) );
             result = qr.getResultList();

@@ -10,7 +10,7 @@ import io.subutai.core.identity.api.SecurityController;
 /**
  * Logs and Checks security events
  */
-public class SecurityControllerImpl implements SecurityController
+class SecurityControllerImpl implements SecurityController
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( SecurityControllerImpl.class.getName() );
 
@@ -35,8 +35,8 @@ public class SecurityControllerImpl implements SecurityController
     @Override
     public int checkTrustLevel( String fingerprint )
     {
-        int level = 0;
-        return level;
+        //todo implement
+        return 0;
     }
 
 
