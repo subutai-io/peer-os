@@ -95,7 +95,7 @@ func Update(name string, check bool) {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update is avalable")
+			log.Info("Update is available")
 			os.Exit(0)
 		}
 
@@ -113,7 +113,7 @@ func Update(name string, check bool) {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update is avalable")
+			log.Info("Update is available")
 			os.Exit(0)
 		}
 		_, err = container.AttachExec(name, []string{"apt-get", "-qq", "upgrade", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5"})
