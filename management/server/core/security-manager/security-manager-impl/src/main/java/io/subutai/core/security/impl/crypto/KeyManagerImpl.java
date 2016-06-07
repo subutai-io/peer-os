@@ -783,7 +783,7 @@ public class KeyManagerImpl implements KeyManager
             if ( keyIden == null )
             {
                 //throw new NullPointerException( "***** Error! Key Identity not found." );
-                LOG.warn( "*******  SecurityKey (getPublicKeyRing) not found for identityID:" + identityId);
+                LOG.warn( "*******  SecurityKey (getPublicKeyRing) not found for identityID:" + identityId );
                 return null;
             }
             else
@@ -1131,8 +1131,8 @@ public class KeyManagerImpl implements KeyManager
             if ( pubRing == null ) // Get from HTTP
             {
                 String baseUrl = String.format( "%s/rest/v1", peerInfo.getPublicUrl() );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
-                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+                WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.TEXT_PLAIN );
 
                 Response response =
                         client.path( "security/keyman/getpublickeyring" ).query( "hostid", peerInfo.getId() ).get();
