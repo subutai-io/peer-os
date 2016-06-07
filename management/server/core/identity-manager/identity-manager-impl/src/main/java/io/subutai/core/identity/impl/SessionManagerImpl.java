@@ -58,7 +58,7 @@ public class SessionManagerImpl implements SessionManager
                     removeInvalidTokens();
                     invalidateSessions();
                 }
-                catch(Exception ex)
+                catch(Exception ignore)
                 {
                 }
             }
@@ -157,7 +157,7 @@ public class SessionManagerImpl implements SessionManager
         {
             sessionContext.remove( sessionId );
         }
-        catch ( Exception ex )
+        catch ( Exception ignore )
         {
         }
     }

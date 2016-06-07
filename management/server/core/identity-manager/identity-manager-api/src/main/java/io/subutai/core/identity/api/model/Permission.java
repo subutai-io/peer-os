@@ -7,33 +7,33 @@ import java.util.List;
 public interface Permission
 {
 
-    public void setDelete( boolean delete );
+    void setDelete( boolean delete );
 
-    public boolean isDelete();
+    boolean isDelete();
 
-    public void setUpdate( boolean update );
+    void setUpdate( boolean update );
 
-    public boolean isUpdate();
+    boolean isUpdate();
 
-    public void setWrite( boolean write );
+    void setWrite( boolean write );
 
-    public boolean isWrite();
+    boolean isWrite();
 
-    public void setRead( boolean read );
+    void setRead( boolean read );
 
-    public boolean isRead();
+    boolean isRead();
 
-    public void setScope( int scope );
+    void setScope( int scope );
 
-    public int getScope();
+    int getScope();
 
-    public void setObject( int object );
+    void setObject( int object );
 
-    public int getObject();
+    int getObject();
 
-    public void setId( final Long id );
+    void setId( final Long id );
 
-    public Long getId();
+    Long getId();
 
     String getObjectName();
 

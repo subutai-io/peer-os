@@ -4,7 +4,7 @@ package io.subutai.core.identity.impl.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import com.google.common.collect.Lists;
 
@@ -16,7 +16,7 @@ import io.subutai.core.identity.impl.model.UserDelegateEntity;
 /**
  *
  */
-public class UserDelegateDAO
+class UserDelegateDAO
 {
     private DaoManager daoManager = null;
 
@@ -24,7 +24,7 @@ public class UserDelegateDAO
     /* *************************************************
      *
      */
-    public UserDelegateDAO( final DaoManager daoManager )
+    UserDelegateDAO( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -33,7 +33,7 @@ public class UserDelegateDAO
     /* *************************************************
      *
      */
-    public UserDelegate find( String id )
+    UserDelegate find( String id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -59,18 +59,18 @@ public class UserDelegateDAO
     /* *************************************************
      *
      */
-    public List<UserDelegate> getAll()
+    List<UserDelegate> getAll()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
         List<UserDelegate> result = Lists.newArrayList();
-        Query query = null;
         try
         {
-            query = em.createQuery( "select h from UserDelegateEntity h", UserDelegateEntity.class );
-            result = ( List<UserDelegate> ) query.getResultList();
+            TypedQuery<UserDelegateEntity> query =
+                    em.createQuery( "select h from UserDelegateEntity h", UserDelegateEntity.class );
+            result.addAll( query.getResultList() );
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -84,7 +84,7 @@ public class UserDelegateDAO
     /* *************************************************
      *
      */
-    public void persist( final UserDelegate item )
+    void persist( final UserDelegate item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -108,7 +108,7 @@ public class UserDelegateDAO
     /* *************************************************
      *
      */
-    public void remove( final String id )
+    void remove( final String id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -132,7 +132,7 @@ public class UserDelegateDAO
     /* *************************************************
      *
      */
-    public void update( final UserDelegate item)
+    public void update( final UserDelegate item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -155,14 +155,16 @@ public class UserDelegateDAO
     /* *************************************************
      *
      */
-    public UserDelegate findByUserId( final long userId )
+    UserDelegate findByUserId( final long userId )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         UserDelegate tk = null;
         try
         {
-            List<UserDelegate> result = null;
-            Query qr = em.createQuery( "select h from UserDelegateEntity h where h.userId=:userId", UserDelegate.class );
+            List<UserDelegateEntity> result;
+            TypedQuery<UserDelegateEntity> qr =
+                    em.createQuery( "select h from UserDelegateEntity h where h.userId=:userId",
+                            UserDelegateEntity.class );
             qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
@@ -171,7 +173,7 @@ public class UserDelegateDAO
                 tk = result.get( 0 );
             }
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -181,6 +183,4 @@ public class UserDelegateDAO
 
         return tk;
     }
-
-
 }

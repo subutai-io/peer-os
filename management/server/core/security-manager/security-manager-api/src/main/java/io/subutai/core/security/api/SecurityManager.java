@@ -3,7 +3,6 @@ package io.subutai.core.security.api;
 
 import org.bouncycastle.openpgp.PGPException;
 
-import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
@@ -19,29 +18,28 @@ public interface SecurityManager
     /* **********************************
      *
      */
-    public KeyManager getKeyManager();
+    KeyManager getKeyManager();
 
 
     /* **********************************
      *
      */
-    public EncryptionTool getEncryptionTool();
+    EncryptionTool getEncryptionTool();
 
 
     /* *****************************
      *
      */
-    public KeyStoreManager getKeyStoreManager();
+    KeyStoreManager getKeyStoreManager();
 
 
     /* *****************************
      *
      */
-    public CertificateManager getCertificateManager();
 
-    public HttpContextManager getHttpContextManager();
+    HttpContextManager getHttpContextManager();
 
-    public String signNEncryptRequestToHost(String message, String hostId) throws PGPException;
+    String signNEncryptRequestToHost( String message, String hostId ) throws PGPException;
 
-    public String decryptNVerifyResponseFromHost(String message) throws PGPException;
+    String decryptNVerifyResponseFromHost( String message ) throws PGPException;
 }
