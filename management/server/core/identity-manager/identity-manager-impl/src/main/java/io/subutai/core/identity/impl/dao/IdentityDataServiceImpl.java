@@ -23,7 +23,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 {
     private static final Logger LOG = LoggerFactory.getLogger( IdentityDataServiceImpl.class );
 
-    private DaoManager daoManager = null;
     private UserDAO userDAOService = null;
     private RoleDAO roleDAOService = null;
     private SessionDAO sessionDAOService = null;
@@ -37,8 +36,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
      */
     public IdentityDataServiceImpl( final DaoManager daoManager )
     {
-        this.daoManager = daoManager;
-
         if ( daoManager != null )
         {
             userDAOService = new UserDAO( daoManager );

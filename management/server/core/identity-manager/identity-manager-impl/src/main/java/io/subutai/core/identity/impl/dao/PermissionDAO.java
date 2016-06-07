@@ -23,7 +23,7 @@ class PermissionDAO
     /* *************************************************
      *
      */
-    public PermissionDAO( final DaoManager daoManager )
+    PermissionDAO( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -32,7 +32,7 @@ class PermissionDAO
     /* *************************************************
      *
      */
-    public Permission find( final long id )
+    Permission find( final long id )
     {
         Permission result = null;
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -40,7 +40,7 @@ class PermissionDAO
         {
             result = em.find( PermissionEntity.class, id );
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -54,15 +54,15 @@ class PermissionDAO
     /* *************************************************
      *
      */
-    public List<Permission> getAll()
+    List<Permission> getAll()
     {
         List<Permission> result = Lists.newArrayList();
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
-            result = em.createQuery( "select h from PermissionEntity h" ).getResultList();
+            result = em.createQuery( "select h from PermissionEntity h", Permission.class ).getResultList();
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -76,7 +76,7 @@ class PermissionDAO
     /* *************************************************
      *
      */
-    public void persist( Permission item )
+    void persist( Permission item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -100,7 +100,7 @@ class PermissionDAO
     /* *************************************************
      *
      */
-    public void remove( final long id )
+    void remove( final long id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try

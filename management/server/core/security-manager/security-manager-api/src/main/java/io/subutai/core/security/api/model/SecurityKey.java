@@ -13,36 +13,36 @@ public interface SecurityKey
     /********************************
      *
      */
-    public String getIdentityId();
+     String getIdentityId();
 
 
     /********************************
      *
      */
-    public void setIdentityId( final String identityId );
+     void setIdentityId( final String identityId );
 
     /********************************
      *
      */
-    public short getStatus();
-
-
-    /********************************
-     *
-     */
-    public void setStatus( final short status );
+     short getStatus();
 
 
     /********************************
      *
      */
-    public int getType();
+     void setStatus( final short status );
 
 
     /********************************
      *
      */
-    public void setType( final int type );
+     int getType();
+
+
+    /********************************
+     *
+     */
+     void setType( final int type );
 
 
     /********************************

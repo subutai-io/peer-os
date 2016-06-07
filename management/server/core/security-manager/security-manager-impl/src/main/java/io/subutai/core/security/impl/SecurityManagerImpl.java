@@ -23,13 +23,11 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.api.jetty.HttpContextManager;
-import io.subutai.core.security.impl.crypto.CertificateManagerImpl;
 import io.subutai.core.security.impl.crypto.EncryptionToolImpl;
 import io.subutai.core.security.impl.crypto.KeyManagerImpl;
 import io.subutai.core.security.impl.crypto.KeyStoreManagerImpl;
@@ -55,7 +53,6 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
     private KeyStoreManager keyStoreManager = null;
-    private CertificateManager certificateManager = null;
     private HttpContextManager httpContextManager;
 
 
@@ -88,8 +85,6 @@ public class SecurityManagerImpl implements SecurityManager
 
         keyData.setSecretKeyringPwd( secretPwd );
 
-        keyData.setJsonProvider( provider );
-
         httpContextManager = new HttpContextManagerImpl();
     }
 
@@ -103,7 +98,6 @@ public class SecurityManagerImpl implements SecurityManager
         keyManager = new KeyManagerImpl( securityDataService, keyServer, keyData );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
         keyStoreManager = new KeyStoreManagerImpl();
-        certificateManager = new CertificateManagerImpl();
     }
 
 
@@ -222,25 +216,6 @@ public class SecurityManagerImpl implements SecurityManager
     public void setKeyStoreManager( final KeyStoreManager keyStoreManager )
     {
         this.keyStoreManager = keyStoreManager;
-    }
-
-
-    /* *****************************
-     *
-     */
-    @Override
-    public CertificateManager getCertificateManager()
-    {
-        return certificateManager;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setCertificateManager( final CertificateManager certificateManager )
-    {
-        this.certificateManager = certificateManager;
     }
 
 

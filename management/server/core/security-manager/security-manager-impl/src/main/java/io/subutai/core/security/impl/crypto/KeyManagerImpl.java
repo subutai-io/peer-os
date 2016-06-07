@@ -33,7 +33,6 @@ import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.DateUtil;
 import io.subutai.common.util.RestUtil;
@@ -49,14 +48,10 @@ import io.subutai.core.security.impl.model.SecurityKeyData;
 
 /**
  * Implementation of KeyManager API
- *
- * todo use the same database for keys (currently keys are stored by both security manager and key manager)
  */
 public class KeyManagerImpl implements KeyManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( KeyManagerImpl.class );
-
-    private static final String PEER_ID_FILE = String.format( "%s/%s", Common.SUBUTAI_APP_KEYSTORES_PATH, "peer.id" );
 
     private SecurityDataService securityDataService = null;
     private KeyServer keyServer = null;
@@ -81,7 +76,7 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
      *
      */
-    public void setEncryptionTool( final EncryptionTool encryptionTool )
+    void setEncryptionTool( final EncryptionTool encryptionTool )
     {
         this.encryptionTool = encryptionTool;
     }
@@ -167,8 +162,9 @@ public class KeyManagerImpl implements KeyManager
 
             targetPubRing = encryptionTool.signPublicKey( targetPubRing, sigId, sourceSecRing.getSecretKey(), "" );
         }
-        catch ( Exception ex )
+        catch ( Exception ignored )
         {
+            //ignore
         }
 
         return targetPubRing;
@@ -298,34 +294,6 @@ public class KeyManagerImpl implements KeyManager
             LOG.error( "Error converting byte array to string with UTF-8 format.", e );
         }
         return null;
-    }
-
-
-    /* ***************************************************************
-     *
-     */
-    private boolean verifyTrustRelationValidity( SecurityKeyType sourceKeyType, SecurityKeyType targetKeyType )
-    {
-        switch ( sourceKeyType )
-        {
-            case ContainerHostKey:
-                return false;
-            case EnvironmentKey:
-                return targetKeyType == SecurityKeyType.PeerEnvironmentKey;
-            case ManagementHostKey:
-                return targetKeyType == SecurityKeyType.ResourceHostKey;
-            case PeerEnvironmentKey:
-                return targetKeyType == SecurityKeyType.ContainerHostKey;
-            case PeerKey:
-                return targetKeyType == SecurityKeyType.ManagementHostKey;
-            case PeerOwnerKey:
-                return targetKeyType == SecurityKeyType.PeerKey;
-            case ResourceHostKey:
-                return targetKeyType == SecurityKeyType.ContainerHostKey;
-            case UserKey:
-                return targetKeyType == SecurityKeyType.EnvironmentKey;
-        }
-        return false;
     }
 
 
@@ -783,7 +751,7 @@ public class KeyManagerImpl implements KeyManager
             if ( keyIden == null )
             {
                 //throw new NullPointerException( "***** Error! Key Identity not found." );
-                LOG.warn( "*******  SecurityKey (getPublicKeyRing) not found for identityID:" + identityId);
+                LOG.warn( "*******  SecurityKey (getPublicKeyRing) not found for identityID:" + identityId );
                 return null;
             }
             else
@@ -1046,7 +1014,7 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
       *
       */
-    public SecurityKeyData getSecurityKeyData()
+    SecurityKeyData getSecurityKeyData()
     {
         return keyData;
     }
@@ -1131,8 +1099,8 @@ public class KeyManagerImpl implements KeyManager
             if ( pubRing == null ) // Get from HTTP
             {
                 String baseUrl = String.format( "%s/rest/v1", peerInfo.getPublicUrl() );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
-                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+                WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.TEXT_PLAIN );
 
                 Response response =
                         client.path( "security/keyman/getpublickeyring" ).query( "hostid", peerInfo.getId() ).get();
@@ -1249,7 +1217,6 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public int getTrustLevel( String sourceFingerprint, String targetFingerprint )
     {
-        List<SecurityKeyTrust> sourceTrusts = getKeyTrustData( sourceFingerprint );
         Set<String> sourceChainTrust = Sets.newHashSet();
         sourceChainTrust.add( sourceFingerprint );
         int trustLevel = buildTrustChainTrustLevel( sourceFingerprint, sourceChainTrust, targetFingerprint, false );
@@ -1259,7 +1226,6 @@ public class KeyManagerImpl implements KeyManager
             return trustLevel;
         }
 
-        Set<String> targetChainTrust = Sets.newHashSet();
         sourceChainTrust.add( targetFingerprint );
         trustLevel = buildTrustChainTrustLevel( targetFingerprint, sourceChainTrust, sourceFingerprint, true );
 
