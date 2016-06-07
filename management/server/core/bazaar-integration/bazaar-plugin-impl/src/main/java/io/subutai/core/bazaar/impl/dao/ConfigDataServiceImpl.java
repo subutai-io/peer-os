@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
 import java.util.List;
 
 public class ConfigDataServiceImpl implements ConfigDataService
@@ -95,5 +97,47 @@ public class ConfigDataServiceImpl implements ConfigDataService
 			daoManager.closeEntityManager( em );
 		}
 		return result;
+	}
+
+	@Override
+	public List<Plugin> getPluginById( final Long id )
+	{
+		List<Plugin> results = Lists.newArrayList();
+		EntityManager em = daoManager.getEntityManagerFromFactory();
+		try
+		{
+			Query qr = em.createQuery( "select h from PluginEntity h where h.id=:id" );
+			qr.setParameter( "id", id );
+			results = qr.getResultList();
+		}
+		catch ( Exception e )
+		{
+		}
+		finally
+		{
+			daoManager.closeEntityManager( em );
+		}
+		return results;
+	}
+
+	@Override
+	public List<Plugin> getPluginByUid( final String uid )
+	{
+		List<Plugin> results = Lists.newArrayList();
+		EntityManager em = daoManager.getEntityManagerFromFactory();
+		try
+		{
+			Query qr = em.createQuery( "select h from PluginEntity h where h.uid=:uid" );
+			qr.setParameter( "uid", uid );
+			results = qr.getResultList();
+		}
+		catch ( Exception e )
+		{
+		}
+		finally
+		{
+			daoManager.closeEntityManager( em );
+		}
+		return results;
 	}
 }
