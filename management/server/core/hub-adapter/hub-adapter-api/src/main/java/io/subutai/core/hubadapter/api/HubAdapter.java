@@ -25,5 +25,7 @@ public interface HubAdapter
 
     <T> List<T> getPluginData( String pluginKey, Class<T> clazz );
 
+    <T> T getPluginDataByKey( String pluginKey, String key, Class<T> clazz );
+
     boolean uploadPluginData( String pluginKey, String key, Object data );
 }

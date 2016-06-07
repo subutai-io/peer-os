@@ -90,7 +90,6 @@ public class PluginDAOImpl implements PluginDAO
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( info, "Info is null" );
 
-
         try
         {
             lock.lock();
@@ -160,9 +159,19 @@ public class PluginDAOImpl implements PluginDAO
     @Override
     public <T> T getInfo( String source, String key, Class<T> clazz )
     {
+        LOG.debug( "source={}, key={}, clazz={}", source, key, clazz );
+
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
         Preconditions.checkNotNull( clazz, "Class is null" );
+
+        // If this plugin data is over Hub environment, we get that from Hub
+        T data = hubAdapter.getPluginDataByKey( source, key, clazz );
+
+        if ( data != null )
+        {
+            return data;
+        }
 
         try
         {
