@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
@@ -239,15 +241,15 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Could not register peer." );
         }
 
-        Encrypted encryptedData = registrationData.getData();
+        Encrypted encryptedSslCert = registrationData.getSslCert();
         try
         {
             SocketUtil.check( registrationData.getPeerInfo().getIp(), 3,
                     registrationData.getPeerInfo().getPublicSecurePort() );
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-            String decryptedCert = encryptedData.decrypt( key, String.class );
+            String decryptedSslCert = encryptedSslCert.decrypt( key, String.class );
             securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(),
-                    registrationData.getPeerInfo().getId(), decryptedCert );
+                    registrationData.getPeerInfo().getId(), decryptedSslCert );
             securityManager.getHttpContextManager().reloadKeyStore();
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
@@ -266,6 +268,11 @@ public class PeerManagerImpl implements PeerManager
             templateManager.addRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             SystemSettings.getSecurePortX1() ) ), registrationData.getToken() );
+
+            Encrypted encryptedPublicKey = registrationData.getPublicKey();
+            String publicKey = encryptedPublicKey.decrypt( key, String.class );
+            securityManager.getKeyManager()
+                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), ( short ) 3, publicKey );
         }
         catch ( GeneralSecurityException e )
         {
@@ -551,11 +558,12 @@ public class PeerManagerImpl implements PeerManager
             return;
         }
 
-        Encrypted encryptedData = registrationData.getData();
+        Encrypted encryptedSslCert = registrationData.getSslCert();
         try
         {
             final String keyPhrase = loadPeerData( registrationData.getPeerInfo().getId() ).getKeyPhrase();
-            byte[] decrypted = encryptedData.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) ) );
+            byte[] decrypted =
+                    encryptedSslCert.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) ) );
             if ( !keyPhrase.equals( new String( decrypted, "UTF-8" ) ) )
             {
                 throw new PeerException( "Could not unregister peer." );
@@ -583,11 +591,11 @@ public class PeerManagerImpl implements PeerManager
         {
             // try to decode with provided key phrase
             final String keyPhrase = request.getKeyPhrase();
-            final Encrypted encryptedData = registrationData.getData();
+            final Encrypted encryptedSslCert = registrationData.getSslCert();
             try
             {
                 byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                encryptedData.decrypt( key, String.class );
+                encryptedSslCert.decrypt( key, String.class );
                 removeRequest( id );
             }
             catch ( Exception e )
@@ -611,7 +619,7 @@ public class PeerManagerImpl implements PeerManager
         {
             // try to decode with provided key phrase
             final String keyPhrase = registrationData.getKeyPhrase();
-            final Encrypted encryptedData = request.getData();
+            final Encrypted encryptedData = request.getSslCert();
             try
             {
                 byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
@@ -640,7 +648,6 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( peerInfo.getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( peerInfo );
     }
 
 
@@ -652,13 +659,18 @@ public class PeerManagerImpl implements PeerManager
         {
             case REQUESTED:
             case APPROVED:
-                String cert =
+                String sslCert =
                         securityManager.getKeyStoreManager().exportCertificate( SystemSettings.getSecurePortX2(), "" );
+
+                PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( localPeerId );
                 try
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                    Encrypted encryptedData = new Encrypted( cert, key );
-                    result.setData( encryptedData );
+                    Encrypted encryptedSslCert = new Encrypted( sslCert, key );
+                    result.setSslCert( encryptedSslCert );
+                    String publicKey = PGPKeyUtil.exportAscii( pkey );
+                    Encrypted encryptedPublicKey = new Encrypted( publicKey, key );
+                    result.setPublicKey( encryptedPublicKey );
                 }
                 catch ( Exception e )
                 {
@@ -670,7 +682,7 @@ public class PeerManagerImpl implements PeerManager
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
                     Encrypted encryptedData = new Encrypted( keyPhrase, key );
-                    result.setData( encryptedData );
+                    result.setSslCert( encryptedData );
                 }
                 catch ( Exception e )
                 {
@@ -868,8 +880,6 @@ public class PeerManagerImpl implements PeerManager
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
-
-            securityManager.getKeyManager().getRemoteHostPublicKey( request.getPeerInfo() );
         }
         catch ( Exception e )
         {
@@ -907,7 +917,7 @@ public class PeerManagerImpl implements PeerManager
             final RegistrationData r = buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED );
 
             // return received data
-            r.setData( request.getData() );
+            r.setSslCert( request.getSslCert() );
 
             try
             {
