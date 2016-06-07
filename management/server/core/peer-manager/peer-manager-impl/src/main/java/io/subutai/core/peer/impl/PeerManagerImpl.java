@@ -20,14 +20,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.core.Response;
 
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -50,6 +49,7 @@ import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
@@ -58,7 +58,6 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -242,15 +241,15 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Could not register peer." );
         }
 
-        Encrypted encryptedData = registrationData.getData();
+        Encrypted encryptedSslCert = registrationData.getSslCert();
         try
         {
             SocketUtil.check( registrationData.getPeerInfo().getIp(), 3,
                     registrationData.getPeerInfo().getPublicSecurePort() );
             byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-            String decryptedCert = encryptedData.decrypt( key, String.class );
+            String decryptedSslCert = encryptedSslCert.decrypt( key, String.class );
             securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(),
-                    registrationData.getPeerInfo().getId(), decryptedCert );
+                    registrationData.getPeerInfo().getId(), decryptedSslCert );
             securityManager.getHttpContextManager().reloadKeyStore();
 
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
@@ -269,6 +268,11 @@ public class PeerManagerImpl implements PeerManager
             templateManager.addRemoteRepository( new URL(
                     String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
                             SystemSettings.getSecurePortX1() ) ), registrationData.getToken() );
+
+            Encrypted encryptedPublicKey = registrationData.getPublicKey();
+            String publicKey = encryptedPublicKey.decrypt( key, String.class );
+            securityManager.getKeyManager()
+                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), ( short ) 3, publicKey );
         }
         catch ( GeneralSecurityException e )
         {
@@ -404,12 +408,6 @@ public class PeerManagerImpl implements PeerManager
 
     private void unregister( final RegistrationData registrationData ) throws PeerException
     {
-
-        if ( !notifyPeerActionListeners(
-                new PeerAction( PeerActionType.UNREGISTER, registrationData.getPeerInfo().getId() ) ).succeeded() )
-        {
-            throw new PeerException( "Could not unregister peer." );
-        }
 
         try
         {
@@ -560,11 +558,12 @@ public class PeerManagerImpl implements PeerManager
             return;
         }
 
-        Encrypted encryptedData = registrationData.getData();
+        Encrypted encryptedSslCert = registrationData.getSslCert();
         try
         {
             final String keyPhrase = loadPeerData( registrationData.getPeerInfo().getId() ).getKeyPhrase();
-            byte[] decrypted = encryptedData.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) ) );
+            byte[] decrypted =
+                    encryptedSslCert.decrypt( SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) ) );
             if ( !keyPhrase.equals( new String( decrypted, "UTF-8" ) ) )
             {
                 throw new PeerException( "Could not unregister peer." );
@@ -592,11 +591,11 @@ public class PeerManagerImpl implements PeerManager
         {
             // try to decode with provided key phrase
             final String keyPhrase = request.getKeyPhrase();
-            final Encrypted encryptedData = registrationData.getData();
+            final Encrypted encryptedSslCert = registrationData.getSslCert();
             try
             {
                 byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                encryptedData.decrypt( key, String.class );
+                encryptedSslCert.decrypt( key, String.class );
                 removeRequest( id );
             }
             catch ( Exception e )
@@ -620,7 +619,7 @@ public class PeerManagerImpl implements PeerManager
         {
             // try to decode with provided key phrase
             final String keyPhrase = registrationData.getKeyPhrase();
-            final Encrypted encryptedData = request.getData();
+            final Encrypted encryptedData = request.getSslCert();
             try
             {
                 byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
@@ -649,7 +648,6 @@ public class PeerManagerImpl implements PeerManager
         }
         register( initRequest.getKeyPhrase(), registrationData );
         removeRequest( peerInfo.getId() );
-        securityManager.getKeyManager().getRemoteHostPublicKey( peerInfo );
     }
 
 
@@ -661,13 +659,18 @@ public class PeerManagerImpl implements PeerManager
         {
             case REQUESTED:
             case APPROVED:
-                String cert =
+                String sslCert =
                         securityManager.getKeyStoreManager().exportCertificate( SystemSettings.getSecurePortX2(), "" );
+
+                PGPPublicKey pkey = securityManager.getKeyManager().getPublicKey( localPeerId );
                 try
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
-                    Encrypted encryptedData = new Encrypted( cert, key );
-                    result.setData( encryptedData );
+                    Encrypted encryptedSslCert = new Encrypted( sslCert, key );
+                    result.setSslCert( encryptedSslCert );
+                    String publicKey = PGPKeyUtil.exportAscii( pkey );
+                    Encrypted encryptedPublicKey = new Encrypted( publicKey, key );
+                    result.setPublicKey( encryptedPublicKey );
                 }
                 catch ( Exception e )
                 {
@@ -679,7 +682,7 @@ public class PeerManagerImpl implements PeerManager
                 {
                     byte[] key = SecurityUtilities.generateKey( keyPhrase.getBytes( "UTF-8" ) );
                     Encrypted encryptedData = new Encrypted( keyPhrase, key );
-                    result.setData( encryptedData );
+                    result.setSslCert( encryptedData );
                 }
                 catch ( Exception e )
                 {
@@ -814,9 +817,13 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+            }
             else
-                LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !" , e );
+            {
+                LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !", e );
+            }
         }
         //***************************************
 
@@ -830,9 +837,13 @@ public class PeerManagerImpl implements PeerManager
             catch ( Exception e )
             {
                 if ( !forceAction )
+                {
                     throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+                }
                 else
-                    LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !" , e );
+                {
+                    LOG.error( "***** Error while performing cancel operation, but proceeding (forcing) !", e );
+                }
             }
 
             //**********************************************
@@ -869,8 +880,6 @@ public class PeerManagerImpl implements PeerManager
             register( keyPhrase, request );
 
             removeRequest( request.getPeerInfo().getId() );
-
-            securityManager.getKeyManager().getRemoteHostPublicKey( request.getPeerInfo() );
         }
         catch ( Exception e )
         {
@@ -893,9 +902,13 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+            }
             else
-                LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !" , e );
+            {
+                LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !", e );
+            }
         }
         //***************************************
 
@@ -904,18 +917,22 @@ public class PeerManagerImpl implements PeerManager
             final RegistrationData r = buildRegistrationData( request.getKeyPhrase(), RegistrationStatus.REJECTED );
 
             // return received data
-            r.setData( request.getData() );
+            r.setSslCert( request.getSslCert() );
 
             try
             {
                 registrationClient.sendRejectRequest( request.getPeerInfo().getPublicUrl(), r );
             }
-            catch(Exception e)
+            catch ( Exception e )
             {
                 if ( !forceAction )
+                {
                     throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+                }
                 else
-                    LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !" , e );
+                {
+                    LOG.error( "***** Error while performing reject operation, but proceeding (forcing) !", e );
+                }
             }
         }
         catch ( Exception e )
@@ -941,9 +958,13 @@ public class PeerManagerImpl implements PeerManager
         catch ( Exception e )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Remote peer is not accessible:" + e.getMessage() );
+            }
             else
-                LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !" , e );
+            {
+                LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !", e );
+            }
         }
 
         //***************************************
@@ -951,9 +972,13 @@ public class PeerManagerImpl implements PeerManager
                 .succeeded() )
         {
             if ( !forceAction )
+            {
                 throw new PeerException( "Could not unregister peer. Peer in use." );
+            }
             else
-                LOG.error( "***** Error, Peer in use, but proceeding (forcing) !");
+            {
+                LOG.error( "***** Error, Peer in use, but proceeding (forcing) !" );
+            }
         }
 
         try
@@ -966,14 +991,16 @@ public class PeerManagerImpl implements PeerManager
                 registrationClient.sendUnregisterRequest( request.getPeerInfo().getPublicUrl(),
                         buildRegistrationData( peerData.getKeyPhrase(), RegistrationStatus.UNREGISTERED ) );
             }
-            catch(Exception e)
+            catch ( Exception e )
             {
                 if ( !forceAction )
                 {
                     throw new PeerException( "Could not unregister peer. Peer in use." );
                 }
                 else
-                    LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !" , e );
+                {
+                    LOG.error( "***** Error while performing unregister operation, but proceeding (forcing) !", e );
+                }
             }
         }
         catch ( Exception e )
