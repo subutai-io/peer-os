@@ -23,7 +23,7 @@ class RoleDAO
     /* *************************************************
      *
      */
-    public RoleDAO( final DaoManager daoManager )
+    RoleDAO( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -32,7 +32,7 @@ class RoleDAO
     /* *************************************************
      *
      */
-    public Role find( final long id )
+    Role find( final long id )
     {
         Role result = null;
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -40,7 +40,7 @@ class RoleDAO
         {
             result = em.find( RoleEntity.class, id );
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -54,15 +54,15 @@ class RoleDAO
     /* *************************************************
      *
      */
-    public List<Role> getAll()
+    List<Role> getAll()
     {
         List<Role> result = Lists.newArrayList();
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
-            result = em.createQuery( "select h from RoleEntity h" ).getResultList();
+            result = em.createQuery( "select h from RoleEntity h", Role.class ).getResultList();
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -76,7 +76,7 @@ class RoleDAO
     /* *************************************************
      *
      */
-    public void persist( Role item )
+    void persist( Role item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -100,7 +100,7 @@ class RoleDAO
     /* *************************************************
      *
      */
-    public void remove( final long id )
+    void remove( final long id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -142,7 +142,4 @@ class RoleDAO
             daoManager.closeEntityManager( em );
         }
     }
-
-
-
 }

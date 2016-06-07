@@ -6,5 +6,5 @@ public interface HttpContextManager
     /**
      * Reloads Jetty keystores
      */
-    public void reloadKeyStore();
+    void reloadKeyStore();
 }

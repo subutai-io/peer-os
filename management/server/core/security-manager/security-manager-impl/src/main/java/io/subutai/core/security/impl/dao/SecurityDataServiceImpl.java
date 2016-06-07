@@ -25,7 +25,6 @@ public class SecurityDataServiceImpl implements SecurityDataService
 {
     private static final Logger LOG = LoggerFactory.getLogger( SecurityDataServiceImpl.class );
 
-    private DaoManager daoManager = null;
     private SecretKeyStoreDAO secretKeyStoreDAO = null;
     private SecurityKeyTrustDAO securityKeyTrustDAO = null;
     private SecurityKeyDAO securityKeyDAO = null;
@@ -36,7 +35,6 @@ public class SecurityDataServiceImpl implements SecurityDataService
      */
     public SecurityDataServiceImpl( DaoManager daoManager )
     {
-        this.daoManager = daoManager;
         this.secretKeyStoreDAO = new SecretKeyStoreDAO( daoManager );
         this.securityKeyTrustDAO = new SecurityKeyTrustDAO( daoManager );
         this.securityKeyDAO = new SecurityKeyDAO( daoManager );
@@ -191,7 +189,7 @@ public class SecurityDataServiceImpl implements SecurityDataService
     @Override
     public SecurityKeyTrust saveKeyTrustData( String sourceFingerprint, String targetFingerprint, int trustLevel )
     {
-        SecurityKeyTrust secTrust = null;
+        SecurityKeyTrust secTrust;
 
         try
         {
@@ -289,7 +287,4 @@ public class SecurityDataServiceImpl implements SecurityDataService
     {
         return securityKeyTrustDAO.findBySourceId( sourceFingerprint );
     }
-
-
-
 }

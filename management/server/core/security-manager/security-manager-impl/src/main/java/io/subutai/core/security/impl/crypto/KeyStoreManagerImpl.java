@@ -51,7 +51,7 @@ public class KeyStoreManagerImpl implements KeyStoreManager
     @Override
     public String exportCertificate( int port, String storeAlias )
     {
-        String cert = "";
+        String cert;
         KeyStore keyStore;
         KeyStoreData keyStoreData;
         KeyStoreTool keyStoreTool;
