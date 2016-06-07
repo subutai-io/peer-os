@@ -1,8 +1,6 @@
 package io.subutai.core.identity.rest;
 
 
-import java.net.URLDecoder;
-
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Strings;
@@ -48,7 +46,6 @@ public class RestServiceImpl implements RestService
     }
 
 
-
     @Override
     public Response authenticate( int type, String userName, String password )
     {
@@ -67,13 +64,12 @@ public class RestServiceImpl implements RestService
             {
                 return Response.status( Response.Status.FORBIDDEN ).build();
             }
-
         }
-        catch(IdentityExpiredException e)
+        catch ( IdentityExpiredException e )
         {
             User user = identityManager.getUserByUsername( userName );
 
-            if(user != null)
+            if ( user != null )
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setStatus( 1 );
@@ -85,23 +81,22 @@ public class RestServiceImpl implements RestService
                 return Response.status( Response.Status.NOT_FOUND ).build();
             }
         }
-        catch(Exception e)
+        catch ( Exception e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
-
     }
 
 
     @Override
-    public Response updateAuthId( int type,String userName,String password ,String authId  )
+    public Response updateAuthId( int type, String userName, String password, String authId )
     {
         try
         {
             //password = URLDecoder.decode( password, "UTF-8" );
             User user = identityManager.authenticateByAuthSignature( userName, password );
 
-            if(user != null)
+            if ( user != null )
             {
                 identityManager.updateUserAuthId( user, authId );
                 return Response.ok().build();
@@ -111,11 +106,11 @@ public class RestServiceImpl implements RestService
                 throw new InvalidLoginException( "User not found" );
             }
         }
-        catch(IdentityExpiredException e)
+        catch ( IdentityExpiredException e )
         {
             User user = identityManager.getUserByUsername( userName );
 
-            if(user != null)
+            if ( user != null )
             {
                 identityManager.updateUserAuthId( user, authId );
                 return Response.ok().build();
@@ -125,11 +120,10 @@ public class RestServiceImpl implements RestService
                 throw new InvalidLoginException( "User not found" );
             }
         }
-        catch(Exception e)
+        catch ( Exception e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
-
     }
 
 
@@ -143,7 +137,7 @@ public class RestServiceImpl implements RestService
 
             if ( user != null )
             {
-                return Response.ok(user.getAuthId()).build();
+                return Response.ok( user.getAuthId() ).build();
             }
             else
             {
@@ -159,5 +153,4 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
-
 }

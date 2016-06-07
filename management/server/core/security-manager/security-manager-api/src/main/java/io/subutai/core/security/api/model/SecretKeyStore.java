@@ -7,39 +7,32 @@ package io.subutai.core.security.api.model;
 public interface SecretKeyStore
 {
 
-    public String getKeyFingerprint();
+    String getKeyFingerprint();
 
 
-    public void setKeyFingerprint( final String keyFingerprint );
+    void setKeyFingerprint( final String keyFingerprint );
 
 
-
-    public short getStatus();
-
-
-    public void setStatus( final short status );
+    short getStatus();
 
 
-    public int getType();
+    void setStatus( final short status );
 
 
-
-    public void setType( final int type );
-
+    int getType();
 
 
-    public String getPwd();
+    void setType( final int type );
 
 
-
-    public void setPwd( final String pwd );
-
+    String getPwd();
 
 
-    public byte[] getData();
+    void setPwd( final String pwd );
 
 
+    byte[] getData();
 
-    public void setData( final byte[] data );
 
+    void setData( final byte[] data );
 }

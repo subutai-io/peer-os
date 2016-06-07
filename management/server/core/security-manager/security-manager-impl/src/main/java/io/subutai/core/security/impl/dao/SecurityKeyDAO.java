@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import com.google.common.collect.Lists;
 
@@ -24,7 +25,7 @@ class SecurityKeyDAO
     /******************************************
      *
      */
-    public SecurityKeyDAO( DaoManager daoManager )
+    SecurityKeyDAO( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -33,15 +34,14 @@ class SecurityKeyDAO
     /******************************************
      * Get Security KeyId from DB
      */
-    public SecurityKey find( String identityId )
+    SecurityKey find( String identityId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            SecurityKey SecurityKey = em.find( SecurityKeyEntity.class, identityId );
 
-            return SecurityKey;
+            return em.find( SecurityKeyEntity.class, identityId );
         }
         catch ( Exception ex )
         {
@@ -57,14 +57,15 @@ class SecurityKeyDAO
     /******************************************
      *
      */
-    public SecurityKey findByFingerprint( String fingerprint )
+    SecurityKey findByFingerprint( String fingerprint )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         SecurityKey key = null;
         try
         {
-            Query qr = em.createQuery(
-                    "select ss from SecurityKeyEntity AS ss" + " where ss.publicKeyFingerprint=:publicKeyFingerprint" );
+            TypedQuery<SecurityKeyEntity> qr = em.createQuery(
+                    "select ss from SecurityKeyEntity AS ss" + " where ss.publicKeyFingerprint=:publicKeyFingerprint",
+                    SecurityKeyEntity.class );
             qr.setParameter( "publicKeyFingerprint", fingerprint );
             List<SecurityKeyEntity> result = qr.getResultList();
 
@@ -88,20 +89,22 @@ class SecurityKeyDAO
     /* *************************************************
      *
      */
-    public List<SecurityKey> findByType( int keyType )
+    List<SecurityKey> findByType( int keyType )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
         List<SecurityKey> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select h from SecurityKeyEntity h where h.type=:keyType", SecurityKey.class );
+            TypedQuery<SecurityKey> qr =
+                    em.createQuery( "select h from SecurityKeyEntity h where h.type=:keyType", SecurityKey.class );
 
-            qr.setParameter( "keyType",keyType );
+            qr.setParameter( "keyType", keyType );
             result = qr.getResultList();
         }
         catch ( Exception e )
         {
+            //ignore
         }
         finally
         {
@@ -114,7 +117,7 @@ class SecurityKeyDAO
     /******************************************
      *
      */
-    public void persist( SecurityKey SecurityKey )
+    void persist( SecurityKey SecurityKey )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -138,7 +141,7 @@ class SecurityKeyDAO
     /******************************************
      *
      */
-    public void update( SecurityKey SecurityKey )
+    void update( SecurityKey SecurityKey )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -162,7 +165,7 @@ class SecurityKeyDAO
     /******************************************
      *
      */
-    public void remove( String identityId )
+    void remove( String identityId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 

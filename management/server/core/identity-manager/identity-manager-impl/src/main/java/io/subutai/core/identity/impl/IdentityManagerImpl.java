@@ -141,8 +141,8 @@ public class IdentityManagerImpl implements IdentityManager
         if ( identityDataService.getAllUsers().size() < 1 )
         {
             PermissionObject permsp[] = PermissionObject.values();
-            Role role = null;
-            Permission per = null;
+            Role role;
+            Permission per;
 
             //***Create User ********************************************
 
@@ -169,9 +169,9 @@ public class IdentityManagerImpl implements IdentityManager
             role = createRole( "Administrator", UserType.Regular.getId() );
             assignUserRole( admin.getId(), role );
 
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                per = createPermission( aPermsp.getId(), 1, true, true, true, true );
                 assignRolePermission( role, per );
             }
             //*********************************************
@@ -180,11 +180,11 @@ public class IdentityManagerImpl implements IdentityManager
             role = createRole( "Peer-Manager", UserType.System.getId() );
 
             //*********************************************
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                if ( permsp[a] == PermissionObject.PeerManagement || permsp[a] == PermissionObject.ResourceManagement )
+                if ( aPermsp == PermissionObject.PeerManagement || aPermsp == PermissionObject.ResourceManagement )
                 {
-                    per = createPermission( permsp[a].getId(), 3, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
                     assignRolePermission( role, per );
                 }
             }
@@ -194,14 +194,14 @@ public class IdentityManagerImpl implements IdentityManager
             role = createRole( "Environment-Manager", UserType.System.getId() );
 
             //*********************************************
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                if ( permsp[a] != PermissionObject.IdentityManagement &&
-                        permsp[a] != PermissionObject.KarafServerAdministration &&
-                        permsp[a] != PermissionObject.PeerManagement &&
-                        permsp[a] != PermissionObject.ResourceManagement )
+                if ( aPermsp != PermissionObject.IdentityManagement &&
+                        aPermsp != PermissionObject.KarafServerAdministration &&
+                        aPermsp != PermissionObject.PeerManagement &&
+                        aPermsp != PermissionObject.ResourceManagement )
                 {
-                    per = createPermission( permsp[a].getId(), 3, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
                     assignRolePermission( role, per );
                 }
             }
@@ -212,12 +212,12 @@ public class IdentityManagerImpl implements IdentityManager
             assignUserRole( internal, role );
 
             //*********************************************
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                if ( permsp[a] != PermissionObject.IdentityManagement
-                        && permsp[a] != PermissionObject.KarafServerAdministration )
+                if ( aPermsp != PermissionObject.IdentityManagement
+                        && aPermsp != PermissionObject.KarafServerAdministration )
                 {
-                    per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), 1, true, true, true, true );
                     assignRolePermission( role, per );
                 }
             }
@@ -240,7 +240,8 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private CallbackHandler getCalbackHandler( final String userName, final String password )
     {
-        CallbackHandler callbackHandler = new CallbackHandler()
+
+        return new CallbackHandler()
         {
             public void handle( Callback[] callbacks ) throws IOException, UnsupportedCallbackException
             {
@@ -261,8 +262,6 @@ public class IdentityManagerImpl implements IdentityManager
                 }
             }
         };
-
-        return callbackHandler;
     }
 
 
@@ -429,6 +428,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         try
         {
+            //todo implement
             //loginContext.logout();
         }
         catch ( Exception e )
@@ -634,7 +634,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User authenticateUser( String userName, String password ) throws SystemSecurityException
     {
-        User user = null;
+        User user;
 
         if ( userName.equalsIgnoreCase( "token" ) )
         {
@@ -994,7 +994,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User createTempUser( String userName, String password, String fullName, String email, int type )
     {
-        String salt = null;
+        String salt;
         User user = null;
 
         try
@@ -1023,13 +1023,9 @@ public class IdentityManagerImpl implements IdentityManager
             user.setType( type );
             user.setAuthId( UUID.randomUUID().toString() );
         }
-        catch ( NoSuchAlgorithmException e )
+        catch ( NoSuchAlgorithmException | NoSuchProviderException e )
         {
-            e.printStackTrace();
-        }
-        catch ( NoSuchProviderException e )
-        {
-            e.printStackTrace();
+            LOGGER.warn( "Error in #createTempUser" , e);
         }
 
         return user;

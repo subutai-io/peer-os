@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
@@ -24,7 +26,7 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public SessionDAO( final DaoManager daoManager )
+    SessionDAO( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -33,7 +35,7 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public Session find( final long id )
+    Session find( final long id )
     {
         Session result = null;
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -41,7 +43,7 @@ class SessionDAO
         {
             result = em.find( SessionEntity.class, id );
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -55,17 +57,18 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public List<Session> getByUserId( final long userId )
+    List<Session> getByUserId( final long userId )
     {
         List<Session> results = null;
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
-            Query qr = em.createQuery( "select se from SessionEntity se where se.user.id=:userId" );
+            TypedQuery<Session> qr =
+                    em.createQuery( "select se from SessionEntity se where se.user.id=:userId", Session.class );
             qr.setParameter( "userId", userId );
             results = qr.getResultList();
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -79,7 +82,7 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public Session getValid( final long userId )
+    Session getValid( final long userId )
     {
         Session result = null;
         EntityManager em = daoManager.getEntityManagerFromFactory();
@@ -87,9 +90,9 @@ class SessionDAO
         {
             Query qr = em.createQuery( "select se from SessionEntity se where se.status=1 and se.user.id=:userId" );
             qr.setParameter( "userId", userId );
-            result = (Session)qr.getResultList().get( 0 );
+            result = ( Session ) qr.getResultList().get( 0 );
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -103,7 +106,7 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public void invalidate()
+    void invalidate()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -128,15 +131,15 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public List<Session> getAll()
+    List<Session> getAll()
     {
         List<Session> result = Lists.newArrayList();
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
         {
-            result = em.createQuery( "select h from SessionEntity h" ).getResultList();
+            result = em.createQuery( "select h from SessionEntity h", Session.class ).getResultList();
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -150,7 +153,7 @@ class SessionDAO
     /* *************************************************
      *
      */
-    public void persist( Session item )
+    void persist( Session item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
