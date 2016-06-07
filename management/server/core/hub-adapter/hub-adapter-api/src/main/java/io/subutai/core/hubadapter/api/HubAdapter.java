@@ -28,4 +28,6 @@ public interface HubAdapter
     <T> T getPluginDataByKey( String pluginKey, String key, Class<T> clazz );
 
     boolean uploadPluginData( String pluginKey, String key, Object data );
+
+    boolean deletePluginData( String pluginKey, String key );
 }

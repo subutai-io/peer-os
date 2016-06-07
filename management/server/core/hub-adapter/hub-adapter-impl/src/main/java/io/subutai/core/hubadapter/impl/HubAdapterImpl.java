@@ -246,4 +246,26 @@ public class HubAdapterImpl implements HubAdapter
 
         return response != null ? gson.fromJson( response, clazz ) : null;
     }
+
+
+    @Override
+    public boolean deletePluginData( String pluginKey, String key )
+    {
+        String userId = getUserIdWithCheck();
+
+        if ( userId == null )
+        {
+            return false;
+        }
+
+        log.debug( "userId={}, pluginKey={}, key={}", userId, pluginKey, key );
+
+        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
+
+        String response = httpClient.doDelete( url );
+
+        log.debug( "response: {}", response );
+
+        return true;
+    }
 }

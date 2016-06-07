@@ -265,6 +265,8 @@ public class PluginDAOImpl implements PluginDAO
         Preconditions.checkArgument( !Strings.isNullOrEmpty( source ), "Source is null or empty" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( key ), "Key is null or empty" );
 
+        hubAdapter.deletePluginData( source, key );
+
         try
         {
             lock.lock();
