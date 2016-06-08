@@ -10,7 +10,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -70,6 +72,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
+import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
@@ -226,7 +229,7 @@ public class HubManagerImpl implements HubManager
 
         StateLinkProcessor systemConfProcessor = new SystemConfProcessor( configManager );
 
-        ProductProcessor productProcessor = new ProductProcessor( configManager );
+        ProductProcessor productProcessor = new ProductProcessor( configManager, this.hubEventListeners );
 
         StateLinkProcessor vehsProccessor = new VehsProcessor( configManager, peerManager );
 
@@ -396,7 +399,7 @@ public class HubManagerImpl implements HubManager
 
 
     @Override
-    public void installPlugin( String url, String name ) throws Exception
+    public void installPlugin( String url, String name, String uid ) throws Exception
     {
         try
         {
@@ -449,12 +452,33 @@ public class HubManagerImpl implements HubManager
         {
             throw new Exception( "Could not install plugin", e );
         }
+
+        if ( isRegistered() )
+        {
+            ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
+            Set<String> links = new HashSet<>();
+            links.add( productProcessor.getProductProcessUrl( configManager.getPeerId(), uid ) );
+            PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
+            peerProductDataDto.setProductId( uid );
+            peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
+            peerProductDataDto.setInstallDate( new Date() );
+
+            try
+            {
+                productProcessor.updatePeerProductData( peerProductDataDto );
+            }
+            catch ( Exception e )
+            {
+                log.error( "Failed to send plugin install command to Hub: {}", e.getMessage() );
+            }
+        }
+
         log.debug( "Product installed successfully..." );
     }
 
 
     @Override
-    public void uninstallPlugin( final String name )
+    public void uninstallPlugin( final String name, final String uid )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
         log.info( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
@@ -487,6 +511,24 @@ public class HubManagerImpl implements HubManager
         {
             log.debug( file.getName() + " is removed." );
         }
+
+        if ( isRegistered() )
+        {
+            ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
+            PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
+            peerProductDataDto.setProductId( uid );
+            peerProductDataDto.setState( PeerProductDataDto.State.REMOVE );
+
+            try
+            {
+                productProcessor.deletePeerProductData( peerProductDataDto );
+            }
+            catch ( Exception e )
+            {
+                log.error( "Failed to send plugin remove command to Hub: {}", e.getMessage() );
+            }
+        }
+
         log.debug( "Product uninstalled successfully..." );
     }
 
