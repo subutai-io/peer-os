@@ -25,9 +25,9 @@ public interface HubManager
 
     String getProducts() throws Exception;
 
-    void installPlugin( String url, String filename ) throws Exception;
+    void installPlugin( String url, String filename, String uid ) throws Exception;
 
-    void uninstallPlugin( String name );
+    void uninstallPlugin( String name, String uid );
 
 
 

@@ -100,6 +100,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
 @PermitAll
@@ -1777,6 +1778,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.error( "Error uploading environments to Hub: {}", e.getMessage() );
         }
+    }
+
+
+    @Override
+    public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
+    {
     }
 
 
