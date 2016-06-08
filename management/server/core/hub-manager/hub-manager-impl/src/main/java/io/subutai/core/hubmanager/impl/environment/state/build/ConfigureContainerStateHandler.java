@@ -3,6 +3,8 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.HostAddresses;
@@ -78,6 +80,8 @@ public class ConfigureContainerStateHandler extends StateHandler
 
     public void configureHosts( EnvironmentDto envDto ) throws Exception
     {
+        log.info( "Configuring hosts:" );
+
         // <hostname, IPs>
         final Map<String, String> hostAddresses = Maps.newHashMap();
 
@@ -85,7 +89,13 @@ public class ConfigureContainerStateHandler extends StateHandler
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
-                hostAddresses.put( nodeDto.getHostName(), nodeDto.getIp() );
+                log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
+                        nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+
+                // Remove network mask "/24" in IP
+                String ip = StringUtils.substringBefore( nodeDto.getIp(), "/" );
+
+                hostAddresses.put( nodeDto.getHostName(), ip );
             }
         }
 
