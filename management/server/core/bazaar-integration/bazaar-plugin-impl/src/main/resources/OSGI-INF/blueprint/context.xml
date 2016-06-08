@@ -17,6 +17,9 @@
 
 	<service id="bazaarPlugin" ref="bazaarPluginImpl" interface="io.subutai.core.bazaar.api.Bazaar">
 	</service>
+	<service ref="bazaarPluginImpl" interface="io.subutai.hub.share.common.HubEventListener">
+	</service>
+
 	<bean id="bazaarPluginImpl" class="io.subutai.core.bazaar.impl.BazaarImpl"
 		  scope="singleton" activation="eager">
 		<argument ref="integration" />

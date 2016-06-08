@@ -71,6 +71,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubEventListener;
+import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
 public class EnvironmentManagerSecureProxy
@@ -479,6 +480,13 @@ public class EnvironmentManagerSecureProxy
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
+        // Environment is from Hub
+        if ( environment instanceof ProxyEnvironment )
+        {
+            return environment;
+        }
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -505,6 +513,7 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
@@ -513,6 +522,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
+
         environmentManager.removeEnvironmentDomain( environmentId );
     }
 
@@ -838,5 +848,11 @@ public class EnvironmentManagerSecureProxy
     public void onRegistrationSucceeded()
     {
         environmentManager.onRegistrationSucceeded();
+    }
+
+
+    @Override
+    public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
+    {
     }
 }

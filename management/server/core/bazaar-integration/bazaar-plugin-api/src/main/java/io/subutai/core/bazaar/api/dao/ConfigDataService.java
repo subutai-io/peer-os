@@ -12,4 +12,8 @@ public interface ConfigDataService
 	void deletePlugin (final Long id);
 
 	List<Plugin> getPlugins();
+
+	List<Plugin> getPluginById( final Long id );
+
+	List<Plugin> getPluginByUid( final String uid );
 }
