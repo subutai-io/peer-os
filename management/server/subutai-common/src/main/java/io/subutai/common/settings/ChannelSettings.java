@@ -27,6 +27,7 @@ public class ChannelSettings
             "/rest/v1/pks/{$}",
             "/rest/v1/security/keyman/getpublickeyring",
             "/rest/v1/security/keyman/getpublickey",
+            "/rest/v1/security/keyman/getpublickeyfingerprint",
             "/rest/v1/handshake/info",
             "/rest/v1/handshake/register",
             "/rest/v1/handshake/approve",
