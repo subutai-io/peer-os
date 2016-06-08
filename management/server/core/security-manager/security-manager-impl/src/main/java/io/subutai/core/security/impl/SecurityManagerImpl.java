@@ -63,6 +63,8 @@ public class SecurityManagerImpl implements SecurityManager
     {
         keyData = new SecurityKeyData();
 
+
+        //todo store secret pwd in database along with secret key
         Path secretKeyPwdFile = Paths.get( PEER_SECRET_KEY_PWD_FILE );
 
         String secretPwd;
