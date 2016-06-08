@@ -480,6 +480,13 @@ public class EnvironmentManagerSecureProxy
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
+        // Environment is from Hub
+        if ( environment instanceof ProxyEnvironment )
+        {
+            return environment;
+        }
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -506,6 +513,7 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
@@ -514,6 +522,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
+
         environmentManager.removeEnvironmentDomain( environmentId );
     }
 

@@ -192,11 +192,16 @@ public class HubAdapterImpl implements HubAdapter
             return Collections.emptyList();
         }
 
-        log.debug( "pluginKey={}, class={}", pluginKey, clazz );
+        log.debug( "userId={}, pluginKey={}, class={}", userId, pluginKey, clazz );
 
         String response = httpClient.doGet( format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) );
 
         log.debug( "response: {}", response );
+
+        if ( response == null )
+        {
+            return Collections.emptyList();
+        }
 
         List<T> resultList = new ArrayList<>();
 
@@ -206,7 +211,10 @@ public class HubAdapterImpl implements HubAdapter
 
             for ( String data : dataList )
             {
-                resultList.add( gson.fromJson( data, clazz ) );
+                if ( StringUtils.isNotBlank( data ) )
+                {
+                    resultList.add( gson.fromJson( data, clazz ) );
+                }
             }
         }
         catch ( IOException e )
@@ -215,5 +223,49 @@ public class HubAdapterImpl implements HubAdapter
         }
 
         return resultList;
+    }
+
+
+    @Override
+    public <T> T getPluginDataByKey( String pluginKey, String key, Class<T> clazz )
+    {
+        String userId = getUserIdWithCheck();
+
+        if ( userId == null )
+        {
+            return null;
+        }
+
+        log.debug( "userId={}, pluginKey={}, key={}, class={}", userId, pluginKey, key, clazz );
+
+        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
+
+        String response = httpClient.doGet( url );
+
+        log.debug( "response: {}", response );
+
+        return response != null ? gson.fromJson( response, clazz ) : null;
+    }
+
+
+    @Override
+    public boolean deletePluginData( String pluginKey, String key )
+    {
+        String userId = getUserIdWithCheck();
+
+        if ( userId == null )
+        {
+            return false;
+        }
+
+        log.debug( "userId={}, pluginKey={}, key={}", userId, pluginKey, key );
+
+        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
+
+        String response = httpClient.doDelete( url );
+
+        log.debug( "response: {}", response );
+
+        return true;
     }
 }
