@@ -765,6 +765,14 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 	}
 
 	function editEnvironment(environment) {
+
+		if ( environment.dataSource == "hub" )
+		{
+			SweetAlert.swal( "Feature coming soon...", "This environment created on Hub. Please use Hub to manage it.", "success");
+
+			return;
+		}
+
 		clearWorkspace();
 		vm.editingEnv = environment;
 		vm.environment2BuildName = environment.name;
