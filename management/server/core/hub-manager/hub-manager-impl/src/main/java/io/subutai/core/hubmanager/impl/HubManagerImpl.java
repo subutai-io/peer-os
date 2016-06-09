@@ -43,6 +43,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
@@ -401,7 +402,7 @@ public class HubManagerImpl implements HubManager
     @Override
     public void installPlugin( String url, String name, String uid ) throws Exception
     {
-        try
+        /*try
         {
             TrustManager[] trustAllCerts = new TrustManager[] {
                     new X509TrustManager()
@@ -451,13 +452,19 @@ public class HubManagerImpl implements HubManager
         catch ( IOException e )
         {
             throw new Exception( "Could not install plugin", e );
-        }
+        }*/
+        WebClient webClient = RestUtil.createTrustedWebClient(url);
+        File product = webClient.get( File.class );
+        InputStream initialStream = FileUtils.openInputStream( product );
+        File targetFile = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        FileUtils.copyInputStreamToFile( initialStream, targetFile );
+        initialStream.close();
 
         if ( isRegistered() )
         {
             ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
             Set<String> links = new HashSet<>();
-            links.add( productProcessor.getProductProcessUrl( configManager.getPeerId(), uid ) );
+            links.add( productProcessor.getProductProcessUrl( uid ) );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
             peerProductDataDto.setProductId( uid );
             peerProductDataDto.setState( PeerProductDataDto.State.INSTALLED );
@@ -481,7 +488,7 @@ public class HubManagerImpl implements HubManager
     public void uninstallPlugin( final String name, final String uid )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-        log.info( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        log.info( file.getAbsolutePath() );
         File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
         File[] dirs = repo.listFiles( new FileFilter()
         {
