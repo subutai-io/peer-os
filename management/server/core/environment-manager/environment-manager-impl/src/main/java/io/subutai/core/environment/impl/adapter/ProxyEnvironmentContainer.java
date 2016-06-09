@@ -150,6 +150,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         LOG.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
 
-        return new RequestBuilder( command );
+        return new RequestBuilder( command )
+                .withTimeout( requestBuilder.getTimeout() );
     }
 }
