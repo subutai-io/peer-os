@@ -104,6 +104,7 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 				localStorage.setItem('currentUser', vm.name);
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+				sessionStorage.removeItem('notifications');
 				//$state.go('home');
 				window.location = '/';
 			}).error(function(error, status){

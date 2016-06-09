@@ -50,8 +50,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 
 	$scope.session = {
 		commands: [],
-		output: [],
-		$scope:$scope
+		output: []
 	};
 
 	$scope.$watchCollection(function () { return $scope.session.commands; }, function (n) {
