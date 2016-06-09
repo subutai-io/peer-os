@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.ProductDto;
+import io.subutai.hub.share.dto.product.ProductDtoV1_2;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -152,28 +154,26 @@ public class ProductProcessor implements StateLinkProcessor
     {
         LOG.debug( "Installing Product to Local Peer..." );
         boolean isSuccess = false;
-        ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
+        ProductDtoV1_2 productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
 
+        // install dependencies first (if plugin has dependencies)
+        for ( String dependencyId : productDTO.getDependencies() )
+        {
+            PeerProductDataDto _peerProductDataDto = getPeerProductDto( getProductProcessUrl( dependencyId ) );
+            if ( _peerProductDataDto.getState() != PeerProductDataDto.State.INSTALLED )
+            {
+                installingProcess( _peerProductDataDto );
+            }
+        }
 
         // downloading plugin files
         for ( String url : productDTO.getMetadata() )
         {
-            int indexOfStr = url.indexOf( "/package/" );
-            String fileName;
-            if ( indexOfStr != -1 )
-            {
-                fileName = url.substring( indexOfStr + 9, url.length() );
-            }
-            else
-            {
-                fileName = productDTO.getId() + ".kar";
-            }
-
             WebClient webClient = RestUtil.createTrustedWebClient( url );
 
             File product = webClient.get( File.class );
             InputStream initialStream = FileUtils.openInputStream( product );
-            File targetFile = new File( PATH_TO_DEPLOY + "/" + fileName );
+            File targetFile = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
             FileUtils.copyInputStreamToFile( initialStream, targetFile );
         }
 
@@ -193,21 +193,14 @@ public class ProductProcessor implements StateLinkProcessor
     {
         // remove file from deploy package
         LOG.debug( "Removing product from Local Peer..." );
-        ProductDto productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
+        ProductDtoV1_2 productDTO = getProductDataDTO( peerProductDataDTO.getProductId() );
         int deleteFileCounter = 0;
+
+        // TODO: check that there is no installed plugins, which depends on this plugin
+
         for ( String url : productDTO.getMetadata() )
         {
-            int indexOfStr = url.indexOf( "/package/" );
-            String fileName;
-            if ( indexOfStr != -1 )
-            {
-                fileName = url.substring( indexOfStr + 9, url.length() );
-            }
-            else
-            {
-                fileName = productDTO.getId() + ".kar";
-            }
-            File file = new File( PATH_TO_DEPLOY + "/" + fileName );
+            File file = new File( PATH_TO_DEPLOY + "/" + productDTO.getName() + ".kar" );
             if ( file.delete() )
             {
                 LOG.debug( file.getName() + " is removed." );
@@ -226,10 +219,10 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    private ProductDto getProductDataDTO( final String productId ) throws Exception
+    private ProductDtoV1_2 getProductDataDTO( final String productId ) throws Exception
     {
-        ProductDto result = null;
-        String path = String.format( "/rest/v1/marketplace/products/%s", productId );
+        ProductDtoV1_2 result = null;
+        String path = String.format( "/rest/v1.2/marketplace/products/%s", productId );
         try
         {
             WebClient client = configManager.getTrustedWebClientWithAuth( path, configManager.getHubIp() );
@@ -239,23 +232,23 @@ public class ProductProcessor implements StateLinkProcessor
 
             if ( r.getStatus() == HttpStatus.SC_NO_CONTENT )
             {
-                return result;
+                return null;
             }
 
             if ( r.getStatus() != HttpStatus.SC_OK )
             {
                 LOG.error( r.readEntity( String.class ) );
-                return result;
+                return null;
             }
 
-            byte[] encryptedContent = configManager.readContent( r );
+            String jsonString = r.readEntity( String.class );
+            JSONObject jsonObj = new JSONObject( jsonString );
+            result = new ProductDtoV1_2( jsonObj );
 
-            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
-            result = JsonUtil.fromCbor( plainContent, ProductDto.class );
             LOG.debug( "ProductDataDTO: " + result.toString() );
             return result;
         }
-        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | PGPException | IOException
+        catch ( UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException
                 e )
         {
             throw new Exception( "Could not retrieve product data", e );
@@ -263,16 +256,16 @@ public class ProductProcessor implements StateLinkProcessor
     }
 
 
-    public String getProductProcessUrl( String peerId, String productId )
+    public String getProductProcessUrl( String productId )
     {
-        return String.format( "/rest/v1/peers/%s/products/%s", peerId, productId );
+        return String.format( "/rest/v1/peers/%s/products/%s", configManager.getPeerId(), productId );
     }
 
     public void updatePeerProductData( final PeerProductDataDto peerProductDataDTO )
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, Exception
     {
         LOG.debug( "Sending update : " + peerProductDataDTO );
-        String updatePath = getProductProcessUrl( configManager.getPeerId(), peerProductDataDTO.getProductId() );
+        String updatePath = getProductProcessUrl( peerProductDataDTO.getProductId() );
 
         try
         {
@@ -296,7 +289,7 @@ public class ProductProcessor implements StateLinkProcessor
     public void deletePeerProductData( final PeerProductDataDto peerProductDataDto )
             throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException
     {
-        String removePath = getProductProcessUrl( configManager.getPeerId(), peerProductDataDto.getProductId() );
+        String removePath = getProductProcessUrl( peerProductDataDto.getProductId() );
 
         WebClient client = configManager.getTrustedWebClientWithAuth( removePath, configManager.getHubIp() );
 
