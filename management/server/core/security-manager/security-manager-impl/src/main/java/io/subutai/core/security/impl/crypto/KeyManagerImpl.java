@@ -9,6 +9,7 @@ import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -94,13 +95,18 @@ public class KeyManagerImpl implements KeyManager
                 //assume there is always one Peer Key
                 SecurityKey peerKey = peerKeyList.get( 0 );
 
+                SecretKeyStore secretKeyStore =
+                        securityDataService.getSecretKeyData( peerKey.getSecretKeyFingerprint() );
+
                 keyData.setManHostId( peerKey.getPublicKeyFingerprint() );
+                keyData.setSecretKeyringPwd( secretKeyStore.getPwd() );
             }
             else
             {
+                String secretPwd = UUID.randomUUID().toString();
                 KeyPair keyPair = PGPEncryptionUtil
                         .generateKeyPair( String.format( "subutai%d@subutai.io", DateUtil.getUnixTimestamp() ),
-                                keyData.getSecretKeyringPwd(), true );
+                                secretPwd, true );
 
                 PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
                 PGPSecretKeyRing peerSecRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
@@ -108,6 +114,7 @@ public class KeyManagerImpl implements KeyManager
                 String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
 
                 keyData.setManHostId( peerId );
+                keyData.setSecretKeyringPwd( secretPwd );
 
                 saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
                 savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );

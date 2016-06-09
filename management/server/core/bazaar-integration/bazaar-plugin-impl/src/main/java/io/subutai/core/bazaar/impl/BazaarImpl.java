@@ -76,14 +76,15 @@ public class BazaarImpl implements Bazaar, HubEventListener
     @Override
     public void uninstallPlugin( Long id, String name )
     {
-        this.hubManager.uninstallPlugin( name, this.configDataService.getPluginById( id ).get( 0 ).getUid() );
+        Plugin plugin = this.configDataService.getPluginById( id ).get( 0 );
+        this.hubManager.uninstallPlugin( name, plugin.getUid() );
         this.configDataService.deletePlugin( id );
     }
 
 	@Override
 	public void restorePlugin (Long id, String name, String version, String kar, String url, String uid) throws Exception
 	{
-		this.hubManager.uninstallPlugin(name, uid );
+		this.hubManager.uninstallPlugin( name, uid );
 		this.hubManager.installPlugin(kar, name, uid );
 		this.configDataService.deletePlugin (id);
 		this.configDataService.savePlugin( name, version, kar, url, uid );

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.http.HttpStatus;
 
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
@@ -40,11 +41,14 @@ public class HeartbeatProcessor implements Runnable
 
     private volatile boolean inProgress = false;
 
+    private String peerId;
+
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
     {
         this.hubManager = hubManager;
         this.restClient = restClient;
+        this.peerId = peerId;
 
         path = String.format( "/rest/v1.3/peers/%s/heartbeat/", peerId );
     }
@@ -120,7 +124,14 @@ public class HeartbeatProcessor implements Runnable
 
             if ( !restResult.isSuccess() )
             {
-                throw new Exception( "Error to send heartbeat: " + restResult.getError() );
+                if ( restResult.getStatus() == HttpStatus.SC_FORBIDDEN )
+                {
+                    hubManager.getConfigDataService().deleteConfig( peerId );
+                }
+                else
+                {
+                    throw new Exception( "Error to send heartbeat: " + restResult.getError() );
+                }
             }
 
             HeartbeatResponseDto dto = restResult.getEntity();
