@@ -1,25 +1,13 @@
 package io.subutai.core.security.impl;
 
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
-
-import javax.jms.IllegalStateException;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
 
 import io.subutai.common.command.EncryptedRequestWrapper;
 import io.subutai.common.command.EncryptedResponseWrapper;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
-import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.SecurityManager;
@@ -41,10 +29,6 @@ import io.subutai.core.security.impl.model.SecurityKeyData;
  */
 public class SecurityManagerImpl implements SecurityManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SecurityManagerImpl.class );
-
-    private static final String PEER_SECRET_KEY_PWD_FILE =
-            String.format( "%s/%s", Common.SUBUTAI_APP_DATA_PATH, "peer.pwd" );
 
     private KeyManager keyManager = null;
     private DaoManager daoManager = null;
@@ -62,30 +46,6 @@ public class SecurityManagerImpl implements SecurityManager
     public SecurityManagerImpl( Object provider ) throws Exception
     {
         keyData = new SecurityKeyData();
-
-
-        //todo store secret pwd in database along with secret key
-        Path secretKeyPwdFile = Paths.get( PEER_SECRET_KEY_PWD_FILE );
-
-        String secretPwd;
-
-        if ( Files.exists( secretKeyPwdFile ) )
-        {
-            secretPwd = new String( Files.readAllBytes( secretKeyPwdFile ) );
-
-            if ( Strings.isNullOrEmpty( secretPwd ) )
-            {
-                throw new IllegalStateException( "Peer secret key pwd is invalid" );
-            }
-        }
-        else
-        {
-            secretPwd = UUID.randomUUID().toString();
-
-            Files.write( secretKeyPwdFile, secretPwd.getBytes() );
-        }
-
-        keyData.setSecretKeyringPwd( secretPwd );
 
         httpContextManager = new HttpContextManagerImpl();
     }

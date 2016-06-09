@@ -36,9 +36,6 @@ import io.subutai.core.kurjun.manager.impl.model.KurjunType;
 import io.subutai.core.security.api.SecurityManager;
 
 
-/**
- * TODO close web clients and responses with RestUtil.close
- */
 public class KurjunManagerImpl implements KurjunManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( KurjunManagerImpl.class.getName() );
@@ -50,9 +47,6 @@ public class KurjunManagerImpl implements KurjunManager
 
     private KurjunDataService dataService;
     private static Properties properties;
-    private static String ownerKey;
-    private static String fingerprint;
-    //**********************************
 
 
     //****************************************
@@ -135,17 +129,25 @@ public class KurjunManagerImpl implements KurjunManager
         String path = getKurjunUrl( kurjun.getUrl(), "url.identity.user.add", kurjun.getType() );
 
         WebClient client = RestUtil.createTrustedWebClient( path );
-        client.query( "key", ownerKey );
 
-        Response response = client.post( null );
-
-        if ( response.getStatus() == HttpStatus.SC_OK )
+        try
         {
-            authId = response.readEntity( String.class );
+            client.query( "key", ownerKey );
+
+            Response response = client.post( null );
+
+            if ( response.getStatus() == HttpStatus.SC_OK )
+            {
+                authId = response.readEntity( String.class );
+            }
+            else
+            {
+                return null;
+            }
         }
-        else
+        finally
         {
-            return null;
+            RestUtil.close( client );
         }
 
         kurjun.setAuthID( authId );
@@ -167,24 +169,31 @@ public class KurjunManagerImpl implements KurjunManager
 
         WebClient client = RestUtil.createTrustedWebClient( path );
 
-        client.query( "fingerprint", kurjun.getOwnerFingerprint().toLowerCase() );
-        client.query( "message", signedMessage );
-
-        Response response = client.post( null );
-
-        if ( response.getStatus() != HttpStatus.SC_OK )
+        try
         {
-            return null;
+            client.query( "fingerprint", kurjun.getOwnerFingerprint().toLowerCase() );
+            client.query( "message", signedMessage );
+
+            Response response = client.post( null );
+
+            if ( response.getStatus() != HttpStatus.SC_OK )
+            {
+                return null;
+            }
+            else
+            {
+                byte[] signedMsg = Base64.encodeBase64( signedMessage.getBytes() );
+                kurjun.setSignedMessage( signedMsg );
+                kurjun.setToken( response.readEntity( String.class ) );
+                kurjun.setState( true );
+
+                dataService.updateKurjunData( kurjun );
+                return "success";
+            }
         }
-        else
+        finally
         {
-            byte[] signedMsg = Base64.encodeBase64( signedMessage.getBytes() );
-            kurjun.setSignedMessage( signedMsg );
-            kurjun.setToken( response.readEntity( String.class ) );
-            kurjun.setState( true );
-
-            dataService.updateKurjunData( kurjun );
-            return "success";
+            RestUtil.close( client );
         }
     }
 
@@ -219,18 +228,25 @@ public class KurjunManagerImpl implements KurjunManager
 
         String path = getKurjunUrl( kurjun.getUrl(), "url.identity.user.get", kurjun.getType() );
         WebClient client = RestUtil.createTrustedWebClient( path );
-        client.query( "fingerprint", fingerprint );
-
-        Response response = client.get();
-
-        if ( response.getStatus() != HttpStatus.SC_OK )
+        try
         {
-            LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
-            return null;
+            client.query( "fingerprint", fingerprint );
+
+            Response response = client.get();
+
+            if ( response.getStatus() != HttpStatus.SC_OK )
+            {
+                LOG.error( "Could not get AuthId:" + response.readEntity( String.class ) );
+                return null;
+            }
+            else
+            {
+                return "success";
+            }
         }
-        else
+        finally
         {
-            return "success";
+            RestUtil.close( client );
         }
     }
 
