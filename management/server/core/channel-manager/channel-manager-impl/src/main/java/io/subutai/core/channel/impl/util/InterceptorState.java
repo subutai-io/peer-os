@@ -10,27 +10,13 @@ import org.apache.cxf.message.MessageUtils;
  */
 public enum InterceptorState
 {
-    CLIENT_OUT(1),
-    SERVER_IN(2),
-    SERVER_OUT(3),
-    CLIENT_IN(4);
-
-    private int step;
+    CLIENT_OUT,
+    SERVER_IN,
+    SERVER_OUT,
+    CLIENT_IN;
 
 
-    InterceptorState( final int step )
-    {
-        this.step = step;
-    }
-
-
-    public int getStep()
-    {
-        return step;
-    }
-
-
-    public  boolean isActive( final Message message )
+    public boolean isActive( final Message message )
     {
         boolean requestor = MessageUtils.isRequestor( message );
         boolean outbound = MessageUtils.isOutbound( message );
@@ -40,23 +26,23 @@ public enum InterceptorState
 
             if ( outbound )
             {
-                return step == CLIENT_OUT.step;
+                return this == CLIENT_OUT;
             }
             else
             {
-                return step == CLIENT_IN.step;
+                return this == CLIENT_IN;
             }
         }
         else
         {
             if ( outbound )
             {
-                return step == SERVER_OUT.step;
+                return this == SERVER_OUT;
             }
             else
             {
-                return step == SERVER_IN.step;
+                return this == SERVER_IN;
             }
         }
     }
-    }
+}
