@@ -14,7 +14,10 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
         SettingsUpdatesSrv.getConfig().success(function (data) {
             LOADING_SCREEN('none');
             vm.config = data;
-        });
+        }).error(function(error) {
+            LOADING_SCREEN('none');
+            SweetAlert.swal("ERROR!", error, "error");
+		});
     }
 
     getConfig();
@@ -27,9 +30,11 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
             LOADING_SCREEN('none');
             localStorage.removeItem('notifications');
             SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
+			getConfig();
         }).error(function (error) {
             LOADING_SCREEN('none');
-            SweetAlert.swal("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");
+            //SweetAlert.swal("ERROR!", "Save config error: " + error, "error");
+			//getConfig();
         });
     }
 }
