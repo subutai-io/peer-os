@@ -933,10 +933,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				if (result.containersObj[currentElement.get('templateName')] === undefined) {
 					result.containersObj[currentElement.get('templateName')] = {};
 					result.containersObj[currentElement.get('templateName')].count = 1;
-					result.containersObj[currentElement.get('templateName')]
-						.sizes = {};
-					result.containersObj[currentElement.get('templateName')]
-						.sizes[currentElement.get('quotaSize')] = 1;
+					result.containersObj[currentElement.get('templateName')].sizes = {};
+					result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
+					result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
 				} else {
 					result.containersObj[currentElement.get('templateName')].count++;
 					if(result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
@@ -974,6 +973,20 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		currentTemplate.set('containerName', settings.containerName);
 		//ngDialog.closeAll();
 		containerSettingMenu.hide();
+	}
+
+	function getTemplateNameById( id )
+	{
+		var arr = jQuery.grep(vm.templatesList, function( e ) {
+			return ( e.id == id );
+		});
+
+		if( arr.length > 0 && arr[0].name.length > 0 )
+		{
+			return arr[0].name;
+		}
+
+		return id;
 	}
 }
 
