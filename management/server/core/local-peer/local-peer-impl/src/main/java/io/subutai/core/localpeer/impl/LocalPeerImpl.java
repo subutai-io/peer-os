@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl;
 
 
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -63,6 +64,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
@@ -2396,6 +2398,43 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostId getResourceHostIdByContainerId( final ContainerId id ) throws PeerException
     {
         return new HostId( getResourceHostByContainerId( id.getId() ).getId() );
+    }
+
+    @Override
+    public Set<ContainerHost> listOrphanContainers( Set<String> registeredPeers )
+    {
+        Preconditions.checkNotNull( registeredPeers, "Registered peers could not be null." );
+        Set<ContainerHost> result = new HashSet<>();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                if ( !registeredPeers.contains( containerHost.getPeerId() ) )
+                {
+                    result.add( containerHost );
+                }
+            }
+        }
+        return result;
+    }
+
+
+    @Override
+    public void removeOrphanContainers( Set<String> registeredPeers )
+    {
+        Set<ContainerHost> orphanContainers = listOrphanContainers( registeredPeers );
+
+        for ( ContainerHost containerHost : orphanContainers )
+        {
+            try
+            {
+                destroyContainer( containerHost.getContainerId() );
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Error on destroying container", e );
+            }
+        }
     }
 
 

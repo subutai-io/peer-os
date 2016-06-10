@@ -70,6 +70,22 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/list-orphan-containers">
+      <action class="io.subutai.core.localpeer.cli.ListOrphanContainersCommand">
+        <argument ref="peerManager" />
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="localpeer/remove-orphan-containers">
+      <action class="io.subutai.core.localpeer.cli.RemoveOrphanContainersCommand">
+        <argument ref="peerManager" />
+        <argument ref="localPeer" />
+      </action>
+    </command>
+  </command-bundle>
 
   <reference id="localPeer" availability="mandatory" interface="io.subutai.common.peer.LocalPeer" />
   <reference id="peerManager" availability="mandatory" interface="io.subutai.core.peer.api.PeerManager" />
