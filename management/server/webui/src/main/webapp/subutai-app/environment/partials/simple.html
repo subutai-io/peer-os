@@ -24,15 +24,15 @@
 					</select>
 				</div>
 				<ul>
-					<li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:searchTemplate | orderBy: identity">
-						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template, $event)">
+					<li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:searchTemplate | orderBy: 'name'">
+						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template.id, $event)">
 							<span class="b-cloud-item">
 								<img
-									ng-src="assets/templates/{{ template }}.jpg"
-									alt="{{ template }}"
+									ng-src="assets/templates/{{ template.name }}.jpg"
+									alt="{{ template.name }}"
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</span>
-							<span class="b-cloud-item-text">{{ template }}</span>
+							<span class="b-cloud-item-text">{{ template.name }}</span>
 						</span>
 					</li>
 				</ul>

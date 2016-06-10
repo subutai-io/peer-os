@@ -755,18 +755,15 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			if (vm.env2Build[currentElement.get('templateName')] === undefined) {
 				vm.env2Build[currentElement.get('templateName')] = {};
 				vm.env2Build[currentElement.get('templateName')].count = 1;
-				vm.env2Build[currentElement.get('templateName')]
-					.sizes = {};
-				vm.env2Build[currentElement.get('templateName')]
-					.sizes[currentElement.get('quotaSize')] = 1;
+				vm.env2Build[currentElement.get('templateName')].sizes = {};
+				vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
+				vm.env2Build[currentElement.get('templateName')].name = getTemplateNameById( currentElement.get('templateName') );
 			} else {
 				vm.env2Build[currentElement.get('templateName')].count++;
 				if(vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
-					vm.env2Build[currentElement.get('templateName')]
-						.sizes[currentElement.get('quotaSize')] = 1;
+					vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
 				} else {
-					vm.env2Build[currentElement.get('templateName')]
-						.sizes[currentElement.get('quotaSize')]++;
+					vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')]++;
 				}
 			}
 
@@ -851,5 +848,19 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		}
 		return null;
+	}
+
+	function getTemplateNameById( id )
+	{
+		var arr = jQuery.grep(vm.templatesList, function( e ) {
+			return ( e.id == id );
+		});
+
+		if( arr.length > 0 && arr[0].name.length > 0 )
+		{
+			return arr[0].name;
+		}
+
+		return id;
 	}
 }

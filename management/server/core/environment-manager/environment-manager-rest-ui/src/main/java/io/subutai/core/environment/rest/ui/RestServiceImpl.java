@@ -108,10 +108,10 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        // @todo added management template filtration, needs minor enhancement
-        Set<String> templates = templateRegistry.list().stream().map( TemplateKurjun::getName )
-                                                .filter( n -> !n.equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                .collect( Collectors.toSet() );
+        // @todo check for management container should be here
+        Set<TemplateKurjun> templates = templateRegistry.list().stream()
+                                            .filter( n -> !n.getName().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
+                                            .collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
