@@ -88,7 +88,6 @@ import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModifi
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.hubadapter.api.HubAdapter;
-import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -100,6 +99,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
@@ -321,15 +321,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         activeWorkflows.put( environment.getId(), newWorkflow );
     }
-
-
-    private CancellableWorkflow getActiveWorkflow( Environment environment )
-    {
-        Preconditions.checkNotNull( environment );
-
-        return activeWorkflows.get( environment.getId() );
-    }
-
 
     private void removeActiveWorkflow( String environmentId )
     {
@@ -1271,15 +1262,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting up ssh tunnel for container %s ", containerHostId ) );
 
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
-                || environment.getStatus() == EnvironmentStatus.CANCELLED )
-        {
-            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
-
-            throw new EnvironmentModificationException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-
         try
         {
             SshTunnel sshTunnel = peerManager.getLocalPeer().setupSshTunnelForContainer(
@@ -1810,8 +1792,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.debug( "Environment background tasks started..." );
 
-            User user = identityManager.getActiveUser();
-
 
             //**************************************************
             Subject.doAs( systemUser, new PrivilegedAction<Void>()
@@ -1836,7 +1816,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             for ( Environment environment : getEnvironments() )
             {
-                if ( environment.getStatus() != EnvironmentStatus.UNDER_MODIFICATION )
+                if ( !( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                        || environment.getStatus() == EnvironmentStatus.CANCELLED ) )
                 {
 
                     final String secretKey = UUID.randomUUID().toString();
