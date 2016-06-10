@@ -248,7 +248,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     }, 15000);
 
     function addNewNotification(notification) {
-        var notifications = localStorage.getItem('notifications');
+        var notifications = sessionStorage.getItem('notifications');
         if (
             notifications == null ||
             notifications == undefined ||
@@ -256,17 +256,17 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             notifications.length <= 0
         ) {
             notifications = [];
-            localStorage.setItem('notifications', notifications);
+            sessionStorage.setItem('notifications', notifications);
         } else {
             notifications = JSON.parse(notifications);
             vm.notificationsCount = notifications.length;
         }
 
         if (notification.message) {
-            if (!localStorage.getItem('notifications').includes(JSON.stringify(notification.message))) {
+            if (!sessionStorage.getItem('notifications').includes(JSON.stringify(notification.message))) {
                 notifications.push(notification);
                 vm.notificationsCount++;
-                localStorage.setItem('notifications', JSON.stringify(notifications));
+                sessionStorage.setItem('notifications', JSON.stringify(notifications));
             } else {
                 for (var i = 0; i < notifications.length; i++) {
                     if (notifications[i].message == notification.message && notification.type !== undefined) {
@@ -283,7 +283,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     function clearLogs() {
         vm.notifications = [];
         vm.notificationsCount = 0;
-        localStorage.removeItem('notifications');
+        sessionStorage.removeItem('notifications');
 
         trackerSrv.deleteAllNotifications().success(function (data) {
         }).error(function (error) {
