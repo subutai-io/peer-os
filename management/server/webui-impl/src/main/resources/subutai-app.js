@@ -50,6 +50,15 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         return vm.isRegistrationFormVisible;
     };
 
+	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null) && getCookie('sptoken')) {
+		$http.get(SERVER_URL + "rest/ui/identity/user", {
+			withCredentials: true,
+			headers: {'Content-Type': 'application/json'}
+		}).success(function (data) {
+			localStorage.setItem('currentUser', data.userName);
+			vm.currentUser = localStorage.getItem('currentUser');
+		});
+	}
 
     function checkIfRegistered(afterRegistration) {
         if (afterRegistration === undefined || afterRegistration === null) afterRegistration = false;
