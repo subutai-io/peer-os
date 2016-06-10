@@ -73,30 +73,25 @@ public class RawManagerImpl implements RawManager
 
     public RawManagerImpl()
     {
-        injector = bootstrapDI();
-
-        _local();
-
-        new Thread( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    _unified();
-                }
-                catch ( Exception e )
-                {
-                    LOGGER.error( e.getMessage() );
-                }
-            }
-        } ).start();
     }
 
 
     public void init()
     {
+        injector = bootstrapDI();
+
+        _local();
+
+        new Thread( () -> {
+            try
+            {
+                _unified();
+            }
+            catch ( Exception e )
+            {
+                LOGGER.error( e.getMessage() );
+            }
+        } ).start();
     }
 
 

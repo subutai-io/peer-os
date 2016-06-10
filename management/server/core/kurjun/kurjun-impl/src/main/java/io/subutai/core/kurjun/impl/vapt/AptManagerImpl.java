@@ -112,19 +112,14 @@ public class AptManagerImpl implements AptManager
 
         _local();
 
-        new Thread( new Runnable()
-        {
-            @Override
-            public void run()
+        new Thread( () -> {
+            try
             {
-                try
-                {
-                    _remote();
-                }
-                catch ( MalformedURLException e )
-                {
-                    LOGGER.error("Invalid url format exception. " + e.getMessage());
-                }
+                _remote();
+            }
+            catch ( MalformedURLException e )
+            {
+                LOGGER.error("Invalid url format exception. " + e.getMessage());
             }
         } ).start();
     }

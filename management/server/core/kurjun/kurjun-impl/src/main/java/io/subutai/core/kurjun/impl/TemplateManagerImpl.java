@@ -102,19 +102,14 @@ public class TemplateManagerImpl implements TemplateManager
 
         _local();
 
-        new Thread( new Runnable()
-        {
-            @Override
-            public void run()
+        new Thread( () -> {
+            try
             {
-                try
-                {
-                    _remote();
-                }
-                catch(Exception e)
-                {
-                    LOGGER.error(e.getMessage());
-                }
+                _remote();
+            }
+            catch(Exception e)
+            {
+                LOGGER.error(e.getMessage());
             }
         } ).start();
     }
