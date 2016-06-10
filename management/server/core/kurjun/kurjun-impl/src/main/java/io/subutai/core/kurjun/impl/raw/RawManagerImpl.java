@@ -77,7 +77,14 @@ public class RawManagerImpl implements RawManager
 
         _local();
 
-        _unified();
+        new Thread( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                _unified();
+            }
+        } ).start();
     }
 
 

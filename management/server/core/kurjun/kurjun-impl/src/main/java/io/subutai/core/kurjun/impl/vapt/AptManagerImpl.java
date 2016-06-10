@@ -112,14 +112,21 @@ public class AptManagerImpl implements AptManager
 
         _local();
 
-        try
+        new Thread( new Runnable()
         {
-            _remote();
-        }
-        catch ( MalformedURLException e )
-        {
-            e.printStackTrace();
-        }
+            @Override
+            public void run()
+            {
+                try
+                {
+                    _remote();
+                }
+                catch ( MalformedURLException e )
+                {
+                    e.printStackTrace();
+                }
+            }
+        } ).start();
     }
 
 
@@ -160,6 +167,7 @@ public class AptManagerImpl implements AptManager
 
     private void _remote() throws MalformedURLException
     {
+
         RepositoryFactory repositoryFactory = injector.getInstance( RepositoryFactory.class );
         this.unifiedRepository = repositoryFactory.createUnifiedRepo();
 

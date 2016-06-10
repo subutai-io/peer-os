@@ -102,7 +102,14 @@ public class TemplateManagerImpl implements TemplateManager
 
         _local();
 
-        _remote();
+        new Thread( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                _remote();
+            }
+        } ).start();
     }
 
 
