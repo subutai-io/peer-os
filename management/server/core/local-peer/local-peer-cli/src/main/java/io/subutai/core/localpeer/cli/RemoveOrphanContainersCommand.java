@@ -17,12 +17,10 @@ import io.subutai.core.peer.api.PeerManager;
 public class RemoveOrphanContainersCommand extends SubutaiShellCommandSupport
 {
     private final LocalPeer localPeer;
-    private final PeerManager peerManager;
 
 
-    public RemoveOrphanContainersCommand( final PeerManager peerManager, final LocalPeer localPeer )
+    public RemoveOrphanContainersCommand( final LocalPeer localPeer )
     {
-        this.peerManager = peerManager;
         this.localPeer = localPeer;
     }
 
@@ -30,20 +28,8 @@ public class RemoveOrphanContainersCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-        Set<String> registeredPeers = getRegisteredPeers();
-        localPeer.removeOrphanContainers( registeredPeers );
+        localPeer.removeOrphanContainers();
 
         return null;
-    }
-
-
-    protected Set<String> getRegisteredPeers()
-    {
-        final Set<String> registeredPeers = new HashSet<>();
-        for ( Peer peer : peerManager.getPeers() )
-        {
-            registeredPeers.add( peer.getId() );
-        }
-        return registeredPeers;
     }
 }

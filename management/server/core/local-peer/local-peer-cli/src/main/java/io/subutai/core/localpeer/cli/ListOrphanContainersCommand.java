@@ -18,12 +18,10 @@ import io.subutai.core.peer.api.PeerManager;
 public class ListOrphanContainersCommand extends SubutaiShellCommandSupport
 {
     private final LocalPeer localPeer;
-    private final PeerManager peerManager;
 
 
-    public ListOrphanContainersCommand( final PeerManager peerManager, final LocalPeer localPeer )
+    public ListOrphanContainersCommand( final LocalPeer localPeer )
     {
-        this.peerManager = peerManager;
         this.localPeer = localPeer;
     }
 
@@ -31,9 +29,7 @@ public class ListOrphanContainersCommand extends SubutaiShellCommandSupport
     @Override
     protected Object doExecute() throws Exception
     {
-
-        Set<String> registeredPeers = getRegisteredPeers();
-        Set<ContainerHost> hosts = localPeer.listOrphanContainers( registeredPeers );
+        Set<ContainerHost> hosts = localPeer.listOrphanContainers();
 
         for ( ContainerHost containerHost : hosts )
         {
@@ -42,16 +38,5 @@ public class ListOrphanContainersCommand extends SubutaiShellCommandSupport
         }
 
         return null;
-    }
-
-
-    protected Set<String> getRegisteredPeers()
-    {
-        final Set<String> registeredPeers = new HashSet<>();
-        for ( Peer peer : peerManager.getPeers() )
-        {
-            registeredPeers.add( peer.getId() );
-        }
-        return registeredPeers;
     }
 }

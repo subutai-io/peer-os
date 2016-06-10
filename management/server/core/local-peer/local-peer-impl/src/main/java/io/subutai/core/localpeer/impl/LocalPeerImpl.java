@@ -1,7 +1,6 @@
 package io.subutai.core.localpeer.impl;
 
 
-import java.awt.Container;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -134,6 +133,7 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -2400,15 +2400,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         return new HostId( getResourceHostByContainerId( id.getId() ).getId() );
     }
 
+
     @Override
-    public Set<ContainerHost> listOrphanContainers( Set<String> registeredPeers )
+    public Set<ContainerHost> listOrphanContainers()
     {
-        Preconditions.checkNotNull( registeredPeers, "Registered peers could not be null." );
         Set<ContainerHost> result = new HashSet<>();
+        final Set<String> registeredPeers = getRegisteredPeers();
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
+
                 if ( !registeredPeers.contains( containerHost.getPeerId() ) )
                 {
                     result.add( containerHost );
@@ -2419,10 +2421,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    @Override
-    public void removeOrphanContainers( Set<String> registeredPeers )
+    protected Set<String> getRegisteredPeers()
     {
-        Set<ContainerHost> orphanContainers = listOrphanContainers( registeredPeers );
+        final Set<String> registeredPeers = new HashSet<>();
+        PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+        for ( Peer peer : peerManager.getPeers() )
+        {
+            registeredPeers.add( peer.getId() );
+        }
+        return registeredPeers;
+    }
+
+
+    @Override
+    public void removeOrphanContainers()
+    {
+        Set<ContainerHost> orphanContainers = listOrphanContainers();
 
         for ( ContainerHost containerHost : orphanContainers )
         {
