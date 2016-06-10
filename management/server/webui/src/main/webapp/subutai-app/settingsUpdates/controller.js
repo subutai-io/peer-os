@@ -14,7 +14,10 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
         SettingsUpdatesSrv.getConfig().success(function (data) {
             LOADING_SCREEN('none');
             vm.config = data;
-        });
+        }).error(function(error) {
+            LOADING_SCREEN('none');
+            SweetAlert.swal("ERROR!", error, "error");
+		});
     }
 
     getConfig();
@@ -30,8 +33,8 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 			getConfig();
         }).error(function (error) {
             LOADING_SCREEN('none');
-            SweetAlert.swal("ERROR!", "Save config error: " + error, "error");
-			getConfig();
+            //SweetAlert.swal("ERROR!", "Save config error: " + error, "error");
+			//getConfig();
         });
     }
 }
