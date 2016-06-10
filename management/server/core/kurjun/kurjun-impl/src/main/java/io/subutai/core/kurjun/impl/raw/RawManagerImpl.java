@@ -89,7 +89,7 @@ public class RawManagerImpl implements RawManager
             }
             catch ( Exception e )
             {
-                LOGGER.error( e.getMessage() );
+                LOGGER.error( "Error pulling raw files metadata. " + e.getMessage() );
             }
         } ).start();
     }

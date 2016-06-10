@@ -109,7 +109,7 @@ public class TemplateManagerImpl implements TemplateManager
             }
             catch(Exception e)
             {
-                LOGGER.error(e.getMessage());
+                LOGGER.error("Error pulling template metadata " + e.getMessage());
             }
         } ).start();
     }

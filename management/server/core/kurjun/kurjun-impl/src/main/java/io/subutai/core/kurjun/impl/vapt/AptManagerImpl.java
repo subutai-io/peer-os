@@ -117,9 +117,9 @@ public class AptManagerImpl implements AptManager
             {
                 _remote();
             }
-            catch ( MalformedURLException e )
+            catch ( Exception e )
             {
-                LOGGER.error("Invalid url format exception. " + e.getMessage());
+                LOGGER.error("Error pulling apt manager metadata. " + e.getMessage());
             }
         } ).start();
     }
