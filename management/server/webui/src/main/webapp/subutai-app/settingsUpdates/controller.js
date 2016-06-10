@@ -30,7 +30,8 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 			getConfig();
         }).error(function (error) {
             LOADING_SCREEN('none');
-            SweetAlert.swal("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");
+            SweetAlert.swal("ERROR!", "Save config error: " + error, "error");
+			getConfig();
         });
     }
 }
