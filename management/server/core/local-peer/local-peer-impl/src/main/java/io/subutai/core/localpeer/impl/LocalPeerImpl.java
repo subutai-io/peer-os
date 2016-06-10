@@ -63,6 +63,7 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
@@ -132,6 +133,7 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -2396,6 +2398,57 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostId getResourceHostIdByContainerId( final ContainerId id ) throws PeerException
     {
         return new HostId( getResourceHostByContainerId( id.getId() ).getId() );
+    }
+
+
+    @Override
+    public Set<ContainerHost> listOrphanContainers()
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        final Set<String> registeredPeers = getRegisteredPeers();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+
+                if ( !registeredPeers.contains( containerHost.getPeerId() ) )
+                {
+                    result.add( containerHost );
+                }
+            }
+        }
+        return result;
+    }
+
+
+    protected Set<String> getRegisteredPeers()
+    {
+        final Set<String> registeredPeers = new HashSet<>();
+        PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+        for ( Peer peer : peerManager.getPeers() )
+        {
+            registeredPeers.add( peer.getId() );
+        }
+        return registeredPeers;
+    }
+
+
+    @Override
+    public void removeOrphanContainers()
+    {
+        Set<ContainerHost> orphanContainers = listOrphanContainers();
+
+        for ( ContainerHost containerHost : orphanContainers )
+        {
+            try
+            {
+                destroyContainer( containerHost.getContainerId() );
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Error on destroying container", e );
+            }
+        }
     }
 
 

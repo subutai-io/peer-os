@@ -10,7 +10,7 @@
              interface="io.subutai.common.security.relation.RelationManager" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/error">
+    <command name="test/do">
       <action class="io.subutai.core.test.cli.TestCommand" />
     </command>
   </command-bundle>
@@ -39,6 +39,4 @@
     </command>
   </command-bundle>
 
-  <!--<bean id="errLstnr" scope="singleton" class="io.subutai.core.test.cli.SubutaiEventListenerImpl" />-->
-  <!--<service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />-->
 </blueprint>

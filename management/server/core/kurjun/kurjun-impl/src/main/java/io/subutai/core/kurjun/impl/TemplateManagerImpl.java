@@ -102,7 +102,16 @@ public class TemplateManagerImpl implements TemplateManager
 
         _local();
 
-        _remote();
+        new Thread( () -> {
+            try
+            {
+                _remote();
+            }
+            catch(Exception e)
+            {
+                LOGGER.error("Error pulling template metadata " + e.getMessage());
+            }
+        } ).start();
     }
 
 
