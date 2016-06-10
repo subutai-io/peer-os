@@ -27,8 +27,8 @@ public class RhP2PIpEntity implements RhP2pIp
 
     public RhP2PIpEntity( @JsonProperty( "rhId" ) final String rhId, @JsonProperty( "p2pIp" ) final String p2pIp )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pIp ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ), "Resource host id is null or empty" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( p2pIp ), "Resource host IP is null or empty" );
         Preconditions.checkArgument( p2pIp.matches( Common.IP_REGEX ) );
 
         this.rhId = rhId;

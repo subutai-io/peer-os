@@ -3,6 +3,7 @@ package io.subutai.core.identity.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
@@ -83,7 +84,6 @@ import io.subutai.core.security.api.model.SecurityKey;
 
 /**
  * Overall Subutai Identity Management
- *
  */
 @PermitAll
 public class IdentityManagerImpl implements IdentityManager
@@ -92,7 +92,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private static final String SYSTEM_USERNAME = "internal";
-    private static final int  IDENTITY_LIFETIME =  240; //hours
+    private static final int IDENTITY_LIFETIME = 240; //hours
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -141,8 +141,8 @@ public class IdentityManagerImpl implements IdentityManager
         if ( identityDataService.getAllUsers().size() < 1 )
         {
             PermissionObject permsp[] = PermissionObject.values();
-            Role role = null;
-            Permission per = null;
+            Role role;
+            Permission per;
 
             //***Create User ********************************************
 
@@ -169,9 +169,9 @@ public class IdentityManagerImpl implements IdentityManager
             role = createRole( "Administrator", UserType.Regular.getId() );
             assignUserRole( admin.getId(), role );
 
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                per = createPermission( aPermsp.getId(), 1, true, true, true, true );
                 assignRolePermission( role, per );
             }
             //*********************************************
@@ -180,11 +180,11 @@ public class IdentityManagerImpl implements IdentityManager
             role = createRole( "Peer-Manager", UserType.System.getId() );
 
             //*********************************************
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                if ( permsp[a] == PermissionObject.PeerManagement || permsp[a] == PermissionObject.ResourceManagement )
+                if ( aPermsp == PermissionObject.PeerManagement || aPermsp == PermissionObject.ResourceManagement )
                 {
-                    per = createPermission( permsp[a].getId(), 3, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
                     assignRolePermission( role, per );
                 }
             }
@@ -194,14 +194,14 @@ public class IdentityManagerImpl implements IdentityManager
             role = createRole( "Environment-Manager", UserType.System.getId() );
 
             //*********************************************
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                if ( permsp[a] != PermissionObject.IdentityManagement &&
-                        permsp[a] != PermissionObject.KarafServerAdministration &&
-                        permsp[a] != PermissionObject.PeerManagement &&
-                        permsp[a] != PermissionObject.ResourceManagement )
+                if ( aPermsp != PermissionObject.IdentityManagement &&
+                        aPermsp != PermissionObject.KarafServerAdministration &&
+                        aPermsp != PermissionObject.PeerManagement &&
+                        aPermsp != PermissionObject.ResourceManagement )
                 {
-                    per = createPermission( permsp[a].getId(), 3, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), 3, true, true, true, true );
                     assignRolePermission( role, per );
                 }
             }
@@ -212,12 +212,12 @@ public class IdentityManagerImpl implements IdentityManager
             assignUserRole( internal, role );
 
             //*********************************************
-            for ( int a = 0; a < permsp.length; a++ )
+            for ( final PermissionObject aPermsp : permsp )
             {
-                if ( permsp[a] != PermissionObject.IdentityManagement
-                        && permsp[a] != PermissionObject.KarafServerAdministration )
+                if ( aPermsp != PermissionObject.IdentityManagement
+                        && aPermsp != PermissionObject.KarafServerAdministration )
                 {
-                    per = createPermission( permsp[a].getId(), 1, true, true, true, true );
+                    per = createPermission( aPermsp.getId(), 1, true, true, true, true );
                     assignRolePermission( role, per );
                 }
             }
@@ -240,7 +240,8 @@ public class IdentityManagerImpl implements IdentityManager
      */
     private CallbackHandler getCalbackHandler( final String userName, final String password )
     {
-        CallbackHandler callbackHandler = new CallbackHandler()
+
+        return new CallbackHandler()
         {
             public void handle( Callback[] callbacks ) throws IOException, UnsupportedCallbackException
             {
@@ -261,8 +262,6 @@ public class IdentityManagerImpl implements IdentityManager
                 }
             }
         };
-
-        return callbackHandler;
     }
 
 
@@ -429,6 +428,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         try
         {
+            //todo implement
             //loginContext.logout();
         }
         catch ( Exception e )
@@ -489,19 +489,21 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public String updateUserAuthId( User user , String authId ) throws SystemSecurityException
+    public String updateUserAuthId( User user, String authId ) throws SystemSecurityException
     {
-        if(user != null)
+        if ( user != null )
         {
-            if(Strings.isNullOrEmpty( authId ))
+            if ( Strings.isNullOrEmpty( authId ) )
+            {
                 authId = UUID.randomUUID().toString();
+            }
 
-            if( authId.length() < 4 )
+            if ( authId.length() < 4 )
             {
                 throw new IllegalArgumentException( "Password cannot be shorter than 4 characters" );
             }
 
-            if(user.getAuthId() .equals( authId ) )
+            if ( user.getAuthId().equals( authId ) )
             {
                 throw new IllegalArgumentException( "NewPassword cannot be the same as old one." );
             }
@@ -526,12 +528,12 @@ public class IdentityManagerImpl implements IdentityManager
     {
         try
         {
-            if(user != null)
+            if ( user != null )
             {
                 String authId = user.getAuthId();
                 PGPPublicKey pubKey = securityManager.getKeyManager().getPublicKey( user.getSecurityKeyId() );
 
-                if(pubKey != null)
+                if ( pubKey != null )
                 {
                     byte enc[] = securityManager.getEncryptionTool().encrypt( authId.getBytes(), pubKey, true );
 
@@ -547,7 +549,7 @@ public class IdentityManagerImpl implements IdentityManager
                 throw new InvalidLoginException( "User not found." );
             }
         }
-        catch(Exception e)
+        catch ( Exception e )
         {
             LOGGER.error( " **** Error creating encrypted userAuth message ****", e );
         }
@@ -570,7 +572,8 @@ public class IdentityManagerImpl implements IdentityManager
 
         try
         {
-            if ( !encryptionTool.verifyClearSign( signedAuth.trim().getBytes(), publicKeyRing ) )
+            if ( Strings.isNullOrEmpty( signedAuth ) || !encryptionTool
+                    .verifyClearSign( signedAuth.trim().getBytes(), publicKeyRing ) )
             {
                 throw new InvalidLoginException( "Signed Auth verification failed." );
             }
@@ -584,13 +587,12 @@ public class IdentityManagerImpl implements IdentityManager
 
             String authId = new String( encryptionTool.extractClearSignContent( signedAuth.getBytes() ) );
 
-            if ( !user.isIdentityValid() || !user.getAuthId().equals( authId.trim()))
+            if ( !user.isIdentityValid() || !user.getAuthId().equals( authId.trim() ) )
             {
                 throw new IdentityExpiredException( "User Credentials are expired" );
             }
 
             return user;
-
         }
         catch ( Exception e )
         {
@@ -630,9 +632,9 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public User authenticateUser( String userName, String password )  throws SystemSecurityException
+    public User authenticateUser( String userName, String password ) throws SystemSecurityException
     {
-        User user = null;
+        User user;
 
         if ( userName.equalsIgnoreCase( "token" ) )
         {
@@ -652,13 +654,13 @@ public class IdentityManagerImpl implements IdentityManager
 
                 if ( !pswHash.equals( user.getPassword() ) || user.getStatus() == UserStatus.Disabled.getId() )
                 {
-                    throw new InvalidLoginException( "***** Invalid Login for user:" + userName);
+                    throw new InvalidLoginException( "***** Invalid Login for user:" + userName );
                 }
                 else
                 {
-                    if(!user.isIdentityValid())
+                    if ( !user.isIdentityValid() )
                     {
-                        throw new IdentityExpiredException( "***** Identity Expired for user:" + userName);
+                        throw new IdentityExpiredException( "***** Identity Expired for user:" + userName );
                     }
                 }
             }
@@ -992,7 +994,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User createTempUser( String userName, String password, String fullName, String email, int type )
     {
-        String salt = null;
+        String salt;
         User user = null;
 
         try
@@ -1020,15 +1022,10 @@ public class IdentityManagerImpl implements IdentityManager
             user.setFullName( fullName );
             user.setType( type );
             user.setAuthId( UUID.randomUUID().toString() );
-
         }
-        catch ( NoSuchAlgorithmException e )
+        catch ( NoSuchAlgorithmException | NoSuchProviderException e )
         {
-            e.printStackTrace();
-        }
-        catch ( NoSuchProviderException e )
-        {
-            e.printStackTrace();
+            LOGGER.warn( "Error in #createTempUser" , e);
         }
 
         return user;
@@ -1310,7 +1307,7 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean changeUserPassword( String userName, String oldPassword, String newPassword ) throws Exception
     {
         User user = identityDataService.getUserByUsername( userName );
-        return changeUserPassword(user,oldPassword,newPassword);
+        return changeUserPassword( user, oldPassword, newPassword );
     }
 
 
@@ -1321,7 +1318,7 @@ public class IdentityManagerImpl implements IdentityManager
     public boolean changeUserPassword( long userId, String oldPassword, String newPassword ) throws Exception
     {
         User user = identityDataService.getUser( userId );
-        return changeUserPassword(user,oldPassword,newPassword);
+        return changeUserPassword( user, oldPassword, newPassword );
     }
 
 
@@ -1333,7 +1330,7 @@ public class IdentityManagerImpl implements IdentityManager
     {
         String salt;
 
-        if(oldPassword.equals( newPassword ))
+        if ( oldPassword.equals( newPassword ) )
         {
             throw new IllegalArgumentException( "NewPassword cannot be the same as old one." );
         }

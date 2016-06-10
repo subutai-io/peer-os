@@ -26,7 +26,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
         SettingsUpdatesSrv.update(vm.config).success(function (data) {
             LOADING_SCREEN('none');
             localStorage.removeItem('notifications');
-            SweetAlert.swal("Success!", "Your settings were saved.", "success");
+            SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
 			getConfig();
         }).error(function (error) {
             LOADING_SCREEN('none');

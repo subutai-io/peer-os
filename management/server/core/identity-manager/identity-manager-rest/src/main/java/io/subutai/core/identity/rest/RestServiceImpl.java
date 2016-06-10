@@ -46,12 +46,12 @@ public class RestServiceImpl implements RestService
     }
 
 
-
     @Override
-    public Response authenticate( int type, final String userName, final String password )
+    public Response authenticate( int type, String userName, String password )
     {
         try
         {
+            //password = URLDecoder.decode( password, "UTF-8" );
             String token = identityManager.getUserToken( userName, password );
 
             if ( !Strings.isNullOrEmpty( token ) )
@@ -64,13 +64,12 @@ public class RestServiceImpl implements RestService
             {
                 return Response.status( Response.Status.FORBIDDEN ).build();
             }
-
         }
-        catch(IdentityExpiredException e)
+        catch ( IdentityExpiredException e )
         {
             User user = identityManager.getUserByUsername( userName );
 
-            if(user != null)
+            if ( user != null )
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setStatus( 1 );
@@ -82,63 +81,63 @@ public class RestServiceImpl implements RestService
                 return Response.status( Response.Status.NOT_FOUND ).build();
             }
         }
-        catch(Exception e)
+        catch ( Exception e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
-
     }
 
 
     @Override
-    public Response updateAuthId( int type,String userName,String password ,String authId  )
+    public Response updateAuthId( int type, String userName, String password, String authId )
     {
         try
         {
-            User user = identityManager.authenticateByAuthSignature( userName, password );
-
-            if(user != null)
-            {
-                identityManager.updateUserAuthId( user, authId );
-                return Response.ok().build();
-            }
-            else
-            {
-                throw new InvalidLoginException( "User not found" );
-            }
-        }
-        catch(IdentityExpiredException e)
-        {
-            User user = identityManager.getUserByUsername( userName );
-
-            if(user != null)
-            {
-                identityManager.updateUserAuthId( user, authId );
-                return Response.ok().build();
-            }
-            else
-            {
-                throw new InvalidLoginException( "User not found" );
-            }
-        }
-        catch(Exception e)
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
-
-    }
-
-
-    @Override
-    public Response getAuthId( int type, final String userName, final String password )
-    {
-        try
-        {
+            //password = URLDecoder.decode( password, "UTF-8" );
             User user = identityManager.authenticateByAuthSignature( userName, password );
 
             if ( user != null )
             {
-                return Response.ok(user.getAuthId()).build();
+                identityManager.updateUserAuthId( user, authId );
+                return Response.ok().build();
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found" );
+            }
+        }
+        catch ( IdentityExpiredException e )
+        {
+            User user = identityManager.getUserByUsername( userName );
+
+            if ( user != null )
+            {
+                identityManager.updateUserAuthId( user, authId );
+                return Response.ok().build();
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found" );
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+    }
+
+
+    @Override
+    public Response getAuthId( int type, String userName, String password )
+    {
+        try
+        {
+            //password = URLDecoder.decode( password, "UTF-8" );
+            User user = identityManager.authenticateByAuthSignature( userName, password );
+
+            if ( user != null )
+            {
+                return Response.ok( user.getAuthId() ).build();
             }
             else
             {
@@ -154,5 +153,4 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
-
 }

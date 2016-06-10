@@ -17,7 +17,7 @@ class SecretKeyStoreDAO
     /******************************************
      *
      */
-    public SecretKeyStoreDAO( DaoManager daoManager )
+     SecretKeyStoreDAO( DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -26,7 +26,7 @@ class SecretKeyStoreDAO
      *
      */
     
-    public void persist(SecretKeyStore secretKeyStore)
+     void persist(SecretKeyStore secretKeyStore)
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -54,7 +54,7 @@ class SecretKeyStoreDAO
     /******************************************
      *
      */
-    public void remove( String fingerprint )
+    void remove( String fingerprint )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -78,15 +78,14 @@ class SecretKeyStoreDAO
     /******************************************
      * Get Secret KeyId from DB
      */
-    public SecretKeyStore find( String fingerprint )
+     SecretKeyStore find( String fingerprint )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
         try
         {
-            SecretKeyStore secretKeyStore = em.find( SecretKeyStoreEntity.class, fingerprint );
 
-            return secretKeyStore;
+            return em.find( SecretKeyStoreEntity.class, fingerprint );
         }
         catch ( Exception ex )
         {

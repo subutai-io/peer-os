@@ -82,7 +82,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
     setInterval(function () {
         checkIfRegistered();
-    }, 30000);
+    }, 120000);
 
 
     vm.hub = {
