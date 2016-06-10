@@ -27,6 +27,7 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
             LOADING_SCREEN('none');
             localStorage.removeItem('notifications');
             SweetAlert.swal("Success!", "Your settings were saved.", "success");
+			getConfig();
         }).error(function (error) {
             LOADING_SCREEN('none');
             SweetAlert.swal("ERROR!", "Save config error: " + error.replace(/\\n/g, " "), "error");
