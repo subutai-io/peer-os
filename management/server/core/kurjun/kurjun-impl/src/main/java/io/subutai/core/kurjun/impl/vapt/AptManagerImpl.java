@@ -123,7 +123,7 @@ public class AptManagerImpl implements AptManager
                 }
                 catch ( MalformedURLException e )
                 {
-                    e.printStackTrace();
+                    LOGGER.error("Invalid url format exception. " + e.getMessage());
                 }
             }
         } ).start();

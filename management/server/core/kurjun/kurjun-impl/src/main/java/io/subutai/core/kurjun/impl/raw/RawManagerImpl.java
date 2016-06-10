@@ -82,7 +82,14 @@ public class RawManagerImpl implements RawManager
             @Override
             public void run()
             {
-                _unified();
+                try
+                {
+                    _unified();
+                }
+                catch ( Exception e )
+                {
+                    LOGGER.error( e.getMessage() );
+                }
             }
         } ).start();
     }

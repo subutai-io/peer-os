@@ -107,7 +107,14 @@ public class TemplateManagerImpl implements TemplateManager
             @Override
             public void run()
             {
-                _remote();
+                try
+                {
+                    _remote();
+                }
+                catch(Exception e)
+                {
+                    LOGGER.error(e.getMessage());
+                }
             }
         } ).start();
     }
