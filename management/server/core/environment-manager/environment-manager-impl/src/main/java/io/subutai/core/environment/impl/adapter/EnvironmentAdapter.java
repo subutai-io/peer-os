@@ -260,8 +260,15 @@ public class EnvironmentAdapter
     }
 
 
-    public boolean isRegistered()
+    public void onContainerStart( String envId, String contId )
     {
-        return hubAdapter.isRegistered();
+        hubAdapter.onContainerStart( envId, contId );
     }
+
+
+    public void onContainerStop( String envId, String contId )
+    {
+        hubAdapter.onContainerStop( envId, contId );
+    }
+
 }

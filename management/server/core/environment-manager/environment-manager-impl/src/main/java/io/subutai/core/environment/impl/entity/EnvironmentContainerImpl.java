@@ -61,6 +61,7 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
+import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -156,6 +157,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     //workaround for JPA problem setting parent environment field
     @Transient
     private Environment parent;
+
+    private EnvironmentAdapter envAdapter;
 
 
     protected EnvironmentContainerImpl()
@@ -292,6 +295,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public void start() throws PeerException
     {
         getPeer().startContainer( getContainerId() );
+
+        envAdapter.onContainerStart( environment.getId(), getId() );
     }
 
 
@@ -299,6 +304,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public void stop() throws PeerException
     {
         getPeer().stopContainer( getContainerId() );
+
+        envAdapter.onContainerStop( environment.getId(), getId() );
+    }
+
+
+    public void setEnvironmentAdapter( EnvironmentAdapter envAdapter )
+    {
+        this.envAdapter = envAdapter;
     }
 
 
