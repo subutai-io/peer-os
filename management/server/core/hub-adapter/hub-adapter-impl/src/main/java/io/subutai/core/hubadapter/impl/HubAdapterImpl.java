@@ -31,6 +31,8 @@ public class HubAdapterImpl implements HubAdapter
 
     private static final String CONTAINERS_URL = "/rest/v1/adapter/environments/%s/containers/%s";
 
+    private static final String CONTAINERS_STATE_URL = "/rest/v1/adapter/environments/%s/containers/%s/%s";
+
     private static final String PLUGIN_DATA_URL = "/rest/v1/adapter/users/%s/peers/%s/plugins/%s";
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -267,5 +269,34 @@ public class HubAdapterImpl implements HubAdapter
         log.debug( "response: {}", response );
 
         return true;
+    }
+
+
+    @Override
+    public void onContainerStart( String envId, String contId )
+    {
+        onContainerStateChange( envId, contId, "start" );
+    }
+
+
+    @Override
+    public void onContainerStop( String envId, String contId )
+    {
+        onContainerStateChange( envId, contId, "stop" );
+    }
+
+
+    private void onContainerStateChange( String envId, String contId, String state )
+    {
+        String userId = getUserIdWithCheck();
+
+        if ( userId == null )
+        {
+            return;
+        }
+
+        log.info( "onContainerStateChange: envId={}, contId={}, state={}", envId, contId, state );
+
+        httpClient.doPost( format( CONTAINERS_STATE_URL, envId, contId, state ), null );
     }
 }
