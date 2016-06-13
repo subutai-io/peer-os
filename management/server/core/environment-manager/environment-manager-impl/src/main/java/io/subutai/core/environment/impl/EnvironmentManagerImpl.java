@@ -259,45 +259,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
-        Set<Environment> environments = getLocalEnvironments();
+        Set<Environment> envs = new HashSet<>();
 
-        environments.addAll( environmentAdapter.getEnvironments() );
+        envs.addAll( environmentService.getAll() );
 
-        setEnvironmentAdapter( environments );
+        envs.addAll( environmentAdapter.getEnvironments() );
 
-        return environments;
+        setTransientFields( envs );
+
+        return envs;
     }
 
 
-    private void setEnvironmentAdapter( Set<Environment> envs )
+    private void setTransientFields( Set<Environment> envs )
     {
         for ( Environment env : envs )
         {
-            for ( EnvironmentContainerHost cont : env.getContainerHosts() )
-            {
-                if ( cont instanceof EnvironmentContainerImpl )
-                {
-                    ( ( EnvironmentContainerImpl ) cont ).setEnvironmentAdapter( environmentAdapter );
-                }
-            }
+            setEnvironmentTransientFields( env );
+
+            setContainersTransientFields( env );
         }
-    }
-
-
-    private Set<Environment> getLocalEnvironments()
-    {
-        Set<Environment> environments = new HashSet<>();
-
-        for ( Environment environment : environmentService.getAll() )
-        {
-            environments.add( environment );
-
-            setEnvironmentTransientFields( environment );
-
-            setContainersTransientFields( environment );
-        }
-
-        return environments;
     }
 
 
@@ -305,21 +286,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironmentsByOwnerId( long userId )
     {
-        Set<Environment> environments = new HashSet<>();
+        Set<Environment> envs = new HashSet<>();
 
-        for ( Environment environment : environmentService.getAll() )
+        for ( Environment env : environmentService.getAll() )
         {
-            if ( environment.getUserId().equals( userId ) )
+            if ( env.getUserId().equals( userId ) )
             {
-                environments.add( environment );
-
-                setEnvironmentTransientFields( environment );
-
-                setContainersTransientFields( environment );
+                envs.add( env );
             }
         }
 
-        return environments;
+        setTransientFields( envs );
+
+        return envs;
     }
 
 
@@ -338,6 +317,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         activeWorkflows.put( environment.getId(), newWorkflow );
     }
+
 
     private void removeActiveWorkflow( String environmentId )
     {
@@ -1362,11 +1342,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setContainersTransientFields( final Environment environment )
     {
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
+
         for ( ContainerHost containerHost : containers )
         {
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
             environmentContainer.setEnvironmentManager( this );
+
+            environmentContainer.setEnvironmentAdapter( environmentAdapter );
         }
     }
 
@@ -1769,9 +1752,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void onRegistrationSucceeded()
     {
+        Set<Environment> envs = new HashSet<>();
+
+        envs.addAll( environmentService.getAll() );
+
+        setTransientFields( envs );
+
+        LOG.info( "onRegistrationSucceeded: local environments count = {}", envs.size() );
+
         try
         {
-            environmentAdapter.uploadEnvironments( getLocalEnvironments() );
+            environmentAdapter.uploadEnvironments( envs );
         }
         catch ( Exception e )
         {
