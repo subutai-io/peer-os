@@ -90,7 +90,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, proxyContainerHelper ) );
+                envs.add( new ProxyEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
@@ -270,5 +270,4 @@ public class EnvironmentAdapter
     {
         hubAdapter.onContainerStop( envId, contId );
     }
-
 }
