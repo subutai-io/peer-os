@@ -15,9 +15,12 @@ import org.apache.http.HttpStatus;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandResult;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.ConfigManager;
+import io.subutai.core.hubmanager.impl.tunnel.TunnelHelper;
 import io.subutai.hub.share.dto.AppScaleConfigDto;
+import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -70,39 +73,47 @@ public class AppScaleProcessor implements StateLinkProcessor
 
         final AppScaleConfigDto config = getData( stateLink );
 
-        log.debug( "config: {}", config );
-
-        if ( config == null )
+        if ( config.getState() != null && config.getState().equals( "ENABLING_DOMAIN" ) )
         {
-            return;
+            appScaleManager.createTunnel( stateLink, config, configManager );
         }
-
-        executor.execute( new Runnable()
+        else
         {
-            public void run()
+
+            log.debug( "config: {}", config );
+
+            if ( config == null )
             {
-                processLinks.add( stateLink );
-
-                update( stateLink, "INSTALLING" );
-
-                try
-                {
-                    appScaleManager.installCluster( config );
-
-                    update( stateLink, "INSTALLED" );
-                }
-                catch ( Exception e )
-                {
-                    log.error( "Error to install AppScale cluster: ", e );
-
-                    update( stateLink, e.getMessage() );
-                }
-                finally
-                {
-                    processLinks.remove( stateLink );
-                }
+                return;
             }
-        } );
+
+            executor.execute( new Runnable()
+            {
+                public void run()
+                {
+                    processLinks.add( stateLink );
+
+                    update( stateLink, "INSTALLING" );
+
+                    try
+                    {
+                        appScaleManager.installCluster( config );
+
+                        update( stateLink, "INSTALLED" );
+                    }
+                    catch ( Exception e )
+                    {
+                        log.error( "Error to install AppScale cluster: ", e );
+
+                        update( stateLink, e.getMessage() );
+                    }
+                    finally
+                    {
+                        processLinks.remove( stateLink );
+                    }
+                }
+            } );
+        }
     }
 
 
@@ -143,7 +154,8 @@ public class AppScaleProcessor implements StateLinkProcessor
 
             if ( res.getStatus() != HttpStatus.SC_OK )
             {
-                log.error( "Error to get AppScale data from Hub: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
+                log.error( "Error to get AppScale data from Hub: HTTP {} - {}", res.getStatus(),
+                        res.getStatusInfo().getReasonPhrase() );
 
                 return null;
             }
@@ -161,5 +173,4 @@ public class AppScaleProcessor implements StateLinkProcessor
             return null;
         }
     }
-
 }
