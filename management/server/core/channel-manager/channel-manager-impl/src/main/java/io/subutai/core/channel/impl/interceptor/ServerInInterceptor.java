@@ -43,11 +43,6 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
-        if ( !SystemSettings.getEncryptionState() )
-        {
-            return;
-        }
-
         try
         {
             if ( InterceptorState.SERVER_IN.isActive( message ) )

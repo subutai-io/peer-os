@@ -618,7 +618,7 @@ public class KeyManagerImpl implements KeyManager
         SecurityKey keyIden = null;
         try
         {
-            keyIden = securityDataService.getKeyDataByFingerprint( fingerprint );
+            keyIden = securityDataService.getKeyDataByFingerprint( fingerprint.toUpperCase() );
         }
         catch ( Exception ex )
         {

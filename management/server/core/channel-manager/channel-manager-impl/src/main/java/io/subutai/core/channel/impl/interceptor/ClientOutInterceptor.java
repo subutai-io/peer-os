@@ -43,10 +43,6 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
     @Override
     public void handleMessage( final Message message )
     {
-        if ( !SystemSettings.getEncryptionState() )
-        {
-            return;
-        }
         try
         {
             if ( InterceptorState.CLIENT_OUT.isActive( message ) )
