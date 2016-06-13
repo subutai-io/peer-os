@@ -99,7 +99,7 @@ public class EnvironmentAdapter
             log.error( "Error to parse json: ", e );
         }
 
-        printLocalContainers();
+//        printLocalContainers();
 
         return envs;
     }
@@ -140,7 +140,15 @@ public class EnvironmentAdapter
 
     public void removeEnvironment( EnvironmentImpl env )
     {
-        hubAdapter.removeEnvironment( env.getId() );
+
+        try
+        {
+            hubAdapter.removeEnvironment( env.getId() );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to remove environment: ", e );
+        }
     }
 
 
