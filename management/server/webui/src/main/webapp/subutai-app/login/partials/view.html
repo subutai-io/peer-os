@@ -95,22 +95,14 @@
 
 						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
 							<label class="b-form-label">New Message</label>
-							<input
-									class="b-form-input b-form-input_full"
-									ng-model="loginCtrl.newMsg"
-									name="new-password"
-									tabindex=2
-									type="password">
+							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.newMsg">
+							</textarea>
 						</div>
 
 						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
-							<label class="b-form-label">New Message</label>
-							<input
-									class="b-form-input b-form-input_full"
-									ng-model="loginCtrl.msgConf"
-									name="confirm-password"
-									tabindex=2
-									type="password">
+							<label class="b-form-label">Confirm Message</label>
+							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.msgConf">
+							</textarea>
 						</div>
 
 						<div class="b-login-form-btn">

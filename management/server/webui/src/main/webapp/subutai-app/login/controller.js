@@ -61,7 +61,15 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 	vm.changeMode = changeMode;
 
 	function changeMode(modeStatus) {
+		vm.name = "";
+		vm.pass = "";
+		vm.fingerprint = "";
+		vm.sptoken = "";
+
 		vm.passExpired = false;
+		vm.newPass = "";
+		vm.passConf = "";
+
 		if(modeStatus) {
 			vm.activeMode = 'sptoken';
 		} else {
