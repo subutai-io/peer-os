@@ -263,24 +263,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         environments.addAll( environmentAdapter.getEnvironments() );
 
-        setEnvironmentAdapter( environments );
-
         return environments;
-    }
-
-
-    private void setEnvironmentAdapter( Set<Environment> envs )
-    {
-        for ( Environment env : envs )
-        {
-            for ( EnvironmentContainerHost cont : env.getContainerHosts() )
-            {
-                if ( cont instanceof EnvironmentContainerImpl )
-                {
-                    ( ( EnvironmentContainerImpl ) cont ).setEnvironmentAdapter( environmentAdapter );
-                }
-            }
-        }
     }
 
 
@@ -338,6 +321,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         activeWorkflows.put( environment.getId(), newWorkflow );
     }
+
 
     private void removeActiveWorkflow( String environmentId )
     {
@@ -1362,11 +1346,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setContainersTransientFields( final Environment environment )
     {
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
+
         for ( ContainerHost containerHost : containers )
         {
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
             environmentContainer.setEnvironmentManager( this );
+
+            environmentContainer.setEnvironmentAdapter( environmentAdapter );
         }
     }
 
