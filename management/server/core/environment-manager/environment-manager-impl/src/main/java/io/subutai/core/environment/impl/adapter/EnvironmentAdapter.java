@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl.adapter;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -143,14 +144,11 @@ public class EnvironmentAdapter
     }
 
 
-    public void uploadEnvironments( Set<Environment> envs )
+    public void uploadEnvironments( Collection<Environment> envs )
     {
         for ( Environment env : envs )
         {
-            if ( env instanceof EnvironmentImpl )
-            {
-                uploadEnvironment( ( EnvironmentImpl ) env );
-            }
+            uploadEnvironment( ( EnvironmentImpl ) env );
         }
     }
 
