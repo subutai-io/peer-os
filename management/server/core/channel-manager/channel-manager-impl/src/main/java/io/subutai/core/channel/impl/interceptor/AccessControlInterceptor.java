@@ -75,7 +75,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                     {
                         userSession = authenticateAccess( null,null );
                     }
-                    else if ( status == 2 )
+                    else
                     {
                         MessageContentUtil.abortChain( message, 403, "Permission denied" );
                     }
