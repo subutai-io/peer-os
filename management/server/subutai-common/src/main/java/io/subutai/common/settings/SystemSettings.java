@@ -125,9 +125,7 @@ public class SystemSettings
         String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
         if ( globalKurjunUrls.length < 1 )
         {
-            globalKurjunUrls = new String[] {
-                    DEFAULT_KURJUN_REPO
-            };
+            globalKurjunUrls = new String[] { DEFAULT_KURJUN_REPO };
         }
 
         GLOBAL_KURJUN_URLS = validateGlobalKurjunUrls( globalKurjunUrls );
