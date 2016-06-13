@@ -1822,7 +1822,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         try
         {
-            for ( Environment environment : getEnvironments() )
+            //process only SS side environments
+            for ( Environment environment : environmentService.getAll() )
             {
                 if ( !( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                         || environment.getStatus() == EnvironmentStatus.CANCELLED ) )
