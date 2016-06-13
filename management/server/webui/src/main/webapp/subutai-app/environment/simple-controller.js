@@ -379,6 +379,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					'<title>Remove</title>',
 				'</g>',
 			'</g>',
+			'<g class="element-tools element-tools_copy">',
+				'<g class="element-tool-copy">',
+					'<circle fill="#F8FBFD" r="8" stroke="#dcdcdc"/>',
+					'<g class="copy-icon element-tool-copy">',
+						'<path class="element-tool-copy" d="M7.1,9.5H0.7c-0.1,0-0.2-0.1-0.2-0.2V2.8c0-0.1,0.1-0.2,0.2-0.2h6.5c0.1,0,0.2,0.1,0.2,0.2v6.5C7.3,9.4,7.2,9.5,7.1,9.5z M0.8,9.1H7V3H0.8V9.1z"/>',
+						'<path class="element-tool-copy" d="M9.3,7.3H8.8c-0.1,0-0.2-0.1-0.2-0.2S8.7,7,8.8,7h0.4V0.9H3v0.3c0,0.1-0.1,0.2-0.2,0.2c-0.1,0-0.2-0.1-0.2-0.2V0.7 c0-0.1,0.1-0.2,0.2-0.2h6.5c0.1,0,0.2,0.1,0.2,0.2v6.5C9.5,7.3,9.4,7.3,9.3,7.3z"/>',
+					'</g>',					
+					'<title>Copy</title>',
+				'</g>',
+			'</g>',
 			'<g class="element-call-menu">',
 				'<rect class="b-magnet"/>',
 				'<g class="b-container-plus-icon">',
@@ -463,6 +473,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 					delete vm.templateGrid[Math.floor(x / GRID_CELL_SIZE)][Math.floor(y / GRID_CELL_SIZE)];
 
 					filterPluginsList();
+
+					return;
+					break;
+				case 'element-tool-copy':
+					addContainer(
+						this.model.attributes.templateName,
+						false,
+						this.model.attributes.quotaSize,
+						getTemplateNameById(this.model.attributes.templateName)
+					);
 
 					return;
 					break;
@@ -558,7 +578,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	function setTemplatesByPlugin() {
 
-		console.log(vm.selectedPlugin);
 		if(vm.selectedPlugin.requirement !== undefined) {
 			for(var template in vm.selectedPlugin.requirement) {
 				for(var i = 0; i < vm.selectedPlugin.requirement[template]; i++) {
@@ -589,11 +608,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	var containerCounter = 1;
-	function addContainer(template, $event) {
+	function addContainer(template, $event, size, templateImg) {
+		console.log(template);
 		if($event === undefined || $event === null) $event = false;
 
+		if(size === undefined || size === null) size = 'SMALL';
+		if(templateImg === undefined || templateImg === null) templateImg = template;
+
 		var pos = findEmptyCubePostion();
-		var img = 'assets/templates/' + template + '.jpg';
+		var img = 'assets/templates/' + templateImg + '.jpg';
+
 		if($event) {
 			img = $($event.currentTarget).find('img').attr('src');
 		} else {
@@ -605,11 +629,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		var devElement = new joint.shapes.tm.devElement({
 			position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 			templateName: template,
-			quotaSize: 'SMALL',
+			quotaSize: size,
 			containerName: 'Container ' + (containerCounter++).toString(),
 			attrs: {
 				image: { 'xlink:href': img },
-				'rect.b-magnet': {fill: vm.colors['SMALL']},
+				'rect.b-magnet': {fill: vm.colors[size]},
 				title: {text: template}
 			}
 		});
