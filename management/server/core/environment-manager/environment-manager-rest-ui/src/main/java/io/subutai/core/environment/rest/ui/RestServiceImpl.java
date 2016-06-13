@@ -111,6 +111,22 @@ public class RestServiceImpl implements RestService
         // @todo check for management container should be here
         Set<TemplateKurjun> templates = templateRegistry.list().stream()
                                             .filter( n -> !n.getName().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
+                                            .filter( n -> !n.getName().matches("(?i)cassandra14|" +
+                                                    "cassandra16|" +
+                                                    "elasticsearch14|" +
+                                                    "elasticsearch16|" +
+                                                    "hadoop14|" +
+                                                    "hadoop16|" +
+                                                    "mongo14|" +
+                                                    "mongo16|" +
+                                                    "openjre714|" +
+                                                    "openjre716|" +
+                                                    "solr14|" +
+                                                    "solr16|" +
+                                                    "storm14|" +
+                                                    "storm16|" +
+                                                    "zookeeper14|" +
+                                                    "zookeeper16") )
                                             .collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
