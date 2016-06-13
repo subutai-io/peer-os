@@ -23,7 +23,7 @@
             <tr ng-repeat="apt in kurjunCtrl.aptList">
                 <td>{{ apt.name }}</td>
                 <td>{{ apt.architecture }}</td>
-                <td>{{ kurjunCtrl.formatSize(apt.size) }}</td>
+                <td>{{ kurjunCtrl.formatSize(apt.installedSize) }}</td>
                 <td>{{ apt.version }}</td>
                 <td>
                     <a href class="b-icon b-icon_info"

@@ -23,17 +23,18 @@ public class ProxyEnvironment extends EnvironmentImpl
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
+    private final EnvironmentAdapter environmentAdapter;
 
-    ProxyEnvironment( JsonNode json, EnvironmentManagerImpl environmentManager, ProxyContainerHelper proxyContainerHelper )
+
+    ProxyEnvironment( EnvironmentAdapter environmentAdapter, JsonNode json, EnvironmentManagerImpl environmentManager,
+                      ProxyContainerHelper proxyContainerHelper )
     {
-        super(
-                json.get( "name" ).asText(),
-                json.get( "subnetCidr" ).asText(),
-                0L,
-                "hub" // peerId
-        );
+        super( json.get( "name" ).asText(), json.get( "subnetCidr" ).asText(), 0L, "hub" // peerId
+             );
 
         init( json );
+
+        this.environmentAdapter = environmentAdapter;
 
         addContainers( parseContainers( json, environmentManager, proxyContainerHelper ) );
     }
@@ -66,9 +67,12 @@ public class ProxyEnvironment extends EnvironmentImpl
         {
             for ( JsonNode node : arr )
             {
-                ProxyEnvironmentContainer ch = new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
+                ProxyEnvironmentContainer ch =
+                        new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
 
                 ch.setEnvironment( this );
+
+                ch.setEnvironmentAdapter( environmentAdapter );
 
                 containers.add( ch );
             }

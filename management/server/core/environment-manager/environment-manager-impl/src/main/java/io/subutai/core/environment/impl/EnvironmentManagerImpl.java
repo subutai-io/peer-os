@@ -259,28 +259,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
-        Set<Environment> environments = getLocalEnvironments();
+        Set<Environment> envs = new HashSet<>();
 
-        environments.addAll( environmentAdapter.getEnvironments() );
+        envs.addAll( environmentService.getAll() );
 
-        return environments;
+        envs.addAll( environmentAdapter.getEnvironments() );
+
+        setTransientFields( envs );
+
+        return envs;
     }
 
 
-    private Set<Environment> getLocalEnvironments()
+    private void setTransientFields( Set<Environment> envs )
     {
-        Set<Environment> environments = new HashSet<>();
-
-        for ( Environment environment : environmentService.getAll() )
+        for ( Environment env : envs )
         {
-            environments.add( environment );
+            setEnvironmentTransientFields( env );
 
-            setEnvironmentTransientFields( environment );
-
-            setContainersTransientFields( environment );
+            setContainersTransientFields( env );
         }
-
-        return environments;
     }
 
 
@@ -288,21 +286,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironmentsByOwnerId( long userId )
     {
-        Set<Environment> environments = new HashSet<>();
+        Set<Environment> envs = new HashSet<>();
 
-        for ( Environment environment : environmentService.getAll() )
+        for ( Environment env : environmentService.getAll() )
         {
-            if ( environment.getUserId().equals( userId ) )
+            if ( env.getUserId().equals( userId ) )
             {
-                environments.add( environment );
-
-                setEnvironmentTransientFields( environment );
-
-                setContainersTransientFields( environment );
+                envs.add( env );
             }
         }
 
-        return environments;
+        setTransientFields( envs );
+
+        return envs;
     }
 
 
@@ -321,6 +317,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         activeWorkflows.put( environment.getId(), newWorkflow );
     }
+
 
     private void removeActiveWorkflow( String environmentId )
     {
@@ -1345,11 +1342,14 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     public void setContainersTransientFields( final Environment environment )
     {
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
+
         for ( ContainerHost containerHost : containers )
         {
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
             environmentContainer.setEnvironmentManager( this );
+
+            environmentContainer.setEnvironmentAdapter( environmentAdapter );
         }
     }
 
@@ -1752,9 +1752,17 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void onRegistrationSucceeded()
     {
+        Set<Environment> envs = new HashSet<>();
+
+        envs.addAll( environmentService.getAll() );
+
+        setTransientFields( envs );
+
+        LOG.info( "onRegistrationSucceeded: local environments count = {}", envs.size() );
+
         try
         {
-            environmentAdapter.uploadEnvironments( getLocalEnvironments() );
+            environmentAdapter.uploadEnvironments( envs );
         }
         catch ( Exception e )
         {
@@ -1814,7 +1822,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         try
         {
-            for ( Environment environment : getEnvironments() )
+            //process only SS side environments
+            for ( Environment environment : environmentService.getAll() )
             {
                 if ( !( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                         || environment.getStatus() == EnvironmentStatus.CANCELLED ) )

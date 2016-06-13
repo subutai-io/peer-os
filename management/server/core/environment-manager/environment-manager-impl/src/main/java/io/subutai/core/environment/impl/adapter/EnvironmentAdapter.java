@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl.adapter;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, proxyContainerHelper ) );
+                envs.add( new ProxyEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
@@ -98,7 +99,7 @@ public class EnvironmentAdapter
             log.error( "Error to parse json: ", e );
         }
 
-        printLocalContainers();
+//        printLocalContainers();
 
         return envs;
     }
@@ -139,18 +140,23 @@ public class EnvironmentAdapter
 
     public void removeEnvironment( EnvironmentImpl env )
     {
-        hubAdapter.removeEnvironment( env.getId() );
+
+        try
+        {
+            hubAdapter.removeEnvironment( env.getId() );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to remove environment: ", e );
+        }
     }
 
 
-    public void uploadEnvironments( Set<Environment> envs )
+    public void uploadEnvironments( Collection<Environment> envs )
     {
         for ( Environment env : envs )
         {
-            if ( env instanceof EnvironmentImpl )
-            {
-                uploadEnvironment( ( EnvironmentImpl ) env );
-            }
+            uploadEnvironment( ( EnvironmentImpl ) env );
         }
     }
 
@@ -260,8 +266,14 @@ public class EnvironmentAdapter
     }
 
 
-    public boolean isRegistered()
+    public void onContainerStart( String envId, String contId )
     {
-        return hubAdapter.isRegistered();
+        hubAdapter.onContainerStart( envId, contId );
+    }
+
+
+    public void onContainerStop( String envId, String contId )
+    {
+        hubAdapter.onContainerStop( envId, contId );
     }
 }
