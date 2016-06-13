@@ -8,7 +8,7 @@ SettingsUpdatesCtrl.$inject = ["$scope", "SettingsUpdatesSrv", "SweetAlert"];
 function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 	var vm = this;
 	vm.config = {isUpdatesAvailable: "waiting"};
-	vm.updateText = 'Your system is already up-to-date';
+	vm.updateText = 'Checking...';
 
 	function getConfig() {
 		LOADING_SCREEN();
