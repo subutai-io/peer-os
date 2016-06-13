@@ -7,6 +7,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.rest.model.AuthMessage;
@@ -58,28 +59,38 @@ public class RestServiceImpl implements RestService
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setToken( token );
-                return Response.ok( authM ).build();
+                return Response.ok( JsonUtil.toJson( authM ) ) .build();
             }
             else
             {
-                return Response.status( Response.Status.FORBIDDEN ).build();
+                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid Login" ).build();
             }
         }
         catch ( IdentityExpiredException e )
         {
-            User user = identityManager.getUserByUsername( userName );
+
+            User user = null;
+
+            if ( userName.length() == 40 )
+                identityManager.getUserByFingerprint( userName );
+            else
+                identityManager.getUserByUsername( userName );
 
             if ( user != null )
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setStatus( 1 );
                 authM.setAuthId( identityManager.updateUserAuthId( user, null ) );
-                return Response.ok( authM ).build();
+                return Response.ok( JsonUtil.toJson( authM ) ).build();
             }
             else
             {
                 return Response.status( Response.Status.NOT_FOUND ).build();
             }
+        }
+        catch ( InvalidLoginException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid Login" ).build();
         }
         catch ( Exception e )
         {
@@ -93,7 +104,6 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            //password = URLDecoder.decode( password, "UTF-8" );
             User user = identityManager.authenticateByAuthSignature( userName, password );
 
             if ( user != null )
@@ -108,7 +118,12 @@ public class RestServiceImpl implements RestService
         }
         catch ( IdentityExpiredException e )
         {
-            User user = identityManager.getUserByUsername( userName );
+            User user = null;
+
+            if ( userName.length() == 40 )
+                identityManager.getUserByFingerprint( userName );
+            else
+                identityManager.getUserByUsername( userName );
 
             if ( user != null )
             {

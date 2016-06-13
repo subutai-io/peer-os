@@ -221,20 +221,6 @@ public class SystemSettings
     }
 
 
-    // Security Settings
-
-
-    public static boolean getKeyTrustCheckState()
-    {
-        return PROPERTIES.getBoolean( "keyTrustCheckEnabled", false );
-    }
-
-
-    public static void setKeyTrustCheckState( boolean keyTrustCheckEnabled )
-    {
-        saveProperty( "keyTrustCheckEnabled", keyTrustCheckEnabled );
-    }
-
 
     // Peer Settings
 

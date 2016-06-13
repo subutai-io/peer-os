@@ -58,7 +58,6 @@ import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
@@ -414,24 +413,22 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             logger.warn( "Trust chain validation is on..." );
             // TODO call relationManager validation here instead
             EnvironmentManagerImpl envImpl = environmentManager;
-            if ( SystemSettings.getKeyTrustCheckState() )
+
+            IdentityManager identityManager = envImpl.getIdentityManager();
+            RelationManager relationManager = envImpl.getRelationManager();
+
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate userDelegate = identityManager.getUserDelegate( activeUser );
+
+            if ( activeUser != null )
             {
-                IdentityManager identityManager = envImpl.getIdentityManager();
-                RelationManager relationManager = envImpl.getRelationManager();
+                RelationMeta relationMeta = new RelationMeta( userDelegate, userDelegate, parent, parent.getId() );
+                boolean trustedRelation =
+                        relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
 
-                User activeUser = identityManager.getActiveUser();
-                UserDelegate userDelegate = identityManager.getUserDelegate( activeUser );
-
-                if ( activeUser != null )
+                if ( !trustedRelation )
                 {
-                    RelationMeta relationMeta = new RelationMeta( userDelegate, userDelegate, parent, parent.getId() );
-                    boolean trustedRelation =
-                            relationManager.getRelationInfoManager().groupHasWritePermissions( relationMeta );
-
-                    if ( !trustedRelation )
-                    {
-                        throw new CommandException( "Host was revoked to execute commands" );
-                    }
+                    throw new CommandException( "Host was revoked to execute commands" );
                 }
             }
         }
