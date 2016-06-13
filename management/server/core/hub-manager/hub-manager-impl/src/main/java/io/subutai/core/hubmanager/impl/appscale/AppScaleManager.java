@@ -124,12 +124,7 @@ public class AppScaleManager
         {
             ResourceHost resourceHostByContainerId = localPeer.getResourceHostByContainerId( containerHost.getId() );
 
-            CommandResult resultStr = resourceHostByContainerId
-                    .execute( new RequestBuilder( "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" ) );
-
-            String stdOut = resultStr.getStdOut();
-
-            String vlanString = stdOut.substring( 11, 14 );
+            String vlanString = getVlan( config, resourceHostByContainerId );
 
             resourceHostByContainerId.execute( new RequestBuilder( "subutai proxy del " + vlanString + " -d" ) );
 
@@ -178,7 +173,7 @@ public class AppScaleManager
     }
 
 
-    private boolean isChConnected( final Host ch )
+    private boolean isChConnected( final ContainerHost ch )
     {
         boolean exec = true;
         int tryCount = 0;
@@ -213,7 +208,53 @@ public class AppScaleManager
 
         String cmd = "subutai tunnel add %s:%s %s -g";
 
+        ResourceHost resourceHost = getResourceHost( config );
 
+
+        CommandResult commandResult = TunnelHelper.execute( resourceHost,
+                String.format( cmd, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(), "" ) );
+
+        tunnelInfoDto = TunnelHelper.parseResult( link, commandResult.getStdOut(), configManager );
+        tunnelInfoDto.setTunnelStatus( TunnelInfoDto.TunnelStatus.READY );
+
+        String tunnelLink = link + "/tunnel";
+
+        String vlanString = null;
+        try
+        {
+            vlanString = getVlan( config, resourceHost );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error getting vlan : {}", e.getMessage() );
+            e.printStackTrace();
+        }
+
+        String revpx = "sed -i -e 's/https:\\/\\/$host$request_uri/https:\\/\\/$host:%s$request_uri/g' "
+                + "/var/lib/apps/subutai/current/nginx-includes/%s.conf";
+
+        String port = tunnelInfoDto.getOpenedPort().replaceAll( "\\n", "" );
+        String ccmd = String.format( revpx, port, vlanString ).replaceAll( "\\n", "" );
+        TunnelHelper.execute( resourceHost, ccmd );
+
+        TunnelHelper.execute( resourceHost, "systemctl restart *nginx*" );
+
+        updateTunnelStatus( tunnelLink, tunnelInfoDto, configManager );
+    }
+
+
+    private String getVlan( final AppScaleConfigDto config, ResourceHost resourceHost ) throws Exception
+    {
+        CommandResult res =
+                TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" );
+
+        String vlanString = res.getStdOut().substring( 11, 14 );
+        return vlanString;
+    }
+
+
+    private ResourceHost getResourceHost( final AppScaleConfigDto config )
+    {
         ContainerHost containerHost = null;
         ResourceHost resourceHost = null;
         try
@@ -235,33 +276,11 @@ public class AppScaleManager
         }
         catch ( HostNotFoundException e )
         {
+            log.error( e.getMessage() );
             e.printStackTrace();
         }
 
-        CommandResult commandResult = TunnelHelper.execute( resourceHost,
-                String.format( cmd, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(), "" ) );
-
-        tunnelInfoDto = TunnelHelper.parseResult( link, commandResult.getStdOut(), configManager );
-        tunnelInfoDto.setTunnelStatus( TunnelInfoDto.TunnelStatus.READY );
-
-        link += "/tunnel";
-
-
-        CommandResult res =
-                TunnelHelper.execute( resourceHost, "grep vlan /mnt/lib/lxc/" + config.getClusterName() + "/config" );
-
-        String vlanString = res.getStdOut().substring( 11, 14 );
-
-        String revpx = "sed -i -e 's/https:\\/\\/$host$request_uri/https:\\/\\/$host:%s$request_uri/g' "
-                + "/var/lib/apps/subutai/current/nginx-includes/%s.conf";
-
-        String port = tunnelInfoDto.getOpenedPort().replaceAll( "\\n", "" );
-        String ccmd = String.format( revpx, port, vlanString ).replaceAll( "\\n","" );
-        TunnelHelper.execute( resourceHost, ccmd);
-
-        TunnelHelper.execute( resourceHost, "systemctl restart *nginx*" );
-
-        updateTunnelStatus( link, tunnelInfoDto, configManager );
+        return resourceHost;
     }
 
 
