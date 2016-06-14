@@ -612,7 +612,12 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		console.log(template);
 		if($event === undefined || $event === null) $event = false;
 
-		if(size === undefined || size === null) size = 'SMALL';
+		if(size === undefined || size === null) {
+			size = 'SMALL';
+			if(template == 'appscale') {
+				size = 'HUGE';
+			}
+		}
 		if(templateImg === undefined || templateImg === null) templateImg = template;
 
 		var pos = findEmptyCubePostion();

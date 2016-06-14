@@ -777,10 +777,12 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		vm.editingEnv = environment;
 		vm.environment2BuildName = environment.name;
 		vm.excludedContainers = [];
+		vm.currentPeerIndex = 0;
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];
 			var resourceHostItemId = addResource2Build(container.hostId, container.peerId, i);
 			var resourceHost = graph.getCell(resourceHostItemId);
+			vm.currentPeerIndex++;
 			var img = 'assets/templates/' + container.templateName + '.jpg';
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
