@@ -91,7 +91,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private static final String SYSTEM_USERNAME = "internal";
-    private static final int IDENTITY_LIFETIME = 8; //hours
+    private static final int IDENTITY_LIFETIME = 240; //days
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -509,7 +509,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             user.setAuthId( authId );
-            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            user.setValidDate( DateUtils.addDays( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
             identityDataService.updateUser( user );
 
             return authId;
@@ -1197,7 +1197,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setType( type );
             user.setTrustLevel( trustLevel );
             user.setAuthId( userName );
-            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            user.setValidDate( DateUtils.addDays( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
 
             identityDataService.persistUser( user );
 
@@ -1356,7 +1356,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setSalt( salt );
             user.setPassword( newPassword );
             //user.setAuthId( UUID.randomUUID().toString() ); //Update AuthID also
-            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            user.setValidDate( DateUtils.addDays( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
             identityDataService.updateUser( user );
         }
         catch ( NoSuchAlgorithmException | NoSuchProviderException e )
