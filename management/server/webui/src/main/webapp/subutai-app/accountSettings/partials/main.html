@@ -4,12 +4,13 @@
 
 		<div class="b-pgp-page-row">
 			<div class="b-pgp-page-row_list">
-				<div class="b-form-label">Public key</div>
+				<div class="b-form-label">Set Public Key</div>
 				<textarea class="b-form-input b-form-input_textarea js-auto-set-key" 
 					ng-model="publicKey" 
 					ng-change="accountCtrl.setPublicKey(publicKey)" 
 					style="width: 420px; height: 160px; font-family: monospace;">
 				</textarea>
+				<div class="b-form-hint">You have more than 1 PGP key, please select one of them</div>
 			</div>
 
 			<div class="b-pgp-page-row" style="display: none;" >

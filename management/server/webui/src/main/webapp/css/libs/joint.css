@@ -251,6 +251,15 @@ Do not allow adding new vertices: .connection-wrap { pointer-events: none; }
 	transform: translate(58px, 5px);
 }
 
+.element .element-tools_copy {
+	transform: translate(70px, 25px);
+}
+
+.element .copy-icon {
+	transform: translate(-5px, -5px);
+	fill: #292F6C;
+}
+
 .recourceHost .element-tools {
 	transform: translate(155px, 0);
 }
