@@ -3,7 +3,6 @@ package io.subutai.core.identity.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.security.AccessControlContext;
 import java.security.AccessControlException;
 import java.security.AccessController;
@@ -92,7 +91,7 @@ public class IdentityManagerImpl implements IdentityManager
     private static final Logger LOGGER = LoggerFactory.getLogger( IdentityManagerImpl.class.getName() );
 
     private static final String SYSTEM_USERNAME = "internal";
-    private static final int IDENTITY_LIFETIME = 240; //hours
+    private static final int IDENTITY_LIFETIME = 8; //hours
 
     private IdentityDataService identityDataService = null;
     private SecurityController securityController = null;
@@ -510,7 +509,7 @@ public class IdentityManagerImpl implements IdentityManager
 
 
             user.setAuthId( authId );
-            user.setValidDate( DateUtils.addHours( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
             identityDataService.updateUser( user );
 
             return authId;
@@ -1198,7 +1197,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setType( type );
             user.setTrustLevel( trustLevel );
             user.setAuthId( userName );
-            user.setValidDate( DateUtils.addHours( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
 
             identityDataService.persistUser( user );
 
@@ -1237,7 +1236,7 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    @RolesAllowed( { "Identity-Management|Write", "Identity-Management|Update", "Identity-Management|Read" } )
+    @PermitAll
     @Override
     public User getUserByUsername( String userName )
     {
@@ -1357,7 +1356,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setSalt( salt );
             user.setPassword( newPassword );
             //user.setAuthId( UUID.randomUUID().toString() ); //Update AuthID also
-            user.setValidDate( DateUtils.addHours( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            user.setValidDate( DateUtils.addMinutes( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
             identityDataService.updateUser( user );
         }
         catch ( NoSuchAlgorithmException | NoSuchProviderException e )

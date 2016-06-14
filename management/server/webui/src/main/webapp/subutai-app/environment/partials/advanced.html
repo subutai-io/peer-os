@@ -21,7 +21,7 @@
 				</div>
 				<div class="b-tools-menu__inpit">
 					<select class="b-search-input" ng-model="advEnvCtrl.templatesType" ng-change="advEnvCtrl.getFilteredTemplates()">
-						<option value="all">All</option>
+						<oreption value="all">All</option>
 						<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
 							{{ templatesType }} ({{ templateList.length }})
 						</option>
@@ -84,7 +84,7 @@
 						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
 						ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
 							<span class="b-cloud-item-resource-name g-margin-bottom">
-								Recource Host {{$index + 1}}
+								Resource Host {{$index + 1}}
 							</span>
 							<div class="b-progress__cloud b-progress__cloud_rh">
 								<div class="g-margin-bottom">

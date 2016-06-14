@@ -125,9 +125,7 @@ public class SystemSettings
         String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
         if ( globalKurjunUrls.length < 1 )
         {
-            globalKurjunUrls = new String[] {
-                    DEFAULT_KURJUN_REPO
-            };
+            globalKurjunUrls = new String[] { DEFAULT_KURJUN_REPO };
         }
 
         GLOBAL_KURJUN_URLS = validateGlobalKurjunUrls( globalKurjunUrls );
@@ -220,59 +218,6 @@ public class SystemSettings
         saveProperty( "agentPort", agentPort );
     }
 
-
-    // Security Settings
-
-
-    //todo remove this since communication is always encrypted
-    @Deprecated
-    public static boolean getEncryptionState()
-    {
-        return PROPERTIES.getBoolean( "encryptionEnabled", false );
-    }
-
-
-    //todo remove
-    public static boolean getRestEncryptionState()
-    {
-        return PROPERTIES.getBoolean( "restEncryptionEnabled", false );
-    }
-
-
-    public static boolean getIntegrationState()
-    {
-        return PROPERTIES.getBoolean( "integrationEnabled", false );
-    }
-
-
-    public static boolean getKeyTrustCheckState()
-    {
-        return PROPERTIES.getBoolean( "keyTrustCheckEnabled", false );
-    }
-
-
-    public static void setEncryptionState( boolean encryptionEnabled )
-    {
-        saveProperty( "encryptionEnabled", encryptionEnabled );
-    }
-
-
-    public static void setRestEncryptionState( boolean restEncryptionEnabled )
-    {
-        saveProperty( "restEncryptionEnabled", restEncryptionEnabled );
-    }
-
-
-    public static void setIntegrationState( boolean integrationEnabled )
-    {
-        saveProperty( "integrationEnabled", integrationEnabled );
-    }
-
-
-    public static void setKeyTrustCheckState( boolean keyTrustCheckEnabled )
-    {
-        saveProperty( "keyTrustCheckEnabled", keyTrustCheckEnabled );
-    }
 
 
     // Peer Settings
