@@ -21,6 +21,7 @@ import io.subutai.core.object.relation.impl.model.RelationImpl;
 import io.subutai.core.object.relation.impl.model.RelationLinkImpl;
 
 
+@SuppressWarnings( "JpaQlInspection" )
 public class RelationDataService
 {
     private static final Logger logger = LoggerFactory.getLogger( RelationDataService.class );
@@ -42,6 +43,7 @@ public class RelationDataService
             daoManager.startTransaction( em );
             em.persist( relationLink );
             daoManager.commitTransaction( em );
+            em.refresh( relationLink );
         }
         catch ( Exception ex )
         {
@@ -64,6 +66,7 @@ public class RelationDataService
             daoManager.startTransaction( em );
             em.merge( relationLink );
             daoManager.commitTransaction( em );
+            em.refresh( relationLink );
         }
         catch ( Exception ex )
         {
