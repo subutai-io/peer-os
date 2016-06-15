@@ -25,7 +25,7 @@
 				</div>
 				<ul>
 					<li ng-repeat="template in environmentSimpleViewCtrl.templatesList | filter:searchTemplate | orderBy: 'name'">
-						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template.id, $event)">
+						<span class="b-tools-menu__item" ng-click="environmentSimpleViewCtrl.addContainer(template.name, $event)">
 							<span class="b-cloud-item">
 								<img
 									ng-src="assets/templates/{{ template.name }}.jpg"
