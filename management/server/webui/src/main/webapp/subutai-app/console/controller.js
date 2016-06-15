@@ -81,8 +81,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	$scope.session = {
 		commands: [],
-		output: [],
-		$scope:$scope
+		output: []
 	};
 
 	$scope.$watchCollection(function () { return $scope.session.commands; }, function (n) {

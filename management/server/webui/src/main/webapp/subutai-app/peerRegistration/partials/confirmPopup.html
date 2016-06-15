@@ -20,9 +20,6 @@
 				class="b-popup-body-checkbox">
 		</div>
 
-		<button class="b-btn b-btn_red" ng-click="closeThisDialog()">
-			Cancel
-		</button>
 		<button ng-click="peerRegistrationCtrl.unregisterPeer(peerRegistrationCtrl.peerToAction, force)" 
 			class="b-btn b-btn_green" 
 			ng-show="peerRegistrationCtrl.action == 'Unregister'">
@@ -38,6 +35,11 @@
 			ng-show="peerRegistrationCtrl.action == 'Reject'">
 			Proceed
 		</button>
+
+		<button class="b-btn b-btn_red" ng-click="closeThisDialog()">
+			Cancel
+		</button>
+
 		<div class="clear"></div>
 	</div>
 </div>

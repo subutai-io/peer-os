@@ -87,11 +87,24 @@
 								name="fingerprint"
 								type="text">
 						</div>
-						<div class="b-form__wrapper g-margin-bottom">
+						<div ng-hide="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
 							<label class="b-form-label">Signed message</label>
 							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.sptoken">
 							</textarea>
 						</div>
+
+						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
+							<label class="b-form-label">New Message</label>
+							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.newMsg">
+							</textarea>
+						</div>
+
+						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
+							<label class="b-form-label">Confirm Message</label>
+							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.msgConf">
+							</textarea>
+						</div>
+
 						<div class="b-login-form-btn">
 							<button type="submit" class="b-btn b-btn_green b-btn_full-width">
 								Login
