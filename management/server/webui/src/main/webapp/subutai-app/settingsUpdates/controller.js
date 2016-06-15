@@ -31,11 +31,12 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 
 	vm.update = update;
 	function update() {
+
 		LOADING_SCREEN();
 		vm.updateText = 'Please wait, update is in progress. System will restart automatically';
 		SettingsUpdatesSrv.update(vm.config).success(function (data) {
 			LOADING_SCREEN('none');
-			localStorage.removeItem('notifications');
+			sessionStorage.removeItem('notifications');
 			SweetAlert.swal("Success!", "Subutai Successfully updated.", "success");
 			getConfig();
 		}).error(function (error) {
@@ -46,5 +47,24 @@ function SettingsUpdatesCtrl($scope, SettingsUpdatesSrv, SweetAlert) {
 				getConfig();
 			}, 120000);
 		});
+
+		var notifications = sessionStorage.getItem('notifications');
+		if (
+			notifications !== null &&
+			notifications !== undefined &&
+			notifications !== 'null' &&
+			notifications.length > 0
+		) {
+			notifications = JSON.parse(notifications);
+			for (var i = 0; i < notifications.length; i++) {
+				if (notifications[i].updateMessage !== undefined && notifications[i].updateMessage) {
+					notifications.splice(i, 1);
+					sessionStorage.setItem('notifications', JSON.stringify(notifications));
+					$rootScope.notifications = {};
+					break;
+				}
+			}
+		}
+
 	}
 }

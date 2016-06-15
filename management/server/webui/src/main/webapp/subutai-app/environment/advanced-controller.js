@@ -1158,7 +1158,12 @@ function drop(event) {
 }
 
 function addContainerToHost(model, template, img, size, containerId) {
-	if(size == undefined || size == null) size = 'SMALL';
+	if(size === undefined || size === null) {
+		size = 'SMALL';
+		if(template == 'appscale') {
+			size = 'HUGE';
+		}
+	}
 	if(containerId == undefined || containerId == null) containerId = false;
 	checkResourceHost(model);
 	var rPos = model.attributes.position;
