@@ -108,7 +108,7 @@ function environmentService($http, $q) {
 
 				for( var i = 0; i < data.length; i++ )
 				{
-					res[ getCategory( data[i] )].push( data[i] );
+					res[ getCategory( data[i].name )].push( data[i] );
 				}
 
 				callF.resolve(res);
