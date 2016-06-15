@@ -1335,7 +1335,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void setEnvironmentTransientFields( final Environment environment )
     {
-        ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+        // Using environmentManager for ProxyEnvironment may give side effects. For example, empty container list.
+        if ( !( environment instanceof ProxyEnvironment ) )
+        {
+            ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+        }
     }
 
 

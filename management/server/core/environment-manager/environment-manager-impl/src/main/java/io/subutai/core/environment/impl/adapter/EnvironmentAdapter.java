@@ -99,7 +99,7 @@ public class EnvironmentAdapter
             log.error( "Error to parse json: ", e );
         }
 
-//        printLocalContainers();
+        printLocalContainers();
 
         return envs;
     }
