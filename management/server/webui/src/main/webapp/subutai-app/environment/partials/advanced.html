@@ -21,7 +21,7 @@
 				</div>
 				<div class="b-tools-menu__inpit">
 					<select class="b-search-input" ng-model="advEnvCtrl.templatesType" ng-change="advEnvCtrl.getFilteredTemplates()">
-						<oreption value="all">All</option>
+						<option value="all">All</option>
 						<option ng-repeat="(templatesType, templateList) in advEnvCtrl.templates" value="{{ templatesType }}">
 							{{ templatesType }} ({{ templateList.length }})
 						</option>
