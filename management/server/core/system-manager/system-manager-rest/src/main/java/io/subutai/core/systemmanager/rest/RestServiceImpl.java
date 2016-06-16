@@ -183,12 +183,14 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                        final String publicUrl, final String agentPort, final String publicSecurePort, final String keyServer )
+                                        final String publicUrl, final String agentPort, final String publicSecurePort,
+                                        final String keyServer )
     {
+        //todo remove securePortX3
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, securePortX3, publicUrl, agentPort,
-                    publicSecurePort, keyServer );
+            systemManager.setNetworkSettings( securePortX1, securePortX2, publicUrl, agentPort, publicSecurePort,
+                    keyServer );
 
             systemManager.sendSystemConfigToHub();
         }
