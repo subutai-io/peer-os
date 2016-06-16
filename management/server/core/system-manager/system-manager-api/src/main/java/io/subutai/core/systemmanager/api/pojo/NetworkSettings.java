@@ -11,9 +11,6 @@ public interface NetworkSettings
 
     public int getSecurePortX2();
 
-    public void setSecurePortX3( final int securePortX3 );
-
-    public int getSecurePortX3();
 
     public String getPublicUrl();
 
