@@ -53,6 +53,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
@@ -276,7 +277,19 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public Environment destroy() throws PeerException
     {
-        getPeer().destroyContainer( getContainerId() );
+
+        final Peer peer = getPeer();
+
+        final RegistrationStatus status = peer.getStatus();
+        if ( status == RegistrationStatus.APPROVED )
+        {
+            peer.destroyContainer( getContainerId() );
+        }
+        else if ( status != RegistrationStatus.NOT_REGISTERED )
+        {
+            throw new PeerException( "Could not destroy container when remote peer status is " + status );
+        }
+
 
         ( ( EnvironmentImpl ) parent ).removeContainer( this );
 

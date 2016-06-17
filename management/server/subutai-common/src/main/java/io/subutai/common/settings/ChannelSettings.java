@@ -34,6 +34,7 @@ public class ChannelSettings
             "/rest/v1/handshake/cancel",
             "/rest/v1/handshake/reject",
             "/rest/v1/handshake/unregister",
+            "/rest/v1/handshake/status/{$}",
             "/rest/v1/registration/public-key"
     };
 

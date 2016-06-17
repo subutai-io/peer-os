@@ -67,6 +67,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -2405,13 +2406,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public Set<ContainerHost> listOrphanContainers()
     {
         Set<ContainerHost> result = new HashSet<>();
-        final Set<String> registeredPeers = getRegisteredPeers();
+        Set<String> involvedPeers = getInvolvedPeers();
+        final Set<String> unregisteredPeers = getNotRegisteredPeers( involvedPeers );
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
 
-                if ( !registeredPeers.contains( containerHost.getPeerId() ) )
+                if ( unregisteredPeers.contains( containerHost.getPeerId() ) )
                 {
                     result.add( containerHost );
                 }
@@ -2421,16 +2423,58 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected Set<String> getRegisteredPeers()
+    protected Set<String> getInvolvedPeers()
     {
-        final Set<String> registeredPeers = new HashSet<>();
-        PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-        for ( Peer peer : peerManager.getPeers() )
+        final Set<String> result = new HashSet<>();
+        for ( ResourceHost resourceHost : getResourceHosts() )
         {
-            registeredPeers.add( peer.getId() );
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                result.add( containerHost.getPeerId() );
+            }
         }
-        return registeredPeers;
+        return result;
     }
+
+
+    protected Set<String> getNotRegisteredPeers( Set<String> peers )
+    {
+        final Set<String> result = new HashSet<>();
+        PeerManager peerManager = getPeerManager();
+
+        for ( String p : peers )
+        {
+            if ( RegistrationStatus.NOT_REGISTERED == peerManager.getRemoteRegistrationStatus( p ) )
+            {
+                result.add( p );
+            }
+        }
+        return result;
+    }
+
+
+    protected PeerManager getPeerManager() {return ServiceLocator.getServiceNoCache( PeerManager.class );}
+
+
+    @Override
+    public RegistrationStatus getStatus()
+    {
+        return RegistrationStatus.APPROVED;
+    }
+
+    //    protected Set<String> getRegisteredPeers()
+    //    {
+    //        final Set<String> registeredPeers = new HashSet<>();
+    //        PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
+    //        for ( Peer peer : peerManager.getPeers() )
+    //        {
+    //            if ( RegistrationStatus.NOT_REGISTERED == peerManager.getRemoteRegistrationStatus( peer.getId() ) )
+    //            {
+    //                registeredPeers.add( peer.getId() );
+    //            }
+    //        }
+    //        return registeredPeers;
+    //    }
 
 
     @Override
