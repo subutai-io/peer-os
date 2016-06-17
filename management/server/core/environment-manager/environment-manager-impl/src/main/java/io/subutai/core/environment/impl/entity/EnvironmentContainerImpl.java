@@ -284,6 +284,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         if ( status == RegistrationStatus.APPROVED )
         {
             peer.destroyContainer( getContainerId() );
+            if ( parent.getContainerHostsByPeerId( getPeerId() ).size() == 0 )
+            {
+                parent.removeEnvironmentPeer( getPeerId() );
+            }
         }
         else if ( status != RegistrationStatus.NOT_REGISTERED )
         {

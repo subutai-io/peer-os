@@ -2412,8 +2412,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
-
-                if ( unregisteredPeers.contains( containerHost.getPeerId() ) )
+                if ( unregisteredPeers.contains( containerHost.getInitiatorPeerId() ) && !"management"
+                        .equalsIgnoreCase( containerHost.getHostname() ) )
                 {
                     result.add( containerHost );
                 }
@@ -2430,7 +2430,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
-                result.add( containerHost.getPeerId() );
+                result.add( containerHost.getInitiatorPeerId() );
             }
         }
         return result;
@@ -2461,21 +2461,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         return RegistrationStatus.APPROVED;
     }
-
-    //    protected Set<String> getRegisteredPeers()
-    //    {
-    //        final Set<String> registeredPeers = new HashSet<>();
-    //        PeerManager peerManager = ServiceLocator.getServiceNoCache( PeerManager.class );
-    //        for ( Peer peer : peerManager.getPeers() )
-    //        {
-    //            if ( RegistrationStatus.NOT_REGISTERED == peerManager.getRemoteRegistrationStatus( peer.getId() ) )
-    //            {
-    //                registeredPeers.add( peer.getId() );
-    //            }
-    //        }
-    //        return registeredPeers;
-    //    }
-
 
     @Override
     public void removeOrphanContainers()
