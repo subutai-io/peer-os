@@ -44,7 +44,6 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
@@ -52,6 +51,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
@@ -75,6 +75,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -99,7 +100,7 @@ public class RemotePeerImpl implements RemotePeer
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
     private RelationManager relationManager;
-    private LocalPeer localPeer;
+    private PeerManager peerManager;
     private PeerWebClient peerWebClient;
     private EnvironmentWebClient environmentWebClient;
 
@@ -123,7 +124,7 @@ public class RemotePeerImpl implements RemotePeer
         this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
         this.relationManager = peerManager.getRelationManager();
-        this.localPeer = peerManager.getLocalPeer();
+        this.peerManager = peerManager;
         this.provider = provider;
 
         this.peerWebClient = new PeerWebClient( provider, peerInfo, this );
@@ -141,7 +142,7 @@ public class RemotePeerImpl implements RemotePeer
         traits.put( "sendHeartbeats", "allow" );
         traits.put( "hostTemplates", "allow" );
 
-        relationInfoManager.checkRelation( localPeer, this, relationInfoMeta, null );
+        relationInfoManager.checkRelation( peerManager.getLocalPeer(), this, relationInfoMeta, null );
     }
 
 
@@ -199,6 +200,13 @@ public class RemotePeerImpl implements RemotePeer
     public PeerInfo getPeerInfo()
     {
         return peerInfo;
+    }
+
+
+    @Override
+    public RegistrationStatus getStatus()
+    {
+        return peerManager.getRemoteRegistrationStatus( peerInfo.getId() );
     }
 
 

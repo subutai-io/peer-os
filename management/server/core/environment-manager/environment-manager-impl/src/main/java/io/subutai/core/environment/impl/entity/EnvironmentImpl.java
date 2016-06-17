@@ -321,6 +321,23 @@ public class EnvironmentImpl implements Environment, Serializable
 
 
     @Override
+    public Set<EnvironmentContainerHost> getContainerHostsByPeerId( String id )
+    {
+        Preconditions.checkNotNull( id, "Invalid id" );
+
+        Set<EnvironmentContainerHost> result = new HashSet<>();
+        for ( final EnvironmentContainerHost containerHost : getContainerHosts() )
+        {
+            if ( containerHost.getPeerId().equals( id ) )
+            {
+                result.add( containerHost );
+            }
+        }
+        return result;
+    }
+
+
+    @Override
     public EnvironmentContainerHost getContainerHostByHostname( String hostname ) throws ContainerHostNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
@@ -357,6 +374,24 @@ public class EnvironmentImpl implements Environment, Serializable
 
         peerConf.setEnvironment( this );
         peerConfs.add( peerConf );
+    }
+
+
+    @Override
+    public void removeEnvironmentPeer( final String peerId )
+    {
+
+        Preconditions.checkNotNull( peerId, "Environment peer id could not be null." );
+
+        for ( Iterator<PeerConf> i = peerConfs.iterator(); ; i.hasNext() )
+        {
+            PeerConf c = i.next();
+            if ( c.getPeerId().equals( peerId ) )
+            {
+                i.remove();
+                break;
+            }
+        }
     }
 
 
