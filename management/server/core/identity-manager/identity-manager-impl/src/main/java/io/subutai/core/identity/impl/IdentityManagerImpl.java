@@ -1197,7 +1197,7 @@ public class IdentityManagerImpl implements IdentityManager
             user.setType( type );
             user.setTrustLevel( trustLevel );
             user.setAuthId( userName );
-            user.setValidDate( DateUtils.addDays( new Date( System.currentTimeMillis() ), IDENTITY_LIFETIME ) );
+            user.setValidDate( new Date() );
 
             identityDataService.persistUser( user );
 

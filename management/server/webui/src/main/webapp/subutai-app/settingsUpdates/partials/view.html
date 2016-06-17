@@ -1,31 +1,26 @@
 <div ng-controller="SettingsUpdatesCtrl as settingsUpdatesCtrl">
 
-  <div class="b-workspace__header">
-    <h1 class="b-title"><span class="b-title_breadcrumbs">Updates</span></h1>
-  </div>
+<div class="b-workspace__header">
+	<h1 class="b-title"><span class="b-title_breadcrumbs">Updates</span></h1>
+</div>
 
-  <div class="b-workspace__content">
-    <div class="b-workspace-content__row">
+<div class="b-workspace__content">
+	<div class="b-workspace-content__row">
 
-      <div ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == false" >
-      <p>Your system is already up-to-date</p>
-      </div>
+		<p>{{ settingsUpdatesCtrl.updateText }}</p>
 
-      <div ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == true">
-        <p>Update is available</p>
-
-        <br>
-
-        <button
-            class="b-btn b-btn_blue g-left g-margin-bottom"
-            ng-click="settingsUpdatesCtrl.update()"
-            tabindex=6
-            style="margin-top: 15px">
-          <i class="fa fa-refresh"></i>&#160;&#160;Update
-        </button>
-      </div>
+		<div ng-show="settingsUpdatesCtrl.config.isUpdatesAvailable == true">
+			<br>
+			<button
+				class="b-btn b-btn_blue g-left g-margin-bottom"
+				ng-click="settingsUpdatesCtrl.update()"
+				tabindex=6
+				style="margin-top: 15px">
+				<i class="fa fa-refresh"></i>&#160;&#160;Update
+			</button>
+		</div>
 
 
-    </div>
-  </div>
+	</div>
+</div>
 </div>

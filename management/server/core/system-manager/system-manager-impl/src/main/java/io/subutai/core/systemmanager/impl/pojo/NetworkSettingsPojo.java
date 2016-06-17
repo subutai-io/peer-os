@@ -8,7 +8,6 @@ public class NetworkSettingsPojo implements NetworkSettings
 {
     public int securePortX1;
     public int securePortX2;
-    public int securePortX3;
     public String publicUrl;
     public int agentPort;
     public int publicSecurePort;
@@ -72,18 +71,6 @@ public class NetworkSettingsPojo implements NetworkSettings
     public void setSecurePortX2( final int securePortX2 )
     {
         this.securePortX2 = securePortX2;
-    }
-
-
-    public int getSecurePortX3()
-    {
-        return securePortX3;
-    }
-
-
-    public void setSecurePortX3( final int securePortX3 )
-    {
-        this.securePortX3 = securePortX3;
     }
 
 

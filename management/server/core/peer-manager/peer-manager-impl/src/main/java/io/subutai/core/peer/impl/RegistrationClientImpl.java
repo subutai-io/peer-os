@@ -7,6 +7,9 @@ import java.net.URL;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
@@ -14,6 +17,7 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.IPUtil;
@@ -22,9 +26,13 @@ import io.subutai.core.peer.api.RegistrationClient;
 
 /**
  * REST client implementation of registration process
+ *
+ * todo close response and client
  */
 public class RegistrationClientImpl implements RegistrationClient
 {
+    private static final Logger LOG = LoggerFactory.getLogger( RegistrationClientImpl.class );
+
     protected RestUtil restUtil = new RestUtil();
     private static final String urlTemplate = "%s/rest/v1/handshake/%s";
     private Object provider;
@@ -43,7 +51,7 @@ public class RegistrationClientImpl implements RegistrationClient
     public PeerInfo getPeerInfo( final String destinationHost ) throws PeerException
     {
 
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/info" ), provider );
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "info" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -73,7 +81,7 @@ public class RegistrationClientImpl implements RegistrationClient
     public RegistrationData sendInitRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/register" ), provider );
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "register" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -102,7 +110,7 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendCancelRequest( String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/cancel" ), provider );
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "cancel" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -127,7 +135,7 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendRejectRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/reject" ), provider );
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "reject" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -152,7 +160,7 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendUnregisterRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/unregister" ), provider );
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "unregister" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -177,7 +185,7 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendApproveRequest( String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "/approve" ), provider );
+        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "approve" ), provider );
 
         client.type( MediaType.APPLICATION_JSON );
         client.accept( MediaType.APPLICATION_JSON );
@@ -198,6 +206,32 @@ public class RegistrationClientImpl implements RegistrationClient
     }
 
 
+    @Override
+    public RegistrationStatus getStatus( String destinationHost, String peerId )
+    {
+        try
+        {
+            WebClient client =
+                    restUtil.getTrustedWebClient( buildUrl( destinationHost, "status/" + peerId ), provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+
+            Response response = client.get();
+            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+            {
+                return response.readEntity( RegistrationStatus.class );
+            }
+
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( e.getMessage() );
+        }
+        return RegistrationStatus.OFFLINE;
+    }
+
+
     private String buildUrl( String destination, String action ) throws PeerException
     {
         try
@@ -210,5 +244,4 @@ public class RegistrationClientImpl implements RegistrationClient
             throw new PeerException( "Invalid URL." );
         }
     }
-
 }

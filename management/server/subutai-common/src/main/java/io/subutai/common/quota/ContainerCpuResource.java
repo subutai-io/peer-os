@@ -35,6 +35,6 @@ public class ContainerCpuResource extends ContainerResource<NumericValueResource
     @Override
     public String getPrintValue()
     {
-        return String.format( "%s\\%", resource.getValue().intValue() );
+        return String.format( "%s%%", resource.getValue().intValue() );
     }
 }

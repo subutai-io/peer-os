@@ -7,8 +7,10 @@ import java.util.Set;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.resource.PeerGroupResources;
 
 
@@ -21,7 +23,7 @@ public interface PeerManager
     void unregisterPeerActionListener( PeerActionListener peerActionListener );
 
 
-    void doUnregisterRequest( RegistrationData request , boolean forceAction  ) throws PeerException;
+    void doUnregisterRequest( RegistrationData request, boolean forceAction ) throws PeerException;
 
     List<RegistrationData> getRegistrationRequests();
 
@@ -46,9 +48,9 @@ public interface PeerManager
 
     void doApproveRequest( String keyPhrase, RegistrationData request ) throws PeerException;
 
-    void doRejectRequest( RegistrationData request , boolean forceAction  ) throws PeerException;
+    void doRejectRequest( RegistrationData request, boolean forceAction ) throws PeerException;
 
-    void doCancelRequest( RegistrationData request , boolean forceAction  ) throws PeerException;
+    void doCancelRequest( RegistrationData request, boolean forceAction ) throws PeerException;
 
     void processCancelRequest( RegistrationData registrationData ) throws PeerException;
 
@@ -65,6 +67,10 @@ public interface PeerManager
     PeerGroupResources getPeerGroupResources() throws PeerException;
 
     PeerPolicy getAvailablePolicy();
+
+    RegistrationStatus getRegistrationStatus( String peerId );
+
+    RegistrationStatus getRemoteRegistrationStatus( String peerId );
 
     PeerPolicy getPolicy( String peerId );
 

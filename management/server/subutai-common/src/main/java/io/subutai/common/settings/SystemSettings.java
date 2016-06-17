@@ -17,9 +17,7 @@ import io.subutai.common.util.ServiceLocator;
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
-    public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_KEY_SERVER = "https://localhost:8443/rest/v1/pks";
-    public static final String DEFAULT_MGMT_INTERFACE = "mng-net";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
     public static final int DEFAULT_PUBLIC_PORT = ChannelSettings.SECURE_PORT_X1;
     public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
@@ -107,18 +105,6 @@ public class SystemSettings
     }
 
 
-    protected static void validatePublicUrl( String publicUrl ) throws ConfigurationException
-    {
-        try
-        {
-            new URL( publicUrl );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new ConfigurationException( "Invalid URL: " + publicUrl );
-        }
-    }
-
 
     private static void loadGlobalKurjunUrls() throws ConfigurationException
     {
@@ -133,12 +119,6 @@ public class SystemSettings
 
 
     // Network Settings
-
-
-    public static int getOpenPort()
-    {
-        return PROPERTIES.getInt( "openPort", ChannelSettings.OPEN_PORT );
-    }
 
 
     public static String getKeyServer()
@@ -165,27 +145,9 @@ public class SystemSettings
     }
 
 
-    public static int getSecurePortX3()
-    {
-        return PROPERTIES.getInt( "securePortX3", ChannelSettings.SECURE_PORT_X3 );
-    }
-
-
-    public static int getSpecialPortX1()
-    {
-        return PROPERTIES.getInt( "specialPortX1", ChannelSettings.SPECIAL_PORT_X1 );
-    }
-
-
     public static int getAgentPort()
     {
         return PROPERTIES.getInt( "agentPort", ChannelSettings.AGENT_PORT );
-    }
-
-
-    public static void setOpenPort( int openPort )
-    {
-        saveProperty( "openPort", openPort );
     }
 
 
@@ -201,23 +163,10 @@ public class SystemSettings
     }
 
 
-    public static void setSecurePortX3( int securePortX3 )
-    {
-        saveProperty( "securePortX3", securePortX3 );
-    }
-
-
-    public static void setSpecialPortX1( int specialPortX1 )
-    {
-        saveProperty( "specialPortX1", specialPortX1 );
-    }
-
-
     public static void setAgentPort( int agentPort )
     {
         saveProperty( "agentPort", agentPort );
     }
-
 
 
     // Peer Settings

@@ -777,10 +777,12 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		vm.editingEnv = environment;
 		vm.environment2BuildName = environment.name;
 		vm.excludedContainers = [];
+		vm.currentPeerIndex = 0;
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];
 			var resourceHostItemId = addResource2Build(container.hostId, container.peerId, i);
 			var resourceHost = graph.getCell(resourceHostItemId);
+			vm.currentPeerIndex++;
 			var img = 'assets/templates/' + container.templateName + '.jpg';
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
@@ -933,10 +935,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 				if (result.containersObj[currentElement.get('templateName')] === undefined) {
 					result.containersObj[currentElement.get('templateName')] = {};
 					result.containersObj[currentElement.get('templateName')].count = 1;
-					result.containersObj[currentElement.get('templateName')]
-						.sizes = {};
-					result.containersObj[currentElement.get('templateName')]
-						.sizes[currentElement.get('quotaSize')] = 1;
+					result.containersObj[currentElement.get('templateName')].sizes = {};
+					result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
+					result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
 				} else {
 					result.containersObj[currentElement.get('templateName')].count++;
 					if(result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
@@ -974,6 +975,20 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		currentTemplate.set('containerName', settings.containerName);
 		//ngDialog.closeAll();
 		containerSettingMenu.hide();
+	}
+
+	function getTemplateNameById( id )
+	{
+		var arr = jQuery.grep(vm.templatesList, function( e ) {
+			return ( e.id == id );
+		});
+
+		if( arr.length > 0 && arr[0].name.length > 0 )
+		{
+			return arr[0].name;
+		}
+
+		return id;
 	}
 }
 
@@ -1143,7 +1158,12 @@ function drop(event) {
 }
 
 function addContainerToHost(model, template, img, size, containerId) {
-	if(size == undefined || size == null) size = 'SMALL';
+	if(size === undefined || size === null) {
+		size = 'SMALL';
+		if(template == 'appscale') {
+			size = 'HUGE';
+		}
+	}
 	if(containerId == undefined || containerId == null) containerId = false;
 	checkResourceHost(model);
 	var rPos = model.attributes.position;

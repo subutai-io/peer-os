@@ -26,7 +26,6 @@ import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -564,5 +563,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
             }
         }
+        throw new RelationVerificationException( "No relation exist." );
     }
 }
