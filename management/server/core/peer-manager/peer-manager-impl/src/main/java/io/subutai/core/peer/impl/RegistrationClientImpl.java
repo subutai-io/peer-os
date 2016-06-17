@@ -26,6 +26,8 @@ import io.subutai.core.peer.api.RegistrationClient;
 
 /**
  * REST client implementation of registration process
+ *
+ * todo close response and client
  */
 public class RegistrationClientImpl implements RegistrationClient
 {

@@ -63,7 +63,6 @@ import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Payload;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
@@ -2412,7 +2411,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
             {
-                if ( unregisteredPeers.contains( containerHost.getInitiatorPeerId() ) && !"management"
+                if ( unregisteredPeers.contains( containerHost.getInitiatorPeerId() ) && !Common.MANAGEMENT_HOSTNAME
                         .equalsIgnoreCase( containerHost.getHostname() ) )
                 {
                     result.add( containerHost );
@@ -2453,7 +2452,10 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected PeerManager getPeerManager() {return ServiceLocator.getServiceNoCache( PeerManager.class );}
+    protected PeerManager getPeerManager()
+    {
+        return ServiceLocator.getServiceNoCache( PeerManager.class );
+    }
 
 
     @Override
@@ -2461,6 +2463,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         return RegistrationStatus.APPROVED;
     }
+
 
     @Override
     public void removeOrphanContainers()
