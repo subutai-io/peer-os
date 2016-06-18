@@ -158,7 +158,7 @@ public class RestServiceImpl implements RestService
                 EnvironmentDto environmentDto =
                         new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
                                 convertContainersToContainerJson( environment.getContainerHosts() ),
-                                environment.getRelationDeclaration(), environment.getClass().getName() );
+                                environment.getClass().getName() );
 
                 environmentDtos.add( environmentDto );
             }
