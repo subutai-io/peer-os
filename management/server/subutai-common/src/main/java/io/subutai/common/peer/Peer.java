@@ -278,4 +278,6 @@ public interface Peer extends RelationLink
             throws PeerException;
 
     void setContainerHostname( ContainerId containerId, String hostname ) throws PeerException;
+
+    RegistrationStatus getStatus();
 }

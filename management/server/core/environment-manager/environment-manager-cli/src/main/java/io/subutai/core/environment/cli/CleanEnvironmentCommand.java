@@ -18,10 +18,10 @@ import io.subutai.core.peer.api.PeerManager;
 
 
 /**
- * View target environment brief info
+ * Clean target environment
  */
-@Command( scope = "environment", name = "view", description = "Command to view environment" )
-public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
+@Command( scope = "environment", name = "clean", description = "Command to view environment" )
+public class CleanEnvironmentCommand extends SubutaiShellCommandSupport
 {
 
     @Argument( name = "envId", description = "Environment id",
@@ -36,7 +36,7 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
     private final PeerManager peerManager;
 
 
-    public ViewEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
+    public CleanEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
@@ -70,26 +70,10 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
 
 
-            if ( peerStatus == RegistrationStatus.APPROVED )
+            if ( peerStatus == RegistrationStatus.NOT_REGISTERED )
             {
-                System.out.println( "Container state: " + containerHost.getState() );
-
-                try
-                {
-                    final ContainerQuota quota = containerHost.getQuota();
-
-                    System.out.println( "Granted resources: " );
-                    System.out.println( "Type\tValue\tThreshold" );
-                    for ( Quota q : quota.getAll() )
-                    {
-                        System.out.println( String.format( "%s\t%s\t%s", q.getResource().getContainerResourceType(),
-                                q.getResource().getPrintValue(), q.getThreshold() ) );
-                    }
-                }
-                catch ( Exception e )
-                {
-                    System.out.println( "ERROR: " + e.getMessage() );
-                }
+                environment.destroyContainer( containerHost, false );
+                System.out.println( "Container destroyed: " + containerHost.getHostname() );
             }
         }
 

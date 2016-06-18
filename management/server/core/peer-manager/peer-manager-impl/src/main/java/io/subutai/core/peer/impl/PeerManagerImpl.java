@@ -43,6 +43,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
@@ -1121,6 +1122,59 @@ public class PeerManagerImpl implements PeerManager
             // ignore
         }
         return result;
+    }
+
+
+    @Override
+    public RegistrationStatus getRegistrationStatus( String peerId )
+    {
+        if ( localPeerId.equals( peerId ) )
+        {
+            return RegistrationStatus.APPROVED;
+        }
+        RegistrationData r = null;
+
+        for ( RegistrationData rd : getRegistrationRequests() )
+        {
+            if ( rd.getPeerInfo().getId().equals( peerId ) )
+            {
+                r = rd;
+                break;
+            }
+        }
+        if ( r == null )
+        {
+            return RegistrationStatus.NOT_REGISTERED;
+        }
+
+        return r.getStatus();
+    }
+
+
+    @Override
+    public RegistrationStatus getRemoteRegistrationStatus( String peerId )
+    {
+        if ( localPeerId.equals( peerId ) )
+        {
+            return RegistrationStatus.APPROVED;
+        }
+        RegistrationData r = null;
+
+        for ( RegistrationData rd : getRegistrationRequests() )
+        {
+            if ( rd.getPeerInfo().getId().equals( peerId ) )
+            {
+                r = rd;
+                break;
+            }
+        }
+
+        if ( r == null )
+        {
+            return RegistrationStatus.NOT_REGISTERED;
+        }
+
+        return registrationClient.getStatus( r.getPeerInfo().getPublicUrl(), localPeerId );
     }
 
 
