@@ -43,6 +43,16 @@
     <command name="environment/view">
       <action class="io.subutai.core.environment.cli.ViewEnvironmentCommand">
         <argument ref="environmentManager" />
+        <argument ref="peerManager" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/clean">
+      <action class="io.subutai.core.environment.cli.CleanEnvironmentCommand">
+        <argument ref="environmentManager" />
+        <argument ref="peerManager" />
       </action>
     </command>
   </command-bundle>

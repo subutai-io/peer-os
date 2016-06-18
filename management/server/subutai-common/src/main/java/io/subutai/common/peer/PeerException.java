@@ -13,6 +13,11 @@ public class PeerException extends Exception
     }
 
 
+    public PeerException()
+    {
+    }
+
+
     public PeerException( final String message )
     {
         super( message );

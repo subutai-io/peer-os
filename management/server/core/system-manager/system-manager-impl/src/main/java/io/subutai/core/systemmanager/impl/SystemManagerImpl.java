@@ -199,13 +199,12 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                    final String publicUrl, final String agentPort, final String publicSecurePort,
-                                    final String keyServer ) throws ConfigurationException
+    public void setNetworkSettings( final String securePortX1, final String securePortX2, final String publicUrl,
+                                    final String agentPort, final String publicSecurePort, final String keyServer )
+            throws ConfigurationException
     {
         SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
         SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-        SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
         SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
         SystemSettings.setKeyServer( keyServer );
 
@@ -214,7 +213,6 @@ public class SystemManagerImpl implements SystemManager
         {
             SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
             SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-            SystemSettings.setSecurePortX3( Integer.parseInt( securePortX3 ) );
             SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
                     Integer.parseInt( publicSecurePort ) );
@@ -288,7 +286,6 @@ public class SystemManagerImpl implements SystemManager
         dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
         dto.setSecurePortX1( networkSettings.getSecurePortX1() );
         dto.setSecurePortX2( networkSettings.getSecurePortX2() );
-        dto.setSecurePortX3( networkSettings.getSecurePortX3() );
         dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
         dto.setPublicUrl( networkSettings.getPublicUrl() );
         dto.setAgentPort( networkSettings.getAgentPort() );
@@ -368,12 +365,10 @@ public class SystemManagerImpl implements SystemManager
 
         pojo.setSecurePortX1( SystemSettings.getSecurePortX1() );
         pojo.setSecurePortX2( SystemSettings.getSecurePortX2() );
-        pojo.setSecurePortX3( SystemSettings.getSecurePortX3() );
         pojo.setPublicUrl( SystemSettings.getPublicUrl() );
         pojo.setAgentPort( SystemSettings.getAgentPort() );
         pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
         pojo.setKeyServer( SystemSettings.getKeyServer() );
-
         return pojo;
     }
 
