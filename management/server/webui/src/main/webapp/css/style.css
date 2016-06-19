@@ -2337,6 +2337,11 @@ td.b-main-table__status-col {
     margin: -12px 0 0 -12px;
 }
 
+.js-peer-load-screen .b-load-icon {
+	position: absolute!important;
+	left: 50%;
+}
+
 .b-popup-checkbox {
     line-height: 20px;
     vertical-align: middle;
