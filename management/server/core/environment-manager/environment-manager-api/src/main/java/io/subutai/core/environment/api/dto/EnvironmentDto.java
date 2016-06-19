@@ -15,8 +15,6 @@ public class EnvironmentDto
     private String id;
     @JsonProperty( "name" )
     private String name;
-    @JsonProperty( "relationDeclaration" )
-    private String relationDeclaration;
     @JsonProperty( "status" )
     private EnvironmentStatus status;
     @JsonIgnore
@@ -32,14 +30,12 @@ public class EnvironmentDto
     public EnvironmentDto( @JsonProperty( "id" ) final String id, @JsonProperty( "name" ) final String name,
                            @JsonProperty( "status" ) final EnvironmentStatus status,
                            @JsonProperty( "containers" ) final Set<ContainerDto> containers,
-                           @JsonProperty( "relationDeclaration" ) String relationDeclaration,
                            @JsonProperty( "dataSource" ) String dataSource )
     {
         this.id = id;
         this.name = name;
         this.status = status;
         this.containers = containers;
-        this.relationDeclaration = relationDeclaration;
         this.dataSource = dataSource;
     }
 
@@ -101,18 +97,6 @@ public class EnvironmentDto
     public void setContainers( final Set<ContainerDto> containers )
     {
         this.containers = containers;
-    }
-
-
-    public String getRelationDeclaration()
-    {
-        return relationDeclaration;
-    }
-
-
-    public void setRelationDeclaration( final String relationDeclaration )
-    {
-        this.relationDeclaration = relationDeclaration;
     }
 
 
