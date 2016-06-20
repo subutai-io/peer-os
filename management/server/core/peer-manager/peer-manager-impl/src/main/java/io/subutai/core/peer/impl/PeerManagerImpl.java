@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -25,8 +24,6 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.commons.lang3.time.DateUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -290,16 +287,15 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    //todo review and remove if not needed (when kurjun will be removed)
     private String generateActiveUserToken() throws PeerException
     {
         try
         {
             User user = identityManager.getActiveUser();
 
-            Date date = DateUtils.addMonths( new Date(), 10 );
-
             UserToken userToken =
-                    identityManager.createUserToken( user, "", "", "", TokenType.Permanent.getId(), date );
+                    identityManager.createUserToken( user, "", "", "", TokenType.Permanent.getId(), null );
 
             return userToken.getFullToken();
         }
