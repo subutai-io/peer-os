@@ -454,6 +454,10 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
             }
+            else
+            {
+                //todo check if token is expired, and issue new one if so
+            }
 
             token = userToken.getFullToken();
         }
@@ -1024,7 +1028,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( NoSuchAlgorithmException | NoSuchProviderException e )
         {
-            LOGGER.warn( "Error in #createTempUser" , e);
+            LOGGER.warn( "Error in #createTempUser", e );
         }
 
         return user;

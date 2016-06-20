@@ -225,6 +225,7 @@ class UserTokenDAO
         UserToken tk = null;
         try
         {
+            //todo select last one by date
             List<UserTokenEntity> result;
             TypedQuery<UserTokenEntity> qr =
                     em.createQuery( "select h from UserTokenEntity h where h.userId=:userId", UserTokenEntity.class );
