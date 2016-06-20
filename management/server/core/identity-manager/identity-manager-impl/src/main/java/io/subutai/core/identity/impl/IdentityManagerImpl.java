@@ -151,8 +151,7 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 100 );
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
+            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
             //***********************************************************
 
             //****Create Roles ******************************************
@@ -375,6 +374,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
+    //todo check all places where this method is called to make validDate not needed for persistent tokens
     public UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType,
                                       Date validDate )
     {
@@ -450,17 +450,12 @@ public class IdentityManagerImpl implements IdentityManager
         {
             UserToken userToken = getUserToken( user.getId() );
 
-            //no token yet, create new one
-            if ( userToken == null )
+            if ( userToken != null )
             {
-                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                removeUserToken( userToken.getTokenId() );
             }
-            //check if token is expired, and issue new one in this case
-            else if ( userToken.getValidDate() == null || System.currentTimeMillis() >= userToken.getValidDate()
-                                                                                                 .getTime() )
-            {
-                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
-            }
+
+            userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
 
             token = userToken.getFullToken();
         }
