@@ -19,8 +19,9 @@ public class SystemSettings
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
     public static final String DEFAULT_KEY_SERVER = "https://localhost:8443/rest/v1/pks";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
-    public static final int DEFAULT_PUBLIC_PORT = ChannelSettings.SECURE_PORT_X1;
-    public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
+    public static final int DEFAULT_PUBLIC_PORT = 8443;
+    public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
+    public static final int DEFAULT_AGENT_PORT = 7070;
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
     public static final String DEFAULT_LOCAL_KURJUN_REPO = "http://localhost:8081/kurjun";
 
@@ -135,19 +136,19 @@ public class SystemSettings
 
     public static int getSecurePortX1()
     {
-        return PROPERTIES.getInt( "securePortX1", ChannelSettings.SECURE_PORT_X1 );
+        return PROPERTIES.getInt( "securePortX1", DEFAULT_PUBLIC_PORT );
     }
 
 
     public static int getSecurePortX2()
     {
-        return PROPERTIES.getInt( "securePortX2", ChannelSettings.SECURE_PORT_X2 );
+        return PROPERTIES.getInt( "securePortX2", DEFAULT_PUBLIC_SECURE_PORT );
     }
 
 
     public static int getAgentPort()
     {
-        return PROPERTIES.getInt( "agentPort", ChannelSettings.AGENT_PORT );
+        return PROPERTIES.getInt( "agentPort", DEFAULT_AGENT_PORT );
     }
 
 

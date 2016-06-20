@@ -82,26 +82,21 @@ public class MessageContentUtil
 
 
     //***************************************************************************
-    public static int checkUrlAccessibility( final int currentStatus, HttpServletRequest req )
+    public static int checkUrlAccessibility( HttpServletRequest req )
     {
-        int status = currentStatus;
         int inPort = req.getLocalPort();
         String basePath = req.getRequestURI();
 
 
         if ( inPort == SystemSettings.getSecurePortX1() )
         {
-            if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
+            if ( !ChannelSettings.checkURLAccess( basePath ) )
             {
-                status = 1;
+                return 1;
             }
         }
-        else
-        {
-            status = 0;
-        }
 
-        return status;
+        return 0;
     }
 
 
