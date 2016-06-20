@@ -510,6 +510,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             if ( targetRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
             {
+                logger.error("You should pass relation token challenge first.");
                 throw new RelationVerificationException( "You should pass relation token challenge first." );
             }
             if ( targetRelation.getTrustedObject().equals( object ) )
@@ -521,6 +522,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
                 else
                 {
+                    logger.error("Your relation has insufficient permissions.");
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
             }
@@ -533,6 +535,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
                 else
                 {
+                    logger.error("Your relation has insufficient permissions.");
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
             }
@@ -547,22 +550,24 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             if ( sourceRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
             {
+                logger.error("You should pass relation token challenge first.");
                 throw new RelationVerificationException( "You should pass relation token challenge first." );
             }
             if ( sourceRelation.getTrustedObject().equals( object ) )
             {
                 // Requested relation should be less then or equal to relation that was granted
-
                 if ( compareRelationships( sourceRelation.getRelationInfo(), relationInfo ) >= 0 )
                 {
                     return;
                 }
                 else
                 {
+                    logger.error("Your relation has insufficient permissions");
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
             }
         }
+        logger.error("No relation exist.");
         throw new RelationVerificationException( "No relation exist." );
     }
 }

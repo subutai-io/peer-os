@@ -56,7 +56,7 @@ public class ExecAsyncCommand extends SubutaiShellCommandSupport
 
 
         RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
-        executor.executeAsync( hostId, daemon ? requestBuilder.daemon() : requestBuilder, new CommandCallback()
+        executor.authorizedExecute( hostId, daemon ? requestBuilder.daemon() : requestBuilder, new CommandCallback()
         {
             @Override
             public void onResponse( final Response response, final CommandResult commandResult )

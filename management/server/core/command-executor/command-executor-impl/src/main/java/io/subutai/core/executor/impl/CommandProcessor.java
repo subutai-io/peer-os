@@ -136,7 +136,7 @@ public class CommandProcessor implements RestProcessor
 
 
     @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
-    public void execute( final Request request, CommandCallback callback ) throws CommandException
+    public void executeSystemCall( final Request request, CommandCallback callback ) throws CommandException
     {
 
         //find target host
