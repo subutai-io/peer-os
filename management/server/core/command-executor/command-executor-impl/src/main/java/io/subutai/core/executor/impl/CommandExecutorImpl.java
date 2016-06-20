@@ -8,6 +8,9 @@ import java.util.Set;
 
 import javax.security.auth.Subject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.karaf.jaas.boot.principal.RolePrincipal;
 
 import com.google.common.base.Preconditions;
@@ -25,6 +28,7 @@ import io.subutai.core.executor.api.CommandExecutor;
  */
 public class CommandExecutorImpl implements CommandExecutor
 {
+    private static final Logger logger = LoggerFactory.getLogger(CommandExecutorImpl.class);
 
     protected CommandProcessor commandProcessor;
 
@@ -87,6 +91,7 @@ public class CommandExecutorImpl implements CommandExecutor
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
         Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
 
+        logger.debug("Authorized execute");
         Request request = requestBuilder.build( hostId );
 
         commandProcessor.executeSystemCall( request, callback );
@@ -141,6 +146,7 @@ public class CommandExecutorImpl implements CommandExecutor
         Preconditions.checkNotNull( requestBuilder, "Invalid request builder" );
         Preconditions.checkNotNull( requestBuilder, "Invalid callback" );
 
+        logger.debug("Authorized execute.");
         commandProcessor.executeSystemCall( requestBuilder.build( hostId ), callback );
     }
 }
