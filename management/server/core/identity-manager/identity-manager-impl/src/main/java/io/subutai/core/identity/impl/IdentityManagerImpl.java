@@ -425,14 +425,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void logout()
     {
-        try
-        {
-            //todo implement
-            //loginContext.logout();
-        }
-        catch ( Exception e )
-        {
-        }
+        //reserved for future
     }
 
 
