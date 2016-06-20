@@ -339,7 +339,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Session authenticateSession( String login, String password )
     {
         String sessionId;
-        Session session = null;
+        Session session;
         User user = null;
 
         //-------------------------------------
@@ -450,13 +450,16 @@ public class IdentityManagerImpl implements IdentityManager
         {
             UserToken userToken = getUserToken( user.getId() );
 
+            //no token yet, create new one
             if ( userToken == null )
             {
                 userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
             }
-            else
+            //check if token is expired, and issue new one in this case
+            else if ( userToken.getValidDate() == null || System.currentTimeMillis() >= userToken.getValidDate()
+                                                                                                 .getTime() )
             {
-                //todo check if token is expired, and issue new one if so
+                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
             }
 
             token = userToken.getFullToken();
@@ -1220,14 +1223,6 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 createUserDelegate( user, null, true );
             }
-            //***************************************
-
-            /*
-            if ( generateKeyPair && inited )
-            {
-                TemplateManager templateManager = ServiceLocator.getServiceNoCache( TemplateManager.class );
-                .createUserRepository( user.getUserName() );
-            }*/
         }
         catch ( Exception e )
         {
@@ -1723,22 +1718,6 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private void removeInvalidTokens()
-    {
-        identityDataService.removeInvalidTokens();
-    }
-
-
-    /* *************************************************
-    */
-    public DaoManager getDaoManager()
-    {
-        return daoManager;
-    }
-
-
-    /* *************************************************
-     */
     public void setDaoManager( DaoManager daoManager )
     {
         this.daoManager = daoManager;
@@ -1747,31 +1726,9 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    public SecurityManager getSecurityManager()
-    {
-        return securityManager;
-    }
-
-
-    /* *************************************************
-     */
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
-    }
-
-
-    /* *************************************************
-     */
-    private boolean validUsername( String username )
-    {
-        if ( username.length() == 0 || username.isEmpty() || username.equalsIgnoreCase( "token" ) )
-        {
-            return false;
-        }
-        User user = identityDataService.getUserByUsername( username );
-
-        return user == null;
     }
 
 
