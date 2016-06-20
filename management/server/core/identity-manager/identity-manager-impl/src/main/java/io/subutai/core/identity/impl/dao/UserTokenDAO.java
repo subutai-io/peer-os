@@ -227,7 +227,8 @@ class UserTokenDAO
         {
             List<UserTokenEntity> result;
             TypedQuery<UserTokenEntity> qr =
-                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId", UserTokenEntity.class );
+                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId order by h.validDate desc",
+                            UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
@@ -262,9 +263,10 @@ class UserTokenDAO
         try
         {
             List<UserTokenEntity> result;
-            TypedQuery<UserTokenEntity> qr =
-                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId and h.type=:tokenType",
-                            UserTokenEntity.class );
+            TypedQuery<UserTokenEntity> qr = em.createQuery(
+                    "select h from UserTokenEntity h where h.userId=:userId and h.type=:tokenType order by h"
+                            + ".validDate desc",
+                    UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "tokenType", tokenType );
 
@@ -302,7 +304,8 @@ class UserTokenDAO
         {
             List<UserTokenEntity> result;
             TypedQuery<UserTokenEntity> qr = em.createQuery(
-                    "select h from UserTokenEntity h where h.userId=:userId and h.validDate>=:validDate",
+                    "select h from UserTokenEntity h where h.userId=:userId and h.validDate>=:validDate order by h"
+                            + ".validDate desc",
                     UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "validDate", new Date( System.currentTimeMillis() ) );
