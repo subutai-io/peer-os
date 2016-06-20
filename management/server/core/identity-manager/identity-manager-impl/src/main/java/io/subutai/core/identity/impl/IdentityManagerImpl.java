@@ -374,7 +374,6 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @RolesAllowed( "Identity-Management|Write" )
     @Override
-    //todo check all places where this method is called to make validDate not needed for persistent tokens
     public UserToken createUserToken( User user, String token, String secret, String issuer, int tokenType,
                                       Date validDate )
     {
