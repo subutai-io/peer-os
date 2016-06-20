@@ -2,6 +2,8 @@ package io.subutai.webui;
 
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -13,12 +15,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
 import io.subutai.common.security.exception.SessionBlockedException;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.Permission;
+import io.subutai.core.identity.api.model.Role;
 import io.subutai.core.identity.api.model.User;
 
 
@@ -121,8 +126,24 @@ public class Login extends HttpServlet
         Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
         //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
 
+        List<Role> roles = user.getRoles();
+        Set<String> p = Sets.newHashSet();
+        for ( Role role : roles )
+        {
+            List<Permission> permissions = role.getPermissions();
+            for ( Permission permission : permissions )
+            {
+                List<String> perms = permission.asString();
+                p.addAll( perms );
+            }
+        }
+
+        Cookie userPermissions = new Cookie( "permissions", p.toString() );
+        logger.debug(p.toString());
+
         response.addCookie( ctoken );
         response.addCookie( fingerprint );
+        response.addCookie( userPermissions );
     }
 
     @Override
