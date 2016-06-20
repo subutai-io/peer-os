@@ -289,7 +289,7 @@ public class PeerManagerImpl implements PeerManager
         }
     }
 
-
+    //todo review and remove if not needed (when kurjun will be removed)
     private String generateActiveUserToken() throws PeerException
     {
         try
