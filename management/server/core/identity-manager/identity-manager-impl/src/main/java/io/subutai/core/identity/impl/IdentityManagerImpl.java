@@ -440,7 +440,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public String getUserToken( String userName, String password )
+    public String getNewUserToken( String userName, String password )
     {
         String token = "";
 
