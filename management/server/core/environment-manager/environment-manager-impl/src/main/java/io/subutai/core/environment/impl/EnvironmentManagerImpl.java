@@ -668,7 +668,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
-                getSshKeyAdditionWorkflow( environment, sshKey, operationTracker );
+                getSshKeyAdditionWorkflow( environment, sshKey.trim(), operationTracker );
 
         registerActiveWorkflow( environment, sshKeyAdditionWorkflow );
 
@@ -719,7 +719,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
-                getSshKeyRemovalWorkflow( environment, sshKey, operationTracker );
+                getSshKeyRemovalWorkflow( environment, sshKey.trim(), operationTracker );
 
         registerActiveWorkflow( environment, sshKeyRemovalWorkflow );
 
