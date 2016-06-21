@@ -28,7 +28,7 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 			}
 
 			$rootScope.notifications = {
-				"message": "Life is hard when you're stupid dude! Install the subutai browser plugin for added security with end to end encryption.",
+				"message": "Install the subutai browser plugin for added security with end to end encryption.",
 				"browserPluginMessage": true,
 				"date": moment().format('MMMM Do YYYY, HH:mm:ss'),
 				"links": [

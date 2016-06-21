@@ -56,7 +56,18 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 			headers: {'Content-Type': 'application/json'}
 		}).success(function (data) {
 			localStorage.setItem('currentUser', data.userName);
-			vm.currentUser = localStorage.getItem('currentUser');
+
+            var perms = [];
+            for( var i = 0; i < data.roles.length; i++ )
+            {
+                for( var j = 0; j < data.roles[i].permissions.length; j++ )
+                {
+                    perms.push(data.roles[i].permissions[j].object);
+                }
+            }
+
+            localStorage.setItem('currentUserPermissions', perms);
+            vm.currentUser = localStorage.getItem('currentUser');
 		});
 	}
 

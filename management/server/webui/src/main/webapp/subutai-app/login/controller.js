@@ -101,7 +101,6 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 					postData += '&newpassword=' + vm.newPass;
 
 				loginSrv.login( postData ).success(function(data){
-					localStorage.setItem('currentUser', vm.name);
 					$rootScope.currentUser = vm.name;
 					$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 					//$state.go('home');
@@ -113,7 +112,6 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 		}
 		else {
 			loginSrv.login( postData ).success(function(data){
-				localStorage.setItem('currentUser', vm.name);
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 				sessionStorage.removeItem('notifications');

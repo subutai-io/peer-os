@@ -6,6 +6,7 @@
 
 			<ul>
 				<li class="b-tabs-menu__item"
+					ng-show="consoleViewCtrl.admin"
 					ng-class="consoleViewCtrl.currentType == 'peer' ? 'b-tabs-menu__item_active' : ''" 
 					ng-click="consoleViewCtrl.setCurrentType('peer')">
 					Peer
