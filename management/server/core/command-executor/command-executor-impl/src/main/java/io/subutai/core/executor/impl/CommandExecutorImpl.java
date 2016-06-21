@@ -64,11 +64,15 @@ public class CommandExecutorImpl implements CommandExecutor
         if ( subject != null )
         {
             Set<Principal> principalSet = subject.getPrincipals();
-            if ( principalSet != null )
+            if ( principalSet != null && !principalSet.contains( rolePrincipal ) )
             {
                 principalSet.add( rolePrincipal );
                 commandProcessor.executeSystemCall( request, callback );
                 principalSet.remove( rolePrincipal );
+            }
+            else
+            {
+                commandProcessor.executeSystemCall( request, callback );
             }
         }
         return commandProcessor.getResult( request.getCommandId() );
@@ -121,11 +125,15 @@ public class CommandExecutorImpl implements CommandExecutor
         if ( subject != null )
         {
             Set<Principal> principalSet = subject.getPrincipals();
-            if ( principalSet != null )
+            if ( principalSet != null && !principalSet.contains( rolePrincipal ))
             {
                 principalSet.add( rolePrincipal );
                 commandProcessor.executeSystemCall( requestBuilder.build( hostId ), callback );
                 principalSet.remove( rolePrincipal );
+            }
+            else
+            {
+                commandProcessor.executeSystemCall( requestBuilder.build( hostId ), callback );
             }
         }
     }
