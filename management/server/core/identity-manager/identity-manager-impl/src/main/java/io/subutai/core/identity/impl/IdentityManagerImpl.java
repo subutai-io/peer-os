@@ -151,8 +151,7 @@ public class IdentityManagerImpl implements IdentityManager
             //***********************************************************
 
             //***Create Token *******************************************
-            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 100 );
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
+            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
             //***********************************************************
 
             //****Create Roles ******************************************
@@ -425,14 +424,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void logout()
     {
-        try
-        {
-            //todo implement
-            //loginContext.logout();
-        }
-        catch ( Exception e )
-        {
-        }
+        //reserved for future
     }
 
 
@@ -440,7 +432,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public String getUserToken( String userName, String password )
+    public String getNewUserToken( String userName, String password )
     {
         String token = "";
 
@@ -450,17 +442,12 @@ public class IdentityManagerImpl implements IdentityManager
         {
             UserToken userToken = getUserToken( user.getId() );
 
-            //no token yet, create new one
-            if ( userToken == null )
+            if ( userToken != null )
             {
-                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                removeUserToken( userToken.getTokenId() );
             }
-            //check if token is expired, and issue new one in this case
-            else if ( userToken.getValidDate() == null || System.currentTimeMillis() >= userToken.getValidDate()
-                                                                                                 .getTime() )
-            {
-                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
-            }
+
+            userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
 
             token = userToken.getFullToken();
         }
