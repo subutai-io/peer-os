@@ -27,7 +27,7 @@ public class RestServiceImpl implements RestService
     @Override
     public String createTokenPOST( final String userName, final String password )
     {
-        String token = identityManager.getNewUserToken( userName, password );
+        String token = identityManager.getUserToken( userName, password );
 
         if ( !Strings.isNullOrEmpty( token ) )
         {
@@ -53,7 +53,7 @@ public class RestServiceImpl implements RestService
         try
         {
             //password = URLDecoder.decode( password, "UTF-8" );
-            String token = identityManager.getNewUserToken( userName, password );
+            String token = identityManager.getUserToken( userName, password );
 
             if ( !Strings.isNullOrEmpty( token ) )
             {

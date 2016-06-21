@@ -55,7 +55,7 @@ public class Login extends HttpServlet
                 {
                     if ( identityManager != null )
                     {
-                        sptoken = identityManager.getNewUserToken( username, password );
+                        sptoken = identityManager.getUserToken( username, password );
                         user = identityManager.authenticateByToken( sptoken );
                     }
                     else
