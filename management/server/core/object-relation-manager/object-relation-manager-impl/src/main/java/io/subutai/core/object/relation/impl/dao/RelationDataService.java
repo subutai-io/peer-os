@@ -69,7 +69,36 @@ public class RelationDataService
         catch ( Exception ex )
         {
             logger.error( "Error persisting object", ex );
+
             daoManager.rollBackTransaction( em );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
+    public void updateBatch( List<Object> relationLinks )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+
+            for ( Object relationLink : relationLinks )
+            {
+                em.merge( relationLink );
+            }
+
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+
+            logger.error( "Error updating relations", ex );
         }
         finally
         {

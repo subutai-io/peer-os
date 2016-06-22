@@ -45,8 +45,6 @@ public interface Environment extends RelationLink
     EnvironmentStatus getStatus();
 
 
-    String getRelationDeclaration();
-
     /**
      * Returns creation timestamp
      */

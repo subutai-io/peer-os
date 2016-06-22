@@ -107,7 +107,7 @@ public class RestServiceImpl implements RestService
             }
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(), containers,
-                            environment.getRelationDeclaration(), "subutai" );
+                            "subutai" );
             return Response.ok( environmentDto ).build();
         }
         catch ( Exception e )

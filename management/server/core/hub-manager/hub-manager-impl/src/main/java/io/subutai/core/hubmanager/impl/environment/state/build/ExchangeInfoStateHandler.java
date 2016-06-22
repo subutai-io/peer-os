@@ -1,10 +1,6 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
-import java.util.Date;
-
-import org.apache.commons.lang3.time.DateUtils;
-
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -12,6 +8,7 @@ import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+
 
 public class ExchangeInfoStateHandler extends StateHandler
 {
@@ -32,9 +29,7 @@ public class ExchangeInfoStateHandler extends StateHandler
         UserToken token = ctx.identityManager.getUserToken( user.getId() );
         if ( token == null )
         {
-            Date validDate = DateUtils.addYears( new Date(), 3 );
-            token = ctx.identityManager
-                    .createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
+            token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
         }
         resultDto.setEnvOwnerToken( token.getFullToken() );
         resultDto.setEnvOwnerTokenId( user.getAuthId() );

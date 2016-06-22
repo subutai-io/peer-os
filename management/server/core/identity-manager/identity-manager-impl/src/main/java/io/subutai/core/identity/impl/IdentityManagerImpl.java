@@ -145,14 +145,17 @@ public class IdentityManagerImpl implements IdentityManager
 
             //***Create User ********************************************
 
-            User internal = createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", 1, 3, false, false );
+            User internal =
+                    createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", UserType.System.getId(), 3,
+                            false, false );
             //User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
-            User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, 3, true, true );
+            User admin =
+                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", UserType.Regular.getId(), 3,
+                            true, true );
             //***********************************************************
 
             //***Create Token *******************************************
-            Date tokenDate = DateUtils.addMonths( new Date( System.currentTimeMillis() ), 100 );
-            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), tokenDate );
+            createUserToken( internal, "", "", "", TokenType.Permanent.getId(), null );
             //***********************************************************
 
             //****Create Roles ******************************************
@@ -339,7 +342,7 @@ public class IdentityManagerImpl implements IdentityManager
     public Session authenticateSession( String login, String password )
     {
         String sessionId;
-        Session session = null;
+        Session session;
         User user = null;
 
         //-------------------------------------
@@ -425,14 +428,7 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public void logout()
     {
-        try
-        {
-            //todo implement
-            //loginContext.logout();
-        }
-        catch ( Exception e )
-        {
-        }
+        //reserved for future
     }
 
 
@@ -453,6 +449,15 @@ public class IdentityManagerImpl implements IdentityManager
             if ( userToken == null )
             {
                 userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+            }
+            else
+            {
+                if ( userToken.getType() == TokenType.Session.getId() )
+                {
+                    removeUserToken( userToken.getTokenId() );
+
+                    userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                }
             }
 
             token = userToken.getFullToken();
@@ -613,7 +618,13 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( userToken != null )
         {
-            if ( TokenUtil.verifySignatureAndDate( token, userToken.getSecret() ) )
+            if ( TokenType.Permanent.getId() == userToken.getType() && TokenUtil
+                    .verifySignature( token, userToken.getSecret() ) )
+            {
+                return getUser( userToken.getUserId() );
+            }
+            else if ( TokenType.Session.getId() == userToken.getType() && TokenUtil
+                    .verifySignatureAndDate( token, userToken.getSecret() ) )
             {
                 return getUser( userToken.getUserId() );
             }
@@ -1024,7 +1035,7 @@ public class IdentityManagerImpl implements IdentityManager
         }
         catch ( NoSuchAlgorithmException | NoSuchProviderException e )
         {
-            LOGGER.warn( "Error in #createTempUser" , e);
+            LOGGER.warn( "Error in #createTempUser", e );
         }
 
         return user;
@@ -1216,14 +1227,6 @@ public class IdentityManagerImpl implements IdentityManager
             {
                 createUserDelegate( user, null, true );
             }
-            //***************************************
-
-            /*
-            if ( generateKeyPair && inited )
-            {
-                TemplateManager templateManager = ServiceLocator.getServiceNoCache( TemplateManager.class );
-                .createUserRepository( user.getUserName() );
-            }*/
         }
         catch ( Exception e )
         {
@@ -1719,22 +1722,6 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    private void removeInvalidTokens()
-    {
-        identityDataService.removeInvalidTokens();
-    }
-
-
-    /* *************************************************
-    */
-    public DaoManager getDaoManager()
-    {
-        return daoManager;
-    }
-
-
-    /* *************************************************
-     */
     public void setDaoManager( DaoManager daoManager )
     {
         this.daoManager = daoManager;
@@ -1743,31 +1730,9 @@ public class IdentityManagerImpl implements IdentityManager
 
     /* *************************************************
      */
-    public SecurityManager getSecurityManager()
-    {
-        return securityManager;
-    }
-
-
-    /* *************************************************
-     */
     public void setSecurityManager( final SecurityManager securityManager )
     {
         this.securityManager = securityManager;
-    }
-
-
-    /* *************************************************
-     */
-    private boolean validUsername( String username )
-    {
-        if ( username.length() == 0 || username.isEmpty() || username.equalsIgnoreCase( "token" ) )
-        {
-            return false;
-        }
-        User user = identityDataService.getUserByUsername( username );
-
-        return user == null;
     }
 
 

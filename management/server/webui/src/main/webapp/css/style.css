@@ -2331,10 +2331,16 @@ td.b-main-table__status-col {
 }
 
 .b-loading-screen .b-load-icon {
-    position: absolute;
+    position: fixed;
     top: 50%;
-    left: 50%;
+    left: 60%;
     margin: -12px 0 0 -12px;
+}
+
+.js-peer-load-screen .b-load-icon,
+.js-hub-screen .b-load-icon {
+	position: absolute!important;
+	left: 50%;
 }
 
 .b-popup-checkbox {

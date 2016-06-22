@@ -108,6 +108,37 @@ public class TunnelHelper
         }
     }
 
+    public static TunnelInfoDto getPeerTunnelState( String link , ConfigManager configManager)
+    {
+        try
+        {
+            WebClient client = configManager.getTrustedWebClientWithAuth( link, configManager.getHubIp() );
+            Response res = client.get();
+
+            LOG.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
+
+            if ( res.getStatus() != HttpStatus.SC_OK )
+            {
+                LOG.error( "Error to get tunnel  data from Hub: HTTP {} - {}", res.getStatus(),
+                        res.getStatusInfo().getReasonPhrase() );
+
+                return null;
+            }
+
+            byte[] encryptedContent = configManager.readContent( res );
+
+            byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
+
+            return JsonUtil.fromCbor( plainContent, TunnelInfoDto.class );
+        }
+        catch ( Exception e )
+        {
+            sendError( link, e.getMessage(), configManager );
+            LOG.error( e.getMessage() );
+            return null;
+        }
+    }
+
 
     public static TunnelInfoDto parseResult( String link, String result, ConfigManager configManager )
     {

@@ -27,8 +27,8 @@ import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.READY;
 public class TunnelProcessor implements StateLinkProcessor
 {
     private final Logger LOG = LoggerFactory.getLogger( getClass() );
-    private static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
-    private static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
+    public static final String CREATE_TUNNEL_COMMAND = "subutai tunnel add %s:%s %s -g";
+    public static final String DELETE_TUNNEL_COMMAND = "subutai tunnel del %s:%s";
 
     private PeerManager peerManager;
     private ConfigManager configManager;
