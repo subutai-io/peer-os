@@ -58,6 +58,10 @@ public class Login extends HttpServlet
                         sptoken = identityManager.getNewUserToken( username, password );
                         user = identityManager.authenticateByToken( sptoken );
                     }
+                    else
+                    {
+                        throw new Exception( "Karaf Auth Module is loading, please try again later" );
+                    }
                 }
                 else if ( !Strings.isNullOrEmpty( sptoken ) )
                 {

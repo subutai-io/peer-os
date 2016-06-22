@@ -4,6 +4,7 @@
 		<div class="b-tabs-menu b-tabs-menu_header">
 			<ul>
 				<li class="b-tabs-menu__item"
+				ng-show="settingsAdvancedCtrl.admin"
 				ng-click="settingsAdvancedCtrl.activeTab = 'karafconsole'"
 				ng-class="settingsAdvancedCtrl.activeTab == 'karafconsole' ? 'b-tabs-menu__item_active' : ''">
 					Console
