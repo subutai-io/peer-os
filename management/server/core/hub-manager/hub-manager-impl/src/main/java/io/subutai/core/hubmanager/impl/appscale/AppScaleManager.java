@@ -99,7 +99,9 @@ public class AppScaleManager
 
         String cmd = format( "sudo /var/lib/appscale/setup.sh %s %s %s", config.getUserDomain(), email, password );
 
-        execute( containerHost, cmd );
+        String skipSymbols = cmd.replaceAll( "\n","" );
+
+        execute( containerHost, skipSymbols );
     }
 
 
