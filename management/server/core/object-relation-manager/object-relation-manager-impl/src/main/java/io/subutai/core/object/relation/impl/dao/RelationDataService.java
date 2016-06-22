@@ -103,7 +103,7 @@ public class RelationDataService
     }
 
 
-    public void removeAllRelationLinks( RelationLink link )
+    public void removeAllRelationsWithLink( RelationLink link )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
@@ -111,9 +111,16 @@ public class RelationDataService
         {
             daoManager.startTransaction( em );
 
-            Query qr = em.createQuery( "DELETE FROM RelationImpl AS rln WHERE rln.source.linkId=:id OR "
-                    + "rln.target.linkId=:id OR rln.trustedObject.linkId=:id" );
-            qr.setParameter( "id", link.getLinkId() );
+            Query qr = em.createQuery( "DELETE FROM RelationImpl AS rln"
+                    + " WHERE rln.source.uniqueIdentifier=:id"
+                    + " OR rln.target.uniqueIdentifier=:id"
+                    + " OR rln.trustedObject.uniqueIdentifier=:id" );
+            qr.setParameter( "id", link.getUniqueIdentifier() );
+            qr.executeUpdate();
+
+            qr = em.createQuery( "DELETE FROM RelationLinkImpl AS link"
+                    + " WHERE link.uniqueIdentifier=:id" );
+            qr.setParameter( "id", link.getUniqueIdentifier() );
             qr.executeUpdate();
 
             daoManager.commitTransaction( em );
@@ -155,8 +162,8 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source.linkId=:source ORDER BY ss.relationStatus DESC" );
-            qr.setParameter( "source", source.getLinkId() );
+                    + " where ss.source.uniqueIdentifier=:source ORDER BY ss.relationStatus DESC" );
+            qr.setParameter( "source", source.getUniqueIdentifier() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -177,9 +184,9 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.target.linkId=:target ORDER BY ss.relationStatus DESC" );
-            qr.setParameter( "target", target.getLinkId() );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
+                    + " WHERE ss.target.uniqueIdentifier=:target ORDER BY ss.relationStatus DESC" );
+            qr.setParameter( "target", target.getUniqueIdentifier() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -201,9 +208,9 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery(
-                    "select ss from RelationImpl AS ss" + " where ss.trustedObject.linkId=:trustedObject "
+                    "select ss from RelationImpl AS ss" + " where ss.trustedObject.uniqueIdentifier=:trustedObject "
                             + "and ss.relationInfo.ownershipLevel=:ownershipLevel ORDER BY ss.relationStatus DESC" );
-            qr.setParameter( "trustedObject", trustedObject.getLinkId() );
+            qr.setParameter( "trustedObject", trustedObject.getUniqueIdentifier() );
             qr.setParameter( "ownershipLevel", ownership.getLevel() );
             result.addAll( qr.getResultList() );
         }
@@ -225,7 +232,7 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss ORDER BY ss.relationStatus DESC" );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss ORDER BY ss.relationStatus DESC" );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -246,9 +253,9 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.trustedObject.linkId=:trustedObject ORDER BY ss.relationStatus DESC" );
-            qr.setParameter( "trustedObject", object.getLinkId() );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
+                    + " WHERE ss.trustedObject.uniqueIdentifier=:trustedObject ORDER BY ss.relationStatus DESC" );
+            qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -269,10 +276,10 @@ public class RelationDataService
         Relation result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject" );
-            qr.setParameter( "source", source.getLinkId() );
-            qr.setParameter( "trustedObject", object.getLinkId() );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
+                    + " where ss.source.uniqueIdentifier=:source AND ss.trustedObject.uniqueIdentifier=:trustedObject" );
+            qr.setParameter( "source", source.getUniqueIdentifier() );
+            qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             List<Relation> list = qr.getResultList();
 
             if ( list.size() > 0 )
@@ -300,11 +307,12 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source.linkId=:source AND ss.target.linkId=:target AND ss.trustedObject"
-                    + ".linkId=:trustedObject" );
-            qr.setParameter( "source", source.getLinkId() );
-            qr.setParameter( "target", target.getLinkId() );
-            qr.setParameter( "trustedObject", object.getLinkId() );
+                    + " WHERE ss.source.uniqueIdentifier=:source"
+                    + " AND ss.target.uniqueIdentifier=:target"
+                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject" );
+            qr.setParameter( "source", source.getUniqueIdentifier() );
+            qr.setParameter( "target", target.getUniqueIdentifier() );
+            qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             List<Relation> list = qr.getResultList();
 
             if ( list.size() > 0 )
@@ -330,11 +338,12 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.source.linkId=:source AND ss.trustedObject.linkId=:trustedObject ORDER BY ss"
-                    + ".relationStatus DESC" );
-            qr.setParameter( "source", source.getLinkId() );
-            qr.setParameter( "trustedObject", object.getLinkId() );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
+                    + " WHERE ss.source.uniqueIdentifier=:source"
+                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject"
+                    + " ORDER BY ss.relationStatus DESC" );
+            qr.setParameter( "source", source.getUniqueIdentifier() );
+            qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -355,10 +364,11 @@ public class RelationDataService
         Relation result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject" );
-            qr.setParameter( "target", target.getLinkId() );
-            qr.setParameter( "trustedObject", object.getLinkId() );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
+                    + " WHERE ss.target.uniqueIdentifier=:target"
+                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject" );
+            qr.setParameter( "target", target.getUniqueIdentifier() );
+            qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             List<Relation> list = qr.getResultList();
 
             if ( list.size() > 0 )
@@ -384,11 +394,12 @@ public class RelationDataService
         List<Relation> result = Lists.newArrayList();
         try
         {
-            Query qr = em.createQuery( "select ss from RelationImpl AS ss"
-                    + " where ss.target.linkId=:target AND ss.trustedObject.linkId=:trustedObject ORDER BY ss"
-                    + ".relationStatus DESC" );
-            qr.setParameter( "target", target.getLinkId() );
-            qr.setParameter( "trustedObject", object.getLinkId() );
+            Query qr = em.createQuery( "SELECT ss FROM RelationImpl AS ss"
+                    + " WHERE ss.target.uniqueIdentifier=:target"
+                    + " AND ss.trustedObject.uniqueIdentifier=:trustedObject"
+                    + " ORDER BY ss.relationStatus DESC" );
+            qr.setParameter( "target", target.getUniqueIdentifier() );
+            qr.setParameter( "trustedObject", object.getUniqueIdentifier() );
             result.addAll( qr.getResultList() );
         }
         catch ( Exception ex )
@@ -403,14 +414,15 @@ public class RelationDataService
     }
 
 
-    public RelationLink findRelationLink( final RelationLink relationLink )
+    public RelationLink findRelationLinkByIdClass( final RelationLink relationLink )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
         RelationLink result = null;
         try
         {
-            Query qr = em.createQuery( "select ss from RelationLinkImpl AS ss"
-                    + " where ss.uniqueIdentifier=:uniqueIdentifier AND ss.classPath=:classPath" );
+            Query qr = em.createQuery( "SELECT ss FROM RelationLinkImpl AS ss"
+                    + " WHERE ss.uniqueIdentifier=:uniqueIdentifier"
+                    + " AND ss.classPath=:classPath" );
             qr.setParameter( "uniqueIdentifier", relationLink.getUniqueIdentifier() );
             qr.setParameter( "classPath", relationLink.getClassPath() );
             List<RelationLink> list = qr.getResultList();
@@ -439,7 +451,7 @@ public class RelationDataService
         try
         {
             Query qr = em.createQuery(
-                    "select ss from RelationLinkImpl AS ss" + " where ss.uniqueIdentifier=:uniqueIdentifier" );
+                    "SELECT ss FROM RelationLinkImpl AS ss" + " WHERE ss.uniqueIdentifier=:uniqueIdentifier" );
             qr.setParameter( "uniqueIdentifier", uniqueIdentifier );
             List<RelationLink> list = qr.getResultList();
 
@@ -467,7 +479,7 @@ public class RelationDataService
         try
         {
             TypedQuery<RelationChallengeImpl> qr =
-                    em.createQuery( "select rt from RelationChallengeImpl AS rt" + " where rt" + ".token=:token",
+                    em.createQuery( "SELECT rt FROM RelationChallengeImpl AS rt" + " where rt" + ".token=:token",
                             RelationChallengeImpl.class );
             qr.setParameter( "token", token );
             List<RelationChallengeImpl> list = qr.getResultList();

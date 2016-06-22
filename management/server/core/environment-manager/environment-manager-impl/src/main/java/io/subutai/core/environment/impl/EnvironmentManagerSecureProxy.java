@@ -128,37 +128,6 @@ public class EnvironmentManagerSecureProxy
     }
 
 
-    private void buildRelation( Environment environment )
-    {
-        try
-        {
-            User activeUser = identityManager.getActiveUser();
-            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
-
-            // User - Delegated user - Environment
-            // Delegated user - Delegated user - Environment
-            // Delegated user - Environment - Container
-            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-            Map<String, String> traits = relationInfoMeta.getRelationTraits();
-            traits.put( "read", "true" );
-            traits.put( "write", "true" );
-            traits.put( "update", "true" );
-            traits.put( "delete", "true" );
-            traits.put( "ownership", Ownership.USER.getName() );
-
-            RelationMeta relationMeta =
-                    new RelationMeta( delegatedUser, delegatedUser, environment, activeUser.getSecurityKeyId() );
-            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
-            relation.setRelationStatus( RelationStatus.VERIFIED );
-            relationManager.saveRelation( relation );
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "Error message.", e );
-        }
-    }
-
-
     private Map<String, String> traitsBuilder( String traitCollection )
     {
         Map<String, String> keyValue = Maps.newHashMap();
@@ -245,9 +214,7 @@ public class EnvironmentManagerSecureProxy
     public Environment createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
-        Environment environment = environmentManager.createEnvironment( topology, async );
-        buildRelation( environment );
-        return environment;
+        return environmentManager.createEnvironment( topology, async );
     }
 
 
@@ -264,8 +231,7 @@ public class EnvironmentManagerSecureProxy
         TrackerOperation operationTracker = tracker.createTrackerOperation( EnvironmentManagerImpl.MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
-        Environment environment = environmentManager.createEnvironment( topology, async, operationTracker );
-        buildRelation( environment );
+        environmentManager.createEnvironment( topology, async, operationTracker );
 
         return operationTracker.getId();
     }

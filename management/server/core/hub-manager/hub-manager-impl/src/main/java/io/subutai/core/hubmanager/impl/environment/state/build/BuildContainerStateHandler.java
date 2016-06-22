@@ -76,7 +76,7 @@ public class BuildContainerStateHandler extends StateHandler
     private void setupPeerEnvironmentKey( EnvironmentPeerDto peerDto ) throws PeerException, PGPException
     {
         RelationLinkDto envLink = new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
-                PermissionObject.EnvironmentManagement.getName(), "" );
+                PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
 
         ctx.localPeer.createPeerEnvironmentKeyPair( envLink );
     }

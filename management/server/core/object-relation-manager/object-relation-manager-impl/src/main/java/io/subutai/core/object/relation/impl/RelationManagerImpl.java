@@ -20,6 +20,8 @@ import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.object.relation.impl.dao.RelationDataService;
 import io.subutai.core.object.relation.impl.model.RelationChallengeImpl;
 import io.subutai.core.object.relation.impl.model.RelationImpl;
@@ -130,6 +132,17 @@ public class RelationManagerImpl implements RelationManager
     public Relation buildRelation( final RelationInfoMeta relationInfoMeta, final RelationMeta relationMeta )
     {
         RelationInfoImpl relationInfo = new RelationInfoImpl( relationInfoMeta );
+        if ( relationMeta.getSource() == null )
+        {
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate delegatedUser = null;
+            if ( activeUser != null )
+            {
+                delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+            }
+            relationMeta.setSource( delegatedUser );
+        }
+
         RelationImpl relation =
                 new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(), relationMeta.getObject(),
                         relationInfo, relationMeta.getKeyId() );
@@ -252,7 +265,7 @@ public class RelationManagerImpl implements RelationManager
     @Override
     public void removeRelation( final RelationLink link )
     {
-        relationDataService.removeAllRelationLinks( link );
+        relationDataService.removeAllRelationsWithLink( link );
     }
 
 

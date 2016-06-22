@@ -111,6 +111,7 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
+import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainersRequestListener;
@@ -807,6 +808,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
 
+            buildEnvContainerRelation( containerHost );
+
             LOG.debug( "New container host registered: " + containerHost.getHostname() );
         }
         catch ( Exception e )
@@ -815,6 +818,67 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             throw new PeerException( String.format( "Error registering container: %s", e.getMessage() ), e );
         }
+    }
+
+
+    protected void buildEnvContainerRelation( final ContainerHostEntity containerHost ){
+        RelationLink envLink = new RelationLink()
+        {
+            @Override
+            public String getLinkId()
+            {
+                return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+            }
+
+
+            @Override
+            public String getUniqueIdentifier()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+
+
+            @Override
+            public String getClassPath()
+            {
+                return "EnvironmentImpl";
+            }
+
+
+            @Override
+            public String getContext()
+            {
+                return PermissionObject.EnvironmentManagement.getName();
+            }
+
+
+            @Override
+            public String getKeyId()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+        };
+
+        containerHost.getOwnerId();
+
+        RelationInfoMeta relationInfoMeta =
+                new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+        relationTraits.put( "containerLimit", "unlimited" );
+        relationTraits.put( "bandwidthLimit", "unlimited" );
+        relationTraits.put( "read", "true" );
+        relationTraits.put( "write", "true" );
+        relationTraits.put( "update", "true" );
+        relationTraits.put( "delete", "true" );
+        relationTraits.put( "ownership", Ownership.USER.getName() );
+
+        User activeUser = identityManager.getActiveUser();
+        UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+
+        RelationMeta relationMeta = new RelationMeta( delegatedUser, envLink, containerHost, envLink.getKeyId() );
+        Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+        relation.setRelationStatus( RelationStatus.VERIFIED );
+        relationManager.saveRelation( relation );
     }
 
 
@@ -1721,7 +1785,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private void buildPeerEnvRelation( final RelationLink envLink )
     {
 
-        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment.
+        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment. Planned to use it in future
+        // for peer policy feature between peers.
 
         User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
         if ( peerOwner != null )
@@ -1742,6 +1807,37 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
+        }
+        buildRelation( envLink );
+    }
+
+    private void buildRelation( final RelationLink envLink )
+    {
+        try
+        {
+            User activeUser = identityManager.getActiveUser();
+            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+
+            // User           - Delegated user - Environment
+            // Delegated user - Delegated user - Environment
+            // Delegated user - Environment    - Container
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
+
+            RelationMeta relationMeta =
+                    new RelationMeta( delegatedUser, delegatedUser, envLink, activeUser.getSecurityKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error message.", e );
         }
     }
 
