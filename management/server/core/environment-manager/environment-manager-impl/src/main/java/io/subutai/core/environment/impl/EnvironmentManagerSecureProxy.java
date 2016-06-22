@@ -265,6 +265,7 @@ public class EnvironmentManagerSecureProxy
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
         Environment environment = environmentManager.createEnvironment( topology, async, operationTracker );
+
         buildRelation( environment );
 
         return operationTracker.getId();

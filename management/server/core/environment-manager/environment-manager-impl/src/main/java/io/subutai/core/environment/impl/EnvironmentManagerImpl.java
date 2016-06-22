@@ -668,7 +668,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
-                getSshKeyAdditionWorkflow( environment, sshKey, operationTracker );
+                getSshKeyAdditionWorkflow( environment, sshKey.trim(), operationTracker );
 
         registerActiveWorkflow( environment, sshKeyAdditionWorkflow );
 
@@ -719,7 +719,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
-                getSshKeyRemovalWorkflow( environment, sshKey, operationTracker );
+                getSshKeyRemovalWorkflow( environment, sshKey.trim(), operationTracker );
 
         registerActiveWorkflow( environment, sshKeyRemovalWorkflow );
 
@@ -1296,9 +1296,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         environment.setUserId( delegatedUser.getUserId() );
 
-        createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
-
         save( environment );
+
+        createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
 
         setEnvironmentTransientFields( environment );
 
@@ -1830,7 +1830,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             for ( Environment environment : environmentService.getAll() )
             {
                 if ( !( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
-                        || environment.getStatus() == EnvironmentStatus.CANCELLED ) )
+                        || environment.getStatus() == EnvironmentStatus.CANCELLED || (
+                        ( System.currentTimeMillis() - environment.getCreationTimestamp() )
+                                < Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC * 1000 ) ) )
                 {
 
                     final String secretKey = UUID.randomUUID().toString();

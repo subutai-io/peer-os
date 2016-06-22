@@ -436,7 +436,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public String getNewUserToken( String userName, String password )
+    public String getUserToken( String userName, String password )
     {
         String token = "";
 
@@ -446,12 +446,19 @@ public class IdentityManagerImpl implements IdentityManager
         {
             UserToken userToken = getUserToken( user.getId() );
 
-            if ( userToken != null )
+            if ( userToken == null )
             {
-                removeUserToken( userToken.getTokenId() );
+                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
             }
+            else
+            {
+                if ( userToken.getType() == TokenType.Session.getId() )
+                {
+                    removeUserToken( userToken.getTokenId() );
 
-            userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                    userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                }
+            }
 
             token = userToken.getFullToken();
         }
