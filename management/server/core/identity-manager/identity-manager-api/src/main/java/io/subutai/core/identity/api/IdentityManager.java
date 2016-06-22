@@ -57,7 +57,7 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    String getNewUserToken( String userName, String password );
+    String getUserToken( String userName, String password );
 
 
     /* *************************************************

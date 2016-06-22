@@ -145,9 +145,13 @@ public class IdentityManagerImpl implements IdentityManager
 
             //***Create User ********************************************
 
-            User internal = createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", 1, 3, false, false );
+            User internal =
+                    createUser( SYSTEM_USERNAME, "", "System User", "internal@subutai.io", UserType.System.getId(), 3,
+                            false, false );
             //User karaf = createUser( "karaf", "secret", "Karaf Manager", "karaf@subutai.io", 1, 3, false, false );
-            User admin = createUser( "admin", "secret", "Administrator", "admin@subutai.io", 2, 3, true, true );
+            User admin =
+                    createUser( "admin", "secret", "Administrator", "admin@subutai.io", UserType.Regular.getId(), 3,
+                            true, true );
             //***********************************************************
 
             //***Create Token *******************************************
@@ -432,7 +436,7 @@ public class IdentityManagerImpl implements IdentityManager
      */
     @PermitAll
     @Override
-    public String getNewUserToken( String userName, String password )
+    public String getUserToken( String userName, String password )
     {
         String token = "";
 
@@ -442,12 +446,19 @@ public class IdentityManagerImpl implements IdentityManager
         {
             UserToken userToken = getUserToken( user.getId() );
 
-            if ( userToken != null )
+            if ( userToken == null )
             {
-                removeUserToken( userToken.getTokenId() );
+                userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
             }
+            else
+            {
+                if ( userToken.getType() == TokenType.Session.getId() )
+                {
+                    removeUserToken( userToken.getTokenId() );
 
-            userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                    userToken = createUserToken( user, "", "", "", TokenType.Session.getId(), null );
+                }
+            }
 
             token = userToken.getFullToken();
         }
@@ -607,7 +618,13 @@ public class IdentityManagerImpl implements IdentityManager
 
         if ( userToken != null )
         {
-            if ( TokenUtil.verifySignatureAndDate( token, userToken.getSecret() ) )
+            if ( TokenType.Permanent.getId() == userToken.getType() && TokenUtil
+                    .verifySignature( token, userToken.getSecret() ) )
+            {
+                return getUser( userToken.getUserId() );
+            }
+            else if ( TokenType.Session.getId() == userToken.getType() && TokenUtil
+                    .verifySignatureAndDate( token, userToken.getSecret() ) )
             {
                 return getUser( userToken.getUserId() );
             }
