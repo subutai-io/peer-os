@@ -18,6 +18,7 @@ import io.subutai.core.identity.impl.model.SessionEntity;
 /**
  *
  */
+@Deprecated
 class SessionDAO
 {
     private DaoManager daoManager = null;

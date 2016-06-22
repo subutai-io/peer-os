@@ -8,8 +8,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.util.Calendar;
-import java.util.Date;
 
 import javax.ws.rs.core.Response;
 
@@ -23,6 +21,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SecuritySettings;
 import io.subutai.core.identity.api.IdentityManager;
@@ -146,14 +145,10 @@ public class ConfigManager
 
     public UserToken getPermanentToken()
     {
-        Date newDate = new Date();
-        java.util.Calendar cal = Calendar.getInstance();
-        cal.setTime( newDate );
-        cal.add( Calendar.YEAR, 2 );
 
         User user = identityManager.getActiveUser();
 
-        return identityManager.createUserToken( user, null, null, null, 2, cal.getTime() );
+        return identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
     }
 
 

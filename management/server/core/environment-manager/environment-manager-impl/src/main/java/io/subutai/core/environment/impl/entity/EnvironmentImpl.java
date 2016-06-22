@@ -128,10 +128,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "status" )
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
-    @Column( name = "relation_declaration", length = 3000 )
-    @JsonIgnore
-    private String relationDeclaration;
-
     @Column( name = "initial_blueprint" )
     @JsonIgnore
     @Lob
@@ -269,19 +265,6 @@ public class EnvironmentImpl implements Environment, Serializable
     public EnvironmentStatus getStatus()
     {
         return status;
-    }
-
-
-    @Override
-    public String getRelationDeclaration()
-    {
-        return relationDeclaration;
-    }
-
-
-    public void setRelationDeclaration( final String relationDeclaration )
-    {
-        this.relationDeclaration = relationDeclaration;
     }
 
 

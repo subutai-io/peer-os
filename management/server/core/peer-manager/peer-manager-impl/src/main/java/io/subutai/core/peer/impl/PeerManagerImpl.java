@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,8 +25,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.lang3.time.DateUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -43,7 +40,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
@@ -291,16 +287,15 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
+    //todo review and remove if not needed (when kurjun will be removed)
     private String generateActiveUserToken() throws PeerException
     {
         try
         {
             User user = identityManager.getActiveUser();
 
-            Date date = DateUtils.addMonths( new Date(), 10 );
-
             UserToken userToken =
-                    identityManager.createUserToken( user, "", "", "", TokenType.Permanent.getId(), date );
+                    identityManager.createUserToken( user, "", "", "", TokenType.Permanent.getId(), null );
 
             return userToken.getFullToken();
         }
@@ -777,7 +772,8 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( "Invalid URL." );
         }
 
-        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) )
+        if ( destinationUrl.getHost().equals( localPeer.getPeerInfo().getIp() ) && destinationUrl.getPort() == localPeer
+                .getPeerInfo().getPort() )
         {
             throw new PeerException( "Could not send registration request to ourselves." );
         }

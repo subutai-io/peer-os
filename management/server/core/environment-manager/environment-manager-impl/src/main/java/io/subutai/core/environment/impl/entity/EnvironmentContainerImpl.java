@@ -277,23 +277,20 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public Environment destroy() throws PeerException
     {
-
-        final Peer peer = getPeer();
-
-        final RegistrationStatus status = peer.getStatus();
-        if ( status == RegistrationStatus.APPROVED )
+        try
         {
+            final Peer peer = getPeer();
+
             peer.destroyContainer( getContainerId() );
             if ( parent.getContainerHostsByPeerId( getPeerId() ).size() == 0 )
             {
                 parent.removeEnvironmentPeer( getPeerId() );
             }
         }
-        else if ( status != RegistrationStatus.NOT_REGISTERED )
+        catch ( Exception e )
         {
-            throw new PeerException( "Could not destroy container when remote peer status is " + status );
+            logger.warn( e.getMessage() );
         }
-
 
         ( ( EnvironmentImpl ) parent ).removeContainer( this );
 

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
+import io.subutai.common.security.objects.TokenType;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.core.identity.impl.model.UserTokenEntity;
 
@@ -74,7 +75,8 @@ class UserTokenDAO
             if ( result != null )
             {
                 Date curDate = new Date( System.currentTimeMillis() );
-                if ( !result.getValidDate().after( curDate ) )
+
+                if ( result.getType() == TokenType.Session.getId() && !result.getValidDate().after( curDate ) )
                 {
                     return null;
                 }
@@ -98,8 +100,9 @@ class UserTokenDAO
         try
         {
             daoManager.startTransaction( em );
-            Query query =
-                    em.createQuery( "delete from UserTokenEntity ut where ut.type=1 and ut.validDate<:CurrentDate" );
+            Query query = em.createQuery(
+                    "delete from UserTokenEntity ut where ut.type=:Type and ut.validDate<:CurrentDate" );
+            query.setParameter( "Type", TokenType.Session.getId() );
             query.setParameter( "CurrentDate", new Date( System.currentTimeMillis() ) );
             query.executeUpdate();
             daoManager.commitTransaction( em );
@@ -227,7 +230,8 @@ class UserTokenDAO
         {
             List<UserTokenEntity> result;
             TypedQuery<UserTokenEntity> qr =
-                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId", UserTokenEntity.class );
+                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId order by h.validDate desc",
+                            UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             result = qr.getResultList();
 
@@ -262,9 +266,9 @@ class UserTokenDAO
         try
         {
             List<UserTokenEntity> result;
-            TypedQuery<UserTokenEntity> qr =
-                    em.createQuery( "select h from UserTokenEntity h where h.userId=:userId and h.type=:tokenType",
-                            UserTokenEntity.class );
+            TypedQuery<UserTokenEntity> qr = em.createQuery(
+                    "select h from UserTokenEntity h where h.userId=:userId and h.type=:tokenType order by h"
+                            + ".validDate desc", UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "tokenType", tokenType );
 
@@ -302,8 +306,8 @@ class UserTokenDAO
         {
             List<UserTokenEntity> result;
             TypedQuery<UserTokenEntity> qr = em.createQuery(
-                    "select h from UserTokenEntity h where h.userId=:userId and h.validDate>=:validDate",
-                    UserTokenEntity.class );
+                    "select h from UserTokenEntity h where h.userId=:userId and h.validDate>=:validDate order by h"
+                            + ".validDate desc", UserTokenEntity.class );
             qr.setParameter( "userId", userId );
             qr.setParameter( "validDate", new Date( System.currentTimeMillis() ) );
             result = qr.getResultList();
