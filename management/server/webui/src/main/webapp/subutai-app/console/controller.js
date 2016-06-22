@@ -60,12 +60,13 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 		}
 	});
 
-	for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
-		if (localStorage.getItem("currentUserPermissions")[i] == 2) {
-			vm.activeTab = "peer";
-			vm.admin = true;
+	if( localStorage.getItem("currentUserPermissions") )
+		for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
+			if (localStorage.getItem("currentUserPermissions")[i] == 2) {
+				vm.activeTab = "peer";
+				vm.admin = true;
+			}
 		}
-	}
 
 	//Console UI
 	$scope.theme = 'modern';
