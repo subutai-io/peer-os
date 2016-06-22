@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.security.RolesAllowed;
 import javax.naming.NamingException;
 import javax.ws.rs.core.Form;
 
@@ -134,7 +135,8 @@ public class CommandProcessor implements RestProcessor
     }
 
 
-    public void execute( final Request request, CommandCallback callback ) throws CommandException
+    @RolesAllowed( { "Peer-Management|Write", "Peer-Management|Update" } )
+    public void executeSystemCall( final Request request, CommandCallback callback ) throws CommandException
     {
 
         //find target host

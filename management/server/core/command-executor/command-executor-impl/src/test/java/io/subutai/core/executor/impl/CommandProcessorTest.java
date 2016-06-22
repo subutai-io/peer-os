@@ -155,7 +155,7 @@ public class CommandProcessorTest
 
         try
         {
-            commandProcessor.execute( request, callback );
+            commandProcessor.executeSystemCall( request, callback );
             fail( "Expected CommandException" );
         }
         catch ( CommandException e )
@@ -251,7 +251,7 @@ public class CommandProcessorTest
         when( containerHostInfo.getState() ).thenReturn( ContainerHostState.RUNNING );
         try
         {
-            commandProcessor.execute( request, callback );
+            commandProcessor.executeSystemCall( request, callback );
             fail( "Expected CommandException" );
         }
         catch ( CommandException e )
@@ -270,7 +270,7 @@ public class CommandProcessorTest
                                                       .getResourceHostByContainerHost( containerHostInfo );
         try
         {
-            commandProcessor.execute( request, callback );
+            commandProcessor.executeSystemCall( request, callback );
             fail( "Expected CommandException" );
         }
         catch ( CommandException e )

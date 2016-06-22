@@ -91,7 +91,7 @@ public class RestServiceImpl implements RestService
             }
             else
             {
-                result = commandExecutor.execute( hostId, request );
+                result = commandExecutor.authorizedExecute( hostId, request );
             }
 
 

@@ -46,7 +46,7 @@ public class ExecSyncCommand extends SubutaiShellCommandSupport
     {
 
         RequestBuilder requestBuilder = new RequestBuilder( command ).withTimeout( timeout );
-        CommandResult result = executor.execute( hostId, daemon ? requestBuilder.daemon() : requestBuilder );
+        CommandResult result = executor.authorizedExecute( hostId, daemon ? requestBuilder.daemon() : requestBuilder );
 
         System.out.println( result );
 
