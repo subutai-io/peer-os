@@ -13,7 +13,7 @@ import io.subutai.common.command.RequestBuilder;
 public interface CommandExecutor
 {
     /**
-     * Executes system command on host synchronously
+     * Executes command on host synchronously
      *
      * @param hostId - target host id
      * @param requestBuilder - command to execute
@@ -22,20 +22,8 @@ public interface CommandExecutor
      */
     public CommandResult execute( String hostId, RequestBuilder requestBuilder ) throws CommandException;
 
-
     /**
      * Executes command on host synchronously
-     *
-     * @param hostId - target host id
-     * @param requestBuilder - command to execute
-     *
-     * @return - result of command execution
-     */
-    public CommandResult authorizedExecute( String hostId, RequestBuilder requestBuilder ) throws CommandException;
-
-
-    /**
-     * Executes system command on host synchronously
      *
      * @param hostId - target host id
      * @param requestBuilder - command to execute
@@ -46,21 +34,8 @@ public interface CommandExecutor
     public CommandResult execute( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
             throws CommandException;
 
-
     /**
-     * Executes command on host synchronously
-     *
-     * @param hostId - target host id
-     * @param requestBuilder - command to execute
-     * @param callback - callback to trigger on each response from host
-     *
-     * @return - result of command execution
-     */
-    public CommandResult authorizedExecute( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
-            throws CommandException;
-
-    /**
-     * Executes system command on host asynchronously
+     * Executes command on host asynchronously
      *
      * @param hostId - target host id
      * @param requestBuilder - command to execute
@@ -68,30 +43,12 @@ public interface CommandExecutor
     public void executeAsync( String hostId, RequestBuilder requestBuilder ) throws CommandException;
 
     /**
-     * Executes system command on host asynchronously
+     * Executes command on host asynchronously
      *
      * @param hostId - target host id
      * @param requestBuilder - command to execute
      * @param callback - callback to trigger on each response from host
      */
     public void executeAsync( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
-            throws CommandException;
-
-    /**
-     * Executes command on host asynchronously
-     *
-     * @param hostId - target host id
-     * @param requestBuilder - command to execute
-     */
-    public void authorizedExecuteAsync( String hostId, RequestBuilder requestBuilder ) throws CommandException;
-
-    /**
-     * Executes command on host asynchronously
-     *
-     * @param hostId - target host id
-     * @param requestBuilder - command to execute
-     * @param callback - callback to trigger on each response from host
-     */
-    public void authorizedExecuteAsync( String hostId, RequestBuilder requestBuilder, CommandCallback callback )
             throws CommandException;
 }

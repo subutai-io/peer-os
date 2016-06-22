@@ -67,7 +67,7 @@ public class CommandExecutorImplTest
     {
         commandExecutor.execute( HOST_ID, requestBuilder );
 
-        verify( commandProcessor ).executeSystemCall( any( Request.class ), any( CommandCallback.class ) );
+        verify( commandProcessor ).execute( any( Request.class ), any( CommandCallback.class ) );
         verify( commandProcessor ).getResult( any( UUID.class ) );
     }
 
@@ -77,7 +77,7 @@ public class CommandExecutorImplTest
     {
         commandExecutor.execute( HOST_ID, requestBuilder, callback );
 
-        verify( commandProcessor ).executeSystemCall( any( Request.class ), eq( callback ) );
+        verify( commandProcessor ).execute( any( Request.class ), eq( callback ) );
         verify( commandProcessor ).getResult( any( UUID.class ) );
     }
 
@@ -87,7 +87,7 @@ public class CommandExecutorImplTest
     {
         commandExecutor.executeAsync( HOST_ID, requestBuilder );
 
-        verify( commandProcessor ).executeSystemCall( any( Request.class ), isA( DummyCallback.class ) );
+        verify( commandProcessor ).execute( any( Request.class ), isA( DummyCallback.class ) );
     }
 
 
@@ -96,6 +96,6 @@ public class CommandExecutorImplTest
     {
         commandExecutor.executeAsync( HOST_ID, requestBuilder, callback );
 
-        verify( commandProcessor ).executeSystemCall( any( Request.class ), eq( callback ) );
+        verify( commandProcessor ).execute( any( Request.class ), eq( callback ) );
     }
 }
