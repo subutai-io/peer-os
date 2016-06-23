@@ -181,7 +181,7 @@ public class EnvironmentUserHelper
     }
 
 
-    private UserDto getUserDataFromHub( String userId )
+    public UserDto getUserDataFromHub( String userId )
     {
         String path = "/rest/v1/users/" + userId;
 
