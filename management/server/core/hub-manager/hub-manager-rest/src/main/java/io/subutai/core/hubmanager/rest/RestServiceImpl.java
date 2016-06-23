@@ -133,7 +133,7 @@ public class RestServiceImpl implements RestService
         {
             pojo.setOwnerId( hubManager.getHubConfiguration().getOwnerId() );
 
-            pojo.setOwnerEmail( hubManager.getHubConfiguration().getOwnerEmail() );
+            pojo.setCurrentUserEmail( hubManager.getCurrentUserEmail() );
         }
 
         pojo.setRegisteredToHub( hubManager.isRegistered() );

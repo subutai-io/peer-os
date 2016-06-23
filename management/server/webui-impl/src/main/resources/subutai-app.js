@@ -80,7 +80,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
             vm.hubStatus = data.isRegisteredToHub;
             vm.userId = data.ownerId;
-            vm.userEmail = data.ownerEmail;
+            vm.userEmail = data.currentUserEmail;
 
             if (vm.hubStatus != "true" && vm.hubStatus != true) {
                 vm.hubStatus = false;

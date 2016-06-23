@@ -29,8 +29,6 @@ public interface HubManager
 
     void uninstallPlugin( String name, String uid );
 
-
-
     Map<String, String> getPeerInfo() throws Exception;
 
     Config getHubConfiguration();
@@ -38,4 +36,6 @@ public interface HubManager
     String getChecksum();
 
     void sendSystemConfiguration( SystemConfDto dto );
+
+    String getCurrentUserEmail();
 }
