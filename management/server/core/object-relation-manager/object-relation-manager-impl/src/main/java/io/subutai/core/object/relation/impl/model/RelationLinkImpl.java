@@ -5,8 +5,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -21,10 +19,6 @@ import io.subutai.common.security.relation.RelationLink;
 public class RelationLinkImpl implements RelationLink
 {
     @Id
-    @GeneratedValue( strategy = GenerationType.IDENTITY )
-    @Column( name = "rl_id" )
-    private long id;
-
     @Column( name = "link_id" )
     private String linkId;
 
@@ -37,7 +31,7 @@ public class RelationLinkImpl implements RelationLink
     @Column( name = "context" )
     private String context = "";
 
-    @Column(name = "key_id")
+    @Column( name = "key_id" )
     private String keyId;
 
 
@@ -139,7 +133,7 @@ public class RelationLinkImpl implements RelationLink
 
         final RelationLinkImpl that = ( RelationLinkImpl ) o;
 
-        return linkId != null ? linkId.equals( that.linkId ) : that.linkId == null;
+        return uniqueIdentifier != null ? uniqueIdentifier.equals( that.uniqueIdentifier ) : that.uniqueIdentifier == null;
     }
 
 
@@ -154,11 +148,7 @@ public class RelationLinkImpl implements RelationLink
     public String toString()
     {
         return "RelationLinkImpl{" +
-                "id=" + id +
                 ", linkId='" + linkId + '\'' +
-                ", uniqueIdentifier='" + uniqueIdentifier + '\'' +
-                ", classPath='" + classPath + '\'' +
-                ", context='" + context + '\'' +
                 '}';
     }
 }
