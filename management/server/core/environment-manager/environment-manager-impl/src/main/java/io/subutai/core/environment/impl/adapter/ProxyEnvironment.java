@@ -88,6 +88,7 @@ public class ProxyEnvironment extends EnvironmentImpl
             log.error( "Error to parse container json: ", e );
         }
 
+        //todo REVIEW: do we need now proxy to remote containers???
         proxyContainerHelper.setProxyToRemoteContainers( containers );
 
         Set<EnvironmentContainerImpl> resultSet = new HashSet<>();
