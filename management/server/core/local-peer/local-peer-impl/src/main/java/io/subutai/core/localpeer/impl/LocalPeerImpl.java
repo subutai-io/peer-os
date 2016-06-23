@@ -89,6 +89,7 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.security.relation.RelationManager;
@@ -111,7 +112,6 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainersRequestListener;
@@ -821,7 +821,37 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected void buildEnvContainerRelation( final ContainerHostEntity containerHost ){
+    protected void buildEnvContainerRelation( final ContainerHostEntity containerHost )
+    {
+
+
+        containerHost.getOwnerId();
+
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+        relationTraits.put( "containerLimit", "unlimited" );
+        relationTraits.put( "bandwidthLimit", "unlimited" );
+        relationTraits.put( "read", "true" );
+        relationTraits.put( "write", "true" );
+        relationTraits.put( "update", "true" );
+        relationTraits.put( "delete", "true" );
+        relationTraits.put( "ownership", Ownership.USER.getName() );
+
+        RelationLink source;
+        User activeUser = identityManager.getActiveUser();
+        if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+        {
+            // Most probably it is remote container, so owner will be localPeer
+            source = this;
+            LOG.debug( "Setting LocalPeer as source" );
+        }
+        else
+        {
+            source = identityManager.getUserDelegate( activeUser.getId() );
+            LOG.debug( "Setting DelegatedUser as source" );
+        }
+
+
         RelationLink envLink = new RelationLink()
         {
             @Override
@@ -859,23 +889,21 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         };
 
-        containerHost.getOwnerId();
+        if ( source == null )
+        {
+            LOG.debug( "Source is null" );
+        }
+        if ( containerHost == null )
+        {
+            LOG.debug( "containerHost is null" );
+        }
+        if ( envLink == null )
+        {
+            LOG.debug( "envLink is null" );
+        }
 
-        RelationInfoMeta relationInfoMeta =
-                new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
-        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
-        relationTraits.put( "containerLimit", "unlimited" );
-        relationTraits.put( "bandwidthLimit", "unlimited" );
-        relationTraits.put( "read", "true" );
-        relationTraits.put( "write", "true" );
-        relationTraits.put( "update", "true" );
-        relationTraits.put( "delete", "true" );
-        relationTraits.put( "ownership", Ownership.USER.getName() );
 
-        User activeUser = identityManager.getActiveUser();
-        UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
-
-        RelationMeta relationMeta = new RelationMeta( delegatedUser, envLink, containerHost, envLink.getKeyId() );
+        RelationMeta relationMeta = new RelationMeta( source, envLink, containerHost, envLink.getKeyId() );
         Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
         relation.setRelationStatus( RelationStatus.VERIFIED );
         relationManager.saveRelation( relation );
@@ -1815,8 +1843,22 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         try
         {
+            RelationLink source;
+            String keyId;
             User activeUser = identityManager.getActiveUser();
-            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
+            if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+            {
+                // Most probably it is cross peer environment
+                source = this;
+                keyId = source.getKeyId();
+                LOG.debug( "Setting local peer as source" );
+            }
+            else
+            {
+                source = identityManager.getUserDelegate( activeUser.getId() );
+                keyId = activeUser.getSecurityKeyId();
+                LOG.debug("Extracting delegated user");
+            }
 
             // User           - Delegated user - Environment
             // Delegated user - Delegated user - Environment
@@ -1829,8 +1871,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             traits.put( "delete", "true" );
             traits.put( "ownership", Ownership.USER.getName() );
 
-            RelationMeta relationMeta =
-                    new RelationMeta( delegatedUser, delegatedUser, envLink, activeUser.getSecurityKeyId() );
+            if ( source == null )
+            {
+                LOG.debug( "Source is null" );
+            }
+            if ( envLink == null )
+            {
+                LOG.debug( "envLink is null" );
+            }
+
+            RelationMeta relationMeta = new RelationMeta( source, source, envLink, keyId );
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
