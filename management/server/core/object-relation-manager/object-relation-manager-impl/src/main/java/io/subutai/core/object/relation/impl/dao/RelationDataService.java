@@ -107,6 +107,34 @@ public class RelationDataService
     }
 
 
+    public void saveBatch( List<Object> relationLinks )
+    {
+        EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
+
+        try
+        {
+            daoManager.startTransaction( em );
+
+            for ( Object relationLink : relationLinks )
+            {
+                em.persist( relationLink );
+            }
+
+            daoManager.commitTransaction( em );
+        }
+        catch ( Exception ex )
+        {
+            daoManager.rollBackTransaction( em );
+
+            logger.error( "Error updating relations", ex );
+        }
+        finally
+        {
+            daoManager.closeEntityManager( em );
+        }
+    }
+
+
     public void remove( long trustRelationId )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();

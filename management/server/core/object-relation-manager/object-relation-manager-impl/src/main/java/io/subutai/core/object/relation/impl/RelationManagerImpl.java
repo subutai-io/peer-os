@@ -206,9 +206,9 @@ public class RelationManagerImpl implements RelationManager
     {
         //TODO check if relation valid otherwise break relation build
 
-        relationDataService.updateBatch(
-                Lists.<Object>newArrayList( relation.getSource(), relation.getTarget(), relation.getTrustedObject(),
-                        relation ) );
+        relationDataService.updateBatch( Lists.<Object>newArrayList( relation.getSource(), relation.getTarget(),
+                relation.getTrustedObject() ) );
+        relationDataService.update( relation );
     }
 
 
