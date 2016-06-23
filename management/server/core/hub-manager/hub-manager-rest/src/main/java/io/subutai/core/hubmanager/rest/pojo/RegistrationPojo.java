@@ -5,7 +5,7 @@ public class RegistrationPojo
 {
     private boolean isRegisteredToHub;
     private String ownerId;
-    private String ownerEmail;
+    private String currentUserEmail;
 
     public boolean isRegisteredToHub()
     {
@@ -31,14 +31,14 @@ public class RegistrationPojo
     }
 
 
-    public String getOwnerEmail()
+    public String getCurrentUserEmail()
     {
-        return ownerEmail;
+        return currentUserEmail;
     }
 
 
-    public void setOwnerEmail( String ownerEmail )
+    public void setCurrentUserEmail( String currentUserEmail )
     {
-        this.ownerEmail = ownerEmail;
+        this.currentUserEmail = currentUserEmail;
     }
 }
