@@ -8,7 +8,7 @@ import org.bouncycastle.openpgp.PGPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
@@ -206,7 +206,7 @@ public class RelationManagerImpl implements RelationManager
     {
         //TODO check if relation valid otherwise break relation build
 
-        relationDataService.updateBatch( Lists.<Object>newArrayList( relation.getSource(), relation.getTarget(),
+        relationDataService.updateBatch( Sets.<Object>newHashSet( relation.getSource(), relation.getTarget(),
                 relation.getTrustedObject() ) );
         relationDataService.update( relation );
     }

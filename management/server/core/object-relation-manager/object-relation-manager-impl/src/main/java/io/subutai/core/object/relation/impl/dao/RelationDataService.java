@@ -2,6 +2,7 @@ package io.subutai.core.object.relation.impl.dao;
 
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -79,7 +80,7 @@ public class RelationDataService
     }
 
 
-    public void updateBatch( List<Object> relationLinks )
+    public void updateBatch( Set<Object> relationLinks )
     {
         EntityManager em = daoManager.getEntityManagerFactory().createEntityManager();
 
