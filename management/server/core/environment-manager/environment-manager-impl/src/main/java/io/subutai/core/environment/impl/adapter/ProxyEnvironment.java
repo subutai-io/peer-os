@@ -67,14 +67,20 @@ public class ProxyEnvironment extends EnvironmentImpl
         {
             for ( JsonNode node : arr )
             {
+
                 ProxyEnvironmentContainer ch =
                         new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
 
-                ch.setEnvironment( this );
+                //skip remote containers
+                if ( ch.isLocal() )
+                {
 
-                ch.setEnvironmentAdapter( environmentAdapter );
+                    ch.setEnvironment( this );
 
-                containers.add( ch );
+                    ch.setEnvironmentAdapter( environmentAdapter );
+
+                    containers.add( ch );
+                }
             }
         }
         catch ( Exception e )
