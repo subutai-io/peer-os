@@ -490,7 +490,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				case 'b-container-plus-icon':
 					currentTemplate = this.model;
 					$('#js-container-name').val(currentTemplate.get('containerName')).trigger('change');
-					$('#js-container-size').val(currentTemplate.get('quotaSize'));
+					$('#js-container-size').val(currentTemplate.get('quotaSize')).trigger('change');
 					containerSettingMenu.find('.header').text('Settings ' + this.model.get('templateName'));
 					var elementPos = this.model.get('position');
 					containerSettingMenu.css({

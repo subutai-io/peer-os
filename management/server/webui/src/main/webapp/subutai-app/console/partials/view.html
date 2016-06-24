@@ -50,7 +50,7 @@
 						<option value="">Select container</option>
 						<option 
 						ng-repeat="container in consoleViewCtrl.containers" 
-						ng-if="container.local" 
+						ng-if="container.local || container.dataSource != 'hub'" 
 						ng-selected="container.id == consoleViewCtrl.selectedContainer" 
 						value="{{ container.id }}">
 							{{ container.hostname }}
