@@ -89,6 +89,7 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.security.relation.RelationManager;
@@ -807,6 +808,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
 
+            buildEnvContainerRelation( containerHost );
+
             LOG.debug( "New container host registered: " + containerHost.getHostname() );
         }
         catch ( Exception e )
@@ -815,6 +818,95 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             throw new PeerException( String.format( "Error registering container: %s", e.getMessage() ), e );
         }
+    }
+
+
+    protected void buildEnvContainerRelation( final ContainerHostEntity containerHost )
+    {
+
+
+        containerHost.getOwnerId();
+
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+        relationTraits.put( "containerLimit", "unlimited" );
+        relationTraits.put( "bandwidthLimit", "unlimited" );
+        relationTraits.put( "read", "true" );
+        relationTraits.put( "write", "true" );
+        relationTraits.put( "update", "true" );
+        relationTraits.put( "delete", "true" );
+        relationTraits.put( "ownership", Ownership.USER.getName() );
+
+        RelationLink source;
+        User activeUser = identityManager.getActiveUser();
+        if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+        {
+            // Most probably it is remote container, so owner will be localPeer
+            source = this;
+            LOG.debug( "Setting LocalPeer as source" );
+        }
+        else
+        {
+            source = identityManager.getUserDelegate( activeUser.getId() );
+            LOG.debug( "Setting DelegatedUser as source" );
+        }
+
+
+        RelationLink envLink = new RelationLink()
+        {
+            @Override
+            public String getLinkId()
+            {
+                return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+            }
+
+
+            @Override
+            public String getUniqueIdentifier()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+
+
+            @Override
+            public String getClassPath()
+            {
+                return "EnvironmentImpl";
+            }
+
+
+            @Override
+            public String getContext()
+            {
+                return PermissionObject.EnvironmentManagement.getName();
+            }
+
+
+            @Override
+            public String getKeyId()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+        };
+
+        if ( source == null )
+        {
+            LOG.debug( "Source is null" );
+        }
+        if ( containerHost == null )
+        {
+            LOG.debug( "containerHost is null" );
+        }
+        if ( envLink == null )
+        {
+            LOG.debug( "envLink is null" );
+        }
+
+
+        RelationMeta relationMeta = new RelationMeta( source, envLink, containerHost, envLink.getKeyId() );
+        Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+        relation.setRelationStatus( RelationStatus.VERIFIED );
+        relationManager.saveRelation( relation );
     }
 
 
@@ -1721,7 +1813,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private void buildPeerEnvRelation( final RelationLink envLink )
     {
 
-        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment.
+        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment. Planned to use it in future
+        // for peer policy feature between peers.
 
         User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
         if ( peerOwner != null )
@@ -1742,6 +1835,59 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
+        }
+        buildRelation( envLink );
+    }
+
+    private void buildRelation( final RelationLink envLink )
+    {
+        try
+        {
+            RelationLink source;
+            String keyId;
+            User activeUser = identityManager.getActiveUser();
+            if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+            {
+                // Most probably it is cross peer environment
+                source = this;
+                keyId = source.getKeyId();
+                LOG.debug( "Setting local peer as source" );
+            }
+            else
+            {
+                source = identityManager.getUserDelegate( activeUser.getId() );
+                keyId = activeUser.getSecurityKeyId();
+                LOG.debug("Extracting delegated user");
+            }
+
+            // User           - Delegated user - Environment
+            // Delegated user - Delegated user - Environment
+            // Delegated user - Environment    - Container
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
+
+            if ( source == null )
+            {
+                LOG.debug( "Source is null" );
+            }
+            if ( envLink == null )
+            {
+                LOG.debug( "envLink is null" );
+            }
+
+            RelationMeta relationMeta = new RelationMeta( source, source, envLink, keyId );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error message.", e );
         }
     }
 

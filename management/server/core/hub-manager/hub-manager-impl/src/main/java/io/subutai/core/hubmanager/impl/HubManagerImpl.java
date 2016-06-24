@@ -3,12 +3,8 @@ package io.subutai.core.hubmanager.impl;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,17 +16,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
@@ -68,6 +60,7 @@ import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
@@ -75,6 +68,7 @@ import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 import io.subutai.hub.share.dto.SystemConfDto;
+import io.subutai.hub.share.dto.UserDto;
 import io.subutai.hub.share.dto.product.ProductsDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -135,6 +129,8 @@ public class HubManagerImpl implements HubManager
     private HubRestClient restClient;
 
     private LocalPeer localPeer;
+
+    private EnvironmentUserHelper envUserHelper;
 
 
     public HubManagerImpl( DaoManager daoManager )
@@ -208,6 +204,8 @@ public class HubManagerImpl implements HubManager
             }, 1, 600000, TimeUnit.MILLISECONDS );
 
 
+            envUserHelper = new EnvironmentUserHelper( identityManager, configDataService, envManager, restClient );
+
             initHeartbeatProcessor();
         }
         catch ( Exception e )
@@ -219,9 +217,6 @@ public class HubManagerImpl implements HubManager
 
     private void initHeartbeatProcessor()
     {
-        EnvironmentUserHelper envUserHelper =
-                new EnvironmentUserHelper( identityManager, configDataService, envManager, restClient );
-
         StateLinkProcessor tunnelProcessor = new TunnelProcessor( peerManager, configManager );
 
         Context ctx = new Context( identityManager, envManager, envUserHelper, localPeer, restClient );
@@ -716,5 +711,25 @@ public class HubManagerImpl implements HubManager
                 log.error( "Could not send SS configuration to Hub", e );
             }
         }
+    }
+
+
+    @Override
+    public String getCurrentUserEmail()
+    {
+        User currentUser = identityManager.getActiveUser();
+
+        String email = currentUser.getEmail();
+
+        log.info( "currentUser: id={}, username={}, email={}", currentUser.getId(), currentUser.getUserName(), email );
+
+        if ( !email.contains( "@hub.subut.ai" ) )
+        {
+            return getHubConfiguration().getOwnerEmail();
+        }
+
+        UserDto userDto = envUserHelper.getUserDataFromHub( StringUtils.substringBefore( email, "@" ) );
+
+        return userDto.getEmail();
     }
 }
