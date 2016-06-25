@@ -102,7 +102,8 @@ public class TunnelHelper
         }
     }
 
-    public static TunnelInfoDto getPeerTunnelState( String link , ConfigManager configManager)
+
+    public static TunnelInfoDto getPeerTunnelState( String link, ConfigManager configManager )
     {
         try
         {
@@ -142,7 +143,14 @@ public class TunnelHelper
         try
         {
             tunnelInfoDto.setOpenedIp( data[0] );
-            tunnelInfoDto.setOpenedPort( data[1] );
+            if ( data[1].contains( " " ) )
+            {
+                tunnelInfoDto.setOpenedPort( data[1].split( " " )[0] );
+            }
+            else
+            {
+                tunnelInfoDto.setOpenedPort( data[1] );
+            }
         }
         catch ( Exception e )
         {
