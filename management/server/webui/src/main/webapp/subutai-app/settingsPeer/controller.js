@@ -13,9 +13,9 @@ function SettingsPeerCtrl ($scope, SettingsPeerSrv, SweetAlert) {
 		SettingsPeerSrv.getSettingsConfig().success (function (data) {
 			vm.settingsConfig = data;
 		});
-		SettingsPeerSrv.getPolicyConfig().success (function (data) {
+		/*SettingsPeerSrv.getPolicyConfig().success (function (data) {
 			vm.policyConfig = data;
-		});
+		});*/
 	}
 	getConfig();
 
