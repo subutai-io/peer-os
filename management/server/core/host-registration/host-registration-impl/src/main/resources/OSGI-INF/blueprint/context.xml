@@ -2,7 +2,8 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:jpa="http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
+  <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager"
+        scope="prototype">
     <jpa:unit unitname="nodeRegistrationUnit" property="entityManagerFactory" />
   </bean>
 
