@@ -158,7 +158,7 @@ public class TunnelProcessor implements StateLinkProcessor
 
                 if ( response.getStatus() == HttpStatus.SC_OK || response.getStatus() == 204 )
                 {
-                    LOG.debug( "Tunnel peer data successfully sent to hub" );
+                    LOG.info( "Tunnel peer data successfully sent to hub" );
                 }
                 else
                 {

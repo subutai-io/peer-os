@@ -154,7 +154,8 @@ public class TunnelHelper
         }
         catch ( Exception e )
         {
-            TunnelHelper.sendError( link, "Executed: " + COMMAND + "   output: " + result, configManager );
+            LOG.error( e.getMessage() );
+            sendError( link, "Executed: " + COMMAND + "   output: " + result, configManager );
             return null;
         }
         return tunnelInfoDto;
