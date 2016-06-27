@@ -28,8 +28,8 @@ public class TunnelEventProcessor implements Runnable
     private static final String REST_TUNNEL_URL = "/rest/v1/tunnel/update/";
     private static final String REST_GET_TUNNEL_DATA_URL = "/rest/v1/tunnel/%s";
 
-    private static final String TUNNEL_LIST_CMD = "subutai tunnel list | grep 8443";
-    private static String OPENED_IP_PORT;
+    public static final String TUNNEL_LIST_CMD = "subutai tunnel list | grep 8443";
+    public static String OPENED_IP_PORT;
 
     private PeerManager peerManager;
 
@@ -97,7 +97,7 @@ public class TunnelEventProcessor implements Runnable
                 .getPeerTunnelState( String.format( REST_GET_TUNNEL_DATA_URL, configManager.getPeerId() ),
                         configManager );
 
-        if ( tunnelInfoDto.getTunnelStatus().equals( READY ) )
+        if ( tunnelInfoDto != null && tunnelInfoDto.getTunnelStatus().equals( READY ) )
         {
             CommandResult resultIpPort = TunnelHelper.execute( resourceHost,
                     String.format( TunnelProcessor.CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(),
@@ -105,9 +105,12 @@ public class TunnelEventProcessor implements Runnable
 
             if ( resultIpPort.hasSucceeded() )
             {
-                updateTunnelIpPort( resultIpPort );
+                TunnelInfoDto tunnelInfoDto1 = TunnelHelper
+                        .parseResult( REST_TUNNEL_URL + configManager.getPeerId(), resultIpPort.getStdOut(),
+                                configManager );
+                TunnelHelper.updateTunnelStatus( REST_TUNNEL_URL + configManager.getPeerId(), tunnelInfoDto1,
+                        configManager );
             }
-
             OPENED_IP_PORT = resultIpPort.getStdOut().replaceAll( "\n", "" );
         }
     }
