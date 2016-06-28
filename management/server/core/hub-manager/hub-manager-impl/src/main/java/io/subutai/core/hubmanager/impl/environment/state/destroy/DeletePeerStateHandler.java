@@ -46,13 +46,14 @@ public class DeletePeerStateHandler extends StateHandler
     }
 
 
-    private void deleteLocalEnvironment( Environment env ) throws EnvironmentDestructionException, EnvironmentNotFoundException
+    private void deleteLocalEnvironment( Environment env )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
         ctx.envManager.destroyEnvironment( env.getId(), false );
     }
 
 
-    private Environment getEnvironment( EnvironmentPeerDto peerDto  )
+    private Environment getEnvironment( EnvironmentPeerDto peerDto )
     {
         String envId = peerDto.getEnvironmentInfo().getId();
 
@@ -73,6 +74,8 @@ public class DeletePeerStateHandler extends StateHandler
         EnvironmentId envId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
 
         ctx.localPeer.cleanupEnvironment( envId );
+
+        ctx.envManager.notifyOnEnvironmentDestroyed( envId.getId() );
 
         ctx.envUserHelper.handleEnvironmentOwnerDeletion( peerDto );
     }
