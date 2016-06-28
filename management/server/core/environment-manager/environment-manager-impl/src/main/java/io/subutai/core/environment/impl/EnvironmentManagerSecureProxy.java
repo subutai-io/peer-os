@@ -647,6 +647,14 @@ public class EnvironmentManagerSecureProxy
     }
 
 
+    @PermitAll
+    @Override
+    public void notifyOnEnvironmentDestroyed( final String environmentId )
+    {
+        environmentManager.notifyOnEnvironmentDestroyed( environmentId );
+    }
+
+
     @Override
     public void addAlertHandler( final AlertHandler alertHandler )
     {
