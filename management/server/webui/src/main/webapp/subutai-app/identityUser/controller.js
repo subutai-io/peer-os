@@ -16,7 +16,6 @@ var trustedLevels = {
 
 function userPostData(user) {
 	var currentUserRoles = JSON.stringify(user.roles);
-	console.log(user);
 	var postData = 'username=' + user.userName +
 		'&full_name=' + user.fullName +
 		'&password=' + user.password +
@@ -138,7 +137,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	function userForm(userId) {
 		if(userId === undefined || userId === null) userId = false;
 		if(userId) {
-			vm.user2Add = vm.users[userId];
+			vm.user2Add = angular.copy(vm.users[userId]);
 			vm.editUser = true;
 			vm.loginPatern = '';
 			vm.currentUserRoles = angular.copy(vm.user2Add.roles);
@@ -150,6 +149,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 				vm.user2Add.roles.push(vm.currentUserRoles[i].id);
 			}			
 		} else {
+			vm.editUser = false;
 			vm.loginPatern = '(?=^.{4,}$)(^(?!(admin|sys|token)).*)';
 			vm.user2Add = {"trustLevel": 2};
 		}
@@ -173,6 +173,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			LOADING_SCREEN();
 			ngDialog.closeAll();
 			identitySrv.addUser(postData).success(function (data) {
+				vm.users[vm.user2Add.id] = vm.user2Add;
 				LOADING_SCREEN('none');
 				if(Object.keys(vm.dtInstance).length !== 0) {
 					vm.dtInstance.reloadData(null, false);
