@@ -54,7 +54,7 @@ public class Common
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_HOSTNAME = "management";
     public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
-    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 90 * 60;// 1.5 hour
+    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 180 * 60;// 3 hour
     public static final String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";
