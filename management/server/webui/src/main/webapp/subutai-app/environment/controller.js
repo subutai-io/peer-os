@@ -431,15 +431,58 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 		vm.containersForQuota = environment.containers;
 	}
 
+
 	function showSSHKeyForm(environmentId) {
+
+		if ( alertForHubEnvironment( environmentId ) )
+		{
+			return;
+		}
+
 		vm.sshKeyForEnvironment = environmentId;
+
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/sshKeyForm.html',
 			scope: $scope
 		});
 	}
 
+
+	function alertForHubEnvironment( envId )
+	{
+		var env = getEnvironment( envId );
+
+		if ( env != null && env.dataSource == "hub" )
+		{
+			SweetAlert.swal( "Feature coming soon...", "This environment created on Hub. Please use Hub to manage it.", "success");
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+	function getEnvironment( envId )
+	{
+		for ( var i = 0; i < vm.environments.length; i++ )
+		{
+			if ( vm.environments[i].id == envId )
+			{
+				return vm.environments[i];
+			}
+		}
+
+		return null;
+	}
+
+
 	function showSSHKeysPopup(environmentId) {
+
+		if ( alertForHubEnvironment( environmentId ) )
+		{
+			return;
+		}
 
 		vm.sshKeysList = [];
 		vm.sshKeyForEnvironment = environmentId;
