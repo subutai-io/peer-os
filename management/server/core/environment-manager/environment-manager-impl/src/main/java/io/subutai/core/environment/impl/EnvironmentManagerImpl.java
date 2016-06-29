@@ -1831,8 +1831,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             {
                 if ( !( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
                         || environment.getStatus() == EnvironmentStatus.CANCELLED || (
-                        ( System.currentTimeMillis() - environment.getCreationTimestamp() )
-                                < Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC * 1000 ) ) )
+                        ( System.currentTimeMillis() - environment.getCreationTimestamp() ) < TimeUnit.HOURS
+                                .toMillis( 1 ) ) ) )
                 {
 
                     final String secretKey = UUID.randomUUID().toString();
