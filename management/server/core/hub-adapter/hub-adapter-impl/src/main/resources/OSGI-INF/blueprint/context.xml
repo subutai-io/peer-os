@@ -8,7 +8,8 @@
                                http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
 >
 
-  <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
+  <bean id="daoManager" init-method="init" class="io.subutai.common.dao.DaoManager"
+        scope="prototype">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
   </bean>
 

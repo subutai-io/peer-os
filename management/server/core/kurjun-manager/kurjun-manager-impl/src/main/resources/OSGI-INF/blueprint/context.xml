@@ -12,7 +12,7 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <!--*****************************************************************-->
-  <bean id="daoManager" init-method="init" activation="eager" scope="singleton"
+  <bean id="daoManager" init-method="init" scope="prototype"
         class="io.subutai.common.dao.DaoManager">
     <jpa:unit unitname="kurjunManagerPUnit" property="entityManagerFactory" />
   </bean>

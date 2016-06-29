@@ -3,7 +3,7 @@
            xmlns:authz="http://aries.apache.org/xmlns/authorization/v1.0.0"
            default-activation="eager"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-    >
+>
 
   <!--**************Enable Authorization ******************************-->
   <authz:enable />
@@ -20,7 +20,7 @@
              interface="io.subutai.core.security.api.SecurityManager" />
 
   <!--*****************************************************************-->
-  <bean id="daoManagerIdenity" init-method="init" activation="eager" scope="singleton"
+  <bean id="daoManagerIdenity" init-method="init" scope="prototype"
         class="io.subutai.common.dao.DaoManager">
     <jpa:unit unitname="identityManagerPUnit" property="entityManagerFactory" />
   </bean>

@@ -44,7 +44,8 @@
   <reference id="localPeer" availability="optional"
              interface="io.subutai.common.peer.LocalPeer" />
 
-  <bean id="daoManagerQuota" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
+  <bean id="daoManagerQuota" init-method="init" class="io.subutai.common.dao.DaoManager"
+        scope="prototype">
     <jpa:unit unitname="quotaManagerPUnit" property="entityManagerFactory" />
   </bean>
 
@@ -52,7 +53,7 @@
         init-method="init">
     <argument ref="peerManager" />
     <argument ref="localPeer" />
-    <argument ref="daoManagerQuota"/>
+    <argument ref="daoManagerQuota" />
     <property name="defaultQuota"
               value="$(TINY.ram)|$(TINY.cpu)|$(TINY.space.opt)|$(TINY.space.home)|$(TINY.space.var)|$(TINY.space.root):$(SMALL.ram)|$(SMALL.cpu)|$(SMALL.space.opt)|$(SMALL.space.home)|$(SMALL.space.var)|$(SMALL.space.root):$(MEDIUM.ram)|$(MEDIUM.cpu)|$(MEDIUM.space.opt)|$(MEDIUM.space.home)|$(MEDIUM.space.var)|$(MEDIUM.space.root):$(LARGE.ram)|$(LARGE.cpu)|$(LARGE.space.opt)|$(LARGE.space.home)|$(LARGE.space.var)|$(LARGE.space.root):$(HUGE.ram)|$(HUGE.cpu)|$(HUGE.space.opt)|$(HUGE.space.home)|$(HUGE.space.var)|$(HUGE.space.root)" />
 

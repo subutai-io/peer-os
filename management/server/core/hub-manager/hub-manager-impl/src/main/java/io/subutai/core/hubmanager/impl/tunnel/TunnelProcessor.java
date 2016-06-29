@@ -111,40 +111,67 @@ public class TunnelProcessor implements StateLinkProcessor
             ResourceHost resourceHost = peerManager.getLocalPeer().getManagementHost();
             String tunnelLifeTime = getTunnelLifetime( tunnelInfoDto );
 
-            CommandResult result = TunnelHelper.execute( resourceHost,
-                    String.format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
-                            tunnelLifeTime ) );
+            CommandResult result = getOpenedTunnelData( resourceHost );
 
-            if ( result.hasSucceeded() )
+            if ( result == null )
             {
-                tunnelInfoDto = TunnelHelper.parseResult( stateLink, result.getStdOut(), configManager );
-
-                if ( tunnelInfoDto != null )
-                {
-                    tunnelInfoDto.setTunnelStatus( READY );
-                    Response response = TunnelHelper.updateTunnelStatus( stateLink, tunnelInfoDto, configManager );
-
-                    if ( response.getStatus() == HttpStatus.SC_OK )
-                    {
-                        LOG.debug( "Tunnel peer data successfully sent to hub" );
-                    }
-                    else
-                    {
-                        LOG.error( "Tunnel peer data was not successfully sent to hub" );
-                    }
-                }
+                result = TunnelHelper.execute( resourceHost,
+                        String.format( CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(), tunnelInfoDto.getPortToOpen(),
+                                tunnelLifeTime ) );
             }
-            else
-            {
-                String errorLog = String.format( "Executed: " + CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(),
-                        tunnelInfoDto.getPortToOpen(), tunnelLifeTime ) + " |  Result: " + result.getStdErr();
 
-                TunnelHelper.sendError( stateLink, errorLog, configManager );
-            }
+            parseResult( stateLink, result, tunnelInfoDto, tunnelLifeTime );
         }
         catch ( Exception e )
         {
+            LOG.error( e.getMessage() );
             TunnelHelper.sendError( stateLink, e.getMessage(), configManager );
+        }
+    }
+
+
+    private CommandResult getOpenedTunnelData( ResourceHost resourceHost )
+    {
+        CommandResult result = TunnelHelper.execute( resourceHost, TunnelEventProcessor.TUNNEL_LIST_CMD );
+
+        if ( result.getExitCode() != 0 )
+        {
+            return null;
+        }
+
+        return result;
+    }
+
+
+    private void parseResult( String stateLink, CommandResult result, TunnelInfoDto tunnelInfoDto,
+                              String tunnelLifeTime )
+    {
+        if ( result.hasSucceeded() )
+        {
+            tunnelInfoDto = TunnelHelper.parseResult( stateLink, result.getStdOut(), configManager );
+
+            if ( tunnelInfoDto != null )
+            {
+                tunnelInfoDto.setTunnelStatus( READY );
+                TunnelEventProcessor.OPENED_IP_PORT = result.getStdOut();
+                Response response = TunnelHelper.updateTunnelStatus( stateLink, tunnelInfoDto, configManager );
+
+                if ( response.getStatus() == HttpStatus.SC_OK || response.getStatus() == 204 )
+                {
+                    LOG.info( "Tunnel peer data successfully sent to hub" );
+                }
+                else
+                {
+                    LOG.error( "Tunnel peer data was not successfully sent to hub" );
+                }
+            }
+        }
+        else
+        {
+            String errorLog = String.format( "Executed: " + CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(),
+                    tunnelInfoDto.getPortToOpen(), tunnelLifeTime ) + " |  Result: " + result.getStdErr();
+
+            TunnelHelper.sendError( stateLink, errorLog, configManager );
         }
     }
 

@@ -72,9 +72,9 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         {
             CommandResult result = execute( WHOAMI );
 
-            return result.getExitCode() == 0
-                    && StringUtils.isNotBlank( result.getStdOut() )
-                    && result.getStdOut().contains( "root" );
+            return result.getExitCode() == 0 && StringUtils.isNotBlank( result.getStdOut() ) && result.getStdOut()
+                                                                                                      .contains(
+                                                                                                              "root" );
         }
         catch ( CommandException e )
         {
@@ -122,11 +122,20 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         // If this is a remote host then the command is sent via a proxyContainer
         // b/c the remote host is not directly accessible from the current peer.
-        if ( proxyContainer != null )
+        if ( !isLocal() )
         {
-            requestBuilder = wrapForProxy( requestBuilder );
+            if ( proxyContainer != null )
+            {
+                requestBuilder = wrapForProxy( requestBuilder );
 
-            host = proxyContainer;
+                host = proxyContainer;
+            }
+            else
+            {
+                throw new CommandException(
+                        "Please start at least one local container from this environment to be able to execute "
+                                + "commands on remote ones" );
+            }
         }
 
         return host.getPeer().execute( requestBuilder, host );
@@ -150,7 +159,6 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         LOG.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
 
-        return new RequestBuilder( command )
-                .withTimeout( requestBuilder.getTimeout() );
+        return new RequestBuilder( command ).withTimeout( requestBuilder.getTimeout() );
     }
 }

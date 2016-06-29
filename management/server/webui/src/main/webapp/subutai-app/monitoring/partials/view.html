@@ -49,7 +49,10 @@
 						ng-model="monitoringCtrl.currentHost"
 						ng-change="monitoringCtrl.getServerData()">
 						<option value="" disabled>Select Container</option>
-						<option ng-repeat="container in monitoringCtrl.containers" value="{{ container.id }}">
+						<option 
+						ng-repeat="container in monitoringCtrl.containers" 
+						ng-if="container.local || container.dataSource != 'hub'" 
+						value="{{ container.id }}">
 							{{ container.hostname }}
 						</option>
 					</select>

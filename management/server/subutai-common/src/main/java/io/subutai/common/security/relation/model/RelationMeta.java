@@ -31,10 +31,9 @@ public class RelationMeta
     }
 
 
-    public RelationMeta( final RelationLink source, final RelationLink object, final String keyId )
+    public RelationMeta( final RelationLink target, final RelationLink object, final String keyId )
     {
-        this.source = source;
-        this.target = source;
+        this.target = target;
         this.object = object;
         this.keyId = keyId;
     }

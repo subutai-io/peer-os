@@ -1,8 +1,6 @@
 package io.subutai.core.hubmanager.impl.tunnel;
 
 
-import java.util.Set;
-
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -11,15 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.http.HttpStatus;
 
-import com.google.common.collect.Sets;
-
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.impl.ConfigManager;
-import io.subutai.core.peer.api.PeerManager;
-import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -108,7 +102,8 @@ public class TunnelHelper
         }
     }
 
-    public static TunnelInfoDto getPeerTunnelState( String link , ConfigManager configManager)
+
+    public static TunnelInfoDto getPeerTunnelState( String link, ConfigManager configManager )
     {
         try
         {
@@ -148,11 +143,19 @@ public class TunnelHelper
         try
         {
             tunnelInfoDto.setOpenedIp( data[0] );
-            tunnelInfoDto.setOpenedPort( data[1] );
+            if ( data[1].contains( " " ) )
+            {
+                tunnelInfoDto.setOpenedPort( data[1].split( " " )[0] );
+            }
+            else
+            {
+                tunnelInfoDto.setOpenedPort( data[1] );
+            }
         }
         catch ( Exception e )
         {
-            TunnelHelper.sendError( link, "Executed: " + COMMAND + "   output: " + result, configManager );
+            LOG.error( e.getMessage() );
+            sendError( link, "Executed: " + COMMAND + "   output: " + result, configManager );
             return null;
         }
         return tunnelInfoDto;
