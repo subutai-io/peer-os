@@ -86,6 +86,13 @@ func State(name string) (state string) {
 }
 
 func SetApt(name string) {
+	root := GetConfigItem(config.Agent.LxcPrefix+name+"/config", "subutai.parent")
+	for parent := name; root != parent; root = GetConfigItem(config.Agent.LxcPrefix+parent+"/config", "subutai.parent") {
+		parent = root
+	}
+	if root != "master" {
+		return
+	}
 	gateway := GetConfigItem(config.Agent.LxcPrefix+name+"/config", "lxc.network.ipv4.gateway")
 	if len(gateway) == 0 {
 		gateway = "10.10.0.254"
