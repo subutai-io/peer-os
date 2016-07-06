@@ -145,6 +145,11 @@ func diskQuota(mountid, diskMap string) []int {
 func AlertProcessing() {
 	for {
 		stats = Alert()
+		for k, _ := range cpu {
+			if _, ok := stats[k]; !ok {
+				delete(cpu, k)
+			}
+		}
 		time.Sleep(time.Second * 5)
 	}
 }

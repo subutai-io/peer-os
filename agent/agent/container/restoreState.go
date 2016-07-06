@@ -24,12 +24,12 @@ func ContainersRestoreState() {
 		case 100:
 		case 5:
 			{
-				log.Debug("Failed to START sontainer " + cont.Name + " after 5 attempts")
+				log.Debug("Failed to START container " + cont.Name + " after 5 attempts")
 				contsStatus[cont.Name] = 100
 			}
 		case -5:
 			{
-				log.Debug("Failed to STOP sontainer " + cont.Name + " after 5 attempts")
+				log.Debug("Failed to STOP container " + cont.Name + " after 5 attempts")
 				contsStatus[cont.Name] = 100
 			}
 		case 10:

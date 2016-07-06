@@ -3,11 +3,12 @@ package net
 import (
 	"bufio"
 	"bytes"
-	"github.com/subutai-io/base/agent/log"
 	"net"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/subutai-io/base/agent/log"
 )
 
 func RateLimit(nic string, rate ...string) string {
@@ -62,7 +63,11 @@ func GetIp() string {
 		addrs, err := nic.Addrs()
 		log.Check(log.ErrorLevel, "Getting interface addresses", err)
 		if len(addrs) > 0 {
-			return strings.Split(addrs[0].String(), "/")[0]
+			if ipnet, ok := addrs[0].(*net.IPNet); ok {
+				if ipnet.IP.To4() != nil {
+					return ipnet.IP.String()
+				}
+			}
 		}
 	}
 	return ""

@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -23,7 +24,11 @@ type snap struct {
 
 func getAvailable(name string) string {
 	var update snap
-	client := &http.Client{}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
+	if !config.Cdn.Allowinsecure {
+		client = &http.Client{}
+	}
 	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/info?name=" + name)
 	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/info?name="+name, err)
 	defer resp.Body.Close()
@@ -55,7 +60,11 @@ func upgradeRh(packet string) {
 	file, err := os.Create("/tmp/" + packet)
 	log.Check(log.FatalLevel, "Creating update file", err)
 	defer file.Close()
-	client := &http.Client{}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
+	if !config.Cdn.Allowinsecure {
+		client = &http.Client{}
+	}
 	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?name=" + packet)
 	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?name="+packet, err)
 	defer resp.Body.Close()
@@ -95,7 +104,7 @@ func Update(name string, check bool) {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update is avalable")
+			log.Info("Update is available")
 			os.Exit(0)
 		}
 
@@ -113,7 +122,7 @@ func Update(name string, check bool) {
 			log.Info("No update is available")
 			os.Exit(1)
 		} else if check {
-			log.Info("Update is avalable")
+			log.Info("Update is available")
 			os.Exit(0)
 		}
 		_, err = container.AttachExec(name, []string{"apt-get", "-qq", "upgrade", "-y", "--force-yes", "-o", "Acquire::http::Timeout=5"})
