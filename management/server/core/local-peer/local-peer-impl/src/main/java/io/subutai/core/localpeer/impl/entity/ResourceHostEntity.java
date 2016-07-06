@@ -819,7 +819,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             ContainerHostEntity containerHost;
             try
             {
-                containerHost = ( ContainerHostEntity ) getContainerHostByName( info.getHostname() );
+                containerHost = ( ContainerHostEntity ) getContainerHostById( info.getId() );
                 containerHost.updateHostInfo( info );
             }
             catch ( HostNotFoundException e )

@@ -10,8 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+import io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState;
+
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.READY;
+import static io.subutai.hub.share.dto.environment.EnvironmentPeerDto.PeerState.WAIT;
 
 
 public abstract class StateHandler
@@ -66,6 +71,13 @@ public abstract class StateHandler
 
     private void runAs( EnvironmentPeerDto peerDto )
     {
+        if ( canIgnoreState( peerDto ) )
+        {
+            log.info( "Ignoring state: {}", peerDto.getState() );
+
+            return;
+        }
+
         try
         {
             Object result = doHandle( peerDto );
@@ -81,9 +93,17 @@ public abstract class StateHandler
     }
 
 
-    protected void post( EnvironmentPeerDto peerDto, Object body )
+    protected boolean canIgnoreState( EnvironmentPeerDto peerDto )
     {
-        ctx.restClient.post( path( PATH, peerDto ), body );
+        PeerState state = peerDto.getState();
+
+        return state == WAIT || state == READY;
+    }
+
+
+    protected RestResult<Object> post( EnvironmentPeerDto peerDto, Object body )
+    {
+        return ctx.restClient.post( path( PATH, peerDto ), body );
     }
 
 

@@ -1,32 +1,21 @@
 package io.subutai.core.security.impl;
 
 
-import java.util.UUID;
-
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.commons.configuration.ConfigurationException;
-
-import com.google.common.base.Strings;
 
 import io.subutai.common.command.EncryptedRequestWrapper;
 import io.subutai.common.command.EncryptedResponseWrapper;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.security.crypto.pgp.ContentAndSignatures;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.keyserver.api.KeyServer;
 import io.subutai.core.security.api.SecurityManager;
-import io.subutai.core.security.api.crypto.CertificateManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
 import io.subutai.core.security.api.dao.SecurityDataService;
 import io.subutai.core.security.api.jetty.HttpContextManager;
-import io.subutai.core.security.impl.crypto.CertificateManagerImpl;
 import io.subutai.core.security.impl.crypto.EncryptionToolImpl;
 import io.subutai.core.security.impl.crypto.KeyManagerImpl;
 import io.subutai.core.security.impl.crypto.KeyStoreManagerImpl;
@@ -40,7 +29,6 @@ import io.subutai.core.security.impl.model.SecurityKeyData;
  */
 public class SecurityManagerImpl implements SecurityManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( SecurityManagerImpl.class );
 
     private KeyManager keyManager = null;
     private DaoManager daoManager = null;
@@ -49,32 +37,15 @@ public class SecurityManagerImpl implements SecurityManager
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
     private KeyStoreManager keyStoreManager = null;
-    private CertificateManager certificateManager = null;
     private HttpContextManager httpContextManager;
 
 
     /* *****************************
      *
      */
-    public SecurityManagerImpl( Object provider ) throws ConfigurationException
+    public SecurityManagerImpl( Object provider ) throws Exception
     {
         keyData = new SecurityKeyData();
-
-        if ( Strings.isNullOrEmpty(SystemSettings.getPeerSecretKeyringPwd()) )
-        {
-            try
-            {
-                SystemSettings.setPeerSecretKeyringPwd( UUID.randomUUID().toString() );
-            }
-            catch ( ConfigurationException e )
-            {
-                LOG.error( " ***** Error in getting value from subutaisystem.cfg",e );
-                throw new ConfigurationException(e);
-            }
-        }
-
-        keyData.setSecretKeyringPwd( SystemSettings.getPeerSecretKeyringPwd() );
-        keyData.setJsonProvider( provider );
 
         httpContextManager = new HttpContextManagerImpl();
     }
@@ -89,7 +60,6 @@ public class SecurityManagerImpl implements SecurityManager
         keyManager = new KeyManagerImpl( securityDataService, keyServer, keyData );
         encryptionTool = new EncryptionToolImpl( ( KeyManagerImpl ) keyManager );
         keyStoreManager = new KeyStoreManagerImpl();
-        certificateManager = new CertificateManagerImpl();
     }
 
 
@@ -208,25 +178,6 @@ public class SecurityManagerImpl implements SecurityManager
     public void setKeyStoreManager( final KeyStoreManager keyStoreManager )
     {
         this.keyStoreManager = keyStoreManager;
-    }
-
-
-    /* *****************************
-     *
-     */
-    @Override
-    public CertificateManager getCertificateManager()
-    {
-        return certificateManager;
-    }
-
-
-    /* *****************************
-     *
-     */
-    public void setCertificateManager( final CertificateManager certificateManager )
-    {
-        this.certificateManager = certificateManager;
     }
 
 

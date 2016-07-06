@@ -12,6 +12,7 @@ public class SystemConfDto
 
     public int securePortX1;
     public int securePortX2;
+    @Deprecated
     public int securePortX3;
     public String publicUrl;
     public int agentPort;
@@ -119,18 +120,6 @@ public class SystemConfDto
     public void setSecurePortX2( final int securePortX2 )
     {
         this.securePortX2 = securePortX2;
-    }
-
-
-    public int getSecurePortX3()
-    {
-        return securePortX3;
-    }
-
-
-    public void setSecurePortX3( final int securePortX3 )
-    {
-        this.securePortX3 = securePortX3;
     }
 
 

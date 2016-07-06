@@ -7,6 +7,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.security.exception.IdentityExpiredException;
 import io.subutai.common.security.exception.InvalidLoginException;
+import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.rest.model.AuthMessage;
@@ -46,91 +47,60 @@ public class RestServiceImpl implements RestService
     }
 
 
-
     @Override
-    public Response authenticate( int type, final String userName, final String password )
+    public Response authenticate( int type, String userName, String password )
     {
         try
         {
+            //password = URLDecoder.decode( password, "UTF-8" );
             String token = identityManager.getUserToken( userName, password );
 
             if ( !Strings.isNullOrEmpty( token ) )
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setToken( token );
-                return Response.ok( authM ).build();
+                return Response.ok( JsonUtil.toJson( authM ) ) .build();
             }
             else
             {
-                return Response.status( Response.Status.FORBIDDEN ).build();
+                return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid Login" ).build();
             }
-
         }
-        catch(IdentityExpiredException e)
+        catch ( IdentityExpiredException e )
         {
-            User user = identityManager.getUserByUsername( userName );
 
-            if(user != null)
+            User user = null;
+
+            if ( userName.length() == 40 )
+                identityManager.getUserByFingerprint( userName );
+            else
+                identityManager.getUserByUsername( userName );
+
+            if ( user != null )
             {
                 AuthMessage authM = new AuthMessage();
                 authM.setStatus( 1 );
                 authM.setAuthId( identityManager.updateUserAuthId( user, null ) );
-                return Response.ok( authM ).build();
+                return Response.ok( JsonUtil.toJson( authM ) ).build();
             }
             else
             {
                 return Response.status( Response.Status.NOT_FOUND ).build();
             }
         }
-        catch(Exception e)
+        catch ( InvalidLoginException e )
+        {
+            return Response.status( Response.Status.FORBIDDEN ).entity( "Invalid Login" ).build();
+        }
+        catch ( Exception e )
         {
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
-
     }
 
 
     @Override
-    public Response updateAuthId( int type,String userName,String password ,String authId  )
-    {
-        try
-        {
-            User user = identityManager.authenticateByAuthSignature( userName, password );
-
-            if(user != null)
-            {
-                identityManager.updateUserAuthId( user, authId );
-                return Response.ok().build();
-            }
-            else
-            {
-                throw new InvalidLoginException( "User not found" );
-            }
-        }
-        catch(IdentityExpiredException e)
-        {
-            User user = identityManager.getUserByUsername( userName );
-
-            if(user != null)
-            {
-                identityManager.updateUserAuthId( user, authId );
-                return Response.ok().build();
-            }
-            else
-            {
-                throw new InvalidLoginException( "User not found" );
-            }
-        }
-        catch(Exception e)
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
-
-    }
-
-
-    @Override
-    public Response getAuthId( int type, final String userName, final String password )
+    public Response updateAuthId( int type, String userName, String password, String authId )
     {
         try
         {
@@ -138,7 +108,51 @@ public class RestServiceImpl implements RestService
 
             if ( user != null )
             {
-                return Response.ok(user.getAuthId()).build();
+                identityManager.updateUserAuthId( user, authId );
+                return Response.ok().build();
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found" );
+            }
+        }
+        catch ( IdentityExpiredException e )
+        {
+            User user = null;
+
+            if ( userName.length() == 40 )
+                identityManager.getUserByFingerprint( userName );
+            else
+                identityManager.getUserByUsername( userName );
+
+            if ( user != null )
+            {
+                identityManager.updateUserAuthId( user, authId );
+                return Response.ok().build();
+            }
+            else
+            {
+                throw new InvalidLoginException( "User not found" );
+            }
+        }
+        catch ( Exception e )
+        {
+            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
+        }
+    }
+
+
+    @Override
+    public Response getAuthId( int type, String userName, String password )
+    {
+        try
+        {
+            //password = URLDecoder.decode( password, "UTF-8" );
+            User user = identityManager.authenticateByAuthSignature( userName, password );
+
+            if ( user != null )
+            {
+                return Response.ok( user.getAuthId() ).build();
             }
             else
             {
@@ -154,5 +168,4 @@ public class RestServiceImpl implements RestService
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
     }
-
 }

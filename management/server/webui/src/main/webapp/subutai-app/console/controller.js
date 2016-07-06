@@ -21,7 +21,8 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 		cfpLoadingBar.complete();
 	});
 
-	vm.currentType = 'peer';
+	vm.currentType = 'environments';
+	vm.admin = false,
 	vm.activeConsole = false;
 	vm.hosts = [];
 	vm.environments = [];
@@ -59,6 +60,14 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 		}
 	});
 
+	if( localStorage.getItem("currentUserPermissions") )
+		for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
+			if (localStorage.getItem("currentUserPermissions")[i] == 2) {
+				vm.activeTab = "peer";
+				vm.admin = true;
+			}
+		}
+
 	//Console UI
 	$scope.theme = 'modern';
 	setTimeout(function () {
@@ -81,8 +90,7 @@ function ConsoleViewCtrl($scope, consoleService, peerRegistrationService, $state
 
 	$scope.session = {
 		commands: [],
-		output: [],
-		$scope:$scope
+		output: []
 	};
 
 	$scope.$watchCollection(function () { return $scope.session.commands; }, function (n) {

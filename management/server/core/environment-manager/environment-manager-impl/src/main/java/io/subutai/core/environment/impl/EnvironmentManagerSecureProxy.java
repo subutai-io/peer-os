@@ -61,7 +61,6 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
 import io.subutai.core.hubadapter.api.HubAdapter;
-import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -71,6 +70,8 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.common.HubEventListener;
+import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
 public class EnvironmentManagerSecureProxy
@@ -124,37 +125,6 @@ public class EnvironmentManagerSecureProxy
     public void unregisterListener( final EnvironmentEventListener listener )
     {
         environmentManager.unregisterListener( listener );
-    }
-
-
-    private void buildRelation( Environment environment )
-    {
-        try
-        {
-            User activeUser = identityManager.getActiveUser();
-            UserDelegate delegatedUser = identityManager.getUserDelegate( activeUser.getId() );
-
-            // User - Delegated user - Environment
-            // Delegated user - Delegated user - Environment
-            // Delegated user - Environment - Container
-            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
-            Map<String, String> traits = relationInfoMeta.getRelationTraits();
-            traits.put( "read", "true" );
-            traits.put( "write", "true" );
-            traits.put( "update", "true" );
-            traits.put( "delete", "true" );
-            traits.put( "ownership", Ownership.USER.getName() );
-
-            RelationMeta relationMeta =
-                    new RelationMeta( delegatedUser, delegatedUser, environment, activeUser.getSecurityKeyId() );
-            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
-            relation.setRelationStatus( RelationStatus.VERIFIED );
-            relationManager.saveRelation( relation );
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "Error message.", e );
-        }
     }
 
 
@@ -244,9 +214,7 @@ public class EnvironmentManagerSecureProxy
     public Environment createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
-        Environment environment = environmentManager.createEnvironment( topology, async );
-        buildRelation( environment );
-        return environment;
+        return environmentManager.createEnvironment( topology, async );
     }
 
 
@@ -263,8 +231,7 @@ public class EnvironmentManagerSecureProxy
         TrackerOperation operationTracker = tracker.createTrackerOperation( EnvironmentManagerImpl.MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
-        Environment environment = environmentManager.createEnvironment( topology, async, operationTracker );
-        buildRelation( environment );
+        environmentManager.createEnvironment( topology, async, operationTracker );
 
         return operationTracker.getId();
     }
@@ -378,7 +345,7 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    @RolesAllowed( {"Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
+    @RolesAllowed( { "Environment-Management|Update", "System-Management|Write", "System-Management|Update" } )
     public void resetP2PSecretKey( final String environmentId, final String newP2pSecretKey,
                                    final long p2pSecretKeyTtlSec, final boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException
@@ -479,6 +446,13 @@ public class EnvironmentManagerSecureProxy
     public Environment loadEnvironment( final String environmentId ) throws EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
+        // Environment is from Hub
+        if ( environment instanceof ProxyEnvironment )
+        {
+            return environment;
+        }
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;read=true" ) );
@@ -505,6 +479,7 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=All;update=true" ) );
@@ -513,6 +488,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
+
         environmentManager.removeEnvironmentDomain( environmentId );
     }
 
@@ -578,7 +554,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentManagerException( e.getMessage(), e );
         }
-        return environmentManager.isContainerInEnvironmentDomain( environmentId, containerHostId );
+        return environmentManager.isContainerInEnvironmentDomain( containerHostId, environmentId );
     }
 
 
@@ -668,6 +644,14 @@ public class EnvironmentManagerSecureProxy
     public void notifyOnContainerDestroyed( final Environment environment, final String containerId )
     {
         environmentManager.notifyOnContainerDestroyed( environment, containerId );
+    }
+
+
+    @PermitAll
+    @Override
+    public void notifyOnEnvironmentDestroyed( final String environmentId )
+    {
+        environmentManager.notifyOnEnvironmentDestroyed( environmentId );
     }
 
 
@@ -838,5 +822,11 @@ public class EnvironmentManagerSecureProxy
     public void onRegistrationSucceeded()
     {
         environmentManager.onRegistrationSucceeded();
+    }
+
+
+    @Override
+    public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
+    {
     }
 }

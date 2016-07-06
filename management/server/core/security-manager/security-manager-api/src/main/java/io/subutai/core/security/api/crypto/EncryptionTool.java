@@ -19,19 +19,19 @@ public interface EncryptionTool
     /**
      * Decrypts message with Peer private key
      */
-    public byte[] decrypt( final byte[] message ) throws PGPException;
+    byte[] decrypt( final byte[] message ) throws PGPException;
 
 
     /**
      * Decrypts message with Private Key found by HostId
      */
-    public byte[] decrypt( final byte[] message, String secretKeyHostId, String pwd ) throws PGPException;
+    byte[] decrypt( final byte[] message, String secretKeyHostId, String pwd ) throws PGPException;
 
 
     /* *****************************************
      *
      */
-    public byte[] decryptAndVerify( final byte[] message, PGPSecretKey secretKey, String pwd, PGPPublicKey pubKey )
+    byte[] decryptAndVerify( final byte[] message, PGPSecretKey secretKey, String pwd, PGPPublicKey pubKey )
             throws PGPException;
 
 
@@ -56,32 +56,32 @@ public interface EncryptionTool
     /* *****************************************
      *
      */
-    public byte[] decryptAndVerify( final byte[] message, String secretKeyHostId, String pwd, String publicKeyHostId )
+    byte[] decryptAndVerify( final byte[] message, String secretKeyHostId, String pwd, String publicKeyHostId )
             throws PGPException;
 
 
     /* **********************************************
      *
      */
-    public byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing, String pwd ) throws PGPException;
+    byte[] decrypt( final byte[] message, PGPSecretKeyRing keyRing, String pwd ) throws PGPException;
 
 
     /* *****************************************
      *
      */
-    public byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored );
+    byte[] encrypt( final byte[] message, final PGPPublicKey publicKey, boolean armored );
 
 
     /* *****************************************
      *
      */
-    public byte[] encrypt( final byte[] message, final String publicKeyHostId, boolean armored );
+    byte[] encrypt( final byte[] message, final String publicKeyHostId, boolean armored );
 
 
     /* *****************************************
      *
      */
-    public boolean verify( byte[] signedMessage, PGPPublicKey publicKey );
+    boolean verify( byte[] signedMessage, PGPPublicKey publicKey );
 
 
     /**
@@ -91,7 +91,7 @@ public interface EncryptionTool
      * @param publicKey - encryption key
      * @param armored - output in armored format
      */
-    public byte[] signAndEncrypt( final byte[] message, final PGPPublicKey publicKey, final boolean armored )
+    byte[] signAndEncrypt( final byte[] message, final PGPPublicKey publicKey, final boolean armored )
             throws PGPException;
 
 
@@ -104,22 +104,21 @@ public interface EncryptionTool
      * @param publicKey - encryption key
      * @param armored - output in armored format
      */
-    public byte[] signAndEncrypt( final byte[] message, PGPSecretKey secretKey, String secretPwd,
-                                  final PGPPublicKey publicKey, final boolean armored ) throws PGPException;
+    byte[] signAndEncrypt( final byte[] message, PGPSecretKey secretKey, String secretPwd, final PGPPublicKey publicKey,
+                           final boolean armored ) throws PGPException;
 
 
     /* *********************************************************************
      *
      */
-    public byte[] signAndEncrypt( final byte[] message, String secretKeyHostId, String secretPwd,
-                                  final String publicKeyHostId, final boolean armored ) throws PGPException;
+    byte[] signAndEncrypt( final byte[] message, String secretKeyHostId, String secretPwd, final String publicKeyHostId,
+                           final boolean armored ) throws PGPException;
 
 
     /* *********************************************************************
      *
      */
-    byte[] clearSign( final byte[] message, PGPSecretKey secretKey, String secretPwd )
-            throws PGPException;
+    byte[] clearSign( final byte[] message, PGPSecretKey secretKey, String secretPwd ) throws PGPException;
 
 
     /* *********************************************************************
@@ -141,20 +140,19 @@ public interface EncryptionTool
      *
      * @return - {@code ContentAndSignatures}
      */
-    public ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException;
+    ContentAndSignatures decryptAndReturnSignatures( final byte[] encryptedMessage ) throws PGPException;
 
 
     /**
      * Verifies the content with its signatures
      *
      * @param contentAndSignatures -  {@code ContentAndSignatures}
-     * @param publicKey - public key to verify signatures
+     * @param publicKey -  key to verify signatures
      *
      * @return - true if verified successfully, false otherwise
      */
 
-    public boolean verifySignature( ContentAndSignatures contentAndSignatures, PGPPublicKey publicKey )
-            throws PGPException;
+    boolean verifySignature( ContentAndSignatures contentAndSignatures, PGPPublicKey publicKey ) throws PGPException;
 
 
     /**
@@ -162,35 +160,35 @@ public interface EncryptionTool
      *
      * @return - KeyPair
      */
-    public KeyPair generateKeyPair( String userId, String secretPwd, boolean armored );
+    KeyPair generateKeyPair( String userId, String secretPwd, boolean armored );
 
 
     /**
-     * Signs a public key
+     * Signs a  key
      *
-     * @param publicKeyRing a public key ring containing the single public key to sign
-     * @param id the id we are certifying against the public key
+     * @param publicKeyRing a  key ring containing the single  key to sign
+     * @param id the id we are certifying against the  key
      * @param secretKey the signing key
      * @param secretKeyPassword the signing key password
      *
-     * @return a public key ring with the signed public key
+     * @return a  key ring with the signed  key
      */
 
-    public PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,
-                                           String secretKeyPassword );
+    PGPPublicKeyRing signPublicKey( PGPPublicKeyRing publicKeyRing, String id, PGPSecretKey secretKey,
+                                    String secretKeyPassword );
 
 
     /**
-     * Verifies that a public key is signed with another public key
+     * Verifies that a  key is signed with another  key
      *
-     * @param keyToVerify the public key to verify
-     * @param id the id we are verifying against the public key
+     * @param keyToVerify the  key to verify
+     * @param id the id we are verifying against the  key
      * @param keyToVerifyWith the key to verify with
      *
      * @return true if verified, false otherwise
      */
-    public boolean verifyPublicKey( PGPPublicKey keyToVerify, String id, PGPPublicKey keyToVerifyWith );
+    boolean verifyPublicKey( PGPPublicKey keyToVerify, String id, PGPPublicKey keyToVerifyWith );
 
 
-    public String armorByteArrayToString( byte[] array ) throws PGPException;
+    String armorByteArrayToString( byte[] array ) throws PGPException;
 }

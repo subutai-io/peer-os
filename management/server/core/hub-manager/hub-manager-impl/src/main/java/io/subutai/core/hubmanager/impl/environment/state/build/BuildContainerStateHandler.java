@@ -29,10 +29,13 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.hub.share.dto.environment.ContainerStateDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
 import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+
+import static io.subutai.hub.share.dto.environment.ContainerStateDto.BUILDING;
 
 
 public class BuildContainerStateHandler extends StateHandler
@@ -73,16 +76,16 @@ public class BuildContainerStateHandler extends StateHandler
     private void setupPeerEnvironmentKey( EnvironmentPeerDto peerDto ) throws PeerException, PGPException
     {
         RelationLinkDto envLink = new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
-                PermissionObject.EnvironmentManagement.getName(), "" );
+                PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
 
         ctx.localPeer.createPeerEnvironmentKeyPair( envLink );
     }
 
 
     @Override
-    protected void post( EnvironmentPeerDto peerDto, Object body )
+    protected RestResult<Object> post( EnvironmentPeerDto peerDto, Object body )
     {
-        ctx.restClient.post( path( PATH, peerDto ), body );
+        return ctx.restClient.post( path( PATH, peerDto ), body );
     }
 
 
@@ -90,9 +93,14 @@ public class BuildContainerStateHandler extends StateHandler
     {
         Set<Node> nodes = new HashSet<>();
 
+        log.info( "Prepare templates:" );
+
         for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
         {
             ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
+
+            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
+                    nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
             Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0, 0,
                     peerDto.getPeerId(), nodeDto.getHostId() );
@@ -147,7 +155,11 @@ public class BuildContainerStateHandler extends StateHandler
 
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
-            updateNodeDto( nodeDto, envContainers );
+            // Update for just cloned containers only. Containers with RUNNING state were created in previous builds.
+            if ( nodeDto.getState() == BUILDING )
+            {
+                updateNodeDto( nodeDto, envContainers );
+            }
         }
     }
 
@@ -174,10 +186,15 @@ public class BuildContainerStateHandler extends StateHandler
 
         CreateEnvironmentContainersRequest createRequests = new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
 
+        log.info( "Clone requests:" );
+
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
-            // Exclude existing containers. This may happen as a result of duplicated requests.
-            if ( !containerExists( nodeDto.getHostName(), envContainers ) )
+            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
+                    nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+
+            // Exclude existing containers. This may happen as a result of duplicated requests or adding a new container to existing peer in env.
+            if ( !containerExists( nodeDto.getHostName(), envContainers ) && nodeDto.getState() == BUILDING )
             {
                 createRequests.addRequest( createCloneRequest( nodeDto ) );
             }
@@ -232,7 +249,7 @@ public class BuildContainerStateHandler extends StateHandler
         RequestBuilder rb = new RequestBuilder( String.format( "rm -rf %1$s && " +
                         "mkdir -p %1$s && " +
                         "chmod 700 %1$s && " +
-                        "ssh-keygen -t dsa -P '' -f %1$s/id_dsa -q && " + "cat %1$s/id_dsa.pub",
+                        "ssh-keygen -t rsa -P '' -f %1$s/id_rsa -q && " + "cat %1$s/id_rsa.pub",
                 Common.CONTAINER_SSH_FOLDER ) );
 
         CommandResult result = commandUtil.execute( rb, host );

@@ -8,9 +8,7 @@ public class SecurityKeyData
 {
     private String secretKeyringPwd;
     private String manHostId;
-    private String manHostKeyFingerprint;
     private String peerOwnerId;
-    private Object jsonProvider;
 
 
     public String getSecretKeyringPwd()
@@ -24,6 +22,7 @@ public class SecurityKeyData
         this.secretKeyringPwd = secretKeyringPwd;
     }
 
+
     public String getManHostId()
     {
         return manHostId;
@@ -33,30 +32,6 @@ public class SecurityKeyData
     public void setManHostId( final String manHostId )
     {
         this.manHostId = manHostId;
-    }
-
-
-    public String getManHostKeyFingerprint()
-    {
-        return manHostKeyFingerprint;
-    }
-
-
-    public void setManHostKeyFingerprint( final String manHostKeyFingerprint )
-    {
-        this.manHostKeyFingerprint = manHostKeyFingerprint;
-    }
-
-
-    public Object getJsonProvider()
-    {
-        return jsonProvider;
-    }
-
-
-    public void setJsonProvider( final Object jsonProvider )
-    {
-        this.jsonProvider = jsonProvider;
     }
 
 

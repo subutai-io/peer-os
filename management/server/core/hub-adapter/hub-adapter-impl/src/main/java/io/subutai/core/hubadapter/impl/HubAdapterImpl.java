@@ -31,6 +31,8 @@ public class HubAdapterImpl implements HubAdapter
 
     private static final String CONTAINERS_URL = "/rest/v1/adapter/environments/%s/containers/%s";
 
+    private static final String CONTAINERS_STATE_URL = "/rest/v1/adapter/environments/%s/containers/%s/%s";
+
     private static final String PLUGIN_DATA_URL = "/rest/v1/adapter/users/%s/peers/%s/plugins/%s";
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -192,11 +194,16 @@ public class HubAdapterImpl implements HubAdapter
             return Collections.emptyList();
         }
 
-        log.debug( "pluginKey={}, class={}", pluginKey, clazz );
+        log.debug( "userId={}, pluginKey={}, class={}", userId, pluginKey, clazz );
 
         String response = httpClient.doGet( format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) );
 
         log.debug( "response: {}", response );
+
+        if ( response == null )
+        {
+            return Collections.emptyList();
+        }
 
         List<T> resultList = new ArrayList<>();
 
@@ -206,7 +213,10 @@ public class HubAdapterImpl implements HubAdapter
 
             for ( String data : dataList )
             {
-                resultList.add( gson.fromJson( data, clazz ) );
+                if ( StringUtils.isNotBlank( data ) )
+                {
+                    resultList.add( gson.fromJson( data, clazz ) );
+                }
             }
         }
         catch ( IOException e )
@@ -215,5 +225,78 @@ public class HubAdapterImpl implements HubAdapter
         }
 
         return resultList;
+    }
+
+
+    @Override
+    public <T> T getPluginDataByKey( String pluginKey, String key, Class<T> clazz )
+    {
+        String userId = getUserIdWithCheck();
+
+        if ( userId == null )
+        {
+            return null;
+        }
+
+        log.debug( "userId={}, pluginKey={}, key={}, class={}", userId, pluginKey, key, clazz );
+
+        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
+
+        String response = httpClient.doGet( url );
+
+        log.debug( "response: {}", response );
+
+        return response != null ? gson.fromJson( response, clazz ) : null;
+    }
+
+
+    @Override
+    public boolean deletePluginData( String pluginKey, String key )
+    {
+        String userId = getUserIdWithCheck();
+
+        if ( userId == null )
+        {
+            return false;
+        }
+
+        log.debug( "userId={}, pluginKey={}, key={}", userId, pluginKey, key );
+
+        String url = format( PLUGIN_DATA_URL, userId, peerId, pluginKey ) + "/data/" + key;
+
+        String response = httpClient.doDelete( url );
+
+        log.debug( "response: {}", response );
+
+        return true;
+    }
+
+
+    @Override
+    public void onContainerStart( String envId, String contId )
+    {
+        onContainerStateChange( envId, contId, "start" );
+    }
+
+
+    @Override
+    public void onContainerStop( String envId, String contId )
+    {
+        onContainerStateChange( envId, contId, "stop" );
+    }
+
+
+    private void onContainerStateChange( String envId, String contId, String state )
+    {
+        String userId = getUserIdWithCheck();
+
+        if ( userId == null )
+        {
+            return;
+        }
+
+        log.info( "onContainerStateChange: envId={}, contId={}, state={}", envId, contId, state );
+
+        httpClient.doPost( format( CONTAINERS_STATE_URL, envId, contId, state ), null );
     }
 }

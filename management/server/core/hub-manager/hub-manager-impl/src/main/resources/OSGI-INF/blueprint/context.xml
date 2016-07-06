@@ -45,7 +45,7 @@
              interface="io.subutai.core.executor.api.CommandExecutor" />
 
   <!-- ***************************************************************** -->
-  <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
+  <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
   </bean>
   <!-- ***************************************************************** -->
@@ -64,7 +64,7 @@
   <service ref="hubImpl" interface="io.subutai.core.hubmanager.api.HubManager" />
 
   <reference-list id="hubEventLstnr"
-                  interface="io.subutai.core.hubmanager.api.HubEventListener"
+                  interface="io.subutai.hub.share.common.HubEventListener"
                   availability="optional">
     <reference-listener ref="hubImpl"
                         bind-method="addListener" unbind-method="removeListener" />

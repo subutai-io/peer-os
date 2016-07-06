@@ -108,10 +108,25 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        // @todo added management template filtration, needs minor enhancement
-        Set<String> templates = templateRegistry.list().stream().map( TemplateKurjun::getName )
-                                                .filter( n -> !n.equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                .collect( Collectors.toSet() );
+        // @todo check for management container should be here
+        Set<TemplateKurjun> templates = templateRegistry.list().stream().filter(
+                n -> !n.getName().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
+                                                        .filter( n -> !n.getName().matches( "(?i)cassandra14|" +
+                                                                "cassandra16|" +
+                                                                "elasticsearch14|" +
+                                                                "elasticsearch16|" +
+                                                                "hadoop14|" +
+                                                                "hadoop16|" +
+                                                                "mongo14|" +
+                                                                "mongo16|" +
+                                                                "openjre714|" +
+                                                                "openjre716|" +
+                                                                "solr14|" +
+                                                                "solr16|" +
+                                                                "storm14|" +
+                                                                "storm16|" +
+                                                                "zookeeper14|" +
+                                                                "zookeeper16" ) ).collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
@@ -134,14 +149,22 @@ public class RestServiceImpl implements RestService
         Set<Environment> environments = environmentManager.getEnvironments();
         Set<EnvironmentDto> environmentDtos = Sets.newHashSet();
 
+
         for ( Environment environment : environments )
         {
-            EnvironmentDto environmentDto =
-                    new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
-                            convertContainersToContainerJson( environment.getContainerHosts() ),
-                            environment.getRelationDeclaration(), environment.getClass().getName() );
+            try
+            {
+                EnvironmentDto environmentDto =
+                        new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(),
+                                convertContainersToContainerJson( environment.getContainerHosts() ),
+                                environment.getClass().getName() );
 
-            environmentDtos.add( environmentDto );
+                environmentDtos.add( environmentDto );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error JSON-ifying environment {}: {}", environment.getId(), e.getMessage() );
+            }
         }
 
         return Response.ok( JsonUtil.toJson( environmentDtos ) ).build();
@@ -343,7 +366,7 @@ public class RestServiceImpl implements RestService
         try
         {
             byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
-            environmentManager.addSshKey( environmentId, new String( bytesEncoded ), false );
+            environmentManager.addSshKey( environmentId, new String( bytesEncoded ).trim(), false );
         }
         catch ( Exception e )
         {
@@ -374,7 +397,7 @@ public class RestServiceImpl implements RestService
         try
         {
             byte[] bytesEncoded = Base64.decodeBase64( key.getBytes() );
-            environmentManager.removeSshKey( environmentId, new String( bytesEncoded ), false );
+            environmentManager.removeSshKey( environmentId, new String( bytesEncoded ).trim(), false );
         }
         catch ( Exception e )
         {
@@ -481,11 +504,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setContainerDomain( final String environmentId, final String containerId )
+    public Response setContainerDomain( final String environmentId, final String containerId, final Boolean state )
     {
         try
         {
-            if ( environmentManager.isContainerInEnvironmentDomain( containerId, environmentId ) )
+            if ( !state )
             {
                 environmentManager.removeContainerFromEnvironmentDomain( containerId, environmentId );
             }
@@ -790,8 +813,8 @@ public class RestServiceImpl implements RestService
         try
         {
 
-            return Response.ok( JsonUtil.toJson( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ) )
-                           .build();
+            return Response.ok( JsonUtil
+                    .toJson( environmentManager.setupSshTunnelForContainer( containerId, environmentId ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -880,6 +903,10 @@ public class RestServiceImpl implements RestService
         if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
         {
             throw new Exception( "Duplicated environment name" );
+        }
+        if ( name.length() > 50 )
+        {
+            throw new Exception( "Environment name is too long, it should be 50 chars max" );
         }
     }
 }

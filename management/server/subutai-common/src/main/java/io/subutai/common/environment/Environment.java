@@ -25,6 +25,8 @@ public interface Environment extends RelationLink
      */
     Long getUserId();
 
+    void removeEnvironmentPeer( String peerId );
+
     /**
      * Returns id of environment
      */
@@ -42,8 +44,6 @@ public interface Environment extends RelationLink
      */
     EnvironmentStatus getStatus();
 
-
-    String getRelationDeclaration();
 
     /**
      * Returns creation timestamp
@@ -117,6 +117,8 @@ public interface Environment extends RelationLink
      * @return - found container host
      */
     EnvironmentContainerHost getContainerHostById( String id ) throws ContainerHostNotFoundException;
+
+    Set<EnvironmentContainerHost> getContainerHostsByPeerId( String id );
 
     /**
      * Searches container by its hostname withing this environment

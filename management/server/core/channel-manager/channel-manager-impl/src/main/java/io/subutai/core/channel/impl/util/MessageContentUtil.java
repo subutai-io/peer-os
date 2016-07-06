@@ -82,55 +82,21 @@ public class MessageContentUtil
 
 
     //***************************************************************************
-    public static int checkUrlAccessibility( final int currentStatus, HttpServletRequest req )
+    public static int checkUrlAccessibility( HttpServletRequest req )
     {
-        int status = currentStatus;
         int inPort = req.getLocalPort();
         String basePath = req.getRequestURI();
 
 
         if ( inPort == SystemSettings.getSecurePortX1() )
         {
-            if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
+            if ( !ChannelSettings.checkURLAccess( basePath ) )
             {
-                status = 1;
+                return 1;
             }
-        }
-        else if ( inPort == SystemSettings.getOpenPort() )
-        {
-            if ( ChannelSettings.checkURLAccess( basePath, ChannelSettings.URL_ACCESS_PX1 ) == 0 )
-            {
-                status = 1;
-            }
-        }
-        else if ( inPort == SystemSettings.getSecurePortX3())
-        {
-            if ( basePath.startsWith( "/rest/kurjun" )  || basePath.startsWith( "/kurjun/rest" ) )
-            {
-                status = 0;
-            }
-            else
-            {
-                status = 1;
-            }
-        }
-        else if ( inPort ==  SystemSettings.getSpecialPortX1() ) //file server
-        {
-            if ( basePath.startsWith( "/rest/kurjun" ) )
-            {
-                status = 0;
-            }
-            else
-            {
-                status = 1;
-            }
-        }
-        else
-        {
-            status = 0;
         }
 
-        return status;
+        return 0;
     }
 
 
@@ -291,7 +257,7 @@ public class MessageContentUtil
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
                 KeyManager keyMan = securityManager.getKeyManager();
-                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget);
+                PGPPublicKey pubKey = keyMan.getRemoteHostPublicKey( hostIdTarget );
 
                 if ( pubKey != null )
                 {

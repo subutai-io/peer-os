@@ -60,22 +60,21 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
                 if ( req.getLocalPort() == SystemSettings.getSecurePortX2() )
                 {
-                    userSession = authenticateAccess( null,null );
+                    userSession = authenticateAccess( null, null ); // auth with system user
                 }
                 else
                 {
-                    int status = 0;
-                    status = MessageContentUtil.checkUrlAccessibility( status, req );
+                    int status = MessageContentUtil.checkUrlAccessibility( req );
                     //----------------------------------------------------------------------------------------------
                     if ( status == 1 ) //require tokenauth
                     {
-                        userSession = authenticateAccess( message,req );
+                        userSession = authenticateAccess( message, req );
                     }
                     else if ( status == 0 ) // auth with system user
                     {
-                        userSession = authenticateAccess( null,null );
+                        userSession = authenticateAccess( null, null );
                     }
-                    else if ( status == 2 )
+                    else
                     {
                         MessageContentUtil.abortChain( message, 403, "Permission denied" );
                     }
@@ -107,7 +106,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                     MessageContentUtil.abortChain( message, 401, "User is not authorized" );
                 }
             }
-                //-----------------------------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------------------------
         }
         catch ( Exception e )
         {
@@ -123,7 +122,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
         if ( message == null )
         {
-            //***********internal auth ********* for regisration and 8444 port
+            //***********internal auth ********* for registration , 8444 port and 8443 open REST endpoints
             return channelManagerImpl.getIdentityManager().loginSystemUser();
         }
         else

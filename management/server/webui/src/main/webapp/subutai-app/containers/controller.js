@@ -69,7 +69,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function checkDomain() {
-		environmentService.checkDomain(vm.domainContainer).success(function (data) {
+		environmentService.checkDomain(vm.domainContainer, vm.currentDomainStatus).success(function (data) {
 			vm.currentDomainStatus = data;
 		});
 		ngDialog.closeAll();
@@ -167,6 +167,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 					// We don't show on UI containers created by Hub, located on other peers.
 					// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
+					// @todo remove when implement on backend
 					var container = vm.environments[i].containers[j];
 					var remoteProxyContainer = !container.local && container.dataSource == "hub";
 

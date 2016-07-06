@@ -33,12 +33,12 @@ You can easily combine all parameters in one comand!
 
 Parameter       | Description 
 ----------------|----------------------
--m              | Set Management Host First:  IP, domain
--M              | Set Management Host Second: IP, domain
+-m              | Set Management Host First:  IP/domain
+-M              | Set Management Host Second: IP/domain
 -l              | Observe List of All Playbooks
 -L              | Observe List Playbooks for current run
 -s              | Choice of Playbooks for run
-                | “playbook1.story, playbook2.story” ...  Start a few Playbooks
+                | “playbook1.story playbook2.story” ...  Start a few Playbooks
 -r              | Start acceptance tests
 -h              | Get Help info
 
@@ -104,4 +104,6 @@ UserRegistration.story
 SERENITY 
 TEST STARTED ....
 ```
-To be continue ...
+For record video you need use ```./run_tests_rec.sh```
+Directory for videos: ``` /src/test/resources/video/ ```
+For run on the Jenkins you need use ```./run_tests.sh```

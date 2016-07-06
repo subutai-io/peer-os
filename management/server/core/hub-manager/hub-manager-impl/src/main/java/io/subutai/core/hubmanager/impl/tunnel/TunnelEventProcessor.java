@@ -18,14 +18,18 @@ import io.subutai.core.hubmanager.impl.ConfigManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.dto.TunnelInfoDto;
 
+import static io.subutai.hub.share.dto.TunnelInfoDto.TunnelStatus.READY;
+
 
 public class TunnelEventProcessor implements Runnable
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final String REST_TUNNEL_URL = "/rest/v1/tunnel/update/";
-    private static final String TUNNEL_LIST_CMD = "subutai tunnel list | grep 8443";
-    private static String OPENED_IP_PORT;
+    private static final String REST_GET_TUNNEL_DATA_URL = "/rest/v1/tunnel/%s";
+
+    public static final String TUNNEL_LIST_CMD = "subutai tunnel list | grep 8443";
+    public static String OPENED_IP_PORT;
 
     private PeerManager peerManager;
 
@@ -61,18 +65,11 @@ public class TunnelEventProcessor implements Runnable
 
             if ( result.hasSucceeded() && !result.getStdOut().isEmpty() )
             {
-                Map<Long, String> map = parseResult( result.getStdOut() );
-
-                if ( OPENED_IP_PORT == null || !map.containsValue( OPENED_IP_PORT ) )
-                {
-                    sendDataToHub( map );
-                }
+                updateTunnelIpPort( result );
             }
-
-            if ( !result.hasSucceeded() && !result.getStdErr().isEmpty() )
+            else
             {
-                TunnelHelper.sendError( REST_TUNNEL_URL + configManager.getPeerId(),
-                        "Executed: " + TUNNEL_LIST_CMD + " |  Result: " + result.getStdErr(), configManager );
+                checkTunnelStateHub( resourceHost );
             }
         }
         catch ( Exception e )
@@ -83,27 +80,48 @@ public class TunnelEventProcessor implements Runnable
     }
 
 
+    private void updateTunnelIpPort( final CommandResult result )
+    {
+        Map<Long, String> map = parseResult( result.getStdOut() );
+
+        if ( OPENED_IP_PORT == null || !map.containsValue( OPENED_IP_PORT ) )
+        {
+            sendDataToHub( map );
+        }
+    }
+
+
+    private void checkTunnelStateHub( ResourceHost resourceHost )
+    {
+        TunnelInfoDto tunnelInfoDto = TunnelHelper
+                .getPeerTunnelState( String.format( REST_GET_TUNNEL_DATA_URL, configManager.getPeerId() ),
+                        configManager );
+
+        if ( tunnelInfoDto != null && tunnelInfoDto.getTunnelStatus().equals( READY ) )
+        {
+            CommandResult resultIpPort = TunnelHelper.execute( resourceHost,
+                    String.format( TunnelProcessor.CREATE_TUNNEL_COMMAND, tunnelInfoDto.getIp(),
+                            tunnelInfoDto.getPortToOpen(), "" ) );
+
+            if ( resultIpPort.hasSucceeded() )
+            {
+                TunnelInfoDto tunnelInfoDto1 = TunnelHelper
+                        .parseResult( REST_TUNNEL_URL + configManager.getPeerId(), resultIpPort.getStdOut(),
+                                configManager );
+                TunnelHelper.updateTunnelStatus( REST_TUNNEL_URL + configManager.getPeerId(), tunnelInfoDto1,
+                        configManager );
+            }
+            OPENED_IP_PORT = resultIpPort.getStdOut().replaceAll( "\n", "" );
+        }
+    }
+
+
     private void sendDataToHub( Map<Long, String> map )
     {
-        String result = "";
-
-        if ( map.containsKey( -1L ) )
-        {
-            result = map.get( -1L );
-        }
-
-        else
-        {
-            for ( long key : map.keySet() )
-            {
-                result = map.get( key );
-            }
-        }
-
-        OPENED_IP_PORT = result;
+        OPENED_IP_PORT = getOptimalIpPort( map );
 
         TunnelInfoDto tunnelInfoDto =
-                TunnelHelper.parseResult( REST_TUNNEL_URL + configManager.getPeerId(), result, configManager );
+                TunnelHelper.parseResult( REST_TUNNEL_URL + configManager.getPeerId(), OPENED_IP_PORT, configManager );
 
         Response response = TunnelHelper
                 .updateTunnelStatus( REST_TUNNEL_URL + configManager.getPeerId(), tunnelInfoDto, configManager );
@@ -112,6 +130,26 @@ public class TunnelEventProcessor implements Runnable
         {
             OPENED_IP_PORT = null;
         }
+    }
+
+
+    private String getOptimalIpPort( final Map<Long, String> map )
+    {
+        String ipPort = "";
+        if ( map.containsKey( -1L ) )
+        {
+            ipPort = map.get( -1L );
+        }
+
+        else
+        {
+            for ( long key : map.keySet() )
+            {
+                ipPort = map.get( key );
+            }
+        }
+
+        return ipPort;
     }
 
 

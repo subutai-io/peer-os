@@ -15,7 +15,8 @@
 					placeholder="Environment name" 
 					ng-model="advEnvCtrl.environment2BuildName" 
 					ng-readonly="advEnvCtrl.editingEnv" 
-					required>
+					required
+					maxlength="50">
 			</div>
 
 			<div ng-if="advEnvCtrl.containers2Remove.length > 0">
@@ -26,11 +27,11 @@
 						<tr ng-repeat="(templateName, templateInfo) in advEnvCtrl.env2Remove">
 							<td class="b-main-table__20 g-text-center">
 								<img 
-									src="assets/templates/{{ templateName }}.jpg" 
-									alt="{{ templateName }}" 
+									src="assets/templates/{{ templateInfo.name }}.jpg"
+									alt="{{ templateInfo.name }}"
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</td>
-							<td>{{ templateName }}</td>
+							<td>{{ templateInfo.name }}</td>
 							<td class="b-main-table__right">
 								<span 
 								class="g-circle-label g-margin-left-quarter" 
@@ -56,11 +57,11 @@
 						<tr ng-repeat="(templateName, templateInfo) in advEnvCtrl.env2Build">
 							<td class="b-main-table__20 g-text-center">
 								<img 
-									src="assets/templates/{{ templateName }}.jpg" 
-									alt="{{ templateName }}" 
+									src="assets/templates/{{ templateInfo.name }}.jpg"
+									alt="{{ templateInfo.name }}"
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</td>
-							<td>{{ templateName }}</td>
+							<td>{{ templateInfo.name }}</td>
 							<td class="b-main-table__right">
 								<span 
 								class="g-circle-label g-margin-left-quarter" 

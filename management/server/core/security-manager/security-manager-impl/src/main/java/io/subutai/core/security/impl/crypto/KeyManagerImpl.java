@@ -9,6 +9,7 @@ import java.security.AccessControlException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -33,7 +34,7 @@ import io.subutai.common.security.crypto.pgp.PGPEncryptionUtil;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.SecurityKeyType;
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.DateUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.keyserver.api.KeyServer;
@@ -48,8 +49,6 @@ import io.subutai.core.security.impl.model.SecurityKeyData;
 
 /**
  * Implementation of KeyManager API
- *
- * todo use the same database for keys (currently keys are stored by both security manager and key manager)
  */
 public class KeyManagerImpl implements KeyManager
 {
@@ -59,10 +58,6 @@ public class KeyManagerImpl implements KeyManager
     private KeyServer keyServer = null;
     private SecurityKeyData keyData = null;
     private EncryptionTool encryptionTool = null;
-    //private static final String PEER_PUBLIC_KEY_FILE =
-            //System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.public.key";
-    //private static final String PEER_PRIVATE_KEY_FILE =
-            //System.getenv( "SUBUTAI_APP_KEYSTORE_PATH" ) + "/peer.secret.key";
 
 
     /* *****************************
@@ -82,47 +77,48 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
      *
      */
-    public void setEncryptionTool( final EncryptionTool encryptionTool )
+    void setEncryptionTool( final EncryptionTool encryptionTool )
     {
         this.encryptionTool = encryptionTool;
     }
 
 
-    /* *****************************
-     *
-     * just save fingerprint to file system and store keys in db.
-     * Next time if fingerprint exists just use it to fetch peer pgp keys from database.
-     * No need to store pgp keys in the file system
-     */
     private void init()
     {
 
         try
         {
-            //InputStream peerSecStream = PGPEncryptionUtil.getFileInputStream( PEER_PRIVATE_KEY_FILE );
-            //InputStream peerPubStream = PGPEncryptionUtil.getFileInputStream( PEER_PUBLIC_KEY_FILE );
+            List<SecurityKey> peerKeyList = securityDataService.getKeyDataByType( SecurityKeyType.PeerKey.getId() );
 
-            PGPPublicKeyRing peerPubRing;
-            PGPSecretKeyRing peerSecRing;
+            if ( !CollectionUtil.isCollectionEmpty( peerKeyList ) )
+            {
+                //assume there is always one Peer Key
+                SecurityKey peerKey = peerKeyList.get( 0 );
 
-            KeyPair keyPair = PGPEncryptionUtil
-                    .generateKeyPair( String.format( "subutai%d@subutai.io", DateUtil.getUnixTimestamp() ),
-                            SystemSettings.getPeerSecretKeyringPwd(), true );
+                SecretKeyStore secretKeyStore =
+                        securityDataService.getSecretKeyData( peerKey.getSecretKeyFingerprint() );
 
-            //Files.write( keyPair.getPubKeyring(), new File( PEER_PUBLIC_KEY_FILE ) );
-            //Files.write( keyPair.getSecKeyring(), new File( PEER_PRIVATE_KEY_FILE ) );
+                keyData.setManHostId( peerKey.getPublicKeyFingerprint() );
+                keyData.setSecretKeyringPwd( secretKeyStore.getPwd() );
+            }
+            else
+            {
+                String secretPwd = UUID.randomUUID().toString();
+                KeyPair keyPair = PGPEncryptionUtil
+                        .generateKeyPair( String.format( "subutai%d@subutai.io", DateUtil.getUnixTimestamp() ),
+                                secretPwd, true );
 
-            peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
-            peerSecRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
+                PGPPublicKeyRing peerPubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+                PGPSecretKeyRing peerSecRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
 
-            String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
+                String peerId = PGPKeyUtil.getFingerprint( peerPubRing.getPublicKey().getFingerprint() );
 
-            keyData.setManHostId( peerId );
+                keyData.setManHostId( peerId );
+                keyData.setSecretKeyringPwd( secretPwd );
 
-            saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
-            savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
-            //************************************************************
-            //************************************************************
+                saveSecretKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerSecRing );
+                savePublicKeyRing( peerId, SecurityKeyType.PeerKey.getId(), peerPubRing );
+            }
         }
         catch ( Exception ex )
         {
@@ -173,8 +169,9 @@ public class KeyManagerImpl implements KeyManager
 
             targetPubRing = encryptionTool.signPublicKey( targetPubRing, sigId, sourceSecRing.getSecretKey(), "" );
         }
-        catch ( Exception ex )
+        catch ( Exception ignored )
         {
+            //ignore
         }
 
         return targetPubRing;
@@ -304,34 +301,6 @@ public class KeyManagerImpl implements KeyManager
             LOG.error( "Error converting byte array to string with UTF-8 format.", e );
         }
         return null;
-    }
-
-
-    /* ***************************************************************
-     *
-     */
-    private boolean verifyTrustRelationValidity( SecurityKeyType sourceKeyType, SecurityKeyType targetKeyType )
-    {
-        switch ( sourceKeyType )
-        {
-            case ContainerHostKey:
-                return false;
-            case EnvironmentKey:
-                return targetKeyType == SecurityKeyType.PeerEnvironmentKey;
-            case ManagementHostKey:
-                return targetKeyType == SecurityKeyType.ResourceHostKey;
-            case PeerEnvironmentKey:
-                return targetKeyType == SecurityKeyType.ContainerHostKey;
-            case PeerKey:
-                return targetKeyType == SecurityKeyType.ManagementHostKey;
-            case PeerOwnerKey:
-                return targetKeyType == SecurityKeyType.PeerKey;
-            case ResourceHostKey:
-                return targetKeyType == SecurityKeyType.ContainerHostKey;
-            case UserKey:
-                return targetKeyType == SecurityKeyType.EnvironmentKey;
-        }
-        return false;
     }
 
 
@@ -649,7 +618,7 @@ public class KeyManagerImpl implements KeyManager
         SecurityKey keyIden = null;
         try
         {
-            keyIden = securityDataService.getKeyDataByFingerprint( fingerprint );
+            keyIden = securityDataService.getKeyDataByFingerprint( fingerprint.toUpperCase() );
         }
         catch ( Exception ex )
         {
@@ -788,7 +757,9 @@ public class KeyManagerImpl implements KeyManager
 
             if ( keyIden == null )
             {
-                throw new NullPointerException( "***** Error! Key Identity not found." );
+                //throw new NullPointerException( "***** Error! Key Identity not found." );
+                LOG.warn( "*******  SecurityKey (getPublicKeyRing) not found for identityID:" + identityId );
+                return null;
             }
             else
             {
@@ -1050,7 +1021,7 @@ public class KeyManagerImpl implements KeyManager
     /* *****************************
       *
       */
-    public SecurityKeyData getSecurityKeyData()
+    SecurityKeyData getSecurityKeyData()
     {
         return keyData;
     }
@@ -1135,8 +1106,8 @@ public class KeyManagerImpl implements KeyManager
             if ( pubRing == null ) // Get from HTTP
             {
                 String baseUrl = String.format( "%s/rest/v1", peerInfo.getPublicUrl() );
-                WebClient client = RestUtil.createTrustedWebClient( baseUrl, keyData.getJsonProvider() );
-                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.APPLICATION_JSON );
+                WebClient client = RestUtil.createTrustedWebClient( baseUrl );
+                client.type( MediaType.MULTIPART_FORM_DATA ).accept( MediaType.TEXT_PLAIN );
 
                 Response response =
                         client.path( "security/keyman/getpublickeyring" ).query( "hostid", peerInfo.getId() ).get();
@@ -1253,7 +1224,6 @@ public class KeyManagerImpl implements KeyManager
     @Override
     public int getTrustLevel( String sourceFingerprint, String targetFingerprint )
     {
-        List<SecurityKeyTrust> sourceTrusts = getKeyTrustData( sourceFingerprint );
         Set<String> sourceChainTrust = Sets.newHashSet();
         sourceChainTrust.add( sourceFingerprint );
         int trustLevel = buildTrustChainTrustLevel( sourceFingerprint, sourceChainTrust, targetFingerprint, false );
@@ -1263,7 +1233,6 @@ public class KeyManagerImpl implements KeyManager
             return trustLevel;
         }
 
-        Set<String> targetChainTrust = Sets.newHashSet();
         sourceChainTrust.add( targetFingerprint );
         trustLevel = buildTrustChainTrustLevel( targetFingerprint, sourceChainTrust, sourceFingerprint, true );
 

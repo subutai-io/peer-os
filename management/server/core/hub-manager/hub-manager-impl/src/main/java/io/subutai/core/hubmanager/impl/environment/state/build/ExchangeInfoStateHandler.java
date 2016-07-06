@@ -1,10 +1,6 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
-import java.util.Date;
-
-import org.apache.commons.lang3.time.DateUtils;
-
 import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -12,6 +8,7 @@ import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
+
 
 public class ExchangeInfoStateHandler extends StateHandler
 {
@@ -28,10 +25,14 @@ public class ExchangeInfoStateHandler extends StateHandler
 
         EnvironmentPeerDto resultDto = getReservedNetworkResource( peerDto );
 
-        UserToken token = getEnvironmentOwnerToken( peerDto );
-
+        User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
+        UserToken token = ctx.identityManager.getUserToken( user.getId() );
+        if ( token == null )
+        {
+            token = ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), null );
+        }
         resultDto.setEnvOwnerToken( token.getFullToken() );
-        resultDto.setEnvOwnerTokenId( token.getTokenId() );
+        resultDto.setEnvOwnerTokenId( user.getAuthId() );
 
         logEnd();
 
@@ -50,24 +51,5 @@ public class ExchangeInfoStateHandler extends StateHandler
         peerDto.setP2pSubnets( usedNetworkResources.getP2pSubnets() );
 
         return peerDto;
-    }
-
-
-    private UserToken getEnvironmentOwnerToken( EnvironmentPeerDto peerDto )
-    {
-        User user = ctx.envUserHelper.handleEnvironmentOwnerCreation( peerDto );
-
-        UserToken userToken = ctx.identityManager.getUserToken( user.getId() );
-
-        if ( userToken != null )
-        {
-            log.info( "User token already exists" );
-
-            return userToken;
-        }
-
-        Date validDate = DateUtils.addYears( new Date(), 3 );
-
-        return ctx.identityManager.createUserToken( user, null, null, null, TokenType.Permanent.getId(), validDate );
     }
 }

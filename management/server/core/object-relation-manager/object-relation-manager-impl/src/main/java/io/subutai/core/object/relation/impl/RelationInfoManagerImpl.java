@@ -26,7 +26,6 @@ import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
@@ -48,8 +47,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     private SecurityManager securityManager;
 
 
-    public RelationInfoManagerImpl( final RelationDataService relationDataService,
-                                    final IdentityManager identityManager, final SecurityManager securityManager )
+    public RelationInfoManagerImpl( final RelationDataService relationDataService, final IdentityManager
+            identityManager, final SecurityManager securityManager )
     {
         this.identityManager = identityManager;
         this.relationDataService = relationDataService;
@@ -71,20 +70,19 @@ public class RelationInfoManagerImpl implements RelationInfoManager
             byte[] decrypted = encryptionTool.decrypt( extractedText, secretKeyRing, "" );
 
             String decryptedMessage = new String( decrypted, "UTF-8" );
-            RelationChallengeImpl relationChallengeImpl =
-                    JsonUtil.fromJson( decryptedMessage, RelationChallengeImpl.class );
+            RelationChallengeImpl relationChallengeImpl = JsonUtil.fromJson( decryptedMessage, RelationChallengeImpl
+                    .class );
 
-            if ( relationChallengeImpl.getTtl() > 0
-                    && relationChallengeImpl.getTimestamp() + relationChallengeImpl.getTtl() < System
-                    .currentTimeMillis() )
+            if ( relationChallengeImpl.getTtl() > 0 && relationChallengeImpl.getTimestamp() + relationChallengeImpl
+                    .getTtl() < System.currentTimeMillis() )
             {
                 throw new RelationVerificationException( "Relation token timeout exceeded." );
             }
 
             if ( relationChallengeImpl.getStatus() == RelationStatus.STATED )
             {
-                RelationChallengeImpl persistedToken =
-                        relationDataService.getRelationToken( relationChallengeImpl.getToken() );
+                RelationChallengeImpl persistedToken = relationDataService.getRelationToken( relationChallengeImpl
+                        .getToken() );
                 if ( relationChallengeImpl.equals( persistedToken ) )
                 {
                     persistedToken.setStatus( RelationStatus.VERIFIED );
@@ -110,9 +108,9 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         }
         catch ( PGPException ex )
         {
-            throw new RelationVerificationException(
-                    "Relation verification failed (possible cause of error: clear sign document extraction failed, "
-                            + "failed to decrypt message or failed to verify message).", ex );
+            throw new RelationVerificationException( "Relation verification failed (possible cause of error: clear "
+                    + "sign document extraction failed, " + "failed to decrypt message or failed to verify message)"
+                    + ".", ex );
         }
         catch ( UnsupportedEncodingException e )
         {
@@ -183,10 +181,6 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     // C should give correct verification through relationship path.
     private boolean isRelationValid( final RelationInfo relationInfo, final RelationMeta relationMeta )
     {
-        if ( !SystemSettings.getKeyTrustCheckState() )
-        {
-            return true;
-        }
 
         Set<RelationLink> relationLinks = Sets.newHashSet();
 
@@ -233,10 +227,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     private int getDeeper( final RelationInfo relationInfo, final RelationLink target, final RelationLink object,
                            Set<RelationLink> relationLinks )
     {
-        if ( !SystemSettings.getKeyTrustCheckState() )
-        {
-            return 0;
-        }
+
         List<Relation> byTargetRelations = relationDataService.findByTarget( target );
         relationLinks.add( target );
         // When relation info is found check that relation was granted from verified source
@@ -308,8 +299,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean groupHasWritePermissions( final RelationMeta relationMeta )
     {
-        RelationInfoMeta relationInfoMeta =
-                new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel() );
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, true, false, false, Ownership.GROUP.getLevel
+                () );
 
         Map<String, String> traits = Maps.newHashMap();
         traits.put( "ownership", Ownership.GROUP.getName() );
@@ -353,8 +344,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
     public boolean groupHasDeletePermissions( final RelationLink relationLink )
     {
-        RelationInfoMeta relationInfoMeta =
-                new RelationInfoMeta( false, false, false, true, Ownership.GROUP.getLevel() );
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, false, true, Ownership.GROUP.getLevel
+                () );
 
         Map<String, String> traits = Maps.newHashMap();
         traits.put( "ownership", Ownership.GROUP.getName() );
@@ -376,8 +367,8 @@ public class RelationInfoManagerImpl implements RelationInfoManager
     @Override
     public boolean groupHasUpdatePermissions( final RelationLink relationLink )
     {
-        RelationInfoMeta relationInfoMeta =
-                new RelationInfoMeta( false, false, true, false, Ownership.GROUP.getLevel() );
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( false, false, true, false, Ownership.GROUP.getLevel
+                () );
 
         Map<String, String> traits = Maps.newHashMap();
         traits.put( "ownership", Ownership.GROUP.getName() );
@@ -486,22 +477,19 @@ public class RelationInfoManagerImpl implements RelationInfoManager
 
 
     @Override
-    public void checkRelation( final RelationLink targetObject, final RelationInfoMeta relationInfoMeta,
-                               final String encodedToken ) throws RelationVerificationException
+    public void checkRelation( final RelationLink targetObject, final RelationInfoMeta relationInfoMeta, final String
+            encodedToken )
+            throws RelationVerificationException
     {
         checkRelation( getDelegatedUserLink( targetObject ), targetObject, relationInfoMeta, encodedToken );
     }
 
 
     @Override
-    public void checkRelation( final RelationLink source, final RelationLink targetObject,
-                               final RelationInfoMeta relationInfoMeta, final String encodedToken )
+    public void checkRelation( final RelationLink source, final RelationLink targetObject, final RelationInfoMeta
+            relationInfoMeta, final String encodedToken )
             throws RelationVerificationException
     {
-        if ( !SystemSettings.getKeyTrustCheckState() )
-        {
-            return;
-        }
 
         if ( !Strings.isNullOrEmpty( encodedToken ) )
         {
@@ -522,6 +510,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             if ( targetRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
             {
+                logger.error( "You should pass relation token challenge first." );
                 throw new RelationVerificationException( "You should pass relation token challenge first." );
             }
             if ( targetRelation.getTrustedObject().equals( object ) )
@@ -533,6 +522,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
                 else
                 {
+                    logger.error( "Your relation has insufficient permissions." );
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
             }
@@ -545,6 +535,7 @@ public class RelationInfoManagerImpl implements RelationInfoManager
                 }
                 else
                 {
+                    logger.error( "Your relation has insufficient permissions." );
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
             }
@@ -559,21 +550,24 @@ public class RelationInfoManagerImpl implements RelationInfoManager
         {
             if ( sourceRelation.getRelationStatus() == RelationStatus.STATED && Strings.isNullOrEmpty( encodedToken ) )
             {
+                logger.error( "You should pass relation token challenge first." );
                 throw new RelationVerificationException( "You should pass relation token challenge first." );
             }
             if ( sourceRelation.getTrustedObject().equals( object ) )
             {
                 // Requested relation should be less then or equal to relation that was granted
-
                 if ( compareRelationships( sourceRelation.getRelationInfo(), relationInfo ) >= 0 )
                 {
                     return;
                 }
                 else
                 {
+                    logger.error( "Your relation has insufficient permissions" );
                     throw new RelationVerificationException( "Your relation has insufficient permissions." );
                 }
             }
         }
+        logger.error( "No relation exist.", new RuntimeException( "No relation exists" ) );
+        throw new RelationVerificationException( "No relation exist." );
     }
 }

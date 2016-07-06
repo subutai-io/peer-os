@@ -17,15 +17,13 @@ import io.subutai.common.util.ServiceLocator;
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
-    public static final String DEFAULT_EXTERNAL_INTERFACE = "wan";
     public static final String DEFAULT_KEY_SERVER = "https://localhost:8443/rest/v1/pks";
-    public static final String DEFAULT_MGMT_INTERFACE = "mng-net";
     public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
-    public static final int DEFAULT_PUBLIC_PORT = ChannelSettings.SECURE_PORT_X1;
-    public static final int DEFAULT_PUBLIC_SECURE_PORT = ChannelSettings.SECURE_PORT_X2;
+    public static final int DEFAULT_PUBLIC_PORT = 8443;
+    public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
+    public static final int DEFAULT_AGENT_PORT = 7070;
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
     public static final String DEFAULT_LOCAL_KURJUN_REPO = "http://localhost:8081/kurjun";
-    public static final String DEFAULT_PEER_PWD = "12345678";
 
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
@@ -108,27 +106,13 @@ public class SystemSettings
     }
 
 
-    protected static void validatePublicUrl( String publicUrl ) throws ConfigurationException
-    {
-        try
-        {
-            new URL( publicUrl );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new ConfigurationException( "Invalid URL: " + publicUrl );
-        }
-    }
-
 
     private static void loadGlobalKurjunUrls() throws ConfigurationException
     {
         String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
         if ( globalKurjunUrls.length < 1 )
         {
-            globalKurjunUrls = new String[] {
-                    DEFAULT_KURJUN_REPO
-            };
+            globalKurjunUrls = new String[] { DEFAULT_KURJUN_REPO };
         }
 
         GLOBAL_KURJUN_URLS = validateGlobalKurjunUrls( globalKurjunUrls );
@@ -136,12 +120,6 @@ public class SystemSettings
 
 
     // Network Settings
-
-
-    public static int getOpenPort()
-    {
-        return PROPERTIES.getInt( "openPort", ChannelSettings.OPEN_PORT );
-    }
 
 
     public static String getKeyServer()
@@ -158,37 +136,19 @@ public class SystemSettings
 
     public static int getSecurePortX1()
     {
-        return PROPERTIES.getInt( "securePortX1", ChannelSettings.SECURE_PORT_X1 );
+        return PROPERTIES.getInt( "securePortX1", DEFAULT_PUBLIC_PORT );
     }
 
 
     public static int getSecurePortX2()
     {
-        return PROPERTIES.getInt( "securePortX2", ChannelSettings.SECURE_PORT_X2 );
-    }
-
-
-    public static int getSecurePortX3()
-    {
-        return PROPERTIES.getInt( "securePortX3", ChannelSettings.SECURE_PORT_X3 );
-    }
-
-
-    public static int getSpecialPortX1()
-    {
-        return PROPERTIES.getInt( "specialPortX1", ChannelSettings.SPECIAL_PORT_X1 );
+        return PROPERTIES.getInt( "securePortX2", DEFAULT_PUBLIC_SECURE_PORT );
     }
 
 
     public static int getAgentPort()
     {
-        return PROPERTIES.getInt( "agentPort", ChannelSettings.AGENT_PORT );
-    }
-
-
-    public static void setOpenPort( int openPort )
-    {
-        saveProperty( "openPort", openPort );
+        return PROPERTIES.getInt( "agentPort", DEFAULT_AGENT_PORT );
     }
 
 
@@ -204,75 +164,9 @@ public class SystemSettings
     }
 
 
-    public static void setSecurePortX3( int securePortX3 )
-    {
-        saveProperty( "securePortX3", securePortX3 );
-    }
-
-
-    public static void setSpecialPortX1( int specialPortX1 )
-    {
-        saveProperty( "specialPortX1", specialPortX1 );
-    }
-
-
     public static void setAgentPort( int agentPort )
     {
         saveProperty( "agentPort", agentPort );
-    }
-
-
-    // Security Settings
-
-
-    //todo remove this since communication is always encrypted
-    @Deprecated
-    public static boolean getEncryptionState()
-    {
-        return PROPERTIES.getBoolean( "encryptionEnabled", false );
-    }
-
-
-    //todo remove
-    public static boolean getRestEncryptionState()
-    {
-        return PROPERTIES.getBoolean( "restEncryptionEnabled", false );
-    }
-
-
-    public static boolean getIntegrationState()
-    {
-        return PROPERTIES.getBoolean( "integrationEnabled", false );
-    }
-
-
-    public static boolean getKeyTrustCheckState()
-    {
-        return PROPERTIES.getBoolean( "keyTrustCheckEnabled", false );
-    }
-
-
-    public static void setEncryptionState( boolean encryptionEnabled )
-    {
-        saveProperty( "encryptionEnabled", encryptionEnabled );
-    }
-
-
-    public static void setRestEncryptionState( boolean restEncryptionEnabled )
-    {
-        saveProperty( "restEncryptionEnabled", restEncryptionEnabled );
-    }
-
-
-    public static void setIntegrationState( boolean integrationEnabled )
-    {
-        saveProperty( "integrationEnabled", integrationEnabled );
-    }
-
-
-    public static void setKeyTrustCheckState( boolean keyTrustCheckEnabled )
-    {
-        saveProperty( "keyTrustCheckEnabled", keyTrustCheckEnabled );
     }
 
 
@@ -310,18 +204,6 @@ public class SystemSettings
         {
             return SystemSettings.DEFAULT_PUBLIC_SECURE_PORT;
         }
-    }
-
-
-    public static String getPeerSecretKeyringPwd()
-    {
-        return PROPERTIES.getString( "peerSecretKeyringPwd", DEFAULT_PEER_PWD );
-    }
-
-
-    public static void setPeerSecretKeyringPwd( String pwd ) throws ConfigurationException
-    {
-        saveProperty( "peerSecretKeyringPwd", pwd );
     }
 
 

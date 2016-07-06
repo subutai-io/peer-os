@@ -20,38 +20,49 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	vm.config = {};
 	vm.karafLogs = '';
 	vm.logLevel = 'all';
-	vm.activeTab = "karafconsole";
+	vm.activeTab = "karaflogs";
+	vm.admin = false;
 	vm.getConfig = getConfig;
 	vm.updateConfig = updateConfig;
 	vm.saveLogs = saveLogs;
 	vm.renderHtml = renderHtml;
 	vm.setLevel = setLevel;
 
-	//Console UI
-	$scope.theme = 'modern';
-	setTimeout(function () {
-		$scope.$broadcast('terminal-output', {
-			output: true,
-			text: [
-				'Karaf Subutai',
-			],
-			breakLine: true
-		});
-		$scope.prompt.path('/');
-		$scope.prompt.user('karaf');
+	if( localStorage.getItem("currentUserPermissions") )
+		for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ )
+		{
+			if( localStorage.getItem("currentUserPermissions")[i] == 2 )
+			{
+				vm.activeTab = "karafconsole";
+				vm.admin = true;
+	
+				//Console UI
+				$scope.theme = 'modern';
+				setTimeout(function () {
+					$scope.$broadcast('terminal-output', {
+						output: true,
+						text: [
+							'Karaf Subutai',
+						],
+						breakLine: true
+					});
+					$scope.prompt.path('/');
+					$scope.prompt.user('karaf');
 
-		/*$scope.results.splice(0, $scope.results.length);
-		$scope.$$phase || $scope.$apply();*/
+					/*$scope.results.splice(0, $scope.results.length);
+					 $scope.$$phase || $scope.$apply();*/
 
-		$scope.$apply();
+					$scope.$apply();
 
-		$('.terminal-viewport').perfectScrollbar();
-	}, 100);
+					$('.terminal-viewport').perfectScrollbar();
+				}, 100);
+			}
+		}
+
 
 	$scope.session = {
 		commands: [],
-		output: [],
-		$scope:$scope
+		output: []
 	};
 
 	$scope.$watchCollection(function () { return $scope.session.commands; }, function (n) {

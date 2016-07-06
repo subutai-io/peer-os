@@ -19,6 +19,10 @@ public class Common
     public static final String RH_INTERFACE = "mng-net";
     public static final String LOCAL_HOST_IP = "127.0.0.1";
     public static final String LOCAL_HOST_NAME = "localhost";
+    public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keys/h.public.gpg";
+
+    public static final String PEER_CERT_ALIAS = "peer_cert";
+
     //10 min including possible template download
     public static final int WAIT_CONTAINER_CONNECTION_SEC = 30;
     public static final int DEFAULT_EXECUTOR_REQUEST_TIMEOUT_SEC = 30;
@@ -50,7 +54,7 @@ public class Common
     public static final String MASTER_TEMPLATE_NAME = "master";
     public static final String MANAGEMENT_HOSTNAME = "management";
     public static final int CONTAINER_SSH_TIMEOUT_SEC = 1800;
-    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 90 * 60;// 1.5 hour
+    public static final long DEFAULT_P2P_SECRET_KEY_TTL_SEC = 180 * 60;// 3 hour
     public static final String DEFAULT_TEMPLATE_VERSION = "2.1.0";
     public static final String PACKAGE_PREFIX = "subutai-";
     public static final String PACKAGE_PREFIX_WITHOUT_DASH = "subutai";

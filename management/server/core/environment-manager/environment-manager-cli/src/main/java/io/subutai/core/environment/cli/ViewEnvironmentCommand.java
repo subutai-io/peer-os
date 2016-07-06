@@ -8,9 +8,13 @@ import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.RegistrationStatus;
+import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.Quota;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.core.peer.api.PeerManager;
 
 
 /**
@@ -29,13 +33,16 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
             String environmentId;
 
     private final EnvironmentManager environmentManager;
+    private final PeerManager peerManager;
 
 
-    public ViewEnvironmentCommand( final EnvironmentManager environmentManager )
+    public ViewEnvironmentCommand( final EnvironmentManager environmentManager, final PeerManager peerManager )
     {
         Preconditions.checkNotNull( environmentManager );
+        Preconditions.checkNotNull( peerManager );
 
         this.environmentManager = environmentManager;
+        this.peerManager = peerManager;
     }
 
 
@@ -45,28 +52,44 @@ public class ViewEnvironmentCommand extends SubutaiShellCommandSupport
 
         Environment environment = environmentManager.loadEnvironment( environmentId );
 
+
         System.out.println( String.format( "Environment name %s", environment.getName() ) );
 
         for ( EnvironmentContainerHost containerHost : environment.getContainerHosts() )
         {
+            RegistrationStatus peerStatus = peerManager.getRemoteRegistrationStatus( containerHost.getPeerId() );
             System.out.println( "-----------------------------------------------------------------" );
 
             System.out.println( String.format( "Container id: %s", containerHost.getId() ) );
             System.out.println( String.format( "Container hostname: %s", containerHost.getHostname() ) );
             System.out.println( String.format( "Environment id: %s", containerHost.getEnvironmentId() ) );
             System.out.println( String.format( "Peer id: %s", containerHost.getPeerId() ) );
+            System.out.println( String.format( "Peer status: %s", peerStatus ) );
             System.out.println( String.format( "Template name: %s", containerHost.getTemplateName() ) );
             System.out.println( String.format( "IP: %s",
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
-            System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
 
-            try
+
+            if ( peerStatus == RegistrationStatus.APPROVED )
             {
-                System.out.println( String.format( "quota: %s", containerHost.getQuota() ) );
-            }
-            catch ( Exception e )
-            {
-                System.out.println( "ERROR: " + e.getMessage() );
+                System.out.println( "Container state: " + containerHost.getState() );
+
+                try
+                {
+                    final ContainerQuota quota = containerHost.getQuota();
+
+                    System.out.println( "Granted resources: " );
+                    System.out.println( "Type\tValue\tThreshold" );
+                    for ( Quota q : quota.getAll() )
+                    {
+                        System.out.println( String.format( "%s\t%s\t%s", q.getResource().getContainerResourceType(),
+                                q.getResource().getPrintValue(), q.getThreshold() ) );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    System.out.println( "ERROR: " + e.getMessage() );
+                }
             }
         }
 

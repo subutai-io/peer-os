@@ -58,6 +58,10 @@ public class Login extends HttpServlet
                         sptoken = identityManager.getUserToken( username, password );
                         user = identityManager.authenticateByToken( sptoken );
                     }
+                    else
+                    {
+                        throw new Exception( "Karaf Auth Module is loading, please try again later" );
+                    }
                 }
                 else if ( !Strings.isNullOrEmpty( sptoken ) )
                 {
@@ -98,7 +102,7 @@ public class Login extends HttpServlet
         {
             request.setAttribute( "error", "karaf exceptions !!!" );
             response.getWriter().write( "Error: " + e.getMessage() );
-            response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+            response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
         }
     }
 

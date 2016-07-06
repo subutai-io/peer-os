@@ -108,7 +108,7 @@ function environmentService($http, $q) {
 
 				for( var i = 0; i < data.length; i++ )
 				{
-					res[ getCategory( data[i] )].push( data[i] );
+					res[ getCategory( data[i].name )].push( data[i] );
 				}
 
 				callF.resolve(res);
@@ -228,8 +228,9 @@ function environmentService($http, $q) {
 		);
 	}
 
-	function checkDomain(container) {
-		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain');
+	function checkDomain(container, state) {
+		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain' +
+			'?state=' + state);
 	}
 
 

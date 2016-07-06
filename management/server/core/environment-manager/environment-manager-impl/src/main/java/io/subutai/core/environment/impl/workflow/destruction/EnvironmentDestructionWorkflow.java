@@ -2,6 +2,7 @@ package io.subutai.core.environment.impl.workflow.destruction;
 
 
 import io.subutai.common.environment.EnvironmentStatus;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
@@ -76,9 +77,13 @@ public class EnvironmentDestructionWorkflow
     public void FINALIZE()
     {
 
+        RelationManager relationManager = environmentManager.getRelationManager();
+        for ( final EnvironmentContainerHost containerHost : environment.getContainerHosts() )
+        {
+            relationManager.removeRelation( containerHost );
+        }
         environmentManager.remove( environment );
 
-        RelationManager relationManager = environmentManager.getRelationManager();
         relationManager.removeRelation( environment );
 
         operationTracker.addLogDone( "Environment is destroyed" );

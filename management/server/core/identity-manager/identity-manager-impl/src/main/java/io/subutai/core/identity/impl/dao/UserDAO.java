@@ -28,7 +28,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public UserDAO( final DaoManager daoManager )
+    UserDAO( final DaoManager daoManager )
     {
         this.daoManager = daoManager;
     }
@@ -37,7 +37,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public User find( final long id )
+    User find( final long id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -63,7 +63,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public List<User> getAll()
+    List<User> getAll()
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
 
@@ -86,7 +86,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public void persist( User item )
+    void persist( User item )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -111,7 +111,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public void remove( final Long id )
+    void remove( final Long id )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         try
@@ -146,7 +146,7 @@ class UserDAO
         }
         catch ( Exception e )
         {
-            logger.error("Error updating user", e);
+            logger.error( "Error updating user", e );
             daoManager.rollBackTransaction( em );
         }
         finally
@@ -159,7 +159,7 @@ class UserDAO
     /* *************************************************
      *
      */
-    public User findByUsername( final String userName )
+    User findByUsername( final String userName )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         User result = null;
@@ -175,7 +175,7 @@ class UserDAO
                 result = users.iterator().next();
             }
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally
@@ -186,11 +186,10 @@ class UserDAO
     }
 
 
-
     /* *************************************************
      *
      */
-    public User findByKeyId( final String keyId )
+    User findByKeyId( final String keyId )
     {
         EntityManager em = daoManager.getEntityManagerFromFactory();
         User result = null;
@@ -206,7 +205,7 @@ class UserDAO
                 result = users.iterator().next();
             }
         }
-        catch ( Exception e )
+        catch ( Exception ignore )
         {
         }
         finally

@@ -341,10 +341,7 @@ public class UserEntity implements User
     @Override
     public boolean isIdentityValid()
     {
-        if(validDate == null)
-            return true;
-        else
-            return System.currentTimeMillis() <= validDate.getTime();
+        return validDate == null || System.currentTimeMillis() <= validDate.getTime();
     }
 
 }

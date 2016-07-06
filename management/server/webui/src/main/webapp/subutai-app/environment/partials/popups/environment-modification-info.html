@@ -10,10 +10,10 @@
                 <table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
                     <tr ng-repeat="(containerName, container) in environmentSimpleViewCtrl.currentEnvironment.excludedContainersByQuota">
                         <td class="b-main-table__20 g-text-center">
-                            <img ng-src="assets/templates/{{containerName}}.jpg" alt="{{containerName}}"
+                            <img ng-src="assets/templates/{{container.name}}.jpg" alt="{{container.name}}"
                                  onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
                         </td>
-                        <td>{{containerName}}</td>
+                        <td>{{container.name}}</td>
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"
@@ -33,10 +33,10 @@
                 <table class="b-main-table b-main-table_custom-1 g-margin-bottom-half">
                     <tr ng-repeat="(containerName, container) in environmentSimpleViewCtrl.currentEnvironment.includedContainersByQuota">
                         <td class="b-main-table__20 g-text-center">
-                            <img ng-src="assets/templates/{{containerName}}.jpg" alt="{{containerName}}"
+                            <img ng-src="assets/templates/{{container.name}}.jpg" alt="{{container.name}}"
                                  onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
                         </td>
-                        <td>{{containerName}}</td>
+                        <td>{{container.name}}</td>
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"

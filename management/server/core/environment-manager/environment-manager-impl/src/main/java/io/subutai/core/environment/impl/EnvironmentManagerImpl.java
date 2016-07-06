@@ -88,7 +88,6 @@ import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModifi
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
 import io.subutai.core.hubadapter.api.HubAdapter;
-import io.subutai.core.hubmanager.api.HubEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -100,6 +99,8 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.common.HubEventListener;
+import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
 @PermitAll
@@ -258,28 +259,26 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironments()
     {
-        Set<Environment> environments = getLocalEnvironments();
+        Set<Environment> envs = new HashSet<>();
 
-        environments.addAll( environmentAdapter.getEnvironments() );
+        envs.addAll( environmentService.getAll() );
 
-        return environments;
+        envs.addAll( environmentAdapter.getEnvironments() );
+
+        setTransientFields( envs );
+
+        return envs;
     }
 
 
-    private Set<Environment> getLocalEnvironments()
+    private void setTransientFields( Set<Environment> envs )
     {
-        Set<Environment> environments = new HashSet<>();
-
-        for ( Environment environment : environmentService.getAll() )
+        for ( Environment env : envs )
         {
-            environments.add( environment );
+            setEnvironmentTransientFields( env );
 
-            setEnvironmentTransientFields( environment );
-
-            setContainersTransientFields( environment );
+            setContainersTransientFields( env );
         }
-
-        return environments;
     }
 
 
@@ -287,21 +286,19 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public Set<Environment> getEnvironmentsByOwnerId( long userId )
     {
-        Set<Environment> environments = new HashSet<>();
+        Set<Environment> envs = new HashSet<>();
 
-        for ( Environment environment : environmentService.getAll() )
+        for ( Environment env : environmentService.getAll() )
         {
-            if ( environment.getUserId().equals( userId ) )
+            if ( env.getUserId().equals( userId ) )
             {
-                environments.add( environment );
-
-                setEnvironmentTransientFields( environment );
-
-                setContainersTransientFields( environment );
+                envs.add( env );
             }
         }
 
-        return environments;
+        setTransientFields( envs );
+
+        return envs;
     }
 
 
@@ -319,14 +316,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         activeWorkflows.put( environment.getId(), newWorkflow );
-    }
-
-
-    private CancellableWorkflow getActiveWorkflow( Environment environment )
-    {
-        Preconditions.checkNotNull( environment );
-
-        return activeWorkflows.get( environment.getId() );
     }
 
 
@@ -679,7 +668,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final SshKeyAdditionWorkflow sshKeyAdditionWorkflow =
-                getSshKeyAdditionWorkflow( environment, sshKey, operationTracker );
+                getSshKeyAdditionWorkflow( environment, sshKey.trim(), operationTracker );
 
         registerActiveWorkflow( environment, sshKeyAdditionWorkflow );
 
@@ -730,7 +719,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final SshKeyRemovalWorkflow sshKeyRemovalWorkflow =
-                getSshKeyRemovalWorkflow( environment, sshKey, operationTracker );
+                getSshKeyRemovalWorkflow( environment, sshKey.trim(), operationTracker );
 
         registerActiveWorkflow( environment, sshKeyRemovalWorkflow );
 
@@ -1270,15 +1259,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Setting up ssh tunnel for container %s ", containerHostId ) );
 
-        if ( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
-                || environment.getStatus() == EnvironmentStatus.CANCELLED )
-        {
-            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
-
-            throw new EnvironmentModificationException(
-                    String.format( "Environment status is %s", environment.getStatus() ) );
-        }
-
         try
         {
             SshTunnel sshTunnel = peerManager.getLocalPeer().setupSshTunnelForContainer(
@@ -1316,9 +1296,9 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         environment.setUserId( delegatedUser.getUserId() );
 
-        createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
-
         save( environment );
+
+        createEnvironmentKeyPair( environment.getEnvironmentId(), delegatedUser.getId() );
 
         setEnvironmentTransientFields( environment );
 
@@ -1355,18 +1335,25 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     public void setEnvironmentTransientFields( final Environment environment )
     {
-        ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+        // Using environmentManager for ProxyEnvironment may give side effects. For example, empty container list.
+        if ( !( environment instanceof ProxyEnvironment ) )
+        {
+            ( ( EnvironmentImpl ) environment ).setEnvironmentManager( this );
+        }
     }
 
 
     public void setContainersTransientFields( final Environment environment )
     {
         Set<EnvironmentContainerHost> containers = environment.getContainerHosts();
+
         for ( ContainerHost containerHost : containers )
         {
             EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) containerHost;
 
             environmentContainer.setEnvironmentManager( this );
+
+            environmentContainer.setEnvironmentAdapter( environmentAdapter );
         }
     }
 
@@ -1769,14 +1756,28 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void onRegistrationSucceeded()
     {
+        Set<Environment> envs = new HashSet<>();
+
+        envs.addAll( environmentService.getAll() );
+
+        setTransientFields( envs );
+
+        LOG.info( "onRegistrationSucceeded: local environments count = {}", envs.size() );
+
         try
         {
-            environmentAdapter.uploadEnvironments( getLocalEnvironments() );
+            environmentAdapter.uploadEnvironments( envs );
         }
         catch ( Exception e )
         {
             LOG.error( "Error uploading environments to Hub: {}", e.getMessage() );
         }
+    }
+
+
+    @Override
+    public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
+    {
     }
 
 
@@ -1803,8 +1804,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.debug( "Environment background tasks started..." );
 
-            User user = identityManager.getActiveUser();
-
 
             //**************************************************
             Subject.doAs( systemUser, new PrivilegedAction<Void>()
@@ -1827,9 +1826,13 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         try
         {
-            for ( Environment environment : getEnvironments() )
+            //process only SS side environments
+            for ( Environment environment : environmentService.getAll() )
             {
-                if ( environment.getStatus() != EnvironmentStatus.UNDER_MODIFICATION )
+                if ( !( environment.getStatus() == EnvironmentStatus.UNDER_MODIFICATION
+                        || environment.getStatus() == EnvironmentStatus.CANCELLED || (
+                        ( System.currentTimeMillis() - environment.getCreationTimestamp() ) < TimeUnit.HOURS
+                                .toMillis( 1 ) ) ) )
                 {
 
                     final String secretKey = UUID.randomUUID().toString();

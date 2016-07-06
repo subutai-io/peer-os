@@ -91,9 +91,13 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function rejectPeerRequest(peerId, force) {
+		ngDialog.closeAll();
+		LOADING_SCREEN();
 		peerRegistrationService.rejectPeerRequest(peerId, force).success(function (data) {
+			LOADING_SCREEN('none');
 			vm.dtInstance.reloadData(null, false);
 		}).error(function(error){
+			LOADING_SCREEN('none');
 			if(error.ERROR !== undefined) {
 				SweetAlert.swal("ERROR!", error.ERROR, "error");
 			} else {
@@ -157,10 +161,14 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function unregisterPeer(peerId, force) {
+		ngDialog.closeAll();
+		LOADING_SCREEN();
 		peerRegistrationService.unregisterPeerRequest(peerId, force).success(function (data) {
 			SweetAlert.swal("Unregistered!", "Your peer request has been unregistered.", "success");
+			LOADING_SCREEN('none');
 			vm.dtInstance.reloadData(null, false);
 		}).error(function (error) {
+			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}
@@ -190,10 +198,14 @@ function PeerRegistrationCtrl($scope, peerRegistrationService, DTOptionsBuilder,
 	}
 
 	function cancelPeerRequest(peerId, force) {
+		ngDialog.closeAll();
+		LOADING_SCREEN();
 		peerRegistrationService.cancelPeerRequest(peerId, force).success(function (data) {
 			SweetAlert.swal("Canceled!", "Your peer request has been canceled.", "success");
+			LOADING_SCREEN('none');
 			vm.dtInstance.reloadData(null, false);
 		}).error(function (error) {
+			LOADING_SCREEN('none');
 			SweetAlert.swal("ERROR!", error, "error");
 		});
 	}	

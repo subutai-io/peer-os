@@ -38,6 +38,8 @@ public class AppScaleConfigDto
     private int vlanNumber;
     private String scaleOption;
 
+    private TunnelInfoDto tunnelInfoDto;
+
     // <containerName, containerIP>
 
     private HashMap<String, String> containerAddresses = new HashMap<>();
@@ -265,6 +267,18 @@ public class AppScaleConfigDto
     {
         this.state = state;
     }
+
+    public TunnelInfoDto getTunnelInfoDto()
+    {
+        return tunnelInfoDto;
+    }
+
+
+    public void setTunnelInfoDto( final TunnelInfoDto tunnelInfoDto )
+    {
+        this.tunnelInfoDto = tunnelInfoDto;
+    }
+
 
 
     @Override

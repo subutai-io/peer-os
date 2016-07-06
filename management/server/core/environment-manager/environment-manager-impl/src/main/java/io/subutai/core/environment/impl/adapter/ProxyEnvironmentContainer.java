@@ -6,6 +6,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 
@@ -27,6 +29,8 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 {
     private static final Logger LOG = LoggerFactory.getLogger( ProxyEnvironmentContainer.class );
+
+    private static final RequestBuilder WHOAMI = new RequestBuilder( "whoami" );
 
     private Host proxyContainer;
 
@@ -52,6 +56,32 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     public boolean isLocal()
     {
         return local;
+    }
+
+
+    @Override
+    public boolean isConnected()
+    {
+        return isLocal() ? super.isConnected() : isRemoteContainerConnected();
+    }
+
+
+    private boolean isRemoteContainerConnected()
+    {
+        try
+        {
+            CommandResult result = execute( WHOAMI );
+
+            return result.getExitCode() == 0 && StringUtils.isNotBlank( result.getStdOut() ) && result.getStdOut()
+                                                                                                      .contains(
+                                                                                                              "root" );
+        }
+        catch ( CommandException e )
+        {
+            LOG.error( "Error to check if remote container is connected: ", e );
+
+            return false;
+        }
     }
 
 
@@ -92,11 +122,20 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         // If this is a remote host then the command is sent via a proxyContainer
         // b/c the remote host is not directly accessible from the current peer.
-        if ( proxyContainer != null )
+        if ( !isLocal() )
         {
-            requestBuilder = wrapForProxy( requestBuilder );
+            if ( proxyContainer != null )
+            {
+                requestBuilder = wrapForProxy( requestBuilder );
 
-            host = proxyContainer;
+                host = proxyContainer;
+            }
+            else
+            {
+                throw new CommandException(
+                        "Please start at least one local container from this environment to be able to execute "
+                                + "commands on remote ones" );
+            }
         }
 
         return host.getPeer().execute( requestBuilder, host );
@@ -109,12 +148,17 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
         String targetHostIp = getHostInterfaces().getAll().iterator().next().getIp();
 
+        if ( targetHostIp.contains( "/" ) )
+        {
+            targetHostIp = StringUtils.substringBefore( targetHostIp, "/" );
+        }
+
         Request req = requestBuilder.build( "id" );
 
         String command = String.format( "ssh root@%s %s", targetHostIp, req.getCommand() );
 
         LOG.debug( "Command wrapped '{}' to send via {}", command, proxyIp );
 
-        return new RequestBuilder( command );
+        return new RequestBuilder( command ).withTimeout( requestBuilder.getTimeout() );
     }
 }

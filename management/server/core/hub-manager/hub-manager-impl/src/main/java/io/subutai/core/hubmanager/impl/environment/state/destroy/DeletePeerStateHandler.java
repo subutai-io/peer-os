@@ -1,14 +1,14 @@
 package io.subutai.core.hubmanager.impl.environment.state.destroy;
 
 
-import java.security.PrivilegedAction;
-
-import javax.security.auth.Subject;
-
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerException;
+import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
-import io.subutai.core.identity.api.model.Session;
+import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 
 
@@ -21,25 +21,24 @@ public class DeletePeerStateHandler extends StateHandler
 
 
     @Override
-    protected Object doHandle( final EnvironmentPeerDto peerDto ) throws Exception
+    protected Object doHandle( EnvironmentPeerDto peerDto ) throws Exception
     {
         logStart();
 
-        EnvironmentId envId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
+        Environment env = getEnvironment( peerDto );
 
-        ctx.localPeer.cleanupEnvironment( envId );
+        log.info( "env: {}", env );
 
-        Session session = ctx.identityManager.login( "token", peerDto.getPeerToken() );
+        boolean isHubEnvironment = env == null || env.getPeerId().equals( "hub" );
 
-        Subject.doAs( session.getSubject(), new PrivilegedAction<Void>()
+        if ( isHubEnvironment )
         {
-            @Override
-            public Void run()
-            {
-                ctx.envUserHelper.handleEnvironmentOwnerDeletion( peerDto );
-                return null;
-            }
-        } );
+            deleteHubEnvironment( peerDto );
+        }
+        else
+        {
+            deleteLocalEnvironment( env );
+        }
 
         logEnd();
 
@@ -47,9 +46,51 @@ public class DeletePeerStateHandler extends StateHandler
     }
 
 
-    @Override
-    protected void post( EnvironmentPeerDto peerDto, Object body )
+    private void deleteLocalEnvironment( Environment env )
+            throws EnvironmentDestructionException, EnvironmentNotFoundException
     {
-        ctx.restClient.delete( path( "/rest/v1/environments/%s/peers/%s", peerDto ) );
+        ctx.envManager.destroyEnvironment( env.getId(), false );
+    }
+
+
+    private Environment getEnvironment( EnvironmentPeerDto peerDto )
+    {
+        String envId = peerDto.getEnvironmentInfo().getId();
+
+        for ( Environment env : ctx.envManager.getEnvironments() )
+        {
+            if ( envId.equals( env.getId() ) )
+            {
+                return env;
+            }
+        }
+
+        return null;
+    }
+
+
+    private void deleteHubEnvironment( EnvironmentPeerDto peerDto ) throws PeerException
+    {
+        EnvironmentId envId = new EnvironmentId( peerDto.getEnvironmentInfo().getId() );
+
+        ctx.localPeer.cleanupEnvironment( envId );
+
+        ctx.envManager.notifyOnEnvironmentDestroyed( envId.getId() );
+
+        ctx.envUserHelper.handleEnvironmentOwnerDeletion( peerDto );
+    }
+
+
+    @Override
+    protected String getToken( EnvironmentPeerDto peerDto )
+    {
+        return peerDto.getPeerToken();
+    }
+
+
+    @Override
+    protected RestResult<Object> post( EnvironmentPeerDto peerDto, Object body )
+    {
+        return ctx.restClient.delete( path( "/rest/v1/environments/%s/peers/%s", peerDto ) );
     }
 }

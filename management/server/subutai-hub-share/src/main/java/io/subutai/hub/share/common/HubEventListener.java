@@ -1,4 +1,7 @@
-package io.subutai.core.hubmanager.api;
+package io.subutai.hub.share.common;
+
+
+import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
 /**
@@ -7,6 +10,8 @@ package io.subutai.core.hubmanager.api;
 public interface HubEventListener
 {
     void onRegistrationSucceeded();
+
+    void onPluginEvent( String pluginUid, PeerProductDataDto.State state );
 
     //add more events if needed
 }

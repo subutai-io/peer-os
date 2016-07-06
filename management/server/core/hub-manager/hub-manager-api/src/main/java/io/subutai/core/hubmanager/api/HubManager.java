@@ -25,11 +25,9 @@ public interface HubManager
 
     String getProducts() throws Exception;
 
-    void installPlugin( String url, String filename ) throws Exception;
+    void installPlugin( String url, String filename, String uid ) throws Exception;
 
-    void uninstallPlugin( String name );
-
-
+    void uninstallPlugin( String name, String uid );
 
     Map<String, String> getPeerInfo() throws Exception;
 
@@ -38,4 +36,6 @@ public interface HubManager
     String getChecksum();
 
     void sendSystemConfiguration( SystemConfDto dto );
+
+    String getCurrentUserEmail();
 }

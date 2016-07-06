@@ -1,6 +1,7 @@
 package io.subutai.core.environment.impl.adapter;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class EnvironmentAdapter
 
             for ( int i = 0; i < arr.size(); i++ )
             {
-                envs.add( new ProxyEnvironment( arr.get( i ), environmentManager, proxyContainerHelper ) );
+                envs.add( new ProxyEnvironment( this, arr.get( i ), environmentManager, proxyContainerHelper ) );
             }
         }
         catch ( Exception e )
@@ -139,33 +140,23 @@ public class EnvironmentAdapter
 
     public void removeEnvironment( EnvironmentImpl env )
     {
-        hubAdapter.removeEnvironment( env.getId() );
+
+        try
+        {
+            hubAdapter.removeEnvironment( env.getId() );
+        }
+        catch ( Exception e )
+        {
+            log.error( "Error to remove environment: ", e );
+        }
     }
 
 
-    /**
-     * The method is called each time when SS gets environment list. This is only when we can upload all environments to
-     * Hub. Otherwise there is no way to get all environments on SS side. The intend for all of this: to show on Hub
-     * side SS environments created before SS registered to Hub.
-     *
-     * This implementation of the requirement is not a proper way but more workaround. In future there should be some
-     * refactoring for this.
-     *
-     * TODO:
-     *
-     * this method will slow execution of io.subutai.core.environment.impl.EnvironmentManagerImpl#getEnvironments()
-     *
-     * To handle it properly, this module should receive Peer registration event with Hub and upload all already
-     * existing environments at that moment
-     */
-    public void uploadEnvironments( Set<Environment> envs )
+    public void uploadEnvironments( Collection<Environment> envs )
     {
         for ( Environment env : envs )
         {
-            if ( env instanceof EnvironmentImpl )
-            {
-                uploadEnvironment( ( EnvironmentImpl ) env );
-            }
+            uploadEnvironment( ( EnvironmentImpl ) env );
         }
     }
 
@@ -275,8 +266,14 @@ public class EnvironmentAdapter
     }
 
 
-    public boolean isRegistered()
+    public void onContainerStart( String envId, String contId )
     {
-        return hubAdapter.isRegistered();
+        hubAdapter.onContainerStart( envId, contId );
+    }
+
+
+    public void onContainerStop( String envId, String contId )
+    {
+        hubAdapter.onContainerStop( envId, contId );
     }
 }

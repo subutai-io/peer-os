@@ -466,7 +466,7 @@ input[type=checkbox] {
 }
 
 .b-main-table__tags {
-    width: 250px;
+    width: 150px;
 }
 
 .b-main-table__empty-item {
@@ -474,7 +474,7 @@ input[type=checkbox] {
 }
 
 .b-main-table__controls {
-    width: 82px;
+    width: 85px;
 }
 
 .b-main-table__node-one {
@@ -1459,7 +1459,7 @@ input.b-popup-body-checkbox {
 }
 
 .b-main-form__wrapper_min {
-    margin-right: 20px;
+    margin-right: 15px;
     line-height: 24px;
 	vertical-align: top;
 }
@@ -2331,10 +2331,16 @@ td.b-main-table__status-col {
 }
 
 .b-loading-screen .b-load-icon {
-    position: absolute;
+    position: fixed;
     top: 50%;
-    left: 50%;
+    left: 60%;
     margin: -12px 0 0 -12px;
+}
+
+.js-peer-load-screen .b-load-icon,
+.js-hub-screen .b-load-icon {
+	position: absolute!important;
+	left: 50%;
 }
 
 .b-popup-checkbox {
@@ -2767,6 +2773,7 @@ td.b-main-table__status-col {
 }
 .b-progress-cloud {
     border: 1px solid #ccceee;
+    background-color: #078DD0;
     border-radius: 4px;
     height: 5px;
     width: 100%;
@@ -2777,7 +2784,7 @@ td.b-main-table__status-col {
     position: absolute;
     left: 0;
     height: 100%;
-    background-color: #078DD0;
+    background-color: #FFF;
 }
 .b-progress-text {
     font-size: 11px;
@@ -3034,7 +3041,7 @@ td.b-main-table__status-col {
 }
 
 .b-switcher_login .b-toggle_cloud {
-    width: 210px;
+    width: 190px;
 }
 
 .b-check {
@@ -3059,9 +3066,6 @@ td.b-main-table__status-col {
 .b-toggle_cloud .b-check:checked ~ .b-switch {
     right: -1px;
     left: 44%;
-}
-.b-switcher_login .b-toggle_cloud .b-check:checked ~ .b-switch {
-    left: 54%;
 }
 .b-check:checked ~ .b-toggle-bg {
     background-color: #4bbc6e;
@@ -3144,10 +3148,6 @@ td.b-main-table__status-col {
     position: absolute;
     right: 56%;
     border-radius: 2px;
-}
-
-.b-switcher_login .b-toggle_cloud .b-switch {
-    right: 46%;
 }
 
 .b-pgp-page-row {
@@ -3437,7 +3437,7 @@ td.b-main-table__status-col {
 	right: -442px;
 	top: 25%;
 	padding: 10px;
-	border: 1px solid #CCCEEE;
+	border: 1px solid #078dd0;
     transition: all .4s ease-in-out;
 }
 
@@ -3610,6 +3610,11 @@ td.b-main-table__status-col {
 }
 .b-form-input_textarea {
     height: 100px;
+}
+
+.e2e-sign-message {
+    /*width: 370px;*/
+    height: 160px;
 }
 
 .b-text-logs {
@@ -3868,5 +3873,9 @@ a[disabled] {
 	text-align: center;
 	color: #04346E;
 	font-size: 14px;
+}
+
+.b-word-break-all {
+	word-break: break-all;
 }
 

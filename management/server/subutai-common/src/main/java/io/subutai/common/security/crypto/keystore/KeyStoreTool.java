@@ -6,11 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
 import java.security.Key;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -19,15 +17,17 @@ import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.security.crypto.certificate.CertificateData;
 import io.subutai.common.security.crypto.certificate.CertificateTool;
+import io.subutai.common.security.crypto.key.KeyManager;
+import io.subutai.common.security.crypto.key.KeyPairType;
 import io.subutai.common.security.utils.io.SafeCloseUtil;
+import io.subutai.common.settings.SecuritySettings;
 
 
 /**
@@ -189,65 +189,6 @@ public class KeyStoreTool
 
 
     /**
-     * *********************************************************************************** Save x509 Certificate in
-     * Keystore
-     *
-     * @param keyStore KeyStore
-     * @param keyStoreData KeyStoreData
-     * @param x509Cert X509Certificate
-     * @param keyPair KeyPair
-     */
-    public void addNSaveX509Certificate( KeyStore keyStore, KeyStoreData keyStoreData, X509Certificate x509Cert,
-                                         KeyPair keyPair )
-    {
-        try
-        {
-            keyStore.setKeyEntry( keyStoreData.getAlias(), keyPair.getPrivate(),
-                    keyStoreData.getPassword().toCharArray(), new java.security.cert.Certificate[] { x509Cert } );
-
-            save( keyStore, keyStoreData );
-        }
-        catch ( KeyStoreException e )
-        {
-            LOGGER.error( "Error setting keyEntry", e );
-        }
-    }
-
-
-    /**
-     * ***********************************************************************************
-     *
-     * @param keyStore KeyStore
-     *
-     * @return String
-     */
-    public String getEntries( KeyStore keyStore )
-    {
-        Enumeration<String> enumeration;
-        StringBuilder entryData = new StringBuilder( "" );
-
-        try
-        {
-            enumeration = keyStore.aliases();
-
-            while ( enumeration.hasMoreElements() )
-            {
-                String alias = enumeration.nextElement();
-                entryData.append( "\nalias name: " ).append( alias );
-                Certificate certificate = keyStore.getCertificate( alias );
-                entryData.append( "\nCertificate: " ).append( certificate.toString() );
-                entryData.append( "\n\n**************************************" );
-            }
-        }
-        catch ( KeyStoreException e )
-        {
-            LOGGER.error( "Error retrieving keyStore aliases/getting certificate by alias", e );
-        }
-        return entryData.toString();
-    }
-
-
-    /**
      * *********************************************************************************** Delete entry in the Keystore
      *
      * @param keyStore KeyStore
@@ -269,101 +210,6 @@ public class KeyStoreTool
         }
 
         return true;
-    }
-
-
-    /**
-     * *********************************************************************************** import Hexadecimal format
-     * certificate into Keystore
-     *
-     * @param keyStore KeyStore
-     * @param keyStoreData KeyStoreData
-     */
-    public void importCertificate( KeyStore keyStore, KeyStoreData keyStoreData )
-    {
-        try
-        {
-            File file = new File( keyStoreData.getImportFileLocation() );
-            finStream = new FileInputStream( file );
-
-            //****************************************************************
-            CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
-            X509Certificate cert = ( X509Certificate ) cf.generateCertificate( finStream );
-
-            keyStore.setCertificateEntry( keyStoreData.getAlias(), cert );
-
-            //save Keystore file
-            this.save( keyStore, keyStoreData );
-        }
-        catch ( FileNotFoundException e )
-        {
-            LOGGER.error( "Error accessing file", e );
-        }
-        catch ( KeyStoreException e )
-        {
-            LOGGER.error( "Error " );
-        }
-        catch ( CertificateException e )
-        {
-            LOGGER.error( "Error getting generating certificate", e );
-        }
-        finally
-        {
-            SafeCloseUtil.close( finStream );
-        }
-    }
-
-
-    /**
-     * *********************************************************************************** Export Certificate as a .cer
-     * file.
-     *
-     * @param keyStore KeyStore
-     * @param keyStoreData KeyStoreData
-     */
-    @SuppressWarnings( "restriction" )
-    public void exportCertificate( KeyStore keyStore, KeyStoreData keyStoreData )
-    {
-        try
-        {
-            X509Certificate cert = ( X509Certificate ) keyStore.getCertificate( keyStoreData.getAlias() );
-
-            File file = new File( keyStoreData.getExportFileLocation() );
-
-            if ( !file.exists() )
-            {
-                file.mkdirs();
-            }
-
-            byte[] buf = cert.getEncoded();
-
-            FileOutputStream os = new FileOutputStream( file );
-            os.write( buf );
-            os.close();
-
-            Writer wr = null;
-            try
-            {
-                wr = new OutputStreamWriter( os, Charset.forName( "UTF-8" ) );
-                wr.write( new sun.misc.BASE64Encoder().encode( buf ) );
-                wr.flush();
-            }
-            finally
-            {
-                if ( wr != null )
-                {
-                    wr.close();
-                }
-            }
-        }
-        catch ( Exception ex )
-        {
-            LOGGER.error( "Error KeyStoreManager#exportCertificate", ex );
-        }
-        finally
-        {
-            SafeCloseUtil.close( foutStream );
-        }
     }
 
 
@@ -415,80 +261,30 @@ public class KeyStoreTool
     }
 
 
-    /**
-     * *********************************************************************************** Check if keystore entry type
-     * is a keypair entry
-     *
-     * @param keyStore KeyStore
-     * @param alias String
-     *
-     * @return boolean
-     */
-    public static boolean isKeyPairEntry( KeyStore keyStore, String alias ) throws KeyStoreException
+    public KeyStore createPeerCertKeystore( String alias, String cn ) throws Exception
     {
-        return ( keyStore.isKeyEntry( alias ) ) && ( ( keyStore.getCertificateChain( alias ) != null ) && (
-                keyStore.getCertificateChain( alias ).length != 0 ) );
-    }
 
+        KeyManager sslkeyMan = new KeyManager();
 
-    /**
-     * *********************************************************************************** Check if keystore entry type
-     * is a key entry
-     *
-     * @return boolean
-     */
-    public boolean isKeyEntry( KeyStore keyStoreParam, String alias ) throws KeyStoreException
-    {
-        return ( keyStoreParam.isKeyEntry( alias ) ) && ( ( keyStoreParam.getCertificateChain( alias ) == null ) || (
-                keyStoreParam.getCertificateChain( alias ).length == 0 ) );
-    }
+        KeyPairGenerator keyPairGenerator = sslkeyMan.prepareKeyPairGeneration( KeyPairType.RSA, 1024 );
 
+        KeyPair sslKeyPair = sslkeyMan.generateKeyPair( keyPairGenerator );
 
-    /**
-     * *********************************************************************************** Check if keystore entry type
-     * is a Trusted Certificate
-     *
-     * @param alias Sring
-     * @param keyStoreParam keyStoreParam
-     *
-     * @return boolean
-     */
-    public boolean isTrustedCertificateEntry( KeyStore keyStoreParam, String alias ) throws KeyStoreException
-    {
-        return ( keyStoreParam.isCertificateEntry( alias ) );
-    }
+        CertificateData certificateData = new CertificateData();
 
+        certificateData.setCommonName( cn );
 
-    /**
-     * *********************************************************************************** Check if Keystore contains
-     * any key data
-     *
-     * @param keyStore KeyStore
-     *
-     * @return boolean
-     */
-    public boolean containsKey( KeyStore keyStore )
-    {
-        try
-        {
-            Enumeration<String> aliases = keyStore.aliases();
+        CertificateTool certificateTool = new CertificateTool();
 
-            while ( aliases.hasMoreElements() )
-            {
-                String alias = aliases.nextElement();
+        X509Certificate x509cert = certificateTool.generateSelfSignedCertificate( sslKeyPair, certificateData );
 
-                if ( isKeyEntry( keyStore, alias ) )
-                {
-                    return true;
-                }
-            }
+        KeyStore keyStore = KeyStore.getInstance( KeyStoreType.JKS.jce() );
 
-            return false;
-        }
-        catch ( KeyStoreException ex )
-        {
-            LOGGER.error( "CheckKeyStoreKeys exception", ex );
-            return false;
-        }
+        keyStore.load( null, null );
+
+        keyStore.setKeyEntry( alias, sslKeyPair.getPrivate(), SecuritySettings.KEYSTORE_PX1_PSW.toCharArray(),
+                new java.security.cert.Certificate[] { x509cert } );
+
+        return keyStore;
     }
 }

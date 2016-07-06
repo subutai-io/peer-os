@@ -173,5 +173,9 @@ public interface LocalPeer extends Peer
      * Returns true if MH is connected
      */
     boolean isMHPresent();
+
+    Set<ContainerHost> listOrphanContainers( );
+
+    void removeOrphanContainers( );
 }
 

@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.RegistrationData;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -122,5 +124,12 @@ public class RegistrationServiceImpl implements RegistrationService
             LOG.error( e.getMessage(), e );
             return Response.serverError().entity( e.getMessage() ).build();
         }
+    }
+
+
+    @Override
+    public Response getRegistrationStatus( final String peerId )
+    {
+        return Response.ok( peerManager.getRegistrationStatus( peerId ) ).build();
     }
 }

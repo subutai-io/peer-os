@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import io.subutai.common.settings.SystemSettings;
@@ -105,6 +106,24 @@ public class PeerInfo implements Serializable
     public String getPublicUrl()
     {
         return publicUrl;
+    }
+
+
+    @JsonIgnore
+    public int getPort()
+    {
+        try
+        {
+            URL url = new URL( publicUrl );
+
+            return url.getPort();
+        }
+        catch ( MalformedURLException e )
+        {
+            //ignore
+        }
+
+        return SystemSettings.DEFAULT_PUBLIC_PORT;
     }
 
 

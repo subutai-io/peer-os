@@ -32,15 +32,15 @@ public class RelationImpl implements Relation
     private long id;
 
     @Column( name = "source_link" )
-    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @ManyToOne( cascade = CascadeType.MERGE, fetch = FetchType.EAGER )
     private RelationLinkImpl source;
 
     @Column( name = "target_link" )
-    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @ManyToOne( cascade = CascadeType.MERGE, fetch = FetchType.EAGER )
     private RelationLinkImpl target;
 
     @Column( name = "trusted_object_link" )
-    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.EAGER )
+    @ManyToOne( cascade = CascadeType.MERGE, fetch = FetchType.EAGER )
     private RelationLinkImpl trustedObject;
 
     @Column( name = "relation_info" )

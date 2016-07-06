@@ -8,7 +8,8 @@
 
   <!-- ************************************************************************************************* -->
 
-  <bean id="daoKeyServer" init-method="init" class="io.subutai.common.dao.DaoManager" activation="eager">
+  <bean id="daoKeyServer" init-method="init" class="io.subutai.common.dao.DaoManager"
+        scope="prototype">
     <jpa:unit unitname="keyServerPUnit" property="entityManagerFactory" />
   </bean>
 

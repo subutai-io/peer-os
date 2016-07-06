@@ -50,6 +50,7 @@ import io.subutai.core.kurjun.impl.store.RepoUrlStore;
 public class RawManagerImpl implements RawManager
 {
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger( TemplateManagerImpl.class );
 
     private static final String DEFAULT_RAW_REPO_NAME = "raw";
@@ -72,16 +73,25 @@ public class RawManagerImpl implements RawManager
 
     public RawManagerImpl()
     {
-        injector = bootstrapDI();
-
-        _local();
-
-        _unified();
     }
 
 
     public void init()
     {
+        injector = bootstrapDI();
+
+        _local();
+
+        new Thread( () -> {
+            try
+            {
+                _unified();
+            }
+            catch ( Exception e )
+            {
+                LOGGER.error( "Error pulling raw files metadata. " + e.getMessage() );
+            }
+        } ).start();
     }
 
 

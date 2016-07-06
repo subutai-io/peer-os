@@ -22,15 +22,15 @@ public class SecretKeyStoreEntity implements SecretKeyStore
 {
 
     /********* Table name *********/
-    public static final String TABLE_NAME = "secret_key_store";
+    static final String TABLE_NAME = "secret_key_store";
 
     /********* column names *******/
 
-    public static final String KEY_FINGERPRINT  = "kfingerprint";
-    public static final String STATUS  = "status";
-    public static final String TYPE    = "type";
-    public static final String DATA    = "data";
-    public static final String PWD     = "pwd";
+    private static final String KEY_FINGERPRINT = "kfingerprint";
+    private static final String STATUS = "status";
+    private static final String TYPE = "type";
+    private static final String DATA = "data";
+    private static final String PWD = "pwd";
 
 
     @Id
@@ -43,7 +43,7 @@ public class SecretKeyStoreEntity implements SecretKeyStore
     @Column( name = TYPE )
     private int type = 1;
 
-    @Column( name = PWD)
+    @Column( name = PWD )
     private String pwd;
 
     @Lob

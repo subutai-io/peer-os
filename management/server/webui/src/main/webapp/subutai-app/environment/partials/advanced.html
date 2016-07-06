@@ -17,7 +17,7 @@
 			</div>
 			<div class="b-tools-menu js-scrollbar" ng-show="advEnvCtrl.activeCloudTab == 'templates'">
 				<div class="b-tools-menu__inpit">
-					<input type="text" class="b-search-input" ng-model="searchTemplate" id="js-search">
+					<input type="text" class="b-search-input" ng-model="searchTemplate" ng-init="searchTemplate=''" id="js-search">
 				</div>
 				<div class="b-tools-menu__inpit">
 					<select class="b-search-input" ng-model="advEnvCtrl.templatesType" ng-change="advEnvCtrl.getFilteredTemplates()">
@@ -28,20 +28,20 @@
 					</select>
 				</div>
 				<ul>
-					<li ng-repeat="template in advEnvCtrl.templatesList  | filter:searchTemplate | orderBy: identity" 
-						data-template="{{ template }}">
+					<li ng-repeat="template in advEnvCtrl.templatesList  | filter:{'name' : searchTemplate} | orderBy: 'name'"
+						data-template="{{ template.name }}">
 						<span class="b-tools-menu__item">
 							<span class="b-cloud-item">
 								<img
-									ng-src="assets/templates/{{ template }}.jpg"
-									alt="{{ template }}"
+									ng-src="assets/templates/{{ template.name }}.jpg"
+									alt="{{ template.name }}"
 									onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 							</span>
-							<span class="b-cloud-item-text">{{ template }}</span>
+							<span class="b-cloud-item-text">{{ template.name }}</span>
 						</span>
 						<div class="b-dragAndDrop-item"
 							ondragstart="startDrag(event)" ondragend="endtDrag(event)" draggable="true" 
-							data-template="{{ template }}">
+							data-template="{{ template.name }}">
 						</div>
 					</li>
 				</ul>
@@ -84,7 +84,7 @@
 						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
 						ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
 							<span class="b-cloud-item-resource-name g-margin-bottom">
-								Recource Host {{$index + 1}}
+								Resource Host {{$index + 1}}
 							</span>
 							<div class="b-progress__cloud b-progress__cloud_rh">
 								<div class="g-margin-bottom">
@@ -236,7 +236,7 @@
 
 					<button class="b-btn b-btn_white"
 					ng-click="advEnvCtrl.clearWorkspace()">
-						Cancel
+						Clear
 					</button>
 
 					<button
@@ -280,7 +280,7 @@
 									tooltip-side="right">
 								</div>
 							</td>
-							<td>
+							<td class="b-word-break-all">
 								<span tooltips
 									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"

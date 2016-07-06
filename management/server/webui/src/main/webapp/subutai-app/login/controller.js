@@ -61,6 +61,15 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 	vm.changeMode = changeMode;
 
 	function changeMode(modeStatus) {
+		vm.name = "";
+		vm.pass = "";
+		vm.fingerprint = "";
+		vm.sptoken = "";
+
+		vm.passExpired = false;
+		vm.newPass = "";
+		vm.passConf = "";
+
 		if(modeStatus) {
 			vm.activeMode = 'sptoken';
 		} else {
@@ -73,7 +82,7 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 		var postData = '';
 		if(vm.activeMode == 'sptoken') {
 			postData =
-				'username=' + vm.fingerprint +
+				'username=' + $("#subt-input__login").val() +
 				'&password=' + encodeURIComponent(vm.sptoken);
 		} else {
 			postData =
@@ -86,10 +95,12 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
 			}
 			else {
-				postData += '&newpassword=' + vm.newPass;
+				if(vm.activeMode == 'sptoken')
+					postData += '&newpassword=' + encodeURIComponent( vm.newPass );
+				else
+					postData += '&newpassword=' + vm.newPass;
 
 				loginSrv.login( postData ).success(function(data){
-					localStorage.setItem('currentUser', vm.name);
 					$rootScope.currentUser = vm.name;
 					$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 					//$state.go('home');
@@ -101,9 +112,9 @@ function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
 		}
 		else {
 			loginSrv.login( postData ).success(function(data){
-				localStorage.setItem('currentUser', vm.name);
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
+				sessionStorage.removeItem('notifications');
 				//$state.go('home');
 				window.location = '/';
 			}).error(function(error, status){

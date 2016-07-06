@@ -248,6 +248,8 @@ public interface EnvironmentManager
 
     void notifyOnContainerDestroyed( Environment environment, String containerId );
 
+    void notifyOnEnvironmentDestroyed( final String environmentId );
+
     void addAlertHandler( AlertHandler alertHandler );
 
     void removeAlertHandler( AlertHandler alertHandler );

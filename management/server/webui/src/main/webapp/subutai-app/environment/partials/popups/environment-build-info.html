@@ -14,7 +14,8 @@
 					id="env-name" 
 					placeholder="Environment name" 
 					ng-model="environmentSimpleViewCtrl.environment2BuildName" 
-					required>
+					required
+					maxlength="50">
 			</div>
 
 			<div class="g-text g-margin-bottom-half">Create environment with following containers</div>
@@ -24,11 +25,11 @@
 					<tr ng-repeat="(templateName, templateInfo) in environmentSimpleViewCtrl.env2Build">
 						<td class="b-main-table__20 g-text-center">
 							<img 
-								src="assets/templates/{{ templateName }}.jpg" 
-								alt="{{ templateName }}" 
+								src="assets/templates/{{ templateInfo.name }}.jpg"
+								alt="{{ templateInfo.name }}"
 								onError="this.onerror=null;this.src='assets/templates/no-image.jpg';">
 						</td>
-						<td>{{ templateName }}</td>
+						<td>{{ templateInfo.name }}</td>
 						<td class="b-main-table__right">
 							<span 
 							class="g-circle-label g-margin-left-quarter" 

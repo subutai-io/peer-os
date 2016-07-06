@@ -9,8 +9,6 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
@@ -25,7 +23,6 @@ import io.subutai.core.security.api.crypto.EncryptionTool;
  */
 public class EncryptionToolImpl implements EncryptionTool
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EncryptionToolImpl.class );
 
     private final KeyManagerImpl keyManager;
 
@@ -315,7 +312,7 @@ public class EncryptionToolImpl implements EncryptionTool
     @Override
     public KeyPair generateKeyPair( String userId, String secretPwd, boolean armored )
     {
-        KeyPair keyPair = null;
+        KeyPair keyPair;
 
         try
         {

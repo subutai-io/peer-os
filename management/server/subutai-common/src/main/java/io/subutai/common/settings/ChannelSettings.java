@@ -6,51 +6,36 @@ package io.subutai.common.settings;
  */
 public class ChannelSettings
 {
-    public static int OPEN_PORT = 8080;
 
-    public static int SECURE_PORT_X1 = 8443;
-    public static int SECURE_PORT_X2 = 8444;
-    public static int SECURE_PORT_X3 = 8338;
-    public static int SPECIAL_PORT_X1 = 8333;
-    public static int AGENT_PORT = 7777;
-    public static final String SPECIAL_REST_BUS = "cxfBusAptManager";
+    private static final String[] URL_ACCESS_PX1 = {
 
-    public static final String[] URL_ACCESS_PX1 = {
-
-            "/rest/v1/identity/auth",
-            "/rest/v1/identity/authid",
-            "/rest/v1/identity/gettoken",
-            "/rest/v1/peer/id",
-            "/rest/v1/peer/inited",
-            "/rest/v1/peer/mhpresent",
-            "/rest/v1/pks/{$}",
+            "/rest/v1/identity/auth", "/rest/v1/identity/authid", "/rest/v1/identity/gettoken", "/rest/v1/peer/id",
+            "/rest/v1/peer/inited", "/rest/v1/peer/mhpresent", "/rest/v1/peer/ready", "/rest/v1/pks/{$}",
             "/rest/v1/security/keyman/getpublickeyring", "/rest/v1/security/keyman/getpublickey",
-            "/rest/v1/handshake/info", "/rest/v1/handshake/register", "/rest/v1/handshake/approve",
-            "/rest/v1/handshake/cancel", "/rest/v1/handshake/reject", "/rest/v1/handshake/unregister",
+            "/rest/v1/security/keyman/getpublickeyfingerprint", "/rest/v1/handshake/info",
+            "/rest/v1/handshake/register", "/rest/v1/handshake/approve", "/rest/v1/handshake/cancel",
+            "/rest/v1/handshake/reject", "/rest/v1/handshake/unregister", "/rest/v1/handshake/status/{$}",
             "/rest/v1/registration/public-key"
     };
 
 
-    public static short checkURLAccess( String uri, String[] urlAccessArray )
+    public static boolean checkURLAccess( String uri )
     {
-        short status = 0;
 
-        for ( final String aUrlAccess : urlAccessArray )
+        for ( final String aUrlAccess : URL_ACCESS_PX1 )
         {
-            if ( checkURL( uri, aUrlAccess ) == 1 )
+            if ( checkURL( uri, aUrlAccess ) )
             {
-                status = 1;
-                break;
+                return true;
             }
         }
 
-        return status;
+        return false;
     }
 
 
-    private static short checkURL( String uri, String urlAccess )
+    private static boolean checkURL( String uri, String urlAccess )
     {
-        short status = 0;
 
         String subURI[] = uri.split( "/" );
         int subURISize = subURI.length;
@@ -77,10 +62,10 @@ public class ChannelSettings
 
             if ( st == subURISize )
             {
-                status = 1;
+                return true;
             }
         }
 
-        return status;
+        return false;
     }
 }

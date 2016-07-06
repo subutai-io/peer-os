@@ -128,10 +128,6 @@ public class EnvironmentImpl implements Environment, Serializable
     @JsonProperty( "status" )
     private EnvironmentStatus status = EnvironmentStatus.EMPTY;
 
-    @Column( name = "relation_declaration", length = 3000 )
-    @JsonIgnore
-    private String relationDeclaration;
-
     @Column( name = "initial_blueprint" )
     @JsonIgnore
     @Lob
@@ -272,19 +268,6 @@ public class EnvironmentImpl implements Environment, Serializable
     }
 
 
-    @Override
-    public String getRelationDeclaration()
-    {
-        return relationDeclaration;
-    }
-
-
-    public void setRelationDeclaration( final String relationDeclaration )
-    {
-        this.relationDeclaration = relationDeclaration;
-    }
-
-
     public String getRawTopology()
     {
         return rawBlueprint;
@@ -317,6 +300,23 @@ public class EnvironmentImpl implements Environment, Serializable
             }
         }
         throw new ContainerHostNotFoundException( String.format( "Container host not found by id %s", id ) );
+    }
+
+
+    @Override
+    public Set<EnvironmentContainerHost> getContainerHostsByPeerId( String id )
+    {
+        Preconditions.checkNotNull( id, "Invalid id" );
+
+        Set<EnvironmentContainerHost> result = new HashSet<>();
+        for ( final EnvironmentContainerHost containerHost : getContainerHosts() )
+        {
+            if ( containerHost.getPeerId().equals( id ) )
+            {
+                result.add( containerHost );
+            }
+        }
+        return result;
     }
 
 
@@ -357,6 +357,24 @@ public class EnvironmentImpl implements Environment, Serializable
 
         peerConf.setEnvironment( this );
         peerConfs.add( peerConf );
+    }
+
+
+    @Override
+    public void removeEnvironmentPeer( final String peerId )
+    {
+
+        Preconditions.checkNotNull( peerId, "Environment peer id could not be null." );
+
+        for ( Iterator<PeerConf> i = peerConfs.iterator(); ; i.hasNext() )
+        {
+            PeerConf c = i.next();
+            if ( c.getPeerId().equals( peerId ) )
+            {
+                i.remove();
+                break;
+            }
+        }
     }
 
 

@@ -5,7 +5,7 @@
   <parent>
     <artifactId>environment-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.0-RC13</version>
+    <version>4.0.0-RC14-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -74,11 +74,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hub-adapter-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hub-manager-api</artifactId>
     </dependency>
 
     <!-- Testing -->

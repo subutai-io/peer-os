@@ -44,7 +44,6 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.MessageRequest;
 import io.subutai.common.peer.MessageResponse;
 import io.subutai.common.peer.Payload;
@@ -52,6 +51,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RecipientType;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
 import io.subutai.common.protocol.P2PConfig;
@@ -65,16 +65,26 @@ import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
+import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.relation.RelationInfoManager;
+import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.RelationVerificationException;
+import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
+import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.security.relation.model.RelationStatus;
+import io.subutai.common.task.CloneResponse;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.identity.api.model.User;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
 import io.subutai.core.messenger.api.Messenger;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
@@ -98,8 +108,9 @@ public class RemotePeerImpl implements RemotePeer
     private final Object provider;
     protected JsonUtil jsonUtil = new JsonUtil();
     private String baseUrl;
+    private IdentityManager identityManager;
     private RelationManager relationManager;
-    private LocalPeer localPeer;
+    private PeerManager peerManager;
     private PeerWebClient peerWebClient;
     private EnvironmentWebClient environmentWebClient;
 
@@ -122,8 +133,9 @@ public class RemotePeerImpl implements RemotePeer
         this.messenger = messenger;
         this.commandResponseListener = commandResponseListener;
         this.messageResponseListener = messageResponseListener;
+        this.identityManager = peerManager.getIdentityManager();
         this.relationManager = peerManager.getRelationManager();
-        this.localPeer = peerManager.getLocalPeer();
+        this.peerManager = peerManager;
         this.provider = provider;
 
         this.peerWebClient = new PeerWebClient( provider, peerInfo, this );
@@ -141,7 +153,7 @@ public class RemotePeerImpl implements RemotePeer
         traits.put( "sendHeartbeats", "allow" );
         traits.put( "hostTemplates", "allow" );
 
-        relationInfoManager.checkRelation( localPeer, this, relationInfoMeta, null );
+        relationInfoManager.checkRelation( peerManager.getLocalPeer(), this, relationInfoMeta, null );
     }
 
 
@@ -199,6 +211,13 @@ public class RemotePeerImpl implements RemotePeer
     public PeerInfo getPeerInfo()
     {
         return peerInfo;
+    }
+
+
+    @Override
+    public RegistrationStatus getStatus()
+    {
+        return peerManager.getRemoteRegistrationStatus( peerInfo.getId() );
     }
 
 
@@ -575,12 +594,132 @@ public class RemotePeerImpl implements RemotePeer
 
         if ( response != null )
         {
+
+            for ( final CloneResponse cloneResponse : response.getResponses() )
+            {
+                buildEnvContainerRelation(cloneResponse, request.getEnvironmentId());
+            }
             return response;
         }
         else
         {
             throw new PeerException( "Command timed out" );
         }
+    }
+
+
+    /**
+     * This method saves new containers as relation between user or peer.
+     */
+    protected void buildEnvContainerRelation( final CloneResponse cloneResponse, final String environmentId )
+    {
+
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+        relationTraits.put( "containerLimit", "unlimited" );
+        relationTraits.put( "bandwidthLimit", "unlimited" );
+        relationTraits.put( "read", "true" );
+        relationTraits.put( "write", "true" );
+        relationTraits.put( "update", "true" );
+        relationTraits.put( "delete", "true" );
+        relationTraits.put( "ownership", Ownership.USER.getName() );
+
+        RelationLink source;
+        User activeUser = identityManager.getActiveUser();
+
+        // TODO: 6/23/16 it is not clear is relation built between container and real owner (user)
+        // or container <> peer that hosts it.
+        if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+        {
+            // Since this container is hosted on remote peer owner will be remotePeer
+            source = this;
+            LOG.debug( "Setting RemotePeer as source" );
+        }
+        else
+        {
+            source = identityManager.getUserDelegate( activeUser.getId() );
+            LOG.debug( "Setting DelegatedUser as source" );
+        }
+
+
+        RelationLink envLink = new RelationLink()
+        {
+            @Override
+            public String getLinkId()
+            {
+                return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+            }
+
+
+            @Override
+            public String getUniqueIdentifier()
+            {
+                return environmentId;
+            }
+
+
+            @Override
+            public String getClassPath()
+            {
+                return "EnvironmentImpl";
+            }
+
+
+            @Override
+            public String getContext()
+            {
+                return PermissionObject.EnvironmentManagement.getName();
+            }
+
+
+            @Override
+            public String getKeyId()
+            {
+                return environmentId;
+            }
+        };
+
+        RelationLink containerLink = new RelationLink()
+        {
+            @Override
+            public String getLinkId()
+            {
+                return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+            }
+
+
+            @Override
+            public String getUniqueIdentifier()
+            {
+                return cloneResponse.getContainerId();
+            }
+
+
+            @Override
+            public String getClassPath()
+            {
+                return "RemoteContainerHost";
+            }
+
+
+            @Override
+            public String getContext()
+            {
+                return PermissionObject.PeerManagement.getName();
+            }
+
+
+            @Override
+            public String getKeyId()
+            {
+                return cloneResponse.getContainerId();
+            }
+        };
+
+        RelationMeta relationMeta = new RelationMeta( source, envLink, containerLink, envLink.getKeyId() );
+        Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+        relation.setRelationStatus( RelationStatus.VERIFIED );
+        relationManager.saveRelation( relation );
     }
 
 

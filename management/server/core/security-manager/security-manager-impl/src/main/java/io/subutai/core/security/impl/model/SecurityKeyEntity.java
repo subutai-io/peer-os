@@ -26,16 +26,16 @@ import io.subutai.core.security.api.model.SecurityKeyTrust;
 public class SecurityKeyEntity implements SecurityKey
 {
     /********* Table name *********/
-    public static final String TABLE_NAME = "security_key";
+    static final String TABLE_NAME = "security_key";
 
     /********* column names *******/
 
-    public static final String IDENTITY_ID = "identity_id";
-    public static final String HOST_IP = "host_ip";
-    public static final String PUBLIC_KEY_FINGERPRINT  = "pkfingerprint";
-    public static final String SECRET_KEY_FINGERPRINT  = "skfingerprint";
-    public static final String STATUS  = "status";
-    public static final String TYPE    = "type";
+    private static final String IDENTITY_ID = "identity_id";
+    private static final String HOST_IP = "host_ip";
+    private static final String PUBLIC_KEY_FINGERPRINT  = "pkfingerprint";
+    private static final String SECRET_KEY_FINGERPRINT  = "skfingerprint";
+    private static final String STATUS  = "status";
+    private static final String TYPE    = "type";
 
 
     @Id

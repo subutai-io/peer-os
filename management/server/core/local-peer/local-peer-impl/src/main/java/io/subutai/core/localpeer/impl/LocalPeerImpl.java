@@ -66,6 +66,7 @@ import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
@@ -88,6 +89,7 @@ import io.subutai.common.security.objects.KeyTrustLevel;
 import io.subutai.common.security.objects.Ownership;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.objects.SecurityKeyType;
+import io.subutai.common.security.objects.UserType;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.security.relation.RelationManager;
@@ -132,6 +134,7 @@ import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -805,6 +808,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             resourceHostDataService.update( ( ResourceHostEntity ) resourceHost );
 
+            buildEnvContainerRelation( containerHost );
+
             LOG.debug( "New container host registered: " + containerHost.getHostname() );
         }
         catch ( Exception e )
@@ -813,6 +818,95 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             throw new PeerException( String.format( "Error registering container: %s", e.getMessage() ), e );
         }
+    }
+
+
+    protected void buildEnvContainerRelation( final ContainerHostEntity containerHost )
+    {
+
+
+        containerHost.getOwnerId();
+
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+        relationTraits.put( "containerLimit", "unlimited" );
+        relationTraits.put( "bandwidthLimit", "unlimited" );
+        relationTraits.put( "read", "true" );
+        relationTraits.put( "write", "true" );
+        relationTraits.put( "update", "true" );
+        relationTraits.put( "delete", "true" );
+        relationTraits.put( "ownership", Ownership.USER.getName() );
+
+        RelationLink source;
+        User activeUser = identityManager.getActiveUser();
+        if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+        {
+            // Most probably it is remote container, so owner will be localPeer
+            source = this;
+            LOG.debug( "Setting LocalPeer as source" );
+        }
+        else
+        {
+            source = identityManager.getUserDelegate( activeUser.getId() );
+            LOG.debug( "Setting DelegatedUser as source" );
+        }
+
+
+        RelationLink envLink = new RelationLink()
+        {
+            @Override
+            public String getLinkId()
+            {
+                return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+            }
+
+
+            @Override
+            public String getUniqueIdentifier()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+
+
+            @Override
+            public String getClassPath()
+            {
+                return "EnvironmentImpl";
+            }
+
+
+            @Override
+            public String getContext()
+            {
+                return PermissionObject.EnvironmentManagement.getName();
+            }
+
+
+            @Override
+            public String getKeyId()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+        };
+
+        if ( source == null )
+        {
+            LOG.debug( "Source is null" );
+        }
+        if ( containerHost == null )
+        {
+            LOG.debug( "containerHost is null" );
+        }
+        if ( envLink == null )
+        {
+            LOG.debug( "envLink is null" );
+        }
+
+
+        RelationMeta relationMeta = new RelationMeta( source, envLink, containerHost, envLink.getKeyId() );
+        Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+        relation.setRelationStatus( RelationStatus.VERIFIED );
+        relationManager.saveRelation( relation );
     }
 
 
@@ -1719,7 +1813,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private void buildPeerEnvRelation( final RelationLink envLink )
     {
 
-        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment.
+        // Build relation between LocalPeer and LocalEnvironment/CrossPeerEnvironment. Planned to use it in future
+        // for peer policy feature between peers.
 
         User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
         if ( peerOwner != null )
@@ -1740,6 +1835,59 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
             relation.setRelationStatus( RelationStatus.VERIFIED );
             relationManager.saveRelation( relation );
+        }
+        buildRelation( envLink );
+    }
+
+    private void buildRelation( final RelationLink envLink )
+    {
+        try
+        {
+            RelationLink source;
+            String keyId;
+            User activeUser = identityManager.getActiveUser();
+            if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+            {
+                // Most probably it is cross peer environment
+                source = this;
+                keyId = source.getKeyId();
+                LOG.debug( "Setting local peer as source" );
+            }
+            else
+            {
+                source = identityManager.getUserDelegate( activeUser.getId() );
+                keyId = activeUser.getSecurityKeyId();
+                LOG.debug("Extracting delegated user");
+            }
+
+            // User           - Delegated user - Environment
+            // Delegated user - Delegated user - Environment
+            // Delegated user - Environment    - Container
+            RelationInfoMeta relationInfoMeta = new RelationInfoMeta();
+            Map<String, String> traits = relationInfoMeta.getRelationTraits();
+            traits.put( "read", "true" );
+            traits.put( "write", "true" );
+            traits.put( "update", "true" );
+            traits.put( "delete", "true" );
+            traits.put( "ownership", Ownership.USER.getName() );
+
+            if ( source == null )
+            {
+                LOG.debug( "Source is null" );
+            }
+            if ( envLink == null )
+            {
+                LOG.debug( "envLink is null" );
+            }
+
+            RelationMeta relationMeta = new RelationMeta( source, source, envLink, keyId );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
+        catch ( Exception e )
+        {
+            LOG.warn( "Error message.", e );
         }
     }
 
@@ -2396,6 +2544,89 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public HostId getResourceHostIdByContainerId( final ContainerId id ) throws PeerException
     {
         return new HostId( getResourceHostByContainerId( id.getId() ).getId() );
+    }
+
+
+    @Override
+    public Set<ContainerHost> listOrphanContainers()
+    {
+        Set<ContainerHost> result = new HashSet<>();
+        Set<String> involvedPeers = getInvolvedPeers();
+        final Set<String> unregisteredPeers = getNotRegisteredPeers( involvedPeers );
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                if ( unregisteredPeers.contains( containerHost.getInitiatorPeerId() ) && !Common.MANAGEMENT_HOSTNAME
+                        .equalsIgnoreCase( containerHost.getHostname() ) )
+                {
+                    result.add( containerHost );
+                }
+            }
+        }
+        return result;
+    }
+
+
+    protected Set<String> getInvolvedPeers()
+    {
+        final Set<String> result = new HashSet<>();
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            for ( ContainerHost containerHost : resourceHost.getContainerHosts() )
+            {
+                result.add( containerHost.getInitiatorPeerId() );
+            }
+        }
+        return result;
+    }
+
+
+    protected Set<String> getNotRegisteredPeers( Set<String> peers )
+    {
+        final Set<String> result = new HashSet<>();
+        PeerManager peerManager = getPeerManager();
+
+        for ( String p : peers )
+        {
+            if ( RegistrationStatus.NOT_REGISTERED == peerManager.getRemoteRegistrationStatus( p ) )
+            {
+                result.add( p );
+            }
+        }
+        return result;
+    }
+
+
+    protected PeerManager getPeerManager()
+    {
+        return ServiceLocator.getServiceNoCache( PeerManager.class );
+    }
+
+
+    @Override
+    public RegistrationStatus getStatus()
+    {
+        return RegistrationStatus.APPROVED;
+    }
+
+
+    @Override
+    public void removeOrphanContainers()
+    {
+        Set<ContainerHost> orphanContainers = listOrphanContainers();
+
+        for ( ContainerHost containerHost : orphanContainers )
+        {
+            try
+            {
+                destroyContainer( containerHost.getContainerId() );
+            }
+            catch ( PeerException e )
+            {
+                LOG.error( "Error on destroying container", e );
+            }
+        }
     }
 
 
