@@ -227,26 +227,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private boolean isPeerInUse( String peerId )
     {
-        boolean inUse = false;
-        for ( Iterator<EnvironmentImpl> i = environmentService.getAll().iterator(); !inUse && i.hasNext(); )
+        for ( EnvironmentImpl e : environmentService.getAll() )
         {
-            EnvironmentImpl e = i.next();
             if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
             {
-                inUse = true;
-                break;
+                return true;
             }
 
             for ( PeerConf p : e.getPeerConfs() )
             {
                 if ( peerId.equals( p.getPeerId() ) )
                 {
-                    inUse = true;
-                    break;
+                    return true;
                 }
             }
         }
-        return inUse;
+
+        return !peerManager.getLocalPeer().getPeerContainers( peerId ).isEmpty();
     }
 
 
