@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import io.subutai.core.systemmanager.impl.pojo.*;
 import org.apache.commons.configuration.ConfigurationException;
 
 import io.subutai.common.command.CommandException;
@@ -34,11 +37,6 @@ import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
-import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.SystemConfigurationType;
 
@@ -164,6 +162,20 @@ public class SystemManagerImpl implements SystemManager
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
             pojo.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
             pojo.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+
+            Map p2pVersions = new HashMap<String, P2PStats>();
+            peerManager.getLocalPeer().getResourceHosts().stream().forEach( rh -> {
+                try
+                {
+                    p2pVersions.put( rh.getId(), new P2PStats(rh.getId(), rh.getRhVersion(), rh.getP2pVersion()) );
+                } catch (ResourceHostException e)
+                {
+                    p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                }
+            } );
+
+
+            pojo.setPeerP2PVersions( p2pVersions );
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {

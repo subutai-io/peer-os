@@ -3,6 +3,8 @@ package io.subutai.core.systemmanager.impl.pojo;
 
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
+import java.util.Map;
+
 
 public class SystemInfoPojo implements SystemInfo
 {
@@ -13,6 +15,8 @@ public class SystemInfoPojo implements SystemInfo
     private String projectVersion;
     private String rhVersion;
     private String p2pVersion;
+
+    private Map peerP2PVersions;
 
     private String gitBuildUserName;
     private String gitBuildUserEmail;
@@ -229,5 +233,13 @@ public class SystemInfoPojo implements SystemInfo
     public void setUpdatesAvailable( final boolean updatesAvailable )
     {
         isUpdatesAvailable = updatesAvailable;
+    }
+
+    public Map getPeerP2PVersions() {
+        return peerP2PVersions;
+    }
+
+    public void setPeerP2PVersions(Map peerP2PVersions) {
+        this.peerP2PVersions = peerP2PVersions;
     }
 }
