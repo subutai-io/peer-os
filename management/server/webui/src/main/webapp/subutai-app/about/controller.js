@@ -13,9 +13,9 @@ function AboutCtrl ($http, ngDialog, SweetAlert, $scope, $timeout) {
 	vm.currentType = 'about';
 
 	vm.statusColors = [
-		{"color": "#22b573", "text": "p2p is already up-to-date"},
-		{"color": "#efc94c", "text": "p2p need update soon"},
-		{"color": "#c1272d", "text": "Update your p2p immediately"},
+		{"color": "#22b573", "text": "Already up-to-date", "status": "true", "statusText": "Healthy"},
+		{"color": "#efc94c", "text": "Need update soon", "status": "WAIT", "statusText": "Problems"},
+		{"color": "#c1272d", "text": "Update immediately", "status": "false", "statusText": "Not working"},
 	]
 
 	$http.get (SERVER_URL + "rest/v1/system/about").success (function (data) {
