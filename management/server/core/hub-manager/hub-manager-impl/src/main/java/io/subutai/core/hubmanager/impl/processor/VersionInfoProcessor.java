@@ -70,8 +70,8 @@ public class VersionInfoProcessor implements Runnable
 
         ResourceHost host = configManager.getPeerManager().getLocalPeer().getManagementHost();
 
-        versionInfoDto.setP2pVersion( host.getP2pVersion() );
-        versionInfoDto.setRhVersion( host.getRhVersion() );
+        versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+        versionInfoDto.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
 
         RestResult<Object> restResult = restClient.post( path, versionInfoDto );
         if ( !restResult.isSuccess() )
