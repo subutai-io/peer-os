@@ -30,6 +30,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
+import io.subutai.common.settings.Common;
 
 
 /**
@@ -293,5 +294,12 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public String getKeyId()
     {
         return getId();
+    }
+
+
+    @Override
+    public String getIp()
+    {
+        return getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
     }
 }

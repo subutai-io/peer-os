@@ -53,12 +53,12 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
-import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
+import io.subutai.common.settings.Common;
 import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
@@ -702,5 +702,12 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public Environment getEnvironment()
     {
         return parent;
+    }
+
+
+    @Override
+    public String getIp()
+    {
+        return getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
     }
 }
