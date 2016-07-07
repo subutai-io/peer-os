@@ -136,4 +136,12 @@
       </action>
     </command>
   </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="environment/check-connectivity">
+      <action class="io.subutai.core.environment.cli.CheckEnvironmentConnectivityCommand">
+        <argument ref="environmentManager" />
+      </action>
+    </command>
+  </command-bundle>
 </blueprint>
