@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
@@ -38,7 +39,8 @@ public class ResourceHostDataProcessor implements Runnable
     private Date p2pLogsEndDate;
 
 
-    public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor, HubRestClient restClient )
+    public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
+                                      HubRestClient restClient )
     {
         this.hubManager = hubManager;
         this.localPeer = localPeer;
@@ -160,9 +162,7 @@ public class ResourceHostDataProcessor implements Runnable
     {
         Date currentDate = new Date();
 
-        Date startDate = p2pLogsEndDate != null
-                         ? p2pLogsEndDate
-                         : DateUtils.addMinutes( currentDate, -15 );
+        Date startDate = p2pLogsEndDate != null ? p2pLogsEndDate : DateUtils.addMinutes( currentDate, -15 );
 
         p2pLogsEndDate = currentDate;
 
@@ -186,9 +186,11 @@ public class ResourceHostDataProcessor implements Runnable
 
         P2pLogs p2pLogs = rh.getP2pLogs( JournalCtlLevel.ERROR, startDate, endDate );
 
+        String p2pStatus = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+
         log.info( "logs.size: {}", p2pLogs.getLogs().size() );
 
-        if ( p2pLogs.isEmpty() )
+        if ( p2pLogs.isEmpty() && p2pStatus == null )
         {
             return;
         }
@@ -196,8 +198,9 @@ public class ResourceHostDataProcessor implements Runnable
         SystemLogsDto logsDto = new SystemLogsDto();
 
         logsDto.setLogs( p2pLogs.getLogs() );
+        logsDto.setStatus( p2pStatus );
 
-        log.info( "Sending p2p logs to Hub..." );
+        log.info( "Sending p2p logs and status to Hub..." );
 
         String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", localPeer.getId(), rh.getId() );
 
