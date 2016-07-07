@@ -3879,3 +3879,7 @@ a[disabled] {
 	word-break: break-all;
 }
 
+.b-pointer-obj {
+	cursor: pointer;
+}
+

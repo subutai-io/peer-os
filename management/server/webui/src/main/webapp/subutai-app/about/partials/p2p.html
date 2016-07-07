@@ -1,0 +1,26 @@
+<div class="b-workspace-content__row">
+	<div class="b-main-table-border">
+		<table class="b-main-table">
+			<tr>
+				<th>Recource host</th>
+				<th>RH version</th>
+				<th>P2P version</th>
+				<th>P2P error</th>
+			</tr>
+			<tr ng-repeat="(rhName, rh) in aboutCtrl.info.peerP2PVersions">
+				<td>rhName</td>
+				<td>{{ rh.rhVersion }}</td>
+				<td>
+					<span 
+						class="b-pointer-obj" 
+						style="color: {{ aboutCtrl.statusColors[rh.p2pStatus].color }}" 
+						tooltips
+						tooltip-template="{{ aboutCtrl.statusColors[rh.p2pStatus].text }}">
+						{{ rh.p2pVersion }}
+					</span>
+				</td>
+				<td>{{ rh.p2pErrorMessage }}</td>
+			</tr>
+		</table>
+	</div>
+</div>
