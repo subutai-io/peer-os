@@ -31,4 +31,10 @@ public interface P2Pinfo
 
 
     public void setState( final String state );
+
+
+    public String getP2pVersion();
+
+
+    public void setP2pVersion( final String p2pVersion );
 }

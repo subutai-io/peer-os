@@ -537,7 +537,7 @@ public class MonitorImpl implements Monitor, HostListener
                     }
                 }
 
-                if ( errors == statusLines.size() )
+                if ( errors > 0 && errors == statusLines.size() )
                 {
                     info.setP2pStatus( 2 );
                 }
@@ -552,6 +552,7 @@ public class MonitorImpl implements Monitor, HostListener
 
                 info.setRhId( resourceHost.getId() );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
+                info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
 
                 pojos.add( info );
             }

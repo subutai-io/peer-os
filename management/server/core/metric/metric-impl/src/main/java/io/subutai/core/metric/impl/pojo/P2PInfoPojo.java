@@ -8,6 +8,7 @@ public class P2PInfoPojo implements P2Pinfo
 {
     private String rhId;
     private String rhVersion;
+    private String p2pVersion;
     private int p2pStatus;
     private String state;
     private String p2pErrorLogs;
@@ -70,5 +71,17 @@ public class P2PInfoPojo implements P2Pinfo
     public void setState( final String state )
     {
         this.state = state;
+    }
+
+
+    public String getP2pVersion()
+    {
+        return p2pVersion;
+    }
+
+
+    public void setP2pVersion( final String p2pVersion )
+    {
+        this.p2pVersion = p2pVersion;
     }
 }
