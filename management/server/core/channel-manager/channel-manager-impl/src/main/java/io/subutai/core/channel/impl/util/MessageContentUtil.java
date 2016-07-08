@@ -25,6 +25,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.ChannelSettings;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
@@ -88,7 +89,7 @@ public class MessageContentUtil
         String basePath = req.getRequestURI();
 
 
-        if ( inPort == SystemSettings.getSecurePortX1() )
+        if ( inPort == Common.DEFAULT_PUBLIC_PORT )
         {
             if ( !ChannelSettings.checkURLAccess( basePath ) )
             {

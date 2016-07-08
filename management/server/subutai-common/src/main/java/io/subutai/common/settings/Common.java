@@ -6,6 +6,11 @@ import java.util.regex.Pattern;
 
 public class Common
 {
+    public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
+    public static final int DEFAULT_PUBLIC_PORT = 8443;
+    public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
+    public static final int DEFAULT_AGENT_PORT = 7070;
+
     public static final String GATEWAY_INTERFACE_NAME_REGEX = "^gw-(\\d+)$";
     public static final Pattern GATEWAY_INTERFACE_NAME_PATTERN = Pattern.compile( GATEWAY_INTERFACE_NAME_REGEX );
     public static final String P2P_INTERFACE_NAME_REGEX = "^p2p(\\d+)$";
