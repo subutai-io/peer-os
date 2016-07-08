@@ -363,9 +363,8 @@ public class HostRegistryImpl implements HostRegistry
 
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
     {
-        return RestUtil.createWebClient(
-                String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ), SystemSettings.getAgentPort(),
-                        action ), 3000, 5000, 1 );
+        return RestUtil.createWebClient( String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ),
+                Common.DEFAULT_AGENT_PORT, action ), 3000, 5000, 1 );
     }
 
 
