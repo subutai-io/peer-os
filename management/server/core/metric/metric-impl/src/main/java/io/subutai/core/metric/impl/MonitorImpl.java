@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.command.CommandException;
@@ -48,13 +50,18 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
+import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
+
+import static java.awt.SystemColor.info;
 
 
 /**
@@ -475,5 +482,87 @@ public class MonitorImpl implements Monitor, HostListener
     public void putAlert( final Alert alert )
     {
         queueAlertResource( alert );
+    }
+
+
+    @Override
+    public List<P2Pinfo> getP2PStatus()
+    {
+        List<P2Pinfo> pojos = Lists.newArrayList();
+
+        for ( final ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
+        {
+            P2Pinfo info = new P2PInfoPojo();
+
+            try
+            {
+                List<String> statusLines = Lists.newArrayList();
+
+                String status = resourceHost.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+
+                String lines[] = status.split( "\\r?\\n" );
+
+                for ( final String line : lines )
+                {
+                    String[] part = line.split( Pattern.quote( "|" ) );
+
+                    if ( part.length > 2 )
+                    {
+                        statusLines.add( line );
+                    }
+                }
+
+                int errors = 0;
+
+                for ( final String statusLine : statusLines )
+                {
+                    if ( statusLine.contains( "LastError" ) )
+                    {
+                        String[] part = statusLine.split( Pattern.quote( "|" ) );
+
+                        for ( final String s : part )
+                        {
+                            if ( s.contains( "State:" ) )
+                            {
+                                String state = s.replace( "State:", "" ).trim();
+                                info.setState( state );
+                            }
+                            if ( s.contains( "LastError:" ) )
+                            {
+                                String error = s.replace( "LastError:", "" ).trim();
+                                info.setP2pErrorLogs( error );
+                            }
+                        }
+                        errors++;
+                    }
+                }
+
+                if ( errors == statusLines.size() )
+                {
+                    info.setP2pStatus( 2 );
+                }
+                else if ( errors == 0 )
+                {
+                    info.setP2pStatus( 0 );
+                }
+                else if ( errors > 0 && errors < statusLines.size() )
+                {
+                    info.setP2pStatus( 1 );
+                }
+
+                info.setRhId( resourceHost.getId() );
+                info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
+
+                pojos.add( info );
+            }
+            catch ( CommandException | ResourceHostException e )
+            {
+                e.printStackTrace();
+                LOG.error( "Error while getting RH version and P2P status. Seems RH is not connected." );
+                info.setRhVersion( "No RH connected" );
+            }
+        }
+
+        return pojos;
     }
 }
