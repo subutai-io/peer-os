@@ -87,13 +87,12 @@ public interface IdentityManager
 
     /* *************************************************
      */
-    User authenticateByToken( String token )  throws SystemSecurityException;
+    User authenticateByToken( String token ) throws SystemSecurityException;
 
 
     /* *************************************************
      */
     User authenticateUser( String userName, String password );
-
 
 
     /* *************************************************
@@ -190,7 +189,6 @@ public interface IdentityManager
     void setTrustLevel( User user, int trustLevel );
 
 
-
     /* *************************************************
      */
     UserDelegate createUserDelegate( User user, String delegateUserId, boolean genKeyPair );
@@ -209,7 +207,7 @@ public interface IdentityManager
 
     void createIdentityDelegationDocument();
 
-        
+
     User getUserByUsername( String userName );
 
 

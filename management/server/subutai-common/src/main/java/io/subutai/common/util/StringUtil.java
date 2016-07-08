@@ -10,10 +10,7 @@ import com.google.common.collect.Lists;
 
 /**
  * Provides utility functions for working with Strings
- *
- * Deprecated: use commons.StringUtils or guava.Strings.
  */
-@Deprecated
 public class StringUtil
 {
 

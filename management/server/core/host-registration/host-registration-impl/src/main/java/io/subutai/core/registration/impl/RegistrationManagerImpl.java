@@ -284,7 +284,7 @@ public class RegistrationManagerImpl implements RegistrationManager
 
     private void importHostSslCert( String hostId, String cert )
     {
-        securityManager.getKeyStoreManager().importCertAsTrusted( SystemSettings.getSecurePortX2(), hostId, cert );
+        securityManager.getKeyStoreManager().importCertAsTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT, hostId, cert );
         securityManager.getHttpContextManager().reloadKeyStore();
     }
 

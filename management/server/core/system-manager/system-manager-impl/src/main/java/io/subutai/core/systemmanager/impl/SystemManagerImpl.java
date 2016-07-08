@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import io.subutai.core.systemmanager.impl.pojo.*;
 import org.apache.commons.configuration.ConfigurationException;
 
 import io.subutai.common.command.CommandException;
@@ -19,6 +22,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
@@ -34,11 +38,6 @@ import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
-import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 import io.subutai.hub.share.dto.SystemConfDto;
 import io.subutai.hub.share.dto.SystemConfigurationType;
 
@@ -164,6 +163,40 @@ public class SystemManagerImpl implements SystemManager
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
             pojo.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
             pojo.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+
+            Map p2pVersions = new HashMap<String, P2PStats>();
+            peerManager.getLocalPeer().getResourceHosts().stream().forEach( rh -> {
+                try
+                {
+                    String status = "";
+                    try
+                    {
+                        status = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+                    }
+                    catch (CommandException e)
+                    {
+                        // @todo add logger
+                        e.printStackTrace();
+                    }
+
+                    if( status.length() > 0 )
+                    {
+                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId(), rh.getRhVersion(), rh.getP2pVersion(), status) );
+                    }
+                    else
+                    {
+                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                    }
+                } catch (ResourceHostException e)
+                {
+                    // @todo add logger
+                    e.printStackTrace();
+                    p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                }
+            } );
+
+
+            pojo.setPeerP2PVersions( p2pVersions );
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {
@@ -174,7 +207,6 @@ public class SystemManagerImpl implements SystemManager
 
         return pojo;
     }
-
 
     @Override
     public void setPeerSettings()
@@ -199,21 +231,13 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setNetworkSettings( final String securePortX1, final String securePortX2, final String publicUrl,
-                                    final String agentPort, final String publicSecurePort, final String keyServer )
+    public void setNetworkSettings( final String publicUrl, final String publicSecurePort )
             throws ConfigurationException
     {
-        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
-        SystemSettings.setKeyServer( keyServer );
 
-        notifyListeners();
+
         try
         {
-            SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-            SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-            SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
                     Integer.parseInt( publicSecurePort ) );
         }
@@ -284,12 +308,8 @@ public class SystemManagerImpl implements SystemManager
 
         dto.setGlobalKurjunUrls( kurjunSettings.getGlobalKurjunUrls() );
         dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
-        dto.setSecurePortX1( networkSettings.getSecurePortX1() );
-        dto.setSecurePortX2( networkSettings.getSecurePortX2() );
-        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
         dto.setPublicUrl( networkSettings.getPublicUrl() );
-        dto.setAgentPort( networkSettings.getAgentPort() );
-        dto.setKeyServer( networkSettings.getKeyServer() );
+        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
 
 
         hubManager.sendSystemConfiguration( dto );
@@ -363,12 +383,9 @@ public class SystemManagerImpl implements SystemManager
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
 
-        pojo.setSecurePortX1( SystemSettings.getSecurePortX1() );
-        pojo.setSecurePortX2( SystemSettings.getSecurePortX2() );
         pojo.setPublicUrl( SystemSettings.getPublicUrl() );
-        pojo.setAgentPort( SystemSettings.getAgentPort() );
         pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-        pojo.setKeyServer( SystemSettings.getKeyServer() );
+
         return pojo;
     }
 

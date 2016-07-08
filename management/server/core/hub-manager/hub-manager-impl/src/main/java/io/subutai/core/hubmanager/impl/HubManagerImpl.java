@@ -184,7 +184,7 @@ public class HubManagerImpl implements HubManager
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
             resourceHostConfExecutorService
-                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, /*TIME_15_MINUTES*/30, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
 
             resourceHostMonitorExecutorService
                     .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
