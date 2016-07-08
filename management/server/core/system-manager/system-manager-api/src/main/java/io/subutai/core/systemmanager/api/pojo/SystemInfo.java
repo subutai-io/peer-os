@@ -1,105 +1,113 @@
 package io.subutai.core.systemmanager.api.pojo;
 
 
+import java.util.Map;
+
 public interface SystemInfo
 {
-    public String getProjectVersion();
+    String getProjectVersion();
 
 
-    public void setProjectVersion( final String projectVersion );
+    void setProjectVersion( final String projectVersion );
 
 
-    public String getGitBuildUserEmail();
+    String getGitBuildUserEmail();
 
 
-    public void setGitBuildUserEmail( final String gitBuildUserEmail );
+    void setGitBuildUserEmail( final String gitBuildUserEmail );
 
 
-    public String getGitBuildHost();
+    String getGitBuildHost();
 
 
-    public void setGitBuildHost( final String gitBuildHost );
+    void setGitBuildHost( final String gitBuildHost );
 
 
-    public String getGitClosestTagName();
+    String getGitClosestTagName();
 
 
-    public void setGitClosestTagName( final String gitClosestTagName );
+    void setGitClosestTagName( final String gitClosestTagName );
 
 
-    public String getGitCommitIdDescribeShort();
+    String getGitCommitIdDescribeShort();
 
 
-    public void setGitCommitIdDescribeShort( final String gitCommitIdDescribeShort );
+    void setGitCommitIdDescribeShort( final String gitCommitIdDescribeShort );
 
 
-    public String getGitCommitTime();
+    String getGitCommitTime();
 
 
-    public void setGitCommitTime( final String gitCommitTime );
+    void setGitCommitTime( final String gitCommitTime );
 
 
-    public String getGitBranch();
+    String getGitBranch();
 
 
-    public void setGitBranch( final String gitBranch );
+    void setGitBranch( final String gitBranch );
 
 
-    public String getGitBuildUserName();
+    String getGitBuildUserName();
 
 
-    public void setGitBuildUserName( final String gitBuildUserName );
+    void setGitBuildUserName( final String gitBuildUserName );
 
 
-    public String getGitClosestTagCommitCount();
+    String getGitClosestTagCommitCount();
 
 
-    public void setGitClosestTagCommitCount( final String gitClosestTagCommitCount );
+    void setGitClosestTagCommitCount( final String gitClosestTagCommitCount );
 
 
-    public String getGitCommitIdDescribe();
+    String getGitCommitIdDescribe();
 
 
-    public void setGitCommitIdDescribe( final String gitCommitIdDescribe );
+    void setGitCommitIdDescribe( final String gitCommitIdDescribe );
 
 
-    public String getGitCommitId();
+    String getGitCommitId();
 
 
-    public void setGitCommitId( final String gitCommitId );
+    void setGitCommitId( final String gitCommitId );
 
 
-    public String getGitBuildTime();
+    String getGitBuildTime();
 
 
-    public void setGitBuildTime( final String gitBuildTime );
+    void setGitBuildTime( final String gitBuildTime );
 
 
-    public String getGitCommitUserName();
+    String getGitCommitUserName();
 
 
-    public void setGitCommitUserName( final String gitCommitUserName );
+    void setGitCommitUserName( final String gitCommitUserName );
 
 
-    public String getGitCommitUserEmail();
+    String getGitCommitUserEmail();
 
 
-    public void setGitCommitUserEmail( final String gitCommitUserEmail );
+    void setGitCommitUserEmail( final String gitCommitUserEmail );
 
-    public String getRhVersion();
+    String getRhVersion();
 
 
-    public void setRhVersion( final String rhVersion );
+    void setRhVersion( final String rhVersion );
 
 
-    public String getP2pVersion();
+    String getP2pVersion();
 
 
-    public void setP2pVersion( final String p2pVersion );
+    void setP2pVersion( final String p2pVersion );
 
 
-    public boolean isUpdatesAvailable();
+    boolean isUpdatesAvailable();
 
 
-    public void setUpdatesAvailable( final boolean updatesAvailable );
+    void setUpdatesAvailable( final boolean updatesAvailable );
+
+
+    Map getPeerP2PVersions();
+
+
+    void setPeerP2PVersions(Map peerP2PVersions);
 }
