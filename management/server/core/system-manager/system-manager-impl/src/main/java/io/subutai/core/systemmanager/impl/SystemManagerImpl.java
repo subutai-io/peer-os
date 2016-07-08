@@ -167,9 +167,29 @@ public class SystemManagerImpl implements SystemManager
             peerManager.getLocalPeer().getResourceHosts().stream().forEach( rh -> {
                 try
                 {
-                    p2pVersions.put( rh.getId(), new P2PStats(rh.getId(), rh.getRhVersion(), rh.getP2pVersion()) );
+                    String status = "";
+                    try
+                    {
+                        status = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+                    }
+                    catch (CommandException e)
+                    {
+                        // @todo add logger
+                        e.printStackTrace();
+                    }
+
+                    if( status.length() > 0 )
+                    {
+                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId(), rh.getRhVersion(), rh.getP2pVersion(), status) );
+                    }
+                    else
+                    {
+                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                    }
                 } catch (ResourceHostException e)
                 {
+                    // @todo add logger
+                    e.printStackTrace();
                     p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
                 }
             } );
@@ -186,7 +206,6 @@ public class SystemManagerImpl implements SystemManager
 
         return pojo;
     }
-
 
     @Override
     public void setPeerSettings()

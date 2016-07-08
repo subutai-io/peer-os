@@ -15,26 +15,18 @@ public class P2PStats
         this.rhId = rhId;
         this.rhVersion = "Connection problem";
         this.p2pVersion = "Connection problem";
+        this.rhVersionCheck = 2;
+        this.p2pVersionCheck = 2;
+        this.p2pStatus = 2;
+        this.p2pErrorMessage = "";
     }
 
-    // @todo temporary
-    public P2PStats(String rhId, String rhVersion, String p2pVersion) {
+    public P2PStats(String rhId, String rhVersion, String p2pVersion, String p2pErrorMessage) {
         this.rhId = rhId;
         this.rhVersion = rhVersion;
         this.p2pVersion = p2pVersion;
 
-        this.p2pVersionCheck = 1;
-        this.p2pVersionCheck = 1;
-
-        this.p2pStatus = 0;
-        this.p2pErrorMessage = "Error message";
-    }
-
-    public P2PStats(String rhId, String rhVersion, String p2pVersion, int p2pStatus, String p2pErrorMessage) {
-        this.rhId = rhId;
-        this.rhVersion = rhVersion;
-        this.p2pVersion = p2pVersion;
-        this.p2pStatus = p2pStatus;
+        p2pStatus = p2pStatusAnalysis( p2pErrorMessage );
 
         this.p2pVersionCheck = p2pVersionCheck();
         this.rhVersionCheck = rhVersionCheck();
@@ -64,5 +56,34 @@ public class P2PStats
     {
         // @todo add method checking version
         return 1;
+    }
+
+    private int p2pStatusAnalysis( String log )
+    {
+        StringBuilder output = new StringBuilder();
+        int errCnt = 0;
+        int statCnt = 0;
+        for( String row : log.split("\\n") )
+        {
+            if( row.contains( "Status" ) && row.contains( "LastError" ) )
+            {
+                errCnt++;
+            }
+            if( row.contains( "Status" ) )
+            {
+                statCnt++;
+
+                output.append( row );
+            }
+        }
+
+        this.p2pErrorMessage = output.toString();
+
+        if( errCnt > 0 || this.p2pErrorMessage.length() == 0 )
+        {
+            return errCnt < statCnt ? 1 : 2;
+        }
+
+        return 0;
     }
 }
