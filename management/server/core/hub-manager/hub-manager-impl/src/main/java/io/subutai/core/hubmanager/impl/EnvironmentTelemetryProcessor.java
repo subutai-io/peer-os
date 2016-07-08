@@ -1,10 +1,12 @@
 package io.subutai.core.hubmanager.impl;
 
 
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.core.Response;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,11 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.dto.TunnelInfoDto;
+import io.subutai.hub.share.dto.environment.ContainerStateDto;
+import io.subutai.hub.share.dto.environment.EnvironmentDto;
+import io.subutai.hub.share.dto.environment.EnvironmentNodeDto;
+import io.subutai.hub.share.dto.environment.EnvironmentNodesDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.json.JsonUtil;
 
@@ -29,7 +36,15 @@ public class EnvironmentTelemetryProcessor implements Runnable
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private static final String GET_ENV_URL = "/rest/v1/peers/%s/environments";
-    private static final String GET_ENV_DTO_URL = "/rest/v1/environments/%s/peers/%s";
+    private static final String GET_ENV_CONTAINERS_URL = "/rest/v1/environments/%s";
+    private static final String PUT_ENV_TELEMETRY_URL = "/rest/v1/environments/%s/telemetry";
+
+    private static final String PING_COMMAND = "ping -c 5 -i 0.2 -w 5 %s";
+    private static final String SSH_COMMAND = "ssh root@%s date";
+    private static final String SCP_COMMAND = "scp /bin/bash root@%s:/tmp";
+    private static final String GEN_FILE_COMMAND =
+            "dd if=/dev/urandom of=/tmp/file2mb bs=20480 count=100; scp /tmp/file2mb root@%s:/tmp; ssh root@%s'rm -rf"
+                    + " /tmp/file2mb'; rm -rf /tmp/file2mb";
 
     private PeerManager peerManager;
     private ConfigManager configManager;
@@ -49,9 +64,6 @@ public class EnvironmentTelemetryProcessor implements Runnable
     {
         if ( hubManager.isRegistered() )
         {
-            log.info( "---- tick -----" );
-            log.debug( "---- tock -----" );
-            log.error( "---------" );
             startProccess();
         }
     }
@@ -59,60 +71,135 @@ public class EnvironmentTelemetryProcessor implements Runnable
 
     private void startProccess()
     {
-
         Set<String> envs = getEnvIds( format( GET_ENV_URL, configManager.getPeerId() ), configManager );
-
         for ( String envId : envs )
         {
-            log.error( envId );
-            log.error( " -- --- -- -- " );
 
-            //            if ( envManager.getEnvironments() != null )
-            //            {
-            //                log.error( "envs: " + envManager.getEnvironments().size() );
-            //            }
-            //            else
-            //            {
-            //                log.error( "No envs" );
-            //            }
-
-
-            checkPing( envId );
+            JSONObject healthData = new JSONObject();
+            healthData.put( configManager.getPeerId(), checkEnvironmentHealth( envId ).toString() );
+            sendToHUB( healthData, envId );
         }
     }
 
 
-    private String checkPing( String envId )
+    private JSONObject checkEnvironmentHealth( String envId )
     {
-        log.info( "1" );
-
+        JSONObject result = new JSONObject();
         Set<ContainerHost> containerHosts = peerManager.getLocalPeer().findContainersByEnvironmentId( envId );
+        EnvironmentDto environmentDto = getEnvironmentPeerDto( format( GET_ENV_CONTAINERS_URL, envId ), configManager );
+        List<EnvironmentNodesDto> environmentNodeDtoList = environmentDto.getNodes();
 
-        log.info( "containers size:", containerHosts.size() );
-
-        for ( ContainerHost sourceContainer : containerHosts )
+        for ( EnvironmentNodesDto environmentNodesDto : environmentNodeDtoList )
         {
-            for ( ContainerHost targetContainer : containerHosts )
+            for ( ContainerHost sourceContainer : containerHosts )
             {
-                if ( !sourceContainer.getId().equals( targetContainer.getId() ) )
+                for ( EnvironmentNodeDto environmentNodeDto : environmentNodesDto.getNodes() )
                 {
-                    CommandResult res = null;
-                    try
+                    String ip = environmentNodeDto.getIp().replaceAll( "/24", "" );
+
+                    if ( !sourceContainer.getIp().equals( ip ) && environmentNodeDto.getState().equals(
+                            ContainerStateDto.RUNNING ) )
                     {
-                        res = sourceContainer.execute(
-                                new RequestBuilder( format( "ping -c 5 -i 0.2 -w 5 %s", targetContainer.getIp() ) ) );
+                        executeCheckCommand( "ping", sourceContainer, format( PING_COMMAND, ip ), result );
+                        executeCheckCommand( "ssh", sourceContainer, format( SSH_COMMAND, ip ), result );
+                        executeCheckCommand( "scp", sourceContainer, format( GEN_FILE_COMMAND, ip, ip ), result );
                     }
-                    catch ( CommandException e )
-                    {
-                        log.error( e.getMessage() );
-                        e.printStackTrace();
-                    }
-                    log.error( res.getStdOut() );
                 }
             }
         }
 
-        return null;
+        return result;
+    }
+
+
+    private void executeCheckCommand( String key, ContainerHost sourceContainer, String cmd, JSONObject result )
+    {
+        CommandResult res = null;
+        try
+        {
+            if ( isChConnected( sourceContainer ) )
+            {
+                res = sourceContainer.execute( new RequestBuilder( cmd ) );
+
+                if ( res.getExitCode() == 0 && !res.getStdOut().isEmpty() )
+                {
+                    // if SUCCESS not needs logs
+                    //                    result.put( key, "exec: " + cmd + " result: " + res.getStdOut() );
+                    result.put( key + "status", "SUCCESS" );
+                }
+                else
+                {
+                    result.put( key, "exec: " + cmd + " result: " + res.getStdErr() );
+                    result.put( key + "status", "FAILED" );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+            e.printStackTrace();
+        }
+    }
+
+
+    private boolean isChConnected( ContainerHost ch )
+    {
+        boolean exec = true;
+        int tryCount = 0;
+
+        while ( exec )
+        {
+            tryCount++;
+            exec = tryCount > 3 ? false : true;
+
+            if ( !ch.isConnected() )
+            {
+                return true;
+            }
+
+            try
+            {
+                Thread.sleep( 5000 );
+            }
+            catch ( InterruptedException e )
+            {
+                log.error( e.getMessage() );
+                e.printStackTrace();
+            }
+        }
+
+        return true;
+    }
+
+
+    private void sendToHUB( JSONObject healthData, String envId )
+    {
+        WebClient client = null;
+        try
+        {
+            client = configManager
+                    .getTrustedWebClientWithAuth( format( PUT_ENV_TELEMETRY_URL, envId ), configManager.getHubIp() );
+            byte[] cborData = JsonUtil.toCbor( healthData );
+            byte[] encryptedData = configManager.getMessenger().produce( cborData );
+            Response response = client.put( encryptedData );
+
+            if ( response.getStatus() != HttpStatus.SC_OK && response.getStatus() != 204 )
+            {
+                log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", response.getStatus(),
+                        response.getStatusInfo().getReasonPhrase() );
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( "Could not sent  telemetry data to hub.", e.getMessage() );
+        }
+        finally
+        {
+            if ( client != null )
+            {
+                client.close();
+            }
+        }
     }
 
 
@@ -125,7 +212,7 @@ public class EnvironmentTelemetryProcessor implements Runnable
 
             log.debug( "Response: HTTP {} - {}", res.getStatus(), res.getStatusInfo().getReasonPhrase() );
 
-            if ( res.getStatus() != HttpStatus.SC_OK )
+            if ( res.getStatus() != HttpStatus.SC_OK && res.getStatus() != 204 )
             {
                 log.error( "Error to get  environment  ids data from Hub: HTTP {} - {}", res.getStatus(),
                         res.getStatusInfo().getReasonPhrase() );
@@ -147,7 +234,7 @@ public class EnvironmentTelemetryProcessor implements Runnable
     }
 
 
-    private EnvironmentPeerDto getEnvironmentPeerDto( String link, ConfigManager configManager )
+    private EnvironmentDto getEnvironmentPeerDto( String link, ConfigManager configManager )
     {
         try
         {
@@ -168,7 +255,7 @@ public class EnvironmentTelemetryProcessor implements Runnable
 
             byte[] plainContent = configManager.getMessenger().consume( encryptedContent );
 
-            return JsonUtil.fromCbor( plainContent, EnvironmentPeerDto.class );
+            return JsonUtil.fromCbor( plainContent, EnvironmentDto.class );
         }
         catch ( Exception e )
         {

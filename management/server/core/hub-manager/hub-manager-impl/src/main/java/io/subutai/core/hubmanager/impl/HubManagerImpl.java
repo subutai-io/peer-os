@@ -37,6 +37,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
+import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -57,6 +58,7 @@ import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
+import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
@@ -94,6 +96,8 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService environmentTelemetryService = Executors.newSingleThreadScheduledExecutor();
 
+    private final ScheduledExecutorService versionEventExecutor = Executors.newSingleThreadScheduledExecutor();
+
     private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
@@ -123,6 +127,9 @@ public class HubManagerImpl implements HubManager
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ContainerEventProcessor containerEventProcessor;
+
+    private VersionInfoProcessor versionInfoProcessor;
+
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
@@ -177,7 +184,7 @@ public class HubManagerImpl implements HubManager
                     new ResourceHostMonitorProcessor( this, peerManager, configManager, monitor );
 
             resourceHostConfExecutorService
-                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, TIME_15_MINUTES, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( resourceHostDataProcessor, 20, /*TIME_15_MINUTES*/30, TimeUnit.SECONDS );
 
             resourceHostMonitorExecutorService
                     .scheduleWithFixedDelay( resourceHostMonitorProcessor, 30, 300, TimeUnit.SECONDS );
@@ -194,12 +201,15 @@ public class HubManagerImpl implements HubManager
 
             tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
 
+            VersionInfoProcessor versionInfoProcessor = new VersionInfoProcessor( this, peerManager, configManager );
+
+            versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
+
             EnvironmentTelemetryProcessor environmentTelemetryProcessor =
-                    new EnvironmentTelemetryProcessor( this, peerManager, configManager);
+                    new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
             environmentTelemetryService
-                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 15, 300, TimeUnit.SECONDS );
-
+                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 900, TimeUnit.SECONDS );
 
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
