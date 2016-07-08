@@ -92,6 +92,8 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
+    private final ScheduledExecutorService environmentTelemetryService = Executors.newSingleThreadScheduledExecutor();
+
     private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
@@ -182,8 +184,7 @@ public class HubManagerImpl implements HubManager
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
-            containerEventExecutor
-                    .scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
             HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
@@ -192,6 +193,13 @@ public class HubManagerImpl implements HubManager
             TunnelEventProcessor tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
 
             tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
+
+            EnvironmentTelemetryProcessor environmentTelemetryProcessor =
+                    new EnvironmentTelemetryProcessor( this, peerManager, configManager);
+
+            environmentTelemetryService
+                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 15, 300, TimeUnit.SECONDS );
+
 
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
@@ -448,10 +456,11 @@ public class HubManagerImpl implements HubManager
         {
             throw new Exception( "Could not install plugin", e );
         }*/
-        WebClient webClient = RestUtil.createTrustedWebClient(url);
+        WebClient webClient = RestUtil.createTrustedWebClient( url );
         File product = webClient.get( File.class );
         InputStream initialStream = FileUtils.openInputStream( product );
-        File targetFile = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        File targetFile =
+                new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
         FileUtils.copyInputStreamToFile( initialStream, targetFile );
         initialStream.close();
 
