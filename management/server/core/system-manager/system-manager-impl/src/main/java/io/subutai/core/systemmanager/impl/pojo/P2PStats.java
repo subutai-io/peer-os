@@ -63,7 +63,7 @@ public class P2PStats
         StringBuilder output = new StringBuilder();
         int errCnt = 0;
         int statCnt = 0;
-        for( String row : log.split("\\n") )
+        for( String row : log.split("\\r?\\n") )
         {
             if( row.contains( "Status" ) && row.contains( "LastError" ) )
             {
