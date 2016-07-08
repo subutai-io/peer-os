@@ -33,13 +33,19 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandUtil;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
@@ -222,26 +228,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private boolean isPeerInUse( String peerId )
     {
-        boolean inUse = false;
-        for ( Iterator<EnvironmentImpl> i = environmentService.getAll().iterator(); !inUse && i.hasNext(); )
+        for ( EnvironmentImpl e : environmentService.getAll() )
         {
-            EnvironmentImpl e = i.next();
             if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
             {
-                inUse = true;
-                break;
+                return true;
             }
 
             for ( PeerConf p : e.getPeerConfs() )
             {
                 if ( peerId.equals( p.getPeerId() ) )
                 {
-                    inUse = true;
-                    break;
+                    return true;
                 }
             }
         }
-        return inUse;
+
+        return !peerManager.getLocalPeer().getPeerContainers( peerId ).isEmpty();
     }
 
 
@@ -1286,7 +1289,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 new EnvironmentImpl( topology.getEnvironmentName(), topology.getSshKey(), getUserId(),
                         peerManager.getLocalPeer().getId() );
 
-        environment.setStatus( EnvironmentStatus.PENDING );
+        //        environment.setStatus( EnvironmentStatus.PENDING );
 
         User activeUser = identityManager.getActiveUser();
 
@@ -1845,5 +1848,162 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         {
             LOG.warn( e.getMessage() );
         }
+    }
+
+
+    // quick and dirty implementation for env p2p connectivity check.
+    // todo refactor
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public EnvConnectivityState checkEnvironmentConnectivity( final String environmentId )
+            throws EnvironmentNotFoundException, EnvironmentManagerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Checking connectivity for environment %s ", environmentId ) );
+
+        if ( environment.getStatus() != EnvironmentStatus.HEALTHY
+                && environment.getStatus() != EnvironmentStatus.UNHEALTHY )
+        {
+            operationTracker.addLogFailed( String.format( "Environment status is %s", environment.getStatus() ) );
+
+            throw new EnvironmentManagerException(
+                    String.format( "Environment status is %s", environment.getStatus() ) );
+        }
+
+        CommandUtil commandUtil = new CommandUtil();
+
+        Set<EnvironmentContainerHost> envContainers = environment.getContainerHosts();
+
+        Iterator<EnvironmentContainerHost> containerHostIterator = envContainers.iterator();
+
+        //remove not running containers
+        while ( containerHostIterator.hasNext() )
+        {
+            if ( containerHostIterator.next().getState() != ContainerHostState.RUNNING )
+            {
+                containerHostIterator.remove();
+            }
+        }
+
+
+        //perform ping
+        for ( EnvironmentContainerHost sourceContainer : envContainers )
+        {
+            for ( EnvironmentContainerHost targetContainer : envContainers )
+            {
+                if ( !sourceContainer.equals( targetContainer ) )
+                {
+                    try
+                    {
+                        commandUtil.execute( new RequestBuilder(
+                                        String.format( "ping -c 5 -i 0.2 -w 5 %s", targetContainer.getIp() ) ),
+                                sourceContainer );
+
+                        operationTracker.addLog(
+                                String.format( "PING succeeded from %s to %s", sourceContainer.getHostname(),
+                                        targetContainer.getHostname() ) );
+                    }
+                    catch ( CommandException e )
+                    {
+                        operationTracker.addLogFailed(
+                                String.format( "PING failed from %s to %s%s", sourceContainer.getHostname(),
+                                        targetContainer.getHostname(),
+                                        Strings.isNullOrEmpty( e.getMessage() ) ? "" : " : " + e.getMessage() ) );
+
+                        return EnvConnectivityState.PING_FAILS;
+                    }
+                }
+            }
+        }
+
+
+        //perform ssh
+        for ( EnvironmentContainerHost sourceContainer : envContainers )
+        {
+            for ( EnvironmentContainerHost targetContainer : envContainers )
+            {
+                if ( !sourceContainer.equals( targetContainer ) )
+                {
+                    try
+                    {
+                        commandUtil.execute(
+                                new RequestBuilder( String.format( "ssh root@%s date", targetContainer.getIp() ) ),
+                                sourceContainer );
+
+                        operationTracker.addLog(
+                                String.format( "SSH succeeded from %s to %s", sourceContainer.getHostname(),
+                                        targetContainer.getHostname() ) );
+                    }
+                    catch ( CommandException e )
+                    {
+                        operationTracker.addLogFailed(
+                                String.format( "SSH failed from %s to container %s%s", sourceContainer.getHostname(),
+                                        targetContainer.getHostname(),
+                                        Strings.isNullOrEmpty( e.getMessage() ) ? "" : " : " + e.getMessage() ) );
+
+                        return EnvConnectivityState.SSH_FAILS;
+                    }
+                }
+            }
+        }
+
+
+        //perform scp
+        for ( EnvironmentContainerHost sourceContainer : envContainers )
+        {
+            for ( EnvironmentContainerHost targetContainer : envContainers )
+            {
+                if ( !sourceContainer.equals( targetContainer ) )
+                {
+                    try
+                    {
+                        CommandResult scpResult = commandUtil.execute( new RequestBuilder( String.format(
+                                "MD5=`dd bs=1024 count=2 </dev/urandom | tee tmpfile | md5sum | awk '{print $1}'`;"
+                                        + " mv tmpfile $MD5; scp $MD5 root@%s:/tmp; echo $MD5; rm $MD5",
+                                targetContainer.getIp() ) ).withTimeout( 60 ), sourceContainer );
+
+                        String sourceMd5Sum = scpResult.getStdOut().trim();
+
+                        CommandResult targetMd5Result = commandUtil.execute(
+                                new RequestBuilder( String.format( "md5sum /tmp/%1$s; rm /tmp/%1$s", sourceMd5Sum ) ),
+                                targetContainer );
+
+                        String targetMd5Sum = targetMd5Result.getStdOut().split( "\\s+" )[0].trim();
+
+                        if ( sourceMd5Sum.equalsIgnoreCase( targetMd5Sum ) )
+                        {
+
+                            operationTracker.addLog(
+                                    String.format( "SCP succeeded from %s to %s", sourceContainer.getHostname(),
+                                            targetContainer.getHostname() ) );
+                        }
+                        else
+                        {
+                            operationTracker.addLogFailed( String.format( "SCP failed from %s to %s. Md5sum mismatch",
+                                    sourceContainer.getHostname(), targetContainer.getHostname() ) );
+
+                            return EnvConnectivityState.SCP_FAILS;
+                        }
+                    }
+                    catch ( CommandException e )
+                    {
+                        operationTracker.addLogFailed(
+                                String.format( "SCP failed from %s to %s%s", sourceContainer.getHostname(),
+                                        targetContainer.getHostname(),
+                                        Strings.isNullOrEmpty( e.getMessage() ) ? "" : " : " + e.getMessage() ) );
+
+                        return EnvConnectivityState.SCP_FAILS;
+                    }
+                }
+            }
+        }
+
+        operationTracker.addLogDone( "Environment connectivity check succeeded" );
+
+        return EnvConnectivityState.OK;
     }
 }
