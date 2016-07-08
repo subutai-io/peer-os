@@ -414,8 +414,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
         getPeer().setContainerHostname( getContainerId(), hostname );
 
-        //todo we should update each container's /etc/hosts file within the environment
-        //or we can hide this method and expose one in EnvManager
+        //TODO we should update each container's /etc/hosts file within the environment
+        //TODO or we can hide this method and expose one in EnvManager
 
         this.hostname = hostname;
 

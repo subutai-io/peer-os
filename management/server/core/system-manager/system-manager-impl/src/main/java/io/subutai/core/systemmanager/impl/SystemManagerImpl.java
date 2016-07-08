@@ -19,6 +19,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
@@ -199,21 +200,13 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setNetworkSettings( final String securePortX1, final String securePortX2, final String publicUrl,
-                                    final String agentPort, final String publicSecurePort, final String keyServer )
+    public void setNetworkSettings( final String publicUrl, final String publicSecurePort )
             throws ConfigurationException
     {
-        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
-        SystemSettings.setKeyServer( keyServer );
 
-        notifyListeners();
+
         try
         {
-            SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-            SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-            SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
                     Integer.parseInt( publicSecurePort ) );
         }
@@ -284,12 +277,8 @@ public class SystemManagerImpl implements SystemManager
 
         dto.setGlobalKurjunUrls( kurjunSettings.getGlobalKurjunUrls() );
         dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
-        dto.setSecurePortX1( networkSettings.getSecurePortX1() );
-        dto.setSecurePortX2( networkSettings.getSecurePortX2() );
-        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
         dto.setPublicUrl( networkSettings.getPublicUrl() );
-        dto.setAgentPort( networkSettings.getAgentPort() );
-        dto.setKeyServer( networkSettings.getKeyServer() );
+        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
 
 
         hubManager.sendSystemConfiguration( dto );
@@ -363,12 +352,9 @@ public class SystemManagerImpl implements SystemManager
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
 
-        pojo.setSecurePortX1( SystemSettings.getSecurePortX1() );
-        pojo.setSecurePortX2( SystemSettings.getSecurePortX2() );
         pojo.setPublicUrl( SystemSettings.getPublicUrl() );
-        pojo.setAgentPort( SystemSettings.getAgentPort() );
         pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-        pojo.setKeyServer( SystemSettings.getKeyServer() );
+
         return pojo;
     }
 
