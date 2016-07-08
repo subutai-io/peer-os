@@ -4,7 +4,6 @@ package io.subutai.common.security.relation;
 import java.util.List;
 
 import io.subutai.common.security.relation.model.Relation;
-import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 
@@ -15,29 +14,14 @@ public interface RelationManager
     /**
      * Method for constructing relation parameters
      *
-     * @deprecated use Challenge {@link io.subutai.common.security.relation.model.RelationChallenge} approach instead.
      * @param signedMessage - signed message
      * @param secretKeyId - keyId to verify signed message
-     * @throws RelationVerificationException
+     *
+     * @deprecated use Challenge {@link io.subutai.common.security.relation.model.RelationChallenge} approach instead.
      */
     @Deprecated
     void processTrustMessage( String signedMessage, final String secretKeyId ) throws RelationVerificationException;
 
-    /**
-     * Method for constructing relation parameters
-     *
-     * @deprecated use {@link #buildRelation(RelationInfoMeta, RelationMeta)} ()} instead.
-     */
-    @Deprecated
-    RelationInfo createTrustRelationship( RelationInfoMeta relationInfoMeta );
-
-    /**
-     * Method for building trust relation between objects
-     *
-     * @deprecated use {@link #buildRelation(RelationInfoMeta, RelationMeta)} ()} instead.
-     */
-    @Deprecated
-    Relation buildTrustRelation( RelationInfo relationInfo, RelationMeta relationMeta );
 
     String getContext();
 

@@ -1219,7 +1219,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         ResourceHost resourceHost = getResourceHostById( rhId );
 
         //remove rh ssl cert
-        securityManager.getKeyStoreManager().removeCertFromTrusted( SystemSettings.getSecurePortX2(), rhId );
+        securityManager.getKeyStoreManager().removeCertFromTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT, rhId );
 
         securityManager.getHttpContextManager().reloadKeyStore();
 
