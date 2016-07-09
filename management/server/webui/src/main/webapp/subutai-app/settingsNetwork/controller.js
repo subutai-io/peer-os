@@ -35,6 +35,9 @@ function SettingsNetworkCtrl($scope, SettingsNetworkSrv, SweetAlert) {
         else if (parseInt(vm.config.endRange) < 0 || parseInt(vm.config.endRange) > 65535) {
             SweetAlert.swal("ERROR!", 'end range should be 0..65535', "error");
         }
+        else if (parseInt(vm.config.startRange) > parseInt(vm.config.endRange)) {
+            SweetAlert.swal("ERROR!", 'Start range can not be bigger than End range', "error");
+        }
         else {
             SettingsNetworkSrv.updateConfig(vm.config).success(function (data) {
                 SweetAlert.swal("Success!", "Your settings were saved.", "success");
