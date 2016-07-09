@@ -13,6 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.subutai.core.systemmanager.impl.pojo.*;
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -22,11 +25,9 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -44,11 +45,11 @@ import io.subutai.hub.share.dto.SystemConfigurationType;
 
 public class SystemManagerImpl implements SystemManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SystemManagerImpl.class );
 
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
-    private HubManager hubManager;
 
     protected Set<SettingsListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
@@ -104,10 +105,9 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final HubManager hubManager )
-
+    public SystemManagerImpl()
     {
-        this.hubManager = hubManager;
+
     }
 
 
@@ -173,25 +173,27 @@ public class SystemManagerImpl implements SystemManager
                     {
                         status = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
                     }
-                    catch (CommandException e)
+                    catch ( CommandException e )
                     {
                         // @todo add logger
                         e.printStackTrace();
                     }
 
-                    if( status.length() > 0 )
+                    if ( status.length() > 0 )
                     {
-                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId(), rh.getRhVersion(), rh.getP2pVersion(), status) );
+                        p2pVersions.put( rh.getId(),
+                                new P2PStats( rh.getId(), rh.getRhVersion(), rh.getP2pVersion(), status ) );
                     }
                     else
                     {
-                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                        p2pVersions.put( rh.getId(), new P2PStats( rh.getId() ) );
                     }
-                } catch (ResourceHostException e)
+                }
+                catch ( ResourceHostException e )
                 {
                     // @todo add logger
                     e.printStackTrace();
-                    p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                    p2pVersions.put( rh.getId(), new P2PStats( rh.getId() ) );
                 }
             } );
 
@@ -207,6 +209,7 @@ public class SystemManagerImpl implements SystemManager
 
         return pojo;
     }
+
 
     @Override
     public void setPeerSettings()
@@ -295,24 +298,6 @@ public class SystemManagerImpl implements SystemManager
         boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
 
         return isPublicQuotaSaved && isTrustQuotaSaved;
-    }
-
-
-    @Override
-    public void sendSystemConfigToHub() throws ConfigurationException
-    {
-        SystemConfDto dto = new SystemConfDto( SystemConfigurationType.SUBUTAI_SOCIAL );
-
-        KurjunSettings kurjunSettings = getKurjunSettings();
-        NetworkSettings networkSettings = getNetworkSettings();
-
-        dto.setGlobalKurjunUrls( kurjunSettings.getGlobalKurjunUrls() );
-        dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
-        dto.setPublicUrl( networkSettings.getPublicUrl() );
-        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
-
-
-        hubManager.sendSystemConfiguration( dto );
     }
 
 

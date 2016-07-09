@@ -34,8 +34,6 @@ public interface SystemManager
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 
-    void sendSystemConfigToHub() throws ConfigurationException;
-
     SystemInfo getManagementUpdates();
 
     boolean updateManagement();

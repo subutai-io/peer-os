@@ -147,8 +147,6 @@ public class RestServiceImpl implements RestService
         try
         {
             systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ), localKurjunUrls.split( "," ) );
-
-            systemManager.sendSystemConfigToHub();
         }
         catch ( ConfigurationException e )
         {
@@ -190,8 +188,6 @@ public class RestServiceImpl implements RestService
         try
         {
             systemManager.setNetworkSettings( publicUrl, publicSecurePort );
-
-            systemManager.sendSystemConfigToHub();
         }
         catch ( ConfigurationException e )
         {

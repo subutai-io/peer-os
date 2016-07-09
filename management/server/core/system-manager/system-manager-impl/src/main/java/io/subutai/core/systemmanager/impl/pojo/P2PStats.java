@@ -11,7 +11,9 @@ public class P2PStats
     private int p2pStatus;
     private String p2pErrorMessage;
 
-    public P2PStats(String rhId) {
+
+    public P2PStats( String rhId )
+    {
         this.rhId = rhId;
         this.rhVersion = "Connection problem";
         this.p2pVersion = "Connection problem";
@@ -21,7 +23,9 @@ public class P2PStats
         this.p2pErrorMessage = "";
     }
 
-    public P2PStats(String rhId, String rhVersion, String p2pVersion, String p2pErrorMessage) {
+
+    public P2PStats( String rhId, String rhVersion, String p2pVersion, String p2pErrorMessage )
+    {
         this.rhId = rhId;
         this.rhVersion = rhVersion;
         this.p2pVersion = p2pVersion;
@@ -34,17 +38,24 @@ public class P2PStats
         this.p2pErrorMessage = p2pErrorMessage;
     }
 
-    public String getRhId() {
+
+    public String getRhId()
+    {
         return rhId;
     }
 
-    public String getRhVersion() {
+
+    public String getRhVersion()
+    {
         return rhVersion;
     }
 
-    public String getP2pVersion() {
+
+    public String getP2pVersion()
+    {
         return p2pVersion;
     }
+
 
     private int p2pVersionCheck()
     {
@@ -52,24 +63,26 @@ public class P2PStats
         return 1;
     }
 
+
     private int rhVersionCheck()
     {
         // @todo add method checking version
         return 1;
     }
 
+
     private int p2pStatusAnalysis( String log )
     {
         StringBuilder output = new StringBuilder();
         int errCnt = 0;
         int statCnt = 0;
-        for( String row : log.split("\\r?\\n") )
+        for ( String row : log.split( "\\r?\\n" ) )
         {
-            if( row.contains( "Status" ) && row.contains( "LastError" ) )
+            if ( row.contains( "Status" ) && row.contains( "LastError" ) )
             {
                 errCnt++;
             }
-            if( row.contains( "Status" ) )
+            if ( row.contains( "Status" ) )
             {
                 statCnt++;
 
@@ -79,7 +92,7 @@ public class P2PStats
 
         this.p2pErrorMessage = output.toString();
 
-        if( errCnt > 0 || this.p2pErrorMessage.length() == 0 )
+        if ( errCnt > 0 || this.p2pErrorMessage.length() == 0 )
         {
             return errCnt < statCnt ? 1 : 2;
         }

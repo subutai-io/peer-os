@@ -1,6 +1,9 @@
 package io.subutai.core.metric.api.pojo;
 
 
+import java.util.List;
+
+
 public interface P2Pinfo
 {
     public String getRhId();
@@ -21,16 +24,16 @@ public interface P2Pinfo
     public void setP2pStatus( final int p2pStatus );
 
 
-    public String getP2pErrorLogs();
+    public List<String> getState();
 
 
-    public void setP2pErrorLogs( final String p2pErrorLogs );
+    public void setState( final List<String> state );
 
 
-    public String getState();
+    public List<String> getP2pErrorLogs();
 
 
-    public void setState( final String state );
+    public void setP2pErrorLogs( final List<String> p2pErrorLogs );
 
 
     public String getP2pVersion();
