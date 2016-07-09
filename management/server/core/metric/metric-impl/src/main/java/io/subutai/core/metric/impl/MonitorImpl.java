@@ -514,6 +514,9 @@ public class MonitorImpl implements Monitor, HostListener
 
                 int errors = 0;
 
+                List<String> stateList = Lists.newArrayList();
+                List<String> errorList = Lists.newArrayList();
+
                 for ( final String statusLine : statusLines )
                 {
                     if ( statusLine.contains( "LastError" ) )
@@ -525,12 +528,12 @@ public class MonitorImpl implements Monitor, HostListener
                             if ( s.contains( "State:" ) )
                             {
                                 String state = s.replace( "State:", "" ).trim();
-                                info.setState( state );
+                                stateList.add( state );
                             }
                             if ( s.contains( "LastError:" ) )
                             {
                                 String error = s.replace( "LastError:", "" ).trim();
-                                info.setP2pErrorLogs( error );
+                                errorList.add( error );
                             }
                         }
                         errors++;
@@ -553,6 +556,8 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setRhId( resourceHost.getId() );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+                info.setState( stateList );
+                info.setP2pErrorLogs( errorList );
 
                 pojos.add( info );
             }

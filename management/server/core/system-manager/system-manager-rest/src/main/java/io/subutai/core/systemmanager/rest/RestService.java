@@ -86,7 +86,7 @@ public interface RestService
                                         @FormParam( "publicUrl" ) String publicUrl,
                                         @FormParam( "agentPort" ) String agentPort,
                                         @FormParam( "publicSecurePort" ) String publicSecurePort,
-                                        @FormParam( "keyServer" ) String keyServer) throws ConfigurationException;
+                                        @FormParam( "keyServer" ) String keyServer ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )
@@ -104,6 +104,4 @@ public interface RestService
     @Path( "update_management" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response update();
-
-
 }
