@@ -189,7 +189,7 @@ func main() {
 				Name:  "p2p",
 				Usage: "p2p network operation",
 				Flags: []cli.Flag{
-					cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr)"},
+					cli.BoolFlag{Name: "c", Usage: "create p2p instance (p2p -c interfaceName hash key ttl localPeepIPAddr portRange)"},
 					cli.BoolFlag{Name: "d", Usage: "delete p2p instance (p2p -d hash)"},
 					cli.BoolFlag{Name: "u", Usage: "update p2p instance encryption key (p2p -u hash newkey ttl)"},
 					cli.BoolFlag{Name: "l", Usage: "list of p2p instances (p2p -l)"},
