@@ -10,4 +10,12 @@ public interface NetworkSettings
     String getPublicUrl();
 
     void setPublicUrl( final String publicUrl );
+
+    public int getStartRange();
+
+    public void setStartRange( final int startRange );
+
+    public int getEndRange();
+
+    public void setEndRange( final int endRange );
 }

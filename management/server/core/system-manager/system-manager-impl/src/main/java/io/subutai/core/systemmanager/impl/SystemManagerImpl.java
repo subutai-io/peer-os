@@ -237,8 +237,6 @@ public class SystemManagerImpl implements SystemManager
     public void setNetworkSettings( final String publicUrl, final String publicSecurePort )
             throws ConfigurationException
     {
-
-
         try
         {
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
