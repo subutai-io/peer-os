@@ -32,8 +32,8 @@ function AboutCtrl ($http, ngDialog, SweetAlert, $scope, $timeout) {
 
 	$http.get (SERVER_URL + "rest/v1/system/about").success (function (data) {
 		vm.info = data;
-		for(var rhId in vm.info.peerP2PVersions) {
-			switch(vm.info.peerP2PVersions[rhId].p2pStatus) {
+		for (var rhId in vm.info.peerP2PVersions) {
+			switch (vm.info.peerP2PVersions[rhId].p2pStatus) {
 				case 0:
 					vm.statusTable.p2pStatuses.healthy++;
 					break;
@@ -46,7 +46,7 @@ function AboutCtrl ($http, ngDialog, SweetAlert, $scope, $timeout) {
 				default:
 					break;
 			}
-			switch(vm.info.peerP2PVersions[rhId].p2pVersionCheck) {
+			switch (vm.info.peerP2PVersions[rhId].p2pVersionCheck) {
 				case 0:
 					vm.statusTable.p2pUpdates.updated++;
 					break;

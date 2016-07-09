@@ -235,11 +235,15 @@ public class SystemInfoPojo implements SystemInfo
         isUpdatesAvailable = updatesAvailable;
     }
 
-    public Map getPeerP2PVersions() {
+
+    public Map getPeerP2PVersions()
+    {
         return peerP2PVersions;
     }
 
-    public void setPeerP2PVersions(Map peerP2PVersions) {
+
+    public void setPeerP2PVersions( Map peerP2PVersions )
+    {
         this.peerP2PVersions = peerP2PVersions;
     }
 }

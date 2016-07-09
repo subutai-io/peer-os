@@ -1,25 +1,25 @@
 <div class="b-popup b-popup_log">
-	<div class="b-popup__header">
-		P2P error
-		<a href ng-click="closeThisDialog()">
-			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
-		</a>
-	</div>
+  <div class="b-popup__header">
+    P2P error
+    <a href ng-click="closeThisDialog()">
+      <img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
+    </a>
+  </div>
 
-	<script>
-		$('.js-scrollbar').perfectScrollbar({
-			"wheelPropagation": true,
-			"swipePropagation": false
-		});
-	</script>
-	<div class="b-popup__body ">
-		<div class="b-logs-view js-scrollbar" data-ng-bind-html="monitoringCtrl.currentError"></div>
-	</div>
+  <script>
+    $('.js-scrollbar').perfectScrollbar({
+      "wheelPropagation": true,
+      "swipePropagation": false
+    });
+  </script>
+  <div class="b-popup__body ">
+    <div class="b-logs-view js-scrollbar" data-ng-bind-html="monitoringCtrl.currentError"></div>
+  </div>
 
-	<div class="b-popup__footer">
-		<button class="b-btn b-btn_green g-right" ng-click="closeThisDialog()">
-			OK
-		</button>
-		<div class="clear"></div>
-	</div>
+  <div class="b-popup__footer">
+    <button class="b-btn b-btn_green g-right" ng-click="closeThisDialog()">
+      OK
+    </button>
+    <div class="clear"></div>
+  </div>
 </div>

@@ -173,25 +173,27 @@ public class SystemManagerImpl implements SystemManager
                     {
                         status = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
                     }
-                    catch (CommandException e)
+                    catch ( CommandException e )
                     {
                         // @todo add logger
                         e.printStackTrace();
                     }
 
-                    if( status.length() > 0 )
+                    if ( status.length() > 0 )
                     {
-                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId(), rh.getRhVersion(), rh.getP2pVersion(), status) );
+                        p2pVersions.put( rh.getId(),
+                                new P2PStats( rh.getId(), rh.getRhVersion(), rh.getP2pVersion(), status ) );
                     }
                     else
                     {
-                        p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                        p2pVersions.put( rh.getId(), new P2PStats( rh.getId() ) );
                     }
-                } catch (ResourceHostException e)
+                }
+                catch ( ResourceHostException e )
                 {
                     // @todo add logger
                     e.printStackTrace();
-                    p2pVersions.put( rh.getId(), new P2PStats(rh.getId()) );
+                    p2pVersions.put( rh.getId(), new P2PStats( rh.getId() ) );
                 }
             } );
 
