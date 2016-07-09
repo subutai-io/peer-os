@@ -207,7 +207,7 @@ public class HubManagerImpl implements HubManager
                     new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
             environmentTelemetryService
-                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 900, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
 
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
