@@ -186,11 +186,10 @@ public class RestServiceImpl implements RestService
                                         final String publicUrl, final String agentPort, final String publicSecurePort,
                                         final String keyServer )
     {
-        //todo remove securePortX3
+        //todo remove securePortX*, agentPort and keyServer
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, publicUrl, agentPort, publicSecurePort,
-                    keyServer );
+            systemManager.setNetworkSettings( publicUrl, publicSecurePort );
 
             systemManager.sendSystemConfigToHub();
         }

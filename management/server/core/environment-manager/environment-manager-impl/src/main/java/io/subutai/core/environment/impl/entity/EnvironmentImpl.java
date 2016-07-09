@@ -616,16 +616,15 @@ public class EnvironmentImpl implements Environment, Serializable
     @Override
     public boolean isMember( final Peer peer )
     {
-        boolean found = false;
         for ( PeerConf f : peerConfs )
         {
             if ( f.getPeerId().equals( peer.getId() ) )
             {
-                found = true;
-                break;
+                return true;
             }
         }
-        return found;
+
+        return false;
     }
 
 

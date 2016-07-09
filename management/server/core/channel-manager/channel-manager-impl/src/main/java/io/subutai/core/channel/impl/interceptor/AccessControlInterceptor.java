@@ -21,6 +21,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.settings.Common;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
@@ -58,7 +59,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
                 Session userSession = null;
 
-                if ( req.getLocalPort() == SystemSettings.getSecurePortX2() )
+                if ( req.getLocalPort() == Common.DEFAULT_PUBLIC_SECURE_PORT )
                 {
                     userSession = authenticateAccess( null, null ); // auth with system user
                 }

@@ -270,7 +270,7 @@ public class CommandProcessor implements RestProcessor
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo )
     {
         return RestUtil.createWebClient( String.format( "http://%s:%d/trigger", getResourceHostIp( resourceHostInfo ),
-                SystemSettings.getAgentPort() ), 3000, 5000, 1 );
+                Common.DEFAULT_AGENT_PORT ), 3000, 5000, 1 );
     }
 
 

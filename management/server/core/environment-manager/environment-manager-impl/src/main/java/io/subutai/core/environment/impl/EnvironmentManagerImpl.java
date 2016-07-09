@@ -34,6 +34,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.ContainerHostNotFoundException;
@@ -227,26 +228,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     private boolean isPeerInUse( String peerId )
     {
-        boolean inUse = false;
-        for ( Iterator<EnvironmentImpl> i = environmentService.getAll().iterator(); !inUse && i.hasNext(); )
+        for ( EnvironmentImpl e : environmentService.getAll() )
         {
-            EnvironmentImpl e = i.next();
             if ( e.getStatus() == EnvironmentStatus.UNDER_MODIFICATION )
             {
-                inUse = true;
-                break;
+                return true;
             }
 
             for ( PeerConf p : e.getPeerConfs() )
             {
                 if ( peerId.equals( p.getPeerId() ) )
                 {
-                    inUse = true;
-                    break;
+                    return true;
                 }
             }
         }
-        return inUse;
+
+        return !peerManager.getLocalPeer().getPeerContainers( peerId ).isEmpty();
     }
 
 
@@ -1963,13 +1961,33 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 {
                     try
                     {
-                        commandUtil.execute( new RequestBuilder(
-                                String.format( "scp /bin/bash root@%s:/tmp", targetContainer.getIp() ) )
-                                .withTimeout( 60 ), sourceContainer );
+                        CommandResult scpResult = commandUtil.execute( new RequestBuilder( String.format(
+                                "MD5=`dd bs=1024 count=2 </dev/urandom | tee tmpfile | md5sum | awk '{print $1}'`;"
+                                        + " mv tmpfile $MD5; scp $MD5 root@%s:/tmp; echo $MD5; rm $MD5",
+                                targetContainer.getIp() ) ).withTimeout( 60 ), sourceContainer );
 
-                        operationTracker.addLog(
-                                String.format( "SCP succeeded from %s to %s", sourceContainer.getHostname(),
-                                        targetContainer.getHostname() ) );
+                        String sourceMd5Sum = scpResult.getStdOut().trim();
+
+                        CommandResult targetMd5Result = commandUtil.execute(
+                                new RequestBuilder( String.format( "md5sum /tmp/%1$s; rm /tmp/%1$s", sourceMd5Sum ) ),
+                                targetContainer );
+
+                        String targetMd5Sum = targetMd5Result.getStdOut().split( "\\s+" )[0].trim();
+
+                        if ( sourceMd5Sum.equalsIgnoreCase( targetMd5Sum ) )
+                        {
+
+                            operationTracker.addLog(
+                                    String.format( "SCP succeeded from %s to %s", sourceContainer.getHostname(),
+                                            targetContainer.getHostname() ) );
+                        }
+                        else
+                        {
+                            operationTracker.addLogFailed( String.format( "SCP failed from %s to %s. Md5sum mismatch",
+                                    sourceContainer.getHostname(), targetContainer.getHostname() ) );
+
+                            return EnvConnectivityState.SCP_FAILS;
+                        }
                     }
                     catch ( CommandException e )
                     {
@@ -1983,7 +2001,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 }
             }
         }
-
 
         operationTracker.addLogDone( "Environment connectivity check succeeded" );
 
