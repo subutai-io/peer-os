@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.subutai.core.systemmanager.impl.pojo.*;
 import org.apache.commons.configuration.ConfigurationException;
 
 import io.subutai.common.command.CommandException;
@@ -39,8 +38,12 @@ import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
-import io.subutai.hub.share.dto.SystemConfDto;
-import io.subutai.hub.share.dto.SystemConfigurationType;
+import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.P2PStats;
+import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
+import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
 
 public class SystemManagerImpl implements SystemManager
@@ -234,13 +237,29 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setNetworkSettings( final String publicUrl, final String publicSecurePort )
-            throws ConfigurationException
+    public NetworkSettings getNetworkSettings() throws ConfigurationException
+    {
+        NetworkSettings pojo = new NetworkSettingsPojo();
+
+        pojo.setPublicUrl( SystemSettings.getPublicUrl() );
+        pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+        pojo.setStartRange( SystemSettings.getP2pPortStartRange() );
+        pojo.setEndRange( SystemSettings.getP2pPortEndRange() );
+
+        return pojo;
+    }
+
+
+    @Override
+    public void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
+                                    final String endRange ) throws ConfigurationException
     {
         try
         {
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
                     Integer.parseInt( publicSecurePort ) );
+
+            SystemSettings.setP2pPortRange( Integer.parseInt( startRange ), Integer.parseInt( endRange ) );
         }
         catch ( Exception e )
         {
@@ -358,18 +377,6 @@ public class SystemManagerImpl implements SystemManager
             e.printStackTrace();
             return false;
         }
-    }
-
-
-    @Override
-    public NetworkSettings getNetworkSettings() throws ConfigurationException
-    {
-        NetworkSettings pojo = new NetworkSettingsPojo();
-
-        pojo.setPublicUrl( SystemSettings.getPublicUrl() );
-        pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-
-        return pojo;
     }
 
 
