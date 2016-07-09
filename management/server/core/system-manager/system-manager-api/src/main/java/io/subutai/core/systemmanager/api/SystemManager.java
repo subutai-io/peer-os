@@ -24,7 +24,8 @@ public interface SystemManager
 
     PeerSettings getPeerSettings();
 
-    void setNetworkSettings( final String publicUrl, final String publicSecurePort ) throws ConfigurationException;
+    void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
+                             final String endRange ) throws ConfigurationException;
 
     AdvancedSettings getAdvancedSettings();
 

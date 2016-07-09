@@ -185,7 +185,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            systemManager.setNetworkSettings( publicUrl, publicSecurePort );
+            systemManager.setNetworkSettings( publicUrl, publicSecurePort, startRange, endRange );
         }
         catch ( ConfigurationException e )
         {
