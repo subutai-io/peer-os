@@ -109,5 +109,5 @@ public interface SystemInfo
     Map getPeerP2PVersions();
 
 
-    void setPeerP2PVersions(Map peerP2PVersions);
+    void setPeerP2PVersions( Map peerP2PVersions );
 }

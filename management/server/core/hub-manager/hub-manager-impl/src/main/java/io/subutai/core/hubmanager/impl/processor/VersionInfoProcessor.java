@@ -61,25 +61,28 @@ public class VersionInfoProcessor implements Runnable
 
     public void sendVersionInfo() throws Exception
     {
-        String path = format( "/rest/v1/peers/%s/version-info", peerManager.getLocalPeer().getId() );
-
-        VersionInfoDto versionInfoDto = new VersionInfoDto();
-
-        versionInfoDto.setPeerId( configManager.getPeerId() );
-        versionInfoDto.setSsVersion( SubutaiInfo.getVersion() );
-        versionInfoDto.setBuildTime( SubutaiInfo.getBuildTime() );
-        versionInfoDto.setBranch( SubutaiInfo.getBranch() );
-        versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
-
-        ResourceHost host = configManager.getPeerManager().getLocalPeer().getManagementHost();
-
-        versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-        versionInfoDto.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
-
-        RestResult<Object> restResult = restClient.post( path, versionInfoDto );
-        if ( !restResult.isSuccess() )
+        if ( manager.isRegistered() )
         {
-            throw new Exception( "Error on sending version info to hub: " + restResult.getError() );
+            String path = format( "/rest/v1/peers/%s/version-info", peerManager.getLocalPeer().getId() );
+
+            VersionInfoDto versionInfoDto = new VersionInfoDto();
+
+            versionInfoDto.setPeerId( configManager.getPeerId() );
+            versionInfoDto.setSsVersion( SubutaiInfo.getVersion() );
+            versionInfoDto.setBuildTime( SubutaiInfo.getBuildTime() );
+            versionInfoDto.setBranch( SubutaiInfo.getBranch() );
+            versionInfoDto.setCommitId( SubutaiInfo.getCommitId() );
+
+            ResourceHost host = configManager.getPeerManager().getLocalPeer().getManagementHost();
+
+            versionInfoDto.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+            versionInfoDto.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
+
+            RestResult<Object> restResult = restClient.post( path, versionInfoDto );
+            if ( !restResult.isSuccess() )
+            {
+                throw new Exception( "Error on sending version info to hub: " + restResult.getError() );
+            }
         }
     }
 }

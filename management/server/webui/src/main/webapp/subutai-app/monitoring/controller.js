@@ -71,11 +71,11 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 		});
 	}
 
-	$http.get (SERVER_URL + "rest/v1/system/about").success (function (data) {
+	$http.get(SERVER_URL + "rest/v1/system/about").success(function (data) {
 		vm.info = data;
-		for(var rhId in vm.info.peerP2PVersions) {
+		for (var rhId in vm.info.peerP2PVersions) {
 
-			switch(vm.info.peerP2PVersions[rhId].p2pStatus) {
+			switch (vm.info.peerP2PVersions[rhId].p2pStatus) {
 				case 0:
 					vm.statusTable.p2pStatuses.healthy++;
 					break;
@@ -85,7 +85,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 					break;
 				case 2:
 					vm.statusTable.p2pStatuses.notWork++;
-					if(!vm.p2pColor || vm.p2pColor == '#efc94c') {
+					if (!vm.p2pColor || vm.p2pColor == '#efc94c') {
 						vm.p2pColor = '#c1272d';
 					}
 					break;
@@ -93,7 +93,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 					break;
 			}
 
-			switch(vm.info.peerP2PVersions[rhId].p2pVersionCheck) {
+			switch (vm.info.peerP2PVersions[rhId].p2pVersionCheck) {
 				case 0:
 					vm.statusTable.p2pUpdates.updated++;
 					break;
@@ -122,7 +122,7 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 		vm.currentHost = '';
 		vm.currentType = type;
 
-		if( type == 'management' ) {
+		if (type == 'management') {
 			getServerData();
 		}
 	}

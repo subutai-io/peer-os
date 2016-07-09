@@ -24,7 +24,8 @@ public interface SystemManager
 
     PeerSettings getPeerSettings();
 
-    void setNetworkSettings( final String publicUrl, final String publicSecurePort ) throws ConfigurationException;
+    void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
+                             final String endRange ) throws ConfigurationException;
 
     AdvancedSettings getAdvancedSettings();
 
@@ -33,8 +34,6 @@ public interface SystemManager
 
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
-
-    void sendSystemConfigToHub() throws ConfigurationException;
 
     SystemInfo getManagementUpdates();
 

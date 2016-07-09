@@ -34,6 +34,6 @@ public class CommandsTest
     public void testGetSetupP2PConnectionCommand() throws Exception
     {
         assertNotNull( commands.getJoinP2PSwarmCommand( INTERFACE_NAME, LOCAL_IP, COMMUNITY_NAME, SECRET_KEY,
-                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC ) );
+                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC, "0-65535" ) );
     }
 }

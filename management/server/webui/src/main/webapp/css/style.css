@@ -1574,7 +1574,7 @@ td.b-main-table__status-col {
     /*border-radius: 5px;*/
     font-size: 13px;
     color: #5a5a5a;
-	position: relative;
+    position: relative;
 }
 
 .b-logs-view_token {
@@ -3880,36 +3880,42 @@ a[disabled] {
 	word-break: break-all;
 }
 
-.b-pointer-obj {
-	cursor: pointer;
+.b-pointer-obj
+{
+    cursor: pointer;
 }
 
-.b-table-col_2 {
-	width: 45%;
-	float: left;
-	margin: 0 0 0 5%;
+.b-table-col_2
+{
+    width: 45%;
+    float: left;
+    margin: 0 0 0 5%;
 }
 
-.b-table-col_2:first-child {
-	margin-left: 0;
+.b-table-col_2:first-child
+{
+    margin-left: 0;
 }
 
 /*Accordion*/
 
-.accordion ul {
+.accordion ul
+{
     margin: 0;
     padding: 0;
 }
 
-.accordion__item {
+.accordion__item
+{
     margin-bottom: 4px;
     padding: 0;
 
     list-style: none;
 }
 
-.accordion__header {
-	border: 1px solid #fff;	
+.accordion__header
+{
+    border: 1px solid #fff;
     font-size: 18px;
     line-height: 20px;
 
@@ -3919,18 +3925,20 @@ a[disabled] {
 
     cursor: pointer;
     -webkit-transition: 150ms all ease-in-out 0s;
-         -o-transition: 150ms all ease-in-out 0s;
-            transition: 150ms all ease-in-out 0s;
+    -o-transition: 150ms all ease-in-out 0s;
+    transition: 150ms all ease-in-out 0s;
 
     color: #3d3d3d;
     background-color: #f8fbfd;
 }
 
-.accordion__header:hover {
-	border: 1px solid #CCCEEE;
+.accordion__header:hover
+{
+    border: 1px solid #CCCEEE;
 }
 
-.accordion__header:after {
+.accordion__header:after
+{
     position: absolute;
     top: 22px;
     right: 20px;
@@ -3943,8 +3951,8 @@ a[disabled] {
 
     content: '';
     -webkit-transition: 150ms all ease-in-out 0s;
-         -o-transition: 150ms all ease-in-out 0s;
-            transition: 150ms all ease-in-out 0s;
+    -o-transition: 150ms all ease-in-out 0s;
+    transition: 150ms all ease-in-out 0s;
     vertical-align: middle;
 
     border: 4px solid transparent;
@@ -3952,20 +3960,23 @@ a[disabled] {
     border-bottom: none;
 }
 
-.accordion__content {
+.accordion__content
+{
     display: none;
 
     padding: 20px 10px;
 }
 
-.accordion__item_active .accordion__header {
-	border: 1px solid #CCCEEE;
+.accordion__item_active .accordion__header
+{
+    border: 1px solid #CCCEEE;
 }
 
-.accordion__item_active .accordion__header:after {
+.accordion__item_active .accordion__header:after
+{
     -webkit-transform: rotate(180deg);
-        -ms-transform: rotate(180deg);
-         -o-transform: rotate(180deg);
-            transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
