@@ -45,10 +45,7 @@ public class VersionInfoProcessor implements Runnable
     {
         try
         {
-            if ( manager.isRegistered() )
-            {
-                sendVersionInfo();
-            }
+            sendVersionInfo();
         }
         catch ( Exception e )
         {
