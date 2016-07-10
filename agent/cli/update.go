@@ -83,13 +83,12 @@ func upgradeRh(packet string) {
 }
 
 func Update(name string, check bool) {
+	if !lockSubutai(name + ".update") {
+		log.Error("Another update process is already running")
+	}
+	defer unlockSubutai()
 	switch name {
 	case "rh":
-		if !lockSubutai("rh.update") {
-			log.Error("Another update process is already running")
-		}
-		defer unlockSubutai()
-
 		packet := "subutai_" + config.Template.Version + "_" + config.Template.Arch + ".snap"
 		if len(config.Template.Branch) != 0 {
 			packet = "subutai_" + config.Template.Version + "_" + config.Template.Arch + "-" + config.Template.Branch + ".snap"
