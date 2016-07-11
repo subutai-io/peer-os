@@ -40,4 +40,16 @@ public interface P2Pinfo
 
 
     public void setP2pVersion( final String p2pVersion );
+
+
+    public int getRhVersionCheck();
+
+
+    public void setRhVersionCheck( final int rhVersionCheck );
+
+
+    public int getP2pVersionCheck();
+
+
+    public void setP2pVersionCheck( final int p2pVersionCheck );
 }

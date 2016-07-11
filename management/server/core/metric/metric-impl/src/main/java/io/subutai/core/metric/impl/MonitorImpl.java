@@ -559,6 +559,10 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setState( stateList );
                 info.setP2pErrorLogs( errorList );
 
+                // @TODO: add method checking version
+                info.setP2pVersionCheck( 1 );
+                info.setRhVersionCheck( 1 );
+
                 pojos.add( info );
             }
             catch ( CommandException | ResourceHostException e )
