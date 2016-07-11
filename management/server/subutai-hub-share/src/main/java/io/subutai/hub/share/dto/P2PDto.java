@@ -1,19 +1,15 @@
-package io.subutai.core.metric.impl.pojo;
+package io.subutai.hub.share.dto;
 
 
 import java.util.List;
 
-import io.subutai.core.metric.api.pojo.P2Pinfo;
 
-
-public class P2PInfoPojo implements P2Pinfo
+public class P2PDto
 {
     private String rhId;
     private String rhVersion;
     private String p2pVersion;
     private int p2pStatus;
-    private int p2pVersionCheck;
-    private int rhVersionCheck;
     private List<String> state;
     private List<String> p2pErrorLogs;
 
@@ -65,28 +61,7 @@ public class P2PInfoPojo implements P2Pinfo
         this.p2pVersion = p2pVersion;
     }
 
-    @Override
-    public int getRhVersionCheck() {
-        return rhVersionCheck;
-    }
 
-    @Override
-    public void setRhVersionCheck( int rhVersionCheck ) {
-        this.rhVersionCheck = rhVersionCheck;
-    }
-
-    @Override
-    public int getP2pVersionCheck() {
-        return p2pVersionCheck;
-    }
-
-    @Override
-    public void setP2pVersionCheck( int p2pVersionCheck ) {
-        this.p2pVersionCheck = p2pVersionCheck;
-    }
-
-
-    @Override
     public List<String> getState()
     {
         return state;
@@ -99,7 +74,6 @@ public class P2PInfoPojo implements P2Pinfo
     }
 
 
-    @Override
     public List<String> getP2pErrorLogs()
     {
         return p2pErrorLogs;

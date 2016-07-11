@@ -6,8 +6,10 @@ import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 
 public class NetworkSettingsPojo implements NetworkSettings
 {
-    public String publicUrl;
-    public int publicSecurePort;
+    private String publicUrl;
+    private int publicSecurePort;
+    private int startRange;
+    private int endRange;
 
 
     public String getPublicUrl()
@@ -31,5 +33,29 @@ public class NetworkSettingsPojo implements NetworkSettings
     public void setPublicSecurePort( final int publicSecurePort )
     {
         this.publicSecurePort = publicSecurePort;
+    }
+
+
+    public int getStartRange()
+    {
+        return startRange;
+    }
+
+
+    public void setStartRange( final int startRange )
+    {
+        this.startRange = startRange;
+    }
+
+
+    public int getEndRange()
+    {
+        return endRange;
+    }
+
+
+    public void setEndRange( final int endRange )
+    {
+        this.endRange = endRange;
     }
 }

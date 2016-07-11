@@ -1,12 +1,14 @@
 package io.subutai.hub.share.dto;
 
 
+import java.util.List;
 import java.util.Set;
 
 
 public class SystemLogsDto
 {
     private Set<String> logs;
+    private List<P2PDto> P2PInfo;
     private String status;
 
 
@@ -36,5 +38,17 @@ public class SystemLogsDto
     public void setStatus( final String status )
     {
         this.status = status;
+    }
+
+
+    public List<P2PDto> getP2PInfo()
+    {
+        return P2PInfo;
+    }
+
+
+    public void setP2PInfo( final List<P2PDto> p2PInfo )
+    {
+        this.P2PInfo = p2PInfo;
     }
 }

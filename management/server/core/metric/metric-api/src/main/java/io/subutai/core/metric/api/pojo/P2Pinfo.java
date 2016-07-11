@@ -1,40 +1,55 @@
 package io.subutai.core.metric.api.pojo;
 
 
+import java.util.List;
+
+
 public interface P2Pinfo
 {
-    public String getRhId();
+    String getRhId();
 
 
-    public void setRhId( final String rhId );
+    void setRhId( final String rhId );
 
 
-    public String getRhVersion();
+    String getRhVersion();
 
 
-    public void setRhVersion( final String rhVersion );
+    void setRhVersion( final String rhVersion );
 
 
-    public int getP2pStatus();
+    int getP2pStatus();
 
 
-    public void setP2pStatus( final int p2pStatus );
+    void setP2pStatus( final int p2pStatus );
 
 
-    public String getP2pErrorLogs();
+    List<String> getState();
 
 
-    public void setP2pErrorLogs( final String p2pErrorLogs );
+    void setState( final List<String> state );
 
 
-    public String getState();
+    List<String> getP2pErrorLogs();
 
 
-    public void setState( final String state );
+    void setP2pErrorLogs( final List<String> p2pErrorLogs );
 
 
-    public String getP2pVersion();
+    String getP2pVersion();
 
 
-    public void setP2pVersion( final String p2pVersion );
+    void setP2pVersion( final String p2pVersion );
+
+
+    int getRhVersionCheck();
+
+
+    void setRhVersionCheck( int rhVersionCheck );
+
+
+    int getP2pVersionCheck();
+
+
+    void setP2pVersionCheck( int p2pVersionCheck );
 }

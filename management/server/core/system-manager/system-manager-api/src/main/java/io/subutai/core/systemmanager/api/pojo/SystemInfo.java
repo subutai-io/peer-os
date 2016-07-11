@@ -104,10 +104,4 @@ public interface SystemInfo
 
 
     void setUpdatesAvailable( final boolean updatesAvailable );
-
-
-    Map getPeerP2PVersions();
-
-
-    void setPeerP2PVersions(Map peerP2PVersions);
 }

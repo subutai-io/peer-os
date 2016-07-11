@@ -93,6 +93,8 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
+    private final ScheduledExecutorService environmentTelemetryService = Executors.newSingleThreadScheduledExecutor();
+
     private final ScheduledExecutorService versionEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
@@ -201,6 +203,12 @@ public class HubManagerImpl implements HubManager
 
             versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
+            EnvironmentTelemetryProcessor environmentTelemetryProcessor =
+                    new EnvironmentTelemetryProcessor( this, peerManager, configManager );
+
+            environmentTelemetryService
+                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
+
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
                 @Override
@@ -240,13 +248,16 @@ public class HubManagerImpl implements HubManager
         AppScaleProcessor appScaleProcessor =
                 new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
+        EnvironmentTelemetryProcessor environmentTelemetryProcessor = new EnvironmentTelemetryProcessor( this,peerManager,configManager );
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
                                                                              .addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( systemConfProcessor )
                                                                              .addProcessor( productProcessor )
                                                                              .addProcessor( vehsProccessor )
-                                                                             .addProcessor( appScaleProcessor );
+                                                                             .addProcessor( appScaleProcessor )
+                                                                             .addProcessor( environmentTelemetryProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
