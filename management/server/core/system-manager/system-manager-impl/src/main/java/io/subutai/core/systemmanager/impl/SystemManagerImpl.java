@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -41,7 +39,6 @@ import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.P2PStats;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
