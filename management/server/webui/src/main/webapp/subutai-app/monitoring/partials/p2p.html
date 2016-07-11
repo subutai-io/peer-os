@@ -72,8 +72,8 @@
 								<th>P2P status</th>
 								<th>P2P error</th>
 							</tr>
-							<tr ng-repeat="(rhName, rh) in monitoringCtrl.info.peerP2PVersions">
-								<td>{{ rhName }}</td>
+							<tr ng-repeat="rh in monitoringCtrl.info">
+								<td>{{ rh.rhId }}</td>
 								<td>
 									<span 
 										class="b-pointer-obj" 

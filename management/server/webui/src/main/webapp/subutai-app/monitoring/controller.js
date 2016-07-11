@@ -64,51 +64,55 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 	});
 
 	function viewError(errorText) {
-		vm.currentError = $sce.trustAsHtml(errorText.replace(/(?:\r\n|\r|\n)/g, '<br />'));
+		vm.currentError = errorText;
 		ngDialog.open({
 			template: 'subutai-app/monitoring/partials/p2pErrorPopup.html',
 			scope: $scope
 		});
 	}
+	
+	function getP2Pstatus() {
+		monitoringSrv.getP2Pstatus().success (function (data) {
+			vm.info = data.p2pList;
+			for(var i = 0; i < vm.info; i++) {
 
-	$http.get (SERVER_URL + "rest/v1/system/about").success (function (data) {
-		vm.info = data;
-		for(var rhId in vm.info.peerP2PVersions) {
+				switch(vm.info[i].p2pStatus) {
+					case 0:
+						vm.statusTable.p2pStatuses.healthy++;
+						break;
+					case 1:
+						vm.statusTable.p2pStatuses.problems++;
+						vm.p2pColor = '#efc94c';
+						break;
+					case 2:
+						vm.statusTable.p2pStatuses.notWork++;
+						if(!vm.p2pColor || vm.p2pColor == '#efc94c') {
+							vm.p2pColor = '#c1272d';
+						}
+						break;
+					default:
+						break;
+				}
 
-			switch(vm.info.peerP2PVersions[rhId].p2pStatus) {
-				case 0:
-					vm.statusTable.p2pStatuses.healthy++;
-					break;
-				case 1:
-					vm.statusTable.p2pStatuses.problems++;
-					vm.p2pColor = '#efc94c';
-					break;
-				case 2:
-					vm.statusTable.p2pStatuses.notWork++;
-					if(!vm.p2pColor || vm.p2pColor == '#efc94c') {
-						vm.p2pColor = '#c1272d';
-					}
-					break;
-				default:
-					break;
+				switch(vm.info[i].p2pVersionCheck) {
+					case 0:
+						vm.statusTable.p2pUpdates.updated++;
+						break;
+					case 1:
+						vm.statusTable.p2pUpdates.normal++;
+						break;
+					case 2:
+						vm.statusTable.p2pUpdates.needUpdate++;
+						break;
+					default:
+						break;
+				}
+
 			}
-
-			switch(vm.info.peerP2PVersions[rhId].p2pVersionCheck) {
-				case 0:
-					vm.statusTable.p2pUpdates.updated++;
-					break;
-				case 1:
-					vm.statusTable.p2pUpdates.normal++;
-					break;
-				case 2:
-					vm.statusTable.p2pUpdates.needUpdate++;
-					break;
-				default:
-					break;
-			}
-
-		}
-	});
+		});
+		
+	}
+	getP2Pstatus();
 
 	monitoringSrv.getResourceHosts().success(function (data) {
 		vm.hosts = data;
