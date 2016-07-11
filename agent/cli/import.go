@@ -107,6 +107,7 @@ func download(t templ, kurjun *http.Client) bool {
 	log.Check(log.FatalLevel, "Creating file "+t.file, err)
 	defer out.Close()
 	log.Info("Downloading " + t.name)
+
 	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/get?id=" + t.id)
 	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/get?id="+t.id, err)
 	defer response.Body.Close()
@@ -115,13 +116,29 @@ func download(t templ, kurjun *http.Client) bool {
 	rd := bar.NewProxyReader(response.Body)
 
 	_, err = io.Copy(out, rd)
-	log.Check(log.FatalLevel, "Writing file "+t.file, err)
+	for c := 0; err != nil && c < 5; _, err = io.Copy(out, rd) {
+		log.Info("Download interrupted, retrying")
+		time.Sleep(3 * time.Second)
+		c++
+
+		//Repeating GET request to CDN, while need to continue interrupted download
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/get?id=" + t.id)
+		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/get?id="+t.id, err)
+		defer response.Body.Close()
+		bar = pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
+		bar.Start()
+		rd = bar.NewProxyReader(response.Body)
+	}
+
+	log.Check(log.FatalLevel, "Writing response body to file", err)
+
 	if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
 		return true
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return false
 }
+
 func lockSubutai(file string) bool {
 	lock, err := lockfile.New("/var/run/lock/subutai." + file)
 	if log.Check(log.DebugLevel, "Init lock "+file, err) {

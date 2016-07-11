@@ -3,7 +3,9 @@ package config
 import (
 	"crypto/tls"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"time"
 
 	"github.com/subutai-io/base/agent/log"
 
@@ -142,6 +144,14 @@ func CheckKurjun() (client *http.Client) {
 	// if !log.Check(log.InfoLevel, "Trying local repo", err) {
 	// Cdn.Kurjun = "https://" + Management.Host + ":8339/rest/kurjun"
 	// } else {
+	_, err := net.DialTimeout("tcp", Cdn.Url+":"+Cdn.Sslport, time.Duration(2)*time.Second)
+	for c := 0; err != nil && c < 5; _, err = net.DialTimeout("tcp", Cdn.Url+":"+Cdn.Sslport, time.Duration(2)*time.Second) {
+		log.Info("CDN unreachable, retrying")
+		time.Sleep(3 * time.Second)
+		c++
+	}
+	log.Check(log.FatalLevel, "Checking CDN accessibility", err)
+
 	Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
 	if !Cdn.Allowinsecure {
 		client = &http.Client{}
