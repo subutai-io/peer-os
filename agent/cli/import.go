@@ -122,6 +122,9 @@ func download(t templ, kurjun *http.Client) bool {
 		c++
 
 		//Repeating GET request to CDN, while need to continue interrupted download
+		out, err = os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
+		log.Check(log.FatalLevel, "Creating file "+t.file, err)
+		defer out.Close()
 		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/get?id=" + t.id)
 		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/get?id="+t.id, err)
 		defer response.Body.Close()
