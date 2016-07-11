@@ -120,6 +120,10 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 			$('.js-karaflogs-load-screen').hide();
 			vm.config = data;
 			vm.karafLogs = getFilteredLogs(data.karafLogs);
+			setTimeout(function() {
+				var codeBlock = document.getElementById('js-highlight-block');
+				codeBlock.scrollTop = codeBlock.scrollHeight;
+			}, 300);
 		}).error(function(error){
 			SweetAlert.swal("ERROR!", error, "error");
 			$('.js-karaflogs-load-screen').hide();
@@ -152,8 +156,6 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	}
 
 	function renderHtml(html_code) {
-		var codeBlock = document.getElementById('js-highlight-block');
-		codeBlock.scrollTop = codeBlock.scrollHeight;
 		return $sce.trustAsHtml(html_code);
 	}
 
