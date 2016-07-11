@@ -65,26 +65,6 @@ public class P2PInfoPojo implements P2Pinfo
         this.p2pVersion = p2pVersion;
     }
 
-    @Override
-    public int getRhVersionCheck() {
-        return rhVersionCheck;
-    }
-
-    @Override
-    public void setRhVersionCheck( int rhVersionCheck ) {
-        this.rhVersionCheck = rhVersionCheck;
-    }
-
-    @Override
-    public int getP2pVersionCheck() {
-        return p2pVersionCheck;
-    }
-
-    @Override
-    public void setP2pVersionCheck( int p2pVersionCheck ) {
-        this.p2pVersionCheck = p2pVersionCheck;
-    }
-
 
     @Override
     public List<String> getState()
@@ -109,5 +89,29 @@ public class P2PInfoPojo implements P2Pinfo
     public void setP2pErrorLogs( final List<String> p2pErrorLogs )
     {
         this.p2pErrorLogs = p2pErrorLogs;
+    }
+
+
+    public int getRhVersionCheck()
+    {
+        return rhVersionCheck;
+    }
+
+
+    public void setRhVersionCheck( final int rhVersionCheck )
+    {
+        this.rhVersionCheck = rhVersionCheck;
+    }
+
+
+    public int getP2pVersionCheck()
+    {
+        return p2pVersionCheck;
+    }
+
+
+    public void setP2pVersionCheck( final int p2pVersionCheck )
+    {
+        this.p2pVersionCheck = p2pVersionCheck;
     }
 }
