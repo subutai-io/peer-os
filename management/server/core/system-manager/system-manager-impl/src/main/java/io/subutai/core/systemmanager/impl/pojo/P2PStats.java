@@ -92,7 +92,7 @@ public class P2PStats
 
         this.p2pErrorMessage = output.toString();
 
-        if ( errCnt > 0 || this.p2pErrorMessage.length() == 0 )
+        if ( errCnt > 0 )
         {
             return errCnt < statCnt ? 1 : 2;
         }

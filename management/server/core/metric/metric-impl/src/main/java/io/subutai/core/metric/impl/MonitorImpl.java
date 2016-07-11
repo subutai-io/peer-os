@@ -533,7 +533,7 @@ public class MonitorImpl implements Monitor, HostListener
                             if ( s.contains( "LastError:" ) )
                             {
                                 String error = s.replace( "LastError:", "" ).trim();
-                                errorList.add( error );
+                                errorList.add(  String.format( "%s (%s) - %s" , error, part[0], part[1] ));
                             }
                         }
                         errors++;
