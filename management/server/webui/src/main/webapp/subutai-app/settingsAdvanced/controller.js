@@ -154,7 +154,6 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	function renderHtml(html_code) {
 		var codeBlock = document.getElementById('js-highlight-block');
 		codeBlock.scrollTop = codeBlock.scrollHeight;
-		html_code = html_code.replace(/[&<>]/g, replaceTag);
 		return $sce.trustAsHtml(html_code);
 	}
 
@@ -163,6 +162,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	}
 
 	function getFilteredLogs(html_code) {
+		html_code = html_code.replace(/[&<>]/g, replaceTag);
 		if(html_code && html_code.length > 0) {
 			var html_code_array = html_code.match(/[^\r\n]+/g);
 			var temp = false;
