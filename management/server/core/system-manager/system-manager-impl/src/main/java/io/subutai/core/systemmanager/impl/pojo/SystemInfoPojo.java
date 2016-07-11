@@ -16,8 +16,6 @@ public class SystemInfoPojo implements SystemInfo
     private String rhVersion;
     private String p2pVersion;
 
-    private Map peerP2PVersions;
-
     private String gitBuildUserName;
     private String gitBuildUserEmail;
     private String gitBuildHost;
@@ -233,17 +231,5 @@ public class SystemInfoPojo implements SystemInfo
     public void setUpdatesAvailable( final boolean updatesAvailable )
     {
         isUpdatesAvailable = updatesAvailable;
-    }
-
-
-    public Map getPeerP2PVersions()
-    {
-        return peerP2PVersions;
-    }
-
-
-    public void setPeerP2PVersions( Map peerP2PVersions )
-    {
-        this.peerP2PVersions = peerP2PVersions;
     }
 }

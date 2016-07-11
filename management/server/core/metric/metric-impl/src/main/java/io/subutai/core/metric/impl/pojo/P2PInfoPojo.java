@@ -11,9 +11,9 @@ public class P2PInfoPojo implements P2Pinfo
     private String rhId;
     private String rhVersion;
     private String p2pVersion;
-    private int rhVersionCheck;
-    private int p2pVersionCheck;
     private int p2pStatus;
+    private int p2pVersionCheck;
+    private int rhVersionCheck;
     private List<String> state;
     private List<String> p2pErrorLogs;
 
