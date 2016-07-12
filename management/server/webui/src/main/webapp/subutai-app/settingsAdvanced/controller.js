@@ -120,6 +120,10 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 			$('.js-karaflogs-load-screen').hide();
 			vm.config = data;
 			vm.karafLogs = getFilteredLogs(data.karafLogs);
+			setTimeout(function() {
+				var codeBlock = document.getElementById('js-highlight-block');
+				codeBlock.scrollTop = codeBlock.scrollHeight;
+			}, 300);
 		}).error(function(error){
 			SweetAlert.swal("ERROR!", error, "error");
 			$('.js-karaflogs-load-screen').hide();
@@ -152,9 +156,6 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	}
 
 	function renderHtml(html_code) {
-		var codeBlock = document.getElementById('js-highlight-block');
-		codeBlock.scrollTop = codeBlock.scrollHeight;
-		html_code = html_code.replace(/[&<>]/g, replaceTag);
 		return $sce.trustAsHtml(html_code);
 	}
 
@@ -163,6 +164,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	}
 
 	function getFilteredLogs(html_code) {
+		html_code = html_code.replace(/[&<>]/g, replaceTag);
 		if(html_code && html_code.length > 0) {
 			var html_code_array = html_code.match(/[^\r\n]+/g);
 			var temp = false;
