@@ -12,6 +12,8 @@ public class P2PInfoPojo implements P2Pinfo
     private String rhVersion;
     private String p2pVersion;
     private int p2pStatus;
+    private int p2pVersionCheck;
+    private int rhVersionCheck;
     private List<String> state;
     private List<String> p2pErrorLogs;
 
@@ -87,5 +89,29 @@ public class P2PInfoPojo implements P2Pinfo
     public void setP2pErrorLogs( final List<String> p2pErrorLogs )
     {
         this.p2pErrorLogs = p2pErrorLogs;
+    }
+
+
+    public int getRhVersionCheck()
+    {
+        return rhVersionCheck;
+    }
+
+
+    public void setRhVersionCheck( final int rhVersionCheck )
+    {
+        this.rhVersionCheck = rhVersionCheck;
+    }
+
+
+    public int getP2pVersionCheck()
+    {
+        return p2pVersionCheck;
+    }
+
+
+    public void setP2pVersionCheck( final int p2pVersionCheck )
+    {
+        this.p2pVersionCheck = p2pVersionCheck;
     }
 }

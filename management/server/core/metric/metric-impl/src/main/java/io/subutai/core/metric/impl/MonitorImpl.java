@@ -533,7 +533,7 @@ public class MonitorImpl implements Monitor, HostListener
                             if ( s.contains( "LastError:" ) )
                             {
                                 String error = s.replace( "LastError:", "" ).trim();
-                                errorList.add( error );
+                                errorList.add(  String.format( "%s (%s) - %s" , error, part[0], part[1] ));
                             }
                         }
                         errors++;
@@ -558,6 +558,10 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
                 info.setState( stateList );
                 info.setP2pErrorLogs( errorList );
+
+                // @TODO: add method checking version
+                info.setP2pVersionCheck( 1 );
+                info.setRhVersionCheck( 1 );
 
                 pojos.add( info );
             }

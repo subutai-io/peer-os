@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -41,7 +39,6 @@ import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.P2PStats;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
 
@@ -166,42 +163,6 @@ public class SystemManagerImpl implements SystemManager
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
             pojo.setRhVersion( host.getRhVersion().replace( "Subutai version", "" ).trim() );
             pojo.setP2pVersion( host.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
-
-            Map p2pVersions = new HashMap<String, P2PStats>();
-            peerManager.getLocalPeer().getResourceHosts().stream().forEach( rh -> {
-                try
-                {
-                    String status = "";
-                    try
-                    {
-                        status = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
-                    }
-                    catch ( CommandException e )
-                    {
-                        // @todo add logger
-                        e.printStackTrace();
-                    }
-
-                    if ( status.length() > 0 )
-                    {
-                        p2pVersions.put( rh.getId(),
-                                new P2PStats( rh.getId(), rh.getRhVersion(), rh.getP2pVersion(), status ) );
-                    }
-                    else
-                    {
-                        p2pVersions.put( rh.getId(), new P2PStats( rh.getId() ) );
-                    }
-                }
-                catch ( ResourceHostException e )
-                {
-                    // @todo add logger
-                    e.printStackTrace();
-                    p2pVersions.put( rh.getId(), new P2PStats( rh.getId() ) );
-                }
-            } );
-
-
-            pojo.setPeerP2PVersions( p2pVersions );
         }
         catch ( HostNotFoundException | ResourceHostException e )
         {
