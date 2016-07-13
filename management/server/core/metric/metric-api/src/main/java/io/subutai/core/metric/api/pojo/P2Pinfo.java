@@ -52,4 +52,10 @@ public interface P2Pinfo
 
 
     void setP2pVersionCheck( int p2pVersionCheck );
+
+
+    void setP2pVersionCheck( String from, String to );
+
+
+    void setRhVersionCheck( String from, String to );
 }

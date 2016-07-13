@@ -1,6 +1,7 @@
 package io.subutai.core.metric.impl;
 
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +18,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import io.subutai.common.util.RestUtil;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +66,8 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
+
+import javax.ws.rs.core.Response;
 
 import static java.awt.SystemColor.info;
 
@@ -554,14 +562,44 @@ public class MonitorImpl implements Monitor, HostListener
                 }
 
                 info.setRhId( resourceHost.getId() );
+
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
                 info.setState( stateList );
                 info.setP2pErrorLogs( errorList );
 
-                // @TODO: add method checking version
-                info.setP2pVersionCheck( 1 );
-                info.setRhVersionCheck( 1 );
+
+                WebClient client = RestUtil.createTrustedWebClient( "https://hub.subut.ai:443/rest/v1/system/versions/range" );
+                Response response = client.get();
+
+                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+                {
+                    try
+                    {
+                        String output = response.readEntity(String.class);
+
+                        JSONArray entities = new JSONArray(output);
+
+
+                        for (int i = 0; i < entities.length(); i++) {
+                            if( entities.getJSONObject(i).get("key").equals("P2P") )
+                            {
+                                info.setP2pVersionCheck( entities.getJSONObject(i).getString("rangeFrom"),
+                                        entities.getJSONObject(i).getString("rangeTo") );
+                            }
+
+                            if( entities.getJSONObject(i).get("key").equals("RESOURCE_HOST") )
+                            {
+                                info.setRhVersionCheck( entities.getJSONObject(i).getString("rangeFrom"),
+                                        entities.getJSONObject(i).getString("rangeTo") );
+                            }
+                        }
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
 
                 pojos.add( info );
             }
