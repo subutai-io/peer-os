@@ -166,9 +166,9 @@ public class P2PInfoPojo implements P2Pinfo
             compVersion = m.group(0);
         }
 
-        String[] curVerAr = curVer.split(".");
+        String[] curVerAr = curVer.split("\\.");
 
-        String[] compVersionAr = curVer.split(".");
+        String[] compVersionAr = compVersion.split("\\.");
         int curVersionArIt = 0;
 
         for( String lex : compVersionAr)
