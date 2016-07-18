@@ -925,7 +925,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         if ( environment instanceof ProxyEnvironment )
         {
-            environmentAdapter.destroyCo ntainer( ( ProxyEnvironment ) environment, containerId );
+            environmentAdapter.destroyContainer( ( ProxyEnvironment ) environment, containerId );
 
             return;
         }
