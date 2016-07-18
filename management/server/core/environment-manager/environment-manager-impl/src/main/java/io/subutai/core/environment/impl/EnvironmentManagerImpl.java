@@ -150,6 +150,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         this.relationManager = relationManager;
         this.tracker = tracker;
 
+
         //******************************************
         Session session = identityManager.loginSystemUser();
         if ( session != null )
@@ -928,6 +929,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             return;
         }
+        else
+        {
+            environmentAdapter.getHubAdapter().destroyContainer( environmentId, containerId );
+        }
+
 
         TrackerOperation operationTracker =
                 tracker.createTrackerOperation( MODULE_NAME, String.format( "Destroying container %s", containerId ) );
