@@ -5,7 +5,6 @@ import java.util.List;
 
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
@@ -62,9 +61,9 @@ public interface IdentityDataService
     List<User> getAllUsers();
 
 
-     /* *************************************************
-     *
-     */
+    /* *************************************************
+    *
+    */
     void persistUser( User item );
 
 
@@ -172,47 +171,6 @@ public interface IdentityDataService
     void removeRolePermission( Role role, Permission permission );
 
 
-    /* ******Session************************
-     *
-     */
-    List<Session> getAllSessions();
-
-
-    /* *************************************************
-     */
-    Session getSession( long sessionId );
-
-
-    /* *************************************************
-     *
-     */
-    List<Session> getSessionsByUserId( long userId );
-
-
-    /* *************************************************
-     *
-     */
-    Session getValidSession( long userId );
-
-
-    /* *************************************************
-     *
-     */
-    void persistSession( Session item );
-
-
-    /* *************************************************
-     *
-     */
-    void removeSession( long id );
-
-
-    /* *************************************************
-     *
-     */
-    void updateSession( Session item );
-
-
     /* ******UserToken *********************************
     *
     */
@@ -272,12 +230,6 @@ public interface IdentityDataService
     void removeInvalidTokens();
 
 
-    /* *************************************************
-     *
-     */
-    void invalidateSessions();
-
-
     /* ******UserDelegate *********************************
      *
      */
@@ -312,5 +264,4 @@ public interface IdentityDataService
      *
      */
     void removeUserDelegate( String id );
-
 }
