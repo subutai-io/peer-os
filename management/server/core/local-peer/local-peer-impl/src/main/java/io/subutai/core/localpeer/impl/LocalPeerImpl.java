@@ -143,6 +143,8 @@ import io.subutai.core.security.api.crypto.KeyManager;
 
 /**
  * Local peer implementation
+ *
+ * TODO externalize security specific operations to LocalPeerSecureProxy
  */
 @PermitAll
 public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
@@ -152,25 +154,25 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
     private DaoManager daoManager;
     private TemplateManager templateRegistry;
-    protected Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
+    Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
     private CommandExecutor commandExecutor;
     private QuotaManager quotaManager;
     private Monitor monitor;
-    protected ResourceHostDataService resourceHostDataService;
+    ResourceHostDataService resourceHostDataService;
     private HostRegistry hostRegistry;
-    protected CommandUtil commandUtil = new CommandUtil();
-    protected ExceptionUtil exceptionUtil = new ExceptionUtil();
-    protected Set<RequestListener> requestListeners = Sets.newHashSet();
-    protected PeerInfo peerInfo;
+    CommandUtil commandUtil = new CommandUtil();
+    ExceptionUtil exceptionUtil = new ExceptionUtil();
+    Set<RequestListener> requestListeners = Sets.newHashSet();
+    PeerInfo peerInfo;
     private SecurityManager securityManager;
-    protected ServiceLocator serviceLocator = new ServiceLocator();
+    ServiceLocator serviceLocator = new ServiceLocator();
     private IdentityManager identityManager;
     private RelationManager relationManager;
 
-    protected volatile boolean initialized = false;
+    volatile boolean initialized = false;
     private NetworkResourceDaoImpl networkResourceDao;
-    LocalPeerCommands localPeerCommands = new LocalPeerCommands();
-    HostUtil hostUtil = new HostUtil();
+    private final LocalPeerCommands localPeerCommands = new LocalPeerCommands();
+    private final HostUtil hostUtil = new HostUtil();
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
@@ -263,7 +265,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected void initPeerInfo()
+    private void initPeerInfo()
     {
         peerInfo = new PeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
@@ -288,7 +290,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected ResourceHostDataService createResourceHostDataService()
+    ResourceHostDataService createResourceHostDataService()
     {
         return new ResourceHostDataService( daoManager.getEntityManagerFactory() );
     }
@@ -795,7 +797,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected void registerContainer( String resourceHostId, ContainerHostEntity containerHost ) throws PeerException
+    private void registerContainer( String resourceHostId, ContainerHostEntity containerHost ) throws PeerException
     {
 
         ResourceHost resourceHost = getResourceHostById( resourceHostId );
@@ -821,7 +823,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected void buildEnvContainerRelation( final ContainerHostEntity containerHost )
+    private void buildEnvContainerRelation( final ContainerHostEntity containerHost )
     {
 
 
@@ -839,7 +841,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         RelationLink source;
         User activeUser = identityManager.getActiveUser();
-        if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+        if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
         {
             // Most probably it is remote container, so owner will be localPeer
             source = this;
@@ -892,14 +894,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         if ( source == null )
         {
             LOG.debug( "Source is null" );
-        }
-        if ( containerHost == null )
-        {
-            LOG.debug( "containerHost is null" );
-        }
-        if ( envLink == null )
-        {
-            LOG.debug( "envLink is null" );
         }
 
 
@@ -1204,7 +1198,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    public void addResourceHost( final ResourceHost host )
+    void addResourceHost( final ResourceHost host )
     {
         Preconditions.checkNotNull( host, "Resource host could not be null." );
 
@@ -1339,7 +1333,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected <T, V> V sendRequestInternal( final T request, final String recipient, final Class<V> responseType )
+    <T, V> V sendRequestInternal( final T request, final String recipient, final Class<V> responseType )
             throws PeerException
     {
         Preconditions.checkNotNull( request, "Invalid request" );
@@ -1491,6 +1485,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception
     {
         RegistrationManager registrationManager = ServiceLocator.getServiceNoCache( RegistrationManager.class );
+
+        Preconditions.checkNotNull( registrationManager );
 
         String token = registrationManager.generateContainerTTLToken( 30 * 1000L ).getToken();
 
@@ -1839,6 +1835,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         buildRelation( envLink );
     }
 
+
     private void buildRelation( final RelationLink envLink )
     {
         try
@@ -1846,7 +1843,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             RelationLink source;
             String keyId;
             User activeUser = identityManager.getActiveUser();
-            if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+            if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
             {
                 // Most probably it is cross peer environment
                 source = this;
@@ -1857,7 +1854,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 source = identityManager.getUserDelegate( activeUser.getId() );
                 keyId = activeUser.getSecurityKeyId();
-                LOG.debug("Extracting delegated user");
+                LOG.debug( "Extracting delegated user" );
             }
 
             // User           - Delegated user - Environment
@@ -2513,7 +2510,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected NetworkManager getNetworkManager()
+    private NetworkManager getNetworkManager()
     {
 
         return serviceLocator.getService( NetworkManager.class );
@@ -2568,7 +2565,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected Set<String> getInvolvedPeers()
+    private Set<String> getInvolvedPeers()
     {
         final Set<String> result = new HashSet<>();
         for ( ResourceHost resourceHost : getResourceHosts() )
@@ -2582,7 +2579,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    protected Set<String> getNotRegisteredPeers( Set<String> peers )
+    private Set<String> getNotRegisteredPeers( Set<String> peers )
     {
         final Set<String> result = new HashSet<>();
         PeerManager peerManager = getPeerManager();
