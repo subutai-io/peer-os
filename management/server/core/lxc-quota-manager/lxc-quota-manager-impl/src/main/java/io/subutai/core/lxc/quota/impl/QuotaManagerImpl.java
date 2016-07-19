@@ -309,6 +309,7 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
+        //todo use batch instead of separate commands io.subutai.core.localpeer.impl.ResourceHostCommands.getSetQuotaCommand()
         for ( Quota quota : containerQuota.getAll() )
         {
             final Integer threshold = quota.getThreshold();
