@@ -13,6 +13,7 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 		getEnvironments: getEnvironments,
 		getResourceHosts: getResourceHosts,
 		getInfo: getInfo,
+		getP2Pstatus: getP2Pstatus,
 	};
 
 	return monitoringSrv;
@@ -23,6 +24,13 @@ function monitoringSrv($http, environmentService, peerRegistrationService) {
 
 	function getResourceHosts() {
 		return peerRegistrationService.getResourceHosts();
+	}
+
+	function getP2Pstatus() {
+		return $http.get(
+			BASE_URL + 'p2p/status',
+			{withCredentials: true, headers: {'Content-Type': 'application/json'}}
+		);
 	}
 
 	function getInfo(environmentId, hostId, period) {

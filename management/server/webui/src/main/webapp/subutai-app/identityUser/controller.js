@@ -147,7 +147,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 			vm.user2Add.roles = [];
 			for(var i = 0; i < vm.currentUserRoles.length; i++) {
 				vm.user2Add.roles.push(vm.currentUserRoles[i].id);
-			}			
+			}
 		} else {
 			vm.editUser = false;
 			vm.loginPatern = '(?=^.{4,}$)(^(?!(admin|sys|token)).*)';

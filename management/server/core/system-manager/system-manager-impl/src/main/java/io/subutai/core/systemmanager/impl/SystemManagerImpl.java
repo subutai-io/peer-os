@@ -11,6 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.configuration.ConfigurationException;
 
 import io.subutai.common.command.CommandException;
@@ -22,7 +25,6 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.settings.SettingsListener;
 import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
-import io.subutai.core.hubmanager.api.HubManager;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.kurjun.api.KurjunTransferQuota;
@@ -39,17 +41,15 @@ import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
-import io.subutai.hub.share.dto.SystemConfDto;
-import io.subutai.hub.share.dto.SystemConfigurationType;
 
 
 public class SystemManagerImpl implements SystemManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger( SystemManagerImpl.class );
 
     private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
-    private HubManager hubManager;
 
     protected Set<SettingsListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SettingsListener, Boolean>() );
@@ -105,10 +105,9 @@ public class SystemManagerImpl implements SystemManager
     }
 
 
-    public SystemManagerImpl( final HubManager hubManager )
-
+    public SystemManagerImpl()
     {
-        this.hubManager = hubManager;
+
     }
 
 
@@ -199,23 +198,29 @@ public class SystemManagerImpl implements SystemManager
 
 
     @Override
-    public void setNetworkSettings( final String securePortX1, final String securePortX2, final String publicUrl,
-                                    final String agentPort, final String publicSecurePort, final String keyServer )
-            throws ConfigurationException
+    public NetworkSettings getNetworkSettings() throws ConfigurationException
     {
-        SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-        SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-        SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
-        SystemSettings.setKeyServer( keyServer );
+        NetworkSettings pojo = new NetworkSettingsPojo();
 
-        notifyListeners();
+        pojo.setPublicUrl( SystemSettings.getPublicUrl() );
+        pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+        pojo.setStartRange( SystemSettings.getP2pPortStartRange() );
+        pojo.setEndRange( SystemSettings.getP2pPortEndRange() );
+
+        return pojo;
+    }
+
+
+    @Override
+    public void setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
+                                    final String endRange ) throws ConfigurationException
+    {
         try
         {
-            SystemSettings.setSecurePortX1( Integer.parseInt( securePortX1 ) );
-            SystemSettings.setSecurePortX2( Integer.parseInt( securePortX2 ) );
-            SystemSettings.setAgentPort( Integer.parseInt( agentPort ) );
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
                     Integer.parseInt( publicSecurePort ) );
+
+            SystemSettings.setP2pPortRange( Integer.parseInt( startRange ), Integer.parseInt( endRange ) );
         }
         catch ( Exception e )
         {
@@ -271,28 +276,6 @@ public class SystemManagerImpl implements SystemManager
         boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
 
         return isPublicQuotaSaved && isTrustQuotaSaved;
-    }
-
-
-    @Override
-    public void sendSystemConfigToHub() throws ConfigurationException
-    {
-        SystemConfDto dto = new SystemConfDto( SystemConfigurationType.SUBUTAI_SOCIAL );
-
-        KurjunSettings kurjunSettings = getKurjunSettings();
-        NetworkSettings networkSettings = getNetworkSettings();
-
-        dto.setGlobalKurjunUrls( kurjunSettings.getGlobalKurjunUrls() );
-        dto.setLocalKurjunUrls( kurjunSettings.getLocalKurjunUrls() );
-        dto.setSecurePortX1( networkSettings.getSecurePortX1() );
-        dto.setSecurePortX2( networkSettings.getSecurePortX2() );
-        dto.setPublicSecurePort( networkSettings.getPublicSecurePort() );
-        dto.setPublicUrl( networkSettings.getPublicUrl() );
-        dto.setAgentPort( networkSettings.getAgentPort() );
-        dto.setKeyServer( networkSettings.getKeyServer() );
-
-
-        hubManager.sendSystemConfiguration( dto );
     }
 
 
@@ -355,21 +338,6 @@ public class SystemManagerImpl implements SystemManager
             e.printStackTrace();
             return false;
         }
-    }
-
-
-    @Override
-    public NetworkSettings getNetworkSettings() throws ConfigurationException
-    {
-        NetworkSettings pojo = new NetworkSettingsPojo();
-
-        pojo.setSecurePortX1( SystemSettings.getSecurePortX1() );
-        pojo.setSecurePortX2( SystemSettings.getSecurePortX2() );
-        pojo.setPublicUrl( SystemSettings.getPublicUrl() );
-        pojo.setAgentPort( SystemSettings.getAgentPort() );
-        pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-        pojo.setKeyServer( SystemSettings.getKeyServer() );
-        return pojo;
     }
 
 

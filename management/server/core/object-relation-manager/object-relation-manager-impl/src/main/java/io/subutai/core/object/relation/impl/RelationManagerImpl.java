@@ -16,7 +16,6 @@ import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.security.relation.model.Relation;
-import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
@@ -124,13 +123,6 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public RelationInfo createTrustRelationship( final RelationInfoMeta relationInfoMeta )
-    {
-        return new RelationInfoImpl( relationInfoMeta );
-    }
-
-
-    @Override
     public Relation buildRelation( final RelationInfoMeta relationInfoMeta, final RelationMeta relationMeta )
     {
         RelationInfoImpl relationInfo = new RelationInfoImpl( relationInfoMeta );
@@ -179,21 +171,6 @@ public class RelationManagerImpl implements RelationManager
 
 
     @Override
-    public Relation buildTrustRelation( final RelationInfo relationInfo, final RelationMeta relationMeta )
-    {
-        //TODO try to pass interface as is
-        RelationImpl relation =
-                new RelationImpl( relationMeta.getSource(), relationMeta.getTarget(), relationMeta.getObject(),
-                        ( RelationInfoImpl ) relationInfo, relationMeta.getKeyId() );
-
-        saveRelation( relation );
-
-        return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
-                relationMeta.getObject() );
-    }
-
-
-    @Override
     public Relation getRelation( final RelationMeta relationMeta )
     {
         return relationDataService.findBySourceTargetObject( relationMeta.getSource(), relationMeta.getTarget(),
@@ -206,8 +183,8 @@ public class RelationManagerImpl implements RelationManager
     {
         //TODO check if relation valid otherwise break relation build
 
-        relationDataService.updateBatch( Sets.<Object>newHashSet( relation.getSource(), relation.getTarget(),
-                relation.getTrustedObject() ) );
+        relationDataService.updateBatch(
+                Sets.<Object>newHashSet( relation.getSource(), relation.getTarget(), relation.getTrustedObject() ) );
         relationDataService.update( relation );
     }
 

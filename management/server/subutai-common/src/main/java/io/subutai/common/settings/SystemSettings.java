@@ -10,20 +10,22 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.ServiceLocator;
 
 
 public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
-    public static final String DEFAULT_KEY_SERVER = "https://localhost:8443/rest/v1/pks";
-    public static final String DEFAULT_PUBLIC_URL = "https://127.0.0.1:8443";
-    public static final int DEFAULT_PUBLIC_PORT = 8443;
-    public static final int DEFAULT_PUBLIC_SECURE_PORT = 8444;
-    public static final int DEFAULT_AGENT_PORT = 7070;
+
     public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
     public static final String DEFAULT_LOCAL_KURJUN_REPO = "http://localhost:8081/kurjun";
+    public static final int DEFAULT_P2P_PORT_START_RANGE = 0;
+    public static final int DEFAULT_P2P_PORT_END_RANGE = 65535;
+
 
     private static PropertiesConfiguration PROPERTIES = null;
     private static String[] GLOBAL_KURJUN_URLS = null;
@@ -106,7 +108,6 @@ public class SystemSettings
     }
 
 
-
     private static void loadGlobalKurjunUrls() throws ConfigurationException
     {
         String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
@@ -120,54 +121,6 @@ public class SystemSettings
 
 
     // Network Settings
-
-
-    public static String getKeyServer()
-    {
-        return PROPERTIES.getString( "keyServer", DEFAULT_KEY_SERVER );
-    }
-
-
-    public static void setKeyServer( String keyServer )
-    {
-        saveProperty( "keyServer", keyServer );
-    }
-
-
-    public static int getSecurePortX1()
-    {
-        return PROPERTIES.getInt( "securePortX1", DEFAULT_PUBLIC_PORT );
-    }
-
-
-    public static int getSecurePortX2()
-    {
-        return PROPERTIES.getInt( "securePortX2", DEFAULT_PUBLIC_SECURE_PORT );
-    }
-
-
-    public static int getAgentPort()
-    {
-        return PROPERTIES.getInt( "agentPort", DEFAULT_AGENT_PORT );
-    }
-
-
-    public static void setSecurePortX1( int securePortX1 )
-    {
-        saveProperty( "securePortX1", securePortX1 );
-    }
-
-
-    public static void setSecurePortX2( int securePortX2 )
-    {
-        saveProperty( "securePortX2", securePortX2 );
-    }
-
-
-    public static void setAgentPort( int agentPort )
-    {
-        saveProperty( "agentPort", agentPort );
-    }
 
 
     // Peer Settings
@@ -188,7 +141,7 @@ public class SystemSettings
         }
         else
         {
-            return SystemSettings.DEFAULT_PUBLIC_URL;
+            return Common.DEFAULT_PUBLIC_URL;
         }
     }
 
@@ -202,7 +155,7 @@ public class SystemSettings
         }
         else
         {
-            return SystemSettings.DEFAULT_PUBLIC_SECURE_PORT;
+            return Common.DEFAULT_PUBLIC_SECURE_PORT;
         }
     }
 
@@ -218,6 +171,31 @@ public class SystemSettings
         {
             LOG.error( "Error in saving subutaisettings.cfg file.", e );
         }
+    }
+
+
+    public static int getP2pPortStartRange()
+    {
+        return PROPERTIES.getInt( "p2pPortStartRange", DEFAULT_P2P_PORT_START_RANGE );
+    }
+
+
+    public static int getP2pPortEndRange()
+    {
+        return PROPERTIES.getInt( "p2pPortEndRange", DEFAULT_P2P_PORT_END_RANGE );
+    }
+
+
+    public static void setP2pPortRange( final int p2pPortStartRange, final int p2pPortEndRange )
+    {
+        Preconditions.checkArgument(
+                NumUtil.isIntBetween( p2pPortStartRange, DEFAULT_P2P_PORT_START_RANGE, DEFAULT_P2P_PORT_END_RANGE ) );
+        Preconditions.checkArgument(
+                NumUtil.isIntBetween( p2pPortStartRange, DEFAULT_P2P_PORT_START_RANGE, DEFAULT_P2P_PORT_END_RANGE ) );
+        Preconditions.checkArgument( p2pPortEndRange > p2pPortStartRange );
+
+        saveProperty( "p2pPortStartRange", p2pPortStartRange );
+        saveProperty( "p2pPortEndRange", p2pPortEndRange );
     }
 }
 

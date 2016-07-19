@@ -9,7 +9,9 @@
             http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0"
 >
 
+  <!-- ***************************************************************** -->
   <authz:enable />
+  <!-- ***************************************************************** -->
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="test/error">

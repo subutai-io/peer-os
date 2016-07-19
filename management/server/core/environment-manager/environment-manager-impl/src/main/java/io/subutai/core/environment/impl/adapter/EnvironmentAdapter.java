@@ -276,4 +276,9 @@ public class EnvironmentAdapter
     {
         hubAdapter.onContainerStop( envId, contId );
     }
+
+    public HubAdapter getHubAdapter()
+    {
+        return hubAdapter;
+    }
 }

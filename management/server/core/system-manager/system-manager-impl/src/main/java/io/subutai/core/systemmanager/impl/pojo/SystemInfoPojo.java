@@ -3,6 +3,8 @@ package io.subutai.core.systemmanager.impl.pojo;
 
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
+import java.util.Map;
+
 
 public class SystemInfoPojo implements SystemInfo
 {

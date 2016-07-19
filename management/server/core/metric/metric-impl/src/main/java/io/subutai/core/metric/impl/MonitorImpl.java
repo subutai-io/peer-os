@@ -1,6 +1,7 @@
 package io.subutai.core.metric.impl;
 
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,14 +16,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
+import io.subutai.common.util.RestUtil;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.time.DateUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.gson.JsonSyntaxException;
 
 import io.subutai.common.command.CommandException;
@@ -48,13 +56,20 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.MonitorException;
+import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
+
+import javax.ws.rs.core.Response;
+
+import static java.awt.SystemColor.info;
 
 
 /**
@@ -475,5 +490,127 @@ public class MonitorImpl implements Monitor, HostListener
     public void putAlert( final Alert alert )
     {
         queueAlertResource( alert );
+    }
+
+
+    @Override
+    public List<P2Pinfo> getP2PStatus()
+    {
+        List<P2Pinfo> pojos = Lists.newArrayList();
+
+        for ( final ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
+        {
+            P2Pinfo info = new P2PInfoPojo();
+
+            try
+            {
+                List<String> statusLines = Lists.newArrayList();
+
+                String status = resourceHost.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+
+                String lines[] = status.split( "\\r?\\n" );
+
+                for ( final String line : lines )
+                {
+                    String[] part = line.split( Pattern.quote( "|" ) );
+
+                    if ( part.length > 2 )
+                    {
+                        statusLines.add( line );
+                    }
+                }
+
+                int errors = 0;
+
+                List<String> stateList = Lists.newArrayList();
+                List<String> errorList = Lists.newArrayList();
+
+                for ( final String statusLine : statusLines )
+                {
+                    if ( statusLine.contains( "LastError" ) )
+                    {
+                        String[] part = statusLine.split( Pattern.quote( "|" ) );
+
+                        for ( final String s : part )
+                        {
+                            if ( s.contains( "State:" ) )
+                            {
+                                String state = s.replace( "State:", "" ).trim();
+                                stateList.add( state );
+                            }
+                            if ( s.contains( "LastError:" ) )
+                            {
+                                String error = s.replace( "LastError:", "" ).trim();
+                                errorList.add(  String.format( "%s (%s) - %s" , error, part[0], part[1] ));
+                            }
+                        }
+                        errors++;
+                    }
+                }
+
+                if ( errors > 0 && errors == statusLines.size() )
+                {
+                    info.setP2pStatus( 2 );
+                }
+                else if ( errors == 0 )
+                {
+                    info.setP2pStatus( 0 );
+                }
+                else if ( errors > 0 && errors < statusLines.size() )
+                {
+                    info.setP2pStatus( 1 );
+                }
+
+                info.setRhId( resourceHost.getId() );
+
+                info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
+                info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
+                info.setState( stateList );
+                info.setP2pErrorLogs( errorList );
+
+
+                WebClient client = RestUtil.createTrustedWebClient( "https://hub.subut.ai:443/rest/v1/system/versions/range" );
+                Response response = client.get();
+
+                if ( response.getStatus() == Response.Status.OK.getStatusCode() )
+                {
+                    try
+                    {
+                        String output = response.readEntity(String.class);
+
+                        JSONArray entities = new JSONArray(output);
+
+
+                        for (int i = 0; i < entities.length(); i++) {
+                            if( entities.getJSONObject(i).get("key").equals("P2P") )
+                            {
+                                info.setP2pVersionCheck( entities.getJSONObject(i).getString("rangeFrom"),
+                                        entities.getJSONObject(i).getString("rangeTo") );
+                            }
+
+                            if( entities.getJSONObject(i).get("key").equals("RESOURCE_HOST") )
+                            {
+                                info.setRhVersionCheck( entities.getJSONObject(i).getString("rangeFrom"),
+                                        entities.getJSONObject(i).getString("rangeTo") );
+                            }
+                        }
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                pojos.add( info );
+            }
+            catch ( CommandException | ResourceHostException e )
+            {
+                e.printStackTrace();
+                LOG.error( "Error while getting RH version and P2P status. Seems RH is not connected." );
+                info.setRhVersion( "No RH connected" );
+            }
+        }
+
+        return pojos;
     }
 }
