@@ -147,8 +147,6 @@ public class RestServiceImpl implements RestService
         try
         {
             systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ), localKurjunUrls.split( "," ) );
-
-            systemManager.sendSystemConfigToHub();
         }
         catch ( ConfigurationException e )
         {
@@ -182,17 +180,12 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response setNetworkSettings( final String securePortX1, final String securePortX2, final String securePortX3,
-                                        final String publicUrl, final String agentPort, final String publicSecurePort,
-                                        final String keyServer )
+    public Response setNetworkSettings( final String publicUrl, final String publicSecurePort, final String startRange,
+                                        final String endRange )
     {
-        //todo remove securePortX3
         try
         {
-            systemManager.setNetworkSettings( securePortX1, securePortX2, publicUrl, agentPort, publicSecurePort,
-                    keyServer );
-
-            systemManager.sendSystemConfigToHub();
+            systemManager.setNetworkSettings( publicUrl, publicSecurePort, startRange, endRange );
         }
         catch ( ConfigurationException e )
         {

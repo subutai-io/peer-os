@@ -13,9 +13,9 @@ import com.google.common.base.Strings;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.PeerException;
@@ -24,6 +24,7 @@ import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.NumUtil;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -65,7 +66,9 @@ public class NetworkManagerImpl implements NetworkManager
 
 
         execute( host, commands.getJoinP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
-                getUnixTimestampOffset( secretKeyTtlSec ) ) );
+                getUnixTimestampOffset( secretKeyTtlSec ),
+                String.format( "%d-%d", SystemSettings.getP2pPortStartRange(),
+                        SystemSettings.getP2pPortEndRange() ) ) );
     }
 
 
@@ -314,8 +317,8 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkArgument( sshIdleTimeout > 0, "Timeout must be greater than 0" );
         Preconditions.checkArgument( containerIp.matches( Common.HOSTNAME_REGEX ), "Invalid container IP" );
 
-        CommandResult result =
-                execute( getManagementHost(), commands.getSetupContainerSshTunnelCommand( containerIp, sshIdleTimeout ) );
+        CommandResult result = execute( getManagementHost(),
+                commands.getSetupContainerSshTunnelCommand( containerIp, sshIdleTimeout ) );
 
         try
         {

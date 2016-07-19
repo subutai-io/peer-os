@@ -2,12 +2,16 @@ package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang3.time.DateUtils;
 
+import com.google.common.collect.Lists;
+
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
@@ -17,6 +21,8 @@ import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.metric.api.Monitor;
+import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.hub.share.dto.P2PDto;
 import io.subutai.hub.share.dto.ResourceHostMetricDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 
@@ -38,7 +44,8 @@ public class ResourceHostDataProcessor implements Runnable
     private Date p2pLogsEndDate;
 
 
-    public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor, HubRestClient restClient )
+    public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
+                                      HubRestClient restClient )
     {
         this.hubManager = hubManager;
         this.localPeer = localPeer;
@@ -160,9 +167,7 @@ public class ResourceHostDataProcessor implements Runnable
     {
         Date currentDate = new Date();
 
-        Date startDate = p2pLogsEndDate != null
-                         ? p2pLogsEndDate
-                         : DateUtils.addMinutes( currentDate, -15 );
+        Date startDate = p2pLogsEndDate != null ? p2pLogsEndDate : DateUtils.addMinutes( currentDate, -15 );
 
         p2pLogsEndDate = currentDate;
 
@@ -186,9 +191,26 @@ public class ResourceHostDataProcessor implements Runnable
 
         P2pLogs p2pLogs = rh.getP2pLogs( JournalCtlLevel.ERROR, startDate, endDate );
 
+        String p2pStatus = rh.execute( new RequestBuilder( "p2p status" ) ).getStdOut();
+
+        List<P2PDto> p2pList = Lists.newArrayList();
+
+        for ( final P2Pinfo info : monitor.getP2PStatus() )
+        {
+            P2PDto dto = new P2PDto();
+            dto.setRhId( info.getRhId() );
+            dto.setRhVersion( info.getRhVersion() );
+            dto.setP2pVersion( info.getP2pVersion() );
+            dto.setP2pStatus( info.getP2pStatus() );
+            dto.setState( info.getState() );
+            dto.setP2pErrorLogs( info.getP2pErrorLogs() );
+
+            p2pList.add( dto );
+        }
+
         log.info( "logs.size: {}", p2pLogs.getLogs().size() );
 
-        if ( p2pLogs.isEmpty() )
+        if ( p2pLogs.isEmpty() && p2pStatus == null )
         {
             return;
         }
@@ -196,8 +218,10 @@ public class ResourceHostDataProcessor implements Runnable
         SystemLogsDto logsDto = new SystemLogsDto();
 
         logsDto.setLogs( p2pLogs.getLogs() );
+        logsDto.setStatus( p2pStatus );
+        logsDto.setP2PInfo( p2pList );
 
-        log.info( "Sending p2p logs to Hub..." );
+        log.info( "Sending p2p logs and status to Hub..." );
 
         String path = format( "/rest/v1/peers/%s/resource-hosts/%s/system-logs", localPeer.getId(), rh.getId() );
 

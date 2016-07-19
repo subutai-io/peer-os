@@ -120,6 +120,10 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 			$('.js-karaflogs-load-screen').hide();
 			vm.config = data;
 			vm.karafLogs = getFilteredLogs(data.karafLogs);
+			setTimeout(function() {
+				var codeBlock = document.getElementById('js-highlight-block');
+				codeBlock.scrollTop = codeBlock.scrollHeight;
+			}, 300);
 		}).error(function(error){
 			SweetAlert.swal("ERROR!", error, "error");
 			$('.js-karaflogs-load-screen').hide();
@@ -141,10 +145,17 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 		saveAs(blob, "karaflogs" + moment().format('YYYY-MM-DD HH:mm:ss') + ".txt");
 	}
 
+	var tagsToReplace = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;'
+	};
+
+	function replaceTag(tag) {
+		return tagsToReplace[tag] || tag;
+	}
+
 	function renderHtml(html_code) {
-		//initHighlighting();
-		var codeBlock = document.getElementById('js-highlight-block');
-		codeBlock.scrollTop = codeBlock.scrollHeight;
 		return $sce.trustAsHtml(html_code);
 	}
 
@@ -153,6 +164,7 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	}
 
 	function getFilteredLogs(html_code) {
+		html_code = html_code.replace(/[&<>]/g, replaceTag);
 		if(html_code && html_code.length > 0) {
 			var html_code_array = html_code.match(/[^\r\n]+/g);
 			var temp = false;
@@ -199,13 +211,5 @@ function SettingsAdvancedCtrl($scope, SettingsAdvancedSrv, SweetAlert, $sce, cfp
 	function parseDate(str) {
 		var m = str.match(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9].*/);
 		return (m) ? true : false;
-	}
-
-	function initHighlighting() {
-		$('pre code').each(function(i, block) {
-			hljs.highlightBlock(block);
-		});
-		var codeBlock = document.getElementById('js-highlight-block');
-		codeBlock.scrollTop = codeBlock.scrollHeight;
 	}
 }

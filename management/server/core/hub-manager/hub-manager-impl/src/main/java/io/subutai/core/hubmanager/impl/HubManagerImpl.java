@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -57,6 +58,7 @@ import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
+import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelEventProcessor;
 import io.subutai.core.hubmanager.impl.tunnel.TunnelProcessor;
 import io.subutai.core.identity.api.IdentityManager;
@@ -92,6 +94,10 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService containerEventExecutor = Executors.newSingleThreadScheduledExecutor();
 
+    private final ScheduledExecutorService environmentTelemetryService = Executors.newSingleThreadScheduledExecutor();
+
+    private final ScheduledExecutorService versionEventExecutor = Executors.newSingleThreadScheduledExecutor();
+
     private final ScheduledExecutorService tunnelEventService = Executors.newSingleThreadScheduledExecutor();
 
     private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
@@ -121,6 +127,8 @@ public class HubManagerImpl implements HubManager
     private ResourceHostDataProcessor resourceHostDataProcessor;
 
     private ContainerEventProcessor containerEventProcessor;
+
+    private VersionInfoProcessor versionInfoProcessor;
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
@@ -182,8 +190,7 @@ public class HubManagerImpl implements HubManager
 
             containerEventProcessor = new ContainerEventProcessor( this, configManager, peerManager );
 
-            containerEventExecutor
-                    .scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
+            containerEventExecutor.scheduleWithFixedDelay( containerEventProcessor, 30, 300, TimeUnit.SECONDS );
 
             HubLoggerProcessor hubLoggerProcessor = new HubLoggerProcessor( configManager, this );
 
@@ -192,6 +199,16 @@ public class HubManagerImpl implements HubManager
             TunnelEventProcessor tunnelEventProcessor = new TunnelEventProcessor( this, peerManager, configManager );
 
             tunnelEventService.scheduleWithFixedDelay( tunnelEventProcessor, 20, 300, TimeUnit.SECONDS );
+
+            VersionInfoProcessor versionInfoProcessor = new VersionInfoProcessor( this, peerManager, configManager );
+
+            versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
+
+            EnvironmentTelemetryProcessor environmentTelemetryProcessor =
+                    new EnvironmentTelemetryProcessor( this, peerManager, configManager );
+
+            environmentTelemetryService
+                    .scheduleWithFixedDelay( environmentTelemetryProcessor, 20, 1800, TimeUnit.SECONDS );
 
             this.sumChecker.scheduleWithFixedDelay( new Runnable()
             {
@@ -232,13 +249,18 @@ public class HubManagerImpl implements HubManager
         AppScaleProcessor appScaleProcessor =
                 new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
+        EnvironmentTelemetryProcessor environmentTelemetryProcessor =
+                new EnvironmentTelemetryProcessor( this, peerManager, configManager );
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
                                                                              .addProcessor( hubEnvironmentProcessor )
                                                                              .addProcessor( systemConfProcessor )
                                                                              .addProcessor( productProcessor )
                                                                              .addProcessor( vehsProccessor )
-                                                                             .addProcessor( appScaleProcessor );
+                                                                             .addProcessor( appScaleProcessor )
+                                                                             .addProcessor(
+                                                                                     environmentTelemetryProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -293,6 +315,7 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws Exception
     {
@@ -303,6 +326,8 @@ public class HubManagerImpl implements HubManager
         generateChecksum();
 
         notifyRegistrationListeners();
+
+        sendResourceHostInfo();
     }
 
 
@@ -336,6 +361,7 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void unregisterPeer() throws Exception
     {
@@ -448,10 +474,11 @@ public class HubManagerImpl implements HubManager
         {
             throw new Exception( "Could not install plugin", e );
         }*/
-        WebClient webClient = RestUtil.createTrustedWebClient(url);
+        WebClient webClient = RestUtil.createTrustedWebClient( url );
         File product = webClient.get( File.class );
         InputStream initialStream = FileUtils.openInputStream( product );
-        File targetFile = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
+        File targetFile =
+                new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
         FileUtils.copyInputStreamToFile( initialStream, targetFile );
         initialStream.close();
 

@@ -1,0 +1,88 @@
+<div class="b-workspace-content__row">
+
+  <div class="g-margin-bottom">
+    <div class="b-main-table-border b-table-col_2">
+      <table class="b-main-table b-main-table_with-header" align="center">
+        <tr>
+          <th>P2P statuses</th>
+          <td>Count</td>
+        </tr>
+        <tr>
+          <th style="color: {{ aboutCtrl.statusColors[0].color }}">Healthy</th>
+          <td>{{ aboutCtrl.statusTable.p2pStatuses.healthy }}</td>
+        </tr>
+        <tr>
+          <th style="color: {{ aboutCtrl.statusColors[1].color }}">Problems</th>
+          <td>{{ aboutCtrl.statusTable.p2pStatuses.problems }}</td>
+        </tr>
+        <tr>
+          <th style="color: {{ aboutCtrl.statusColors[2].color }}">Not Work</th>
+          <td>{{ aboutCtrl.statusTable.p2pStatuses.notWork }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="b-main-table-border b-table-col_2">
+      <table class="b-main-table b-main-table_with-header" align="center">
+        <tr>
+          <th>P2P updates</th>
+          <td>Count</td>
+        </tr>
+        <tr>
+          <th style="color: {{ aboutCtrl.statusColors[0].color }}">Updated</th>
+          <td>{{ aboutCtrl.statusTable.p2pUpdates.updated }}</td>
+        </tr>
+        <tr>
+          <th style="color: {{ aboutCtrl.statusColors[1].color }}">Normal</th>
+          <td>{{ aboutCtrl.statusTable.p2pUpdates.normal }}</td>
+        </tr>
+        <tr>
+          <th style="color: {{ aboutCtrl.statusColors[2].color }}">Need update</th>
+          <td>{{ aboutCtrl.statusTable.p2pUpdates.needUpdate }}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="clear"></div>
+  </div>
+
+  <div class="b-main-table-border">
+    <table class="b-main-table">
+      <tr>
+        <th>Recource host</th>
+        <th>RH version</th>
+        <th>P2P version</th>
+        <th>P2P status</th>
+        <th>P2P error</th>
+      </tr>
+      <tr ng-repeat="(rhName, rh) in aboutCtrl.info.peerP2PVersions">
+        <td>{{ rhName }}</td>
+        <td>
+					<span
+              class="b-pointer-obj"
+              style="color: {{ aboutCtrl.statusColors[rh.rhVersionCheck].color }}"
+              tooltips
+              tooltip-template="{{ aboutCtrl.statusColors[rh.rhVersionCheck].text }}">
+						{{ rh.rhVersion }}
+					</span>
+        </td>
+        <td>
+					<span
+              class="b-pointer-obj"
+              style="color: {{ aboutCtrl.statusColors[rh.p2pVersionCheck].color }}"
+              tooltips
+              tooltip-template="{{ aboutCtrl.statusColors[rh.p2pVersionCheck].text }}">
+						{{ rh.p2pVersion }}
+					</span>
+        </td>
+        <td style="text-align: center;">
+          <div class="b-status-icon b-status-icon_{{ aboutCtrl.statusColors[rh.p2pStatus].status }}"
+               tooltips
+               tooltip-template="{{ aboutCtrl.statusColors[rh.p2pStatus].statusText }}"
+               tooltip-side="left">
+          </div>
+        </td>
+        <td>{{ rh.p2pErrorMessage }}</td>
+      </tr>
+    </table>
+  </div>
+</div>

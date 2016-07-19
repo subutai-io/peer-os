@@ -80,13 +80,10 @@ public interface RestService
     @POST
     @Path( "update_network_settings" )
     @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setNetworkSettings( @FormParam( "securePortX1" ) String securePortX1,
-                                        @FormParam( "securePortX2" ) String securePortX2,
-                                        @FormParam( "securePortX3" ) String securePortX3,
-                                        @FormParam( "publicUrl" ) String publicUrl,
-                                        @FormParam( "agentPort" ) String agentPort,
+    public Response setNetworkSettings( @FormParam( "publicUrl" ) String publicUrl,
                                         @FormParam( "publicSecurePort" ) String publicSecurePort,
-                                        @FormParam( "keyServer" ) String keyServer) throws ConfigurationException;
+                                        @FormParam( "startRange" ) String startRange,
+                                        @FormParam( "endRange" ) String endRange ) throws ConfigurationException;
 
     @GET
     @Path( "advanced_settings" )
@@ -104,6 +101,4 @@ public interface RestService
     @Path( "update_management" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response update();
-
-
 }

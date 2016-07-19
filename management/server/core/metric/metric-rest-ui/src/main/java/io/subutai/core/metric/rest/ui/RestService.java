@@ -14,7 +14,8 @@ public interface RestService
     @GET
     @Path( "{environment_id}/{host_id}/{interval}" )
     @Produces( { MediaType.APPLICATION_JSON } )
-    Response getMetrics( @PathParam( "environment_id" ) String environmentId, @PathParam( "host_id" ) String hostId, @PathParam( "interval" ) int interval );
+    Response getMetrics( @PathParam( "environment_id" ) String environmentId, @PathParam( "host_id" ) String hostId,
+                         @PathParam( "interval" ) int interval );
 
     @GET
     @Path( "{host_id}/{interval}" )
@@ -25,4 +26,9 @@ public interface RestService
     @Path( "{interval}" )
     @Produces( { MediaType.APPLICATION_JSON } )
     Response getMetrics( @PathParam( "interval" ) int interval );
+
+    @GET
+    @Path( "p2p/status" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response getP2PStatus();
 }
