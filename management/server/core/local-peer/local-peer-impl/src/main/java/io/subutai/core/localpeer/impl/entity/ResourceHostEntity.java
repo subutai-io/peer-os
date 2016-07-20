@@ -56,6 +56,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.QuotaException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
@@ -455,13 +456,11 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerSize );
 
-
-        //todo use io.subutai.core.lxc.quota.impl.QuotaManagerImpl.setQuota()
         try
         {
-            commandUtil.execute( resourceHostCommands.getSetQuotaCommand( containerHost.getHostname(), quota ), this );
+            getQuotaManager().setQuota( containerHost.getContainerId(), quota );
         }
-        catch ( CommandException e )
+        catch ( QuotaException e )
         {
             throw new ResourceHostException( String.format( "Error setting quota %s to container %s: %s", containerSize,
                     containerHost.getHostname(), e.getMessage() ), e );

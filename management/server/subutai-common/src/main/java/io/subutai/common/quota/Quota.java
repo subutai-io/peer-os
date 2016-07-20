@@ -4,7 +4,10 @@ package io.subutai.common.quota;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.resource.ContainerResourceType;
+import io.subutai.common.util.NumUtil;
 
 
 public class Quota
@@ -19,6 +22,10 @@ public class Quota
     public Quota( @JsonProperty( "resource" ) final ContainerResource resource,
                   @JsonProperty( "threshold" ) final Integer threshold )
     {
+        Preconditions.checkNotNull( resource );
+        Preconditions.checkNotNull( threshold );
+        Preconditions.checkArgument( NumUtil.isIntBetween( threshold, 0, 100 ) );
+
         this.resource = resource;
         this.threshold = threshold;
     }
