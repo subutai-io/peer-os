@@ -9,10 +9,12 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.command.CommandException;
+import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshKeys;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
@@ -60,10 +62,14 @@ public class ConfigureContainerStateHandler extends StateHandler
     public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws Exception
     {
         SshKeys sshKeys = new SshKeys();
+        String[] currentSshKeys = null;
+        boolean isSshKeysCleaned = false;
+
+        EnvironmentId envId = new EnvironmentId( envDto.getId() );
 
         if ( envDto != null )
         {
-            cleanSshKeys( envDto.getId() );
+            currentSshKeys = getCurrnetSshKeys( envDto.getId() );
         }
 
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
@@ -73,11 +79,12 @@ public class ConfigureContainerStateHandler extends StateHandler
                 if ( nodeDto.getSshKeys() != null )
                 {
                     sshKeys.addStringKeys( nodeDto.getSshKeys() );
+                    removeKeys( envId, nodeDto.getSshKeys(), currentSshKeys, isSshKeysCleaned );
                 }
             }
         }
 
-        ctx.localPeer.configureSshInEnvironment( new EnvironmentId( envDto.getId() ), sshKeys );
+        ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
 
         for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )
         {
@@ -88,21 +95,61 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    private void cleanSshKeys( String envId )
+    private void removeKeys( EnvironmentId envId, Set<String> sshKeys, String[] currentSshKeys,
+                             boolean isSshKeysCleaned )
+    {
+        if ( isSshKeysCleaned )
+        {
+            return;
+        }
+
+        for ( String sshKey : currentSshKeys )
+        {
+            if ( !sshKeys.contains( sshKey.trim() ) )
+            {
+                try
+                {
+                    ctx.localPeer.removeFromAuthorizedKeys( envId, sshKey );
+                }
+                catch ( PeerException e )
+                {
+                    log.error( e.getMessage() );
+                }
+            }
+        }
+
+        isSshKeysCleaned = true;
+    }
+
+
+    private String[] getCurrnetSshKeys( String envId )
     {
         Set<ContainerHost> containerHosts = ctx.localPeer.findContainersByEnvironmentId( envId );
+        String currentKeys = "";
 
         for ( ContainerHost containerHost : containerHosts )
         {
             try
             {
-                containerHost.execute( new RequestBuilder( "sudo truncate -s 0 /root/.ssh/authorized_keys" ) );
+                CommandResult result =
+                        containerHost.execute( new RequestBuilder( "sudo cat /root/.ssh/authorized_keys" ) );
+                if ( result.getExitCode() == 0 && !currentKeys.contains( result.getStdOut().trim() ) )
+                {
+                    currentKeys += result.getStdOut().trim();
+                }
             }
             catch ( CommandException e )
             {
                 log.error( e.getMessage() );
             }
         }
+
+        if ( !currentKeys.isEmpty() )
+        {
+            return currentKeys.split( System.getProperty( "line.separator" ) );
+        }
+
+        return new String[] {};
     }
 
 
