@@ -175,7 +175,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
 
-            localPeer.addSshKey( environmentId, sshPublicKey );
+            localPeer.addToAuthorizedKeys( environmentId, sshPublicKey );
         }
         catch ( Exception e )
         {
@@ -193,7 +193,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
 
-            localPeer.removeSshKey( environmentId, sshPublicKey );
+            localPeer.removeFromAuthorizedKeys( environmentId, sshPublicKey );
         }
         catch ( Exception e )
         {

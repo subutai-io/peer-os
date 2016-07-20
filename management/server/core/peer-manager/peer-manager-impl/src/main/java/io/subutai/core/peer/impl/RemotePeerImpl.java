@@ -341,7 +341,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    public void addToAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
@@ -374,7 +374,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    public void removeFromAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );

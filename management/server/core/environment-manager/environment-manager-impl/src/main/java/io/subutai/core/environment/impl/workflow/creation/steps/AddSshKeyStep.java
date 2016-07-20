@@ -47,7 +47,7 @@ public class AddSshKeyStep
                     @Override
                     public Object call() throws Exception
                     {
-                        peer.addSshKey( environment.getEnvironmentId(), sshKey );
+                        peer.addToAuthorizedKeys( environment.getEnvironmentId(), sshKey );
 
                         return null;
                     }
