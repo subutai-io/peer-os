@@ -455,6 +455,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         ContainerQuota quota = getQuotaManager().getDefaultContainerQuota( containerSize );
 
+
+        //todo use io.subutai.core.lxc.quota.impl.QuotaManagerImpl.setQuota()
         try
         {
             commandUtil.execute( resourceHostCommands.getSetQuotaCommand( containerHost.getHostname(), quota ), this );

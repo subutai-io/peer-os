@@ -25,7 +25,6 @@ import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 import static java.lang.String.format;
 
-
 public class RegistrationManager
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );

@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -248,7 +249,8 @@ public class HubManagerImpl implements HubManager
         AppScaleProcessor appScaleProcessor =
                 new AppScaleProcessor( configManager, new AppScaleManager( peerManager ) );
 
-        EnvironmentTelemetryProcessor environmentTelemetryProcessor = new EnvironmentTelemetryProcessor( this,peerManager,configManager );
+        EnvironmentTelemetryProcessor environmentTelemetryProcessor =
+                new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
@@ -257,7 +259,8 @@ public class HubManagerImpl implements HubManager
                                                                              .addProcessor( productProcessor )
                                                                              .addProcessor( vehsProccessor )
                                                                              .addProcessor( appScaleProcessor )
-                                                                             .addProcessor( environmentTelemetryProcessor );
+                                                                             .addProcessor(
+                                                                                     environmentTelemetryProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -312,6 +315,7 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void registerPeer( String hupIp, String email, String password ) throws Exception
     {
@@ -322,6 +326,8 @@ public class HubManagerImpl implements HubManager
         generateChecksum();
 
         notifyRegistrationListeners();
+
+        sendResourceHostInfo();
     }
 
 
@@ -355,6 +361,7 @@ public class HubManagerImpl implements HubManager
     }
 
 
+    @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
     public void unregisterPeer() throws Exception
     {

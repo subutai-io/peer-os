@@ -11,12 +11,15 @@ import (
 	"github.com/subutai-io/base/agent/log"
 )
 
-func Create(interfaceName, localPeepIPAddr, hash, key, ttl string) {
-	if localPeepIPAddr == "dhcp" {
-		log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "start", "-key", key, "-dev", interfaceName, "-ttl", ttl, "-hash", hash).Run())
-	} else {
-		log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", "start", "-key", key, "-dev", interfaceName, "-ip", localPeepIPAddr, "-ttl", ttl, "-hash", hash).Run())
+func Create(interfaceName, localPeepIPAddr, hash, key, ttl, portRange string) {
+	cmd := []string{"start", "-key", key, "-dev", interfaceName, "-ttl", ttl, "-hash", hash}
+	if localPeepIPAddr != "dhcp" {
+		cmd = append(cmd, "-ip", localPeepIPAddr)
 	}
+	if len(portRange) > 2 {
+		cmd = append(cmd, "-ports", localPeepIPAddr)
+	}
+	log.Check(log.FatalLevel, "Creating p2p interface", exec.Command("p2p", cmd...).Run())
 }
 
 func Remove(hash string) {

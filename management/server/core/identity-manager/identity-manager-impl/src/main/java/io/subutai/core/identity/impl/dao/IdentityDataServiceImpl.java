@@ -10,7 +10,6 @@ import io.subutai.common.dao.DaoManager;
 import io.subutai.core.identity.api.dao.IdentityDataService;
 import io.subutai.core.identity.api.model.Permission;
 import io.subutai.core.identity.api.model.Role;
-import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
 import io.subutai.core.identity.api.model.UserToken;
@@ -25,7 +24,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
 
     private UserDAO userDAOService = null;
     private RoleDAO roleDAOService = null;
-    private SessionDAO sessionDAOService = null;
     private PermissionDAO permissionDAOService = null;
     private UserTokenDAO userTokenDAOService = null;
     private UserDelegateDAO userDelegateDAOService = null;
@@ -40,10 +38,9 @@ public class IdentityDataServiceImpl implements IdentityDataService
         {
             userDAOService = new UserDAO( daoManager );
             roleDAOService = new RoleDAO( daoManager );
-            sessionDAOService = new SessionDAO( daoManager );
             permissionDAOService = new PermissionDAO( daoManager );
             userTokenDAOService = new UserTokenDAO( daoManager );
-            userDelegateDAOService = new UserDelegateDAO(daoManager);
+            userDelegateDAOService = new UserDelegateDAO( daoManager );
         }
         else
         {
@@ -70,6 +67,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     {
         return userDAOService.findByKeyId( keyId );
     }
+
 
     /* *************************************************
      *
@@ -98,7 +96,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public void assignUserRole( User user, Role role )
     {
-        if(user!=null)
+        if ( user != null )
         {
             user.getRoles().add( role );
             userDAOService.update( user );
@@ -123,7 +121,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public void removeUserRole( User user, Role role )
     {
-        if(user!=null)
+        if ( user != null )
         {
             user.getRoles().remove( role );
             userDAOService.update( user );
@@ -229,7 +227,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public void assignRolePermission( Role role, Permission permission )
     {
-        if(role != null)
+        if ( role != null )
         {
             role.getPermissions().add( permission );
             roleDAOService.update( role );
@@ -254,7 +252,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public void removeAllRolePermissions( Role role )
     {
-        if(role!=null)
+        if ( role != null )
         {
             role.getPermissions().clear();
             roleDAOService.update( role );
@@ -323,91 +321,11 @@ public class IdentityDataServiceImpl implements IdentityDataService
     @Override
     public void removeRolePermission( Role role, Permission permission )
     {
-        if(role != null)
+        if ( role != null )
         {
             role.getPermissions().remove( permission );
             roleDAOService.update( role );
         }
-    }
-
-
-    /* ******Session************************
-     *
-     */
-    @Override
-    public List<Session> getAllSessions()
-    {
-        return sessionDAOService.getAll();
-    }
-
-
-    /* *************************************************
-     *
-     */
-    @Override
-    public Session getSession( final long sessionId )
-    {
-        return sessionDAOService.find( sessionId );
-    }
-
-
-    /* *************************************************
-     *
-     */
-    @Override
-    public List<Session> getSessionsByUserId( final long userId )
-    {
-        return sessionDAOService.getByUserId( userId );
-    }
-
-
-    /* *************************************************
-     *
-     */
-    @Override
-    public Session getValidSession( final long userId )
-    {
-        return sessionDAOService.getValid( userId );
-    }
-
-
-    /* *************************************************
-     *
-     */
-    @Override
-    public void persistSession( final Session item )
-    {
-        sessionDAOService.persist( item );
-    }
-
-
-    /* *************************************************
-     *
-     */
-    @Override
-    public void removeSession( final long id )
-    {
-        sessionDAOService.remove( id );
-    }
-
-
-    /* *************************************************
-     *
-     */
-    @Override
-    public void updateSession( final Session item )
-    {
-        sessionDAOService.update( item );
-    }
-
-
-    /* *************************************************
-     *
-     */
-    @Override
-    public void invalidateSessions()
-    {
-        sessionDAOService.invalidate();
     }
 
 
@@ -455,7 +373,7 @@ public class IdentityDataServiceImpl implements IdentityDataService
      *
      */
     @Override
-    public UserToken getUserTokenByDetails( long userId , int tokenType )
+    public UserToken getUserTokenByDetails( long userId, int tokenType )
     {
         return userTokenDAOService.findByDetails( userId, tokenType );
     }
@@ -541,7 +459,6 @@ public class IdentityDataServiceImpl implements IdentityDataService
     }
 
 
-
     /* *************************************************
      *
      */
@@ -570,5 +487,4 @@ public class IdentityDataServiceImpl implements IdentityDataService
     {
         userDelegateDAOService.remove( id );
     }
-
 }

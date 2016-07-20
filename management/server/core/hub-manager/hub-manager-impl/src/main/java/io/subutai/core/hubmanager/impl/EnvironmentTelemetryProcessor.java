@@ -39,8 +39,7 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
 
     private static final String PING_COMMAND = "ping -c 5 -i 0.2 -w 5 %s";
     private static final String SSH_COMMAND = "ssh root@%s date";
-    private static final String PREPARE_FILE =
-            "MD5=`dd bs=1024 count=2 </dev/urandom | tee /tmp/tmpfile`";
+    private static final String PREPARE_FILE = "MD5=`dd bs=1024 count=2 </dev/urandom | tee /tmp/tmpfile`";
     private static final String SCP_FILE_COMMAND = "scp /tmp/tmpfile root@%s:/tmp";
     private static final String DELETE_PREPARED_FILE = "rm /tmp/tmpfile";
 
@@ -82,7 +81,13 @@ public class EnvironmentTelemetryProcessor implements Runnable, StateLinkProcess
         JSONObject result = new JSONObject();
         Set<ContainerHost> containerHosts = peerManager.getLocalPeer().findContainersByEnvironmentId( envId );
         EnvironmentDto environmentDto = getEnvironmentPeerDto( format( GET_ENV_CONTAINERS_URL, envId ), configManager );
+
         List<EnvironmentNodesDto> environmentNodeDtoList = environmentDto.getNodes();
+
+        if ( environmentNodeDtoList == null || environmentNodeDtoList.size() < 2 )
+        {
+            return result;
+        }
 
         for ( EnvironmentNodesDto environmentNodesDto : environmentNodeDtoList )
         {
