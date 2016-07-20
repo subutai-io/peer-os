@@ -2,12 +2,16 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
+import io.subutai.common.command.CommandException;
+import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.security.SshKeys;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
@@ -24,7 +28,7 @@ public class ConfigureContainerStateHandler extends StateHandler
 {
     public ConfigureContainerStateHandler( Context ctx )
     {
-        super( ctx, "Containers configuration");
+        super( ctx, "Containers configuration" );
     }
 
 
@@ -33,7 +37,8 @@ public class ConfigureContainerStateHandler extends StateHandler
     {
         logStart();
 
-        EnvironmentDto envDto = ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
+        EnvironmentDto envDto =
+                ctx.restClient.getStrict( path( "/rest/v1/environments/%s", peerDto ), EnvironmentDto.class );
 
         peerDto = configureSsh( peerDto, envDto );
 
@@ -55,6 +60,11 @@ public class ConfigureContainerStateHandler extends StateHandler
     public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws Exception
     {
         SshKeys sshKeys = new SshKeys();
+
+        if ( envDto != null )
+        {
+            cleanSshKeys( envDto.getId() );
+        }
 
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
@@ -78,6 +88,24 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
+    private void cleanSshKeys( String envId )
+    {
+        Set<ContainerHost> containerHosts = ctx.localPeer.findContainersByEnvironmentId( envId );
+
+        for ( ContainerHost containerHost : containerHosts )
+        {
+            try
+            {
+                containerHost.execute( new RequestBuilder( "sudo truncate -s 0 /root/.ssh/authorized_keys" ) );
+            }
+            catch ( CommandException e )
+            {
+                log.error( e.getMessage() );
+            }
+        }
+    }
+
+
     public void configureHosts( EnvironmentDto envDto ) throws Exception
     {
         log.info( "Configuring hosts:" );
@@ -90,7 +118,8 @@ public class ConfigureContainerStateHandler extends StateHandler
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
                 log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
-                        nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+                        nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(),
+                        nodeDto.getState() );
 
                 // Remove network mask "/24" in IP
                 String ip = StringUtils.substringBefore( nodeDto.getIp(), "/" );
@@ -99,6 +128,7 @@ public class ConfigureContainerStateHandler extends StateHandler
             }
         }
 
-        ctx.localPeer.configureHostsInEnvironment( new EnvironmentId( envDto.getId() ), new HostAddresses( hostAddresses ) );
+        ctx.localPeer
+                .configureHostsInEnvironment( new EnvironmentId( envDto.getId() ), new HostAddresses( hostAddresses ) );
     }
 }
