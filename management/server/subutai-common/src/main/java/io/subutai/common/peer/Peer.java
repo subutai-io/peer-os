@@ -264,9 +264,9 @@ public interface Peer extends RelationLink
 
     void configureSshInEnvironment( EnvironmentId environmentId, SshKeys sshKeys ) throws PeerException;
 
-    void removeSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+    void removeFromAuthorizedKeys( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
-    void addSshKey( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
+    void addToAuthorizedKeys( EnvironmentId environmentId, String sshPublicKey ) throws PeerException;
 
     void configureHostsInEnvironment( EnvironmentId environmentId, HostAddresses hostAddresses ) throws PeerException;
 

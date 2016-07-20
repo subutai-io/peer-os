@@ -3,6 +3,7 @@ package io.subutai.core.executor.rest;
 
 import java.util.Set;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -20,7 +21,6 @@ import io.subutai.core.executor.api.RestProcessor;
 import io.subutai.core.security.api.SecurityManager;
 
 
-//todo close the URLs for 8444 port only in AccessControlInterceptor
 public class RestServiceImpl implements RestService
 {
     private static final Logger LOG = LoggerFactory.getLogger( RestServiceImpl.class.getName() );
@@ -38,6 +38,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "Resource-Management|Write" )
     @Override
     public Response processHeartbeat( final String heartbeat )
     {
@@ -59,6 +60,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "Resource-Management|Write" )
     @Override
     public Response processResponse( final String response )
     {
@@ -82,6 +84,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "Resource-Management|Read" )
     @Override
     public Response getRequests( String hostId )
     {
@@ -110,6 +113,7 @@ public class RestServiceImpl implements RestService
     }
 
 
+    @RolesAllowed( "Resource-Management|Read" )
     @Override
     public Response check( final String hostId )
     {

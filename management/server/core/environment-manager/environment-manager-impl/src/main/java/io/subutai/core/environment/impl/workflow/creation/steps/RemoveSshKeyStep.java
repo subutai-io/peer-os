@@ -47,7 +47,7 @@ public class RemoveSshKeyStep
                     @Override
                     public Object call() throws Exception
                     {
-                        peer.removeSshKey( environment.getEnvironmentId(), sshKey );
+                        peer.removeFromAuthorizedKeys( environment.getEnvironmentId(), sshKey );
 
                         return null;
                     }
