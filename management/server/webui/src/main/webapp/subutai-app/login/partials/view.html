@@ -5,12 +5,17 @@
 		</div>
 		<div class="b-workspace b-workspace_login" ng-controller="LoginCtrl as loginCtrl">
 
+			<div class="b-workspace__header">
+				<h1 class="b-title b-title_by">Log in</h1>
+				<div class="clear"></div>
+			</div>
+
 			<div class="b-workspace__content">
 				<div class="b-form">
 					<div class="b-form__error-message" ng-if="loginCtrl.errorMessage">
 						{{ loginCtrl.errorMessage }}
 					</div>
-					<form ng-submit="loginCtrl.login()" ng-show="loginCtrl.activeMode == 'username'">
+					<form ng-submit="loginCtrl.login()">
 						<div class="b-form__wrapper g-margin-bottom-half">
 							<label class="b-form-label">Username</label>
 							<input

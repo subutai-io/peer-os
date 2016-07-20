@@ -5,10 +5,10 @@ angular.module('subutai.login.controller', [])
 	.controller('ChangePassCtrl', ChangePassCtrl)
 	.directive('pwCheck', pwCheck);
 
-LoginCtrl.$inject = ['loginSrv', '$http', '$location', '$rootScope', '$state'];
-ChangePassCtrl.$inject = ['$scope', 'loginSrv', '$http', '$location', '$rootScope', '$state', 'SweetAlert'];
+LoginCtrl.$inject = ['loginSrv', '$http', '$rootScope'];
+ChangePassCtrl.$inject = ['$scope', 'loginSrv', 'SweetAlert'];
 
-function ChangePassCtrl( $scope, loginSrv, $http, $location, $rootScope, $state, SweetAlert) {
+function ChangePassCtrl( $scope, loginSrv, SweetAlert) {
 	var vm = this;
 
 	vm.changePass = changePass;
@@ -41,7 +41,7 @@ function pwCheck() {
 	}
 };
 
-function LoginCtrl( loginSrv, $http, $location, $rootScope, $state )
+function LoginCtrl( loginSrv, $http, $rootScope )
 {
 	var vm = this;
 
