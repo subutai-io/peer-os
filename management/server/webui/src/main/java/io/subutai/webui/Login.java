@@ -75,7 +75,7 @@ public class Login extends HttpServlet
             catch ( IdentityExpiredException e )
             {
                 request.setAttribute( "error", "Your credentials are expired  !!!" );
-                response.getWriter().write( "Auth Credentials are expired" );
+                response.getWriter().write( "Please create a new password. The old one is expired" );
                 response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
             }
             catch ( SessionBlockedException e )
