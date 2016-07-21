@@ -198,17 +198,18 @@ public class RestServiceImpl implements RestService
 
             eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
         }
-        catch ( StrategyException | PeerException | EnvironmentCreationException e )
+        catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.serverError().entity(
                     JsonUtil.toJson( ERROR_KEY, ( e.getMessage() == null ? "Internal error" : e.getMessage() ) ) )
                            .build();
-        }
-        catch ( AccessControlException e )
-        {
-            return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY,
-                    ( e.getMessage() == null ? "Internal error" :
-                      "You don't have permission to perform this operation" ) ) ).build();
         }
 
         return Response.ok( JsonUtil.toJson( eventId ) ).build();
@@ -236,6 +237,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
