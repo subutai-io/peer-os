@@ -340,12 +340,22 @@ function SubutaiController($rootScope) {
     var vm = this;
     vm.bodyClass = '';
     vm.activeState = '';
+    vm.adminMenus = false;
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
         if (angular.isDefined(toState.data.bodyClass)) {
             vm.bodyClass = toState.data.bodyClass;
             vm.activeState = toState.name;
+
+            vm.adminMenus = false;
+            if( localStorage.getItem("currentUserPermissions") )
+                for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
+                    if (localStorage.getItem("currentUserPermissions")[i] == 2) {
+                        vm.adminMenus = true;
+                    }
+                }
+
             return;
         }
 
