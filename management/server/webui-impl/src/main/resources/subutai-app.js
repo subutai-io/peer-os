@@ -50,12 +50,20 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         return vm.isRegistrationFormVisible;
     };
 
-	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null) && getCookie('sptoken')) {
+	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null
+        || localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {
+	    console.log("get login details");
 		$http.get(SERVER_URL + "rest/ui/identity/user", {
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		}).success(function (data) {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentUserPermissions');
+            localStorage.removeItem('currentUserToken');
+
+
 			localStorage.setItem('currentUser', data.userName);
+            localStorage.setItem('currentUserToken', getCookie('sptoken'));
 
             var perms = [];
             for( var i = 0; i < data.roles.length; i++ )
