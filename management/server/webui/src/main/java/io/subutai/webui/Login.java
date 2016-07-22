@@ -33,7 +33,7 @@ public class Login extends HttpServlet
 
         String username = request.getParameter( "username" );
         String password = request.getParameter( "password" );
-        String sptoken = "";
+        String sptoken = request.getParameter( "sptoken" );
         String newPassword = request.getParameter( "newpassword" );
         User user = null;
 
@@ -61,6 +61,13 @@ public class Login extends HttpServlet
                     else
                     {
                         throw new Exception( "Karaf Auth Module is loading, please try again later" );
+                    }
+                }
+                else if ( !Strings.isNullOrEmpty( sptoken ) )
+                {
+                    if ( identityManager != null )
+                    {
+                        user = identityManager.authenticateByToken( sptoken );
                     }
                 }
                 else
