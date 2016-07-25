@@ -35,6 +35,8 @@ import io.subutai.common.settings.Common;
 
 /**
  * ContainerHost class.
+ *
+ * TODO add dsiplayName property for UI to set or get
  */
 @Entity
 @Table( name = "peer_con" )
