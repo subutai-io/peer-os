@@ -12,5 +12,7 @@ public interface EnvironmentContainerHost extends ContainerHost
 
     Set<String> getTags();
 
-    EnvironmentContainerHost setHostname( String newHostname ) throws PeerException;
+    String getDisplayName();
+
+    EnvironmentContainerHost setDisplayName( String displayName );
 }
