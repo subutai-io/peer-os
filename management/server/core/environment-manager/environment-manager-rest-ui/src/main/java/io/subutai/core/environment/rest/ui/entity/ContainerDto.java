@@ -12,6 +12,7 @@ import io.subutai.common.peer.ContainerSize;
 public class ContainerDto
 {
     private String id;
+    private String name;
     private String environmentId;
     private String hostname;
     private String ip;
@@ -28,12 +29,13 @@ public class ContainerDto
     private String dataSource;
 
 
-    public ContainerDto( final String id, final String environmentId, final String hostname,
+    public ContainerDto( final String id, final String name, final String environmentId, final String hostname,
                          final String ip, final String templateName,
                          final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
                          final String hostId, boolean local, String className )
     {
         this.id = id;
+        this.name = name;
         this.environmentId = environmentId;
         this.hostname = hostname;
         this.ip = ip;
@@ -58,6 +60,16 @@ public class ContainerDto
     public void setId( final String id )
     {
         this.id = id;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 
