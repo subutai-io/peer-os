@@ -2,6 +2,7 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
+import java.security.AccessControlException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.rest.ui.entity.ContainerDto;
 import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
@@ -64,6 +66,7 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
+import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 
 
@@ -197,6 +200,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.serverError().entity(
                     JsonUtil.toJson( ERROR_KEY, ( e.getMessage() == null ? "Internal error" : e.getMessage() ) ) )
                            .build();
@@ -227,6 +237,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
@@ -898,15 +915,15 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private void checkName( final String name ) throws Exception
+    private void checkName( final String name ) throws EnvironmentCreationException
     {
         if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
         {
-            throw new Exception( "Duplicated environment name" );
+            throw new EnvironmentCreationException( "Duplicated environment name" );
         }
         if ( name.length() > 50 )
         {
-            throw new Exception( "Environment name is too long, it should be 50 chars max" );
+            throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
         }
     }
 }

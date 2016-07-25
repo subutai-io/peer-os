@@ -94,6 +94,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonProperty( "containerName" )
     private String containerName;
 
+    @Column( name = "displayName", nullable = true )
+    @JsonProperty( "displayName" )
+    private String displayName;
+
     @Column( name = "creator_peer_id", nullable = false )
     @JsonIgnore
     private String creatorPeerId;
@@ -189,6 +193,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.containerName = containerName;
+        this.displayName = containerName;
         this.hostArchitecture = hostInfo.getArch();
         this.templateName = templateName;
         this.templateArch = templateArch;
@@ -386,6 +391,34 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
+    public String getDisplayName()
+    {
+        return displayName;
+    }
+
+
+    @Override
+    public EnvironmentContainerHost setDisplayName( final String displayName )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( displayName ) );
+
+        for ( EnvironmentContainerHost environmentContainerHost : environment.getContainerHosts() )
+        {
+            if ( environmentContainerHost.getDisplayName().equalsIgnoreCase( displayName ) )
+            {
+                throw new IllegalArgumentException(
+                        String.format( "Name %s is already assigned to container %s", displayName,
+                                environmentContainerHost.getId() ) );
+            }
+        }
+
+        this.displayName = displayName;
+
+        return environmentManager.update( this );
+    }
+
+
+    @Override
     public String getPeerId()
     {
         return this.peerId;
@@ -416,7 +449,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
         //TODO we should update each container's /etc/hosts file within the environment
         //TODO also probably each authorized_keys file to change hostnames
-        //TODO or we can hide this method and expose one in EnvManager
+        //TODO we must hide this method and expose one in EnvManager with a dedicated workflow
 
         this.hostname = hostname;
 

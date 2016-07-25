@@ -33,7 +33,7 @@ import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 
-
+//TODO add security annotation
 public class RegistrationManagerImpl implements RegistrationManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( RegistrationManagerImpl.class );
