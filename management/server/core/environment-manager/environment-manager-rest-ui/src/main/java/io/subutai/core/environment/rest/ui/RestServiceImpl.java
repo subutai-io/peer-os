@@ -895,7 +895,7 @@ public class RestServiceImpl implements RestService
             {
                 HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(), containerHost.getEnvironmentId().getId(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getDisplayName(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                         containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
@@ -903,7 +903,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( Exception e )
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(), containerHost.getEnvironmentId().getId(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getDisplayName(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                         containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(),
