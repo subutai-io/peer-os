@@ -49,7 +49,7 @@
         </li>
       </ul>
     </li>
-    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'kurjun' ? 'b-nav-menu_active' : ''">
+    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'kurjun' ? 'b-nav-menu_active' : ''" ng-if="subutaiController.adminMenus" >
       <a ui-sref="kurjun" class="b-nav-menu-link" id="subt-link__kurjun">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -89,11 +89,11 @@
 				</span>
       </a>
       <ul class="b-nav-menu__sub">
-        <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
+        <li class="b-nav-menu-sub b-nav-menu-sub_disabled" ng-if="subutaiController.adminMenus"
             ng-class="subutaiController.activeState == 'identity-user' ? 'b-nav-menu-sub_active' : ''">
           <a ui-sref="identity-user" id="subt-link__user-management">User management</a>
         </li>
-        <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
+        <li class="b-nav-menu-sub b-nav-menu-sub_disabled" ng-if="subutaiController.adminMenus"
             ng-class="subutaiController.activeState == 'identity-role' ? 'b-nav-menu-sub_active' : ''">
           <a ui-sref="identity-role" id="subt-link__role-management">Role management</a>
         </li>
@@ -103,7 +103,8 @@
         </li>
       </ul>
     </li>
-    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'peer-registration' ? 'b-nav-menu_active' : ''">
+    <li ng-if="subutaiController.adminMenus"
+        class="b-nav-menu" ng-class="subutaiController.activeState == 'peer-registration' ? 'b-nav-menu_active' : ''">
       <a ui-sref="peer-registration" class="b-nav-menu-link" id="subt-link__peer-registration">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -115,7 +116,8 @@
 				</span>
       </a>
     </li>
-    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'nodeReg' ? 'b-nav-menu_active' : ''">
+    <li ng-if="subutaiController.adminMenus"
+        class="b-nav-menu" ng-class="subutaiController.activeState == 'nodeReg' ? 'b-nav-menu_active' : ''">
       <a ui-sref="nodeReg" class="b-nav-menu-link" id="subt-link__resource-node">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
 					<svg class="b-nav-menu-icon">
@@ -151,7 +153,7 @@
 				</span>
       </a>
     </li>
-    <li class="b-nav-menu"
+    <li class="b-nav-menu" ng-if="subutaiController.adminMenus"
         ng-class="subutaiController.activeState == 'about' || subutaiController.activeState == 'settings-peer' || subutaiController.activeState == 'settings-kurjun' || subutaiController.activeState == 'settings-network' || subutaiController.activeState == 'settings-advanced' || subutaiController.activeState == 'settings-updates' ? 'b-nav-menu_active' : ''">
       <a class="b-nav-menu-link" href id="subt-link__settings">
 				<span class="b-nav-menu__icon b-nav-menu-link__item">
