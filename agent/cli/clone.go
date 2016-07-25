@@ -90,7 +90,6 @@ func addNetConf(name, addr string) {
 	container.SetContainerConf(name, [][]string{
 		{"lxc.network.ipv4", ipvlan[0]},
 		{"lxc.network.ipv4.gateway", net.IP(gw).String()},
-		{"lxc.network.mtu", ""},
 		{"#vlan_id", ipvlan[1]},
 	})
 	setStaticNetwork(name)
