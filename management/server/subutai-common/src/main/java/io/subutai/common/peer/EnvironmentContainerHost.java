@@ -12,7 +12,9 @@ public interface EnvironmentContainerHost extends ContainerHost
 
     Set<String> getTags();
 
+    @Deprecated
     String getDisplayName();
 
+    @Deprecated
     EnvironmentContainerHost setDisplayName( String displayName );
 }

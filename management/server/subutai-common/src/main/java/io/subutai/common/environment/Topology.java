@@ -126,7 +126,7 @@ public class Topology
 
         if ( StringUtils.isEmpty( node.getHostname() ) )
         {
-            node.setHostname( UUID.randomUUID().toString() );
+            node.setHostname( node.getName().replaceAll( "\\s+", "" ) );
         }
 
         Set<Node> peerNodes = nodeGroupPlacement.get( peerId );

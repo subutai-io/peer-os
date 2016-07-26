@@ -23,17 +23,14 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneResponse;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
-import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.CreatePeerEnvironmentContainersTask;
-import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -46,23 +43,18 @@ public class ContainerCloneStep
     private final String defaultDomain;
     private final Topology topology;
     private final EnvironmentImpl environment;
-    private final RelationManager relationManager;
-    private final IdentityManager identityManager;
     private final TrackerOperation operationTracker;
     private final String localPeerId;
     private PeerManager peerManager;
 
 
     public ContainerCloneStep( final String defaultDomain, final Topology topology, final EnvironmentImpl environment,
-                               final PeerManager peerManager, final EnvironmentManagerImpl environmentManager,
-                               final TrackerOperation operationTracker )
+                               final PeerManager peerManager, final TrackerOperation operationTracker )
     {
         this.defaultDomain = defaultDomain;
         this.topology = topology;
         this.environment = environment;
         this.peerManager = peerManager;
-        this.relationManager = environmentManager.getRelationManager();
-        this.identityManager = environmentManager.getIdentityManager();
         this.operationTracker = operationTracker;
         this.localPeerId = peerManager.getLocalPeer().getId();
     }
@@ -142,8 +134,8 @@ public class ContainerCloneStep
     }
 
 
-    protected boolean processResponse( final Set<Node> nodes, final CreateEnvironmentContainersResponse responses,
-                                       final String peerId )
+    private boolean processResponse( final Set<Node> nodes, final CreateEnvironmentContainersResponse responses,
+                                     final String peerId )
     {
         final Set<EnvironmentContainerImpl> containers = new HashSet<>();
 
@@ -191,6 +183,4 @@ public class ContainerCloneStep
                 cloneResponse.getTemplateArch(), node.getSshGroupId(), node.getHostsGroupId(), defaultDomain,
                 node.getType(), node.getHostId(), cloneResponse.getContainerName() );
     }
-
-
 }

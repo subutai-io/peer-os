@@ -909,6 +909,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public int getVlan() throws ResourceHostException
+    {
+        try
+        {
+            return Integer.parseInt(
+                    commandUtil.execute( resourceHostCommands.getGetVlanCommand(), this ).getStdOut().trim() );
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining VLAN : %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public void setContainerHostname( final ContainerHost containerHost, final String hostname )
             throws ResourceHostException
     {

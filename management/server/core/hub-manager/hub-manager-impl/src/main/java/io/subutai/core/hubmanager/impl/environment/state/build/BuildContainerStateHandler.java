@@ -75,8 +75,9 @@ public class BuildContainerStateHandler extends StateHandler
      */
     private void setupPeerEnvironmentKey( EnvironmentPeerDto peerDto ) throws PeerException, PGPException
     {
-        RelationLinkDto envLink = new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
-                PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
+        RelationLinkDto envLink =
+                new RelationLinkDto( peerDto.getEnvironmentInfo().getId(), Environment.class.getSimpleName(),
+                        PermissionObject.EnvironmentManagement.getName(), peerDto.getEnvironmentInfo().getId() );
 
         ctx.localPeer.createPeerEnvironmentKeyPair( envLink );
     }
@@ -99,11 +100,12 @@ public class BuildContainerStateHandler extends StateHandler
         {
             ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
-                    nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
+                    nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
-            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0, 0,
-                    peerDto.getPeerId(), nodeDto.getHostId() );
+            Node node =
+                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0,
+                            0, peerDto.getPeerId(), nodeDto.getHostId() );
 
             nodes.add( node );
         }
@@ -123,18 +125,19 @@ public class BuildContainerStateHandler extends StateHandler
             templates.add( node.getTemplateName() );
         }
 
-        ctx.localPeer.prepareTemplates( new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
+        ctx.localPeer
+                .prepareTemplates( new PrepareTemplatesRequest( peerDto.getEnvironmentInfo().getId(), rhTemplates ) );
     }
 
 
-    private EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes ) throws Exception
+    private EnvironmentNodesDto cloneContainers( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
+            throws Exception
     {
         CreateEnvironmentContainersRequest cloneRequests = createCloneRequests( peerDto, envNodes );
 
         // Clone requests may be empty if all containers already exists. For example, in case of duplicated requests.
-        CreateEnvironmentContainersResponse cloneResponses = cloneRequests.getRequests().isEmpty()
-                                                             ? null
-                                                             : ctx.localPeer.createEnvironmentContainers( cloneRequests );
+        CreateEnvironmentContainersResponse cloneResponses = cloneRequests.getRequests().isEmpty() ? null :
+                                                             ctx.localPeer.createEnvironmentContainers( cloneRequests );
 
         if ( cloneResponses != null && !cloneResponses.hasSucceeded() )
         {
@@ -178,22 +181,25 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private CreateEnvironmentContainersRequest createCloneRequests( EnvironmentPeerDto peerDto, EnvironmentNodesDto envNodes )
+    private CreateEnvironmentContainersRequest createCloneRequests( EnvironmentPeerDto peerDto,
+                                                                    EnvironmentNodesDto envNodes )
     {
         String envId = peerDto.getEnvironmentInfo().getId();
 
         Set<ContainerHost> envContainers = ctx.localPeer.findContainersByEnvironmentId( envId );
 
-        CreateEnvironmentContainersRequest createRequests = new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
+        CreateEnvironmentContainersRequest createRequests =
+                new CreateEnvironmentContainersRequest( envId, peerDto.getPeerId(), peerDto.getOwnerId() );
 
         log.info( "Clone requests:" );
 
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
-            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}",
-                    nodeDto.getContainerId(), nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+            log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
+                    nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
-            // Exclude existing containers. This may happen as a result of duplicated requests or adding a new container to existing peer in env.
+            // Exclude existing containers. This may happen as a result of duplicated requests or adding a new
+            // container to existing peer in env.
             if ( !containerExists( nodeDto.getHostName(), envContainers ) && nodeDto.getState() == BUILDING )
             {
                 createRequests.addRequest( createCloneRequest( nodeDto ) );
