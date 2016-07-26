@@ -439,7 +439,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setContainerQuota( final ContainerHost containerHost, final ContainerSize containerSize )
+    public void setContainerSize( final ContainerHost containerHost, final ContainerSize containerSize )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );

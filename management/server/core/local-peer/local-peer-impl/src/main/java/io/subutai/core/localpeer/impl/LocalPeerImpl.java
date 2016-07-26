@@ -58,6 +58,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.HostNotFoundException;
@@ -665,7 +666,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void removeFromAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    public void removeFromAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey )
+            throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
@@ -2382,6 +2384,30 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( e.getMessage() );
             throw new PeerException(
                     String.format( "Could not set quota for %s: %s", containerId.getId(), e.getMessage() ) );
+        }
+    }
+
+
+    @Override
+    public void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerHostId );
+        Preconditions.checkNotNull( containerSize );
+
+        try
+        {
+            ContainerHost containerHost = getContainerHostById( containerHostId.getId() );
+
+            ResourceHost resourceHost = getResourceHostById( containerHost.getResourceHostId().getId() );
+
+            resourceHost.setContainerSize( containerHost, containerSize );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage() );
+            throw new PeerException( String.format( "Could not set container size for %s: %s", containerHostId.getId(),
+                    e.getMessage() ) );
         }
     }
 

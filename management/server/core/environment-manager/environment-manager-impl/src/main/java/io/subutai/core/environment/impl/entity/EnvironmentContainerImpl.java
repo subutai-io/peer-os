@@ -168,9 +168,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String creatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateName,
-                                     final HostArchitecture templateArch,
-                                     String domainName, ContainerSize containerSize, String resourceHostId,
-                                     final String containerName )
+                                     final HostArchitecture templateArch, String domainName,
+                                     ContainerSize containerSize, String resourceHostId, final String containerName )
     {
         Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
@@ -545,6 +544,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
         getPeer().setQuota( this.getContainerId(), containerQuota );
+    }
+
+
+    @Override
+    public void setContainerSize( final ContainerSize size ) throws PeerException
+    {
+        getPeer().setContainerSize( this.getContainerId(), size );
     }
 
 
