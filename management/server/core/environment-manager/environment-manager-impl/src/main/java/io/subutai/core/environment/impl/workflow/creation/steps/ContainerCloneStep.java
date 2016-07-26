@@ -143,6 +143,7 @@ public class ContainerCloneStep
 
         for ( Node node : nodes )
         {
+            //todo review this line not to use node.getHostname to lookup response
             CloneResponse response = responses.findByHostname( node.getHostname() );
 
             if ( response != null )
