@@ -4,6 +4,8 @@ package io.subutai.common.environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.HostId;
@@ -74,6 +76,12 @@ public class CloneContainerTask extends HostUtil.Task<String>
     @Override
     public String call() throws Exception
     {
+        //update hostname to make it unique on this peer
+        //VLAN will make it unique on this peer
+        //additional suffix (last IP octet) will make it unique inside host environment
+        request.setHostname( String.format( "%s-%d-%s", request.getHostname(), networkResource.getVlan(),
+                StringUtils.substringAfterLast( request.getIp().split( "/" )[0], "." ) ) );
+
         String containerId = resourceHost
                 .cloneContainer( request.getTemplateName(), request.getHostname(), request.getIp(),
                         networkResource.getVlan(), networkResource.getEnvironmentId() );

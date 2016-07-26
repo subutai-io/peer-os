@@ -77,7 +77,7 @@ public class CreateEnvironmentContainersResponse
     {
         for ( CloneResponse response : responses )
         {
-            if ( response.getHostname().equalsIgnoreCase( hostname ) )
+            if ( response.getHostname().startsWith( hostname ) )
             {
                 return response;
             }

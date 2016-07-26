@@ -12,7 +12,7 @@ import io.subutai.common.settings.Common;
 public class CloneRequest implements TaskRequest
 {
     private final String resourceHostId;
-    private final String hostname;
+    private String hostname;
     private final String containerName;
     private final String ip;
     private final String templateName;
@@ -48,6 +48,12 @@ public class CloneRequest implements TaskRequest
     public String getHostname()
     {
         return hostname;
+    }
+
+
+    public void setHostname( final String hostname )
+    {
+        this.hostname = hostname;
     }
 
 
