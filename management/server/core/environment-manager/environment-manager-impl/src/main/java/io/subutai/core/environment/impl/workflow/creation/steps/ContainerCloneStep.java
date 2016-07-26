@@ -124,7 +124,7 @@ public class ContainerCloneStep
         {
             CreateEnvironmentContainersResponse response = cloneResult.getResult();
             String peerId = cloneResult.getPeer().getId();
-            succeeded &= processResponse( placement.get( peerId ), response, peerId );
+            succeeded &= processResponse( response, peerId );
         }
 
         if ( !succeeded )
@@ -134,29 +134,20 @@ public class ContainerCloneStep
     }
 
 
-    private boolean processResponse( final Set<Node> nodes, final CreateEnvironmentContainersResponse responses,
-                                     final String peerId )
+    private boolean processResponse( final CreateEnvironmentContainersResponse responses, final String peerId )
     {
         final Set<EnvironmentContainerImpl> containers = new HashSet<>();
 
-        boolean result = true;
-
-        for ( Node node : nodes )
+        for ( CloneResponse response : responses.getResponses() )
         {
-            CloneResponse response = responses.findByHostname( node.getHostname() );
+            EnvironmentContainerImpl c = buildContainerEntity( peerId, response );
 
-            if ( response != null )
-            {
-                EnvironmentContainerImpl c = buildContainerEntity( peerId, node, response );
+            containers.add( c );
+        }
 
-                containers.add( c );
-            }
-            else
-            {
-                LOGGER.warn( "Scheduled container not found: " + node.toString() );
-
-                result = false;
-            }
+        if ( !responses.hasSucceeded() )
+        {
+            LOGGER.warn( responses.getMessages().toString() );
         }
 
         if ( !containers.isEmpty() )
@@ -164,23 +155,24 @@ public class ContainerCloneStep
             environment.addContainers( containers );
         }
 
-        return result;
+        return responses.hasSucceeded();
     }
 
 
-    private EnvironmentContainerImpl buildContainerEntity( final String peerId, final Node node,
-                                                           final CloneResponse cloneResponse )
+    private EnvironmentContainerImpl buildContainerEntity( final String peerId, final CloneResponse cloneResponse )
     {
-
         final HostInterfaces interfaces = new HostInterfaces();
+
         interfaces.addHostInterface(
                 new HostInterfaceModel( Common.DEFAULT_CONTAINER_INTERFACE, cloneResponse.getIp() ) );
+
         final ContainerHostInfoModel infoModel =
                 new ContainerHostInfoModel( cloneResponse.getContainerId(), cloneResponse.getHostname(),
                         cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
                         ContainerHostState.RUNNING );
+
         return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateName(),
-                cloneResponse.getTemplateArch(), node.getSshGroupId(), node.getHostsGroupId(), defaultDomain,
-                node.getType(), node.getHostId(), cloneResponse.getContainerName() );
+                cloneResponse.getTemplateArch(), defaultDomain, cloneResponse.getContainerSize(),
+                cloneResponse.getResourceHostId(), cloneResponse.getContainerName() );
     }
 }

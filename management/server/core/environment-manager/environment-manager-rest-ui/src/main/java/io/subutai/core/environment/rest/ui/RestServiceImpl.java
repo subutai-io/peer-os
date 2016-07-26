@@ -686,7 +686,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
+            return Response.ok().entity( gson.toJson( ContainerSize.getContainerSizeDescription() ) ).build();
         }
         catch ( Exception e )
         {

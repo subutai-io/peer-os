@@ -157,7 +157,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
                 for ( ResourceAllocator.AllocatedContainer container : containers )
                 {
                     Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
-                            container.getSize(), 0, 0, container.getPeerId(), container.getHostId() );
+                            container.getSize(), container.getPeerId(), container.getHostId() );
                     nodes.add( node );
                 }
             }
