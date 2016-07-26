@@ -11,10 +11,4 @@ public interface EnvironmentContainerHost extends ContainerHost
     EnvironmentContainerHost removeTag( String tag );
 
     Set<String> getTags();
-
-    @Deprecated
-    String getDisplayName();
-
-    @Deprecated
-    EnvironmentContainerHost setDisplayName( String displayName );
 }
