@@ -11,6 +11,8 @@ import com.google.common.collect.Lists;
 /**
  * Provides utility functions for working with Strings
  */
+@Deprecated
+//TODO replace usages of this class with other util classes from Commons or other well-known libraries
 public class StringUtil
 {
 

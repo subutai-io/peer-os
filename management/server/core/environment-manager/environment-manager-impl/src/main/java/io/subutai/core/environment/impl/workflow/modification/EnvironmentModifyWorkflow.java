@@ -206,8 +206,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
-                    operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, operationTracker ).execute();
 
             saveEnvironment();
 

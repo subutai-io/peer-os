@@ -166,8 +166,7 @@ public class EnvironmentGrowingWorkflow extends CancellableWorkflow<EnvironmentG
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
-                    operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, operationTracker ).execute();
 
             saveEnvironment();
 
