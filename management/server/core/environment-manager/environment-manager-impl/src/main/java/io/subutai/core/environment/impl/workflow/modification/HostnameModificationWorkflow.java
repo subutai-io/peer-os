@@ -32,7 +32,7 @@ public class HostnameModificationWorkflow
 
 
     public HostnameModificationWorkflow( final EnvironmentImpl environment,
-                                         final Map<HostId, String> newContainerHostNames, final String newHostname,
+                                         final Map<HostId, String> newContainerHostNames,
                                          final TrackerOperation operationTracker,
                                          final EnvironmentManagerImpl environmentManager )
     {
