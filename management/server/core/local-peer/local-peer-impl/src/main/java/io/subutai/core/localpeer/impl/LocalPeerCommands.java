@@ -18,7 +18,8 @@ public class LocalPeerCommands
 
     protected RequestBuilder getAddIpHostToEtcHostsCommand( Map<String, String> hostAddresses )
     {
-        StringBuilder cleanHosts = new StringBuilder( "localhost|127.0.0.1|" );
+        StringBuilder cleanHosts =
+                new StringBuilder( String.format( "%s|%s|", Common.LOCAL_HOST_NAME, Common.LOCAL_HOST_IP ) );
         StringBuilder appendHosts = new StringBuilder();
 
         for ( Map.Entry<String, String> hostEntry : hostAddresses.entrySet() )
@@ -26,11 +27,11 @@ public class LocalPeerCommands
             String hostname = hostEntry.getKey();
             String ip = hostEntry.getValue();
             cleanHosts.append( ip ).append( "|" ).append( hostname ).append( "|" );
-            appendHosts.append( "/bin/echo '" ).
+            appendHosts.append( "echo '" ).
                     append( ip ).append( " " ).
                                append( hostname ).append( "." ).append( Common.DEFAULT_DOMAIN_NAME ).
                                append( " " ).append( hostname ).
-                               append( "' >> '/etc/hosts'; " );
+                               append( String.format( "' >> '%s'; ", Common.ETC_HOSTS_FILE ) );
         }
 
         if ( cleanHosts.length() > 0 )
@@ -38,11 +39,13 @@ public class LocalPeerCommands
             //drop pipe | symbol
             cleanHosts.setLength( cleanHosts.length() - 1 );
             cleanHosts.insert( 0, "egrep -v '" );
-            cleanHosts.append( "' /etc/hosts > etc-hosts-cleaned; mv etc-hosts-cleaned /etc/hosts;" );
+            cleanHosts.append(
+                    String.format( "' %1$s > etc-hosts-cleaned; mv etc-hosts-cleaned %1$s;", Common.ETC_HOSTS_FILE ) );
             appendHosts.insert( 0, cleanHosts );
         }
 
-        appendHosts.append( "/bin/echo '127.0.0.1 localhost " ).append( "' >> '/etc/hosts';" );
+        appendHosts.append( String.format( "echo '%s %s ", Common.LOCAL_HOST_IP, Common.LOCAL_HOST_NAME ) )
+                   .append( String.format( "' >> '%s';", Common.ETC_HOSTS_FILE ) );
 
         return new RequestBuilder( appendHosts.toString() );
     }

@@ -1,22 +1,28 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
+import java.util.Map;
+
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.host.HostId;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.modification.steps.ChangeHostnameStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.UpdateAuthorizedKeysStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.UpdateEtcHostsStep;
 
 
 public class HostnameModificationWorkflow
         extends CancellableWorkflow<HostnameModificationWorkflow.HostnameModificationPhase>
 {
     private EnvironmentImpl environment;
-    private final ContainerHost containerHost;
-    private final String newHostname;
+    private final Map<HostId, String> newContainerHostNames;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
+
+    private ChangeHostnameStep changeHostnameStep;
 
 
     public enum HostnameModificationPhase
@@ -25,15 +31,15 @@ public class HostnameModificationWorkflow
     }
 
 
-    public HostnameModificationWorkflow( final EnvironmentImpl environment, final ContainerHost containerHost,
-                                         final String newHostname, final TrackerOperation operationTracker,
+    public HostnameModificationWorkflow( final EnvironmentImpl environment,
+                                         final Map<HostId, String> newContainerHostNames, final String newHostname,
+                                         final TrackerOperation operationTracker,
                                          final EnvironmentManagerImpl environmentManager )
     {
         super( HostnameModificationPhase.INIT );
 
         this.environment = environment;
-        this.newHostname = newHostname;
-        this.containerHost = containerHost;
+        this.newContainerHostNames = newContainerHostNames;
         this.operationTracker = operationTracker;
         this.environmentManager = environmentManager;
     }
@@ -59,9 +65,12 @@ public class HostnameModificationWorkflow
 
         operationTracker.addLog( "Modifying container hostname" );
 
+        changeHostnameStep =
+                new ChangeHostnameStep( environmentManager, environment, newContainerHostNames, operationTracker );
+
         try
         {
-            //todo here
+            environment = ( EnvironmentImpl ) changeHostnameStep.execute();
 
             saveEnvironment();
 
@@ -79,11 +88,12 @@ public class HostnameModificationWorkflow
     public HostnameModificationPhase UPDATE_ETC_HOSTS_FILE()
     {
 
-        operationTracker.addLog( "Modifying /etc/hosts files" );
+        operationTracker.addLog( "Modifying hosts files" );
 
         try
         {
-            //todo here
+            new UpdateEtcHostsStep( environment, changeHostnameStep.getOldHostNames(), newContainerHostNames,
+                    operationTracker ).execute();
 
             saveEnvironment();
 
@@ -101,11 +111,12 @@ public class HostnameModificationWorkflow
     public HostnameModificationPhase UPDATE_AUTHORIZED_KEYS_FILE()
     {
 
-        operationTracker.addLog( "Modifying /root/.ssh/authorized_keys files" );
+        operationTracker.addLog( "Modifying authorized_keys files" );
 
         try
         {
-            //todo here
+            new UpdateAuthorizedKeysStep( environment, changeHostnameStep.getOldHostNames(), newContainerHostNames,
+                    operationTracker ).execute();
 
             saveEnvironment();
 
