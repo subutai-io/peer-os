@@ -187,7 +187,7 @@ public class EnvironmentCreationWorkflow
 
     public EnvironmentCreationPhase CONFIGURE_HOSTS()
     {
-        operationTracker.addLog( "Configuring /etc/hosts" );
+        operationTracker.addLog( "Configuring hosts" );
 
         try
         {

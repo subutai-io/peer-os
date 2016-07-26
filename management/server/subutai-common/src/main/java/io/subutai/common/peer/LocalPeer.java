@@ -174,8 +174,8 @@ public interface LocalPeer extends Peer
      */
     boolean isMHPresent();
 
-    Set<ContainerHost> listOrphanContainers( );
+    Set<ContainerHost> listOrphanContainers();
 
-    void removeOrphanContainers( );
+    void removeOrphanContainers();
 }
 

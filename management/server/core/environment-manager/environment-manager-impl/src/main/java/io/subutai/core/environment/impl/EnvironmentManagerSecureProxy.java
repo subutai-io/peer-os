@@ -27,6 +27,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.HostId;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
@@ -838,5 +839,15 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentNotFoundException, EnvironmentManagerException
     {
         return environmentManager.checkEnvironmentConnectivity( environmentId );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void changeContainerHostnames( final Map<HostId, String> newContainerHostnames, final String environmentId,
+                                          final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        environmentManager.changeContainerHostnames( newContainerHostnames, environmentId, async );
     }
 }

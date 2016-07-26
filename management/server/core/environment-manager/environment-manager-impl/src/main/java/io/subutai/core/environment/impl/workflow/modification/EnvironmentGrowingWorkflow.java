@@ -183,7 +183,7 @@ public class EnvironmentGrowingWorkflow extends CancellableWorkflow<EnvironmentG
 
     public EnvironmentGrowingPhase CONFIGURE_HOSTS()
     {
-        operationTracker.addLog( "Configuring /etc/hosts" );
+        operationTracker.addLog( "Configuring hosts" );
 
         try
         {
