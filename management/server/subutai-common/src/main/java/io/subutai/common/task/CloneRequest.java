@@ -13,7 +13,7 @@ public class CloneRequest implements TaskRequest
 {
     private final String resourceHostId;
     private String hostname;
-    private final String containerName;
+    private String containerName;
     private final String ip;
     private final String templateName;
     private final HostArchitecture templateArch;
@@ -60,6 +60,12 @@ public class CloneRequest implements TaskRequest
     public String getContainerName()
     {
         return containerName;
+    }
+
+
+    public void setContainerName( final String containerName )
+    {
+        this.containerName = containerName;
     }
 
 

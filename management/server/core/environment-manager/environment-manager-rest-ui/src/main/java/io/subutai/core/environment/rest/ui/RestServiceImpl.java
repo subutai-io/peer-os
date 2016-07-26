@@ -66,7 +66,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
-import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 
 
@@ -895,19 +894,20 @@ public class RestServiceImpl implements RestService
             {
                 HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
 
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getDisplayName(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
-                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
+                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), iface.getIp(),
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        containerHost.getResourceHostId().getId(), containerHost.isLocal(),
                         containerHost.getClass().getName() ) );
             }
             catch ( Exception e )
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getDisplayName(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
-                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(),
-                        containerHost.getClass().getName() ) );
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
+                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), "UNKNOWN",
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName() ) );
             }
         }
 
