@@ -130,13 +130,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonIgnore
     protected Set<HostInterface> hostInterfaces = new HashSet<>();
 
-    @Column( name = "ssh_group_id" )
-    @JsonIgnore
-    private int sshGroupId;
-
-    @Column( name = "hosts_group_id" )
-    @JsonIgnore
-    private int hostsGroupId;
 
     @Column( name = "domain_name" )
     @JsonProperty( "domainName" )
@@ -175,7 +168,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String creatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateName,
-                                     final HostArchitecture templateArch, int sshGroupId, int hostsGroupId,
+                                     final HostArchitecture templateArch,
                                      String domainName, ContainerSize containerSize, String resourceHostId,
                                      final String containerName )
     {
@@ -193,8 +186,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostArchitecture = hostInfo.getArch();
         this.templateName = templateName;
         this.templateArch = templateArch;
-        this.sshGroupId = sshGroupId;
-        this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
         this.containerSize = containerSize;
         this.resourceHostId = resourceHostId;
@@ -557,31 +548,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public int getSshGroupId()
-    {
-        return sshGroupId;
-    }
-
-
-    public int getHostsGroupId()
-    {
-        return hostsGroupId;
-    }
-
-
-    public String getDomainName()
-    {
-        return domainName;
-    }
-
-
-    protected void setHostId( String id )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
-        this.hostId = id;
-    }
-
-
     @Override
     public String getInitiatorPeerId()
     {
@@ -651,8 +617,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "creatorPeerId", creatorPeerId ).add( "templateName", templateName )
-                          .add( "environmentId", envId ).add( "sshGroupId", sshGroupId )
-                          .add( "hostsGroupId", hostsGroupId ).add( "domainName", domainName ).add( "tags", tags )
+                          .add( "environmentId", envId ).add( "domainName", domainName ).add( "tags", tags )
                           .add( "templateArch", templateArch ).add( "hostArchitecture", hostArchitecture )
                           .add( "resourceHostId", resourceHostId ).toString();
     }

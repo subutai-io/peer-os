@@ -104,8 +104,8 @@ public class BuildContainerStateHandler extends StateHandler
                     nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
             Node node =
-                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize, 0,
-                            0, peerDto.getPeerId(), nodeDto.getHostId() );
+                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize,
+                            peerDto.getPeerId(), nodeDto.getHostId() );
 
             nodes.add( node );
         }

@@ -32,7 +32,8 @@ public class CreateEnvironmentContainersResponse
             {
                 responses.add( new CloneResponse( task.getHost().getId(), request.getHostname(),
                         request.getContainerName(), request.getTemplateName(), request.getTemplateArch(),
-                        request.getIp(), cloneContainerTask.getResult(), task.getDuration() ) );
+                        request.getIp(), cloneContainerTask.getResult(), task.getDuration(),
+                        request.getContainerSize() ) );
 
                 this.messages.add( String
                         .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getId(),
@@ -70,19 +71,5 @@ public class CreateEnvironmentContainersResponse
     public boolean hasSucceeded()
     {
         return hasSucceeded;
-    }
-
-
-    public CloneResponse findByHostname( final String hostname )
-    {
-        for ( CloneResponse response : responses )
-        {
-            if ( response.getHostname().startsWith( hostname ) )
-            {
-                return response;
-            }
-        }
-
-        return null;
     }
 }
