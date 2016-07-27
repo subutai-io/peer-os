@@ -77,7 +77,7 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
             localStorage.setItem('currentUserPermissions', perms);
             vm.currentUser = localStorage.getItem('currentUser');
 
-            $location.reload();
+            location.reload();
 		});
 	}
 
@@ -361,7 +361,7 @@ function SubutaiController($rootScope) {
             vm.adminMenus = false;
             if( localStorage.getItem("currentUserPermissions") )
                 for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
-                    if (localStorage.getItem("currentUserPermissions")[i] == 2) {
+                    if (localStorage.getItem("currentUserPermissions")[i] == 6) {
                         vm.adminMenus = true;
                     }
                 }

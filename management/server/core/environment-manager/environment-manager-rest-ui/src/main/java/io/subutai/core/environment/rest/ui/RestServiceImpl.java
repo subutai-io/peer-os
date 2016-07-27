@@ -887,7 +887,7 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), composeCHName( containerHost ), containerHost.getEnvironmentId().getId(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), containerHost.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                         containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
@@ -895,7 +895,7 @@ public class RestServiceImpl implements RestService
             }
             catch ( Exception e )
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), composeCHName( containerHost ), containerHost.getEnvironmentId().getId(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                         containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(),
@@ -917,21 +917,5 @@ public class RestServiceImpl implements RestService
         {
             throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
         }
-    }
-
-    private String composeCHName( ContainerHost containerHost )
-    {
-        String lastOctet = "";
-        try
-        {
-            lastOctet = Arrays.asList(containerHost.getIp().split("//.")).get(3);
-        }
-        catch (Exception e)
-        {
-            LOG.warn("No ip for container " + containerHost.getId(), e);
-        }
-
-
-        return String.format("%s-%s", containerHost.getContainerName().replaceAll("\\s", ""), lastOctet);
     }
 }
