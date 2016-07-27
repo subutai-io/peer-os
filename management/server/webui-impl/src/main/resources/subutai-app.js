@@ -76,6 +76,8 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
             localStorage.setItem('currentUserPermissions', perms);
             vm.currentUser = localStorage.getItem('currentUser');
+
+            $location.reload();
 		});
 	}
 
