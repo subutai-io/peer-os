@@ -49,7 +49,7 @@ public class ChangeHostnameStep
                 EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) environment
                         .getContainerHostById( newHostnameEntry.getKey().getId() );
 
-                String newHostname = String.format( "%s-%d-%s", newHostnameEntry.getValue(),
+                String newHostname = String.format( "%s-%d-%s", newHostnameEntry.getValue().replaceAll( "\\s+", "" ),
                         environment.getPeerConf( environmentContainer.getPeerId() ).getVlan(),
                         StringUtils.substringAfterLast( environmentContainer.getIp(), "." ) );
 
@@ -58,6 +58,8 @@ public class ChangeHostnameStep
                 environmentContainer.setHostname( newHostname );
 
                 oldHostNames.put( newHostnameEntry.getKey(), oldHostname );
+
+                newContainerHostNames.put( newHostnameEntry.getKey(), newHostname );
             }
             catch ( Exception e )
             {

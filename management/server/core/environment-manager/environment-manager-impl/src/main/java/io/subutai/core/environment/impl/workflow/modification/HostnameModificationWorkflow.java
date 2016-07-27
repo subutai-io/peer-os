@@ -3,6 +3,8 @@ package io.subutai.core.environment.impl.workflow.modification;
 
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.host.HostId;
 import io.subutai.common.tracker.TrackerOperation;
@@ -18,7 +20,7 @@ public class HostnameModificationWorkflow
         extends CancellableWorkflow<HostnameModificationWorkflow.HostnameModificationPhase>
 {
     private EnvironmentImpl environment;
-    private final Map<HostId, String> newContainerHostNames;
+    private final Map<HostId, String> newContainerHostNames = Maps.newConcurrentMap();
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
 
@@ -39,7 +41,7 @@ public class HostnameModificationWorkflow
         super( HostnameModificationPhase.INIT );
 
         this.environment = environment;
-        this.newContainerHostNames = newContainerHostNames;
+        this.newContainerHostNames.putAll( newContainerHostNames );
         this.operationTracker = operationTracker;
         this.environmentManager = environmentManager;
     }

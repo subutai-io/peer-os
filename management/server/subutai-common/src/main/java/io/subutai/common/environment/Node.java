@@ -54,7 +54,7 @@ public class Node
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostId ), "Resource host id is null" );
         Preconditions.checkNotNull( type );
 
-        this.hostname = hostname;
+        this.hostname = hostname.replaceAll( "\\s+", "" );
         this.name = name;
         this.templateName = templateName;
         this.type = type;
@@ -109,6 +109,8 @@ public class Node
 
     public void setHostname( final String hostname )
     {
-        this.hostname = hostname;
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
+
+        this.hostname = hostname.replaceAll( "\\s+", "" );
     }
 }
