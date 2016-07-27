@@ -199,7 +199,7 @@ public interface Peer extends RelationLink
 
     UsedNetworkResources getUsedNetworkResources() throws PeerException;
 
-    void reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
+    Integer reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
 
 
     /**

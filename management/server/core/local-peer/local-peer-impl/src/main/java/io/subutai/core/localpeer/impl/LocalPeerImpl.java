@@ -1946,7 +1946,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public synchronized void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    public synchronized Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
 
         Preconditions.checkNotNull( networkResource );
@@ -1985,7 +1985,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     throw new PeerException( "No free VLANs slots are left" );
                 }
 
-                networkResourceDao.create( new NetworkResourceEntity( networkResource, freeVlan ) );
+                NetworkResourceEntity networkResourceEntity = new NetworkResourceEntity( networkResource, freeVlan );
+
+                networkResourceDao.create( networkResourceEntity );
+
+                return freeVlan;
             }
         }
         catch ( Exception e )
