@@ -401,12 +401,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public EnvironmentContainerHost setHostname( final String hostname ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        String newHostname = hostname.replaceAll( "\\s+", "" );
+
         Preconditions
-                .checkArgument( !StringUtils.equalsIgnoreCase( this.hostname, hostname ), "No change in hostname" );
+                .checkArgument( !StringUtils.equalsIgnoreCase( this.hostname, newHostname ), "No change in hostname" );
 
-        getPeer().setContainerHostname( getContainerId(), hostname );
+        getPeer().setContainerHostname( getContainerId(), newHostname );
 
-        this.hostname = hostname;
+        this.hostname = newHostname;
 
         return environmentManager.update( this );
     }
