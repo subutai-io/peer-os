@@ -5,18 +5,16 @@
 			<img src="assets/elements/buttons/b-icon-close.svg" class="b-icon g-right"/>
 		</a>
 	</div>
-	<form ng-submit="containerViewCtrl.addTags()">								
+	<form ng-submit="containerViewCtrl.setContainerName()">
 		<div class="b-popup__body">
 
 			<div class="popup-body-box">
-				<tags-input ng-model="containerViewCtrl.currentTags">
-					<auto-complete source="containerViewCtrl.allTags"></auto-complete>
-				</tags-input>
+				<input ng-model="containerName" />
 			</div>
 
 		</div>
 		<div class="b-popup__footer">
-			<button class="b-btn b-btn_green g-right" type="submit" id="subt_button__peer-approve-popup">
+			<button class="b-btn b-btn_green g-right" type="submit" >
 				Save
 			</button>
 			<div class="clear"></div>

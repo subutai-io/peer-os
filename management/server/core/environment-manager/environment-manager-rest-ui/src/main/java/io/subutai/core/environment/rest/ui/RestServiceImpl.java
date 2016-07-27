@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.host.HostId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -537,6 +538,25 @@ public class RestServiceImpl implements RestService
     }
 
 
+    public Response setContainerName( String environmentId, String containerId, String name )
+    {
+        try
+        {
+            Environment environment = findEnvironmentByContainerId( containerId );
+            ContainerHost containerHost = environment.getContainerHostById( containerId );
+            HashMap<HostId, String> params = new HashMap<>();
+            params.put( containerHost.getContainerId(), name );
+            environmentManager.changeContainerHostnames( params, environmentId, false );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
     /** Containers **************************************************** */
 
     @Override
@@ -887,10 +907,8 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
                 containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
-                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), iface.getIp(),
+                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), containerHost.getIp(),
                         containerHost.getTemplateName(), containerHost.getContainerSize(),
                         containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
                         containerHost.getResourceHostId().getId(), containerHost.isLocal(),

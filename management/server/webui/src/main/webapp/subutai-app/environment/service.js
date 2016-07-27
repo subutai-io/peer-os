@@ -62,6 +62,7 @@ function environmentService($http, $q) {
 		switchContainer : switchContainer,
 		getContainerDomain : getContainerDomain,
 		checkDomain : checkDomain,
+		setContainerName : setContainerName,
 
 
 		getContainersType : getContainersType,
@@ -231,6 +232,12 @@ function environmentService($http, $q) {
 	function checkDomain(container, state) {
 		return $http.put(ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/domain' +
 			'?state=' + state);
+	}
+
+
+	function setContainerName( container, name ) {
+		return $http.put( ENVIRONMENTS_URL + container.environmentId + 'containers' + container.id + '/name' +
+			'?name=' + name )
 	}
 
 

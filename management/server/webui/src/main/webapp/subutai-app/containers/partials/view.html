@@ -69,6 +69,7 @@
 					<tr>
 						<th>Status</th>
 						<th>Name</th>
+						<th></th>
 						<th>IP</th>
 						<th>Tags</th>
 						<th>Domain</th>
@@ -102,6 +103,14 @@
 								env-data-source="{{ container.dataSource }}"
 							>
 								{{ container.name }}
+							</a>
+						</td>
+						<td>
+							<a href
+							   class="b-icon b-icon_edit"
+							   tooltips
+							   tooltip-template='changeName'
+							   ng-click="containerViewCtrl.changeNamePopup( container )" style = "visibility: visible">
 							</a>
 						</td>
 						<td class="subt_text__container-ip">
