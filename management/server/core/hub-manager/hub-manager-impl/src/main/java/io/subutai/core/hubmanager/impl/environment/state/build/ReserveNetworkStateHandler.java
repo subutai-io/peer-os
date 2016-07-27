@@ -11,7 +11,6 @@ import io.subutai.hub.share.dto.environment.EnvironmentInfoDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerDto;
 import io.subutai.hub.share.dto.environment.EnvironmentPeerRHDto;
 
-
 public class ReserveNetworkStateHandler extends StateHandler
 {
     public ReserveNetworkStateHandler( Context ctx )

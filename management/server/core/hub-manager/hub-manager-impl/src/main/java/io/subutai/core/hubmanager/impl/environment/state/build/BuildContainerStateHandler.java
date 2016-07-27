@@ -196,7 +196,7 @@ public class BuildContainerStateHandler extends StateHandler
         for ( EnvironmentNodeDto nodeDto : envNodes.getNodes() )
         {
             log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
-                    nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
+                    nodeDto.getContainerName(), nodeDto.getContainerName(), nodeDto.getState() );
 
             // Exclude existing containers. This may happen as a result of duplicated requests or adding a new
             // container to existing peer in env.
@@ -214,8 +214,9 @@ public class BuildContainerStateHandler extends StateHandler
     {
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-        return new CloneRequest( nodeDto.getHostId(), nodeDto.getHostName(), nodeDto.getContainerName(),
-                nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64, contSize );
+        return new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
+                nodeDto.getContainerName(), nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64,
+                contSize );
     }
 
 
@@ -233,12 +234,12 @@ public class BuildContainerStateHandler extends StateHandler
         return false;
     }
 
-// TODO this was quick fix we need change hostname on HUB with properly way
+
     private ContainerHost findContainerByHostname( Set<ContainerHost> envContainers, String hostname )
     {
         for ( ContainerHost ch : envContainers )
         {
-            if ( ch.getHostname().contains( hostname ) )
+            if ( ch.getHostname().equals( hostname ) )
             {
                 return ch;
             }
