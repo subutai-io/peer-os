@@ -27,14 +27,6 @@ public class Node
     private ContainerSize type = ContainerSize.SMALL;
 
     @GsonRequired
-    @JsonProperty( "sshGroupId" )
-    private int sshGroupId;
-
-    @GsonRequired
-    @JsonProperty( "hostsGroupId" )
-    private int hostsGroupId;
-
-    @GsonRequired
     @JsonProperty( "peerId" )
     private String peerId;
 
@@ -54,9 +46,7 @@ public class Node
 
     public Node( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
                  @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
-                 @JsonProperty( "sshGroupId" ) final int sshGroupId,
-                 @JsonProperty( "hostsGroupId" ) final int hostsGroupId, @JsonProperty( "peerId" ) final String peerId,
-                 @JsonProperty( "hostId" ) final String hostId )
+                 @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
@@ -68,8 +58,6 @@ public class Node
         this.name = name;
         this.templateName = templateName;
         this.type = type;
-        this.sshGroupId = sshGroupId;
-        this.hostsGroupId = hostsGroupId;
         this.peerId = peerId;
         this.hostId = hostId;
     }
@@ -84,18 +72,6 @@ public class Node
     public String getTemplateName()
     {
         return templateName;
-    }
-
-
-    public int getSshGroupId()
-    {
-        return sshGroupId;
-    }
-
-
-    public int getHostsGroupId()
-    {
-        return hostsGroupId;
     }
 
 
@@ -121,8 +97,7 @@ public class Node
     public String toString()
     {
         return "Node{" + "name='" + name + '\'' + ", templateName='" + templateName + '\'' + ", type=" + type
-                + ", sshGroupId=" + sshGroupId + ", hostsGroupId=" + hostsGroupId + ", peerId='" + peerId + '\''
-                + ", hostId='" + hostId + '\'' + ", hostname='" + hostname + '\'' + '}';
+                + ", peerId='" + peerId + '\'' + ", hostId='" + hostId + '\'' + ", hostname='" + hostname + '\'' + '}';
     }
 
 

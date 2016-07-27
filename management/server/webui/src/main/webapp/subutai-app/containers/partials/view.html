@@ -68,7 +68,7 @@
 				<thead>
 					<tr>
 						<th>Status</th>
-						<th>Template</th>
+						<th>Name</th>
 						<th>IP</th>
 						<th>Tags</th>
 						<th>Domain</th>
@@ -94,13 +94,14 @@
 									<span class="b-nowrap">Environment: {{ containerViewCtrl.environments | getEnvById: container.environmentId }}</span><br>
 									<span class="b-nowrap">ID: {{ container.id }}</span><br>
 									<span class="b-nowrap">Host Name: {{ container.hostname }}</span>
+									<span class="b-nowrap">Template: {{ container.templateName }}</span>
 								' 
 								tooltip-side="right"
 								env-id="{{ container.environmentId }}"
 								container-id="{{ container.id }}"
 								env-data-source="{{ container.dataSource }}"
 							>
-								{{ container.templateName }}
+								{{ container.name }}
 							</a>
 						</td>
 						<td class="subt_text__container-ip">
@@ -185,15 +186,6 @@
 			</table>
 
 		</div>
-
-		<!--<div class="b-empty-list" ng-show="environmentViewCtrl.environments.length == 0">
-			<div class="b-empty-list__text">
-				You don’t have any environments, chose blueprint and build it
-			</div>
-			<a class="b-btn b-btn_blue" ui-sref="blueprints">
-				<i class="fa fa-plus"></i> Blueprints
-			</a>	
-		</div>-->
 	</div>
 
 </div>

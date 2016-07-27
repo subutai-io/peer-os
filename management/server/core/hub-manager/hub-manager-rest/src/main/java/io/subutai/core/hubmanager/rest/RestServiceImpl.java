@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.rest;
 
 
+import java.security.AccessControlException;
+
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
@@ -67,6 +69,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();
@@ -116,6 +125,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             LOG.error( e.getMessage() );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
                     entity( JsonUtil.GSON.toJson( e.getMessage() ) ).build();

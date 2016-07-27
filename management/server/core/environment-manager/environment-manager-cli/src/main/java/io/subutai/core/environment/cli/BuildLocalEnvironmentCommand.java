@@ -1,8 +1,8 @@
 package io.subutai.core.environment.cli;
 
 
+import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -82,9 +82,8 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
             return null;
         }
         String hostId = resourceHosts.iterator().next().getId();
-        Node node =
-                new Node( UUID.randomUUID().toString(), "NodeGroup1", templateName, ContainerSize.TINY, 1, 1, peerId,
-                        hostId );
+        String containerName = String.format( "Container%d", new Random().nextInt( 999 ) );
+        Node node = new Node( containerName, containerName, templateName, ContainerSize.TINY, peerId, hostId );
 
         Topology topology = new Topology( "Dummy environment name" );
         topology.addNodePlacement( peerId, node );

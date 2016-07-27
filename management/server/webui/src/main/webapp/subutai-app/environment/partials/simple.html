@@ -184,13 +184,14 @@
 								</div>
 							</td>
 							<td class="b-word-break-all">
-								<span tooltips
+								<a tooltips
+								   ui-sref="containers({ environmentId: environment.id })"
 									tooltip-template='<span class="b-nowrap">ID: {{ environment.id }}</span>'
 									tooltip-side="right"
 									env-data-source="{{ environment.dataSource }}"
 								>
 									{{ environment.name }}
-								</span>
+								</a>
 							</td>
 							<td><a href ng-click = "environmentViewCtrl.showSSHKeyForm(environment.id)">Add</a>/
 								<a href ng-click="environmentViewCtrl.showSSHKeysPopup(environment.id)">Remove</a></td>

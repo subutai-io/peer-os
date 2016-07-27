@@ -42,7 +42,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         super( "hub", json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING ), json.get( "templateName" ).asText(), HostArchitecture.AMD64, 0, 0,
+                        ContainerHostState.RUNNING ), json.get( "templateName" ).asText(), HostArchitecture.AMD64,
                 json.get( "domainName" ).asText(), parseSize( json ), json.get( "hostId" ).asText(),
                 json.get( "name" ).asText() );
 

@@ -16,6 +16,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
@@ -73,6 +74,12 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
     Response setQuota( @PathParam( "containerId" ) ContainerId containerId, ContainerQuota containerQuota );
+
+    @POST
+    @Path( "{environmentId}/container/{containerId}/size" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response setContainerSize( @PathParam( "containerId" ) ContainerId containerId, ContainerSize containerSize );
 
     @GET
     @Path( "{environmentId}/container/{containerId}/rhId" )

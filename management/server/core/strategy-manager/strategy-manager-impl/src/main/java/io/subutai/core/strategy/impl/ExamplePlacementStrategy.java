@@ -7,19 +7,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Node;
+import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.core.strategy.api.ExampleStrategy;
-import io.subutai.common.environment.NodeSchema;
 import io.subutai.core.strategy.api.StrategyException;
 
 
@@ -157,9 +156,8 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             {
                 for ( ResourceAllocator.AllocatedContainer container : containers )
                 {
-                    Node node =
-                            new Node( UUID.randomUUID().toString(), container.getName(), container.getTemplateName(),
-                                    container.getSize(), 0, 0, container.getPeerId(), container.getHostId() );
+                    Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
+                            container.getSize(), container.getPeerId(), container.getHostId() );
                     nodes.add( node );
                 }
             }
@@ -180,6 +178,6 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
     private String generateContainerName( final NodeSchema nodeSchema )
     {
-        return nodeSchema.getName().replaceAll( "\\s+", "_" );
+        return nodeSchema.getName().replaceAll( "\\s+", "" );
     }
 }

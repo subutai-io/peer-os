@@ -309,19 +309,8 @@ public class QuotaManagerImpl implements QuotaManager
         Preconditions.checkNotNull( containerId, "Container ID cannot be null" );
         Preconditions.checkNotNull( containerQuota, "Container quota cannot be null." );
 
-        for ( Quota quota : containerQuota.getAll() )
-        {
-            final Integer threshold = quota.getThreshold();
-            if ( threshold != null && threshold >= 0 && threshold <= 100 && quota.getResource() != null )
-            {
-                executeOnContainersResourceHost( containerId,
-                        commands.getWriteQuotaCommand( containerId.getHostName(), quota.getResource(), threshold ) );
-            }
-            else
-            {
-                LOGGER.warn( "Invalid quota.", quota );
-            }
-        }
+        executeOnContainersResourceHost( containerId,
+                commands.getSetQuotaCommand( containerId.getHostName(), containerQuota ) );
     }
 
 

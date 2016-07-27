@@ -25,32 +25,32 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns hosts containers
      */
-    public Set<ContainerHost> getContainerHosts();
+    Set<ContainerHost> getContainerHosts();
 
     /**
      * Returns hosted container by its hostname
      */
-    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+    ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
 
     /**
      * Returns hosted container by its id
      */
-    public ContainerHost getContainerHostById( String id ) throws HostNotFoundException;
+    ContainerHost getContainerHostById( String id ) throws HostNotFoundException;
 
     /**
      * Starts hosted container
      */
-    public void startContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+    void startContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
     /**
      * Stops hosted container
      */
-    public void stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+    void stopContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
     /**
      * Destroys hosted container
      */
-    public void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
+    void destroyContainerHost( ContainerHost containerHost ) throws ResourceHostException;
 
     /**
      * Returns network interfaces from db
@@ -60,9 +60,9 @@ public interface ResourceHost extends Host, ResourceHostInfo
     /**
      * Returns state of hosted container
      */
-    public ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
+    ContainerHostState getContainerHostState( final ContainerHost container ) throws ResourceHostException;
 
-    public void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
+    void setupTunnels( P2pIps p2pIps, NetworkResource networkResource ) throws ResourceHostException;
 
     Set<ContainerHost> getContainerHostsByEnvironmentId( String environmentId );
 
@@ -97,16 +97,18 @@ public interface ResourceHost extends Host, ResourceHostInfo
     String cloneContainer( String templateName, String hostname, String ip, int vlan, String environmentId )
             throws ResourceHostException;
 
-    void setContainerQuota( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
+    void setContainerSize( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
 
 
     String getRhVersion() throws ResourceHostException;
 
     String getP2pVersion() throws ResourceHostException;
 
-    public P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException;
+    P2pLogs getP2pLogs( JournalCtlLevel logLevel, Date from, Date till ) throws ResourceHostException;
 
     void setContainerHostname( ContainerHost containerHost, String hostname ) throws ResourceHostException;
 
     void setHostname( String hostname ) throws ResourceHostException;
+
+    int getVlan() throws ResourceHostException;
 }

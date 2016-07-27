@@ -15,6 +15,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.host.HostId;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertHandler;
@@ -273,4 +274,9 @@ public interface EnvironmentManager
 
     EnvConnectivityState checkEnvironmentConnectivity( final String environmentId )
             throws EnvironmentNotFoundException, EnvironmentManagerException;
+
+
+    void changeContainerHostnames( final Map<HostId, String> newContainerHostnames, final String environmentId,
+                                   final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
 }

@@ -1,8 +1,8 @@
 package io.subutai.core.environment.cli;
 
 
+import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -93,8 +93,8 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         }
         String hostId = resourceHosts.iterator().next().getId();
         Environment environment = environmentManager.loadEnvironment( environmentId );
-        Node node = new Node( UUID.randomUUID().toString(), String.format( "NodeGroup%s", System.currentTimeMillis() ),
-                templateName, ContainerSize.TINY, 1, 1, peerId, hostId );
+        String containerName = String.format( "Container%d", new Random().nextInt( 999 ) );
+        Node node = new Node( containerName, containerName, templateName, ContainerSize.TINY, peerId, hostId );
         //
         Topology topology = new Topology( environment.getName() );
         topology.addNodePlacement( peerId, node );

@@ -56,6 +56,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.QuotaException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
@@ -438,7 +439,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setContainerQuota( final ContainerHost containerHost, final ContainerSize containerSize )
+    public void setContainerSize( final ContainerHost containerHost, final ContainerSize containerSize )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
@@ -457,9 +458,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getSetQuotaCommand( containerHost.getHostname(), quota ), this );
+            getQuotaManager().setQuota( containerHost.getContainerId(), quota );
         }
-        catch ( CommandException e )
+        catch ( QuotaException e )
         {
             throw new ResourceHostException( String.format( "Error setting quota %s to container %s: %s", containerSize,
                     containerHost.getHostname(), e.getMessage() ), e );
@@ -903,6 +904,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         catch ( NetworkManagerException e )
         {
             throw new ResourceHostException( String.format( "Error obtaining P2P logs: %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
+    public int getVlan() throws ResourceHostException
+    {
+        try
+        {
+            return Integer.parseInt(
+                    commandUtil.execute( resourceHostCommands.getGetVlanCommand(), this ).getStdOut().trim() );
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining VLAN : %s", e.getMessage() ), e );
         }
     }
 

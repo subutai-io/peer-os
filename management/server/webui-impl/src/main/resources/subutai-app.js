@@ -50,12 +50,20 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
         return vm.isRegistrationFormVisible;
     };
 
-	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null) && getCookie('sptoken')) {
+	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null
+        || localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {
+	    console.log("get login details");
 		$http.get(SERVER_URL + "rest/ui/identity/user", {
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		}).success(function (data) {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentUserPermissions');
+            localStorage.removeItem('currentUserToken');
+
+
 			localStorage.setItem('currentUser', data.userName);
+            localStorage.setItem('currentUserToken', getCookie('sptoken'));
 
             var perms = [];
             for( var i = 0; i < data.roles.length; i++ )
@@ -340,12 +348,22 @@ function SubutaiController($rootScope) {
     var vm = this;
     vm.bodyClass = '';
     vm.activeState = '';
+    vm.adminMenus = false;
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
         vm.layoutType = 'subutai-app/common/layouts/' + toState.data.layout + '.html';
         if (angular.isDefined(toState.data.bodyClass)) {
             vm.bodyClass = toState.data.bodyClass;
             vm.activeState = toState.name;
+
+            vm.adminMenus = false;
+            if( localStorage.getItem("currentUserPermissions") )
+                for( var i = 0; i < localStorage.getItem("currentUserPermissions").length; i++ ) {
+                    if (localStorage.getItem("currentUserPermissions")[i] == 2) {
+                        vm.adminMenus = true;
+                    }
+                }
+
             return;
         }
 

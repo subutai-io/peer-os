@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,9 +157,8 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             {
                 for ( RandomAllocator.AllocatedContainer container : containers )
                 {
-                    Node node =
-                            new Node( UUID.randomUUID().toString(), container.getName(), container.getTemplateName(),
-                                    container.getSize(), 0, 0, container.getPeerId(), container.getHostId() );
+                    Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
+                            container.getSize(), container.getPeerId(), container.getHostId() );
                     nodes.add( node );
                 }
             }
@@ -181,6 +179,6 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
     private String generateContainerName( final NodeSchema nodeSchema )
     {
-        return nodeSchema.getName().replaceAll( "\\s+", "_" );
+        return nodeSchema.getName().replaceAll( "\\s+", "" );
     }
 }

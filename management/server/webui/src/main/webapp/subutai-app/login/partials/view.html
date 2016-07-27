@@ -6,18 +6,7 @@
 		<div class="b-workspace b-workspace_login" ng-controller="LoginCtrl as loginCtrl">
 
 			<div class="b-workspace__header">
-				<h1 class="b-title b-title_by">Log in by</h1>
-				<div class="b-switcher b-switcher_login">
-					<div class="b-toggle b-toggle_cloud">
-						<input type="checkbox" 
-							class="b-check" 
-							ng-model="loginMode" 
-							ng-change="loginCtrl.changeMode(loginMode)">
-
-						<div class="b-toggle-bg"></div>
-						<b class="b-b b-switch"></b>
-					</div>
-				</div>
+				<h1 class="b-title b-title_by">Log in</h1>
 				<div class="clear"></div>
 			</div>
 
@@ -26,7 +15,7 @@
 					<div class="b-form__error-message" ng-if="loginCtrl.errorMessage">
 						{{ loginCtrl.errorMessage }}
 					</div>
-					<form ng-submit="loginCtrl.login()" ng-show="loginCtrl.activeMode == 'username'">
+					<form ng-submit="loginCtrl.login()">
 						<div class="b-form__wrapper g-margin-bottom-half">
 							<label class="b-form-label">Username</label>
 							<input
@@ -74,40 +63,6 @@
 							</button>
 							<button ng-show="loginCtrl.passExpired" type="submit" class="b-btn b-btn_green b-btn_full-width" tabindex=3>
 								Save and login
-							</button>
-						</div>
-					</form>
-					<form ng-submit="loginCtrl.login()" ng-show="loginCtrl.activeMode == 'sptoken'">
-						<div class="b-form__wrapper g-margin-bottom-half">
-							<label class="b-form-label">Fingerprint</label>
-							<input
-								id="subt-input__login"
-								class="b-form-input b-form-input_full" 
-								ng-model="loginCtrl.fingerprint"
-								name="fingerprint"
-								type="text">
-						</div>
-						<div ng-hide="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
-							<label class="b-form-label">Signed message</label>
-							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.sptoken">
-							</textarea>
-						</div>
-
-						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
-							<label class="b-form-label">New Message</label>
-							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.newMsg">
-							</textarea>
-						</div>
-
-						<div ng-show="loginCtrl.passExpired" class="b-form__wrapper g-margin-bottom">
-							<label class="b-form-label">Confirm Message</label>
-							<textarea class="e2e-sign-message b-form-input b-form-input_full b-form-input_textarea" ng-model="loginCtrl.msgConf">
-							</textarea>
-						</div>
-
-						<div class="b-login-form-btn">
-							<button type="submit" class="b-btn b-btn_green b-btn_full-width">
-								Login
 							</button>
 						</div>
 					</form>
