@@ -26,6 +26,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -59,7 +61,6 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.identity.api.IdentityManager;
@@ -401,7 +402,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
         Preconditions
-                .checkArgument( !StringUtil.areStringsEqual( this.hostname, hostname, true ), "No change in hostname" );
+                .checkArgument( !StringUtils.equalsIgnoreCase( this.hostname, hostname ), "No change in hostname" );
 
         getPeer().setContainerHostname( getContainerId(), hostname );
 

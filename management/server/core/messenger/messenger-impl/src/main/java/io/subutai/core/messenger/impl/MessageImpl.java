@@ -6,11 +6,12 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.messenger.api.Message;
 
 
@@ -80,7 +81,7 @@ public class MessageImpl implements Message
     @Override
     public void setSender( final String sender )
     {
-        Preconditions.checkArgument( StringUtil.getLen( sender ) <= MAX_SENDER_LEN,
+        Preconditions.checkArgument( StringUtils.length( sender ) <= MAX_SENDER_LEN,
                 String.format( "Max sender length must be %d", MAX_SENDER_LEN ) );
 
         this.sender = sender;
