@@ -97,7 +97,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
     String cloneContainer( String templateName, String hostname, String ip, int vlan, String environmentId )
             throws ResourceHostException;
 
-    void setContainerQuota( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
+    void setContainerSize( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
 
 
     String getRhVersion() throws ResourceHostException;

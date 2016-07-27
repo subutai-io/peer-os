@@ -184,6 +184,8 @@ public interface Peer extends RelationLink
 
     //******** Quota functions ***********
 
+    void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize ) throws PeerException;
+
     /**
      * Returns resource usage of process on container by its PID
      *
@@ -197,7 +199,7 @@ public interface Peer extends RelationLink
 
     UsedNetworkResources getUsedNetworkResources() throws PeerException;
 
-    void reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
+    Integer reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
 
 
     /**

@@ -239,6 +239,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
+    public void setContainerSize( final ContainerSize size ) throws PeerException
+    {
+        getPeer().setContainerSize( this.getContainerId(), size );
+    }
+
+
+    @Override
     public ContainerSize getContainerSize()
     {
         return containerSize;

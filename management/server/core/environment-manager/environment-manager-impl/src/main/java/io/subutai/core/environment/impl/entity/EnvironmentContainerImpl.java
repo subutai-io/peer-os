@@ -94,9 +94,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonProperty( "containerName" )
     private String containerName;
 
-    @Column( name = "displayName", nullable = true )
-    @JsonProperty( "displayName" )
-    private String displayName;
 
     @Column( name = "creator_peer_id", nullable = false )
     @JsonIgnore
@@ -133,13 +130,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonIgnore
     protected Set<HostInterface> hostInterfaces = new HashSet<>();
 
-    @Column( name = "ssh_group_id" )
-    @JsonIgnore
-    private int sshGroupId;
-
-    @Column( name = "hosts_group_id" )
-    @JsonIgnore
-    private int hostsGroupId;
 
     @Column( name = "domain_name" )
     @JsonProperty( "domainName" )
@@ -178,9 +168,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
     public EnvironmentContainerImpl( final String creatorPeerId, final String peerId,
                                      final ContainerHostInfoModel hostInfo, final String templateName,
-                                     final HostArchitecture templateArch, int sshGroupId, int hostsGroupId,
-                                     String domainName, ContainerSize containerSize, String resourceHostId,
-                                     final String containerName )
+                                     final HostArchitecture templateArch, String domainName,
+                                     ContainerSize containerSize, String resourceHostId, final String containerName )
     {
         Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
@@ -193,12 +182,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
         this.containerName = containerName;
-        this.displayName = containerName;
         this.hostArchitecture = hostInfo.getArch();
         this.templateName = templateName;
         this.templateArch = templateArch;
-        this.sshGroupId = sshGroupId;
-        this.hostsGroupId = hostsGroupId;
         this.domainName = domainName;
         this.containerSize = containerSize;
         this.resourceHostId = resourceHostId;
@@ -391,34 +377,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public String getDisplayName()
-    {
-        return displayName;
-    }
-
-
-    @Override
-    public EnvironmentContainerHost setDisplayName( final String displayName )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( displayName ) );
-
-        for ( EnvironmentContainerHost environmentContainerHost : environment.getContainerHosts() )
-        {
-            if ( environmentContainerHost.getDisplayName().equalsIgnoreCase( displayName ) )
-            {
-                throw new IllegalArgumentException(
-                        String.format( "Name %s is already assigned to container %s", displayName,
-                                environmentContainerHost.getId() ) );
-            }
-        }
-
-        this.displayName = displayName;
-
-        return environmentManager.update( this );
-    }
-
-
-    @Override
     public String getPeerId()
     {
         return this.peerId;
@@ -446,10 +404,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
                 .checkArgument( !StringUtil.areStringsEqual( this.hostname, hostname, true ), "No change in hostname" );
 
         getPeer().setContainerHostname( getContainerId(), hostname );
-
-        //TODO we should update each container's /etc/hosts file within the environment
-        //TODO also probably each authorized_keys file to change hostnames
-        //TODO we must hide this method and expose one in EnvManager with a dedicated workflow
 
         this.hostname = hostname;
 
@@ -589,28 +543,10 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public int getSshGroupId()
+    @Override
+    public void setContainerSize( final ContainerSize size ) throws PeerException
     {
-        return sshGroupId;
-    }
-
-
-    public int getHostsGroupId()
-    {
-        return hostsGroupId;
-    }
-
-
-    public String getDomainName()
-    {
-        return domainName;
-    }
-
-
-    protected void setHostId( String id )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
-        this.hostId = id;
+        getPeer().setContainerSize( this.getContainerId(), size );
     }
 
 
@@ -683,8 +619,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "creatorPeerId", creatorPeerId ).add( "templateName", templateName )
-                          .add( "environmentId", envId ).add( "sshGroupId", sshGroupId )
-                          .add( "hostsGroupId", hostsGroupId ).add( "domainName", domainName ).add( "tags", tags )
+                          .add( "environmentId", envId ).add( "domainName", domainName ).add( "tags", tags )
                           .add( "templateArch", templateArch ).add( "hostArchitecture", hostArchitecture )
                           .add( "resourceHostId", resourceHostId ).toString();
     }

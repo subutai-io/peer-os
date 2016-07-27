@@ -681,7 +681,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
+            return Response.ok().entity( gson.toJson( ContainerSize.getContainerSizeDescription() ) ).build();
         }
         catch ( Exception e )
         {
@@ -887,19 +887,22 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), containerHost.getIp(), containerHost.getTemplateName(),
-                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
+                HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
+
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
+                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), iface.getIp(),
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        containerHost.getResourceHostId().getId(), containerHost.isLocal(),
                         containerHost.getClass().getName() ) );
             }
             catch ( Exception e )
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
-                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(),
-                        containerHost.getClass().getName() ) );
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
+                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), "UNKNOWN",
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName() ) );
             }
         }
 
