@@ -224,7 +224,7 @@ func Clone(parent, child string) {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/home home none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/opt opt none bind,rw 0 0"},
 		{"lxc.mount.entry", config.Agent.LxcPrefix + child + "/var var none bind,rw 0 0"},
-		{"lxc.network.mtu", ""},
+		{"lxc.network.mtu", "1300"},
 	})
 }
 

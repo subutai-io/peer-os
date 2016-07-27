@@ -1,14 +1,15 @@
 package lib
 
 import (
-	"github.com/subutai-io/base/agent/config"
-	"github.com/subutai-io/base/agent/lib/container"
-	"github.com/subutai-io/base/agent/lib/gpg"
-	"github.com/subutai-io/base/agent/log"
 	"io/ioutil"
 	"net"
 	"os"
 	"strings"
+
+	"github.com/subutai-io/base/agent/config"
+	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/gpg"
+	"github.com/subutai-io/base/agent/log"
 )
 
 func LxcClone(parent, child, envId, addr, token string) {
@@ -66,6 +67,8 @@ func setDns(name string) {
 	resolv := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns + "\n")
 	log.Check(log.DebugLevel, "Writing resolv.conf.orig",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/original", resolv, 0644))
+	log.Check(log.DebugLevel, "Writing resolv.conf.tail",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/tail", resolv, 0644))
 	log.Check(log.DebugLevel, "Writing resolv.conf",
 		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolv.conf", resolv, 0644))
 }
@@ -87,7 +90,6 @@ func addNetConf(name, addr string) {
 	container.SetContainerConf(name, [][]string{
 		{"lxc.network.ipv4", ipvlan[0]},
 		{"lxc.network.ipv4.gateway", net.IP(gw).String()},
-		{"lxc.network.mtu", ""},
 		{"#vlan_id", ipvlan[1]},
 	})
 	setStaticNetwork(name)
