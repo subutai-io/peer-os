@@ -63,6 +63,8 @@ public class EnvironmentPeerDto
 
     private String message;
 
+    private Integer vlan;
+
 
     public EnvironmentPeerDto()
     {
@@ -330,6 +332,18 @@ public class EnvironmentPeerDto
     public void setMessage( String message )
     {
         this.message = message;
+    }
+
+
+    public Integer getVlan()
+    {
+        return vlan;
+    }
+
+
+    public void setVlan( final Integer vlan )
+    {
+        this.vlan = vlan;
     }
 
 
