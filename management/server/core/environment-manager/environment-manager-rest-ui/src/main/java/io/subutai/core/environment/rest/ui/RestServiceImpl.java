@@ -3,11 +3,7 @@ package io.subutai.core.environment.rest.ui;
 
 import java.io.File;
 import java.security.AccessControlException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -40,7 +36,6 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -66,7 +61,6 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
-import io.subutai.core.strategy.api.StrategyException;
 import io.subutai.core.strategy.api.StrategyManager;
 
 
@@ -893,17 +887,15 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getDisplayName(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), composeCHName( containerHost ), containerHost.getEnvironmentId().getId(),
+                        containerHost.getHostname(), containerHost.getIp(), containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                         containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
                         containerHost.getClass().getName() ) );
             }
             catch ( Exception e )
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getDisplayName(), containerHost.getEnvironmentId().getId(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), composeCHName( containerHost ), containerHost.getEnvironmentId().getId(),
                         containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
                         containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
                         containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(),
@@ -925,5 +917,21 @@ public class RestServiceImpl implements RestService
         {
             throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
         }
+    }
+
+    private String composeCHName( ContainerHost containerHost )
+    {
+        String lastOctet = "";
+        try
+        {
+            lastOctet = Arrays.asList(containerHost.getIp().split("//.")).get(3);
+        }
+        catch (Exception e)
+        {
+            LOG.warn("No ip for container " + containerHost.getId(), e);
+        }
+
+
+        return String.format("%s-%s", containerHost.getContainerName().replaceAll("\\s", ""), lastOctet);
     }
 }
