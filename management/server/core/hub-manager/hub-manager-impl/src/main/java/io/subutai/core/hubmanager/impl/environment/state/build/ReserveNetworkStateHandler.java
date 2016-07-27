@@ -48,9 +48,10 @@ public class ReserveNetworkStateHandler extends StateHandler
 
         String subnetWithoutMask = envInfo.getSubnetCidr().replace( "/24", "" );
 
-        NetworkResourceImpl networkResource = new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(), subnetWithoutMask );
+        NetworkResourceImpl networkResource =
+                new NetworkResourceImpl( envInfo.getId(), envInfo.getVni(), envInfo.getP2pSubnet(), subnetWithoutMask );
 
-        ctx.localPeer.reserveNetworkResource( networkResource );
+        peerDto.setVlan( ctx.localPeer.reserveNetworkResource( networkResource ) );
     }
 
 
