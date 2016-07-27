@@ -3,17 +3,17 @@ package io.subutai.common.network;
 
 public interface NetworkResource
 {
-    public String getEnvironmentId();
+    String getEnvironmentId();
 
 
-    public long getVni();
+    long getVni();
 
 
-    public String getP2pSubnet();
+    String getP2pSubnet();
 
 
-    public String getContainerSubnet();
+    String getContainerSubnet();
 
 
-    public int getVlan();
+    int getVlan();
 }

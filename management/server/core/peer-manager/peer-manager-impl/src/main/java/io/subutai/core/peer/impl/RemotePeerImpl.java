@@ -841,11 +841,11 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    public Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
         Preconditions.checkNotNull( networkResource );
 
-        peerWebClient.reserveNetworkResource( networkResource );
+        return peerWebClient.reserveNetworkResource( networkResource );
     }
 
 

@@ -3,6 +3,8 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.Environment;
@@ -40,25 +42,29 @@ public class ChangeHostnameStep
         //todo parallelize
         boolean ok = true;
 
-
-        for ( Map.Entry<HostId, String> newHostname : newContainerHostNames.entrySet() )
+        for ( Map.Entry<HostId, String> newHostnameEntry : newContainerHostNames.entrySet() )
         {
             try
             {
-                EnvironmentContainerImpl environmentContainer =
-                        ( EnvironmentContainerImpl ) environment.getContainerHostById( newHostname.getKey().getId() );
+                EnvironmentContainerImpl environmentContainer = ( EnvironmentContainerImpl ) environment
+                        .getContainerHostById( newHostnameEntry.getKey().getId() );
 
-                environmentContainer.setHostname( newHostname.getValue() );
+                String newHostname = String.format( "%s-%d-%s", newHostnameEntry.getValue(),
+                        environment.getPeerConf( environmentContainer.getPeerId() ).getVlan(),
+                        StringUtils.substringAfterLast( environmentContainer.getIp(), "." ) );
 
-                oldHostNames.put( newHostname.getKey(), environmentContainer.getHostname() );
+                String oldHostname = environmentContainer.getHostname();
+
+                environmentContainer.setHostname( newHostname );
+
+                oldHostNames.put( newHostnameEntry.getKey(), oldHostname );
             }
             catch ( Exception e )
             {
                 ok = false;
 
-                trackerOperation.addLog(
-                        String.format( "Failed to change hostname of container %s: %s", newHostname.getKey().getId(),
-                                e.getMessage() ) );
+                trackerOperation.addLog( String.format( "Failed to change hostname of container %s: %s",
+                        newHostnameEntry.getKey().getId(), e.getMessage() ) );
             }
         }
 

@@ -124,32 +124,33 @@ public class ReservationStep
         }
 
         //reserve network resources
-        PeerUtil<Object> netReservationUtil = new PeerUtil<>();
+        PeerUtil<Integer> netReservationUtil = new PeerUtil<>();
 
         for ( final Peer peer : newPeers )
         {
-            netReservationUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            netReservationUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Integer>()
             {
                 @Override
-                public Object call() throws Exception
+                public Integer call() throws Exception
                 {
-                    peer.reserveNetworkResource( new NetworkResourceImpl( environment.getId(), environment.getVni(),
-                            environment.getP2pSubnet(), containerSubnet ) );
-                    return null;
+                    return peer.reserveNetworkResource(
+                            new NetworkResourceImpl( environment.getId(), environment.getVni(),
+                                    environment.getP2pSubnet(), containerSubnet ) );
                 }
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Object> netReservationResults = netReservationUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Integer> netReservationResults = netReservationUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult netReservationResult : netReservationResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<Integer> netReservationResult : netReservationResults.getPeerTaskResults() )
         {
             if ( netReservationResult.hasSucceeded() )
             {
                 trackerOperation.addLog( String.format( "Reserved network resources on peer %s",
                         netReservationResult.getPeer().getName() ) );
 
-                environment.addEnvironmentPeer( new PeerConfImpl( netReservationResult.getPeer().getId() ) );
+                environment.addEnvironmentPeer(
+                        new PeerConfImpl( netReservationResult.getPeer().getId(), netReservationResult.getResult() ) );
             }
             else
             {

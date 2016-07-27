@@ -40,7 +40,10 @@ public class PeerConfImpl implements PeerConf, Serializable
     @Column( name = "peer_id", nullable = false )
     private String peerId;
 
-    @ElementCollection( targetClass = RhP2PIpEntity.class, fetch = FetchType.EAGER)
+    @Column( name = "vlan", nullable = false )
+    private Integer vlan;
+
+    @ElementCollection( targetClass = RhP2PIpEntity.class, fetch = FetchType.EAGER )
     @CollectionTable(
             name = "RH_P2P_IP",
             joinColumns = @JoinColumn( name = "PEER_ID" ) )
@@ -51,16 +54,20 @@ public class PeerConfImpl implements PeerConf, Serializable
     private Environment environment;
 
 
-    public PeerConfImpl( final String peerId )
+    public PeerConfImpl( final String peerId, final Integer vlan )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+        Preconditions.checkNotNull( vlan );
 
         this.peerId = peerId;
+        this.vlan = vlan;
         this.rhP2pIps = Sets.newHashSet();
     }
 
 
-    public PeerConfImpl() {}
+    public PeerConfImpl()
+    {
+    }
 
 
     public void addRhP2pIps( Set<RhP2pIp> rhP2pIps )
@@ -84,6 +91,13 @@ public class PeerConfImpl implements PeerConf, Serializable
     public Long getId()
     {
         return id;
+    }
+
+
+    @Override
+    public Integer getVlan()
+    {
+        return vlan;
     }
 
 
