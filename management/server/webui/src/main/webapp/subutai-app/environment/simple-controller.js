@@ -20,6 +20,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.editEnvironment = editEnvironment;
 	vm.notifyChanges = notifyChanges;
 	vm.applyChanges = applyChanges;
+	vm.getLastOctet = getLastOctet;
 
 	vm.environments = [];
 
@@ -361,6 +362,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			checkLastLog(false);
 			$rootScope.notificationsUpdate = 'modifyEnvironmentError';
 		});
+	}
+
+	function getLastOctet( ip )
+	{
+		return ip.split(".")[2];
 	}
 
 	var graph = new joint.dia.Graph;

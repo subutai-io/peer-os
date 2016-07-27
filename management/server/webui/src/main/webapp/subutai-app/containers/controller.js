@@ -34,6 +34,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.tags2Container = {};
 	vm.currentDomainStatus = {};
 	vm.domainContainer = {};
+	vm.editingContainer = {};
 
 	// functions
 	vm.filterContainersList = filterContainersList;
@@ -45,6 +46,8 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	vm.showDomainForm = showDomainForm;
 	vm.checkDomain = checkDomain;
 	vm.getContainerStatus = getContainerStatus;
+	vm.setContainerName = setContainerName;
+	vm.changeNamePopup = changeNamePopup;
 
 	environmentService.getContainersType().success(function (data) {
 		vm.containersType = data;
@@ -265,4 +268,23 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 		});
 	}
 
+	function setContainerName( container, name ) {
+		environmentService.setContainerName( container, name ).success( function (data) {
+			location.reload();
+		} ).error( function (data) {
+			SweetAlert.swal ("ERROR!", data);
+		} );
+	}
+
+
+	function changeNamePopup( container ) {
+
+		vm.editingContainer = container;
+
+		ngDialog.open({
+			template: 'subutai-app/containers/partials/changeName.html',
+			scope: $scope,
+			className: 'b-build-environment-info'
+		});
+	}
 }
