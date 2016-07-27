@@ -236,7 +236,7 @@ function environmentService($http, $q) {
 
 
 	function setContainerName( container, name ) {
-		return $http.put( ENVIRONMENTS_URL + container.environmentId + 'containers' + container.id + '/name' +
+		return $http.put( ENVIRONMENTS_URL + container.environmentId + '/containers/' + container.id + '/name' +
 			'?name=' + name )
 	}
 

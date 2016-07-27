@@ -94,7 +94,6 @@
 								tooltip-template='
 									<span class="b-nowrap">Environment: {{ containerViewCtrl.environments | getEnvById: container.environmentId }}</span><br>
 									<span class="b-nowrap">ID: {{ container.id }}</span><br>
-									<span class="b-nowrap">Host Name: {{ container.hostname }}</span>
 									<span class="b-nowrap">Template: {{ container.templateName }}</span>
 								' 
 								tooltip-side="right"
@@ -102,14 +101,14 @@
 								container-id="{{ container.id }}"
 								env-data-source="{{ container.dataSource }}"
 							>
-								{{ container.name }}
+								{{ container.hostname }}
 							</a>
 						</td>
 						<td>
 							<a href
 							   class="b-icon b-icon_edit"
 							   tooltips
-							   tooltip-template='changeName'
+							   tooltip-template='Change name'
 							   ng-click="containerViewCtrl.changeNamePopup( container )" style = "visibility: visible">
 							</a>
 						</td>
