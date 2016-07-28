@@ -11,4 +11,6 @@ public interface EnvironmentContainerHost extends ContainerHost
     EnvironmentContainerHost removeTag( String tag );
 
     Set<String> getTags();
+
+    EnvironmentContainerHost setContainerSize( ContainerSize size ) throws PeerException;
 }

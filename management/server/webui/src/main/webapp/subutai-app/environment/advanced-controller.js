@@ -293,7 +293,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         var conteiners = {
             "topology": vm.containers2Build,
             "removedContainers": vm.containers2Remove,
-            "environmentId": vm.editingEnv.id
+            "environmentId": vm.editingEnv.id,
+            "changingContainers": []
         };
         environmentService.modifyEnvironment(conteiners, 'advanced')
             .success(function (data) {
@@ -811,24 +812,33 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             return;
         }
 
-        clearWorkspace();
-        vm.editingEnv = environment;
-        vm.environment2BuildName = environment.name;
-        vm.excludedContainers = [];
-        vm.currentPeerIndex = 0;
-        for (var i = 0; i < environment.containers.length; i++) {
-            var container = environment.containers[i];
-            var resourceHostItemId = addResource2Build(container.hostId, container.peerId, i);
-            var resourceHost = graph.getCell(resourceHostItemId);
-            vm.currentPeerIndex++;
-            var img = 'assets/templates/' + container.templateName + '.jpg';
-            if (!imageExists(img)) {
-                img = 'assets/templates/no-image.jpg';
-            }
-            addContainerToHost(resourceHost, container.templateName, img, container.type, container.id);
-        }
-        filterPluginsList();
-    }
+		clearWorkspace();
+		vm.editingEnv = environment;
+		vm.environment2BuildName = environment.name;
+		vm.excludedContainers = [];
+		vm.currentPeerIndex = 0;
+		for(var i = 0; i < environment.containers.length; i++) {
+			var container = environment.containers[i];
+
+			if( container.name.match(/(\d+)(?!.*\d)/g) != null )
+			{
+				if( containerCounter < parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				{
+					containerCounter = parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1;
+				}
+			}
+
+			var resourceHostItemId = addResource2Build(container.hostId, container.peerId, i);
+			var resourceHost = graph.getCell(resourceHostItemId);
+			vm.currentPeerIndex++;
+			var img = 'assets/templates/' + container.templateName + '.jpg';
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
+			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.name);
+		}
+		filterPluginsList();
+	}
 
     vm.plugins = [];
     vm.filteredPlugins = {};
@@ -1195,40 +1205,41 @@ function drop(event) {
     }
 }
 
-function addContainerToHost(model, template, img, size, containerId) {
-    if (size === undefined || size === null) {
-        size = 'SMALL';
-        if (template == 'appscale') {
-            size = 'HUGE';
-        }
-    }
-    if (containerId == undefined || containerId == null) containerId = false;
-    checkResourceHost(model);
-    var rPos = model.attributes.position;
-    var gPos = placeRhSimple(model);
+function addContainerToHost(model, template, img, size, containerId, name) {
+	if(size === undefined || size === null) {
+		size = 'SMALL';
+		if(template == 'appscale') {
+			size = 'HUGE';
+		}
+	}
+	if(containerId == undefined || containerId == null) containerId = false;
+	checkResourceHost(model);
+	var rPos = model.attributes.position;
+	var gPos = placeRhSimple( model );
 
     var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
     var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
 
-    var devElement = new joint.shapes.tm.devElement({
-        position: {x: x, y: y},
-        templateName: template,
-        parentPeerId: model.get('peerId'),
-        parentHostId: model.get('hostId'),
-        quotaSize: size,
-        containerId: containerId,
-        containerName: 'Container ' + (containerCounter++).toString(),
-        attrs: {
-            image: {'xlink:href': img},
-            'rect.b-magnet': {fill: quotaColors[size]},
-            title: {text: template}
-        },
-        rh: {
-            model: model.id,
-            x: gPos.x,
-            y: gPos.y
-        }
-    });
+	var containerName = ( name == undefined || name == null ? 'Container ' + (containerCounter++).toString() : name );
+	var devElement = new joint.shapes.tm.devElement({
+		position: { x: x, y: y },
+		templateName: template,
+		parentPeerId: model.get('peerId'),
+		parentHostId: model.get('hostId'),
+		quotaSize: size,
+		containerId: containerId,
+		containerName: containerName,
+		attrs: {
+			image: { 'xlink:href': img },
+			'rect.b-magnet': {fill: quotaColors[size]},
+			title: {text: containerName + " ('" + template + "') " + size}
+		},
+		rh: {
+			model: model.id,
+			x: gPos.x,
+			y: gPos.y
+		}
+	});
 
     graph.addCell(devElement);
     model.embed(devElement);
@@ -1236,4 +1247,3 @@ function addContainerToHost(model, template, img, size, containerId) {
 
     angular.element(document.getElementById('js-environment-creation')).scope().filterPluginsList();
 }
-

@@ -3,11 +3,7 @@ package io.subutai.core.environment.rest.ui;
 
 import java.io.File;
 import java.security.AccessControlException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -250,7 +246,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response modify( final String environmentId, final String topologyJson, final String removedContainers )
+    public Response modify( final String environmentId, final String topologyJson, final String removedContainers,
+                            final String quotaContainers )
     {
         UUID eventId;
         try
@@ -271,6 +268,18 @@ public class RestServiceImpl implements RestService
             }.getType() );
 
 
+            Map< String, ContainerSize > changedContainersFiltered = new HashMap<>();
+            List<Map<String, String>> changingContainers =
+                    JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
+                    {
+                    }.getType() );
+
+            for( Map<String, String> cont : changingContainers )
+            {
+                changedContainersFiltered.put( cont.get("key"), ContainerSize.valueOf( cont.get("value") ));
+            }
+
+
             Topology topology = null;
             if ( schema.size() > 0 )
             {
@@ -280,7 +289,7 @@ public class RestServiceImpl implements RestService
                 topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
 
-            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
+            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered, true );
         }
         catch ( Exception e )
         {
@@ -294,7 +303,7 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response modifyAdvanced( final String environmentId, final String topologyJson,
-                                    final String removedContainers )
+                                    final String removedContainers, final String quotaContainers )
     {
         UUID eventId;
 

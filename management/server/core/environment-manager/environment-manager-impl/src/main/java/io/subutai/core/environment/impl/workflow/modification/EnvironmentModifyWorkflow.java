@@ -2,10 +2,13 @@ package io.subutai.core.environment.impl.workflow.modification;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
@@ -29,6 +32,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     private EnvironmentImpl environment;
     private final Topology topology;
     private List<String> removedContainers;
+    private Map<String, ContainerSize> changedContainers;
     private final String defaultDomain;
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
@@ -39,6 +43,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     public enum EnvironmentGrowingPhase
     {
         INIT,
+        MODIFY_CONTAINERS_QUOTA,
         DESTROY_CONTAINERS,
         GENERATE_KEYS,
         RESERVE_NET,
@@ -54,7 +59,8 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
     public EnvironmentModifyWorkflow( String defaultDomain, PeerManager peerManager, SecurityManager securityManager,
                                       EnvironmentImpl environment, Topology topology, List<String> removedContainers,
-                                      TrackerOperation operationTracker, EnvironmentManagerImpl environmentManager )
+                                      Map<String, ContainerSize> changedContainers, TrackerOperation operationTracker,
+                                      EnvironmentManagerImpl environmentManager )
     {
 
         super( EnvironmentGrowingPhase.INIT );
@@ -68,6 +74,8 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
         this.environmentManager = environmentManager;
         this.removedContainers = new ArrayList<>();
         this.removedContainers = removedContainers;
+        this.changedContainers = new HashMap<>();
+        this.changedContainers = changedContainers;
     }
 
 
@@ -82,7 +90,32 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         saveEnvironment();
 
-        return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
+        return changedContainers == null ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
+               EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA;
+    }
+
+
+    public EnvironmentGrowingPhase MODIFY_CONTAINERS_QUOTA()
+    {
+        operationTracker.addLog( "Changing quota sizes" );
+
+        try
+        {
+            for ( Map.Entry<String, ContainerSize> entry : changedContainers.entrySet() )
+            {
+                environment.getContainerHostById( entry.getKey() ).setContainerSize( entry.getValue() );
+            }
+
+            environment = ( EnvironmentImpl ) environmentManager.loadEnvironment( environment.getId() );
+
+            return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
+        }
+
+        return null;
     }
 
 

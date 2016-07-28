@@ -51,6 +51,7 @@ import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
@@ -553,6 +554,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                   final List<String> removedContainers, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
+        return modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, null, async );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public UUID modifyEnvironmentAndGetTrackerID(final String environmentId, final Topology topology,
+                                                 final List<String> removedContainers,
+                                                 final Map<String, ContainerSize> changedContainers,
+                                                 final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
 
         final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
@@ -601,7 +614,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //launch environment growing workflow
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
-                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers );
+                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers, changedContainers );
 
         registerActiveWorkflow( environment, environmentModifyWorkflow );
 
@@ -1470,11 +1483,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final EnvironmentImpl environment,
                                                                          final Topology topology,
                                                                          final TrackerOperation operationTracker,
-                                                                         final List<String> removedContainers )
+                                                                         final List<String> removedContainers,
+                                                                         final Map<String, ContainerSize> changedContainers )
 
     {
         return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
-                topology, removedContainers, operationTracker, this );
+                topology, removedContainers, changedContainers, operationTracker, this );
     }
 
 
