@@ -263,6 +263,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         vm.currentEnvironment.includedContainersByQuota =
             getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
 
+        vm.currentEnvironment.numChangedContainers = 0;
+        for (var key in vm.currentEnvironment.changingContainers) {
+            vm.currentEnvironment.numChangedContainers++;
+        }
+
         ngDialog.open({
             template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
             scope: $scope,
