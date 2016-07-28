@@ -425,7 +425,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( results.hasFailures() )
         {
-            throw new PeerException( "Failed to register all hosts" );
+            throw new PeerException( "Failed to register hosts on each host" );
         }
     }
 
@@ -475,7 +475,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( !failedHosts.isEmpty() )
         {
-            throw new PeerException( "Failed to generate ssh keys on all hosts" );
+            throw new PeerException( "Failed to generate ssh keys on each host" );
         }
 
         return sshPublicKeys;
@@ -531,7 +531,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 if ( appendResults.hasFailures() )
                 {
-                    throw new PeerException( "Failed to add ssh keys on all hosts" );
+                    throw new PeerException( "Failed to add ssh keys on each host" );
                 }
             }
         }
@@ -551,7 +551,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( configResults.hasFailures() )
         {
-            throw new PeerException( "Failed to configure ssh on all hosts" );
+            throw new PeerException( "Failed to configure ssh on each host" );
         }
     }
 
@@ -660,7 +660,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( results.hasFailures() )
         {
-            throw new PeerException( "Failed to add SSH key on all hosts" );
+            throw new PeerException( "Failed to add SSH key on each host" );
         }
     }
 
@@ -697,7 +697,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( results.hasFailures() )
         {
-            throw new PeerException( "Failed to remove SSH key on all hosts" );
+            throw new PeerException( "Failed to remove SSH key on each host" );
         }
     }
 
@@ -777,8 +777,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 ContainerHostEntity containerHostEntity =
                         new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
-                                request.getHostname(), request.getTemplateArch(), interfaces,
-                                request.getHostname(), request.getTemplateName(), request.getTemplateArch().name(),
+                                request.getHostname(), request.getTemplateArch(), interfaces, request.getHostname(),
+                                request.getTemplateName(), request.getTemplateArch().name(),
                                 requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
                                 requestGroup.getInitiatorPeerId(), request.getContainerSize() );
 
@@ -2536,6 +2536,81 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( e.getMessage(), e );
             throw new PeerException(
                     String.format( "Error setting container %s hostname: %s", containerId.getId(), e.getMessage() ) );
+        }
+    }
+
+
+    @Override
+    public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
+                                                        final String newHostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getChangeHostnameInEtcHostsCommand( oldHostname, newHostname ), hosts,
+                        environmentId.getId() );
+
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        {
+            if ( !result.hasSucceeded() )
+            {
+                LOG.error( "Failed to update hosts on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
+        }
+
+        if ( results.hasFailures() )
+        {
+            throw new PeerException( "Failed to update hosts on every host" );
+        }
+    }
+
+
+    @Override
+    public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final String oldHostname, final String newHostname )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getChangeHostnameInAuthorizedKeysCommand( oldHostname, newHostname ), hosts,
+                        environmentId.getId() );
+
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        {
+            if ( !result.hasSucceeded() )
+            {
+                LOG.error( "Failed to update authorized keys on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
+        }
+
+        if ( results.hasFailures() )
+        {
+            throw new PeerException( "Failed to update authorized keys on every host" );
         }
     }
 

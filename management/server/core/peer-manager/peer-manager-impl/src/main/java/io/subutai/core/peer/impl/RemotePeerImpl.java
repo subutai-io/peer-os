@@ -850,6 +850,31 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
+                                                        final String newHostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        environmentWebClient.updateEtcHostsWithNewContainerHostname( environmentId, oldHostname, newHostname );
+    }
+
+
+    @Override
+    public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final String oldHostname, final String newHostname )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+    }
+
+
+    @Override
     public void resetSwarmSecretKey( final P2PCredentials p2PCredentials ) throws PeerException
     {
         Preconditions.checkNotNull( p2PCredentials, "Invalid p2p credentials" );

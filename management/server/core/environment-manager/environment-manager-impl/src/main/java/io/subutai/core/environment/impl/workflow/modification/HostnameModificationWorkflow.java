@@ -1,12 +1,8 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
-
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.host.HostId;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
@@ -19,11 +15,12 @@ import io.subutai.core.environment.impl.workflow.modification.steps.UpdateEtcHos
 public class HostnameModificationWorkflow
         extends CancellableWorkflow<HostnameModificationWorkflow.HostnameModificationPhase>
 {
-    private EnvironmentImpl environment;
-    private final Map<HostId, String> newContainerHostNames = Maps.newConcurrentMap();
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
+    private final ContainerId containerId;
+    private final String newHostname;
 
+    private EnvironmentImpl environment;
     private ChangeHostnameStep changeHostnameStep;
 
 
@@ -33,17 +30,17 @@ public class HostnameModificationWorkflow
     }
 
 
-    public HostnameModificationWorkflow( final EnvironmentImpl environment,
-                                         final Map<HostId, String> newContainerHostNames,
-                                         final TrackerOperation operationTracker,
+    public HostnameModificationWorkflow( final EnvironmentImpl environment, final ContainerId containerId,
+                                         final String newHostname, final TrackerOperation operationTracker,
                                          final EnvironmentManagerImpl environmentManager )
     {
         super( HostnameModificationPhase.INIT );
 
         this.environment = environment;
-        this.newContainerHostNames.putAll( newContainerHostNames );
         this.operationTracker = operationTracker;
         this.environmentManager = environmentManager;
+        this.containerId = containerId;
+        this.newHostname = newHostname;
     }
 
 
@@ -68,7 +65,7 @@ public class HostnameModificationWorkflow
         operationTracker.addLog( "Modifying container hostname" );
 
         changeHostnameStep =
-                new ChangeHostnameStep( environmentManager, environment, newContainerHostNames, operationTracker );
+                new ChangeHostnameStep( environmentManager, environment, containerId, newHostname, operationTracker );
 
         try
         {
@@ -94,8 +91,8 @@ public class HostnameModificationWorkflow
 
         try
         {
-            new UpdateEtcHostsStep( environment, changeHostnameStep.getOldHostNames(), newContainerHostNames,
-                    operationTracker ).execute();
+            new UpdateEtcHostsStep( environment, changeHostnameStep.getOldHostname(),
+                    changeHostnameStep.getNewHostname(), operationTracker ).execute();
 
             saveEnvironment();
 
@@ -117,8 +114,8 @@ public class HostnameModificationWorkflow
 
         try
         {
-            new UpdateAuthorizedKeysStep( environment, changeHostnameStep.getOldHostNames(), newContainerHostNames,
-                    operationTracker ).execute();
+            new UpdateAuthorizedKeysStep( environment, changeHostnameStep.getOldHostname(),
+                    changeHostnameStep.getNewHostname(), operationTracker ).execute();
 
             saveEnvironment();
 
