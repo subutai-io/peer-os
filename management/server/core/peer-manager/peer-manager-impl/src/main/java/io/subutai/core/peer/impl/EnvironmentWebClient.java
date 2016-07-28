@@ -566,4 +566,64 @@ public class EnvironmentWebClient
 
         return WebClientBuilder.checkResponse( response, SshKey.class );
     }
+
+
+    public void updateEtcHostsWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
+                                                        String newHostname ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            String path =
+                    String.format( "/%s/containers/etchosts/%s/%s", environmentId.getId(), oldHostname, newHostname );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error updating hosts : " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
+                                                              String newHostname ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            String path = String.format( "/%s/containers/authorizedkeys/%s/%s", environmentId.getId(), oldHostname,
+                    newHostname );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error updating authorized keys : " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
 }

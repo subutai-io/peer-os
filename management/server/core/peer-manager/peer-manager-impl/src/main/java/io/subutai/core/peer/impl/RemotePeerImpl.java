@@ -841,11 +841,36 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    public Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
         Preconditions.checkNotNull( networkResource );
 
-        peerWebClient.reserveNetworkResource( networkResource );
+        return peerWebClient.reserveNetworkResource( networkResource );
+    }
+
+
+    @Override
+    public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
+                                                        final String newHostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        environmentWebClient.updateEtcHostsWithNewContainerHostname( environmentId, oldHostname, newHostname );
+    }
+
+
+    @Override
+    public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final String oldHostname, final String newHostname )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
     }
 
 

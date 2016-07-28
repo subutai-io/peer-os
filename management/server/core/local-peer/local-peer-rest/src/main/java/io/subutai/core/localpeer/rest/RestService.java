@@ -102,7 +102,7 @@ public interface RestService
     @POST
     @Path( "netresources" )
     @Consumes( MediaType.APPLICATION_JSON )
-    void reserveNetResources( NetworkResourceImpl networkResource );
+    Integer reserveNetResources( NetworkResourceImpl networkResource );
 
     @GET
     @Path( "interfaces" )

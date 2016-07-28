@@ -130,6 +130,13 @@ public interface RestService
                                  @PathParam( "containerId" ) String containerId,
                                  @QueryParam( "state" ) Boolean state );
 
+    @PUT
+    @Path( "{environmentId}/containers/{containerId}/name" )
+    @Produces( { MediaType.APPLICATION_JSON } )
+    Response setContainerName( @PathParam( "environmentId" ) String environmentId,
+                                @PathParam( "containerId" ) String containerId,
+                                @QueryParam( "name" ) String name );
+
 
     /** Containers **************************************************** */
 

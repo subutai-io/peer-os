@@ -199,7 +199,13 @@ public interface Peer extends RelationLink
 
     UsedNetworkResources getUsedNetworkResources() throws PeerException;
 
-    void reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
+    Integer reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
+
+    void updateEtcHostsWithNewContainerHostname( EnvironmentId environmentId, String oldHostname, String newHostname )
+            throws PeerException;
+
+    void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
+                                                       String newHostname ) throws PeerException;
 
 
     /**

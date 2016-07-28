@@ -1,17 +1,15 @@
 package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
-
 import io.subutai.common.environment.Environment;
-import io.subutai.common.host.HostId;
-import io.subutai.common.peer.PeerException;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.modification.steps.helpers.RenameContainerTask;
 
 
 public class ChangeHostnameStep
@@ -19,61 +17,65 @@ public class ChangeHostnameStep
     private final EnvironmentManagerImpl environmentManager;
 
     private final EnvironmentImpl environment;
-    private final Map<HostId, String> newContainerHostNames;
+    private final ContainerId containerId;
+    private final String newHostname;
     private final TrackerOperation trackerOperation;
-    private final Map<HostId, String> oldHostNames = Maps.newConcurrentMap();
+
+    private String oldHostname;
+    private String newFullHostname;
 
 
     public ChangeHostnameStep( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-                               final Map<HostId, String> newContainerHostNames, TrackerOperation trackerOperation )
+                               final ContainerId containerId, final String newHostname,
+                               TrackerOperation trackerOperation )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
-        this.newContainerHostNames = newContainerHostNames;
+        this.containerId = containerId;
+        this.newHostname = newHostname;
         this.trackerOperation = trackerOperation;
     }
 
 
     public Environment execute() throws Exception
     {
+        TaskUtil<EnvironmentContainerImpl> renameUtil = new TaskUtil<>();
 
-        //todo parallelize
-        boolean ok = true;
+        renameUtil.addTask( new RenameContainerTask( environment, containerId, newHostname ) );
 
+        TaskUtil.TaskResults<EnvironmentContainerImpl> renameResults = renameUtil.executeParallel();
 
-        for ( Map.Entry<HostId, String> newHostname : newContainerHostNames.entrySet() )
+        TaskUtil.TaskResult<EnvironmentContainerImpl> renameResult = renameResults.getTaskResults().iterator().next();
+
+        EnvironmentContainerImpl container = renameResult.getResult();
+
+        RenameContainerTask task = ( RenameContainerTask ) renameResult.getTask();
+
+        if ( renameResult.hasSucceeded() )
         {
-            try
-            {
-                EnvironmentContainerImpl environmentContainer =
-                        ( EnvironmentContainerImpl ) environment.getContainerHostById( newHostname.getKey().getId() );
+            oldHostname = task.getOldHostname();
 
-                environmentContainer.setHostname( newHostname.getValue() );
-
-                oldHostNames.put( newHostname.getKey(), environmentContainer.getHostname() );
-            }
-            catch ( Exception e )
-            {
-                ok = false;
-
-                trackerOperation.addLog(
-                        String.format( "Failed to change hostname of container %s: %s", newHostname.getKey().getId(),
-                                e.getMessage() ) );
-            }
+            newFullHostname = task.getNewHostname();
         }
-
-        //todo review may be we should complete the whole chain without throwing exception
-        if ( !ok )
+        else
         {
-            throw new PeerException( "Failed to change all containers' hostnames" );
+            throw new EnvironmentModificationException(
+                    String.format( "Failed to change hostname of container %s. Reason: %s", container.getId(),
+                            renameResult.getFailureReason() ) );
         }
 
         return environmentManager.loadEnvironment( environment.getId() );
     }
 
 
-    public Map<HostId, String> getOldHostNames()
+    public String getOldHostname()
     {
-        return oldHostNames;
+        return oldHostname;
+    }
+
+
+    public String getNewHostname()
+    {
+        return newFullHostname;
     }
 }

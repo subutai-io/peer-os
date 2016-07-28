@@ -26,6 +26,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -59,7 +61,6 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.identity.api.IdentityManager;
@@ -400,16 +401,15 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public EnvironmentContainerHost setHostname( final String hostname ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+
+        String newHostname = hostname.replaceAll( "\\s+", "" );
+
         Preconditions
-                .checkArgument( !StringUtil.areStringsEqual( this.hostname, hostname, true ), "No change in hostname" );
+                .checkArgument( !StringUtils.equalsIgnoreCase( this.hostname, newHostname ), "No change in hostname" );
 
-        getPeer().setContainerHostname( getContainerId(), hostname );
+        getPeer().setContainerHostname( getContainerId(), newHostname );
 
-        //TODO we should update each container's /etc/hosts file within the environment
-        //TODO also probably each authorized_keys file to change hostnames
-        //TODO we must hide this method and expose one in EnvManager with a dedicated workflow
-
-        this.hostname = hostname;
+        this.hostname = newHostname;
 
         return environmentManager.update( this );
     }

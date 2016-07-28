@@ -1,67 +1,77 @@
 package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
-import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
-import io.subutai.common.host.HostId;
-import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.PeerException;
-import io.subutai.common.settings.Common;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
 public class UpdateEtcHostsStep
 {
     private final EnvironmentImpl environment;
-    private final Map<HostId, String> oldContainerHostNames;
-    private final Map<HostId, String> newContainerHostNames;
+    private final String oldHostname;
+    private final String newHostname;
     private final TrackerOperation trackerOperation;
 
 
-    public UpdateEtcHostsStep( final EnvironmentImpl environment, final Map<HostId, String> oldContainerHostNames,
-                               final Map<HostId, String> newContainerHostNames, TrackerOperation trackerOperation )
+    public UpdateEtcHostsStep( final EnvironmentImpl environment, final String oldHostname, final String newHostname,
+                               TrackerOperation trackerOperation )
     {
         this.environment = environment;
-        this.oldContainerHostNames = oldContainerHostNames;
-        this.newContainerHostNames = newContainerHostNames;
+        this.oldHostname = oldHostname;
+        this.newHostname = newHostname;
         this.trackerOperation = trackerOperation;
     }
 
 
     public Environment execute() throws Exception
     {
-        //todo parallelize across peer (use Peer interface)
-        boolean ok = true;
+        Set<Peer> peers = environment.getPeers();
 
-        for ( EnvironmentContainerHost environmentContainer : environment.getContainerHosts() )
+        PeerUtil<Object> peerUtil = new PeerUtil<>();
+
+        for ( final Peer peer : peers )
         {
-            for ( Map.Entry<HostId, String> oldHostname : oldContainerHostNames.entrySet() )
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
-                try
+                @Override
+                public Object call() throws Exception
                 {
+                    peer.updateEtcHostsWithNewContainerHostname( environment.getEnvironmentId(), oldHostname,
+                            newHostname );
 
-                    environmentContainer.execute( new RequestBuilder(
-                            String.format( "sed -i 's/%1$s/%2$s/g' %3$s", oldHostname.getValue(),
-                                    newContainerHostNames.get( oldHostname.getKey() ), Common.ETC_HOSTS_FILE ) ) );
+                    return null;
                 }
-                catch ( Exception e )
-                {
-                    ok = false;
+            } ) );
+        }
 
-                    trackerOperation.addLog( String.format( "Failed to update hosts file of container %s: %s",
-                            oldHostname.getKey().getId(), e.getMessage() ) );
-                }
+        PeerUtil.PeerTaskResults<Object> peerResults = peerUtil.executeParallel();
+
+
+        for ( PeerUtil.PeerTaskResult peerResult : peerResults.getPeerTaskResults() )
+        {
+            if ( peerResult.hasSucceeded() )
+            {
+                trackerOperation.addLog( String.format( "Updated hosts on peer %s", peerResult.getPeer().getName() ) );
+            }
+            else
+            {
+                trackerOperation.addLog(
+                        String.format( "Failed to update hosts on peer %s. Reason: %s", peerResult.getPeer().getName(),
+                                peerResult.getFailureReason() ) );
             }
         }
 
-        //todo review may be we should complete the whole chain without throwing exception
-        if ( !ok )
-        {
-            throw new PeerException( "Failed to update all containers' hosts files" );
-        }
+        //        if ( peerResults.hasFailures() )
+        //        {
+        //            throw new EnvironmentModificationException( "Failed to update hosts across all peers" );
+        //        }
+
 
         return environment;
     }

@@ -18,16 +18,13 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.util.JsonUtil;
+import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.util.RestUtil;
-import io.subutai.common.util.IPUtil;
 import io.subutai.core.peer.api.RegistrationClient;
 
 
 /**
  * REST client implementation of registration process
- *
- * todo close response and client
  */
 public class RegistrationClientImpl implements RegistrationClient
 {
@@ -51,29 +48,27 @@ public class RegistrationClientImpl implements RegistrationClient
     public PeerInfo getPeerInfo( final String destinationHost ) throws PeerException
     {
 
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "info" ), provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        WebClient client = null;
+        Response response;
 
         try
         {
-            Response response = client.get();
+            client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "info" ), provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
 
-            String s = response.readEntity( String.class );
-            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return JsonUtil.fromJson( s, PeerInfo.class );
-            }
+            response = client.get();
         }
         catch ( Exception e )
         {
             throw new PeerException( String.format( "Can not connect to '%s'.", destinationHost ) );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, PeerInfo.class );
     }
 
 
@@ -81,28 +76,28 @@ public class RegistrationClientImpl implements RegistrationClient
     public RegistrationData sendInitRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "register" ), provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        WebClient client = null;
+        Response response;
 
         try
         {
-            Response response = client.post( registrationData );
-            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
-            else
-            {
-                return response.readEntity( RegistrationData.class );
-            }
+            client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "register" ), provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+
+            response = client.post( registrationData );
         }
         catch ( Exception e )
         {
             throw new PeerException(
                     String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, RegistrationData.class );
     }
 
 
@@ -110,24 +105,28 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendCancelRequest( String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "cancel" ), provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        WebClient client = null;
+        Response response;
 
         try
         {
-            Response response = client.post( registrationData );
-            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "cancel" ), provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+
+            response = client.post( registrationData );
         }
         catch ( Exception e )
         {
             throw new PeerException(
                     String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response, Response.Status.OK );
     }
 
 
@@ -135,24 +134,28 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendRejectRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "reject" ), provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        WebClient client = null;
+        Response response;
 
         try
         {
-            Response response = client.post( registrationData );
-            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "reject" ), provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+
+            response = client.post( registrationData );
         }
         catch ( Exception e )
         {
             throw new PeerException(
                     String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response, Response.Status.OK );
     }
 
 
@@ -160,24 +163,28 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendUnregisterRequest( final String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "unregister" ), provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        WebClient client = null;
+        Response response;
 
         try
         {
-            Response response = client.post( registrationData );
-            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "unregister" ), provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+
+            response = client.post( registrationData );
         }
         catch ( Exception e )
         {
             throw new PeerException(
                     String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response, Response.Status.OK );
     }
 
 
@@ -185,49 +192,56 @@ public class RegistrationClientImpl implements RegistrationClient
     public void sendApproveRequest( String destinationHost, final RegistrationData registrationData )
             throws PeerException
     {
-        WebClient client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "approve" ), provider );
-
-        client.type( MediaType.APPLICATION_JSON );
-        client.accept( MediaType.APPLICATION_JSON );
+        WebClient client = null;
+        Response response;
 
         try
         {
-            Response response = client.post( registrationData );
-            if ( response.getStatus() != Response.Status.OK.getStatusCode() )
-            {
-                throw new PeerException( response.readEntity( String.class ) );
-            }
+            client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "approve" ), provider );
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+
+            response = client.post( registrationData );
         }
         catch ( Exception e )
         {
             throw new PeerException(
                     String.format( "Error requesting remote peer '%s': %s.", destinationHost, e.getMessage() ) );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response, Response.Status.OK );
     }
 
 
     @Override
     public RegistrationStatus getStatus( String destinationHost, String peerId )
     {
+        WebClient client = null;
+        Response response;
+
         try
         {
-            WebClient client =
-                    restUtil.getTrustedWebClient( buildUrl( destinationHost, "status/" + peerId ), provider );
-
+            client = restUtil.getTrustedWebClient( buildUrl( destinationHost, "status/" + peerId ), provider );
             client.type( MediaType.APPLICATION_JSON );
             client.accept( MediaType.APPLICATION_JSON );
 
-            Response response = client.get();
-            if ( response.getStatus() == Response.Status.OK.getStatusCode() )
-            {
-                return response.readEntity( RegistrationStatus.class );
-            }
+            response = client.get();
 
+            return WebClientBuilder.checkResponse( response, RegistrationStatus.class );
         }
         catch ( Exception e )
         {
             LOG.warn( e.getMessage() );
         }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
         return RegistrationStatus.OFFLINE;
     }
 

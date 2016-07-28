@@ -382,4 +382,44 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
         }
     }
+
+
+    @Override
+    public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
+                                                        final String newHostname )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+            localPeer.updateEtcHostsWithNewContainerHostname( environmentId, oldHostname, newHostname );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final String oldHostname, final String newHostname )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+            localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
 }

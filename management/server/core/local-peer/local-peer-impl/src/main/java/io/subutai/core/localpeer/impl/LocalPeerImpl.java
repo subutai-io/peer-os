@@ -425,7 +425,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( results.hasFailures() )
         {
-            throw new PeerException( "Failed to register all hosts" );
+            throw new PeerException( "Failed to register hosts on each host" );
         }
     }
 
@@ -475,7 +475,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( !failedHosts.isEmpty() )
         {
-            throw new PeerException( "Failed to generate ssh keys on all hosts" );
+            throw new PeerException( "Failed to generate ssh keys on each host" );
         }
 
         return sshPublicKeys;
@@ -531,7 +531,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 if ( appendResults.hasFailures() )
                 {
-                    throw new PeerException( "Failed to add ssh keys on all hosts" );
+                    throw new PeerException( "Failed to add ssh keys on each host" );
                 }
             }
         }
@@ -551,7 +551,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( configResults.hasFailures() )
         {
-            throw new PeerException( "Failed to configure ssh on all hosts" );
+            throw new PeerException( "Failed to configure ssh on each host" );
         }
     }
 
@@ -660,7 +660,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( results.hasFailures() )
         {
-            throw new PeerException( "Failed to add SSH key on all hosts" );
+            throw new PeerException( "Failed to add SSH key on each host" );
         }
     }
 
@@ -697,7 +697,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
         if ( results.hasFailures() )
         {
-            throw new PeerException( "Failed to remove SSH key on all hosts" );
+            throw new PeerException( "Failed to remove SSH key on each host" );
         }
     }
 
@@ -777,8 +777,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
                 ContainerHostEntity containerHostEntity =
                         new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
-                                request.getHostname(), request.getTemplateArch(), interfaces,
-                                request.getContainerName(), request.getTemplateName(), request.getTemplateArch().name(),
+                                request.getHostname(), request.getTemplateArch(), interfaces, request.getHostname(),
+                                request.getTemplateName(), request.getTemplateArch().name(),
                                 requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
                                 requestGroup.getInitiatorPeerId(), request.getContainerSize() );
 
@@ -822,87 +822,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
             throw new PeerException( String.format( "Error registering container: %s", e.getMessage() ), e );
         }
-    }
-
-
-    private void buildEnvContainerRelation( final ContainerHostEntity containerHost )
-    {
-
-
-        containerHost.getOwnerId();
-
-        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
-        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
-        relationTraits.put( "containerLimit", "unlimited" );
-        relationTraits.put( "bandwidthLimit", "unlimited" );
-        relationTraits.put( "read", "true" );
-        relationTraits.put( "write", "true" );
-        relationTraits.put( "update", "true" );
-        relationTraits.put( "delete", "true" );
-        relationTraits.put( "ownership", Ownership.USER.getName() );
-
-        RelationLink source;
-        User activeUser = identityManager.getActiveUser();
-        if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
-        {
-            // Most probably it is remote container, so owner will be localPeer
-            source = this;
-            LOG.debug( "Setting LocalPeer as source" );
-        }
-        else
-        {
-            source = identityManager.getUserDelegate( activeUser.getId() );
-            LOG.debug( "Setting DelegatedUser as source" );
-        }
-
-
-        RelationLink envLink = new RelationLink()
-        {
-            @Override
-            public String getLinkId()
-            {
-                return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
-            }
-
-
-            @Override
-            public String getUniqueIdentifier()
-            {
-                return containerHost.getEnvironmentId().getId();
-            }
-
-
-            @Override
-            public String getClassPath()
-            {
-                return "EnvironmentImpl";
-            }
-
-
-            @Override
-            public String getContext()
-            {
-                return PermissionObject.EnvironmentManagement.getName();
-            }
-
-
-            @Override
-            public String getKeyId()
-            {
-                return containerHost.getEnvironmentId().getId();
-            }
-        };
-
-        if ( source == null )
-        {
-            LOG.debug( "Source is null" );
-        }
-
-
-        RelationMeta relationMeta = new RelationMeta( source, envLink, containerHost, envLink.getKeyId() );
-        Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
-        relation.setRelationStatus( RelationStatus.VERIFIED );
-        relationManager.saveRelation( relation );
     }
 
 
@@ -1447,42 +1366,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
-    private void buildAdminHostRelation( Host host )
-    {
-        // Build relation between Admin and management/resource host.
-
-        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
-        if ( peerOwner != null )
-        {
-            // Simply pass key value object as map
-            RelationInfoMeta relationInfoMeta =
-                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
-            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
-            relationTraits.put( "bandwidthControl", "true" );
-            relationTraits.put( "ownership", Ownership.USER.getName() );
-            relationTraits.put( "read", "true" );
-            relationTraits.put( "write", "true" );
-            relationTraits.put( "update", "true" );
-            relationTraits.put( "delete", "true" );
-
-            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
-            {
-                relationTraits.put( "managementSupervisor", "true" );
-            }
-            else
-            {
-                relationTraits.put( "resourceSupervisor", "true" );
-                relationTraits.put( "containerManagement", "true" );
-            }
-
-            RelationMeta relationMeta = new RelationMeta( peerOwner, peerOwner, host, peerOwner.getSecurityKeyId() );
-            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
-            relation.setRelationStatus( RelationStatus.VERIFIED );
-            relationManager.saveRelation( relation );
-        }
-    }
-
-
     @Override
     public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception
     {
@@ -1808,6 +1691,123 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     }
 
 
+    private void buildEnvContainerRelation( final ContainerHostEntity containerHost )
+    {
+
+
+        containerHost.getOwnerId();
+
+        RelationInfoMeta relationInfoMeta = new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+        Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+        relationTraits.put( "containerLimit", "unlimited" );
+        relationTraits.put( "bandwidthLimit", "unlimited" );
+        relationTraits.put( "read", "true" );
+        relationTraits.put( "write", "true" );
+        relationTraits.put( "update", "true" );
+        relationTraits.put( "delete", "true" );
+        relationTraits.put( "ownership", Ownership.USER.getName() );
+
+        RelationLink source;
+        User activeUser = identityManager.getActiveUser();
+        if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
+        {
+            // Most probably it is remote container, so owner will be localPeer
+            source = this;
+            LOG.debug( "Setting LocalPeer as source" );
+        }
+        else
+        {
+            source = identityManager.getUserDelegate( activeUser.getId() );
+            LOG.debug( "Setting DelegatedUser as source" );
+        }
+
+
+        RelationLink envLink = new RelationLink()
+        {
+            @Override
+            public String getLinkId()
+            {
+                return String.format( "%s|%s", getClassPath(), getUniqueIdentifier() );
+            }
+
+
+            @Override
+            public String getUniqueIdentifier()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+
+
+            @Override
+            public String getClassPath()
+            {
+                return "EnvironmentImpl";
+            }
+
+
+            @Override
+            public String getContext()
+            {
+                return PermissionObject.EnvironmentManagement.getName();
+            }
+
+
+            @Override
+            public String getKeyId()
+            {
+                return containerHost.getEnvironmentId().getId();
+            }
+        };
+
+        if ( source == null )
+        {
+            LOG.debug( "Source is null" );
+        }
+
+
+        RelationMeta relationMeta = new RelationMeta( source, envLink, containerHost, envLink.getKeyId() );
+        Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+        relation.setRelationStatus( RelationStatus.VERIFIED );
+        relationManager.saveRelation( relation );
+    }
+
+
+    private void buildAdminHostRelation( Host host )
+    {
+        // Build relation between Admin and management/resource host.
+
+        User peerOwner = identityManager.getUserByKeyId( identityManager.getPeerOwnerId() );
+        if ( peerOwner != null )
+        {
+            // Simply pass key value object as map
+            RelationInfoMeta relationInfoMeta =
+                    new RelationInfoMeta( true, true, true, true, Ownership.USER.getLevel() );
+            Map<String, String> relationTraits = relationInfoMeta.getRelationTraits();
+            relationTraits.put( "bandwidthControl", "true" );
+            relationTraits.put( "ownership", Ownership.USER.getName() );
+            relationTraits.put( "read", "true" );
+            relationTraits.put( "write", "true" );
+            relationTraits.put( "update", "true" );
+            relationTraits.put( "delete", "true" );
+
+            if ( Common.MANAGEMENT_HOSTNAME.equalsIgnoreCase( host.getHostname() ) )
+            {
+                relationTraits.put( "managementSupervisor", "true" );
+            }
+            else
+            {
+                relationTraits.put( "resourceSupervisor", "true" );
+                relationTraits.put( "containerManagement", "true" );
+            }
+
+            RelationMeta relationMeta = new RelationMeta( peerOwner, peerOwner, host, peerOwner.getSecurityKeyId() );
+            Relation relation = relationManager.buildRelation( relationInfoMeta, relationMeta );
+            relation.setRelationStatus( RelationStatus.VERIFIED );
+            relationManager.saveRelation( relation );
+        }
+    }
+
+
     private void buildPeerEnvRelation( final RelationLink envLink )
     {
 
@@ -1892,17 +1892,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public void updatePeerEnvironmentPubKey( final EnvironmentId environmentId, final PGPPublicKeyRing pubKeyRing )
-            throws PeerException
-    {
-        Preconditions.checkNotNull( environmentId );
-        Preconditions.checkNotNull( pubKeyRing );
-
-        securityManager.getKeyManager().updatePublicKeyRing( pubKeyRing );
-    }
-
-
-    @Override
     public void addPeerEnvironmentPubKey( final String keyId, final PGPPublicKeyRing pubRing )
     {
         Preconditions.checkNotNull( keyId );
@@ -1939,6 +1928,17 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public void updatePeerEnvironmentPubKey( final EnvironmentId environmentId, final PGPPublicKeyRing pubKeyRing )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkNotNull( pubKeyRing );
+
+        securityManager.getKeyManager().updatePublicKeyRing( pubKeyRing );
+    }
+
+
+    @Override
     public HostInterfaces getInterfaces() throws HostNotFoundException
     {
         return getManagementHost().getHostInterfaces();
@@ -1946,7 +1946,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public synchronized void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    public synchronized Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
 
         Preconditions.checkNotNull( networkResource );
@@ -1985,7 +1985,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                     throw new PeerException( "No free VLANs slots are left" );
                 }
 
-                networkResourceDao.create( new NetworkResourceEntity( networkResource, freeVlan ) );
+                NetworkResourceEntity networkResourceEntity = new NetworkResourceEntity( networkResource, freeVlan );
+
+                networkResourceDao.create( networkResourceEntity );
+
+                return freeVlan;
             }
         }
         catch ( Exception e )
@@ -2532,6 +2536,81 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             LOG.error( e.getMessage(), e );
             throw new PeerException(
                     String.format( "Error setting container %s hostname: %s", containerId.getId(), e.getMessage() ) );
+        }
+    }
+
+
+    @Override
+    public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
+                                                        final String newHostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getChangeHostnameInEtcHostsCommand( oldHostname, newHostname ), hosts,
+                        environmentId.getId() );
+
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        {
+            if ( !result.hasSucceeded() )
+            {
+                LOG.error( "Failed to update hosts on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
+        }
+
+        if ( results.hasFailures() )
+        {
+            throw new PeerException( "Failed to update hosts on every host" );
+        }
+    }
+
+
+    @Override
+    public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final String oldHostname, final String newHostname )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        Set<Host> hosts = Sets.newHashSet();
+
+        hosts.addAll( findContainersByEnvironmentId( environmentId.getId() ) );
+
+        if ( hosts.isEmpty() )
+        {
+            return;
+        }
+
+        CommandUtil.HostCommandResults results = commandUtil
+                .execute( localPeerCommands.getChangeHostnameInAuthorizedKeysCommand( oldHostname, newHostname ), hosts,
+                        environmentId.getId() );
+
+        for ( CommandUtil.HostCommandResult result : results.getCommandResults() )
+        {
+            if ( !result.hasSucceeded() )
+            {
+                LOG.error( "Failed to update authorized keys on host {}: {}", result.getHost().getHostname(),
+                        result.getFailureReason() );
+            }
+        }
+
+        if ( results.hasFailures() )
+        {
+            throw new PeerException( "Failed to update authorized keys on every host" );
         }
     }
 

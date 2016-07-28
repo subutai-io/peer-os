@@ -138,6 +138,10 @@ function AccountCtrl(identitySrv, $scope, $rootScope, ngDialog, SweetAlert, cfpL
 			if (vm.message) {
 				$('.bp-sign-input').addClass('bp-sign-target');
 			}
+
+			identitySrv.getCurrentUser().success(function (data) {
+				vm.activeUser = data;
+			});
 		});
 	}
 
