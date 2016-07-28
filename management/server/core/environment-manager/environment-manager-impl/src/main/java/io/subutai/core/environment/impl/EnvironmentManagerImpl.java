@@ -554,7 +554,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                                                   final List<String> removedContainers, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
-        return modifyEnvironmentAndGetTrackerID( environmentId, topology, null, async );
+        return modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, null, async );
     }
 
 
