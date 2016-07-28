@@ -24,6 +24,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -62,7 +64,6 @@ import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
@@ -931,7 +932,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
         //check if new hostname differs from current one
-        if ( !StringUtil.areStringsEqual( containerHost.getHostname(), hostname, true ) )
+        if ( !StringUtils.equalsIgnoreCase( containerHost.getHostname(), hostname ) )
         {
             try
             {
@@ -952,7 +953,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        if ( !StringUtil.areStringsEqual( this.hostname, hostname, true ) )
+        if ( !StringUtils.equalsIgnoreCase( this.hostname, hostname ) )
         {
             try
             {

@@ -16,6 +16,21 @@ public class LocalPeerCommands
     }
 
 
+    protected RequestBuilder getChangeHostnameInEtcHostsCommand( String oldHostname, String newHostname )
+    {
+        return new RequestBuilder(
+                String.format( "sed -i 's/%1$s/%2$s/g' %3$s", oldHostname, newHostname, Common.ETC_HOSTS_FILE ) );
+    }
+
+
+    protected RequestBuilder getChangeHostnameInAuthorizedKeysCommand( String oldHostname, String newHostname )
+    {
+        return new RequestBuilder(
+                String.format( "chmod 700 %3$s && sed -i 's/%1$s/%2$s/g' %3$s && chmod 644 %3$s", oldHostname,
+                        newHostname, Common.CONTAINER_SSH_FILE ) );
+    }
+
+
     protected RequestBuilder getAddIpHostToEtcHostsCommand( Map<String, String> hostAddresses )
     {
         StringBuilder cleanHosts =

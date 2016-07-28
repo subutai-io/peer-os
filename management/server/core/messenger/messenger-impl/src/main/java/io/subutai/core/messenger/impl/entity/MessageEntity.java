@@ -17,11 +17,12 @@ import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.util.JsonUtil;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.impl.Envelope;
 
@@ -126,7 +127,7 @@ public class MessageEntity implements Message
     @Override
     public void setSender( final String sender )
     {
-        Preconditions.checkArgument( StringUtil.getLen( sender ) <= MAX_SENDER_LEN,
+        Preconditions.checkArgument( StringUtils.length( sender ) <= MAX_SENDER_LEN,
                 String.format( "Max sender length must be %d", MAX_SENDER_LEN ) );
 
         this.sender = sender;

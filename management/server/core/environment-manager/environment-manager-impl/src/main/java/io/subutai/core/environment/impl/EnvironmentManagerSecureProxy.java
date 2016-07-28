@@ -13,7 +13,6 @@ import java.util.UUID;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
-import io.subutai.common.peer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +27,17 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.host.HostId;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
+import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
+import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentAlertHandlers;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
@@ -857,10 +864,9 @@ public class EnvironmentManagerSecureProxy
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void changeContainerHostnames( final Map<HostId, String> newContainerHostnames, final String environmentId,
-                                          final boolean async )
+    public void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        environmentManager.changeContainerHostnames( newContainerHostnames, environmentId, async );
+        environmentManager.changeContainerHostname( containerId, newHostname, async );
     }
 }

@@ -22,7 +22,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.security.auth.Subject;
 import javax.ws.rs.WebApplicationException;
 
-import io.subutai.common.peer.*;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -47,11 +46,22 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostId;
 import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
+import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
+import io.subutai.common.peer.AlertListener;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.EnvironmentAlertHandler;
+import io.subutai.common.peer.EnvironmentAlertHandlers;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -1294,27 +1304,23 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Update" )
     @Override
-    public void changeContainerHostnames( final Map<HostId, String> newContainerHostnames, final String environmentId,
-                                          final boolean async )
+    public void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
-        Preconditions.checkNotNull( newContainerHostnames, "Invalid container hostname(s)" );
-        Preconditions.checkArgument( !newContainerHostnames.isEmpty(), "Empty container hostname(s)" );
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
 
-        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+        final EnvironmentImpl environment =
+                ( EnvironmentImpl ) loadEnvironment( containerId.getEnvironmentId().getId() );
 
-        //check that containers exist in the environment
-        for ( HostId containerId : newContainerHostnames.keySet() )
-        {
-            environment.getContainerHostById( containerId.getId() );
-        }
+        //check that container exists in the environment
+        environment.getContainerHostById( containerId.getId() );
 
         TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
                 String.format( "Changing container hostname(s) in environment %s", environment.getName() ) );
 
         final HostnameModificationWorkflow hostnameModificationWorkflow =
-                getHostnameModificationWorkflow( environment, newContainerHostnames, operationTracker );
+                getHostnameModificationWorkflow( environment, containerId, newHostname, operationTracker );
 
         registerActiveWorkflow( environment, hostnameModificationWorkflow );
 
@@ -1494,11 +1500,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
     protected HostnameModificationWorkflow getHostnameModificationWorkflow( final EnvironmentImpl environment,
-                                                                            final Map<HostId, String>
-                                                                                    newContainerHostNames,
+                                                                            final ContainerId containerId,
+                                                                            final String newHostname,
                                                                             final TrackerOperation operationTracker )
     {
-        return new HostnameModificationWorkflow( environment, newContainerHostNames, operationTracker, this );
+        return new HostnameModificationWorkflow( environment, containerId, newHostname, operationTracker, this );
     }
 
 

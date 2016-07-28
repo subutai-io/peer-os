@@ -3,7 +3,11 @@ package io.subutai.core.environment.rest.ui;
 
 import java.io.File;
 import java.security.AccessControlException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -15,7 +19,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.host.HostId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -557,9 +560,7 @@ public class RestServiceImpl implements RestService
         {
             Environment environment = findEnvironmentByContainerId( containerId );
             ContainerHost containerHost = environment.getContainerHostById( containerId );
-            HashMap<HostId, String> params = new HashMap<>();
-            params.put( containerHost.getContainerId(), name );
-            environmentManager.changeContainerHostnames( params, environmentId, false );
+            environmentManager.changeContainerHostname( containerHost.getContainerId(), name, false );
         }
         catch ( Exception e )
         {
