@@ -293,7 +293,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         var conteiners = {
             "topology": vm.containers2Build,
             "removedContainers": vm.containers2Remove,
-            "environmentId": vm.editingEnv.id
+            "environmentId": vm.editingEnv.id,
+            "quotaContainers": []
         };
         environmentService.modifyEnvironment(conteiners, 'advanced')
             .success(function (data) {
