@@ -247,7 +247,8 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response modify( final String environmentId, final String topologyJson, final String removedContainers )
+    public Response modify( final String environmentId, final String topologyJson, final String removedContainers,
+                            final String quotaContainers )
     {
         UUID eventId;
         try
@@ -264,6 +265,10 @@ public class RestServiceImpl implements RestService
             }.getType() );
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
+            {
+            }.getType() );
+
+            List<ContainerDto> changingContainers = JsonUtil.fromJson( quotaContainers, new TypeToken<List<ContainerDto>>()
             {
             }.getType() );
 
@@ -291,7 +296,7 @@ public class RestServiceImpl implements RestService
 
     @Override
     public Response modifyAdvanced( final String environmentId, final String topologyJson,
-                                    final String removedContainers )
+                                    final String removedContainers, final String quotaContainers )
     {
         UUID eventId;
 

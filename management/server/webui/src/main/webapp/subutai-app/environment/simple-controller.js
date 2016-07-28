@@ -346,6 +346,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		};
 		vm.logMessages.push(currentLog);
 
+		vm.currentEnvironment.modificationData.containers = vm.currentEnvironment.containers;
+
 		environmentService.modifyEnvironment(vm.currentEnvironment.modificationData).success(function (data) {
 			vm.currentEnvironment.modifyStatus = 'modified';
 			clearWorkspace();
@@ -615,7 +617,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
 	var containerCounter = 1;
 	function addContainer(template, $event, size, templateImg) {
-		console.log(template);
+
 		if($event === undefined || $event === null) $event = false;
 
 		if(size === undefined || size === null) {
@@ -637,15 +639,16 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			}
 		}
 
+		var containerName = 'Container ' + (containerCounter++).toString();
 		var devElement = new joint.shapes.tm.devElement({
 			position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 			templateName: template,
 			quotaSize: size,
-			containerName: 'Container ' + (containerCounter++).toString(),
+			containerName: containerName,
 			attrs: {
 				image: { 'xlink:href': img },
 				'rect.b-magnet': {fill: vm.colors[size]},
-				title: {text: template}
+				title: {text: containerName + " ('" + template + "') " + size}
 			}
 		});
 		vm.isEditing ? vm.currentEnvironment.includedContainers.push(devElement) : null;
@@ -831,22 +834,36 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.currentEnvironment.excludedContainers = [];
 		vm.currentEnvironment.includedContainers = [];
 		vm.isEditing = true;
+
 		for(var container in environment.containers) {
 			var pos = vm.findEmptyCubePostion();
 			var img = 'assets/templates/' + environment.containers[container].templateName + '.jpg';
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
+
+			if( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) != null )
+			{
+				if( containerCounter < parseInt( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				{
+					containerCounter = parseInt( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) ) + 1;
+				}
+			}
+
 			var devElement = new joint.shapes.tm.devElement({
 				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
 				templateName: environment.containers[container].templateName,
 				quotaSize: environment.containers[container].type,
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
+				containerName: environment.containers[container].hostname,
 				attrs: {
 					image: { 'xlink:href': img },
 					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
-					title: {text: environment.containers[container].templateName}
+					title: {text: environment.containers[container].hostname + " ("
+						+ environment.containers[container].templateName
+						+ ") " + environment.containers[container].type
+					}
 				}
 			});
 			graph.addCell(devElement);

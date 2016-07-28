@@ -22,6 +22,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.security.auth.Subject;
 import javax.ws.rs.WebApplicationException;
 
+import io.subutai.common.peer.*;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
@@ -51,17 +52,6 @@ import io.subutai.common.mdc.SubutaiExecutors;
 import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.SshTunnel;
-import io.subutai.common.peer.AlertEvent;
-import io.subutai.common.peer.AlertHandler;
-import io.subutai.common.peer.AlertHandlerPriority;
-import io.subutai.common.peer.AlertListener;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.EnvironmentAlertHandler;
-import io.subutai.common.peer.EnvironmentAlertHandlers;
-import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -551,6 +541,18 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public UUID modifyEnvironmentAndGetTrackerID( final String environmentId, final Topology topology,
                                                   final List<String> removedContainers, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        return modifyEnvironmentAndGetTrackerID( environmentId, topology, null, async );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public UUID modifyEnvironmentAndGetTrackerID(final String environmentId, final Topology topology,
+                                                 final List<String> removedContainers,
+                                                 final Map<String, ContainerSize> changedContainers,
+                                                 final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );

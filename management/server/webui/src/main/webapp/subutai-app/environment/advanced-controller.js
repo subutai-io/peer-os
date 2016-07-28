@@ -780,6 +780,15 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 		vm.currentPeerIndex = 0;
 		for(var i = 0; i < environment.containers.length; i++) {
 			var container = environment.containers[i];
+
+			if( container.name.match(/(\d+)(?!.*\d)/g) != null )
+			{
+				if( containerCounter < parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				{
+					containerCounter = parseInt( container.name.match(/(\d+)(?!.*\d)/g) ) + 1;
+				}
+			}
+
 			var resourceHostItemId = addResource2Build(container.hostId, container.peerId, i);
 			var resourceHost = graph.getCell(resourceHostItemId);
 			vm.currentPeerIndex++;
@@ -787,7 +796,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
-			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id);
+			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.name);
 		}
 		filterPluginsList();
 	}
@@ -1157,7 +1166,7 @@ function drop(event) {
 	}
 }
 
-function addContainerToHost(model, template, img, size, containerId) {
+function addContainerToHost(model, template, img, size, containerId, name) {
 	if(size === undefined || size === null) {
 		size = 'SMALL';
 		if(template == 'appscale') {
@@ -1172,6 +1181,7 @@ function addContainerToHost(model, template, img, size, containerId) {
 	var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
 	var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
 
+	var containerName = ( name == undefined || name == null ? 'Container ' + (containerCounter++).toString() : name );
 	var devElement = new joint.shapes.tm.devElement({
 		position: { x: x, y: y },
 		templateName: template,
@@ -1179,11 +1189,11 @@ function addContainerToHost(model, template, img, size, containerId) {
 		parentHostId: model.get('hostId'),
 		quotaSize: size,
 		containerId: containerId,
-		containerName: 'Container ' + (containerCounter++).toString(),
+		containerName: containerName,
 		attrs: {
 			image: { 'xlink:href': img },
 			'rect.b-magnet': {fill: quotaColors[size]},
-			title: {text: template}
+			title: {text: containerName + " ('" + template + "') " + size}
 		},
 		rh: {
 			model: model.id,
@@ -1198,4 +1208,3 @@ function addContainerToHost(model, template, img, size, containerId) {
 
 	angular.element(document.getElementById('js-environment-creation')).scope().filterPluginsList();
 }
-
