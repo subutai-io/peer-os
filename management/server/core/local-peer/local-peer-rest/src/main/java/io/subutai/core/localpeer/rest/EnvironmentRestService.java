@@ -129,4 +129,17 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     Response createSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId,
                            @PathParam( "encType" ) SshEncryptionType encryptionType, String containerId );
+
+
+    @POST
+    @Path( "{environmentId}/containers/etchosts/{oldHostname}/{newHostname}" )
+    void updateEtcHostsWithNewContainerHostname( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                                 @PathParam( "oldHostname" ) String oldHostname,
+                                                 @PathParam( "newHostname" ) String newHostname );
+
+    @POST
+    @Path( "{environmentId}/containers/authorizedkeys/{oldHostname}/{newHostname}" )
+    void updateAuthorizedKeysWithNewContainerHostname( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                                       @PathParam( "oldHostname" ) String oldHostname,
+                                                       @PathParam( "newHostname" ) String newHostname );
 }

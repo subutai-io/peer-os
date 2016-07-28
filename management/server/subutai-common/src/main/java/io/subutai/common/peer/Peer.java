@@ -201,6 +201,12 @@ public interface Peer extends RelationLink
 
     Integer reserveNetworkResource( NetworkResourceImpl networkResource ) throws PeerException;
 
+    void updateEtcHostsWithNewContainerHostname( EnvironmentId environmentId, String oldHostname, String newHostname )
+            throws PeerException;
+
+    void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
+                                                       String newHostname ) throws PeerException;
+
 
     /**
      * Sets up tunnels on the local peer to the specified remote peers
