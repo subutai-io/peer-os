@@ -508,8 +508,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 case 'element-tool-copy':
                     addContainer(
                         this.model.attributes.templateName,
-                        this.model.attributes.quotaSize,
                         false,
+                        this.model.attributes.quotaSize,
                         getTemplateNameById(this.model.attributes.templateName)
                     );
 
@@ -624,10 +624,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                             }
                         }
                         if (!alreadyONWorckspace || templatesCounter == i) {
-                            addContainer(template.toLowerCase(), vm.selectedPlugin.size);
+                            addContainer(template.toLowerCase());
                         }
                     } else {
-                        addContainer(template.toLowerCase(), vm.selectedPlugin.size);
+                        addContainer(template.toLowerCase());
                     }
                 }
             }
@@ -639,7 +639,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
     var containerCounter = 1;
 
-    function addContainer(template, size, $event, templateImg) {
+    function addContainer(template, $event, size, templateImg) {
         console.log(template);
         if ($event === undefined || $event === null) $event = false;
 
