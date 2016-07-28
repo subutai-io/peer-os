@@ -36,6 +36,10 @@ type templ struct {
 }
 
 func templId(t templ, arch string, kurjun *http.Client) string {
+
+	//We'll need to change this function, so it retrieves json from info endpoint (not only "type=text"), parse owner fingerprint and signed hash message, request owner public key using fingerprint
+	//and verify hash, signature and owner key
+
 	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&type=text"
 	if t.name == "management" && len(t.branch) != 0 {
 		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&type=text"
