@@ -6,12 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
-import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
@@ -93,26 +90,32 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         saveEnvironment();
 
-        return changedContainers == null ? EnvironmentGrowingPhase.DESTROY_CONTAINERS : EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA;
+        return changedContainers == null ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
+               EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA;
     }
+
 
     public EnvironmentGrowingPhase MODIFY_CONTAINERS_QUOTA()
     {
         operationTracker.addLog( "Changing quota sizes" );
 
-        for(Map.Entry<String, ContainerSize> entry : changedContainers.entrySet())
+        try
         {
-            try
+            for ( Map.Entry<String, ContainerSize> entry : changedContainers.entrySet() )
             {
                 environment.getContainerHostById( entry.getKey() ).setContainerSize( entry.getValue() );
             }
-            catch (ContainerHostNotFoundException | PeerException e)
-            {
-                fail( e.getMessage(), e );
-            }
+
+            environment = ( EnvironmentImpl ) environmentManager.loadEnvironment( environment.getId() );
+
+            return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
+        }
+        catch ( Exception e )
+        {
+            fail( e.getMessage(), e );
         }
 
-        return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
+        return null;
     }
 
 
@@ -145,6 +148,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
             return null;
         }
     }
+
 
     public EnvironmentGrowingPhase GENERATE_KEYS()
     {
