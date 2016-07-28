@@ -321,6 +321,7 @@
                     <packageDependencies>subutai-dnsmasq</packageDependencies>
                     <packageDependencies>subutai-influxdb</packageDependencies>
                     <packageDependencies>curl</packageDependencies>
+                    <packageDependencies>gorjun</packageDependencies>
                   </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
                 </configuration>
