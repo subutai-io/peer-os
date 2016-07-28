@@ -624,10 +624,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                             }
                         }
                         if (!alreadyONWorckspace || templatesCounter == i) {
-                            addContainer(template.toLowerCase());
+                            addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
                         }
                     } else {
-                        addContainer(template.toLowerCase());
+                        addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
                     }
                 }
             }
