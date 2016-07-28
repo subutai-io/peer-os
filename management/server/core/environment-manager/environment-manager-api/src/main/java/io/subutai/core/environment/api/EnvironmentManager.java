@@ -23,6 +23,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
@@ -67,8 +68,6 @@ public interface EnvironmentManager
      * Grows environment based on a passed topology
      *
      * @param topology - {@code Topology}
-     * @param removedContainers - id of containers to be removed
-     * @param changedContainers - id of containers to change quota based on ContainerSize
      * @param async - indicates whether environment is grown synchronously or asynchronously to the calling party
      *
      * @return - set of newly created {@code ContainerHost} or empty set if operation is async

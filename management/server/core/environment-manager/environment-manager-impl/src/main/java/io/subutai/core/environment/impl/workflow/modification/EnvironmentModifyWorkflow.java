@@ -6,9 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
@@ -99,8 +102,14 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         for(Map.Entry<String, ContainerSize> entry : changedContainers.entrySet())
         {
-//            peerManager.
-//            entry.getKey()
+            try
+            {
+                environment.getContainerHostById( entry.getKey() ).setContainerSize( entry.getValue() );
+            }
+            catch (ContainerHostNotFoundException | PeerException e)
+            {
+                fail( e.getMessage(), e );
+            }
         }
 
         return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
