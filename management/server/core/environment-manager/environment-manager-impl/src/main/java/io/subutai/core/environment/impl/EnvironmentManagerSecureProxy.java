@@ -295,7 +295,7 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
-        return environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, async );
+        return environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, changedContainers, async );
     }
 
 
