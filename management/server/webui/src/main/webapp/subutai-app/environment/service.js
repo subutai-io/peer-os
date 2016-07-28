@@ -172,7 +172,8 @@ function environmentService($http, $q) {
 		if(advanced == undefined || advanced == null) advanced = '';
 		var postData = 'topology=' + JSON.stringify( containers.topology )
 			+ '&removedContainers=' + JSON.stringify( containers.removedContainers )
-			+ '&quotaContainers=' + JSON.stringify( containers.containers );
+			+ '&quotaContainers=' + JSON.stringify( containers.changingContainers );
+
 		return $http.post(
 			ENVIRONMENTS_URL + containers.environmentId + '/modify/' + advanced,
 			postData,

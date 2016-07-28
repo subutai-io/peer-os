@@ -16,6 +16,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	vm.popupLogState = 'full';
 
 	vm.currentEnvironment = {};
+
 	vm.buildEnvironment = buildEnvironment;
 	vm.editEnvironment = editEnvironment;
 	vm.notifyChanges = notifyChanges;
@@ -261,6 +262,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.currentEnvironment.includedContainersByQuota =
 			getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
 
+		console.log(vm.currentEnvironment.changingContainers);
+
 		ngDialog.open({
 			template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
 			scope: $scope,
@@ -318,9 +321,17 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				"position": vm.currentEnvironment.includedContainers[i].get('position')
 			});
 		}
+
+		var quotaContainers = [];
+
+		for (var key in vm.currentEnvironment.changingContainers) {
+			quotaContainers.push({ "key" : key, "value" : vm.currentEnvironment.changingContainers[key] });
+		}
+
 		vm.currentEnvironment.modificationData = {
 			topology: includedContainers,
 			removedContainers: excludedContainers,
+			changingContainers: quotaContainers,
 			environmentId: vm.currentEnvironment.id
 		};
 
@@ -345,8 +356,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			"text": 'Applying your changes...'
 		};
 		vm.logMessages.push(currentLog);
-
-		vm.currentEnvironment.modificationData.containers = vm.currentEnvironment.containers;
 
 		environmentService.modifyEnvironment(vm.currentEnvironment.modificationData).success(function (data) {
 			vm.currentEnvironment.modifyStatus = 'modified';
@@ -833,6 +842,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		vm.currentEnvironment = environment;
 		vm.currentEnvironment.excludedContainers = [];
 		vm.currentEnvironment.includedContainers = [];
+		vm.currentEnvironment.changingContainers = [];
 		vm.isEditing = true;
 
 		for(var container in environment.containers) {
@@ -882,12 +892,35 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function addSettingsToTemplate(settings) {
-
 		currentTemplate.set('quotaSize', settings.quotaSize);
 		currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
 		currentTemplate.set('containerName', settings.containerName);
 		//ngDialog.closeAll();
 		containerSettingMenu.hide();
+
+		if( vm.isEditing )
+		{
+			var id = currentTemplate.attributes.containerId;
+
+			var res = $.grep( vm.currentEnvironment.containers, function( e, i ) {
+				return e.id == id;
+			});
+
+			if( res[0] )
+			{
+				res = res[0];
+
+				if( res.type == settings.quotaSize && vm.currentEnvironment.changingContainers[id] )
+				{
+					delete vm.currentEnvironment.changingContainers[id];
+				}
+
+				if( res.type != settings.quotaSize )
+				{
+					vm.currentEnvironment.changingContainers[id] = settings.quotaSize;
+				}
+			}
+		}
 	}
 
 	function getElementByField(field, value, collection) {

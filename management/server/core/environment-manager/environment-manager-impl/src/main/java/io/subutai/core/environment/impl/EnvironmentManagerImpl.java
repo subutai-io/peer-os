@@ -603,7 +603,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         //launch environment growing workflow
         final EnvironmentModifyWorkflow environmentModifyWorkflow =
-                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers );
+                getEnvironmentModifyingWorkflow( environment, topology, operationTracker, removedContainers, changedContainers );
 
         registerActiveWorkflow( environment, environmentModifyWorkflow );
 
@@ -1476,11 +1476,12 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected EnvironmentModifyWorkflow getEnvironmentModifyingWorkflow( final EnvironmentImpl environment,
                                                                          final Topology topology,
                                                                          final TrackerOperation operationTracker,
-                                                                         final List<String> removedContainers )
+                                                                         final List<String> removedContainers,
+                                                                         final Map<String, ContainerSize> changedContainers )
 
     {
         return new EnvironmentModifyWorkflow( Common.DEFAULT_DOMAIN_NAME, peerManager, securityManager, environment,
-                topology, removedContainers, operationTracker, this );
+                topology, removedContainers, changedContainers, operationTracker, this );
     }
 
 

@@ -268,9 +268,17 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-            List<ContainerDto> changingContainers = JsonUtil.fromJson( quotaContainers, new TypeToken<List<ContainerDto>>()
+
+            Map< String, ContainerSize > changedContainersFiltered = new HashMap<>();
+            List<Map<String, String>> changingContainers =
+                    JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
+                    {
+                    }.getType() );
+
+            for( Map<String, String> cont : changingContainers )
             {
-            }.getType() );
+                changedContainersFiltered.put( cont.get("key"), ContainerSize.valueOf( cont.get("value") ));
+            }
 
 
             Topology topology = null;
@@ -282,7 +290,7 @@ public class RestServiceImpl implements RestService
                 topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
 
-            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
+            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered, true );
         }
         catch ( Exception e )
         {
