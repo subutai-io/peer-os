@@ -4,6 +4,9 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.subutai.hub.share.dto.PublicKeyContainer;
 
 
@@ -63,6 +66,7 @@ public class EnvironmentPeerDto
 
     private String message;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Integer vlan;
 
 
