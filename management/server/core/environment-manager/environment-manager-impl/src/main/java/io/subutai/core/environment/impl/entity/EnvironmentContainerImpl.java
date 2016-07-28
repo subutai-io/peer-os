@@ -551,6 +551,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public void setContainerSize( final ContainerSize size ) throws PeerException
     {
         getPeer().setContainerSize( this.getContainerId(), size );
+        this.containerSize = size;
     }
 
 
