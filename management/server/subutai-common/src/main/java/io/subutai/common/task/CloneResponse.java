@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.peer.ContainerSize;
 
 
 public class CloneResponse implements TaskResponse
@@ -19,11 +20,12 @@ public class CloneResponse implements TaskResponse
     private String ip;
     private String containerId;
     private long elapsedTime;
+    private ContainerSize containerSize;
 
 
     public CloneResponse( final String resourceHostId, final String hostname, final String containerName,
                           final String templateName, final HostArchitecture templateArch, final String ip,
-                          final String containerId, final long elapsedTime )
+                          final String containerId, final long elapsedTime, final ContainerSize containerSize )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
@@ -33,6 +35,7 @@ public class CloneResponse implements TaskResponse
         this.ip = ip;
         this.containerId = containerId;
         this.elapsedTime = elapsedTime;
+        this.containerSize = containerSize;
     }
 
 
@@ -83,6 +86,12 @@ public class CloneResponse implements TaskResponse
     public long getElapsedTime()
     {
         return elapsedTime;
+    }
+
+
+    public ContainerSize getContainerSize()
+    {
+        return containerSize;
     }
 
 

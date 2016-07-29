@@ -8,6 +8,8 @@ public interface PeerConf
 {
     String getPeerId();
 
+    Integer getVlan();
+
     Environment getEnvironment();
 
     void setEnvironment( Environment environment );

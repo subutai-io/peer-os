@@ -557,7 +557,7 @@ public class PeerWebClient
     }
 
 
-    public void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    public Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
         WebClient client = null;
         Response response;
@@ -581,7 +581,7 @@ public class PeerWebClient
             WebClientBuilder.close( client );
         }
 
-        WebClientBuilder.checkResponse( response );
+        return WebClientBuilder.checkResponse( response, Integer.class );
     }
 
 

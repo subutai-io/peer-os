@@ -55,6 +55,7 @@ import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -90,6 +91,7 @@ import io.subutai.core.environment.impl.workflow.destruction.ContainerDestructio
 import io.subutai.core.environment.impl.workflow.destruction.EnvironmentDestructionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentGrowingWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.EnvironmentModifyWorkflow;
+import io.subutai.core.environment.impl.workflow.modification.HostnameModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
@@ -876,7 +878,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         }
 
         final EnvironmentDestructionWorkflow environmentDestructionWorkflow =
-                getEnvironmentDestructionWorkflow( this, environment, operationTracker );
+                getEnvironmentDestructionWorkflow( environment, operationTracker );
 
         registerActiveWorkflow( environment, environmentDestructionWorkflow );
 
@@ -1288,6 +1290,51 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
+
+        final EnvironmentImpl environment =
+                ( EnvironmentImpl ) loadEnvironment( containerId.getEnvironmentId().getId() );
+
+        //check that container exists in the environment
+        environment.getContainerHostById( containerId.getId() );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Changing container hostname(s) in environment %s", environment.getName() ) );
+
+        final HostnameModificationWorkflow hostnameModificationWorkflow =
+                getHostnameModificationWorkflow( environment, containerId, newHostname, operationTracker );
+
+        registerActiveWorkflow( environment, hostnameModificationWorkflow );
+
+        hostnameModificationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            hostnameModificationWorkflow.join();
+
+            if ( hostnameModificationWorkflow.isFailed() )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( hostnameModificationWorkflow.getFailedException() ) );
+            }
+        }
+    }
+
+
     @RolesAllowed( "Environment-Management|Write" )
     protected EnvironmentImpl createEmptyEnvironment( final Topology topology ) throws EnvironmentCreationException
     {
@@ -1431,11 +1478,20 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow(
-            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-            final TrackerOperation operationTracker )
+    protected EnvironmentDestructionWorkflow getEnvironmentDestructionWorkflow( final EnvironmentImpl environment,
+                                                                                final TrackerOperation
+                                                                                        operationTracker )
     {
-        return new EnvironmentDestructionWorkflow( environmentManager, environment, operationTracker );
+        return new EnvironmentDestructionWorkflow( this, environment, operationTracker );
+    }
+
+
+    protected HostnameModificationWorkflow getHostnameModificationWorkflow( final EnvironmentImpl environment,
+                                                                            final ContainerId containerId,
+                                                                            final String newHostname,
+                                                                            final TrackerOperation operationTracker )
+    {
+        return new HostnameModificationWorkflow( environment, containerId, newHostname, operationTracker, this );
     }
 
 

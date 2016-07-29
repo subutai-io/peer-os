@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Strings;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 
 
@@ -139,28 +140,29 @@ public class P2PInfoPojo implements P2Pinfo
         setRhVersionCheck(0);
     }
 
-    private boolean checkOutdatedVersion( String version, String compVersion )
+    private boolean checkOutdatedVersion( String version, String compareVersion )
     {
 //        version
 
-        Pattern p = Pattern.compile("((\\d+)[\\.\\-])*(RC)?(\\d*)");
+        Pattern p = Pattern.compile("((\\d+)[\\.\\-])*((RC)|(SNAPSHOT))?(\\d*)");
         Matcher m = p.matcher(version);
 
         String curVer = "";
+        String compVersion = "";
 
         if( m.find() )
         {
-            if( m.group(0) == null )
+            if( Strings.isNullOrEmpty( m.group(0) ))
                 return false;
 
             curVer = m.group(0);
         }
 
-        m = p.matcher(compVersion);
+        m = p.matcher(compareVersion);
 
         if( m.find() )
         {
-            if( m.group(0) == null )
+            if( Strings.isNullOrEmpty( m.group(0) ))
                 return false;
 
             compVersion = m.group(0);
@@ -182,15 +184,18 @@ public class P2PInfoPojo implements P2Pinfo
 
     private boolean compareLexem( String lex1, String lex2 )
     {
-        lex1 = lex1.replace( "RC", "" );
-        lex2 = lex2.replace( "RC", "" );
+        lex1 = lex1.replace( "RC", "" ).replace( "SNAPSHOT", "" );
+        lex2 = lex2.replace( "RC", "" ).replace( "SNAPSHOT", "" );
 
         String[] lex1Ar = lex1.split("-");
         String[] lex2Ar = lex2.split("-");
 
+        int j = 0;
+
         for( int i = 0; i < lex1Ar.length; i++ )
         {
-            if( Integer.parseInt( lex1Ar[i] ) < Integer.parseInt( lex2Ar[i] ) ) return false;
+            if( j == lex2Ar.length ) return false;
+            if( Integer.parseInt( lex1Ar[i] ) < Integer.parseInt( lex2Ar[j++] ) ) return false;
         }
 
         if( lex1Ar.length < lex2Ar.length ) return false;

@@ -91,6 +91,12 @@ public class ResourceHostCommands
     }
 
 
+    public RequestBuilder getGetVlanCommand()
+    {
+        return new RequestBuilder( "cat /var/lib/apps/subutai/current/vlan" );
+    }
+
+
     public RequestBuilder getGetSetContainerHostnameCommand( final String containerName, final String newHostname )
     {
         return new RequestBuilder( String.format( "subutai hostname %s %s", containerName, newHostname ) );

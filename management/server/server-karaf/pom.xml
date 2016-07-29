@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>mgmt-server-parent</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>subutai</artifactId>
@@ -321,6 +321,7 @@
                     <packageDependencies>subutai-dnsmasq</packageDependencies>
                     <packageDependencies>subutai-influxdb</packageDependencies>
                     <packageDependencies>curl</packageDependencies>
+                    <packageDependencies>gorjun</packageDependencies>
                   </packageDependencies>
                   <excludeAllArtifacts>true</excludeAllArtifacts>
                 </configuration>

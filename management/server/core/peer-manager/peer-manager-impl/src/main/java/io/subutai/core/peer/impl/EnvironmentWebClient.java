@@ -16,6 +16,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
@@ -284,6 +285,37 @@ public class EnvironmentWebClient
     }
 
 
+    public void setContainerSize( final ContainerId containerId, final ContainerSize containerSize )
+            throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            String path = String.format( "/%s/container/%s/size", containerId.getEnvironmentId().getId(),
+                    containerId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+            response = client.post( containerSize );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error on setting container size: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
     public HostId getResourceHostIdByContainerId( final ContainerId containerId ) throws PeerException
     {
         WebClient client = null;
@@ -533,5 +565,65 @@ public class EnvironmentWebClient
         }
 
         return WebClientBuilder.checkResponse( response, SshKey.class );
+    }
+
+
+    public void updateEtcHostsWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
+                                                        String newHostname ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            String path =
+                    String.format( "/%s/containers/etchosts/%s/%s", environmentId.getId(), oldHostname, newHostname );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error updating hosts : " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void updateAuthorizedKeysWithNewContainerHostname( EnvironmentId environmentId, String oldHostname,
+                                                              String newHostname ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            String path = String.format( "/%s/containers/authorizedkeys/%s/%s", environmentId.getId(), oldHostname,
+                    newHostname );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.post( null );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( "Error updating authorized keys : " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
     }
 }

@@ -16,6 +16,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.quota.ContainerQuota;
@@ -74,6 +75,12 @@ public interface EnvironmentRestService
     @Produces( MediaType.APPLICATION_JSON )
     Response setQuota( @PathParam( "containerId" ) ContainerId containerId, ContainerQuota containerQuota );
 
+    @POST
+    @Path( "{environmentId}/container/{containerId}/size" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response setContainerSize( @PathParam( "containerId" ) ContainerId containerId, ContainerSize containerSize );
+
     @GET
     @Path( "{environmentId}/container/{containerId}/rhId" )
     @Consumes( MediaType.APPLICATION_JSON )
@@ -122,4 +129,17 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     Response createSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId,
                            @PathParam( "encType" ) SshEncryptionType encryptionType, String containerId );
+
+
+    @POST
+    @Path( "{environmentId}/containers/etchosts/{oldHostname}/{newHostname}" )
+    void updateEtcHostsWithNewContainerHostname( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                                 @PathParam( "oldHostname" ) String oldHostname,
+                                                 @PathParam( "newHostname" ) String newHostname );
+
+    @POST
+    @Path( "{environmentId}/containers/authorizedkeys/{oldHostname}/{newHostname}" )
+    void updateAuthorizedKeysWithNewContainerHostname( @PathParam( "environmentId" ) EnvironmentId environmentId,
+                                                       @PathParam( "oldHostname" ) String oldHostname,
+                                                       @PathParam( "newHostname" ) String newHostname );
 }

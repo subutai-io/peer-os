@@ -41,6 +41,7 @@ import io.subutai.common.network.UsedNetworkResources;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Host;
@@ -341,7 +342,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    public void addToAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
@@ -374,7 +375,8 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void removeSshKey( final EnvironmentId environmentId, final String sshPublicKey ) throws PeerException
+    public void removeFromAuthorizedKeys( final EnvironmentId environmentId, final String sshPublicKey )
+            throws PeerException
     {
         Preconditions.checkNotNull( environmentId, "Environment id is null" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ), "Invalid ssh key" );
@@ -414,6 +416,18 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( containerQuota, "Container quota is null" );
 
         environmentWebClient.setQuota( containerId, containerQuota );
+    }
+
+
+    @Override
+    public void setContainerSize( final ContainerId containerHostId, final ContainerSize containerSize )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( containerHostId, "Container id is null" );
+        Preconditions.checkArgument( containerHostId.getPeerId().getId().equals( peerInfo.getId() ) );
+        Preconditions.checkNotNull( containerSize, "Container size is null" );
+
+        environmentWebClient.setContainerSize( containerHostId, containerSize );
     }
 
 
@@ -597,7 +611,7 @@ public class RemotePeerImpl implements RemotePeer
 
             for ( final CloneResponse cloneResponse : response.getResponses() )
             {
-                buildEnvContainerRelation(cloneResponse, request.getEnvironmentId());
+                buildEnvContainerRelation( cloneResponse, request.getEnvironmentId() );
             }
             return response;
         }
@@ -629,7 +643,7 @@ public class RemotePeerImpl implements RemotePeer
 
         // TODO: 6/23/16 it is not clear is relation built between container and real owner (user)
         // or container <> peer that hosts it.
-        if ( activeUser == null || activeUser.getType() == UserType.System.getId())
+        if ( activeUser == null || activeUser.getType() == UserType.System.getId() )
         {
             // Since this container is hosted on remote peer owner will be remotePeer
             source = this;
@@ -827,11 +841,36 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public void reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
+    public Integer reserveNetworkResource( final NetworkResourceImpl networkResource ) throws PeerException
     {
         Preconditions.checkNotNull( networkResource );
 
-        peerWebClient.reserveNetworkResource( networkResource );
+        return peerWebClient.reserveNetworkResource( networkResource );
+    }
+
+
+    @Override
+    public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
+                                                        final String newHostname ) throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        environmentWebClient.updateEtcHostsWithNewContainerHostname( environmentId, oldHostname, newHostname );
+    }
+
+
+    @Override
+    public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final String oldHostname, final String newHostname )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+        environmentWebClient.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
     }
 
 

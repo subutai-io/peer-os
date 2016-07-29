@@ -206,8 +206,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, environmentManager,
-                    operationTracker ).execute();
+            new ContainerCloneStep( defaultDomain, topology, environment, peerManager, operationTracker ).execute();
 
             saveEnvironment();
 
@@ -224,7 +223,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
     public EnvironmentGrowingPhase CONFIGURE_HOSTS()
     {
-        operationTracker.addLog( "Configuring /etc/hosts" );
+        operationTracker.addLog( "Configuring hosts" );
 
         try
         {

@@ -284,13 +284,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public void reserveNetResources( final NetworkResourceImpl networkResource )
+    public Integer reserveNetResources( final NetworkResourceImpl networkResource )
     {
         try
         {
             Preconditions.checkNotNull( networkResource );
 
-            localPeer.reserveNetworkResource( networkResource );
+            return localPeer.reserveNetworkResource( networkResource );
         }
         catch ( Exception e )
         {

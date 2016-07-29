@@ -24,6 +24,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -56,12 +58,12 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.quota.QuotaException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.common.util.StringUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
@@ -438,7 +440,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void setContainerQuota( final ContainerHost containerHost, final ContainerSize containerSize )
+    public void setContainerSize( final ContainerHost containerHost, final ContainerSize containerSize )
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
@@ -457,9 +459,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getSetQuotaCommand( containerHost.getHostname(), quota ), this );
+            getQuotaManager().setQuota( containerHost.getContainerId(), quota );
         }
-        catch ( CommandException e )
+        catch ( QuotaException e )
         {
             throw new ResourceHostException( String.format( "Error setting quota %s to container %s: %s", containerSize,
                     containerHost.getHostname(), e.getMessage() ), e );
@@ -908,6 +910,21 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public int getVlan() throws ResourceHostException
+    {
+        try
+        {
+            return Integer.parseInt(
+                    commandUtil.execute( resourceHostCommands.getGetVlanCommand(), this ).getStdOut().trim() );
+        }
+        catch ( Exception e )
+        {
+            throw new ResourceHostException( String.format( "Error obtaining VLAN : %s", e.getMessage() ), e );
+        }
+    }
+
+
+    @Override
     public void setContainerHostname( final ContainerHost containerHost, final String hostname )
             throws ResourceHostException
     {
@@ -915,7 +932,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
         //check if new hostname differs from current one
-        if ( !StringUtil.areStringsEqual( containerHost.getHostname(), hostname, true ) )
+        if ( !StringUtils.equalsIgnoreCase( containerHost.getHostname(), hostname ) )
         {
             try
             {
@@ -936,7 +953,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
 
-        if ( !StringUtil.areStringsEqual( this.hostname, hostname, true ) )
+        if ( !StringUtils.equalsIgnoreCase( this.hostname, hostname ) )
         {
             try
             {

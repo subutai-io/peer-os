@@ -34,6 +34,7 @@ import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -838,5 +839,14 @@ public class EnvironmentManagerSecureProxy
             throws EnvironmentNotFoundException, EnvironmentManagerException
     {
         return environmentManager.checkEnvironmentConnectivity( environmentId );
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        environmentManager.changeContainerHostname( containerId, newHostname, async );
     }
 }

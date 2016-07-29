@@ -2,6 +2,7 @@ package io.subutai.core.environment.rest.ui;
 
 
 import java.io.File;
+import java.security.AccessControlException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.host.HostInterface;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
@@ -55,6 +55,7 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.environment.api.SecureEnvironmentManager;
 import io.subutai.core.environment.api.ShareDto.ShareDto;
+import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.rest.ui.entity.ContainerDto;
 import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
@@ -197,6 +198,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.serverError().entity(
                     JsonUtil.toJson( ERROR_KEY, ( e.getMessage() == null ? "Internal error" : e.getMessage() ) ) )
                            .build();
@@ -227,6 +235,13 @@ public class RestServiceImpl implements RestService
         }
         catch ( Exception e )
         {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOG.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
@@ -526,6 +541,23 @@ public class RestServiceImpl implements RestService
     }
 
 
+    public Response setContainerName( String environmentId, String containerId, String name )
+    {
+        try
+        {
+            Environment environment = findEnvironmentByContainerId( containerId );
+            ContainerHost containerHost = environment.getContainerHostById( containerId );
+            environmentManager.changeContainerHostname( containerHost.getContainerId(), name, false );
+        }
+        catch ( Exception e )
+        {
+            return Response.serverError().entity( e.getMessage() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
     /** Containers **************************************************** */
 
     @Override
@@ -670,7 +702,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok().entity( gson.toJson( ContainerSize.getConteinerSizeDescription() ) ).build();
+            return Response.ok().entity( gson.toJson( ContainerSize.getContainerSizeDescription() ) ).build();
         }
         catch ( Exception e )
         {
@@ -876,21 +908,20 @@ public class RestServiceImpl implements RestService
         {
             try
             {
-                HostInterface iface = containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE );
-
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), iface.getIp(), containerHost.getTemplateName(),
-                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), containerHost.getResourceHostId().getId(), containerHost.isLocal(),
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
+                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), containerHost.getIp(),
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        containerHost.getResourceHostId().getId(), containerHost.isLocal(),
                         containerHost.getClass().getName() ) );
             }
             catch ( Exception e )
             {
-                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getEnvironmentId().getId(),
-                        containerHost.getHostname(), "UNKNOWN", containerHost.getTemplateName(),
-                        containerHost.getContainerSize(), containerHost.getArch().toString(), containerHost.getTags(),
-                        containerHost.getPeerId(), "UNKNOWN", containerHost.isLocal(),
-                        containerHost.getClass().getName() ) );
+                containerDtos.add( new ContainerDto( containerHost.getId(), containerHost.getContainerName(),
+                        containerHost.getEnvironmentId().getId(), containerHost.getHostname(), "UNKNOWN",
+                        containerHost.getTemplateName(), containerHost.getContainerSize(),
+                        containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
+                        "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName() ) );
             }
         }
 
@@ -898,15 +929,15 @@ public class RestServiceImpl implements RestService
     }
 
 
-    private void checkName( final String name ) throws Exception
+    private void checkName( final String name ) throws EnvironmentCreationException
     {
         if ( environmentManager.getEnvironments().stream().filter( e -> e.getName().equals( name ) ).count() > 0 )
         {
-            throw new Exception( "Duplicated environment name" );
+            throw new EnvironmentCreationException( "Duplicated environment name" );
         }
         if ( name.length() > 50 )
         {
-            throw new Exception( "Environment name is too long, it should be 50 chars max" );
+            throw new EnvironmentCreationException( "Environment name is too long, it should be 50 chars max" );
         }
     }
 }

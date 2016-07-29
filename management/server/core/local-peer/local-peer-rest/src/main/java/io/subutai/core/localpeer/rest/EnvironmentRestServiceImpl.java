@@ -15,6 +15,7 @@ import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.protocol.ReverseProxyConfig;
@@ -175,7 +176,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
 
-            localPeer.addSshKey( environmentId, sshPublicKey );
+            localPeer.addToAuthorizedKeys( environmentId, sshPublicKey );
         }
         catch ( Exception e )
         {
@@ -193,7 +194,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
             Preconditions.checkArgument( !Strings.isNullOrEmpty( sshPublicKey ) );
 
-            localPeer.removeSshKey( environmentId, sshPublicKey );
+            localPeer.removeFromAuthorizedKeys( environmentId, sshPublicKey );
         }
         catch ( Exception e )
         {
@@ -287,6 +288,27 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
+    public Response setContainerSize( final ContainerId containerId, ContainerSize containerSize )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+            Preconditions.checkNotNull( containerSize );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( containerId.getId() ) );
+
+            localPeer.setContainerSize( containerId, containerSize );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public HostId getResourceHostIdByContainerId( final ContainerId containerId )
     {
         try
@@ -353,6 +375,46 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             final SshKey key = localPeer
                     .createSshKey( environmentId, JsonUtil.fromJson( containerId, ContainerId.class ), encryptionType );
             return Response.ok( key ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
+                                                        final String newHostname )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+            localPeer.updateEtcHostsWithNewContainerHostname( environmentId, oldHostname, newHostname );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public void updateAuthorizedKeysWithNewContainerHostname( final EnvironmentId environmentId,
+                                                              final String oldHostname, final String newHostname )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( oldHostname ) );
+            Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
+
+            localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
         }
         catch ( Exception e )
         {
