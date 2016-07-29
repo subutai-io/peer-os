@@ -19,54 +19,55 @@ import (
 )
 
 type snap struct {
-	Version string `json:"version"`
-	Hash    string `json:"md5Sum"`
+	Md5Sum  string   `json:"md5Sum"`
+	Name    string   `json:"name"`
+	Owner   []string `json:"owner"`
+	Version string   `json:"version"`
 }
 
-// func getAvailable(name string) string {
-// 	var update snap
-// 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-// 	client := &http.Client{Transport: tr}
-// 	if !config.Cdn.Allowinsecure {
-// 		client = &http.Client{}
-// 	}
-// 	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/info?name=" + name)
-// 	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/info?name="+name, err)
-// 	defer resp.Body.Close()
-// 	js, err := ioutil.ReadAll(resp.Body)
-// 	log.Check(log.FatalLevel, "Reading response", err)
-// 	log.Check(log.FatalLevel, "Parsing file list", json.Unmarshal(js, &update))
-// 	log.Debug("Available: " + update.Version)
-// 	return update.Version
-// }
-
-//Temporary function until gorjun cache will be fixed
 func ifUpdateable(installed int) string {
-	var update snap
+	var update []snap
+
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
 	if !config.Cdn.Allowinsecure {
 		client = &http.Client{}
 	}
-	packet := "subutai_" + config.Template.Version + "_" + config.Template.Arch + ".snap"
-	if len(config.Template.Branch) != 0 {
-		packet = "subutai_" + config.Template.Version + "_" + config.Template.Arch + "-" + config.Template.Branch + ".snap"
-	}
-	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/info?name=" + packet)
-	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/info?name="+packet, err)
+	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/info?name=subutai_")
+	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/info?name=subutai_", err)
 	defer resp.Body.Close()
 	js, err := ioutil.ReadAll(resp.Body)
 	log.Check(log.FatalLevel, "Reading response", err)
 	log.Check(log.FatalLevel, "Parsing file list", json.Unmarshal(js, &update))
-	log.Debug("Available: " + update.Version)
-	available, err := strconv.Atoi(update.Version)
-	log.Check(log.ErrorLevel, "Converting available package timestamp to int", err)
-	if installed >= available {
-		return ""
-	} else {
-		return update.Hash
+
+	hash := ""
+	for _, v := range update {
+		available, err := strconv.Atoi(v.Version)
+		log.Check(log.ErrorLevel, "Matching update, "+v.Version, err)
+		if strings.HasSuffix(v.Name, ".snap") && installed < available && ourCI(v.Owner) && strings.Contains(v.Name, config.Template.Arch) {
+			if len(config.Template.Branch) != 0 && strings.Contains(v.Name, config.Template.Branch) {
+				log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
+				installed = available
+				hash = v.Md5Sum
+			} else if len(config.Template.Branch) == 0 {
+				log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
+				installed = available
+				hash = v.Md5Sum
+			}
+		}
 	}
 
+	log.Debug("Latest version: " + strconv.Itoa(installed))
+	return hash
+}
+
+func ourCI(owners []string) bool {
+	for _, v := range owners {
+		if v == "jenkins" {
+			return true
+		}
+	}
+	return false
 }
 
 func getInstalled() string {
@@ -119,17 +120,10 @@ func Update(name string, check bool) {
 	defer unlockSubutai()
 	switch name {
 	case "rh":
-		// packet := "subutai_" + config.Template.Version + "_" + config.Template.Arch + ".snap"
-		// if len(config.Template.Branch) != 0 {
-		// 	packet = "subutai_" + config.Template.Version + "_" + config.Template.Arch + "-" + config.Template.Branch + ".snap"
-		// }
 
 		installed, err := strconv.Atoi(getInstalled())
 		log.Check(log.FatalLevel, "Converting installed package timestamp to int", err)
-		// available, err := strconv.Atoi(getAvailable(packet))
-		// log.Check(log.FatalLevel, "Converting available package timestamp to int", err)
 
-		//Temporary workaround until gorjun cache will be fixed
 		newsnap := ifUpdateable(installed)
 		if len(newsnap) == 0 {
 			log.Info("No update is available")
@@ -139,16 +133,6 @@ func Update(name string, check bool) {
 			os.Exit(0)
 		}
 		upgradeRh(newsnap)
-
-		// if installed >= available {
-		// 	log.Info("No update is available")
-		// 	os.Exit(1)
-		// } else if check {
-		// 	log.Info("Update is available")
-		// 	os.Exit(0)
-		// }
-
-		// upgradeRh(packet)
 
 	default:
 		if !container.IsContainer(name) {
