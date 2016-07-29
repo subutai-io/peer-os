@@ -48,7 +48,7 @@ type metainfo struct {
 	Owner     []string `json:"owner"`
 }
 
-func templId(t templ, arch string, kurjun *http.Client) {
+func templId(t *templ, arch string, kurjun *http.Client) {
 	var meta metainfo
 
 	url := config.Cdn.Kurjun + "/template/info?name=" + t.name
@@ -252,17 +252,20 @@ func LxcImport(name, version, token string) {
 	}
 
 	kurjun := config.CheckKurjun()
-	templId(t, runtime.GOARCH, kurjun)
-	// key := getOwnerKey(t.owner)
-	// signedhash := verifySignature(key, t.signature)
-	// if len(signedhash) == 0 {
-	// 	log.Error("Digital signature verification failed, invalid owner public key")
-	// }
-	// if t.hash != signedhash {
-	// 	log.Error("Signed hash does not match with repository information, possible security violation")
-	// }
-	// log.Info("Digital signature verification succeeded, owner and template integrity are valid")
-
+	templId(&t, runtime.GOARCH, kurjun)
+	if len(t.signature) != 0 {
+		key := getOwnerKey(t.owner)
+		signedhash := verifySignature(key, t.signature)
+		if len(signedhash) == 0 {
+			log.Error("Digital signature verification failed, invalid owner public key")
+		}
+		if t.hash != signedhash {
+			log.Error("Signed hash does not match with repository information, possible security violation")
+		}
+		log.Info("Digital signature verification succeeded, owner and template integrity are valid")
+	} else {
+		log.Warn("Template is not signed")
+	}
 	if !checkLocal(t) && !download(t, kurjun) {
 		log.Error(t.name + " template not found")
 	}
