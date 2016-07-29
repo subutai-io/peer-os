@@ -32,6 +32,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.templatesType = 'all';
 
     vm.peerIds = [];
+    vm.numChangedContainers = 0;
     vm.resourceHosts = [];
     vm.currentResourceHosts = [];
     vm.advancedEnv = {};
@@ -48,6 +49,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.buildCompleted = false;
     vm.selectedPlugin = false;
     vm.editingEnv = false;
+    vm.isEditing = false;
 
     // functions
 
@@ -221,6 +223,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                         vm.logMessages.push(currentLog);
                         vm.buildCompleted = true;
                         vm.editingEnv = false;
+                        vm.isEditing = false;
 
                     }
 
@@ -290,11 +293,17 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         };
         vm.logMessages.push(currentLog);
 
+        var quotaContainers = [];
+
+        for (var key in vm.editingEnv.changingContainers) {
+            quotaContainers.push({ "key" : key, "value" : vm.editingEnv.changingContainers[key] });
+        }
+
         var conteiners = {
             "topology": vm.containers2Build,
             "removedContainers": vm.containers2Remove,
             "environmentId": vm.editingEnv.id,
-            "changingContainers": []
+            "changingContainers": quotaContainers
         };
         environmentService.modifyEnvironment(conteiners, 'advanced')
             .success(function (data) {
@@ -791,6 +800,12 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             var removeContainers = getContainers2Build(vm.excludedContainers, false, true);
             vm.env2Remove = removeContainers.containersObj;
             vm.containers2Remove = removeContainers.containersList;
+
+            vm.numChangedContainers = 0;
+
+            for (var key in vm.editingEnv.changingContainers) {
+                vm.numChangedContainers++;
+            }
         }
 
         ngDialog.open({
@@ -813,7 +828,9 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         }
 
 		clearWorkspace();
+        vm.isEditing = true;
 		vm.editingEnv = environment;
+        vm.editingEnv.changingContainers = [];
 		vm.environment2BuildName = environment.name;
 		vm.excludedContainers = [];
 		vm.currentPeerIndex = 0;
@@ -835,7 +852,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
-			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.name);
+			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname);
 		}
 		filterPluginsList();
 	}
@@ -904,7 +921,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     function setTemplatesByPlugin() {
 
-        console.log(vm.selectedPlugin);
         if (vm.selectedPlugin.requirement !== undefined) {
 
             var firstPeer;
@@ -1014,6 +1030,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         vm.env2Remove = {};
         vm.containers2Remove = [];
 
+        vm.isEditing = false;
         vm.editingEnv = false;
         graph.resetCells();
         $('.b-resource-host').remove();
@@ -1025,6 +1042,30 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         currentTemplate.set('containerName', settings.containerName);
         //ngDialog.closeAll();
         containerSettingMenu.hide();
+
+        if( vm.isEditing )
+        {
+            var id = currentTemplate.attributes.containerId;
+
+            var res = $.grep( vm.editingEnv.containers, function( e, i ) {
+                return e.id == id;
+            });
+
+            if( res[0] )
+            {
+                res = res[0];
+
+                if( res.type == settings.quotaSize && vm.editingEnv.changingContainers[id] )
+                {
+                    delete vm.editingEnv.changingContainers[id];
+                }
+
+                if( res.type != settings.quotaSize )
+                {
+                    vm.editingEnv.changingContainers[id] = settings.quotaSize;
+                }
+            }
+        }
     }
 
     function getTemplateNameById(id) {
@@ -1228,7 +1269,7 @@ function addContainerToHost(model, template, img, size, containerId, name) {
 		parentHostId: model.get('hostId'),
 		quotaSize: size,
 		containerId: containerId,
-		containerName: containerName,
+		containerName: name,
 		attrs: {
 			image: { 'xlink:href': img },
 			'rect.b-magnet': {fill: quotaColors[size]},

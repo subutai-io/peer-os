@@ -320,13 +320,23 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
+            Map< String, ContainerSize > changedContainersFiltered = new HashMap<>();
+            List<Map<String, String>> changingContainers =
+                    JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
+                    {
+                    }.getType() );
+
+            for( Map<String, String> cont : changingContainers )
+            {
+                changedContainersFiltered.put( cont.get("key"), ContainerSize.valueOf( cont.get("value") ));
+            }
 
             Topology topology = new Topology( name );
 
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
-            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, true );
+            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered, true );
         }
         catch ( Exception e )
         {

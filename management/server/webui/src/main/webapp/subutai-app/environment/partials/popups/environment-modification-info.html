@@ -50,7 +50,7 @@
                 </table>
             </div>
         </div>
-        <div class="g-margin-bottom">
+        <div class="g-margin-bottom" ng-if="environmentSimpleViewCtrl.currentEnvironment.numChangedContainers">
             {{ environmentSimpleViewCtrl.currentEnvironment.numChangedContainers }} containers are about to change sizes
         </div>
         <div>
