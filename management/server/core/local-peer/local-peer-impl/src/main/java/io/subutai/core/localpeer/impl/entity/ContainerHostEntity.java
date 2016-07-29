@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -242,6 +244,14 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public ContainerSize getContainerSize()
     {
         return containerSize;
+    }
+
+
+    public void setContainerSize( final ContainerSize containerSize )
+    {
+        Preconditions.checkNotNull( containerSize );
+        
+        this.containerSize = containerSize;
     }
 
 
