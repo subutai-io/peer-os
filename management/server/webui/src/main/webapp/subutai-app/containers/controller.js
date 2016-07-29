@@ -269,6 +269,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function setContainerName( container, name ) {
+		LOADING_SCREEN();
 		environmentService.setContainerName( container, name ).success( function (data) {
 			location.reload();
 		} ).error( function (data) {

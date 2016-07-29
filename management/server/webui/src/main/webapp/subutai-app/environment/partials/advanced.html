@@ -195,7 +195,8 @@
 								<div class="body">
 									<div class="b-form-group">
 										<div class="b-form-group__label">Container name</div>
-										<input type="text" 
+										<input type="text"
+											ng-disabled="advEnvCtrl.isEditing"
 											id="js-container-name" 
 											class="b-form-input b-form-input_full" 
 											ng-model="templateSettings.containerName" required>									
@@ -241,15 +242,7 @@
 
 					<button
 					class="b-btn b-btn_green"
-					ng-if="!advEnvCtrl.isEditing" 
 					ng-click="advEnvCtrl.buildEnvironmentByJoint()">
-						Apply
-					</button>
-
-					<button
-					class="b-btn b-btn_green"
-					ng-if="advEnvCtrl.isEditing"
-					ng-click="advEnvCtrl.notifyChanges()">
 						Apply
 					</button>
 				</div>

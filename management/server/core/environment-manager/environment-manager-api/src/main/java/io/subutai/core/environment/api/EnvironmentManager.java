@@ -23,6 +23,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
@@ -82,6 +83,13 @@ public interface EnvironmentManager
     UUID modifyEnvironmentAndGetTrackerID( String environmentId, Topology topology, List<String> removedContainers,
                                            boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    UUID modifyEnvironmentAndGetTrackerID(String environmentId, Topology topology, List<String> removedContainers,
+                                          Map<String, ContainerSize> changedContainers, boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
+
 
     /**
      * Assigns ssh key to environment and inserts it into authorized_keys file of all the containers within the

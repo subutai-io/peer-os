@@ -58,14 +58,16 @@ public interface RestService
     @Path( "{environmentId}/modify" )
     Response modify(@PathParam( "environmentId" ) String environmentId,
                     @FormParam( "topology" ) String topologyJson,
-                    @FormParam( "removedContainers" ) String removedContainers );
+                    @FormParam( "removedContainers" ) String removedContainers,
+                    @FormParam( "quotaContainers" ) String quotaContainers);
 
     @POST
     @Produces( { MediaType.APPLICATION_JSON } )
     @Path( "{environmentId}/modify/advanced" )
     Response modifyAdvanced(@PathParam( "environmentId" ) String environmentId,
                             @FormParam( "topology" ) String topologyJson,
-                            @FormParam( "removedContainers" ) String removedContainers );
+                            @FormParam( "removedContainers" ) String removedContainers,
+                            @FormParam( "quotaContainers" ) String quotaContainers);
 
 
     @DELETE

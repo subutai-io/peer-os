@@ -548,9 +548,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public void setContainerSize( final ContainerSize size ) throws PeerException
+    public EnvironmentContainerHost setContainerSize( final ContainerSize size ) throws PeerException
     {
         getPeer().setContainerSize( this.getContainerId(), size );
+
+        this.containerSize = size;
+
+        return environmentManager.update( this );
     }
 
 
