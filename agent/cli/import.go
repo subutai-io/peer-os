@@ -1,7 +1,9 @@
 package lib
 
 import (
+	"bytes"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,6 +16,8 @@ import (
 	"github.com/cheggaaa/pb"
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
+	"golang.org/x/crypto/openpgp"
+	"golang.org/x/crypto/openpgp/clearsign"
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
@@ -27,44 +31,54 @@ var (
 )
 
 type templ struct {
-	name    string
-	file    string
-	version string
-	branch  string
-	id      string
-	hash    string
+	name      string
+	file      string
+	version   string
+	branch    string
+	id        string
+	hash      string
+	signature string
+	owner     string
 }
 
-func templId(t templ, arch string, kurjun *http.Client) string {
+type metainfo struct {
+	ID        string   `json:"id"`
+	Signature string   `json:"signature"`
+	Md5Sum    string   `json:"md5Sum"`
+	Owner     []string `json:"owner"`
+}
 
-	//We'll need to change this function, so it retrieves json from info endpoint (not only "type=text"), parse owner fingerprint and signed hash message, request owner public key using fingerprint
-	//and verify hash, signature and owner key
+func templId(t templ, arch string, kurjun *http.Client) {
+	var meta metainfo
 
-	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&type=text"
+	url := config.Cdn.Kurjun + "/template/info?name=" + t.name
 	if t.name == "management" && len(t.branch) != 0 {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&type=text"
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch
 	} else if t.name == "management" {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&type=text"
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version
 	}
 	response, err := kurjun.Get(url)
 	log.Debug("Retrieving id, get: " + url)
 
 	if err == nil && response.StatusCode == 204 && t.name == "management" {
 		log.Warn("Cannot get management with specified version, trying without version")
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name + "&type=text")
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name)
 	}
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
-		return ""
+		return
 	}
 
-	hash, err := ioutil.ReadAll(response.Body)
-	response.Body.Close()
-	if log.Check(log.WarnLevel, "Reading response body", err) {
-		return ""
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+
+	if log.Check(log.WarnLevel, "Parsing response body", json.Unmarshal(body, &meta)) {
+		return
 	}
 
-	log.Debug("Template id: " + string(hash))
-	return string(hash)
+	t.id = meta.ID
+	t.hash = meta.Md5Sum
+	t.owner = meta.Owner[0]
+	t.signature = meta.Signature
 }
 
 func md5sum(filePath string) string {
@@ -146,6 +160,29 @@ func download(t templ, kurjun *http.Client) bool {
 	return false
 }
 
+func getOwnerKey(owner string) string {
+	response, err := http.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/auth/key?user=" + owner)
+	log.Check(log.FatalLevel, "Getting owner public key", err)
+	defer response.Body.Close()
+	key, err := ioutil.ReadAll(response.Body)
+	log.Check(log.FatalLevel, "Reading key body", err)
+	return string(key)
+}
+
+func verifySignature(key, signature string) string {
+	entity, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(key))
+	log.Check(log.WarnLevel, "Reading user public key", err)
+
+	if block, _ := clearsign.Decode([]byte(signature)); block != nil {
+		_, err = openpgp.CheckDetachedSignature(entity, bytes.NewBuffer(block.Bytes), block.ArmoredSignature.Body)
+		if log.Check(log.WarnLevel, "Checking signature", err) {
+			return ""
+		}
+		return string(block.Bytes)
+	}
+	return ""
+}
+
 func lockSubutai(file string) bool {
 	lock, err := lockfile.New("/var/run/lock/subutai." + file)
 	if log.Check(log.DebugLevel, "Init lock "+file, err) {
@@ -215,10 +252,16 @@ func LxcImport(name, version, token string) {
 	}
 
 	kurjun := config.CheckKurjun()
-	t.id = templId(t, runtime.GOARCH, kurjun)
-	if len(strings.Split(t.id, ".")) > 1 {
-		t.hash = strings.Split(t.id, ".")[1]
-	}
+	templId(t, runtime.GOARCH, kurjun)
+	// key := getOwnerKey(t.owner)
+	// signedhash := verifySignature(key, t.signature)
+	// if len(signedhash) == 0 {
+	// 	log.Error("Digital signature verification failed, invalid owner public key")
+	// }
+	// if t.hash != signedhash {
+	// 	log.Error("Signed hash does not match with repository information, possible security violation")
+	// }
+	// log.Info("Digital signature verification succeeded, owner and template integrity are valid")
 
 	if !checkLocal(t) && !download(t, kurjun) {
 		log.Error(t.name + " template not found")
