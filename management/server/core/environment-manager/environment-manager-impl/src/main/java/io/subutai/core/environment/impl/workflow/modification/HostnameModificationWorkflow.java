@@ -117,6 +117,8 @@ public class HostnameModificationWorkflow
             new UpdateAuthorizedKeysStep( environment, changeHostnameStep.getOldHostname(),
                     changeHostnameStep.getNewHostname(), operationTracker ).execute();
 
+            environment.getContainerHostById( containerId.getId() ).setContainerName( newHostname );
+
             saveEnvironment();
 
             return HostnameModificationPhase.FINALIZE;
