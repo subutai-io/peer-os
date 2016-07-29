@@ -2,7 +2,9 @@ package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,36 +14,45 @@ import org.apache.commons.lang3.time.DateUtils;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.host.HostInfoModel;
+import io.subutai.common.host.HostInterfaceModel;
+import io.subutai.common.host.HostInterfaces;
+import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.JournalCtlLevel;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.hub.share.dto.HostInterfaceDto;
 import io.subutai.hub.share.dto.P2PDto;
-import io.subutai.hub.share.dto.ResourceHostMetricDto;
+import io.subutai.hub.share.dto.host.ResourceHostMetricDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 
 import static java.lang.String.format;
 
 
-public class ResourceHostDataProcessor implements Runnable
+public class ResourceHostDataProcessor implements Runnable, HostListener
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
 
-    private final HubManagerImpl hubManager;
+    private static HubManagerImpl hubManager;
 
-    private final LocalPeer localPeer;
+    private static LocalPeer localPeer;
 
-    private final HubRestClient restClient;
+    private static HubRestClient restClient;
 
-    private final Monitor monitor;
+    private static Monitor monitor;
 
     private Date p2pLogsEndDate;
+
+    private static Set<HostInterfaceDto> interfaces = new HashSet<>();
 
 
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
@@ -52,6 +63,12 @@ public class ResourceHostDataProcessor implements Runnable
         this.monitor = monitor;
 
         this.restClient = restClient;
+    }
+
+
+    public ResourceHostDataProcessor()
+    {
+
     }
 
 
@@ -102,15 +119,18 @@ public class ResourceHostDataProcessor implements Runnable
 
         ResourceHostMetricDto metricDto = getConfigs( rhMetric );
 
+        metricDto.setInterfaces( interfaces );
+
         log.info( "Sending resource host configs to Hub..." );
 
-        String path = format( "/rest/v1/peers/%s/resource-hosts/%s", localPeer.getId(), metricDto.getHostId() );
+        String path = format( "/rest/v1.2/peers/%s/resource-hosts/%s", localPeer.getId(), metricDto.getHostId() );
 
         RestResult<Object> restResult = restClient.post( path, metricDto );
 
         if ( restResult.isSuccess() )
         {
             log.info( "Resource host configs processed successfully" );
+            interfaces.clear();
         }
     }
 
@@ -230,6 +250,28 @@ public class ResourceHostDataProcessor implements Runnable
         if ( restResult.isSuccess() )
         {
             log.info( "Processing p2p logs completed successfully" );
+        }
+    }
+
+
+    @Override
+    public void onHeartbeat( final ResourceHostInfo resourceHostInfo, final Set<QuotaAlertValue> alerts )
+    {
+        // // TODO: 7/29/16 need optimize 
+        if ( hubManager.isRegistered() )
+        {
+            HostInterfaces as = resourceHostInfo.getHostInterfaces();
+            Set<HostInterfaceModel> test = as.getAll();
+
+            for ( final HostInterfaceModel hostInterfaceModel : test )
+            {
+                HostInterfaceDto dto = new HostInterfaceDto();
+                dto.setName( hostInterfaceModel.getName() );
+                dto.setIp( hostInterfaceModel.getIp() );
+
+                interfaces.add( dto );
+            }
+            processConfigs();
         }
     }
 }
