@@ -43,17 +43,15 @@ func ifUpdateable(installed int) string {
 	hash := ""
 	for _, v := range update {
 		available, err := strconv.Atoi(v.Version)
-		log.Check(log.ErrorLevel, "Matching update, "+v.Version, err)
-		if strings.HasSuffix(v.Name, ".snap") && installed < available && ourCI(v.Owner) && strings.Contains(v.Name, config.Template.Arch) {
-			if len(config.Template.Branch) != 0 && strings.Contains(v.Name, config.Template.Branch) {
-				log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
-				installed = available
-				hash = v.Md5Sum
-			} else if len(config.Template.Branch) == 0 {
-				log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
-				installed = available
-				hash = v.Md5Sum
-			}
+		log.Check(log.ErrorLevel, "Matching update "+v.Version, err)
+		if len(config.Template.Branch) != 0 && strings.HasSuffix(v.Name, config.Template.Arch+"-"+config.Template.Branch+".snap") && installed < available && ourCI(v.Owner) {
+			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
+			installed = available
+			hash = v.Md5Sum
+		} else if len(config.Template.Branch) == 0 && strings.HasSuffix(v.Name, config.Template.Arch+".snap") && installed < available && ourCI(v.Owner) {
+			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
+			installed = available
+			hash = v.Md5Sum
 		}
 	}
 
