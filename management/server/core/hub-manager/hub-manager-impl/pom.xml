@@ -84,6 +84,11 @@
       <artifactId>subutai-appender</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registry-api</artifactId>
+    </dependency>
+
   </dependencies>
 
   <build>
