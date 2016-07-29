@@ -690,12 +690,4 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     {
         return getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp();
     }
-
-
-    @Override
-    public EnvironmentContainerHost setContainerName(String containerName)
-    {
-        this.containerName = containerName;
-        return environmentManager.update( this );
-    }
 }
