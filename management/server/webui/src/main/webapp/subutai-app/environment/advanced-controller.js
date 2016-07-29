@@ -852,7 +852,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 			if(!imageExists(img)) {
 				img = 'assets/templates/no-image.jpg';
 			}
-			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.name);
+			addContainerToHost(resourceHost, container.templateName, img, container.type, container.id, container.hostname);
 		}
 		filterPluginsList();
 	}
@@ -1269,7 +1269,7 @@ function addContainerToHost(model, template, img, size, containerId, name) {
 		parentHostId: model.get('hostId'),
 		quotaSize: size,
 		containerId: containerId,
-		containerName: containerName,
+		containerName: name,
 		attrs: {
 			image: { 'xlink:href': img },
 			'rect.b-magnet': {fill: quotaColors[size]},
