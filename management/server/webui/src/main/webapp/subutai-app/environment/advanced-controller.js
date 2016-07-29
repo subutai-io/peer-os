@@ -1269,7 +1269,7 @@ function addContainerToHost(model, template, img, size, containerId, name) {
 		parentHostId: model.get('hostId'),
 		quotaSize: size,
 		containerId: containerId,
-		containerName: name,
+		containerName: containerName,
 		attrs: {
 			image: { 'xlink:href': img },
 			'rect.b-magnet': {fill: quotaColors[size]},
