@@ -444,6 +444,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        Preconditions.checkNotNull( containerSize );
 
         try
         {
@@ -460,6 +461,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             getQuotaManager().setQuota( containerHost.getContainerId(), quota );
+
+            ( ( ContainerHostEntity ) containerHost ).setContainerSize( containerSize );
         }
         catch ( QuotaException e )
         {
