@@ -25,7 +25,9 @@ import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
-
+//TODO
+// 1 ) parallelize change container size step -extract a separate step
+// 2 ) skip destroy containers & change quota steps if not needed
 public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
     private final PeerManager peerManager;
