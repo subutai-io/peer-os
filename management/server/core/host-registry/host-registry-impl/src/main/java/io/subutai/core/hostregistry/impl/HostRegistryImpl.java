@@ -199,6 +199,15 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
+    public void removeResourceHost( final String id )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
+
+        hosts.invalidate( id );
+    }
+
+
+    @Override
     public void addHostListener( final HostListener listener )
     {
         if ( listener != null )
