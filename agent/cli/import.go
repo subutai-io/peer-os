@@ -77,6 +77,7 @@ func templId(t *templ, arch string, kurjun *http.Client) {
 
 	t.id = meta.ID
 	t.hash = meta.Md5Sum
+	//TODO: each artifact might be owned by several people, so considering it we need to add `for-range` cycle to check ownership for a user list
 	t.owner = meta.Owner[0]
 	t.signature = meta.Signature
 }
@@ -101,7 +102,7 @@ func checkLocal(t templ) bool {
 	for _, f := range files {
 		if t.file == f.Name() {
 			if len(t.hash) == 0 {
-				fmt.Print("Cannot check md5 of local archive. Trust anyway? (y/n)")
+				fmt.Print("Cannot verify local template. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
@@ -175,7 +176,7 @@ func verifySignature(key, signature string) string {
 
 	if block, _ := clearsign.Decode([]byte(signature)); block != nil {
 		_, err = openpgp.CheckDetachedSignature(entity, bytes.NewBuffer(block.Bytes), block.ArmoredSignature.Body)
-		if log.Check(log.WarnLevel, "Checking signature", err) {
+		if log.Check(log.ErrorLevel, "Checking signature", err) {
 			return ""
 		}
 		return string(block.Bytes)
@@ -256,12 +257,10 @@ func LxcImport(name, version, token string) {
 	if len(t.signature) != 0 {
 		key := getOwnerKey(t.owner)
 		signedhash := verifySignature(key, t.signature)
-		if len(signedhash) == 0 {
-			log.Error("Digital signature verification failed, invalid owner public key")
-		}
 		if t.hash != signedhash {
-			log.Error("Signed hash does not match with repository information, possible security violation")
+			log.Error("Signature does not match with template hash")
 		}
+		t.hash = signedhash
 		log.Info("Digital signature verification succeeded, owner and template integrity are valid")
 	} else {
 		log.Warn("Template is not signed")
