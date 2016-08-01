@@ -31,9 +31,11 @@ import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -276,7 +278,40 @@ public class CommandProcessor implements RestProcessor
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
-        return resourceHostInfo.getHostInterfaces().findByName( Common.RH_INTERFACE ).getIp();
+        //return mng-net interface ip
+        HostInterface hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.MNG_NET_INTERFACE );
+
+        if ( hostInterface instanceof NullHostInterface )
+        {
+            //otherwise return wan interface ip
+            hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
+        }
+        else
+        {
+            //check if this is not an RH-with-MH and mng-net IP ends with 254
+            //then we need to use WAN interface ip
+            try
+            {
+                LocalPeer localPeer = getLocalPeer();
+
+                if ( localPeer != null && !localPeer.getManagementHost().getId().equals( resourceHostInfo.getId() )
+                        && hostInterface.getIp().endsWith( "254" ) )
+                {
+                    hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
+                }
+            }
+            catch ( Exception e )
+            {
+                throw new RuntimeException( e.getMessage() );
+            }
+        }
+
+        if ( hostInterface instanceof NullHostInterface )
+        {
+            throw new RuntimeException( "Network interface not found" );
+        }
+
+        return hostInterface.getIp();
     }
 
 
@@ -298,6 +333,12 @@ public class CommandProcessor implements RestProcessor
     protected SecurityManager getSecurityManager()
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 

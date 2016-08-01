@@ -31,7 +31,6 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -256,7 +255,7 @@ public class HostRegistryImpl implements HostRegistry
 
             Set<ResourceHost> registeredResourceHosts = Sets.newHashSet();
 
-            LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+            LocalPeer localPeer = getLocalPeer();
 
             if ( localPeer != null )
             {
@@ -363,36 +362,93 @@ public class HostRegistryImpl implements HostRegistry
 
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
     {
-        return RestUtil.createWebClient( String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ),
-                Common.DEFAULT_AGENT_PORT, action ), 3000, 5000, 1 );
+        return RestUtil.createWebClient(
+                String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ), Common.DEFAULT_AGENT_PORT,
+                        action ), 3000, 5000, 1 );
     }
 
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
-        if ( resourceHostInfo instanceof ResourceHost )
+        try
         {
-            for ( HostInterface hostInterface : ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces() )
+            LocalPeer localPeer = getLocalPeer();
+
+            if ( resourceHostInfo instanceof ResourceHost )
             {
-                if ( Common.RH_INTERFACE.equals( hostInterface.getName() ) )
+                Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
+
+                //return mng-net interface ip
+                for ( HostInterface hostInterface : hostInterfaces )
                 {
-                    return hostInterface.getIp();
+                    if ( Common.MNG_NET_INTERFACE.equals( hostInterface.getName() ) )
+                    {
+
+                        //check if this is not an RH-with-MH and mng-net IP ends with 254
+                        //then we need to use WAN interface ip
+                        if ( localPeer != null && !localPeer.getManagementHost().getId()
+                                                            .equals( resourceHostInfo.getId() ) && hostInterface.getIp()
+                                                                                                                .endsWith(
+                                                                                                                        "254" ) )
+                        {
+                            break;
+                        }
+
+                        return hostInterface.getIp();
+                    }
                 }
-            }
 
-            throw new RuntimeException( "Network interface not found" );
-        }
-        else
-        {
-            HostInterface hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.RH_INTERFACE );
+                //otherwise return wan interface ip
+                for ( HostInterface hostInterface : hostInterfaces )
+                {
+                    if ( Common.WAN_INTERFACE.equals( hostInterface.getName() ) )
+                    {
+                        return hostInterface.getIp();
+                    }
+                }
 
-            if ( hostInterface instanceof NullHostInterface )
-            {
                 throw new RuntimeException( "Network interface not found" );
             }
+            else
+            {
+                //return mng-net interface ip
+                HostInterface hostInterface =
+                        resourceHostInfo.getHostInterfaces().findByName( Common.MNG_NET_INTERFACE );
 
-            return hostInterface.getIp();
+                if ( hostInterface instanceof NullHostInterface )
+                {
+                    //otherwise return wan interface ip
+                    hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
+                }
+                else
+                {
+                    //check if this is not an RH-with-MH and mng-net IP ends with 254
+                    //then we need to use WAN interface ip
+                    if ( localPeer != null && !localPeer.getManagementHost().getId().equals( resourceHostInfo.getId() )
+                            && hostInterface.getIp().endsWith( "254" ) )
+                    {
+                        hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
+                    }
+                }
+
+                if ( hostInterface instanceof NullHostInterface )
+                {
+                    throw new RuntimeException( "Network interface not found" );
+                }
+
+                return hostInterface.getIp();
+            }
         }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e.getMessage() );
+        }
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 
