@@ -2,7 +2,6 @@ package config
 
 import (
 	"crypto/tls"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
@@ -113,13 +112,8 @@ func init() {
 	err = gcfg.ReadFileInto(&config, "/apps/subutai/current/etc/agent.gcfg")
 	log.Check(log.WarnLevel, "Opening Agent config file /apps/subutai/current/etc/agent.gcfg", err)
 
-	files, _ := ioutil.ReadDir("/apps/")
-	for _, f := range files {
-		if f.Name() == "subutai-mng" {
-			config.Agent.AppPrefix = "/apps/subutai-mng/current/"
-			config.Agent.DataPrefix = "/var/lib/" + config.Agent.AppPrefix
-		}
-	}
+	err = gcfg.ReadFileInto(&config, "/var/lib/apps/subutai/current/agent.gcfg")
+	log.Check(log.DebugLevel, "Opening preserved config file /var/lib/apps/subutai/current/etc/agent.gcfg", err)
 
 	if config.Agent.GpgUser == "" {
 		config.Agent.GpgUser = "rh@subutai.io"
