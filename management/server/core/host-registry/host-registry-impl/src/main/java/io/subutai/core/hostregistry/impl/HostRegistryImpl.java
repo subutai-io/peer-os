@@ -32,6 +32,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -370,79 +371,29 @@ public class HostRegistryImpl implements HostRegistry
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
-        try
+
+        HostInterface hostInterface;
+
+        if ( resourceHostInfo instanceof ResourceHost )
         {
-            LocalPeer localPeer = getLocalPeer();
+            Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
 
-            if ( resourceHostInfo instanceof ResourceHost )
-            {
-                Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
-
-                //return mng-net interface ip
-                for ( HostInterface hostInterface : hostInterfaces )
-                {
-                    if ( Common.MNG_NET_INTERFACE.equals( hostInterface.getName() ) )
-                    {
-
-                        //check if this is not an RH-with-MH and mng-net IP ends with 254
-                        //then we need to use WAN interface ip
-                        if ( localPeer != null && !localPeer.getManagementHost().getId()
-                                                            .equals( resourceHostInfo.getId() ) && hostInterface.getIp()
-                                                                                                                .endsWith(
-                                                                                                                        "254" ) )
-                        {
-                            break;
-                        }
-
-                        return hostInterface.getIp();
-                    }
-                }
-
-                //otherwise return wan interface ip
-                for ( HostInterface hostInterface : hostInterfaces )
-                {
-                    if ( Common.WAN_INTERFACE.equals( hostInterface.getName() ) )
-                    {
-                        return hostInterface.getIp();
-                    }
-                }
-
-                throw new RuntimeException( "Network interface not found" );
-            }
-            else
-            {
-                //return mng-net interface ip
-                HostInterface hostInterface =
-                        resourceHostInfo.getHostInterfaces().findByName( Common.MNG_NET_INTERFACE );
-
-                if ( hostInterface instanceof NullHostInterface )
-                {
-                    //otherwise return wan interface ip
-                    hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
-                }
-                else
-                {
-                    //check if this is not an RH-with-MH and mng-net IP ends with 254
-                    //then we need to use WAN interface ip
-                    if ( localPeer != null && !localPeer.getManagementHost().getId().equals( resourceHostInfo.getId() )
-                            && hostInterface.getIp().endsWith( "254" ) )
-                    {
-                        hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
-                    }
-                }
-
-                if ( hostInterface instanceof NullHostInterface )
-                {
-                    throw new RuntimeException( "Network interface not found" );
-                }
-
-                return hostInterface.getIp();
-            }
+            hostInterface = IPUtil.findAddressableInterface( hostInterfaces, resourceHostInfo.getId() );
         }
-        catch ( Exception e )
+        else
         {
-            throw new RuntimeException( e.getMessage() );
+            Set<HostInterface> hostInterfaces = Sets.newHashSet();
+            hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
+
+            hostInterface = IPUtil.findAddressableInterface( hostInterfaces, resourceHostInfo.getId() );
         }
+
+        if ( hostInterface instanceof NullHostInterface )
+        {
+            throw new RuntimeException( "Network interface not found" );
+        }
+
+        return hostInterface.getIp();
     }
 
 

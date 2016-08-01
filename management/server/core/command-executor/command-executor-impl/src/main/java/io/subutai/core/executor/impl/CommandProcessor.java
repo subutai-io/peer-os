@@ -36,6 +36,7 @@ import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -278,33 +279,11 @@ public class CommandProcessor implements RestProcessor
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
-        //return mng-net interface ip
-        HostInterface hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.MNG_NET_INTERFACE );
 
-        if ( hostInterface instanceof NullHostInterface )
-        {
-            //otherwise return wan interface ip
-            hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
-        }
-        else
-        {
-            //check if this is not an RH-with-MH and mng-net IP ends with 254
-            //then we need to use WAN interface ip
-            try
-            {
-                LocalPeer localPeer = getLocalPeer();
+        Set<HostInterface> hostInterfaces = Sets.newHashSet();
+        hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
 
-                if ( localPeer != null && !localPeer.getManagementHost().getId().equals( resourceHostInfo.getId() )
-                        && hostInterface.getIp().endsWith( "254" ) )
-                {
-                    hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.WAN_INTERFACE );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new RuntimeException( e.getMessage() );
-            }
-        }
+        HostInterface hostInterface = IPUtil.findAddressableInterface( hostInterfaces, resourceHostInfo.getId() );
 
         if ( hostInterface instanceof NullHostInterface )
         {
