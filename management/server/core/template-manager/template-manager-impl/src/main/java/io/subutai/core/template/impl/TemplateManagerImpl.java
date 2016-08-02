@@ -16,16 +16,20 @@ import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
 
 import io.subutai.common.protocol.Template;
+import io.subutai.common.util.CollectionUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.template.api.TemplateManager;
 
 
-//TODO add cache for templates
 public class TemplateManagerImpl implements TemplateManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( TemplateManagerImpl.class.getName() );
     private static final String GORJUN_LIST_TEMPLATES_URL = "http://localhost:8338/kurjun/rest/template/list";
+
+    private static final int TEMPLATE_CACHE_TTL_SEC = 30;
+    private Set<Template> templatesCache = Sets.newHashSet();
+    private long lastTemplatesFetchTime;
 
 
     protected WebClient getWebClient()
@@ -37,30 +41,42 @@ public class TemplateManagerImpl implements TemplateManager
     @Override
     public Set<Template> getTemplates()
     {
-        Set<Template> templates = Sets.newHashSet();
 
-        WebClient webClient = null;
-        Response response = null;
-        try
+        if ( templatesCache.isEmpty()
+                || ( System.currentTimeMillis() - lastTemplatesFetchTime ) / 1000 >= TEMPLATE_CACHE_TTL_SEC )
         {
-            webClient = getWebClient();
+            WebClient webClient = null;
+            Response response = null;
 
-            response = webClient.get();
-
-            return JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Template>>()
+            try
             {
-            }.getType() );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Error getting templates from local Gorjun", e );
-        }
-        finally
-        {
-            RestUtil.close( response, webClient );
+                webClient = getWebClient();
+
+                response = webClient.get();
+
+                Set<Template> freshTemplateList =
+                        JsonUtil.fromJson( response.readEntity( String.class ), new TypeToken<Set<Template>>()
+                        {
+                        }.getType() );
+
+                lastTemplatesFetchTime = System.currentTimeMillis();
+
+                if ( !CollectionUtil.isCollectionEmpty( freshTemplateList ) )
+                {
+                    templatesCache = freshTemplateList;
+                }
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error getting templates from local Gorjun", e );
+            }
+            finally
+            {
+                RestUtil.close( response, webClient );
+            }
         }
 
-        return templates;
+        return templatesCache;
     }
 
 
