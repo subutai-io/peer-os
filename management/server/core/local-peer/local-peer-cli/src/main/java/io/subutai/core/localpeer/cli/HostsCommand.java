@@ -1,6 +1,8 @@
 package io.subutai.core.localpeer.cli;
 
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.ContainerHost;
@@ -14,6 +16,10 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 public class HostsCommand extends SubutaiShellCommandSupport
 {
     private final LocalPeer localPeer;
+
+    @Argument( index = 0, name = "abbreviate host ids", required = false, multiValued = false, description =
+            "abbreviate host ids (true/false)" )
+    boolean abbreviate = true;
 
 
     public HostsCommand( final LocalPeer localPeer )
@@ -49,8 +55,11 @@ public class HostsCommand extends SubutaiShellCommandSupport
             connectionState += c.getState();
         }
 
-        System.out.println( String.format( "%s+--%s %s %s", padding,
-                ( host instanceof ContainerHost ) ? ( ( ContainerHost ) host ).getContainerName() : host.getHostname(),
-                host.getId(), connectionState ) );
+        System.out.println( String.format( "%s+--%s %s %s", padding, ( host instanceof ContainerHost ) ?
+                                                                     host.getHostname() + " ["
+                                                                             + ( ( ContainerHost ) host )
+                                                                             .getContainerName() + "]" :
+                                                                     host.getHostname(),
+                abbreviate ? StringUtils.abbreviate( host.getId(), 4 ) : host.getId(), connectionState ) );
     }
 }
