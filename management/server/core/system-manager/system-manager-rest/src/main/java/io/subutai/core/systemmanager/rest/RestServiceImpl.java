@@ -14,7 +14,6 @@ import io.subutai.common.util.JsonUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
-import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
@@ -67,49 +66,6 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getKurjunSettings()
-    {
-        try
-        {
-            KurjunSettings pojo = systemManager.getKurjunSettings();
-            String kurjunSettingsInfo = JsonUtil.GSON.toJson( pojo );
-
-            return Response.status( Response.Status.OK ).entity( kurjunSettingsInfo ).build();
-        }
-        catch ( ConfigurationException e )
-        {
-            LOG.error( e.getMessage() );
-            e.printStackTrace();
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
-                    entity( e.getMessage() ).build();
-        }
-    }
-
-
-    @Override
-    public Response setKurjunSettingsQuotas( final String publicDiskQuota, final String publicThreshold,
-                                             final String publicTimeFrame, final String trustDiskQuota,
-                                             final String trustThreshold, final String trustTimeFrame )
-            throws ConfigurationException
-    {
-
-        boolean isSaved = systemManager
-                .setKurjunSettingsQuotas( Long.parseLong( publicDiskQuota ), Long.parseLong( publicThreshold ),
-                        Long.parseLong( publicTimeFrame ), Long.parseLong( trustDiskQuota ),
-                        Long.parseLong( trustThreshold ), Long.parseLong( trustTimeFrame ) );
-
-        if ( isSaved )
-        {
-            return Response.status( Response.Status.OK ).build();
-        }
-        else
-        {
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
-    }
-
-
-    @Override
     public Response getPeerPolicy()
     {
         PeerPolicy peerPolicy = peerManager.getPolicy( peerManager.getLocalPeer().getId() );
@@ -136,25 +92,6 @@ public class RestServiceImpl implements RestService
             Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
             e.printStackTrace();
         }
-        return Response.status( Response.Status.OK ).build();
-    }
-
-
-    @Override
-    public Response setKurjunSettingsUrls( final String globalKurjunUrls, final String localKurjunUrls )
-    {
-
-        try
-        {
-            systemManager.setKurjunSettingsUrls( globalKurjunUrls.split( "," ), localKurjunUrls.split( "," ) );
-        }
-        catch ( ConfigurationException e )
-        {
-            LOG.error( e.getMessage() );
-            e.printStackTrace();
-            return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
-        }
-
         return Response.status( Response.Status.OK ).build();
     }
 

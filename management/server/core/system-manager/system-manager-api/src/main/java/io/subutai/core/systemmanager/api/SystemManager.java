@@ -4,7 +4,6 @@ package io.subutai.core.systemmanager.api;
 import org.apache.commons.configuration.ConfigurationException;
 
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
-import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
@@ -12,10 +11,6 @@ import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 
 public interface SystemManager
 {
-
-    @Deprecated
-    KurjunSettings getKurjunSettings() throws ConfigurationException;
-
 
     NetworkSettings getNetworkSettings() throws ConfigurationException;
 
@@ -30,13 +25,6 @@ public interface SystemManager
 
     AdvancedSettings getAdvancedSettings();
 
-    @Deprecated
-    void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls )
-            throws ConfigurationException;
-
-    @Deprecated
-    boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
-                                     long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 
     SystemInfo getManagementUpdates();
 

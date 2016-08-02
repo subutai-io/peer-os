@@ -29,32 +29,6 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response setPeerSettings();
 
-    @Deprecated
-    @GET
-    @Path( "kurjun_settings" )
-    @Produces( { MediaType.APPLICATION_JSON } )
-    public Response getKurjunSettings() throws ConfigurationException;
-
-    @Deprecated
-    @POST
-    @Path( "update_kurjun_settings_urls" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setKurjunSettingsUrls( @FormParam( "globalKurjunUrls" ) String globalKurjunUrls,
-                                           @FormParam( "localKurjunUrls" ) String localKurjunUrls )
-            throws ConfigurationException;
-
-    @Deprecated
-    @POST
-    @Path( "update_kurjun_settings_quotas" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    public Response setKurjunSettingsQuotas( @FormParam( "publicDiskQuota" ) String publicDiskQuota,
-                                             @FormParam( "publicThreshold" ) String publicThreshold,
-                                             @FormParam( "publicTimeFrame" ) String publicTimeFrame,
-                                             @FormParam( "trustDiskQuota" ) String trustDiskQuota,
-                                             @FormParam( "trustThreshold" ) String trustThreshold,
-                                             @FormParam( "trustTimeFrame" ) String trustTimeFrame )
-            throws ConfigurationException;
-
 
     @GET
     @Path( "peer_policy" )

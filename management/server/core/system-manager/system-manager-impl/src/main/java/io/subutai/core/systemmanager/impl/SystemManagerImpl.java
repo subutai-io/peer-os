@@ -29,7 +29,6 @@ import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
-import io.subutai.core.systemmanager.api.pojo.KurjunSettings;
 import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
@@ -103,14 +102,6 @@ public class SystemManagerImpl implements SystemManager
     public SystemManagerImpl()
     {
 
-    }
-
-
-    @Override
-    public KurjunSettings getKurjunSettings() throws ConfigurationException
-    {
-
-        return null;
     }
 
 
@@ -217,23 +208,6 @@ public class SystemManagerImpl implements SystemManager
         }
 
         return pojo;
-    }
-
-
-    @Override
-    public void setKurjunSettingsUrls( final String[] globalKurjunUrls, final String[] localKurjunUrls )
-            throws ConfigurationException
-    {
-
-    }
-
-
-    @Override
-    public boolean setKurjunSettingsQuotas( final long publicDiskQuota, final long publicThreshold,
-                                            final long publicTimeFrame, final long trustDiskQuota,
-                                            final long trustThreshold, final long trustTimeFrame )
-    {
-        return false;
     }
 
 
