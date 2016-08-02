@@ -54,12 +54,10 @@ import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.SecurityUtilities;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserToken;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.messenger.api.Messenger;
 import io.subutai.core.peer.api.PeerAction;
 import io.subutai.core.peer.api.PeerActionListener;
@@ -94,7 +92,6 @@ public class PeerManagerImpl implements PeerManager
     private Object provider;
     private Map<String, RegistrationData> registrationRequests = new ConcurrentHashMap<>();
     private List<PeerActionListener> peerActionListeners = new CopyOnWriteArrayList<>();
-    private TemplateManager templateManager;
     private IdentityManager identityManager;
     private Map<String, Peer> peers = new ConcurrentHashMap<>();
     private ObjectMapper mapper = new ObjectMapper();
@@ -106,14 +103,13 @@ public class PeerManagerImpl implements PeerManager
 
     public PeerManagerImpl( final Messenger messenger, LocalPeer localPeer, DaoManager daoManager,
                             MessageResponseListener messageResponseListener, SecurityManager securityManager,
-                            TemplateManager templateManager, IdentityManager identityManager, Object provider )
+                            IdentityManager identityManager, Object provider )
     {
         Preconditions.checkNotNull( messenger );
         Preconditions.checkNotNull( localPeer );
         Preconditions.checkNotNull( daoManager );
         Preconditions.checkNotNull( messageResponseListener );
         Preconditions.checkNotNull( securityManager );
-        Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( identityManager );
         Preconditions.checkNotNull( provider );
 
@@ -122,7 +118,6 @@ public class PeerManagerImpl implements PeerManager
         this.daoManager = daoManager;
         this.messageResponseListener = messageResponseListener;
         this.securityManager = securityManager;
-        this.templateManager = templateManager;
         this.identityManager = identityManager;
         this.provider = provider;
         commandResponseListener = new CommandResponseListener();
@@ -268,9 +263,6 @@ public class PeerManagerImpl implements PeerManager
 
             addPeerToRegistry( newPeer );
 
-            templateManager.addRemoteRepository( new URL(
-                    String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
-                            Common.DEFAULT_PUBLIC_PORT ) ), registrationData.getToken() );
 
             Encrypted encryptedPublicKey = registrationData.getPublicKey();
             String publicKey = encryptedPublicKey.decrypt( key, String.class );
@@ -421,10 +413,6 @@ public class PeerManagerImpl implements PeerManager
                     registrationData.getPeerInfo().getId() );
 
             securityManager.getHttpContextManager().reloadKeyStore();
-
-            templateManager.removeRemoteRepository( new URL(
-                    String.format( KURJUN_URL_PATTERN, registrationData.getPeerInfo().getIp(),
-                            Common.DEFAULT_PUBLIC_PORT ) ) );
         }
         catch ( Exception e )
         {
@@ -1348,8 +1336,8 @@ public class PeerManagerImpl implements PeerManager
                 try
                 {
                     if ( localPeer.isInitialized() && (
-                            Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() )
-                                    || !localPeer.getPeerInfo().isManualSetting() ) )
+                            Common.DEFAULT_PUBLIC_URL.equals( localPeer.getPeerInfo().getPublicUrl() ) || !localPeer
+                                    .getPeerInfo().isManualSetting() ) )
                     {
 
                         HostInterface eth1 = localPeer.getManagementHost().getInterfaceByName( "eth1" );

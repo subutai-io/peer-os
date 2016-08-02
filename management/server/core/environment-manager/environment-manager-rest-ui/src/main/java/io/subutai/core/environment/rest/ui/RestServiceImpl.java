@@ -3,7 +3,12 @@ package io.subutai.core.environment.rest.ui;
 
 import java.io.File;
 import java.security.AccessControlException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -43,7 +48,6 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.settings.Common;
@@ -56,12 +60,13 @@ import io.subutai.core.environment.rest.ui.entity.ContainerDto;
 import io.subutai.core.environment.rest.ui.entity.EnvironmentDto;
 import io.subutai.core.environment.rest.ui.entity.PeerDto;
 import io.subutai.core.environment.rest.ui.entity.ResourceHostDto;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.common.protocol.Template;
+import io.subutai.core.template.api.TemplateManager;
 
 
 public class RestServiceImpl implements RestService
@@ -70,7 +75,7 @@ public class RestServiceImpl implements RestService
     private static final String ERROR_KEY = "ERROR";
     private final EnvironmentManager environmentManager;
     private final PeerManager peerManager;
-    private final TemplateManager templateRegistry;
+    private final TemplateManager templateManager;
     private final StrategyManager strategyManager;
     private final QuotaManager quotaManager;
     private Gson gson = RequiredDeserializer.createValidatingGson();
@@ -78,17 +83,17 @@ public class RestServiceImpl implements RestService
 
 
     public RestServiceImpl( final EnvironmentManager environmentManager, final PeerManager peerManager,
-                            final TemplateManager templateRegistry, final StrategyManager strategyManager,
+                            final TemplateManager templateManager, final StrategyManager strategyManager,
                             final QuotaManager quotaManager )
     {
         Preconditions.checkNotNull( environmentManager );
         Preconditions.checkNotNull( peerManager );
-        Preconditions.checkNotNull( templateRegistry );
+        Preconditions.checkNotNull( templateManager );
         Preconditions.checkNotNull( strategyManager );
 
         this.environmentManager = environmentManager;
         this.peerManager = peerManager;
-        this.templateRegistry = templateRegistry;
+        this.templateManager = templateManager;
         this.strategyManager = strategyManager;
         this.quotaManager = quotaManager;
     }
@@ -106,24 +111,24 @@ public class RestServiceImpl implements RestService
     public Response listTemplates()
     {
         // @todo check for management container should be here
-        Set<TemplateKurjun> templates = templateRegistry.list().stream().filter(
+        Set<Template> templates = templateManager.getTemplates().stream().filter(
                 n -> !n.getName().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
-                                                        .filter( n -> !n.getName().matches( "(?i)cassandra14|" +
-                                                                "cassandra16|" +
-                                                                "elasticsearch14|" +
-                                                                "elasticsearch16|" +
-                                                                "hadoop14|" +
-                                                                "hadoop16|" +
-                                                                "mongo14|" +
-                                                                "mongo16|" +
-                                                                "openjre714|" +
-                                                                "openjre716|" +
-                                                                "solr14|" +
-                                                                "solr16|" +
-                                                                "storm14|" +
-                                                                "storm16|" +
-                                                                "zookeeper14|" +
-                                                                "zookeeper16" ) ).collect( Collectors.toSet() );
+                                                 .filter( n -> !n.getName().matches( "(?i)cassandra14|" +
+                                                         "cassandra16|" +
+                                                         "elasticsearch14|" +
+                                                         "elasticsearch16|" +
+                                                         "hadoop14|" +
+                                                         "hadoop16|" +
+                                                         "mongo14|" +
+                                                         "mongo16|" +
+                                                         "openjre714|" +
+                                                         "openjre716|" +
+                                                         "solr14|" +
+                                                         "solr16|" +
+                                                         "storm14|" +
+                                                         "storm16|" +
+                                                         "zookeeper14|" +
+                                                         "zookeeper16" ) ).collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
     }
@@ -268,15 +273,15 @@ public class RestServiceImpl implements RestService
             }.getType() );
 
 
-            Map< String, ContainerSize > changedContainersFiltered = new HashMap<>();
+            Map<String, ContainerSize> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
                     {
                     }.getType() );
 
-            for( Map<String, String> cont : changingContainers )
+            for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered.put( cont.get("key"), ContainerSize.valueOf( cont.get("value") ));
+                changedContainersFiltered.put( cont.get( "key" ), ContainerSize.valueOf( cont.get( "value" ) ) );
             }
 
 
@@ -289,7 +294,9 @@ public class RestServiceImpl implements RestService
                 topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
 
-            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered, true );
+            eventId = environmentManager
+                    .modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered,
+                            true );
         }
         catch ( Exception e )
         {
@@ -320,15 +327,15 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-            Map< String, ContainerSize > changedContainersFiltered = new HashMap<>();
+            Map<String, ContainerSize> changedContainersFiltered = new HashMap<>();
             List<Map<String, String>> changingContainers =
                     JsonUtil.fromJson( quotaContainers, new TypeToken<List<Map<String, String>>>()
                     {
                     }.getType() );
 
-            for( Map<String, String> cont : changingContainers )
+            for ( Map<String, String> cont : changingContainers )
             {
-                changedContainersFiltered.put( cont.get("key"), ContainerSize.valueOf( cont.get("value") ));
+                changedContainersFiltered.put( cont.get( "key" ), ContainerSize.valueOf( cont.get( "value" ) ) );
             }
 
             Topology topology = new Topology( name );
@@ -336,7 +343,9 @@ public class RestServiceImpl implements RestService
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
-            eventId = environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered, true );
+            eventId = environmentManager
+                    .modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered,
+                            true );
         }
         catch ( Exception e )
         {

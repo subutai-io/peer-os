@@ -26,7 +26,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
@@ -585,7 +585,7 @@ public class PeerWebClient
     }
 
 
-    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         WebClient client = null;
         Response response;
@@ -609,6 +609,6 @@ public class PeerWebClient
             WebClientBuilder.close( client );
         }
 
-        return WebClientBuilder.checkResponse( response, TemplateKurjun.class );
+        return WebClientBuilder.checkResponse( response, Template.class );
     }
 }

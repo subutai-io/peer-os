@@ -23,7 +23,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
@@ -57,7 +57,7 @@ public interface RestService
     @GET
     @Path( "template/{templateName}/get" )
     @Produces( MediaType.APPLICATION_JSON )
-    public TemplateKurjun getTemplate( @PathParam( "templateName" ) String templateName );
+    public Template getTemplate( @PathParam( "templateName" ) String templateName );
 
 
     @POST

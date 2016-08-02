@@ -29,13 +29,13 @@ public interface RestService
     @Produces( { MediaType.TEXT_PLAIN } )
     public Response setPeerSettings();
 
-
+    @Deprecated
     @GET
     @Path( "kurjun_settings" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response getKurjunSettings() throws ConfigurationException;
 
-
+    @Deprecated
     @POST
     @Path( "update_kurjun_settings_urls" )
     @Produces( { MediaType.TEXT_PLAIN } )
@@ -43,7 +43,7 @@ public interface RestService
                                            @FormParam( "localKurjunUrls" ) String localKurjunUrls )
             throws ConfigurationException;
 
-
+    @Deprecated
     @POST
     @Path( "update_kurjun_settings_quotas" )
     @Produces( { MediaType.TEXT_PLAIN } )

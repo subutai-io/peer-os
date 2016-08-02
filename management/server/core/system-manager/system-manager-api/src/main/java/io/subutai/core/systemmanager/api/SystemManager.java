@@ -13,6 +13,7 @@ import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 public interface SystemManager
 {
 
+    @Deprecated
     KurjunSettings getKurjunSettings() throws ConfigurationException;
 
 
@@ -29,9 +30,11 @@ public interface SystemManager
 
     AdvancedSettings getAdvancedSettings();
 
+    @Deprecated
     void setKurjunSettingsUrls( String[] globalKurjunUrls, final String[] localKurjunUrls )
             throws ConfigurationException;
 
+    @Deprecated
     boolean setKurjunSettingsQuotas( long publicDiskQuota, long publicThreshold, long publicTimeFrame,
                                      long trustDiskQuota, long trustThreshold, long trustTimeFrame );
 

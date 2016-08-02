@@ -41,6 +41,13 @@ public class RestUtil
     }
 
 
+    public static void close( Response response, WebClient webClient )
+    {
+        close( response );
+        close( webClient );
+    }
+
+
     public static void close( WebClient webClient )
     {
         if ( webClient != null )

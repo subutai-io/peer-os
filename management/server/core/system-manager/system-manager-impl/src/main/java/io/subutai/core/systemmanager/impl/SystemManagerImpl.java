@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +26,6 @@ import io.subutai.common.settings.SubutaiInfo;
 import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.kurjun.api.KurjunTransferQuota;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.systemmanager.api.SystemManager;
 import io.subutai.core.systemmanager.api.pojo.AdvancedSettings;
@@ -37,7 +34,6 @@ import io.subutai.core.systemmanager.api.pojo.NetworkSettings;
 import io.subutai.core.systemmanager.api.pojo.PeerSettings;
 import io.subutai.core.systemmanager.api.pojo.SystemInfo;
 import io.subutai.core.systemmanager.impl.pojo.AdvancedSettingsPojo;
-import io.subutai.core.systemmanager.impl.pojo.KurjunSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.NetworkSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.PeerSettingsPojo;
 import io.subutai.core.systemmanager.impl.pojo.SystemInfoPojo;
@@ -47,7 +43,6 @@ public class SystemManagerImpl implements SystemManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemManagerImpl.class );
 
-    private TemplateManager templateManager;
     private IdentityManager identityManager;
     private PeerManager peerManager;
 
@@ -114,33 +109,8 @@ public class SystemManagerImpl implements SystemManager
     @Override
     public KurjunSettings getKurjunSettings() throws ConfigurationException
     {
-        KurjunSettings pojo = new KurjunSettingsPojo();
 
-        KurjunTransferQuota publicTransferQuota = templateManager.getTransferQuota( "public" );
-        KurjunTransferQuota trustTransferQuota = templateManager.getTransferQuota( "trust" );
-        Long publicDiskQuota = templateManager.getDiskQuota( "public" );
-        Long trustDiskQuota = templateManager.getDiskQuota( "trust" );
-
-        if ( publicDiskQuota != null && publicTransferQuota != null )
-        {
-            pojo.setPublicDiskQuota( publicDiskQuota );
-            pojo.setPublicThreshold( publicTransferQuota.getThreshold() );
-            pojo.setPublicTimeFrame( publicTransferQuota.getTimeFrame() );
-            pojo.setPublicTimeUnit( publicTransferQuota.getTimeUnit() );
-        }
-
-        if ( trustDiskQuota != null && trustTransferQuota != null )
-        {
-            pojo.setTrustDiskQuota( trustDiskQuota );
-            pojo.setTrustThreshold( trustTransferQuota.getThreshold() );
-            pojo.setTrustTimeFrame( trustTransferQuota.getTimeFrame() );
-            pojo.setTrustTimeUnit( trustTransferQuota.getTimeUnit() );
-        }
-
-        pojo.setGlobalKurjunUrls( SystemSettings.getGlobalKurjunUrls() );
-        pojo.setLocalKurjunUrls( SystemSettings.getLocalKurjunUrls() );
-
-        return pojo;
+        return null;
     }
 
 
@@ -254,8 +224,7 @@ public class SystemManagerImpl implements SystemManager
     public void setKurjunSettingsUrls( final String[] globalKurjunUrls, final String[] localKurjunUrls )
             throws ConfigurationException
     {
-        SystemSettings.setGlobalKurjunUrls( globalKurjunUrls );
-        SystemSettings.setLocalKurjunUrls( localKurjunUrls );
+
     }
 
 
@@ -264,18 +233,7 @@ public class SystemManagerImpl implements SystemManager
                                             final long publicTimeFrame, final long trustDiskQuota,
                                             final long trustThreshold, final long trustTimeFrame )
     {
-        templateManager.setDiskQuota( publicDiskQuota, "public" );
-        templateManager.setDiskQuota( trustDiskQuota, "trust" );
-
-        KurjunTransferQuota publicTransferQuota =
-                new KurjunTransferQuota( publicThreshold, publicTimeFrame, TimeUnit.HOURS );
-        KurjunTransferQuota trustTransferQuota =
-                new KurjunTransferQuota( trustThreshold, trustTimeFrame, TimeUnit.HOURS );
-
-        boolean isPublicQuotaSaved = templateManager.setTransferQuota( publicTransferQuota, "public" );
-        boolean isTrustQuotaSaved = templateManager.setTransferQuota( trustTransferQuota, "trust" );
-
-        return isPublicQuotaSaved && isTrustQuotaSaved;
+        return false;
     }
 
 
@@ -338,12 +296,6 @@ public class SystemManagerImpl implements SystemManager
             e.printStackTrace();
             return false;
         }
-    }
-
-
-    public void setTemplateManager( final TemplateManager templateManager )
-    {
-        this.templateManager = templateManager;
     }
 
 
