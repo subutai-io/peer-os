@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 
@@ -31,24 +30,29 @@ var (
 )
 
 type templ struct {
-	name      string
-	file      string
-	version   string
-	branch    string
-	id        string
-	hash      string
-	signature string
-	owner     string
+	name    string
+	file    string
+	version string
+	branch  string
+	id      string
+	hash    string
+	owner   []string
+	signa   signature
 }
 
 type metainfo struct {
-	ID        string   `json:"id"`
-	Signature string   `json:"signature"`
-	Md5Sum    string   `json:"md5Sum"`
-	Owner     []string `json:"owner"`
+	ID     string    `json:"id"`
+	Owner  []string  `json:"owner"`
+	Md5Sum string    `json:"md5Sum"`
+	Signs  signature `json:"signature"`
 }
 
-func templId(t *templ, arch string, kurjun *http.Client) {
+type signature []struct {
+	Author string
+	Sign   string
+}
+
+func templId(t *templ, kurjun *http.Client) {
 	var meta metainfo
 
 	url := config.Cdn.Kurjun + "/template/info?name=" + t.name
@@ -77,9 +81,8 @@ func templId(t *templ, arch string, kurjun *http.Client) {
 
 	t.id = meta.ID
 	t.hash = meta.Md5Sum
-	//TODO: each artifact might be owned by several people, so considering it we need to add `for-range` cycle to check ownership for a user list
-	t.owner = meta.Owner[0]
-	t.signature = meta.Signature
+	t.owner = meta.Owner
+	t.signa = meta.Signs
 }
 
 func md5sum(filePath string) string {
@@ -253,18 +256,22 @@ func LxcImport(name, version, token string) {
 	}
 
 	kurjun := config.CheckKurjun()
-	templId(&t, runtime.GOARCH, kurjun)
-	if len(t.signature) != 0 {
-		key := getOwnerKey(t.owner)
-		signedhash := verifySignature(key, t.signature)
+	templId(&t, kurjun)
+
+	if len(t.hash) != 0 && len(t.signa) == 0 {
+		log.Warn("Template is not signed")
+	}
+	for _, v := range t.signa {
+		// if v.Author == "public" || v.Author == "subutai" || v.Author == "jenkins" {
+		signedhash := verifySignature(getOwnerKey(v.Author), v.Sign)
 		if t.hash != signedhash {
 			log.Error("Signature does not match with template hash")
 		}
-		t.hash = signedhash
 		log.Info("Digital signature verification succeeded, owner and template integrity are valid")
-	} else {
-		log.Warn("Template is not signed")
+		break
+		// }
 	}
+
 	if !checkLocal(t) && !download(t, kurjun) {
 		log.Error(t.name + " template not found")
 	}
