@@ -18,7 +18,6 @@ import io.subutai.common.peer.RequestListener;
 import io.subutai.core.executor.api.CommandExecutor;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.LocalPeerImpl;
 import io.subutai.core.localpeer.impl.request.MessageRequestListener;
 import io.subutai.core.lxc.quota.api.QuotaManager;
@@ -78,8 +77,6 @@ public class PeerManagerImplTest
 
     @Mock
     Set<RequestListener> requestListeners;
-    @Mock
-    TemplateManager templateManager;
 
 
     PeerManagerImpl peerManager;
@@ -99,7 +96,7 @@ public class PeerManagerImplTest
 
         peerManager =
                 spy( new PeerManagerImpl( messenger, localPeer, daoManager, messageResponseListener, securityManager,
-                        templateManager, identityManager, provider ) );
+                        identityManager, provider ) );
 
 
         peerManager.commandResponseListener = commandResponseListener;

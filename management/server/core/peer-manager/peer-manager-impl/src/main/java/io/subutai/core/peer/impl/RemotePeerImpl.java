@@ -59,6 +59,7 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerResources;
@@ -223,7 +224,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 

@@ -30,7 +30,7 @@ import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.core.hostregistry.api.HostRegistry;
-import io.subutai.core.kurjun.api.TemplateManager;
+import io.subutai.core.template.api.TemplateManager;
 import io.subutai.core.metric.api.Monitor;
 
 import static junit.framework.Assert.assertTrue;

@@ -29,7 +29,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
@@ -128,7 +128,7 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public TemplateKurjun getTemplate( final String templateName )
+    public Template getTemplate( final String templateName )
     {
         try
         {

@@ -15,9 +15,6 @@
 					--><span class="b-nav-menu__title b-nav-menu-link__item">
 					Monitoring
 				</span>
-        <!--<span class="b-nav-menu__add">
-          <span class="b-bav-menu-add b-bav-menu-add_notification">0</span>
-        </span>-->
       </a>
     </li>
     <li class="b-nav-menu"
@@ -45,18 +42,6 @@
           <a ui-sref="containers" id="subt-link__containers">Containers</a>
         </li>
       </ul>
-    </li>
-    <li class="b-nav-menu" ng-class="subutaiController.activeState == 'kurjun' ? 'b-nav-menu_active' : ''" ng-if="subutaiController.adminMenus" >
-      <a ui-sref="kurjun" class="b-nav-menu-link" id="subt-link__kurjun">
-				<span class="b-nav-menu__icon b-nav-menu-link__item">
-					<svg class="b-nav-menu-icon">
-						<use xlink:href="assets/elements/icons.svg#nav-kurjun"></use>
-					</svg>
-				</span><!--
-				--><span class="b-nav-menu__title b-nav-menu-link__item">
-					Kurjun
-				</span>
-      </a>
     </li>
     <li class="b-nav-menu" ng-class="subutaiController.activeState == 'console' ? 'b-nav-menu_active' : ''">
       <a ui-sref="console" class="b-nav-menu-link" id="subt-link__console">
@@ -169,10 +154,6 @@
         <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
             ng-class="subutaiController.activeState == 'settings-peer' ? 'b-nav-menu-sub_active' : ''">
           <a ui-sref="settings-peer" id="subt-link__settings-peer">Peer settings</a>
-        </li>
-        <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
-            ng-class="subutaiController.activeState == 'settings-kurjun' ? 'b-nav-menu-sub_active' : ''">
-          <a ui-sref="settings-kurjun" id="subt-link__settings-kurjun">Kurjun Settings</a>
         </li>
         <li class="b-nav-menu-sub b-nav-menu-sub_disabled"
             ng-class="subutaiController.activeState == 'settings-network' ? 'b-nav-menu-sub_active' : ''">

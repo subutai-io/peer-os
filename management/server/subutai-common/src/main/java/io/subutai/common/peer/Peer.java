@@ -27,7 +27,7 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -139,7 +139,7 @@ public interface Peer extends RelationLink
     /**
      * Returns template by name
      */
-    public TemplateKurjun getTemplate( String templateName ) throws PeerException;
+    public Template getTemplate( String templateName ) throws PeerException;
 
     /**
      * Returns true of the peer is reachable online, false otherwise

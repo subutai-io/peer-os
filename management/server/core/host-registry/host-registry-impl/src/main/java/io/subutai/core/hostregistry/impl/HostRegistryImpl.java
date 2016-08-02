@@ -327,12 +327,13 @@ public class HostRegistryImpl implements HostRegistry
     protected void updateHost( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
+        Response response = null;
 
         try
         {
             webClient = getWebClient( resourceHostInfo, "ping" );
 
-            Response response = webClient.get();
+            response = webClient.get();
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
@@ -359,7 +360,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         finally
         {
-            RestUtil.close( webClient );
+            RestUtil.close( response, webClient );
         }
     }
 

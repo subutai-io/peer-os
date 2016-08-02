@@ -251,11 +251,13 @@ public class CommandProcessor implements RestProcessor
     protected void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
+        javax.ws.rs.core.Response response = null;
+
         try
         {
             webClient = getWebClient( resourceHostInfo );
 
-            javax.ws.rs.core.Response response = webClient.form( new Form() );
+            response = webClient.form( new Form() );
 
             if ( response.getStatus() == javax.ws.rs.core.Response.Status.OK.getStatusCode()
                     || response.getStatus() == javax.ws.rs.core.Response.Status.ACCEPTED.getStatusCode() )
@@ -265,7 +267,7 @@ public class CommandProcessor implements RestProcessor
         }
         finally
         {
-            RestUtil.close( webClient );
+            RestUtil.close( response, webClient );
         }
     }
 
