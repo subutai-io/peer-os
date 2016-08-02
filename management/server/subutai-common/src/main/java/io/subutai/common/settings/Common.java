@@ -21,7 +21,8 @@ public class Common
     public static final String SUBUTAI_APP_KEYSTORES_PATH = System.getProperty( "subutaiKeystorePath" );
     public static final String SUBUTAI_APP_CERTS_PATH = System.getProperty( "subutaiCertsPath" );
     public static final String DEFAULT_CONTAINER_INTERFACE = "eth0";
-    public static final String RH_INTERFACE = "mng-net";
+    public static final String MNG_NET_INTERFACE = "mng-net";
+    public static final String WAN_INTERFACE = "wan";
     public static final String LOCAL_HOST_IP = "127.0.0.1";
     public static final String LOCAL_HOST_NAME = "localhost";
     public static final String H_PUB_KEY = Common.SUBUTAI_APP_DATA_PATH + "/keys/h.public.gpg";

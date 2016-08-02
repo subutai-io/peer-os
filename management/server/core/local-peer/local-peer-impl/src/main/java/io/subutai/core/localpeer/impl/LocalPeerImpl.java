@@ -1149,11 +1149,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             keyManager.removeKeyData( containerHost.getKeyId() );
         }
 
-        //remove rh from cache
+        //remove rh from local cache
         resourceHosts.remove( resourceHost );
 
         //remove rh from db
         resourceHostDataService.remove( resourceHost.getId() );
+
+        //remove from host registry cache
+        hostRegistry.removeResourceHost( resourceHost.getId() );
     }
 
 
