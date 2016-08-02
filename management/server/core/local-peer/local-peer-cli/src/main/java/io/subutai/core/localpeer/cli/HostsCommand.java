@@ -55,11 +55,7 @@ public class HostsCommand extends SubutaiShellCommandSupport
             connectionState += c.getState();
         }
 
-        System.out.println( String.format( "%s+--%s %s %s", padding, ( host instanceof ContainerHost ) ?
-                                                                     host.getHostname() + " ["
-                                                                             + ( ( ContainerHost ) host )
-                                                                             .getContainerName() + "]" :
-                                                                     host.getHostname(),
+        System.out.println( String.format( "%s+--%s %s %s", padding, host.getHostname(),
                 abbreviate ? StringUtils.abbreviate( host.getId(), 7 ) : host.getId(), connectionState ) );
     }
 }
