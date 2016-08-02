@@ -60,6 +60,6 @@ public class HostsCommand extends SubutaiShellCommandSupport
                                                                              + ( ( ContainerHost ) host )
                                                                              .getContainerName() + "]" :
                                                                      host.getHostname(),
-                abbreviate ? StringUtils.abbreviate( host.getId(), 4 ) : host.getId(), connectionState ) );
+                abbreviate ? StringUtils.abbreviate( host.getId(), 7 ) : host.getId(), connectionState ) );
     }
 }
