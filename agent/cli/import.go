@@ -30,11 +30,11 @@ var (
 )
 
 type templ struct {
-	name    string `json:"name"`
+	name    string
 	file    string
-	version string `json:"version"`
+	version string
 	branch  string
-	ID      string `json:"id"`
+	id      string
 	owner   []string
 	signa   signature
 }
@@ -79,7 +79,7 @@ func templId(t *templ, kurjun *http.Client) {
 		return
 	}
 
-	t.ID = meta.ID
+	t.id = meta.ID
 	t.owner = meta.Owner
 	t.signa = meta.Signs
 }
@@ -103,7 +103,7 @@ func checkLocal(t templ) bool {
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
 		if t.file == f.Name() {
-			if len(t.ID) == 0 {
+			if len(t.id) == 0 {
 				fmt.Print("Cannot verify local template. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
@@ -112,7 +112,7 @@ func checkLocal(t templ) bool {
 				}
 				return false
 			}
-			if t.ID == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
+			if t.id == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
 				return true
 			}
 		}
@@ -121,7 +121,7 @@ func checkLocal(t templ) bool {
 }
 
 func download(t templ, kurjun *http.Client) bool {
-	if len(t.ID) == 0 {
+	if len(t.id) == 0 {
 		return false
 	}
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
@@ -129,8 +129,8 @@ func download(t templ, kurjun *http.Client) bool {
 	defer out.Close()
 	log.Info("Downloading " + t.name)
 
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.ID)
-	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.ID, err)
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id)
+	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id, err)
 	defer response.Body.Close()
 	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 	bar.Start()
@@ -146,8 +146,8 @@ func download(t templ, kurjun *http.Client) bool {
 		out, err = os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 		log.Check(log.FatalLevel, "Creating file "+t.file, err)
 		defer out.Close()
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.ID)
-		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.ID, err)
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id)
+		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id, err)
 		defer response.Body.Close()
 		bar = pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 		bar.Start()
@@ -156,7 +156,7 @@ func download(t templ, kurjun *http.Client) bool {
 
 	log.Check(log.FatalLevel, "Writing response body to file", err)
 
-	if t.ID == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
+	if t.id == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
 		return true
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
@@ -257,13 +257,13 @@ func LxcImport(name, version, token string) {
 	kurjun := config.CheckKurjun()
 	templId(&t, kurjun)
 
-	if len(t.ID) != 0 && len(t.signa) == 0 {
+	if len(t.id) != 0 && len(t.signa) == 0 {
 		log.Warn("Template is not signed")
 	}
 	for _, v := range t.signa {
 		// if v.Author == "public" || v.Author == "subutai" || v.Author == "jenkins" {
 		signedhash := verifySignature(getOwnerKey(v.Author), v.Sign)
-		if t.ID != signedhash {
+		if t.id != signedhash {
 			log.Error("Signature does not match with template hash")
 		}
 		log.Info("Digital signature verification succeeded, owner and template integrity are valid")
