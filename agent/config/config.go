@@ -131,7 +131,7 @@ func InitAgentDebug() {
 	}
 }
 
-func CheckKurjun() (client *http.Client) {
+func CheckKurjun() (*http.Client, error) {
 	// _, err := net.DialTimeout("tcp", Management.Host+":8339", time.Duration(2)*time.Second)
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client = &http.Client{Transport: tr}
@@ -144,12 +144,14 @@ func CheckKurjun() (client *http.Client) {
 		time.Sleep(3 * time.Second)
 		c++
 	}
-	log.Check(log.FatalLevel, "Checking CDN accessibility", err)
+	if log.Check(log.WarnLevel, "Checking CDN accessibility", err) {
+		return nil, err
+	}
 
 	Cdn.Kurjun = "https://" + Cdn.Url + ":" + Cdn.Sslport + "/kurjun/rest"
 	if !Cdn.Allowinsecure {
 		client = &http.Client{}
 	}
 	// }
-	return
+	return client, nil
 }

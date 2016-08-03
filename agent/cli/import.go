@@ -40,6 +40,7 @@ type templ struct {
 }
 
 type metainfo struct {
+	Name   string    `json:"name"`
 	ID     string    `json:"id"`
 	Owner  []string  `json:"owner"`
 	Md5Sum string    `json:"md5Sum"`
@@ -60,6 +61,7 @@ func templId(t *templ, kurjun *http.Client) {
 	} else if t.name == "management" {
 		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version
 	}
+
 	response, err := kurjun.Get(url)
 	defer response.Body.Close()
 	log.Debug("Retrieving id, get: " + url)
@@ -112,7 +114,7 @@ func checkLocal(t templ) bool {
 				}
 				return false
 			}
-			if t.id == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
+			if id := strings.Split(t.id, "."); len(id) > 0 && id[len(id)-1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
 				return true
 			}
 		}
@@ -164,7 +166,7 @@ func download(t templ, kurjun *http.Client) bool {
 }
 
 func getOwnerKey(owner string) string {
-	response, err := http.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/auth/key?user=" + owner)
+	response, err := http.Get(config.Cdn.Kurjun + "/auth/key?user=" + owner)
 	log.Check(log.FatalLevel, "Getting owner public key", err)
 	defer response.Body.Close()
 	key, err := ioutil.ReadAll(response.Body)
@@ -186,6 +188,25 @@ func verifySignature(key, signature string) string {
 	return ""
 }
 
+func idToName(id string, kurjun *http.Client) string {
+	var meta metainfo
+
+	//Since only kurjun knows template's ID, we cannot define if we have template already installed in system by ID as we do it by name, so unreachable kurjun in this case is a deadend for us
+	//To omit this issue we should add ID into template config and use this ID as a "primary key" to any request
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/info?id=" + id)
+	log.Check(log.ErrorLevel, "Getting kurjun response", err)
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+
+	if string(body) == "Not found" {
+		log.Error("Template with id \"" + id + "\" not found")
+	}
+	log.Check(log.ErrorLevel, "Parsing response body", json.Unmarshal(body, &meta))
+
+	return meta.Name
+}
+
 func lockSubutai(file string) bool {
 	lock, err := lockfile.New("/var/run/lock/subutai." + file)
 	if log.Check(log.DebugLevel, "Init lock "+file, err) {
@@ -205,9 +226,16 @@ func unlockSubutai() {
 }
 
 func LxcImport(name, version, token string) {
+	var kurjun *http.Client
+
 	if container.IsContainer(name) && name == "management" && len(token) > 1 {
 		gpg.ExchageAndEncrypt("management", token)
 		return
+	}
+
+	if id := strings.Split(name, "id:"); len(id) > 1 {
+		kurjun, _ = config.CheckKurjun()
+		name = idToName(id[1], kurjun)
 	}
 
 	log.Info("Importing " + name)
@@ -254,8 +282,14 @@ func LxcImport(name, version, token string) {
 		t.file = t.name + "-subutai-template_" + t.version + "-" + t.branch + "_" + config.Template.Arch + ".tar.gz"
 	}
 
-	kurjun := config.CheckKurjun()
-	templId(&t, kurjun)
+	if kurjun == nil {
+		kurjun, _ = config.CheckKurjun()
+	}
+	if kurjun != nil {
+		templId(&t, kurjun)
+	} else {
+		log.Info("Trying to import from local storage")
+	}
 
 	if len(t.id) != 0 && len(t.signa) == 0 {
 		log.Warn("Template is not signed")
