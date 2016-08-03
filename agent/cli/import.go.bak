@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -9,14 +8,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/cheggaaa/pb"
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
-	"golang.org/x/crypto/openpgp"
-	"golang.org/x/crypto/openpgp/clearsign"
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
@@ -34,25 +32,14 @@ type templ struct {
 	file    string
 	version string `json:"version"`
 	branch  string
-	ID      string `json:"id"`
-	owner   []string
-	signa   signature
+	Id      string `json:"id"`
+	hash    string
 }
 
-type metainfo struct {
-	ID     string    `json:"id"`
-	Owner  []string  `json:"owner"`
-	Md5Sum string    `json:"md5Sum"`
-	Signs  signature `json:"signature"`
-}
+func templId(t templ, arch string, kurjun *http.Client) string {
 
-type signature []struct {
-	Author string
-	Sign   string
-}
-
-func templId(t *templ, kurjun *http.Client) {
-	var meta metainfo
+	//We'll need to change this function, so it retrieves json from info endpoint (not only "type=text"), parse owner fingerprint and signed hash message, request owner public key using fingerprint
+	//and verify hash, signature and owner key
 
 	url := config.Cdn.Kurjun + "/template/info?name=" + t.name
 	if t.name == "management" && len(t.branch) != 0 {
@@ -69,19 +56,21 @@ func templId(t *templ, kurjun *http.Client) {
 		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name)
 	}
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
-		return
+		return ""
 	}
 
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
-
-	if log.Check(log.WarnLevel, "Parsing response body", json.Unmarshal(body, &meta)) {
-		return
+	resp, err := ioutil.ReadAll(response.Body)
+	if log.Check(log.WarnLevel, "Reading response body", err) {
+		return ""
 	}
 
-	t.ID = meta.ID
-	t.owner = meta.Owner
-	t.signa = meta.Signs
+	var template templ
+	if err = json.Unmarshal(resp, &template); log.Check(log.WarnLevel, "Parsing response JSON", err) {
+		return ""
+	}
+
+	log.Debug("Template id: " + template.Id)
+	return template.Id
 }
 
 func md5sum(filePath string) string {
@@ -103,8 +92,8 @@ func checkLocal(t templ) bool {
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
 		if t.file == f.Name() {
-			if len(t.ID) == 0 {
-				fmt.Print("Cannot verify local template. Trust anyway? (y/n)")
+			if len(t.hash) == 0 {
+				fmt.Print("Cannot check md5 of local archive. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
@@ -112,7 +101,7 @@ func checkLocal(t templ) bool {
 				}
 				return false
 			}
-			if t.ID == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
+			if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
 				return true
 			}
 		}
@@ -121,7 +110,7 @@ func checkLocal(t templ) bool {
 }
 
 func download(t templ, kurjun *http.Client) bool {
-	if len(t.ID) == 0 {
+	if len(t.Id) == 0 {
 		return false
 	}
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
@@ -129,8 +118,8 @@ func download(t templ, kurjun *http.Client) bool {
 	defer out.Close()
 	log.Info("Downloading " + t.name)
 
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.ID)
-	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.ID, err)
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.Id)
+	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.Id, err)
 	defer response.Body.Close()
 	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 	bar.Start()
@@ -146,8 +135,8 @@ func download(t templ, kurjun *http.Client) bool {
 		out, err = os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 		log.Check(log.FatalLevel, "Creating file "+t.file, err)
 		defer out.Close()
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.ID)
-		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.ID, err)
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.Id)
+		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.Id, err)
 		defer response.Body.Close()
 		bar = pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 		bar.Start()
@@ -156,34 +145,11 @@ func download(t templ, kurjun *http.Client) bool {
 
 	log.Check(log.FatalLevel, "Writing response body to file", err)
 
-	if t.ID == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
+	if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
 		return true
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return false
-}
-
-func getOwnerKey(owner string) string {
-	response, err := http.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/auth/key?user=" + owner)
-	log.Check(log.FatalLevel, "Getting owner public key", err)
-	defer response.Body.Close()
-	key, err := ioutil.ReadAll(response.Body)
-	log.Check(log.FatalLevel, "Reading key body", err)
-	return string(key)
-}
-
-func verifySignature(key, signature string) string {
-	entity, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(key))
-	log.Check(log.WarnLevel, "Reading user public key", err)
-
-	if block, _ := clearsign.Decode([]byte(signature)); block != nil {
-		_, err = openpgp.CheckDetachedSignature(entity, bytes.NewBuffer(block.Bytes), block.ArmoredSignature.Body)
-		if log.Check(log.ErrorLevel, "Checking signature", err) {
-			return ""
-		}
-		return string(block.Bytes)
-	}
-	return ""
 }
 
 func lockSubutai(file string) bool {
@@ -255,20 +221,9 @@ func LxcImport(name, version, token string) {
 	}
 
 	kurjun := config.CheckKurjun()
-	templId(&t, kurjun)
-
-	if len(t.ID) != 0 && len(t.signa) == 0 {
-		log.Warn("Template is not signed")
-	}
-	for _, v := range t.signa {
-		// if v.Author == "public" || v.Author == "subutai" || v.Author == "jenkins" {
-		signedhash := verifySignature(getOwnerKey(v.Author), v.Sign)
-		if t.ID != signedhash {
-			log.Error("Signature does not match with template hash")
-		}
-		log.Info("Digital signature verification succeeded, owner and template integrity are valid")
-		break
-		// }
+	t.Id = templId(t, runtime.GOARCH, kurjun)
+	if len(strings.Split(t.Id, ".")) > 1 {
+		t.hash = strings.Split(t.Id, ".")[1]
 	}
 
 	if !checkLocal(t) && !download(t, kurjun) {
