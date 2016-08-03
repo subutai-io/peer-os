@@ -81,6 +81,10 @@ func templId(t *templ, kurjun *http.Client) {
 		return
 	}
 
+	if t.name != meta.Name {
+		log.Info("Found: " + t.name + " -> " + meta.Name)
+		t.name = meta.Name
+	}
 	t.id = meta.ID
 	t.owner = meta.Owner
 	t.signa = meta.Signs
