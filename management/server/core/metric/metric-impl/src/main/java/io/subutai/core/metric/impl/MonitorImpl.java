@@ -1,7 +1,6 @@
 package io.subutai.core.metric.impl;
 
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,16 +17,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import io.subutai.common.util.RestUtil;
-import org.apache.cxf.jaxrs.client.WebClient;
+import javax.ws.rs.core.Response;
+
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -57,7 +56,9 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
@@ -66,10 +67,6 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
-
-import javax.ws.rs.core.Response;
-
-import static java.awt.SystemColor.info;
 
 
 /**
@@ -541,7 +538,7 @@ public class MonitorImpl implements Monitor, HostListener
                             if ( s.contains( "LastError:" ) )
                             {
                                 String error = s.replace( "LastError:", "" ).trim();
-                                errorList.add(  String.format( "%s (%s) - %s" , error, part[0], part[1] ));
+                                errorList.add( String.format( "%s (%s) - %s", error, part[0], part[1] ) );
                             }
                         }
                         errors++;
@@ -569,33 +566,35 @@ public class MonitorImpl implements Monitor, HostListener
                 info.setP2pErrorLogs( errorList );
 
 
-                WebClient client = RestUtil.createTrustedWebClient( "https://hub.subut.ai:443/rest/v1/system/versions/range" );
+                WebClient client =
+                        RestUtil.createTrustedWebClient( "https://hub.subut.ai:443/rest/v1/system/versions/range" );
                 Response response = client.get();
 
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {
                     try
                     {
-                        String output = response.readEntity(String.class);
+                        String output = response.readEntity( String.class );
 
-                        JSONArray entities = new JSONArray(output);
+                        JSONArray entities = new JSONArray( output );
 
 
-                        for (int i = 0; i < entities.length(); i++) {
-                            if( entities.getJSONObject(i).get("key").equals("P2P") )
+                        for ( int i = 0; i < entities.length(); i++ )
+                        {
+                            if ( entities.getJSONObject( i ).get( "key" ).equals( "P2P" ) )
                             {
-                                info.setP2pVersionCheck( entities.getJSONObject(i).getString("rangeFrom"),
-                                        entities.getJSONObject(i).getString("rangeTo") );
+                                info.setP2pVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
+                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
                             }
 
-                            if( entities.getJSONObject(i).get("key").equals("RESOURCE_HOST") )
+                            if ( entities.getJSONObject( i ).get( "key" ).equals( "RESOURCE_HOST" ) )
                             {
-                                info.setRhVersionCheck( entities.getJSONObject(i).getString("rangeFrom"),
-                                        entities.getJSONObject(i).getString("rangeTo") );
+                                info.setRhVersionCheck( entities.getJSONObject( i ).getString( "rangeFrom" ),
+                                        entities.getJSONObject( i ).getString( "rangeTo" ) );
                             }
                         }
                     }
-                    catch (JSONException e)
+                    catch ( JSONException e )
                     {
                         e.printStackTrace();
                     }
@@ -612,5 +611,62 @@ public class MonitorImpl implements Monitor, HostListener
         }
 
         return pojos;
+    }
+
+
+    @Override
+    public HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime )
+    {
+        HistoricalMetrics result = new HistoricalMetrics();
+
+        try
+        {
+            CommandResult commandResult = getHistoricalMetricsResp( host, startTime, endTime );
+
+
+            if ( null != commandResult && commandResult.hasSucceeded() )
+            {
+                result = mapper.readValue( commandResult.getStdOut(), HistoricalMetrics.class );
+            }
+            else
+            {
+                LOG.error( String.format( "Error getting historical metrics from %s: %s", host.getHostname(),
+                        commandResult != null ? commandResult.getStdErr() : "" ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Could not run command successfully! Error: {}", e );
+        }
+
+
+        return result;
+    }
+
+
+    private CommandResult getHistoricalMetricsResp( final Host host, final Date startTime, final Date endTime )
+            throws CommandException, HostNotFoundException
+    {
+        Preconditions.checkNotNull( host );
+
+        RequestBuilder historicalMetricCommand = commands.getHistoricalMetricCommand( host, startTime, endTime );
+
+        CommandResult commandResult;
+        if ( host instanceof ResourceHost )
+        {
+            commandResult =
+                    peerManager.getLocalPeer().getResourceHostById( host.getId() ).execute( historicalMetricCommand );
+        }
+        else if ( host instanceof ContainerHost )
+        {
+            commandResult = peerManager.getLocalPeer().getResourceHostByContainerId( host.getId() )
+                                       .execute( historicalMetricCommand );
+        }
+        else
+        {
+            commandResult = peerManager.getLocalPeer().getManagementHost().execute( historicalMetricCommand );
+        }
+
+        return commandResult;
     }
 }
