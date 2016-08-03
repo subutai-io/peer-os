@@ -685,6 +685,7 @@ input[type=checkbox] {
 .b-status-icon_FAILED,
 .b-status-icon_STOPPED,
 .b-status-icon_ABORTING,
+.b-status-icon_REJECTED,
 .b-status-icon_FREEZING,
 .b-status-icon_FROZEN,
 .b-status-icon_false {
