@@ -49,10 +49,11 @@ public class MetricCommand extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         Host host = localPeer.bindHost( hostId );
+
+        //calculate start date (current date - given # of hours)
         Calendar calendar = Calendar.getInstance();
         Date current = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
         calendar.add( Calendar.HOUR, ( -lastHours ) );
-
         Date start = new Date( calendar.getTime().getTime() - Calendar.getInstance().getTimeZone().getRawOffset() );
 
         HistoricalMetrics metrics = monitor.getMetricsSeries( host, start, current );
