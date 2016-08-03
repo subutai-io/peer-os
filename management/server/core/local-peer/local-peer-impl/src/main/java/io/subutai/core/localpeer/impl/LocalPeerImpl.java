@@ -76,7 +76,7 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.PeerResources;
@@ -113,7 +113,6 @@ import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.command.CommandRequestListener;
 import io.subutai.core.localpeer.impl.container.CreateEnvironmentContainersRequestListener;
 import io.subutai.core.localpeer.impl.container.ImportTemplateTask;
@@ -140,6 +139,7 @@ import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
+import io.subutai.core.template.api.TemplateManager;
 
 
 /**
@@ -154,7 +154,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     private DaoManager daoManager;
-    private TemplateManager templateRegistry;
+    private TemplateManager templateManager;
     Set<ResourceHost> resourceHosts = Sets.newConcurrentHashSet();
     private CommandExecutor commandExecutor;
     private QuotaManager quotaManager;
@@ -176,12 +176,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private final HostUtil hostUtil = new HostUtil();
 
 
-    public LocalPeerImpl( DaoManager daoManager, TemplateManager templateRegistry, QuotaManager quotaManager,
+    public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, QuotaManager quotaManager,
                           CommandExecutor commandExecutor, HostRegistry hostRegistry, Monitor monitor,
                           SecurityManager securityManager )
     {
         this.daoManager = daoManager;
-        this.templateRegistry = templateRegistry;
+        this.templateManager = templateManager;
         this.quotaManager = quotaManager;
         this.monitor = monitor;
         this.commandExecutor = commandExecutor;
@@ -1149,11 +1149,14 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             keyManager.removeKeyData( containerHost.getKeyId() );
         }
 
-        //remove rh from cache
+        //remove rh from local cache
         resourceHosts.remove( resourceHost );
 
         //remove rh from db
         resourceHostDataService.remove( resourceHost.getId() );
+
+        //remove from host registry cache
+        hostRegistry.removeResourceHost( resourceHost.getId() );
     }
 
 
@@ -1215,15 +1218,6 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     public boolean isLocal()
     {
         return true;
-    }
-
-
-    @Override
-    public TemplateKurjun getTemplate( final String templateName )
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-
-        return templateRegistry.getTemplate( templateName );
     }
 
 
@@ -2340,18 +2334,18 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public List<TemplateKurjun> getTemplates()
+    public Set<Template> getTemplates()
     {
-        return templateRegistry.list();
+        return templateManager.getTemplates();
     }
 
 
     @Override
-    public TemplateKurjun getTemplateByName( final String name )
+    public Template getTemplate( final String templateName )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( name ) );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
-        return templateRegistry.getTemplate( name );
+        return templateManager.getTemplate( templateName );
     }
 
 

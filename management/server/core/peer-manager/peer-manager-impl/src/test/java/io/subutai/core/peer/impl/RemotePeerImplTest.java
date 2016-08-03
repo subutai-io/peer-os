@@ -33,7 +33,6 @@ import io.subutai.common.peer.Payload;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.messenger.api.Message;
 import io.subutai.core.messenger.api.MessageException;
@@ -189,18 +188,6 @@ public class RemotePeerImplTest
         remotePeer.getOwnerId();
 
         verify( peerInfo ).getOwnerId();
-    }
-
-
-    @Test( expected = PeerException.class )
-    public void testGetTemplate() throws Exception
-    {
-        remotePeer.getTemplate( TEMPLATE_NAME );
-
-        verify( jsonUtil ).from( anyString(), eq( TemplateKurjun.class ) );
-
-
-        remotePeer.getTemplate( TEMPLATE_NAME );
     }
 
 

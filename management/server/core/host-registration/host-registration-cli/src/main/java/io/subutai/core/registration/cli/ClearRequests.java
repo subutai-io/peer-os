@@ -26,14 +26,22 @@ public class ClearRequests extends SubutaiShellCommandSupport
     protected Object doExecute() throws Exception
     {
         List<RequestedHost> requestedHosts = registrationManager.getRequests();
+
         for ( final RequestedHost requestedHost : requestedHosts )
         {
             System.out.println( requestedHost.toString() );
             System.out.println( "==========" );
 
-            registrationManager.removeRequest(requestedHost.getId());
-
+            try
+            {
+                registrationManager.removeRequest( requestedHost.getId() );
+            }
+            catch ( Exception e )
+            {
+                System.err.format( "Error unregistering host %s: %s%n", requestedHost.getHostname(), e.getMessage() );
+            }
         }
+
         return null;
     }
 }

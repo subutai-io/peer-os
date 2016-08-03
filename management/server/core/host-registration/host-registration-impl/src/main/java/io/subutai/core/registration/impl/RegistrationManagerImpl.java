@@ -15,10 +15,10 @@ import com.google.common.collect.Lists;
 
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.host.HostInfo;
+import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.RegistrationStatus;
@@ -32,6 +32,7 @@ import io.subutai.core.registration.impl.entity.ContainerTokenImpl;
 import io.subutai.core.registration.impl.entity.RequestedHostImpl;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
+
 
 //TODO add security annotation
 public class RegistrationManagerImpl implements RegistrationManager
@@ -200,16 +201,18 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             RequestedHost requestedHost = requestDataService.find( requestId );
 
-            if ( requestedHost == null )
+            if ( requestedHost != null )
             {
-                return;
+                requestDataService.remove( requestedHost.getId() );
+
+                LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
+
+                localPeer.removeResourceHost( requestedHost.getId() );
             }
-
-            requestDataService.remove( requestedHost.getId() );
-
-            LocalPeer localPeer = serviceLocator.getService( LocalPeer.class );
-
-            localPeer.removeResourceHost( requestedHost.getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.warn( "Error removing agent registration request: {}", e.getMessage() );
         }
         catch ( Exception e )
         {

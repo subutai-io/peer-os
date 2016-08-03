@@ -46,7 +46,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
 import io.subutai.common.resource.ByteValueResource;
@@ -62,7 +62,6 @@ import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
-import io.subutai.core.kurjun.api.TemplateManager;
 import io.subutai.core.localpeer.impl.dao.ResourceHostDataService;
 import io.subutai.core.localpeer.impl.entity.ContainerHostEntity;
 import io.subutai.core.localpeer.impl.entity.ResourceHostEntity;
@@ -74,6 +73,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.strategy.api.StrategyManager;
+import io.subutai.core.template.api.TemplateManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -169,7 +169,7 @@ public class LocalPeerImplTest
     @Mock
     ContainerHostInfo containerHostInfo;
     @Mock
-    TemplateKurjun template;
+    Template template;
     @Mock
     ContainerHostInfoModel containerHostInfoModel;
 
@@ -587,15 +587,6 @@ public class LocalPeerImplTest
     }
 
 
-    @Test
-    public void testGetTemplate() throws Exception
-    {
-        localPeer.getTemplate( TEMPLATE_NAME );
-
-        verify( templateRegistry ).getTemplate( TEMPLATE_NAME );
-    }
-
-
     @Test( expected = PeerException.class )
     public void testSendRequestInternal() throws Exception
     {
@@ -625,7 +616,7 @@ public class LocalPeerImplTest
         when( resourceHostInfo.getHostname() ).thenReturn( Common.MANAGEMENT_HOSTNAME );
         when( resourceHostInfo.getId() ).thenReturn( MANAGEMENT_HOST_ID );
         when( resourceHostInfo.getHostInterfaces() ).thenReturn( hostInterfaces );
-        doReturn( managementHost ).when( localPeer).getManagementHost() ;
+        doReturn( managementHost ).when( localPeer ).getManagementHost();
 
         localPeer.initialized = true;
         localPeer.onHeartbeat( resourceHostInfo, Sets.newHashSet( quotaAlertValue ) );
