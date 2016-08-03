@@ -139,11 +139,18 @@ public interface RestService
     Response putAlert( AlertEvent alertEvent );
 
     @GET
-    @Path( "hmetrics/{hostname}/{startTime}/{endTime}" )
+    @Path( "hmetrics/{hostId}/{startTime}/{endTime}" )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
+    Response getHistoricalMetrics( @PathParam( "hostId" ) final String hostId,
                                    @PathParam( "startTime" ) final DateTimeParam startTime,
                                    @PathParam( "endTime" ) final DateTimeParam endTime );
+
+    @GET
+    @Path( "metricsseries/{hostId}/{startTime}/{endTime}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getMetricsSeries( @PathParam( "hostId" ) final String hostId,
+                               @PathParam( "startTime" ) final DateTimeParam startTime,
+                               @PathParam( "endTime" ) final DateTimeParam endTime );
 
     @GET
     @Path( "limits/{peerId}" )
