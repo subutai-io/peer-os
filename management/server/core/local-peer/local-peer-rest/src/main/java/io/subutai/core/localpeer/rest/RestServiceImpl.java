@@ -17,6 +17,7 @@ import org.apache.karaf.bundle.core.BundleStateService;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -386,13 +387,30 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getHistoricalMetrics( final String hostName, final DateTimeParam startTime,
+    public Response getHistoricalMetrics( final String hostId, final DateTimeParam startTime,
                                           final DateTimeParam endTime )
     {
         try
         {
-            return Response.ok( localPeer.getHistoricalMetrics( hostName, startTime.getDate(), endTime.getDate() ) )
-                           .build();
+            return Response.ok( localPeer
+                    .getHistoricalMetrics( new HostId( hostId ), startTime.getDate(), endTime.getDate() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response getMetricsSeries( final String hostId, final DateTimeParam startTime, final DateTimeParam endTime )
+    {
+        try
+        {
+            return Response
+                    .ok( localPeer.getMetricsSeries( new HostId( hostId ), startTime.getDate(), endTime.getDate() ) )
+                    .build();
         }
         catch ( Exception e )
         {

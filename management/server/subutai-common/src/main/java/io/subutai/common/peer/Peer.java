@@ -29,6 +29,7 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
@@ -259,7 +260,9 @@ public interface Peer extends RelationLink
 
     void alert( AlertEvent alert ) throws PeerException;
 
-    String getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
+    String getHistoricalMetrics( HostId hostId, Date startTime, Date endTime ) throws PeerException;
+
+    HistoricalMetrics getMetricsSeries( HostId hostId, Date startTime, Date endTime ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 

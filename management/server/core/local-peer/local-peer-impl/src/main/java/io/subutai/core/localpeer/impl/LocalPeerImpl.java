@@ -79,6 +79,7 @@ import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
@@ -2422,17 +2423,38 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final HostId hostId, final Date startTime, final Date endTime )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ) );
+        Preconditions.checkNotNull( hostId );
         Preconditions.checkNotNull( startTime );
         Preconditions.checkNotNull( endTime );
 
         try
         {
-            Host host = findHostByName( hostname );
+            Host host = bindHost( hostId.getId() );
             return monitor.getHistoricalMetrics( host, startTime, endTime );
+        }
+        catch ( HostNotFoundException e )
+        {
+            LOG.error( e.getMessage() );
+            throw new PeerException( e.getMessage(), e );
+        }
+    }
+
+
+    @Override
+    public HistoricalMetrics getMetricsSeries( final HostId hostId, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( hostId );
+        Preconditions.checkNotNull( startTime );
+        Preconditions.checkNotNull( endTime );
+
+        try
+        {
+            Host host = bindHost( hostId.getId() );
+            return monitor.getMetricsSeries( host, startTime, endTime );
         }
         catch ( HostNotFoundException e )
         {
