@@ -156,7 +156,7 @@ func download(t templ, kurjun *http.Client) bool {
 
 	log.Check(log.FatalLevel, "Writing response body to file", err)
 
-	if t.id == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
+	if id := strings.Split(t.id, "."); len(id) > 0 && id[len(id)-1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
 		return true
 	}
 	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
