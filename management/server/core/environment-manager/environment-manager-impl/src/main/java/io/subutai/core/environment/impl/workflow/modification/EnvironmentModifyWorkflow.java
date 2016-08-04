@@ -17,6 +17,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneSt
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.ChangeQuotaStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.DestroyContainersStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
@@ -25,7 +26,6 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
 
-//TODO: parallelize change container size step -extract a separate step
 public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
     private final PeerManager peerManager;
@@ -110,10 +110,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            for ( Map.Entry<String, ContainerSize> entry : changedContainers.entrySet() )
-            {
-                environment.getContainerHostById( entry.getKey() ).setContainerSize( entry.getValue() );
-            }
+            new ChangeQuotaStep( environment, changedContainers, operationTracker ).execute();
 
             environment = ( EnvironmentImpl ) environmentManager.loadEnvironment( environment.getId() );
 
