@@ -18,8 +18,6 @@ import io.subutai.common.security.relation.RelationLink;
 public interface Environment extends RelationLink
 {
 
-    //TODO remove unused methods
-
     /**
      * Return id of environment creator user
      */
@@ -69,16 +67,6 @@ public interface Environment extends RelationLink
      */
     void destroyContainer( EnvironmentContainerHost containerHost, boolean async )
             throws EnvironmentNotFoundException, EnvironmentModificationException;
-
-
-    /**
-     * Grows environment according to the passed blueprint
-     *
-     * @param topology = topology to use when growing
-     * @param async - sync or async to the calling party
-     */
-    Set<EnvironmentContainerHost> growEnvironment( Topology topology, boolean async )
-            throws EnvironmentModificationException;
 
 
     void addSshKey( String sshKey, boolean async ) throws EnvironmentModificationException;
