@@ -1079,7 +1079,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                     containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
                     environment.getVni() );
         }
-        catch ( ContainerHostNotFoundException | PeerException e )
+        catch ( PeerException e )
         {
             throw new EnvironmentManagerException( "Error checking container domain", e );
         }

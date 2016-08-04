@@ -48,6 +48,7 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.settings.Common;
@@ -65,7 +66,6 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
-import io.subutai.common.protocol.Template;
 import io.subutai.core.template.api.TemplateManager;
 
 
@@ -673,7 +673,7 @@ public class RestServiceImpl implements RestService
 
                 return Response.ok().build();
             }
-            catch ( ContainerHostNotFoundException | PeerException e )
+            catch ( PeerException e )
             {
                 LOG.error( "Exception starting container host", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
@@ -706,7 +706,7 @@ public class RestServiceImpl implements RestService
 
                 return Response.ok().build();
             }
-            catch ( ContainerHostNotFoundException | PeerException e )
+            catch ( PeerException e )
             {
                 LOG.error( "Exception stopping container host", e );
                 return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
