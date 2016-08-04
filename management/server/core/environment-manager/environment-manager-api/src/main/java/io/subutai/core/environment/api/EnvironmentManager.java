@@ -34,6 +34,7 @@ import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
 /**
  * Environment Manager
+ * TODO remove deprecated methods
  */
 public interface EnvironmentManager
 {
@@ -57,6 +58,7 @@ public interface EnvironmentManager
      *
      * @throws EnvironmentCreationException - thrown if error occurs during environment creation
      */
+    @Deprecated
     @RolesAllowed( "Environment-Management|Write" )
     Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
@@ -75,10 +77,12 @@ public interface EnvironmentManager
      * @throws EnvironmentModificationException - thrown if error occurs during environment modification
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
+    @Deprecated
     Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 
+    @Deprecated
     @RolesAllowed( "Environment-Management|Write" )
     UUID modifyEnvironmentAndGetTrackerID( String environmentId, Topology topology, List<String> removedContainers,
                                            boolean async )
