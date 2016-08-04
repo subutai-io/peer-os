@@ -43,9 +43,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Environment environment = environmentManager.createEnvironment( topology, true );
+            environmentManager.createEnvironmentAndGetTrackerID( topology, true );
 
-            return Response.ok( environment.getEnvironmentId() ).build();
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
@@ -61,7 +61,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            environmentManager.growEnvironment( environmentId, topology, true );
+            environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, null, null, true );
 
             return Response.ok().build();
         }
@@ -116,5 +116,4 @@ public class RestServiceImpl implements RestService
             throw new WebApplicationException( e.getMessage() );
         }
     }
-
 }

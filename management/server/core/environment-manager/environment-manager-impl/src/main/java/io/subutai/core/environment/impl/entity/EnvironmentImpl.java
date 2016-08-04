@@ -41,7 +41,6 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.PeerConf;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentAlertHandler;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -451,23 +450,6 @@ public class EnvironmentImpl implements Environment, Serializable
             throws EnvironmentNotFoundException, EnvironmentModificationException
     {
         environmentManager.destroyContainer( getId(), containerHost.getId(), async );
-    }
-
-
-    @Override
-    public Set<EnvironmentContainerHost> growEnvironment( final Topology topology, boolean async )
-            throws EnvironmentModificationException
-    {
-        try
-        {
-            return environmentManager.growEnvironment( environmentId, topology, async );
-        }
-        catch ( EnvironmentNotFoundException e )
-        {
-            //this should not happen
-            LOG.error( String.format( "Error growing environment %s", getName() ), e );
-            throw new EnvironmentModificationException( e );
-        }
     }
 
 

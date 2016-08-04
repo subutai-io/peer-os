@@ -20,10 +20,9 @@ import io.subutai.common.network.SshTunnel;
 import io.subutai.common.peer.AlertHandler;
 import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.peer.EnvironmentAlertHandlers;
-import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.EnvironmentAlertHandlers;
+import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
@@ -32,10 +31,6 @@ import io.subutai.core.environment.api.exception.EnvironmentDestructionException
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 
 
-/**
- * Environment Manager
- * TODO remove deprecated methods
- */
 public interface EnvironmentManager
 {
 
@@ -48,50 +43,14 @@ public interface EnvironmentManager
 
     Set<Environment> getEnvironmentsByOwnerId( long userId );
 
-    /**
-     * Creates environment based on a passed topology
-     *
-     * @param topology - {@code Topology}
-     * @param async - indicates whether environment is created synchronously or asynchronously to the calling party
-     *
-     * @return - created environment
-     *
-     * @throws EnvironmentCreationException - thrown if error occurs during environment creation
-     */
-    @Deprecated
-    @RolesAllowed( "Environment-Management|Write" )
-    Environment createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     @RolesAllowed( "Environment-Management|Write" )
     UUID createEnvironmentAndGetTrackerID( Topology topology, boolean async ) throws EnvironmentCreationException;
 
 
-    /**
-     * Grows environment based on a passed topology
-     *
-     * @param topology - {@code Topology}
-     * @param async - indicates whether environment is grown synchronously or asynchronously to the calling party
-     *
-     * @return - set of newly created {@code ContainerHost} or empty set if operation is async
-     *
-     * @throws EnvironmentModificationException - thrown if error occurs during environment modification
-     * @throws EnvironmentNotFoundException - thrown if environment not found
-     */
-    @Deprecated
-    Set<EnvironmentContainerHost> growEnvironment( String environmentId, Topology topology, boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException;
-
-
-    @Deprecated
     @RolesAllowed( "Environment-Management|Write" )
     UUID modifyEnvironmentAndGetTrackerID( String environmentId, Topology topology, List<String> removedContainers,
-                                           boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException;
-
-
-    @RolesAllowed( "Environment-Management|Write" )
-    UUID modifyEnvironmentAndGetTrackerID(String environmentId, Topology topology, List<String> removedContainers,
-                                          Map<String, ContainerSize> changedContainers, boolean async )
+                                           Map<String, ContainerSize> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 
