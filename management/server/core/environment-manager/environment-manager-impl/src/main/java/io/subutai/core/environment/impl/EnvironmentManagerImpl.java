@@ -1740,7 +1740,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public EnvironmentContainerImpl update( final EnvironmentContainerImpl container )
+    public synchronized EnvironmentContainerImpl update( final EnvironmentContainerImpl container )
     {
         Environment environment = container.getEnvironment();
 

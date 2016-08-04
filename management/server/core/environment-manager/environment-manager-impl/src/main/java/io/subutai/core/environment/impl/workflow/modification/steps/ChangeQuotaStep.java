@@ -2,15 +2,13 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
-import io.subutai.common.util.PeerUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
@@ -35,29 +33,28 @@ public class ChangeQuotaStep
     {
         if ( !CollectionUtil.isMapEmpty( changedContainers ) )
         {
-            PeerUtil<Object> quotaUtil = new PeerUtil<>();
-
+            TaskUtil<Object> quotaUtil = new TaskUtil<>();
 
             for ( final Map.Entry<String, ContainerSize> entry : changedContainers.entrySet() )
             {
                 final EnvironmentContainerHost containerHost = environment.getContainerHostById( entry.getKey() );
-                final Peer peer = containerHost.getPeer();
                 final ContainerSize containerSize = entry.getValue();
 
-                quotaUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+                quotaUtil.addTask( new TaskUtil.Task<Object>()
                 {
                     @Override
                     public Object call() throws Exception
                     {
-                        peer.setContainerSize( containerHost.getContainerId(), containerSize );
+                        containerHost.setContainerSize( containerSize );
 
                         return null;
                     }
-                } ) );
+                } );
 
-                PeerUtil.PeerTaskResults<Object> quotaResults = quotaUtil.executeParallel();
 
-                for ( PeerUtil.PeerTaskResult quotaResult : quotaResults.getPeerTaskResults() )
+                TaskUtil.TaskResults<Object> quotaResults = quotaUtil.executeParallel();
+
+                for ( TaskUtil.TaskResult quotaResult : quotaResults.getTaskResults() )
                 {
                     if ( quotaResult.hasSucceeded() )
                     {
