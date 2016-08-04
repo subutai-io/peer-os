@@ -112,6 +112,15 @@ import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
+/**
+ * TODO
+ *
+ * 1) add p2pSecret property to peerConf, set it only after successful p2p secret update on the associated peer (in
+ * P2PSecretKeyResetStep)
+ *
+ * 2) add secret key TTL property to environment (user should be able to change it - add to EM API), update background
+ * task to consider this TTL (make background task run frequently with short intervals)
+ **/
 @PermitAll
 public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionListener, AlertListener, HubEventListener
 {
