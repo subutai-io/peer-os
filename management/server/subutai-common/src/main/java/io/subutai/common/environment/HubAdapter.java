@@ -1,12 +1,13 @@
-package io.subutai.core.hubadapter.api;
+package io.subutai.common.environment;
 
 
 import java.util.List;
 
+
 //TODO put this API to hub-share module and its impl to hub-manager module
 public interface HubAdapter
 {
-    public boolean isRegistered();
+    boolean isRegistered();
     //
     // Environments
     //
