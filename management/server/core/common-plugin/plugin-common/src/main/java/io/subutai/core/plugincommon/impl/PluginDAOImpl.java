@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.JsonSyntaxException;
 
-import io.subutai.core.hubadapter.api.HubAdapter;
+import io.subutai.common.environment.HubAdapter;
 import io.subutai.core.plugincommon.api.PluginDAO;
 
 
