@@ -110,7 +110,6 @@ public class RestServiceImpl implements RestService
     @Override
     public Response listTemplates()
     {
-        // @todo check for management container should be here
         Set<Template> templates = templateManager.getTemplates().stream().filter(
                 n -> !n.getName().equalsIgnoreCase( Common.MANAGEMENT_HOSTNAME ) )
                                                  .filter( n -> !n.getName().matches( "(?i)cassandra14|" +
