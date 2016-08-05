@@ -29,6 +29,11 @@ public class Series
     private List<List<Double>> values;
 
 
+    public Series()
+    {
+    }
+
+
     public Series( @JsonProperty( "name" ) final String name, @JsonProperty( "tags" ) Map<String, String> tags,
                    @JsonProperty( "columns" ) List<String> columns,
                    @JsonProperty( "values" ) final List<List<Double>> values )
