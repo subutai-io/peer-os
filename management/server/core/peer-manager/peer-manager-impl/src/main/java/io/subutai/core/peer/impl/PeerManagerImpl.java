@@ -40,6 +40,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
@@ -150,7 +151,7 @@ public class PeerManagerImpl implements PeerManager
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
                 Peer peer = constructPeerPojo( peerData );
-                addPeerToRegistry( peer );
+                updatePeerInCache( peer );
             }
 
             localIpSetter = Executors.newSingleThreadScheduledExecutor();
@@ -260,8 +261,7 @@ public class PeerManagerImpl implements PeerManager
 
             Peer newPeer = constructPeerPojo( peerData );
 
-            addPeerToRegistry( newPeer );
-
+            updatePeerInCache( newPeer );
 
             Encrypted encryptedPublicKey = registrationData.getPublicKey();
             String publicKey = encryptedPublicKey.decrypt( key, String.class );
@@ -315,7 +315,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void addPeerToRegistry( final Peer peer )
+    protected void updatePeerInCache( final Peer peer )
     {
         Preconditions.checkNotNull( peer, "Peer could not be null." );
 
@@ -323,7 +323,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void removePeer( String id )
+    protected void removePeerFromCache( String id )
     {
         Peer peer = this.peers.get( id );
         if ( peer != null )
@@ -424,7 +424,39 @@ public class PeerManagerImpl implements PeerManager
         relationManager.removeRelation( relationMeta );
 
         removePeerData( registrationData.getPeerInfo().getId() );
-        removePeer( registrationData.getPeerInfo().getId() );
+        removePeerFromCache( registrationData.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public void setName( final String peerId, final String newName ) throws PeerException
+    {
+        PeerData peerData = loadPeerData( peerId );
+
+        if ( peerData == null )
+        {
+            throw new PeerNotRegisteredException();
+        }
+
+
+        Peer peer = constructPeerPojo( peerData );
+
+        peer.getPeerInfo().setName( newName );
+
+        try
+        {
+            peerData.setInfo( toJson( peer.getPeerInfo() ) );
+        }
+        catch ( IOException e )
+        {
+            throw new PeerException( e );
+        }
+
+        //update db
+        updatePeerData( peerData );
+
+        //update cache
+        updatePeerInCache( peer );
     }
 
 
@@ -1306,7 +1338,7 @@ public class PeerManagerImpl implements PeerManager
                 peerDataService.saveOrUpdate( peerData );
 
                 Peer peer = constructPeerPojo( peerData );
-                addPeerToRegistry( peer );
+                updatePeerInCache( peer );
             }
             catch ( Exception e )
             {
