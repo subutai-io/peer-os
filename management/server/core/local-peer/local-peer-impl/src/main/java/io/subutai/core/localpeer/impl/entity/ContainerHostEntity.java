@@ -30,7 +30,6 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
@@ -251,7 +250,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void setContainerSize( final ContainerSize containerSize )
     {
         Preconditions.checkNotNull( containerSize );
-        
+
         this.containerSize = containerSize;
     }
 

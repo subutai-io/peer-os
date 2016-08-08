@@ -60,7 +60,6 @@ import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
@@ -959,7 +958,6 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( endTime, "Invalid end time" );
 
         return peerWebClient.getMetricsSeries( hostId, startTime, endTime );
-
     }
 
 
