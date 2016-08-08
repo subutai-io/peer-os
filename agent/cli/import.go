@@ -30,26 +30,21 @@ var (
 )
 
 type templ struct {
-	name    string
-	file    string
-	version string
-	branch  string
-	id      string
-	owner   []string
-	signa   signature
+	name      string
+	file      string
+	version   string
+	branch    string
+	id        string
+	owner     []string
+	signature map[string]string
 }
 
 type metainfo struct {
-	Name   string    `json:"name"`
-	ID     string    `json:"id"`
-	Owner  []string  `json:"owner"`
-	Md5Sum string    `json:"md5Sum"`
-	Signs  signature `json:"signature"`
-}
-
-type signature []struct {
-	Author string
-	Sign   string
+	Name   string            `json:"name"`
+	ID     string            `json:"id"`
+	Owner  []string          `json:"owner"`
+	Md5Sum string            `json:"md5Sum"`
+	Signs  map[string]string `json:"signature"`
 }
 
 func templId(t *templ, kurjun *http.Client) {
@@ -87,7 +82,7 @@ func templId(t *templ, kurjun *http.Client) {
 	}
 	t.id = meta.ID
 	t.owner = meta.Owner
-	t.signa = meta.Signs
+	t.signature = meta.Signs
 }
 
 func md5sum(filePath string) string {
@@ -295,12 +290,13 @@ func LxcImport(name, version, token string) {
 		log.Info("Trying to import from local storage")
 	}
 
-	if len(t.id) != 0 && len(t.signa) == 0 {
+	if len(t.id) != 0 && len(t.signature) == 0 {
 		log.Warn("Template is not signed")
 	}
-	for _, v := range t.signa {
+
+	for owner, signature := range t.signature {
 		// if v.Author == "public" || v.Author == "subutai" || v.Author == "jenkins" {
-		signedhash := verifySignature(getOwnerKey(v.Author), v.Sign)
+		signedhash := verifySignature(getOwnerKey(owner), signature)
 		if t.id != signedhash {
 			log.Error("Signature does not match with template hash")
 		}
