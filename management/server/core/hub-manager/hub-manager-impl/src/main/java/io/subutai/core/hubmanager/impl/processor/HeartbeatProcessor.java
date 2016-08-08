@@ -51,6 +51,28 @@ public class HeartbeatProcessor implements Runnable
         this.peerId = peerId;
 
         path = String.format( "/rest/v1.3/peers/%s/heartbeat/", peerId );
+
+        addShutDownHook();
+    }
+
+
+    private void addShutDownHook()
+    {
+        Runtime.getRuntime().addShutdownHook( new Thread()
+        {
+            public void run()
+            {
+                try
+                {
+                    log.warn( "Shutting down hub manager" );
+                    //TODO send "i-am-off" heartbeat here
+                }
+                catch ( Exception e )
+                {
+                    //ignore
+                }
+            }
+        } );
     }
 
 
@@ -82,9 +104,9 @@ public class HeartbeatProcessor implements Runnable
     /**
      * @param force is true if a heartbeat is sent not by scheduler, e.g. manually or triggered from Hub.
      *
-     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option
-     * is used to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor
-     * sets this option. See HubEnvironmentProcessor for example.
+     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option is used
+     * to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor sets this option.
+     * See HubEnvironmentProcessor for example.
      */
     public void sendHeartbeat( boolean force ) throws Exception
     {
