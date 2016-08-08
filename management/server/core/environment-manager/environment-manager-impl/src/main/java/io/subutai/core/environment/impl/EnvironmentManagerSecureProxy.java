@@ -63,7 +63,6 @@ import io.subutai.core.environment.api.exception.EnvironmentDestructionException
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
-import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -73,6 +72,7 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
@@ -251,6 +251,26 @@ public class EnvironmentManagerSecureProxy
         return environmentManager
                 .modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, changedContainers,
                         async );
+    }
+
+
+    @Override
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
+                                                          final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Environment environment = environmentManager.loadEnvironment( environmentId );
+
+        try
+        {
+            check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        return environmentManager.growEnvironment( environmentId, topology, async );
     }
 
 
