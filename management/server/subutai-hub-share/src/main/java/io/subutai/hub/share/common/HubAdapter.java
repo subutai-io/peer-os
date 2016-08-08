@@ -4,7 +4,6 @@ package io.subutai.hub.share.common;
 import java.util.List;
 
 
-//TODO put this API to hub-share module and its impl to hub-manager module
 public interface HubAdapter
 {
     boolean isRegistered();

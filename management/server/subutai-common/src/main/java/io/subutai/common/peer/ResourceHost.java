@@ -111,4 +111,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void setHostname( String hostname ) throws ResourceHostException;
 
     int getVlan() throws ResourceHostException;
+
+    boolean isManagementHost();
 }

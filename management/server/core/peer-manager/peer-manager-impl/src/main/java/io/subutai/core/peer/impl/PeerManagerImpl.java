@@ -79,7 +79,6 @@ import io.subutai.core.security.api.SecurityManager;
 public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
-    private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
     final int MAX_CONTAINER_LIMIT = 20;
     final int MAX_ENVIRONMENT_LIMIT = 20;
     protected PeerDataService peerDataService;
