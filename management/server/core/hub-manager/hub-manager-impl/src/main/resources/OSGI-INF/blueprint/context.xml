@@ -83,6 +83,6 @@
     <argument ref="identityManager" />
   </bean>
 
-  <service ref="hubAdapter" interface="io.subutai.common.environment.HubAdapter" />
+  <service ref="hubAdapter" interface="io.subutai.hub.share.common.HubAdapter" />
 
 </blueprint>

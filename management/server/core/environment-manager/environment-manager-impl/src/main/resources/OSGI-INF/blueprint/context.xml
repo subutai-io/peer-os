@@ -32,7 +32,7 @@
   <reference id="relationManager"
              interface="io.subutai.common.security.relation.RelationManager" />
 
-  <reference id="hubAdapter" availability="optional" interface="io.subutai.common.environment.HubAdapter" />
+  <reference id="hubAdapter" availability="optional" interface="io.subutai.hub.share.common.HubAdapter" />
 
   <!-- JTA -->
 
