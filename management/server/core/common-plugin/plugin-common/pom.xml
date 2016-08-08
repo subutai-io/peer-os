@@ -20,6 +20,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -56,7 +60,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>environment-manager-api</artifactId>
     </dependency>
-
 
   </dependencies>
 

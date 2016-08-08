@@ -1,4 +1,4 @@
-package io.subutai.common.environment;
+package io.subutai.hub.share.common;
 
 
 import java.util.List;

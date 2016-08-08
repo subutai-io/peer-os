@@ -27,7 +27,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.common.environment.HubAdapter;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.json.JsonUtil;
 
