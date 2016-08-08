@@ -1005,6 +1005,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
+    public boolean isManagementHost()
+    {
+        try
+        {
+            return getLocalPeer().getManagementHost().getId().equals( getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return false;
+        }
+    }
+
+
+    @Override
     public boolean isConnected()
     {
         return getPeer().isConnected( new HostId( getId() ) );
