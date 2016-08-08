@@ -96,7 +96,6 @@ import io.subutai.core.environment.impl.workflow.modification.HostnameModificati
 import io.subutai.core.environment.impl.workflow.modification.P2PSecretKeyModificationWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyAdditionWorkflow;
 import io.subutai.core.environment.impl.workflow.modification.SshKeyRemovalWorkflow;
-import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
@@ -108,6 +107,7 @@ import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
@@ -432,6 +432,31 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         createEnvironment( topology, async, operationTracker );
 
         return operationTracker.getId();
+    }
+
+
+    @RolesAllowed( "Environment-Management|Write" )
+    @Override
+    public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
+                                                          final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+
+        final EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
+
+        modifyEnvironmentAndGetTrackerID( environmentId, topology, null, null, async );
+
+        Set<EnvironmentContainerHost> newContainers = Sets.newHashSet();
+
+        if ( !async )
+        {
+            newContainers = Sets.newHashSet( loadEnvironment( environmentId ).getContainerHosts() );
+            newContainers.removeAll( oldContainers );
+        }
+
+        return newContainers;
     }
 
 

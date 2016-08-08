@@ -22,6 +22,7 @@ import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
@@ -47,6 +48,10 @@ public interface EnvironmentManager
     @RolesAllowed( "Environment-Management|Write" )
     UUID createEnvironmentAndGetTrackerID( Topology topology, boolean async ) throws EnvironmentCreationException;
 
+    //used in plugins, kept for backward compatibility
+    Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
+                                                   final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     @RolesAllowed( "Environment-Management|Write" )
     UUID modifyEnvironmentAndGetTrackerID( String environmentId, Topology topology, List<String> removedContainers,
