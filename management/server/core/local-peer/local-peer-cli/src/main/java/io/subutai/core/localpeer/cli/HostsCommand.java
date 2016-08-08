@@ -12,7 +12,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-@Command( scope = "peer", name = "hosts" )
+@Command( scope = "localpeer", name = "hosts" )
 public class HostsCommand extends SubutaiShellCommandSupport
 {
     private final LocalPeer localPeer;
