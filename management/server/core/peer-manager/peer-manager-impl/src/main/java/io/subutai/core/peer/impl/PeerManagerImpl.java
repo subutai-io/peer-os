@@ -431,13 +431,16 @@ public class PeerManagerImpl implements PeerManager
     @Override
     public void setName( final String peerId, final String newName ) throws PeerException
     {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newName ), "Invalid peer name" );
+
+
         PeerData peerData = loadPeerData( peerId );
 
         if ( peerData == null )
         {
             throw new PeerNotRegisteredException();
         }
-
 
         Peer peer = constructPeerPojo( peerData );
 
@@ -1330,7 +1333,7 @@ public class PeerManagerImpl implements PeerManager
 
                 peerInfo.setPublicUrl( publicUrl.toLowerCase() );
                 peerInfo.setPublicSecurePort( securePort );
-                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
+//                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
                 peerInfo.setManualSetting( manualSetting );
 
                 peerData.setInfo( toJson( peerInfo ) );
