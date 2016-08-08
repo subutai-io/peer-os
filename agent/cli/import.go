@@ -47,14 +47,14 @@ type metainfo struct {
 	Signs  map[string]string `json:"signature"`
 }
 
-func templId(t *templ, kurjun *http.Client) {
+func templId(t *templ, kurjun *http.Client, token string) {
 	var meta metainfo
 
-	url := config.Cdn.Kurjun + "/template/info?name=" + t.name
+	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&token=" + token
 	if t.name == "management" && len(t.branch) != 0 {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&token=" + token
 	} else if t.name == "management" {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&token=" + token
 	}
 
 	response, err := kurjun.Get(url)
@@ -63,7 +63,7 @@ func templId(t *templ, kurjun *http.Client) {
 
 	if err == nil && response.StatusCode == 204 && t.name == "management" {
 		log.Warn("Cannot get management with specified version, trying without version")
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name)
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name + "&token=" + token)
 	}
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
 		return
@@ -121,7 +121,7 @@ func checkLocal(t templ) bool {
 	return false
 }
 
-func download(t templ, kurjun *http.Client) bool {
+func download(t templ, kurjun *http.Client, token string) bool {
 	if len(t.id) == 0 {
 		return false
 	}
@@ -130,8 +130,8 @@ func download(t templ, kurjun *http.Client) bool {
 	defer out.Close()
 	log.Info("Downloading " + t.name)
 
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id)
-	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id, err)
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id + "&token=" + token)
+	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id+"&token="+token, err)
 	defer response.Body.Close()
 	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 	bar.Start()
@@ -147,8 +147,8 @@ func download(t templ, kurjun *http.Client) bool {
 		out, err = os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 		log.Check(log.FatalLevel, "Creating file "+t.file, err)
 		defer out.Close()
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id)
-		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id, err)
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id + "&token=" + token)
+		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id+"&token="+token, err)
 		defer response.Body.Close()
 		bar = pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 		bar.Start()
@@ -187,12 +187,12 @@ func verifySignature(key, signature string) string {
 	return ""
 }
 
-func idToName(id string, kurjun *http.Client) string {
+func idToName(id string, kurjun *http.Client, token string) string {
 	var meta metainfo
 
 	//Since only kurjun knows template's ID, we cannot define if we have template already installed in system by ID as we do it by name, so unreachable kurjun in this case is a deadend for us
 	//To omit this issue we should add ID into template config and use this ID as a "primary key" to any request
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/info?id=" + id)
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/info?id=" + id + "&token=" + token)
 	log.Check(log.ErrorLevel, "Getting kurjun response", err)
 	defer response.Body.Close()
 
@@ -234,7 +234,7 @@ func LxcImport(name, version, token string) {
 
 	if id := strings.Split(name, "id:"); len(id) > 1 {
 		kurjun, _ = config.CheckKurjun()
-		name = idToName(id[1], kurjun)
+		name = idToName(id[1], kurjun, token)
 	}
 
 	log.Info("Importing " + name)
@@ -285,7 +285,7 @@ func LxcImport(name, version, token string) {
 		kurjun, _ = config.CheckKurjun()
 	}
 	if kurjun != nil {
-		templId(&t, kurjun)
+		templId(&t, kurjun, token)
 	} else {
 		log.Info("Trying to import from local storage")
 	}
@@ -300,12 +300,12 @@ func LxcImport(name, version, token string) {
 		if t.id != signedhash {
 			log.Error("Signature does not match with template hash")
 		}
-		log.Info("Digital signature verification succeeded, owner and template integrity are valid")
+		log.Info("Digital signature and file integrity verified")
 		break
 		// }
 	}
 
-	if !checkLocal(t) && !download(t, kurjun) {
+	if !checkLocal(t) && !download(t, kurjun, token) {
 		log.Error(t.name + " template not found")
 	}
 
