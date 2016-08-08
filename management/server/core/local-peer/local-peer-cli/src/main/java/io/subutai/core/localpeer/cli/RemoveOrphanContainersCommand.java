@@ -13,7 +13,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
 
-@Command( scope = "peer", name = "remove-orphan-containers" )
+@Command( scope = "localpeer", name = "remove-orphan-containers" )
 public class RemoveOrphanContainersCommand extends SubutaiShellCommandSupport
 {
     private final LocalPeer localPeer;

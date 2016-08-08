@@ -14,7 +14,7 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
 
 
-@Command( scope = "peer", name = "list-orphan-containers" )
+@Command( scope = "localpeer", name = "list-orphan-containers" )
 public class ListOrphanContainersCommand extends SubutaiShellCommandSupport
 {
     private final LocalPeer localPeer;

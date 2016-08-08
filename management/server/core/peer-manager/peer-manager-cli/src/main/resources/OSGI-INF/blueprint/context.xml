@@ -17,8 +17,8 @@
   </command-bundle>
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="peer/policy">
-      <action class="io.subutai.core.peer.cli.PeerPolicyCommand">
+    <command name="peer/rename">
+      <action class="io.subutai.core.peer.cli.RenamePeerCommand">
         <property name="peerManager" ref="peerManager" />
       </action>
     </command>

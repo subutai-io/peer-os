@@ -7,7 +7,6 @@ import java.util.Set;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
@@ -81,4 +80,6 @@ public interface PeerManager
     void setPublicUrl( String peerId, String publicUrl, int securePort ) throws PeerException;
 
     void checkHostAvailability( final String destinationHost ) throws PeerException;
+
+    void setName( String peerId, String newName ) throws PeerException;
 }
