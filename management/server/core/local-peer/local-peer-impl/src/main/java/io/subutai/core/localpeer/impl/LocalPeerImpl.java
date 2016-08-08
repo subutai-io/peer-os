@@ -274,7 +274,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
         peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
         peerInfo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-        peerInfo.setName( String.format( "Peer %s on %s", peerInfo.getId(), SystemSettings.getPublicUrl() ) );
+        peerInfo.setName("Local Peer" );
     }
 
 

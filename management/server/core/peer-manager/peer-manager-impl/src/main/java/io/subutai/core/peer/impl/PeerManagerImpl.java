@@ -253,6 +253,10 @@ public class PeerManagerImpl implements PeerManager
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
             final Integer order = getMaxOrder() + 1;
+
+            registrationData.getPeerInfo()
+                            .setName( String.format( "Peer on %s", registrationData.getPeerInfo().getIp() ) );
+
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ), order );
@@ -559,7 +563,10 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( e.getMessage() );
         }
 
+        registrationData.getPeerInfo().setName( String.format( "Peer on %s", registrationData.getPeerInfo().getIp() ) );
+
         addRequest( registrationData );
+
         return new RegistrationData( localPeer.getPeerInfo(), registrationData.getKeyPhrase(),
                 RegistrationStatus.WAIT );
     }
@@ -756,7 +763,9 @@ public class PeerManagerImpl implements PeerManager
 
             RegistrationData result = registrationClient.sendInitRequest( destinationUrl.toString(), registrationData );
 
+            result.getPeerInfo().setName( String.format( "Peer on %s", peerInfo.getIp() ) );
             result.setKeyPhrase( keyPhrase );
+
             addRequest( result );
         }
         catch ( Exception e )
@@ -1333,7 +1342,7 @@ public class PeerManagerImpl implements PeerManager
 
                 peerInfo.setPublicUrl( publicUrl.toLowerCase() );
                 peerInfo.setPublicSecurePort( securePort );
-//                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
+                //                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
                 peerInfo.setManualSetting( manualSetting );
 
                 peerData.setInfo( toJson( peerInfo ) );
