@@ -253,11 +253,8 @@ public class SystemManagerImpl implements SystemManager
         {
             ResourceHost host = peerManager.getLocalPeer().getManagementHost();
 
-            CommandResult result =
-                    host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
+            host.execute( new RequestBuilder( "subutai update management" ).withTimeout( 10000 ) );
 
-            //            return result.hasSucceeded();
-            result.getExitCode();
             return true;
         }
         catch ( HostNotFoundException e )

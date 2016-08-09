@@ -66,11 +66,6 @@
       <artifactId>identity-manager-api</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hub-adapter-api</artifactId>
-    </dependency>
-
     <!-- Testing -->
 
     <dependency>

@@ -40,6 +40,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.peer.PeerNotRegisteredException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
@@ -79,7 +80,6 @@ import io.subutai.core.security.api.SecurityManager;
 public class PeerManagerImpl implements PeerManager
 {
     private static final Logger LOG = LoggerFactory.getLogger( PeerManagerImpl.class );
-    private static final String KURJUN_URL_PATTERN = "https://%s:%s/rest/kurjun";
     final int MAX_CONTAINER_LIMIT = 20;
     final int MAX_ENVIRONMENT_LIMIT = 20;
     protected PeerDataService peerDataService;
@@ -151,7 +151,7 @@ public class PeerManagerImpl implements PeerManager
             for ( PeerData peerData : this.peerDataService.getAll() )
             {
                 Peer peer = constructPeerPojo( peerData );
-                addPeerToRegistry( peer );
+                updatePeerInCache( peer );
             }
 
             localIpSetter = Executors.newSingleThreadScheduledExecutor();
@@ -253,6 +253,10 @@ public class PeerManagerImpl implements PeerManager
             PeerPolicy policy = getDefaultPeerPolicy( registrationData.getPeerInfo().getId() );
 
             final Integer order = getMaxOrder() + 1;
+
+            registrationData.getPeerInfo()
+                            .setName( String.format( "Peer on %s", registrationData.getPeerInfo().getIp() ) );
+
             PeerData peerData =
                     new PeerData( registrationData.getPeerInfo().getId(), toJson( registrationData.getPeerInfo() ),
                             keyPhrase, toJson( policy ), order );
@@ -261,8 +265,7 @@ public class PeerManagerImpl implements PeerManager
 
             Peer newPeer = constructPeerPojo( peerData );
 
-            addPeerToRegistry( newPeer );
-
+            updatePeerInCache( newPeer );
 
             Encrypted encryptedPublicKey = registrationData.getPublicKey();
             String publicKey = encryptedPublicKey.decrypt( key, String.class );
@@ -316,7 +319,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void addPeerToRegistry( final Peer peer )
+    protected void updatePeerInCache( final Peer peer )
     {
         Preconditions.checkNotNull( peer, "Peer could not be null." );
 
@@ -324,7 +327,7 @@ public class PeerManagerImpl implements PeerManager
     }
 
 
-    protected void removePeer( String id )
+    protected void removePeerFromCache( String id )
     {
         Peer peer = this.peers.get( id );
         if ( peer != null )
@@ -425,7 +428,42 @@ public class PeerManagerImpl implements PeerManager
         relationManager.removeRelation( relationMeta );
 
         removePeerData( registrationData.getPeerInfo().getId() );
-        removePeer( registrationData.getPeerInfo().getId() );
+        removePeerFromCache( registrationData.getPeerInfo().getId() );
+    }
+
+
+    @Override
+    public void setName( final String peerId, final String newName ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ), "Invalid peer id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newName ), "Invalid peer name" );
+
+
+        PeerData peerData = loadPeerData( peerId );
+
+        if ( peerData == null )
+        {
+            throw new PeerNotRegisteredException();
+        }
+
+        Peer peer = constructPeerPojo( peerData );
+
+        peer.getPeerInfo().setName( newName );
+
+        try
+        {
+            peerData.setInfo( toJson( peer.getPeerInfo() ) );
+        }
+        catch ( IOException e )
+        {
+            throw new PeerException( e );
+        }
+
+        //update db
+        updatePeerData( peerData );
+
+        //update cache
+        updatePeerInCache( peer );
     }
 
 
@@ -525,7 +563,10 @@ public class PeerManagerImpl implements PeerManager
             throw new PeerException( e.getMessage() );
         }
 
+        registrationData.getPeerInfo().setName( String.format( "Peer on %s", registrationData.getPeerInfo().getIp() ) );
+
         addRequest( registrationData );
+
         return new RegistrationData( localPeer.getPeerInfo(), registrationData.getKeyPhrase(),
                 RegistrationStatus.WAIT );
     }
@@ -722,7 +763,9 @@ public class PeerManagerImpl implements PeerManager
 
             RegistrationData result = registrationClient.sendInitRequest( destinationUrl.toString(), registrationData );
 
+            result.getPeerInfo().setName( String.format( "Peer on %s", peerInfo.getIp() ) );
             result.setKeyPhrase( keyPhrase );
+
             addRequest( result );
         }
         catch ( Exception e )
@@ -1299,7 +1342,7 @@ public class PeerManagerImpl implements PeerManager
 
                 peerInfo.setPublicUrl( publicUrl.toLowerCase() );
                 peerInfo.setPublicSecurePort( securePort );
-                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
+                //                peerInfo.setName( String.format( "Peer %s on %s", peerId, peerInfo.getIp() ) );
                 peerInfo.setManualSetting( manualSetting );
 
                 peerData.setInfo( toJson( peerInfo ) );
@@ -1307,7 +1350,7 @@ public class PeerManagerImpl implements PeerManager
                 peerDataService.saveOrUpdate( peerData );
 
                 Peer peer = constructPeerPojo( peerData );
-                addPeerToRegistry( peer );
+                updatePeerInCache( peer );
             }
             catch ( Exception e )
             {

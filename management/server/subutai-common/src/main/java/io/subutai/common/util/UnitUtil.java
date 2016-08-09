@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 
 public abstract class UnitUtil
 {
-    public static enum Unit
+    public enum Unit
     {
         B, KB, MB, GB
     }

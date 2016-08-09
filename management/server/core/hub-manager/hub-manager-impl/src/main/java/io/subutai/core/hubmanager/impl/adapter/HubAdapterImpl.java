@@ -1,4 +1,4 @@
-package io.subutai.core.hubadapter.impl;
+package io.subutai.core.hubmanager.impl.adapter;
 
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.core.hubadapter.api.HubAdapter;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
@@ -24,7 +24,7 @@ import io.subutai.hub.share.json.JsonUtil;
 
 import static java.lang.String.format;
 
-
+//TODO use HubRestClient and ConfigDataServiceimpl instead of DaoHelper and HttpClient
 public class HubAdapterImpl implements HubAdapter
 {
     private static final String ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";

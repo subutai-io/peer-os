@@ -2,8 +2,8 @@
 
   <reference id="monitor" availability="mandatory"
              interface="io.subutai.core.metric.api.Monitor" />
-  <reference id="environmentManager" availability="mandatory"
-             interface="io.subutai.core.environment.api.EnvironmentManager" />
+  <reference id="localPeer" availability="mandatory"
+             interface="io.subutai.common.peer.LocalPeer" />
 
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="metric/list">
@@ -37,10 +37,18 @@
     </command>
   </command-bundle>
 
-
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
     <command name="alert/put">
       <action class="io.subutai.core.metric.cli.PutAlertCommand">
+        <argument ref="monitor" />
+      </action>
+    </command>
+  </command-bundle>
+
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="metric/get">
+      <action class="io.subutai.core.metric.cli.MetricCommand">
+        <argument ref="localPeer" />
         <argument ref="monitor" />
       </action>
     </command>

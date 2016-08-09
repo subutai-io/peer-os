@@ -11,8 +11,9 @@ public class SeriesBatch
 {
     @JsonProperty("Series")
     Series[] series;
-    @JsonProperty("Err")
-    String error;
+
+    @JsonProperty("Messages")
+    String messages;
 
 
     public Series[] getSeries()
@@ -21,8 +22,8 @@ public class SeriesBatch
     }
 
 
-    public String getError()
+    public String getMessages()
     {
-        return error;
+        return messages;
     }
 }

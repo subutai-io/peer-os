@@ -1,4 +1,4 @@
-package io.subutai.core.hubadapter.impl;
+package io.subutai.core.hubmanager.impl.adapter;
 
 
 import java.io.ByteArrayOutputStream;

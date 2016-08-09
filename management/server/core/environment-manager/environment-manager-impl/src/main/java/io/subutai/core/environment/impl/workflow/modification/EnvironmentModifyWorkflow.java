@@ -1,7 +1,6 @@
 package io.subutai.core.environment.impl.workflow.modification;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.ContainerCloneSt
 import io.subutai.core.environment.impl.workflow.creation.steps.PrepareTemplatesStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterHostsStep;
 import io.subutai.core.environment.impl.workflow.creation.steps.RegisterSshStep;
+import io.subutai.core.environment.impl.workflow.modification.steps.ChangeQuotaStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.DestroyContainersStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.PEKGenerationStep;
 import io.subutai.core.environment.impl.workflow.modification.steps.ReservationStep;
@@ -25,9 +25,7 @@ import io.subutai.core.environment.impl.workflow.modification.steps.SetupP2PStep
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
-//TODO
-// 1 ) parallelize change container size step -extract a separate step
-// 2 ) skip destroy containers & change quota steps if not needed
+
 public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentModifyWorkflow.EnvironmentGrowingPhase>
 {
     private final PeerManager peerManager;
@@ -39,6 +37,11 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
     private final TrackerOperation operationTracker;
     private final EnvironmentManagerImpl environmentManager;
     private final SecurityManager securityManager;
+
+
+    private boolean hasQuotaModification = false;
+    private boolean hasContainerDestruction = false;
+    private boolean hasContainerCreation = false;
 
 
     //environment creation phases
@@ -74,7 +77,6 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
         this.operationTracker = operationTracker;
         this.defaultDomain = defaultDomain;
         this.environmentManager = environmentManager;
-        this.removedContainers = new ArrayList<>();
         this.removedContainers = removedContainers;
         this.changedContainers = new HashMap<>();
         this.changedContainers = changedContainers;
@@ -86,14 +88,19 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
     public EnvironmentGrowingPhase INIT()
     {
+        hasQuotaModification = !CollectionUtil.isMapEmpty( changedContainers );
+        hasContainerDestruction = !CollectionUtil.isCollectionEmpty( removedContainers );
+        hasContainerCreation = topology != null && !CollectionUtil.isCollectionEmpty( topology.getAllPeers() );
+
         operationTracker.addLog( "Initializing environment growth" );
 
         environment.setStatus( EnvironmentStatus.UNDER_MODIFICATION );
 
         saveEnvironment();
 
-        return changedContainers == null ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
-               EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA;
+        return hasQuotaModification ? EnvironmentGrowingPhase.MODIFY_CONTAINERS_QUOTA :
+               ( hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
+                 EnvironmentGrowingPhase.GENERATE_KEYS );
     }
 
 
@@ -103,14 +110,12 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            for ( Map.Entry<String, ContainerSize> entry : changedContainers.entrySet() )
-            {
-                environment.getContainerHostById( entry.getKey() ).setContainerSize( entry.getValue() );
-            }
+            new ChangeQuotaStep( environment, changedContainers, operationTracker ).execute();
 
             environment = ( EnvironmentImpl ) environmentManager.loadEnvironment( environment.getId() );
 
-            return EnvironmentGrowingPhase.DESTROY_CONTAINERS;
+            return hasContainerDestruction ? EnvironmentGrowingPhase.DESTROY_CONTAINERS :
+                   ( hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS : EnvironmentGrowingPhase.FINALIZE );
         }
         catch ( Exception e )
         {
@@ -127,9 +132,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
         try
         {
-            boolean deleteOnly = topology == null || CollectionUtil.isCollectionEmpty( topology.getAllPeers() );
-
-            if ( deleteOnly && environment.getContainerHosts().size() <= removedContainers.size() )
+            if ( !hasContainerCreation && environment.getContainerHosts().size() <= removedContainers.size() )
             {
                 throw new IllegalStateException(
                         "Environment will have 0 containers after modification. Please, destroy environment instead" );
@@ -141,7 +144,7 @@ public class EnvironmentModifyWorkflow extends CancellableWorkflow<EnvironmentMo
 
             saveEnvironment();
 
-            return deleteOnly ? EnvironmentGrowingPhase.FINALIZE : EnvironmentGrowingPhase.GENERATE_KEYS;
+            return hasContainerCreation ? EnvironmentGrowingPhase.GENERATE_KEYS : EnvironmentGrowingPhase.FINALIZE;
         }
         catch ( Exception e )
         {
