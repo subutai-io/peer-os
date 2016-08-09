@@ -19,7 +19,7 @@ import (
 )
 
 type snap struct {
-	Md5Sum  string   `json:"md5Sum"`
+	Id      string   `json:"id"`
 	Name    string   `json:"name"`
 	Owner   []string `json:"owner"`
 	Version string   `json:"version"`
@@ -47,11 +47,11 @@ func ifUpdateable(installed int) string {
 		if len(config.Template.Branch) != 0 && strings.HasSuffix(v.Name, config.Template.Arch+"-"+config.Template.Branch+".snap") && installed < available && ourCI(v.Owner) {
 			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
 			installed = available
-			hash = v.Md5Sum
+			hash = v.Id
 		} else if len(config.Template.Branch) == 0 && strings.HasSuffix(v.Name, config.Template.Arch+".snap") && installed < available && ourCI(v.Owner) {
 			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
 			installed = available
-			hash = v.Md5Sum
+			hash = v.Id
 		}
 	}
 
