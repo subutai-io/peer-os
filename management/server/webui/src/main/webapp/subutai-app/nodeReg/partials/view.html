@@ -1,40 +1,46 @@
 <div ng-controller="NodeRegCtrl as nodeRegCtrl">
-	<div class="b-workspace__header">
+  <div class="b-workspace__header">
 
-		<h1 class="b-title">Resource Hosts</h1>
-	</div>
-	<div class="b-workspace__content">
+    <h1 class="b-title">Resource Hosts</h1>
+  </div>
+  <div class="b-workspace__content">
 
-		<div class="b-data-table">
-			<table datatable="ng"
-				dt-options="nodeRegCtrl.dtOptions"
-				dt-column-defs="nodeRegCtrl.dtColumnDefs"
-				class="row-border hover">
-				<thead>
-					<tr>
-						<th>Status</th>
-						<th>Name</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-				<tr ng-repeat="clusterNode in nodeRegCtrl.nodes">
-					<td class="b-main-table__container-status">
-						<div
-							tooltips
-							tooltip-template="{{ clusterNode.status }}"
-							class="b-status-icon b-status-icon_{{ clusterNode.status }}">
-						</div>
-					</td>
-					<td>{{ clusterNode.hostname }}</td>
-					<td>
-						<button ng-if="clusterNode.status != 'APPROVED'" class="b-btn b-btn_green" ng-click="nodeRegCtrl.approveNode( clusterNode.id )">Approve</button>
-						<button ng-if="clusterNode.status == 'REQUESTED' || clusterNode.status == 'APPROVED'" class="b-btn b-btn_red" ng-click="nodeRegCtrl.unreg( clusterNode.id )">Reject</button>
-						<button ng-if="clusterNode.status == 'REJECTED'" class="b-btn b-btn_red" ng-click="nodeRegCtrl.remove( clusterNode.id )">Remove</button>
-					</td>
-				</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+    <div class="b-data-table">
+      <table datatable="ng"
+             dt-options="nodeRegCtrl.dtOptions"
+             dt-column-defs="nodeRegCtrl.dtColumnDefs"
+             class="row-border hover">
+        <thead>
+        <tr>
+          <th>Status</th>
+          <th>Name</th>
+          <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="clusterNode in nodeRegCtrl.nodes">
+          <td class="b-main-table__container-status">
+            <div
+                tooltips
+                tooltip-template="{{ clusterNode.status }}"
+                class="b-status-icon b-status-icon_{{ clusterNode.status }}">
+            </div>
+          </td>
+          <td>{{ clusterNode.hostname }}</td>
+          <td>
+            <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_green"
+                    ng-click="nodeRegCtrl.approve( clusterNode.id )">Approve
+            </button>
+            <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_red"
+                    ng-click="nodeRegCtrl.reject( clusterNode.id )">Reject
+            </button>
+            <button ng-if="clusterNode.status == 'APPROVED' || clusterNode.status == 'REJECTED'" class="b-btn b-btn_dark"
+                    ng-click="nodeRegCtrl.remove( clusterNode.id )">Remove
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
