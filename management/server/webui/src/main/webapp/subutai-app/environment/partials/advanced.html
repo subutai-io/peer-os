@@ -84,7 +84,7 @@
 						<li ng-repeat="resourceHost in advEnvCtrl.currentResourceHosts" 
 						ng-click="advEnvCtrl.addResource2Build(resourceHost.id, advEnvCtrl.currentPeer, $index)">
 							<span class="b-cloud-item-resource-name g-margin-bottom">
-								Resource Host {{$index + 1}}
+								Resource Host {{$index + 1}} <span ng-show="resourceHost.isManagement"> [MH]</span>
 							</span>
 							<div class="b-progress__cloud b-progress__cloud_rh">
 								<div class="g-margin-bottom">

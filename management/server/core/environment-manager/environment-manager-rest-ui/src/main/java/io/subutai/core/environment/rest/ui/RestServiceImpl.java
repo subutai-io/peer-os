@@ -758,8 +758,6 @@ public class RestServiceImpl implements RestService
     {
         List<Peer> peers = peerManager.getPeers();
 
-        String localId = peerManager.getLocalPeer().getId();
-
         ExecutorService taskExecutor = Executors.newFixedThreadPool( peers.size() );
 
         CompletionService<Boolean> taskCompletionService = getCompletionService( taskExecutor );
@@ -771,8 +769,7 @@ public class RestServiceImpl implements RestService
             for ( Peer peer : peers )
             {
                 taskCompletionService.submit( () -> {
-                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(),
-                            peer.getId().equals( localId ) );
+                    PeerDto peerDto = new PeerDto( peer.getId(), peer.getName(), peer.isOnline(), peer.isLocal() );
                     if ( peer.isOnline() )
                     {
                         Collection<ResourceHostMetric> collection = peer.getResourceHostMetrics().getResources();
@@ -783,7 +780,7 @@ public class RestServiceImpl implements RestService
                                     new ResourceHostDto( metric.getHostInfo().getId(), metric.getCpuModel(),
                                             metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
                                             metric.getAvailableRam().toString(), metric.getTotalSpace().toString(),
-                                            metric.getAvailableSpace().toString() ) );
+                                            metric.getAvailableSpace().toString(), metric.isManagement() ) );
                         }
                     }
 

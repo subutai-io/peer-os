@@ -35,8 +35,13 @@ public class ResourceHostMetric extends BaseMetric
     @JsonProperty( "Disk" )
     protected Disk disk;
 
+    @Expose
     @JsonProperty
     private Integer containersCount;
+
+    @Expose
+    @JsonProperty
+    private boolean management;
 
 
     public ResourceHostMetric()
@@ -153,5 +158,17 @@ public class ResourceHostMetric extends BaseMetric
         return String
                 .format( "%s %s, CPU used:%f, Free ram: %f, Available disk space: %f", super.toString(), getCpuModel(),
                         getUsedCpu(), getFreeRam(), getAvailableSpace() );
+    }
+
+
+    public void setManagement( final boolean management )
+    {
+        this.management = management;
+    }
+
+
+    public boolean isManagement()
+    {
+        return management;
     }
 }
