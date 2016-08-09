@@ -353,6 +353,7 @@ public class MonitorImpl implements Monitor, HostListener
             ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
             if ( m != null )
             {
+                resourceHostMetric.setManagement(resourceHost.isManagementHost());
                 resourceHostMetric.updateMetrics( m );
                 resourceHostMetric.setConnected( true );
             }
