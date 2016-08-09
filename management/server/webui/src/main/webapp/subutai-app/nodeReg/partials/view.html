@@ -26,7 +26,9 @@
                 class="b-status-icon b-status-icon_{{ clusterNode.status }}">
             </div>
           </td>
-          <td>{{ clusterNode.hostname }}</td>
+          <td>{{ clusterNode.hostname }}
+            <span ng-if="clusterNode.isManagement"> [MH]</span>
+          </td>
           <td>
             <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_green"
                     ng-click="nodeRegCtrl.approve( clusterNode.id )">Approve
@@ -34,7 +36,8 @@
             <button ng-if="clusterNode.status == 'REQUESTED'" class="b-btn b-btn_red"
                     ng-click="nodeRegCtrl.reject( clusterNode.id )">Reject
             </button>
-            <button ng-if="clusterNode.status == 'APPROVED' || clusterNode.status == 'REJECTED'" class="b-btn b-btn_dark"
+            <button ng-if="clusterNode.status == 'APPROVED' || clusterNode.status == 'REJECTED'"
+                    class="b-btn b-btn_dark"
                     ng-click="nodeRegCtrl.remove( clusterNode.id )">Remove
             </button>
           </td>
