@@ -77,7 +77,7 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 
 
     @Override
-    public Response unRegisterRequest( final String requestId )
+    public Response rejectRequest( final String requestId )
     {
         try
         {
