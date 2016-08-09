@@ -1,6 +1,8 @@
 package io.subutai.core.environment.rest.ui.entity;
 
-public class ResourceHostDto {
+
+public class ResourceHostDto
+{
     private String id;
     private String cpu;
     private String cpuAvailable;
@@ -8,8 +10,12 @@ public class ResourceHostDto {
     private String memoryAvailable;
     private String hdd;
     private String hddAvailable;
+    private boolean isManagement;
 
-    public ResourceHostDto(String id, String cpu, String cpuAvailable, String memory, String memoryAvailable, String hdd, String hddAvailable) {
+
+    public ResourceHostDto( String id, String cpu, String cpuAvailable, String memory, String memoryAvailable,
+                            String hdd, String hddAvailable, boolean isManagement )
+    {
         this.id = id;
         this.cpu = cpu;
         this.cpuAvailable = cpuAvailable;
@@ -17,61 +23,96 @@ public class ResourceHostDto {
         this.memoryAvailable = memoryAvailable;
         this.hdd = hdd;
         this.hddAvailable = hddAvailable;
+        this.isManagement = isManagement;
     }
 
-    public String getId() {
+
+    public String getId()
+    {
         return id;
     }
 
-    public void setId(String id) {
+
+    public void setId( String id )
+    {
         this.id = id;
     }
 
-    public String getCpu() {
+
+    public String getCpu()
+    {
         return cpu;
     }
 
-    public void setCpu(String cpu) {
+
+    public void setCpu( String cpu )
+    {
         this.cpu = cpu;
     }
 
-    public String getCpuAvailable() {
+
+    public String getCpuAvailable()
+    {
         return cpuAvailable;
     }
 
-    public void setCpuAvailable(String cpuAvailable) {
+
+    public void setCpuAvailable( String cpuAvailable )
+    {
         this.cpuAvailable = cpuAvailable;
     }
 
-    public String getMemory() {
+
+    public String getMemory()
+    {
         return memory;
     }
 
-    public void setMemory(String memory) {
+
+    public void setMemory( String memory )
+    {
         this.memory = memory;
     }
 
-    public String getMemoryAvailable() {
+
+    public String getMemoryAvailable()
+    {
         return memoryAvailable;
     }
 
-    public void setMemoryAvailable(String memoryAvailable) {
+
+    public void setMemoryAvailable( String memoryAvailable )
+    {
         this.memoryAvailable = memoryAvailable;
     }
 
-    public String getHdd() {
+
+    public String getHdd()
+    {
         return hdd;
     }
 
-    public void setHdd(String hdd) {
+
+    public void setHdd( String hdd )
+    {
         this.hdd = hdd;
     }
 
-    public String getHddAvailable() {
+
+    public String getHddAvailable()
+    {
         return hddAvailable;
     }
 
-    public void setHddAvailable(String hddAvailable) {
+
+    public void setHddAvailable( String hddAvailable )
+    {
         this.hddAvailable = hddAvailable;
+    }
+
+
+    public boolean isManagement()
+    {
+        return isManagement;
     }
 }

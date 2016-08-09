@@ -10,25 +10,21 @@ import io.subutai.core.registration.api.RegistrationStatus;
 
 public interface RequestedHost
 {
-    public String getId();
+    String getId();
 
-    public String getHostname();
+    String getHostname();
 
-    public Set<HostInterface> getNetHostInterfaces();
+    Set<HostInterface> getInterfaces();
 
-    public Set<ContainerInfo> getHostInfos();
+    Set<ContainerInfo> getHostInfos();
 
-    public HostArchitecture getArch();
+    HostArchitecture getArch();
 
-    public RegistrationStatus getStatus();
+    RegistrationStatus getStatus();
 
-    public String getPublicKey();
+    String getPublicKey();
 
-    public String getRestHook();
+    String getSecret();
 
-    public void setRestHook( String restHook );
-
-    public String getSecret();
-
-    public String getCert();
+    String getCert();
 }
