@@ -75,15 +75,6 @@ func verifyAuthor(p snap) bool {
 	return true
 }
 
-func ourCI(owners []string) bool {
-	for _, v := range owners {
-		if v == "jenkins" {
-			return true
-		}
-	}
-	return false
-}
-
 func getInstalled() string {
 	f, err := ioutil.ReadFile(config.Agent.AppPrefix + "/meta/package.yaml")
 	if !log.Check(log.DebugLevel, "Reading file package.yaml", err) {
@@ -100,9 +91,9 @@ func getInstalled() string {
 	return "0"
 }
 
-func upgradeRh(packet string) {
+func upgradeRh(hash string) {
 	log.Info("Updating Resource host")
-	file, err := os.Create("/tmp/" + packet)
+	file, err := os.Create("/tmp/" + hash)
 	log.Check(log.FatalLevel, "Creating update file", err)
 	defer file.Close()
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
@@ -110,8 +101,8 @@ func upgradeRh(packet string) {
 	if !config.Cdn.Allowinsecure {
 		client = &http.Client{}
 	}
-	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?id=" + packet)
-	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?id="+packet, err)
+	resp, err := client.Get("https://" + config.Cdn.Url + ":" + config.Cdn.Sslport + "/kurjun/rest/file/get?id=" + hash)
+	log.Check(log.FatalLevel, "GET: https://"+config.Cdn.Url+":"+config.Cdn.Sslport+"/kurjun/rest/file/get?id="+hash, err)
 	defer resp.Body.Close()
 	log.Info("Downloading snap package")
 	bar := pb.New(int(resp.ContentLength)).SetUnits(pb.U_BYTES)
@@ -120,10 +111,14 @@ func upgradeRh(packet string) {
 
 	_, err = io.Copy(file, rd)
 	log.Check(log.FatalLevel, "Writing response to file", err)
+	if hash != md5sum("/tmp/"+hash) {
+		log.Error("Hash does not match")
+	}
 
-	log.Check(log.FatalLevel, "Installing update /tmp/"+packet,
-		exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+packet).Run())
-	log.Check(log.FatalLevel, "Removing update file /tmp/"+packet, os.Remove("/tmp/"+packet))
+	log.Info("Installing update")
+	log.Check(log.FatalLevel, "Installing update /tmp/"+hash,
+		exec.Command("snappy", "install", "--allow-unauthenticated", "/tmp/"+hash).Run())
+	log.Check(log.FatalLevel, "Removing update file /tmp/"+hash, os.Remove("/tmp/"+hash))
 
 }
 
