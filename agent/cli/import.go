@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"bytes"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -15,8 +14,6 @@ import (
 	"github.com/cheggaaa/pb"
 	"github.com/nightlyone/lockfile"
 	"github.com/pivotal-golang/archiver/extractor"
-	"golang.org/x/crypto/openpgp"
-	"golang.org/x/crypto/openpgp/clearsign"
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
@@ -164,29 +161,6 @@ func download(t templ, kurjun *http.Client, token string) bool {
 	return false
 }
 
-func getOwnerKey(owner string) string {
-	response, err := http.Get(config.Cdn.Kurjun + "/auth/key?user=" + owner)
-	log.Check(log.FatalLevel, "Getting owner public key", err)
-	defer response.Body.Close()
-	key, err := ioutil.ReadAll(response.Body)
-	log.Check(log.FatalLevel, "Reading key body", err)
-	return string(key)
-}
-
-func verifySignature(key, signature string) string {
-	entity, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(key))
-	log.Check(log.WarnLevel, "Reading user public key", err)
-
-	if block, _ := clearsign.Decode([]byte(signature)); block != nil {
-		_, err = openpgp.CheckDetachedSignature(entity, bytes.NewBuffer(block.Bytes), block.ArmoredSignature.Body)
-		if log.Check(log.ErrorLevel, "Checking signature", err) {
-			return ""
-		}
-		return string(block.Bytes)
-	}
-	return ""
-}
-
 func idToName(id string, kurjun *http.Client, token string) string {
 	var meta metainfo
 
@@ -296,11 +270,12 @@ func LxcImport(name, version, token string) {
 
 	for owner, signature := range t.signature {
 		// if v.Author == "public" || v.Author == "subutai" || v.Author == "jenkins" {
-		signedhash := verifySignature(getOwnerKey(owner), signature)
+		signedhash := gpg.VerifySignature(gpg.KurjunUserPK(owner), signature)
 		if t.id != signedhash {
 			log.Error("Signature does not match with template hash")
 		}
 		log.Info("Digital signature and file integrity verified")
+		log.Debug("Signature belongs to " + owner)
 		break
 		// }
 	}

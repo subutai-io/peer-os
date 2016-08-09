@@ -15,18 +15,21 @@ import (
 
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
+	"github.com/subutai-io/base/agent/lib/gpg"
 	"github.com/subutai-io/base/agent/log"
 )
 
 type snap struct {
-	Id      string   `json:"id"`
-	Name    string   `json:"name"`
-	Owner   []string `json:"owner"`
-	Version string   `json:"version"`
+	Id        string            `json:"id"`
+	Name      string            `json:"name"`
+	Owner     []string          `json:"owner"`
+	Version   string            `json:"version"`
+	Signature map[string]string `json:"signature"`
 }
 
 func ifUpdateable(installed int) string {
 	var update []snap
+	var hash string
 
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
@@ -40,15 +43,14 @@ func ifUpdateable(installed int) string {
 	log.Check(log.FatalLevel, "Reading response", err)
 	log.Check(log.FatalLevel, "Parsing file list", json.Unmarshal(js, &update))
 
-	hash := ""
 	for _, v := range update {
 		available, err := strconv.Atoi(v.Version)
 		log.Check(log.ErrorLevel, "Matching update "+v.Version, err)
-		if len(config.Template.Branch) != 0 && strings.HasSuffix(v.Name, config.Template.Arch+"-"+config.Template.Branch+".snap") && installed < available && ourCI(v.Owner) {
+		if len(config.Template.Branch) != 0 && strings.HasSuffix(v.Name, config.Template.Arch+"-"+config.Template.Branch+".snap") && installed < available && verifyAuthor(v) {
 			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
 			installed = available
 			hash = v.Id
-		} else if len(config.Template.Branch) == 0 && strings.HasSuffix(v.Name, config.Template.Arch+".snap") && installed < available && ourCI(v.Owner) {
+		} else if len(config.Template.Branch) == 0 && strings.HasSuffix(v.Name, config.Template.Arch+".snap") && installed < available && verifyAuthor(v) {
 			log.Debug("Found newer snap: " + v.Name + ", " + v.Version)
 			installed = available
 			hash = v.Id
@@ -57,6 +59,20 @@ func ifUpdateable(installed int) string {
 
 	log.Debug("Latest version: " + strconv.Itoa(installed))
 	return hash
+}
+
+func verifyAuthor(p snap) bool {
+	if _, ok := p.Signature["jenkins"]; !ok {
+		log.Debug("Update is not owned by Subutai team, ignoring")
+		return false
+	}
+	signedhash := gpg.VerifySignature(gpg.KurjunUserPK("jenkins"), p.Signature["jenkins"])
+	if p.Id != signedhash {
+		log.Debug("Signature does not match with update hash")
+		return false
+	}
+	log.Debug("Digital signature and file integrity verified")
+	return true
 }
 
 func ourCI(owners []string) bool {

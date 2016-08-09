@@ -10,6 +10,9 @@ import (
 	"os/exec"
 	"strings"
 
+	"golang.org/x/crypto/openpgp"
+	"golang.org/x/crypto/openpgp/clearsign"
+
 	"github.com/subutai-io/base/agent/agent/utils"
 	"github.com/subutai-io/base/agent/config"
 	"github.com/subutai-io/base/agent/lib/container"
@@ -243,4 +246,28 @@ func ParsePem(cert string) (crt, key []byte) {
 		crt = bytes.Replace(f, key, []byte(""), -1)
 	}
 	return crt, key
+}
+
+func KurjunUserPK(owner string) string {
+	config.CheckKurjun()
+	response, err := http.Get(config.Cdn.Kurjun + "/auth/key?user=" + owner)
+	log.Check(log.FatalLevel, "Getting owner public key", err)
+	defer response.Body.Close()
+	key, err := ioutil.ReadAll(response.Body)
+	log.Check(log.FatalLevel, "Reading key body", err)
+	return string(key)
+}
+
+func VerifySignature(key, signature string) string {
+	entity, err := openpgp.ReadArmoredKeyRing(bytes.NewBufferString(key))
+	log.Check(log.WarnLevel, "Reading user public key", err)
+
+	if block, _ := clearsign.Decode([]byte(signature)); block != nil {
+		_, err = openpgp.CheckDetachedSignature(entity, bytes.NewBuffer(block.Bytes), block.ArmoredSignature.Body)
+		if log.Check(log.ErrorLevel, "Checking signature", err) {
+			return ""
+		}
+		return string(block.Bytes)
+	}
+	return ""
 }
