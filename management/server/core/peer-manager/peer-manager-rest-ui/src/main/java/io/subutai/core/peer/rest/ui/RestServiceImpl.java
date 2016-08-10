@@ -237,6 +237,29 @@ public class RestServiceImpl implements RestService
 
 
     @Override
+    public Response renamePeer( final String peerId, final String name )
+    {
+        try
+        {
+            peerManager.setName( peerId, name );
+        }
+        catch ( Exception e )
+        {
+            if ( e.getClass() == AccessControlException.class )
+            {
+                LOGGER.error( e.getMessage() );
+                return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).
+                        entity( JsonUtil.GSON.toJson( "You don't have permission to perform this operation" ) ).build();
+            }
+
+            return Response.status( Response.Status.BAD_REQUEST ).entity( e.getMessage() ).build();
+        }
+
+        return Response.ok().build();
+    }
+
+
+    @Override
     public Response unregisterForRegistrationRequest( final String peerId, Boolean force )
     {
         List<RegistrationData> dataList = peerManager.getRegistrationRequests();
