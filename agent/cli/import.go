@@ -37,11 +37,11 @@ type templ struct {
 }
 
 type metainfo struct {
-	Name   string            `json:"name"`
-	ID     string            `json:"id"`
-	Owner  []string          `json:"owner"`
-	Md5Sum string            `json:"md5Sum"`
-	Signs  map[string]string `json:"signature"`
+	ID    string            `json:"id"`
+	Name  string            `json:"name"`
+	Owner []string          `json:"owner"`
+	File  string            `json:"filename"`
+	Signs map[string]string `json:"signature"`
 }
 
 func templId(t *templ, kurjun *http.Client, token string) {
@@ -77,8 +77,11 @@ func templId(t *templ, kurjun *http.Client, token string) {
 		log.Info("Found: " + t.name + " -> " + meta.Name)
 		t.name = meta.Name
 	}
+	if len(t.owner) == 0 {
+		t.owner = meta.Owner
+	}
 	t.id = meta.ID
-	t.owner = meta.Owner
+	t.file = meta.File
 	t.signature = meta.Signs
 }
 
@@ -127,8 +130,13 @@ func download(t templ, kurjun *http.Client, token string) bool {
 	defer out.Close()
 	log.Info("Downloading " + t.name)
 
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id + "&token=" + token)
-	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id+"&token="+token, err)
+	url := config.Cdn.Kurjun + "/template/download?id=" + t.id
+	if len(t.owner) > 0 {
+		url = config.Cdn.Kurjun + "/template/" + t.owner[0] + "/" + t.file
+	}
+	response, err := kurjun.Get(url)
+	log.Check(log.FatalLevel, "Getting "+url, err)
+
 	defer response.Body.Close()
 	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 	bar.Start()
@@ -211,20 +219,25 @@ func LxcImport(name, version, token string) {
 		name = idToName(id[1], kurjun, token)
 	}
 
+	var t templ
+
+	t.name = name
+	if line := strings.Split(t.name, "/"); len(line) > 1 {
+		t.name = line[1]
+		t.owner = append(t.owner, line[0])
+	}
+
 	log.Info("Importing " + name)
-	for !lockSubutai(name + ".import") {
+	for !lockSubutai(t.name + ".import") {
 		time.Sleep(time.Second * 1)
 	}
 	defer unlockSubutai()
 
-	if container.IsContainer(name) {
-		log.Info(name + " instance exist")
+	if container.IsContainer(t.name) {
+		log.Info(t.name + " instance exist")
 		return
 	}
 
-	var t templ
-
-	t.name = name
 	t.version = config.Template.Version
 	t.branch = config.Template.Branch
 	if len(version) != 0 {
