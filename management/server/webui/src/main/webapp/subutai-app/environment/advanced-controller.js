@@ -336,6 +336,21 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     //add resource host
     function addResource2Build(currentResource, peerId, index) {
+
+        var isManagement = false;
+
+        for (var i in vm.currentResourceHosts)
+        {
+            var rh  = vm.currentResourceHosts[i];
+
+            if(rh.id == currentResource && rh.isManagement){
+
+               isManagement = true;
+
+               break;
+            }
+        }
+
         var posX = calculatePeerPos();
 
         if (PEER_MAP[peerId] !== undefined) {
@@ -365,7 +380,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             children: 0,
             grid: [],
             gridSize: {size: 2},
-            'resourceHostName': 'RH' + (index + 1),
+            'resourceHostName': 'RH' + (index + 1) + (isManagement ? " [MH]" : ""),
             'peerName': 'Peer ' + (vm.currentPeerIndex + 1),
             'addClass': 'b-resource-host_last'
         });
