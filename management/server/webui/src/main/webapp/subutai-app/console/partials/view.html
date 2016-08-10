@@ -66,7 +66,7 @@
 						ng-change="consoleViewCtrl.setConsole(consoleViewCtrl.selectedPeer)">
 						<option value="">Select Host</option>
 						<option ng-repeat="host in consoleViewCtrl.hosts" value="{{ host.id }}">
-							{{ host.hostname }} ({{ host.instance }}, {{ host.arch }})
+							{{ host.hostname }} ({{ host.instanceType }}, {{ host.hostArchitecture }}) {{host.isManagement ? " [MH]" :""}}
 						</option>
 					</select>
 					<div class="clear"></div>

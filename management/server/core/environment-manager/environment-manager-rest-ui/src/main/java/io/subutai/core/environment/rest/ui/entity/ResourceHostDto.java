@@ -1,6 +1,10 @@
 package io.subutai.core.environment.rest.ui.entity;
 
 
+import io.subutai.common.host.HostArchitecture;
+import io.subutai.common.host.InstanceType;
+
+
 public class ResourceHostDto
 {
     private String id;
@@ -11,6 +15,20 @@ public class ResourceHostDto
     private String hdd;
     private String hddAvailable;
     private boolean isManagement;
+    private String hostname;
+    private InstanceType instanceType;
+    private HostArchitecture hostArchitecture;
+
+
+    public ResourceHostDto( final String id, final String hostname, final InstanceType instanceType,
+                            final boolean isManagement, final HostArchitecture hostArchitecture )
+    {
+        this.id = id;
+        this.hostname = hostname;
+        this.instanceType = instanceType;
+        this.isManagement = isManagement;
+        this.hostArchitecture = hostArchitecture;
+    }
 
 
     public ResourceHostDto( String id, String cpu, String cpuAvailable, String memory, String memoryAvailable,

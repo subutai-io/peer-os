@@ -28,6 +28,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
@@ -46,6 +47,7 @@ import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
@@ -811,6 +813,31 @@ public class RestServiceImpl implements RestService
 
 
         return Response.ok().entity( JsonUtil.toJson( peerHostMap ) ).build();
+    }
+
+
+    @Override
+    public Response getResourceHosts()
+    {
+        List<ResourceHostDto> resourceHostDtos = Lists.newArrayList();
+        try
+        {
+            LocalPeer localPeer = peerManager.getLocalPeer();
+
+            Collection<ResourceHostMetric> collection = localPeer.getResourceHostMetrics().getResources();
+
+            for ( ResourceHostMetric metric : collection.toArray( new ResourceHostMetric[collection.size()] ) )
+            {
+                resourceHostDtos.add( new ResourceHostDto( metric.getHostInfo().getId(), metric.getHostName(),
+                        metric.getInstanceType(), metric.isManagement(), metric.getHostInfo().getArch() ) );
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.error( "Resource hosts are empty", e );
+        }
+
+        return Response.ok().entity( JsonUtil.toJson( resourceHostDtos ) ).build();
     }
 
 

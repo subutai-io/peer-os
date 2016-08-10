@@ -37,7 +37,6 @@ import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.dao.DaoManager;
 import io.subutai.common.exception.DaoException;
-import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.host.ResourceHostInfoModel;
 import io.subutai.common.metric.Alert;
@@ -336,7 +335,10 @@ public class MonitorImpl implements Monitor, HostListener
         for ( ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
             final ResourceHostMetric m = getResourceHostMetric( resourceHost );
-            result.addMetric( m );
+            if ( m != null )
+            {
+                result.addMetric( m );
+            }
         }
 
         return result;
@@ -345,22 +347,26 @@ public class MonitorImpl implements Monitor, HostListener
 
     private ResourceHostMetric getResourceHostMetric( final ResourceHost resourceHost )
     {
-        ResourceHostMetric resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId() );
+        ResourceHostMetric resourceHostMetric = null;
+
         try
         {
-            HostInfo hostInfo = hostRegistry.getHostInfoById( resourceHost.getId() );
-            resourceHostMetric.setHostInfo( new ResourceHostInfoModel( hostInfo ) );
+            ResourceHostInfo hostInfo = hostRegistry.getResourceHostInfoById( resourceHost.getId() );
+            ResourceHostInfoModel resourceHostInfoModel = new ResourceHostInfoModel( hostInfo );
+            resourceHostMetric = new ResourceHostMetric( peerManager.getLocalPeer().getId(), resourceHostInfoModel );
+            resourceHostMetric.setManagement( resourceHost.isManagementHost() );
+            resourceHostMetric.setConnected( true );
+
             ResourceHostMetric m = fetchResourceHostMetric( resourceHost );
             if ( m != null )
             {
-                resourceHostMetric.setManagement(resourceHost.isManagementHost());
                 resourceHostMetric.updateMetrics( m );
-                resourceHostMetric.setConnected( true );
             }
         }
         catch ( Exception ignore )
         {
         }
+
         return resourceHostMetric;
     }
 
