@@ -23,7 +23,8 @@ import (
 )
 
 var (
-	lock lockfile.Lockfile
+	lock   lockfile.Lockfile
+	owners = []string{"subutai", "public", "jenkins", "docker", ""}
 )
 
 type templ struct {
@@ -77,9 +78,6 @@ func templId(t *templ, kurjun *http.Client, token string) {
 		log.Info("Found: " + t.name + " -> " + meta.Name)
 		t.name = meta.Name
 	}
-	if len(t.owner) == 0 {
-		t.owner = meta.Owner
-	}
 	t.id = meta.ID
 	t.file = meta.File
 	t.signature = meta.Signs
@@ -128,7 +126,6 @@ func download(t templ, kurjun *http.Client, token string) bool {
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 	log.Check(log.FatalLevel, "Creating file "+t.file, err)
 	defer out.Close()
-	log.Info("Downloading " + t.name)
 
 	url := config.Cdn.Kurjun + "/template/download?id=" + t.id
 	if len(t.owner) > 0 {
@@ -152,8 +149,8 @@ func download(t templ, kurjun *http.Client, token string) bool {
 		out, err = os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 		log.Check(log.FatalLevel, "Creating file "+t.file, err)
 		defer out.Close()
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.id + "&token=" + token)
-		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.id+"&token="+token, err)
+		response, err = kurjun.Get(url)
+		log.Check(log.FatalLevel, "Getting "+url, err)
 		defer response.Body.Close()
 		bar = pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 		bar.Start()
@@ -165,7 +162,6 @@ func download(t templ, kurjun *http.Client, token string) bool {
 	if id := strings.Split(t.id, "."); len(id) > 0 && id[len(id)-1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
 		return true
 	}
-	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return false
 }
 
@@ -293,9 +289,26 @@ func LxcImport(name, version, token string) {
 		// }
 	}
 
-	if !checkLocal(t) && !download(t, kurjun, token) {
-		log.Error(t.name + " template not found")
+	if !checkLocal(t) {
+		log.Info("Downloading " + t.name)
+		downloaded := false
+		if len(t.owner) == 0 {
+			for _, owner := range owners {
+				if t.owner = []string{owner}; len(owner) == 0 {
+					t.owner = []string{}
+				}
+				if download(t, kurjun, token) {
+					downloaded = true
+					break
+				}
+			}
+		}
+		if !downloaded && !download(t, kurjun, token) {
+			log.Error("Failed to download template " + t.name)
+		}
 	}
+
+	time.Sleep(time.Millisecond * 200) // Added sleep to prevent output collision with progress bar.
 
 	log.Info("Unpacking template " + t.name)
 	tgz := extractor.NewTgz()
