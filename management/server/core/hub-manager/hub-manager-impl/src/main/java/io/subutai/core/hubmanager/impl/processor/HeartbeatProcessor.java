@@ -65,7 +65,14 @@ public class HeartbeatProcessor implements Runnable
                 try
                 {
                     log.warn( "Shutting down hub manager" );
-                    //TODO send "i-am-off" heartbeat here
+                    String url = path+"shutdown-hook";
+
+                    RestResult<Object> restResult = restClient.post( url, null );
+
+                    if ( restResult.isSuccess() )
+                    {
+                        log.info( "Shutdown hook successfully sent to Hub" );
+                    }
                 }
                 catch ( Exception e )
                 {
