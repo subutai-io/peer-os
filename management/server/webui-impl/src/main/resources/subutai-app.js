@@ -11,7 +11,8 @@ var app = angular.module('subutai-app', [
     'nvd3',
     'cfp.loadingBar',
     'uiSwitch',
-    'ngFileUpload'
+    'ngFileUpload',
+    'subutai.nav-menu'
 ])
     .config(routesConf)
 
@@ -76,8 +77,6 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
 
             localStorage.setItem('currentUserPermissions', perms);
             vm.currentUser = localStorage.getItem('currentUser');
-
-            location.reload();
 		});
 	}
 
