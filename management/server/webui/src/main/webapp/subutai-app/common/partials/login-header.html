@@ -132,11 +132,18 @@
 								   tabindex=2
 								   ng-model="currentUserCtrl.hub.password">
 						</div>
+						<div class="b-form-group">
+							<div class="g-text g-margin-bottom-half">Peer name</div>
+							<input type="text"
+										 class="b-form-input b-form-input_full"
+										 tabindex=3
+										 ng-model="currentUserCtrl.hub.peerName">
+						</div>
 					</div>
 					<div class="footer">
 						<a href="https://hub.subut.ai" target="_blank" tabindex=3 class="b-form-label">Sign Up</a>
 						<button type="submit" class="b-btn b-btn_green g-right" tabindex=4
-								ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password">
+								ng-disabled="!currentUserCtrl.hub.login || !currentUserCtrl.hub.password || !currentUserCtrl.hub.peerName ">
 							Register
 						</button>
 					</div>
