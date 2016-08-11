@@ -172,10 +172,6 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 					// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 					// @todo remove when implement on backend
 					var container = vm.environments[i].containers[j];
-                    var contName = container.hostname;
-                    contName = contName.substring(0, contName.lastIndexOf("-"));
-                    contName = contName.substring(0, contName.lastIndexOf("-"));
-					container.shortName = contName;
 					var remoteProxyContainer = !container.local && container.dataSource == "hub";
 
 					if ( !remoteProxyContainer )
@@ -286,10 +282,19 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 
 		vm.editingContainer = container;
 
+		vm.editingContainer.containerName = getContainerNameFromHostName( container.hostname );
+
 		ngDialog.open({
 			template: 'subutai-app/containers/partials/changeName.html',
 			scope: $scope,
 			className: 'b-build-environment-info'
 		});
+	}
+
+	function getContainerNameFromHostName( name )
+	{
+		var regex = /-(\d)*-(\d)*$/;
+
+		return name.replace( regex, "" );
 	}
 }

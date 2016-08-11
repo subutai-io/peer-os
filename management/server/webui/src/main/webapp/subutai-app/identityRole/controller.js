@@ -20,7 +20,7 @@ function IdentityRoleCtrl($scope, identitySrv, DTOptionsBuilder, DTColumnBuilder
 	vm.role2Add = {}
 
 	vm.rolesTypes = {
-		1: "Systemt",
+		1: "System",
 		2: "Regular",
 	};
 
