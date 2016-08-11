@@ -779,10 +779,11 @@ public class RestServiceImpl implements RestService
                                 .toArray( new ResourceHostMetric[collection.size()] ) )
                         {
                             peerDto.addResourceHostDto(
-                                    new ResourceHostDto( metric.getHostInfo().getId(), metric.getCpuModel(),
-                                            metric.getUsedCpu().toString(), metric.getTotalRam().toString(),
-                                            metric.getAvailableRam().toString(), metric.getTotalSpace().toString(),
-                                            metric.getAvailableSpace().toString(), metric.isManagement() ) );
+                                    new ResourceHostDto( metric.getHostInfo().getId(), metric.getHostName(),
+                                            metric.getCpuModel(), metric.getUsedCpu().toString(),
+                                            metric.getTotalRam().toString(), metric.getAvailableRam().toString(),
+                                            metric.getTotalSpace().toString(), metric.getAvailableSpace().toString(),
+                                            metric.isManagement() ) );
                         }
                     }
 
