@@ -17,8 +17,6 @@ import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.metric.rest.ui.pojo.P2PInfoPojo;
 
-import static io.subutai.common.util.JsonUtil.GSON;
-
 
 public class RestServiceImpl implements RestService
 {
@@ -72,7 +70,9 @@ public class RestServiceImpl implements RestService
 
             if ( host instanceof EnvironmentContainerHost )
             {
-                return Response.ok( host.getPeer().getHistoricalMetrics( host.getHostname(), start, current ) ).build();
+                return Response.ok( host.getPeer()
+                                        .getHistoricalMetrics( ( ( EnvironmentContainerHost ) host ).getContainerId(),
+                                                start, current ) ).build();
             }
 
             return Response.ok( monitor.getHistoricalMetrics( host, start, current ) ).build();

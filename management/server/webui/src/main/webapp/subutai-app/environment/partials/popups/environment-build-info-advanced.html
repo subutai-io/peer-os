@@ -48,6 +48,10 @@
 				</div>
 			</div>
 
+			<div class="g-margin-bottom" ng-if="advEnvCtrl.numChangedContainers">
+				{{ advEnvCtrl.numChangedContainers }} containers are about to change sizes
+			</div>
+
 			<div ng-if="advEnvCtrl.containers2Build.length > 0">
 				<div ng-if="advEnvCtrl.editingEnv" class="g-text g-margin-bottom-half">Following containers will be added to your environment</div>
 				<div ng-if="!advEnvCtrl.editingEnv" class="g-text g-margin-bottom-half">Create environment with following containers</div>

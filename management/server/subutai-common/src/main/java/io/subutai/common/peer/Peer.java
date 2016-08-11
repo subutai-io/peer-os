@@ -27,8 +27,9 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
@@ -47,52 +48,52 @@ public interface Peer extends RelationLink
     /**
      * Returns id of peer
      */
-    public String getId();
+    String getId();
 
     /**
      * Returns name of peer
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns owner id of peer
      */
-    public String getOwnerId();
+    String getOwnerId();
 
     /**
      * Returns metadata object of peer
      */
-    public PeerInfo getPeerInfo();
+    PeerInfo getPeerInfo();
 
     /**
      * Creates environment container group on the peer
      *
      * @param request - container creation request
      */
-    public CreateEnvironmentContainersResponse createEnvironmentContainers(
-            final CreateEnvironmentContainersRequest request ) throws PeerException;
+    CreateEnvironmentContainersResponse createEnvironmentContainers( final CreateEnvironmentContainersRequest request )
+            throws PeerException;
 
 
     /**
      * Start container on the peer
      */
-    public void startContainer( ContainerId containerId ) throws PeerException;
+    void startContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Stops container on the peer
      */
-    public void stopContainer( ContainerId containerId ) throws PeerException;
+    void stopContainer( ContainerId containerId ) throws PeerException;
 
     /**
      * Destroys container on the peer
      */
-    public void destroyContainer( ContainerId containerId ) throws PeerException;
+    void destroyContainer( ContainerId containerId ) throws PeerException;
 
 
     /**
      * Returns true of the host is connected, false otherwise
      */
-    public boolean isConnected( HostId hostId );
+    boolean isConnected( HostId hostId );
 
     /**
      * Executes command on the container
@@ -100,7 +101,7 @@ public interface Peer extends RelationLink
      * @param requestBuilder - command
      * @param host - target host
      */
-    public CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
+    CommandResult execute( RequestBuilder requestBuilder, Host host ) throws CommandException;
 
     /**
      * Executes command on the container
@@ -109,8 +110,7 @@ public interface Peer extends RelationLink
      * @param host - target host
      * @param callback - callback to trigger on each response chunk to the command
      */
-    public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
-            throws CommandException;
+    CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback ) throws CommandException;
 
     /**
      * Executes command on the container asynchronously
@@ -119,7 +119,7 @@ public interface Peer extends RelationLink
      * @param host - target host
      * @param callback - callback to trigger on each response chunk to the command
      */
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
+    void executeAsync( final RequestBuilder requestBuilder, final Host host, final CommandCallback callback )
             throws CommandException;
 
     /**
@@ -128,23 +128,23 @@ public interface Peer extends RelationLink
      * @param requestBuilder - command
      * @param host - target host
      */
-    public void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
+    void executeAsync( final RequestBuilder requestBuilder, final Host host ) throws CommandException;
 
     /**
      * Returns true if this a local peer, false otherwise
      */
-    public boolean isLocal();
+    boolean isLocal();
 
 
     /**
      * Returns template by name
      */
-    public TemplateKurjun getTemplate( String templateName ) throws PeerException;
+    Template getTemplate( String templateName ) throws PeerException;
 
     /**
      * Returns true of the peer is reachable online, false otherwise
      */
-    public boolean isOnline();
+    boolean isOnline();
 
     /**
      * Sends message to the peer
@@ -158,8 +158,8 @@ public interface Peer extends RelationLink
      *
      * @return - response from the recipient
      */
-    public <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType,
-                                 int responseTimeout, Map<String, String> headers ) throws PeerException;
+    <T, V> V sendRequest( T request, String recipient, int requestTimeout, Class<V> responseType, int responseTimeout,
+                          Map<String, String> headers ) throws PeerException;
 
     /**
      * Sends message to the peer
@@ -169,18 +169,18 @@ public interface Peer extends RelationLink
      * @param requestTimeout - message timeout
      * @param headers - map of http headers to pass with message
      */
-    public <T> void sendRequest( T request, String recipient, int requestTimeout, Map<String, String> headers )
+    <T> void sendRequest( T request, String recipient, int requestTimeout, Map<String, String> headers )
             throws PeerException;
 
     /**
      * Returns state of container
      */
-    public ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
+    ContainerHostState getContainerState( ContainerId containerId ) throws PeerException;
 
     /**
      * Returns set of container information of the environment
      */
-    public Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
+    Containers getEnvironmentContainers( EnvironmentId environmentId ) throws PeerException;
 
     //******** Quota functions ***********
 
@@ -192,7 +192,7 @@ public interface Peer extends RelationLink
      * @param containerId - target container
      * @param pid - pid of process
      */
-    public ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
+    ProcessResourceUsage getProcessResourceUsage( final ContainerId containerId, int pid ) throws PeerException;
 
 
     //networking
@@ -211,13 +211,13 @@ public interface Peer extends RelationLink
     /**
      * Sets up tunnels on the local peer to the specified remote peers
      */
-    public void setupTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
+    void setupTunnels( P2pIps p2pIps, EnvironmentId environmentId ) throws PeerException;
 
 
     /* **************************************************************
      *
      */
-    public PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto ) throws PeerException;
+    PublicKeyContainer createPeerEnvironmentKeyPair( RelationLinkDto linkDto ) throws PeerException;
 
     void updatePeerEnvironmentPubKey( EnvironmentId environmentId, PGPPublicKeyRing publicKeyRing )
             throws PeerException;
@@ -259,7 +259,9 @@ public interface Peer extends RelationLink
 
     void alert( AlertEvent alert ) throws PeerException;
 
-    String getHistoricalMetrics( String hostName, Date startTime, Date endTime ) throws PeerException;
+    String getHistoricalMetrics( HostId hostId, Date startTime, Date endTime ) throws PeerException;
+
+    HistoricalMetrics getMetricsSeries( HostId hostId, Date startTime, Date endTime ) throws PeerException;
 
     void addPeerEnvironmentPubKey( String keyId, PGPPublicKeyRing pek ) throws PeerException;
 

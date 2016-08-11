@@ -32,7 +32,7 @@ public class RequestedHostImplTest
     {
         requestedHost =
                 new RequestedHostImpl( uuid.toString(), "hostname", HostArchitecture.AMD64, "secret", "publicKey",
-                        "restHook", RegistrationStatus.REQUESTED, new HashSet<HostInterface>() );
+                        RegistrationStatus.REQUESTED, new HashSet<HostInterface>() );
     }
 
 
@@ -53,15 +53,15 @@ public class RequestedHostImplTest
     @Test
     public void testGetInterfaces() throws Exception
     {
-        assertArrayEquals( Sets.newHashSet().toArray(), requestedHost.getNetHostInterfaces().toArray() );
+        assertArrayEquals( Sets.newHashSet().toArray(), requestedHost.getInterfaces().toArray() );
     }
 
 
     @Test
     public void testSetInterfaces() throws Exception
     {
-        requestedHost.setNetHostInterfaces( Sets.newHashSet( mock( HostInterface.class ) ) );
-        assertEquals( 1, requestedHost.getNetHostInterfaces().size() );
+        requestedHost.setInterfaces( Sets.newHashSet( mock( HostInterface.class ) ) );
+        assertEquals( 1, requestedHost.getInterfaces().size() );
     }
 
 
@@ -76,13 +76,6 @@ public class RequestedHostImplTest
     public void testGetPublicKey() throws Exception
     {
         assertEquals( "publicKey", requestedHost.getPublicKey() );
-    }
-
-
-    @Test
-    public void testGetRestHook() throws Exception
-    {
-        assertEquals( "restHook", requestedHost.getRestHook() );
     }
 
 

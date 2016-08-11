@@ -6,7 +6,7 @@
                                http://www.w3.org/2001/XMLSchema-instance http://www.w3.org/2001/XMLSchema-instance
                                http://aries.apache.org/xmlns/jpa/v1.0.0 http://aries.apache.org/xmlns/jpa/v1.0.0">
 
-  <reference id="hubAdapter" interface="io.subutai.core.hubadapter.api.HubAdapter" />
+  <reference id="hubAdapter" interface="io.subutai.hub.share.common.HubAdapter" />
 
   <bean id="pluginDAO" init-method="init" class="io.subutai.core.plugincommon.impl.PluginDAOImpl" activation="eager">
     <jpa:unit unitname="pluginsPUnit" property="entityManagerFactory" />

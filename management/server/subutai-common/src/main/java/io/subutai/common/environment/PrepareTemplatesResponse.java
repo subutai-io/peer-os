@@ -24,13 +24,13 @@ public class PrepareTemplatesResponse
             if ( task.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
             {
                 this.messages.add( String
-                        .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getId(),
+                        .format( "Task (%s) succeeded on host %s [%s]", task.name(), task.getHost().getHostname(),
                                 task.getDurationFormatted() ) );
             }
             else if ( task.getTaskState() == HostUtil.Task.TaskState.FAILED )
             {
                 this.messages.add( String
-                        .format( "Task (%s) failed on host %s [%s]", task.name(), task.getHost().getId(),
+                        .format( "Task (%s) failed on host %s [%s]", task.name(), task.getHost().getHostname(),
                                 task.getFailureReason() ) );
             }
         }

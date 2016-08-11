@@ -5,7 +5,7 @@
   <parent>
     <artifactId>hub-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -82,6 +82,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>subutai-appender</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registry-api</artifactId>
     </dependency>
 
   </dependencies>

@@ -7,8 +7,6 @@ import java.util.Date;
 
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.Host;
-import io.subutai.common.metric.MetricType;
-import io.subutai.core.metric.api.MonitoringSettings;
 
 
 /**
@@ -23,19 +21,6 @@ public class Commands
     }
 
 
-    public RequestBuilder getContainerHostQuotaCommand( String hostname )
-    {
-        return new RequestBuilder( String.format( "subutai stats quota %s", hostname ) );
-    }
-
-
-    public RequestBuilder getHistoricalMetricCommandOld( Host host, MetricType metricType )
-    {
-        return new RequestBuilder(
-                String.format( "subutai monitor -q %s %s | grep e+", metricType.getName(), host.getHostname() ) );
-    }
-
-
     //subutai metrics management -s "2015-11-30 03:00:00" -e "2015-11-30 20:00:00"
     public RequestBuilder getHistoricalMetricCommand( Host host, Date start, Date end )
     {
@@ -45,19 +30,6 @@ public class Commands
         return new RequestBuilder(
                 String.format( "subutai metrics %s -s \"%s\" -e \"%s\"", host.getHostname(), startTimestamp,
                         endTimestamp ) );
-    }
-
-
-    public RequestBuilder getActivateMonitoringCommand( String hostname, MonitoringSettings monitoringSettings )
-    {
-        return new RequestBuilder( String.format(
-                "subutai monitor -c all -p \" metricCollectionIntervalInMin:%s, maxSampleCount:%s, "
-                        + "metricCountToAverageToAlert:%s, intervalBetweenAlertsInMin:%s, ramAlertThreshold:%s, "
-                        + "cpuAlertThreshold:%s, diskAlertThreshold:%s \" %s",
-                monitoringSettings.getMetricCollectionIntervalInMin(), monitoringSettings.getMaxSampleCount(),
-                monitoringSettings.getMetricCountToAverageToAlert(), monitoringSettings.getIntervalBetweenAlertsInMin(),
-                monitoringSettings.getRamAlertThreshold(), monitoringSettings.getCpuAlertThreshold(),
-                monitoringSettings.getDiskAlertThreshold(), hostname ) );
     }
 
 

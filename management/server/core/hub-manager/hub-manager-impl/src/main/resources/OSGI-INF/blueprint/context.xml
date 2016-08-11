@@ -28,6 +28,9 @@
   <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor" />
   <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
 
+  <bean id="hostLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor" />
+  <service ref="hostLstnr" interface="io.subutai.core.hostregistry.api.HostListener" />
+
   <reference id="securityManager"
              interface="io.subutai.core.security.api.SecurityManager" />
 
@@ -71,5 +74,15 @@
     <reference-listener ref="hubImpl"
                         bind-method="addListener" unbind-method="removeListener" />
   </reference-list>
+
+
+  <bean id="hubAdapter" class="io.subutai.core.hubmanager.impl.adapter.HubAdapterImpl" activation="eager">
+    <argument ref="daoManagerHub" />
+    <argument ref="securityManager" />
+    <argument ref="peerManager" />
+    <argument ref="identityManager" />
+  </bean>
+
+  <service ref="hubAdapter" interface="io.subutai.hub.share.common.HubAdapter" />
 
 </blueprint>

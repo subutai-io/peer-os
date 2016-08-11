@@ -23,6 +23,8 @@ function environmentService($http, $q) {
 
 	var PEERS_URL = ENVIRONMENTS_URL + 'peers/';
 
+	var RH_URL = ENVIRONMENTS_URL + 'resourcehosts/';
+
 
 	// @todo workaround for kurjun to return categorized templates
 	var categories = {
@@ -77,6 +79,8 @@ function environmentService($http, $q) {
 
 
 		getPeers : getPeers,
+
+		getResourceHosts: getResourceHosts,
 
 
 		getShared: getShared,
@@ -170,7 +174,10 @@ function environmentService($http, $q) {
 
 	function modifyEnvironment(containers, advanced) {
 		if(advanced == undefined || advanced == null) advanced = '';
-		var postData = 'topology=' + JSON.stringify( containers.topology ) + '&removedContainers=' + JSON.stringify( containers.removedContainers );
+		var postData = 'topology=' + JSON.stringify( containers.topology )
+			+ '&removedContainers=' + JSON.stringify( containers.removedContainers )
+			+ '&quotaContainers=' + JSON.stringify( containers.changingContainers );
+
 		return $http.post(
 			ENVIRONMENTS_URL + containers.environmentId + '/modify/' + advanced,
 			postData,
@@ -306,6 +313,10 @@ function environmentService($http, $q) {
 
 	function getPeers() {
 		return $http.get(PEERS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
+	}
+
+	function getResourceHosts() {
+		return $http.get(RH_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}
 
 	function setTags(environmentId, containerId, tags) {

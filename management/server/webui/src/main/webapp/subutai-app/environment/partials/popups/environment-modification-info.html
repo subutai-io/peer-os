@@ -13,7 +13,7 @@
                             <img ng-src="assets/templates/{{container.name}}.jpg" alt="{{container.name}}"
                                  onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
                         </td>
-                        <td>{{container.name}}</td>
+                        <td>{{container.hostname}}</td>
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"
@@ -36,7 +36,7 @@
                             <img ng-src="assets/templates/{{container.name}}.jpg" alt="{{container.name}}"
                                  onerror="this.onerror=null;this.src='assets/templates/no-image.jpg';">
                         </td>
-                        <td>{{container.name}}</td>
+                        <td>{{container.hostname}}</td>
                         <td class="b-main-table__right">
                             <span class="g-circle-label g-circle-label_blue g-margin-left-quarter"
                                   ng-repeat="(quotaName, quantity) in container.quotas"
@@ -49,6 +49,9 @@
                     </tr>
                 </table>
             </div>
+        </div>
+        <div class="g-margin-bottom" ng-if="environmentSimpleViewCtrl.currentEnvironment.numChangedContainers">
+            {{ environmentSimpleViewCtrl.currentEnvironment.numChangedContainers }} containers are about to change sizes
         </div>
         <div>
             <button href="#"

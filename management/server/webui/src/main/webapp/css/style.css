@@ -335,6 +335,14 @@ input[type=checkbox] {
     background-color: #d23561;
 }
 
+.b-btn_dark {
+    background-color: #2C1112;
+}
+
+.b-btn_dark:hover {
+    background-color: #1C0A0B;
+}
+
 .b-btn_light-grey {
     background-color: #f8fbfd;
     color: #333333;
@@ -685,6 +693,7 @@ input[type=checkbox] {
 .b-status-icon_FAILED,
 .b-status-icon_STOPPED,
 .b-status-icon_ABORTING,
+.b-status-icon_REJECTED,
 .b-status-icon_FREEZING,
 .b-status-icon_FROZEN,
 .b-status-icon_false {

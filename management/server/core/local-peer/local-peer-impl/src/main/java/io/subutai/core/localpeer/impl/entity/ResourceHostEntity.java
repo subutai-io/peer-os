@@ -50,6 +50,7 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
@@ -269,6 +270,12 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+    }
+
+
     @Override
     public ContainerHostState getContainerHostState( final ContainerHost containerHost ) throws ResourceHostException
     {
@@ -444,6 +451,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             throws ResourceHostException
     {
         Preconditions.checkNotNull( containerHost, PRECONDITION_CONTAINER_IS_NULL_MSG );
+        Preconditions.checkNotNull( containerSize );
 
         try
         {
@@ -460,6 +468,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
         try
         {
             getQuotaManager().setQuota( containerHost.getContainerId(), quota );
+
+            ( ( ContainerHostEntity ) containerHost ).setContainerSize( containerSize );
         }
         catch ( QuotaException e )
         {
@@ -826,19 +836,45 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             }
             catch ( HostNotFoundException e )
             {
-                if ( Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
-                {
-                    containerHost = new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                            info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME,
-                            info.getArch().name(), Common.MANAGEMENT_HOSTNAME, null, null, ContainerSize.SMALL );
 
-                    addContainerHost( containerHost );
-                }
-                else
+                LocalPeer localPeer = getLocalPeer();
+
+                //check that MH container is already registered
+                boolean mhAlreadyRegistered = false;
+
+                if ( localPeer != null )
                 {
-                    LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
-                            info.getHostname() ) );
+                    try
+                    {
+                        localPeer.getManagementHost();
+
+                        mhAlreadyRegistered = true;
+                    }
+                    catch ( HostNotFoundException ex )
+                    {
+                        //ignore
+                    }
+
+                    if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
+                    {
+                        containerHost =
+                                new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
+                                        info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME,
+                                        info.getArch().name(), Common.MANAGEMENT_HOSTNAME, null, null,
+                                        ContainerSize.SMALL );
+
+                        addContainerHost( containerHost );
+                    }
+                    else
+                    {
+                        LOG.warn( String.format( "Found not registered container host: %s %s", info.getId(),
+                                info.getHostname() ) );
+                    }
                 }
+            }
+            catch ( Exception e )
+            {
+                LOG.warn( "Error updating container info {}", e.getMessage() );
             }
         }
 
@@ -964,6 +1000,20 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
                 throw new ResourceHostException(
                         String.format( "Error setting resource host hostname: %s", e.getMessage() ), e );
             }
+        }
+    }
+
+
+    @Override
+    public boolean isManagementHost()
+    {
+        try
+        {
+            return getLocalPeer().getManagementHost().getId().equals( getId() );
+        }
+        catch ( HostNotFoundException e )
+        {
+            return false;
         }
     }
 

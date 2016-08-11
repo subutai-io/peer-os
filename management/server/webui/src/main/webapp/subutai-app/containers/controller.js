@@ -172,6 +172,10 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 					// See details: io.subutai.core.environment.impl.adapter.EnvironmentAdapter.
 					// @todo remove when implement on backend
 					var container = vm.environments[i].containers[j];
+                    var contName = container.hostname;
+                    contName = contName.substring(0, contName.lastIndexOf("-"));
+                    contName = contName.substring(0, contName.lastIndexOf("-"));
+					container.shortName = contName;
 					var remoteProxyContainer = !container.local && container.dataSource == "hub";
 
 					if ( !remoteProxyContainer )
@@ -269,6 +273,7 @@ function ContainerViewCtrl($scope, $rootScope, environmentService, SweetAlert, D
 	}
 
 	function setContainerName( container, name ) {
+		LOADING_SCREEN();
 		environmentService.setContainerName( container, name ).success( function (data) {
 			location.reload();
 		} ).error( function (data) {

@@ -43,7 +43,6 @@ public class ListRequests extends SubutaiShellCommandSupport
                 System.out.print( requestedHost.getHostname() + "; " );
                 System.out.print( requestedHost.getSecret() + "; " );
                 System.out.print( requestedHost.getArch() + "; " );
-                System.out.println( requestedHost.getRestHook() );
             }
             System.out.println( "==========" );
         }

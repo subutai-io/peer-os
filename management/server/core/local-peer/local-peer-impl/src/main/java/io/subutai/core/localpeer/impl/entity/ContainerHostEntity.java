@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.google.common.base.Preconditions;
+
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostArchitecture;
@@ -27,7 +29,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
@@ -179,7 +181,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public TemplateKurjun getTemplate() throws PeerException
+    public Template getTemplate() throws PeerException
     {
         return getPeer().getTemplate( this.templateName );
     }
@@ -239,16 +241,17 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
 
     @Override
-    public void setContainerSize( final ContainerSize size ) throws PeerException
-    {
-        getPeer().setContainerSize( this.getContainerId(), size );
-    }
-
-
-    @Override
     public ContainerSize getContainerSize()
     {
         return containerSize;
+    }
+
+
+    public void setContainerSize( final ContainerSize containerSize )
+    {
+        Preconditions.checkNotNull( containerSize );
+
+        this.containerSize = containerSize;
     }
 
 

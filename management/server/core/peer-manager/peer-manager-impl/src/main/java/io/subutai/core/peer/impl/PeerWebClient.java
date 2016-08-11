@@ -14,6 +14,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Containers;
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -26,7 +27,8 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
@@ -383,7 +385,7 @@ public class PeerWebClient
     }
 
 
-    public String getHistoricalMetrics( final String hostName, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final HostId hostId, final Date startTime, final Date endTime )
             throws PeerException
     {
         WebClient client = null;
@@ -393,7 +395,7 @@ public class PeerWebClient
             remotePeer.checkRelation();
             final DateTimeParam startParam = new DateTimeParam( startTime );
             final DateTimeParam endParam = new DateTimeParam( endTime );
-            String path = String.format( "/hmetrics/%s/%s/%s", hostName, startParam, endParam );
+            String path = String.format( "/hmetrics/%s/%s/%s", hostId.getId(), startParam, endParam );
 
             client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
 
@@ -413,6 +415,39 @@ public class PeerWebClient
         }
 
         return WebClientBuilder.checkResponse( response, String.class );
+    }
+
+
+    public HistoricalMetrics getMetricsSeries( final HostId hostId, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            remotePeer.checkRelation();
+            final DateTimeParam startParam = new DateTimeParam( startTime );
+            final DateTimeParam endParam = new DateTimeParam( endTime );
+            String path = String.format( "/metricsseries/%s/%s/%s", hostId.getId(), startParam, endParam );
+
+            client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
+
+            client.accept( MediaType.APPLICATION_JSON );
+
+            response = client.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException(
+                    String.format( "Error on retrieving historical metrics from remote peer: %s", e.getMessage() ) );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, HistoricalMetrics.class );
     }
 
 
@@ -585,7 +620,7 @@ public class PeerWebClient
     }
 
 
-    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         WebClient client = null;
         Response response;
@@ -609,6 +644,6 @@ public class PeerWebClient
             WebClientBuilder.close( client );
         }
 
-        return WebClientBuilder.checkResponse( response, TemplateKurjun.class );
+        return WebClientBuilder.checkResponse( response, Template.class );
     }
 }

@@ -59,8 +59,9 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
@@ -223,7 +224,7 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
+    public Template getTemplate( final String templateName ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
@@ -937,14 +938,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final HostId hostId, final Date startTime, final Date endTime )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkNotNull( hostId, "Invalid host id" );
         Preconditions.checkNotNull( startTime, "Invalid start time" );
         Preconditions.checkNotNull( endTime, "Invalid end time" );
 
-        return peerWebClient.getHistoricalMetrics( hostname, startTime, endTime );
+        return peerWebClient.getHistoricalMetrics( hostId, startTime, endTime );
+    }
+
+
+    @Override
+    public HistoricalMetrics getMetricsSeries( final HostId hostId, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( hostId, "Invalid host id" );
+        Preconditions.checkNotNull( startTime, "Invalid start time" );
+        Preconditions.checkNotNull( endTime, "Invalid end time" );
+
+        return peerWebClient.getMetricsSeries( hostId, startTime, endTime );
     }
 
 

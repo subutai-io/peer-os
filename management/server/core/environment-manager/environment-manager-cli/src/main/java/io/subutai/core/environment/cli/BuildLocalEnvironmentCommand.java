@@ -9,7 +9,6 @@ import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
@@ -88,9 +87,9 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
         Topology topology = new Topology( "Dummy environment name" );
         topology.addNodePlacement( peerId, node );
 
-        Environment environment = environmentManager.createEnvironment( topology, async );
+        environmentManager.createEnvironmentAndGetTrackerID( topology, async );
 
-        System.out.println( String.format( "Environment created with id %s", environment.getId() ) );
+        System.out.println( "Environment creation started" );
 
         return null;
     }

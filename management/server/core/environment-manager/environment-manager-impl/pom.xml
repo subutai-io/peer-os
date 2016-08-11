@@ -5,7 +5,7 @@
   <parent>
     <artifactId>environment-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -43,11 +43,6 @@
 
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>kurjun-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>peer-manager-api</artifactId>
     </dependency>
 
@@ -69,11 +64,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>identity-manager-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>hub-adapter-api</artifactId>
     </dependency>
 
     <!-- Testing -->

@@ -80,7 +80,6 @@ public class RegistrationManagerImplTest
         requestedHosts.add( host2 );
         when( requestDataService.getAll() ).thenReturn( requestedHosts );
         when( requestDataService.find( uuid.toString() ) ).thenReturn( host1 );
-        when( host1.getRestHook() ).thenReturn( "this is url" );
         when( host1.getId() ).thenReturn( "This is id" );
         when( securityManager.getEncryptionTool() ).thenReturn( encryptionTool );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );

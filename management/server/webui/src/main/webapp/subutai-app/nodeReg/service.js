@@ -12,8 +12,8 @@ function nodeRegSrv($http) {
 
 	var nodeRegSrv = {
 		getData : getData,
-		approveNode : approveNode,
-		unregNode : unregNode,
+		approveReq : approveReq,
+		rejectReq : rejectReq,
 		removeReq : removeReq
 	};
 
@@ -23,12 +23,12 @@ function nodeRegSrv($http) {
 		return $http.get(NODES_URL);
 	}
 
-	function approveNode(nodeId) {
+	function approveReq(nodeId) {
 		return $http.post(NODES_URL + nodeId + '/approve');
 	}
 
-	function unregNode(nodeId) {
-		return $http.post(NODES_URL + nodeId + '/unregister');
+	function rejectReq(nodeId) {
+		return $http.post(NODES_URL + nodeId + '/reject');
 	}
 
 	function removeReq(nodeId) {

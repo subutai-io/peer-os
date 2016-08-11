@@ -23,7 +23,7 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.util.DateTimeParam;
@@ -57,7 +57,7 @@ public interface RestService
     @GET
     @Path( "template/{templateName}/get" )
     @Produces( MediaType.APPLICATION_JSON )
-    public TemplateKurjun getTemplate( @PathParam( "templateName" ) String templateName );
+    public Template getTemplate( @PathParam( "templateName" ) String templateName );
 
 
     @POST
@@ -139,11 +139,18 @@ public interface RestService
     Response putAlert( AlertEvent alertEvent );
 
     @GET
-    @Path( "hmetrics/{hostname}/{startTime}/{endTime}" )
+    @Path( "hmetrics/{hostId}/{startTime}/{endTime}" )
     @Produces( MediaType.APPLICATION_JSON )
-    Response getHistoricalMetrics( @PathParam( "hostname" ) final String hostName,
+    Response getHistoricalMetrics( @PathParam( "hostId" ) final String hostId,
                                    @PathParam( "startTime" ) final DateTimeParam startTime,
                                    @PathParam( "endTime" ) final DateTimeParam endTime );
+
+    @GET
+    @Path( "metricsseries/{hostId}/{startTime}/{endTime}" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getMetricsSeries( @PathParam( "hostId" ) final String hostId,
+                               @PathParam( "startTime" ) final DateTimeParam startTime,
+                               @PathParam( "endTime" ) final DateTimeParam endTime );
 
     @GET
     @Path( "limits/{peerId}" )

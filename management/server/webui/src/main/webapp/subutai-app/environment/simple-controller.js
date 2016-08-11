@@ -15,12 +15,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
     vm.popupLogState = 'full';
 
-    vm.currentEnvironment = {};
-    vm.buildEnvironment = buildEnvironment;
-    vm.editEnvironment = editEnvironment;
-    vm.notifyChanges = notifyChanges;
-    vm.applyChanges = applyChanges;
-    vm.getLastOctet = getLastOctet;
+	vm.currentEnvironment = {};
+
+	vm.buildEnvironment = buildEnvironment;
+	vm.editEnvironment = editEnvironment;
+	vm.notifyChanges = notifyChanges;
+	vm.applyChanges = applyChanges;
+	vm.getLastOctet = getLastOctet;
 
     vm.environments = [];
 
@@ -262,6 +263,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         vm.currentEnvironment.includedContainersByQuota =
             getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
 
+        vm.currentEnvironment.numChangedContainers = 0;
+        for (var key in vm.currentEnvironment.changingContainers) {
+            vm.currentEnvironment.numChangedContainers++;
+        }
+
         ngDialog.open({
             template: 'subutai-app/environment/partials/popups/environment-modification-info.html',
             scope: $scope,
@@ -306,24 +312,32 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         vm.isApplyingChanges = true;
         ngDialog.closeAll();
 
-        var excludedContainers = [];
-        for (var i = 0; i < vm.currentEnvironment.excludedContainers.length; i++) {
-            excludedContainers.push(vm.currentEnvironment.excludedContainers[i].get('containerId'));
-        }
-        var includedContainers = [];
-        for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
-            includedContainers.push({
-                "size": vm.currentEnvironment.includedContainers[i].get('quotaSize'),
-                "templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
-                "name": vm.currentEnvironment.includedContainers[i].get('containerName'),
-                "position": vm.currentEnvironment.includedContainers[i].get('position')
-            });
-        }
-        vm.currentEnvironment.modificationData = {
-            topology: includedContainers,
-            removedContainers: excludedContainers,
-            environmentId: vm.currentEnvironment.id
-        };
+		var excludedContainers = [];
+		for (var i = 0; i < vm.currentEnvironment.excludedContainers.length; i++) {
+			excludedContainers.push(vm.currentEnvironment.excludedContainers[i].get('containerId'));
+		}
+		var includedContainers = [];
+		for (var i = 0; i < vm.currentEnvironment.includedContainers.length; i++) {
+			includedContainers.push({
+				"size": vm.currentEnvironment.includedContainers[i].get('quotaSize'),
+				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
+				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
+				"position": vm.currentEnvironment.includedContainers[i].get('position')
+			});
+		}
+
+		var quotaContainers = [];
+
+		for (var key in vm.currentEnvironment.changingContainers) {
+			quotaContainers.push({ "key" : key, "value" : vm.currentEnvironment.changingContainers[key] });
+		}
+
+		vm.currentEnvironment.modificationData = {
+			topology: includedContainers,
+			removedContainers: excludedContainers,
+			changingContainers: quotaContainers,
+			environmentId: vm.currentEnvironment.id
+		};
 
         ngDialog.open({
             template: 'subutai-app/environment/partials/popups/environment-modification-status.html',
@@ -624,10 +638,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                             }
                         }
                         if (!alreadyONWorckspace || templatesCounter == i) {
-                            addContainer(template.toLowerCase());
+                            addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
                         }
                     } else {
-                        addContainer(template.toLowerCase());
+                        addContainer(template.toLowerCase(), null, vm.selectedPlugin.size);
                     }
                 }
             }
@@ -637,11 +651,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         //getPlugins();
     }
 
-    var containerCounter = 1;
+	var containerCounter = 1;
+	function addContainer(template, $event, size, templateImg) {
 
-    function addContainer(template, $event, size, templateImg) {
-        console.log(template);
-        if ($event === undefined || $event === null) $event = false;
+		if($event === undefined || $event === null) $event = false;
 
         if (size === undefined || size === null) {
             size = 'SMALL';
@@ -662,22 +675,23 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             }
         }
 
-        var devElement = new joint.shapes.tm.devElement({
-            position: {x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20},
-            templateName: template,
-            quotaSize: size,
-            containerName: 'Container ' + (containerCounter++).toString(),
-            attrs: {
-                image: {'xlink:href': img},
-                'rect.b-magnet': {fill: vm.colors[size]},
-                title: {text: template}
-            }
-        });
-        vm.isEditing ? vm.currentEnvironment.includedContainers.push(devElement) : null;
-        graph.addCell(devElement);
-        filterPluginsList();
-        return false;
-    }
+		var containerName = 'Container ' + (containerCounter++).toString();
+		var devElement = new joint.shapes.tm.devElement({
+			position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
+			templateName: template,
+			quotaSize: size,
+			containerName: containerName,
+			attrs: {
+				image: { 'xlink:href': img },
+				'rect.b-magnet': {fill: vm.colors[size]},
+				title: {text: containerName + " ('" + template + "') " + size}
+			}
+		});
+		vm.isEditing ? vm.currentEnvironment.includedContainers.push(devElement) : null;
+		graph.addCell(devElement);
+		filterPluginsList();
+		return false;
+	}
 
     function findEmptyCubePostion() {
         for (var j = 0; j < vm.cubeGrowth; j++) {
@@ -847,34 +861,49 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             return;
         }
 
-        clearWorkspace();
-        vm.isApplyingChanges = false;
-        vm.currentEnvironment = environment;
-        vm.currentEnvironment.excludedContainers = [];
-        vm.currentEnvironment.includedContainers = [];
-        vm.isEditing = true;
-        for (var container in environment.containers) {
-            var pos = vm.findEmptyCubePostion();
-            var img = 'assets/templates/' + environment.containers[container].templateName + '.jpg';
-            if (!imageExists(img)) {
-                img = 'assets/templates/no-image.jpg';
-            }
-            var devElement = new joint.shapes.tm.devElement({
-                position: {x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20},
-                templateName: environment.containers[container].templateName,
-                quotaSize: environment.containers[container].type,
-                hostname: environment.containers[container].hostname,
-                containerId: environment.containers[container].id,
-                attrs: {
-                    image: {'xlink:href': img},
-                    'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
-                    title: {text: environment.containers[container].templateName}
-                }
-            });
-            graph.addCell(devElement);
-        }
-        filterPluginsList();
-    }
+		clearWorkspace();
+		vm.isApplyingChanges = false;
+		vm.currentEnvironment = environment;
+		vm.currentEnvironment.excludedContainers = [];
+		vm.currentEnvironment.includedContainers = [];
+		vm.currentEnvironment.changingContainers = [];
+		vm.isEditing = true;
+
+		for(var container in environment.containers) {
+			var pos = vm.findEmptyCubePostion();
+			var img = 'assets/templates/' + environment.containers[container].templateName + '.jpg';
+			if(!imageExists(img)) {
+				img = 'assets/templates/no-image.jpg';
+			}
+
+			if( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) != null )
+			{
+				if( containerCounter < parseInt( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) ) + 1 )
+				{
+					containerCounter = parseInt( environment.containers[container].name.match(/(\d+)(?!.*\d)/g) ) + 1;
+				}
+			}
+
+			var devElement = new joint.shapes.tm.devElement({
+				position: { x: (GRID_CELL_SIZE * pos.x) + 20, y: (GRID_CELL_SIZE * pos.y) + 20 },
+				templateName: environment.containers[container].templateName,
+				quotaSize: environment.containers[container].type,
+				hostname: environment.containers[container].hostname,
+				containerId: environment.containers[container].id,
+				containerName: environment.containers[container].hostname,
+				attrs: {
+					image: { 'xlink:href': img },
+					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
+					title: {text: environment.containers[container].hostname + " ("
+						+ environment.containers[container].templateName
+						+ ") " + environment.containers[container].type
+					}
+				}
+			});
+			graph.addCell(devElement);
+		}
+		filterPluginsList();
+	}
 
     function clearWorkspace() {
         vm.isEditing = false;
@@ -886,14 +915,37 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         //vm.selectedPlugin = false;
     }
 
-    function addSettingsToTemplate(settings) {
+	function addSettingsToTemplate(settings) {
+		currentTemplate.set('quotaSize', settings.quotaSize);
+		currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
+		currentTemplate.set('containerName', settings.containerName);
+		//ngDialog.closeAll();
+		containerSettingMenu.hide();
 
-        currentTemplate.set('quotaSize', settings.quotaSize);
-        currentTemplate.attr('rect.b-magnet/fill', vm.colors[settings.quotaSize]);
-        currentTemplate.set('containerName', settings.containerName);
-        //ngDialog.closeAll();
-        containerSettingMenu.hide();
-    }
+		if( vm.isEditing )
+		{
+			var id = currentTemplate.attributes.containerId;
+
+			var res = $.grep( vm.currentEnvironment.containers, function( e, i ) {
+				return e.id == id;
+			});
+
+			if( res[0] )
+			{
+				res = res[0];
+
+				if( res.type == settings.quotaSize && vm.currentEnvironment.changingContainers[id] )
+				{
+					delete vm.currentEnvironment.changingContainers[id];
+				}
+
+				if( res.type != settings.quotaSize )
+				{
+					vm.currentEnvironment.changingContainers[id] = settings.quotaSize;
+				}
+			}
+		}
+	}
 
     function getElementByField(field, value, collection) {
         for (var index = 0; index < collection.length; index++) {
