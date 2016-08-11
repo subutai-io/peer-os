@@ -17,7 +17,7 @@ function peerRegistrationService($http) {
         approvePeerRequest: approvePeerRequest,
         cancelPeerRequest: cancelPeerRequest,
         unregisterPeerRequest: unregisterPeerRequest,
-
+        renamePeer: renamePeer,
         getResourceHosts: getResourceHosts,
         checkPeer: checkPeer,
 
@@ -95,5 +95,14 @@ function peerRegistrationService($http) {
             withCredentials: true,
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}
         });
+    }
+
+    function renamePeer(peerId, newName){
+        var postData = 'peerId=' + peerId + '&name=' + newName;
+        return $http.put(
+            PEERS_URL + 'rename/',
+            postData,
+            {withCredentials: true, headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        );
     }
 }

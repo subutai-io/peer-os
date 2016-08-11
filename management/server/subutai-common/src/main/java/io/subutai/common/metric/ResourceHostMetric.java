@@ -7,6 +7,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfoModel;
 
 
@@ -15,6 +16,10 @@ import io.subutai.common.host.ResourceHostInfoModel;
  */
 public class ResourceHostMetric extends BaseMetric
 {
+    @Expose
+    @JsonProperty
+    private InstanceType instanceType;
+
     @Expose
     @SerializedName( "host" )
     @JsonProperty( "host" )
@@ -59,6 +64,7 @@ public class ResourceHostMetric extends BaseMetric
     {
         super( peerId, hostInfo );
         this.containersCount = hostInfo.getContainers().size();
+        this.instanceType = hostInfo.getInstanceType();
     }
 
 
@@ -129,6 +135,13 @@ public class ResourceHostMetric extends BaseMetric
     public Integer getContainersCount()
     {
         return containersCount;
+    }
+
+
+    @JsonIgnore
+    public InstanceType getInstanceType()
+    {
+        return instanceType;
     }
 
 

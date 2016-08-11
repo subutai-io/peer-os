@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -23,64 +24,53 @@ import (
 )
 
 var (
-	lock   lockfile.Lockfile
-	owners = []string{"subutai", "public", "jenkins", "docker", ""}
+	lock lockfile.Lockfile
 )
 
 type templ struct {
-	name      string
-	file      string
-	version   string
-	branch    string
-	id        string
-	owner     []string
-	signature map[string]string
+	name    string `json:"name"`
+	file    string
+	version string `json:"version"`
+	branch  string
+	Id      string `json:"id"`
+	hash    string
 }
 
-type metainfo struct {
-	ID    string            `json:"id"`
-	Name  string            `json:"name"`
-	Owner []string          `json:"owner"`
-	File  string            `json:"filename"`
-	Signs map[string]string `json:"signature"`
-}
+func templId(t templ, arch string, kurjun *http.Client) string {
 
-func templId(t *templ, kurjun *http.Client, token string) {
-	var meta metainfo
+	//We'll need to change this function, so it retrieves json from info endpoint (not only "type=text"), parse owner fingerprint and signed hash message, request owner public key using fingerprint
+	//and verify hash, signature and owner key
 
-	url := config.Cdn.Kurjun + "/template/info?name=" + t.name + "&token=" + token
+	url := config.Cdn.Kurjun + "/template/info?name=" + t.name
 	if t.name == "management" && len(t.branch) != 0 {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch + "&token=" + token
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "-" + t.branch
 	} else if t.name == "management" {
-		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version + "&token=" + token
+		url = config.Cdn.Kurjun + "/template/info?name=" + t.name + "&version=" + t.version
 	}
-
 	response, err := kurjun.Get(url)
 	defer response.Body.Close()
 	log.Debug("Retrieving id, get: " + url)
 
 	if err == nil && response.StatusCode == 204 && t.name == "management" {
 		log.Warn("Cannot get management with specified version, trying without version")
-		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name + "&token=" + token)
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/info?name=" + t.name)
 	}
 	if log.Check(log.WarnLevel, "Getting kurjun response", err) || response.StatusCode != 200 {
-		return
+		return ""
 	}
 
-	defer response.Body.Close()
-	body, err := ioutil.ReadAll(response.Body)
-
-	if log.Check(log.WarnLevel, "Parsing response body", json.Unmarshal(body, &meta)) {
-		return
+	resp, err := ioutil.ReadAll(response.Body)
+	if log.Check(log.WarnLevel, "Reading response body", err) {
+		return ""
 	}
 
-	if t.name != meta.Name {
-		log.Info("Found: " + t.name + " -> " + meta.Name)
-		t.name = meta.Name
+	var template templ
+	if err = json.Unmarshal(resp, &template); log.Check(log.WarnLevel, "Parsing response JSON", err) {
+		return ""
 	}
-	t.id = meta.ID
-	t.file = meta.File
-	t.signature = meta.Signs
+
+	log.Debug("Template id: " + template.Id)
+	return template.Id
 }
 
 func md5sum(filePath string) string {
@@ -102,8 +92,8 @@ func checkLocal(t templ) bool {
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
 		if t.file == f.Name() {
-			if len(t.id) == 0 {
-				fmt.Print("Cannot verify local template. Trust anyway? (y/n)")
+			if len(t.hash) == 0 {
+				fmt.Print("Cannot check md5 of local archive. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
@@ -111,7 +101,7 @@ func checkLocal(t templ) bool {
 				}
 				return false
 			}
-			if id := strings.Split(t.id, "."); len(id) > 0 && id[len(id)-1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
+			if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+f.Name()) {
 				return true
 			}
 		}
@@ -119,21 +109,17 @@ func checkLocal(t templ) bool {
 	return false
 }
 
-func download(t templ, kurjun *http.Client, token string) bool {
-	if len(t.id) == 0 {
+func download(t templ, kurjun *http.Client) bool {
+	if len(t.Id) == 0 {
 		return false
 	}
 	out, err := os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 	log.Check(log.FatalLevel, "Creating file "+t.file, err)
 	defer out.Close()
+	log.Info("Downloading " + t.name)
 
-	url := config.Cdn.Kurjun + "/template/download?id=" + t.id
-	if len(t.owner) > 0 {
-		url = config.Cdn.Kurjun + "/template/" + t.owner[0] + "/" + t.file
-	}
-	response, err := kurjun.Get(url)
-	log.Check(log.FatalLevel, "Getting "+url, err)
-
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.Id)
+	log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.Id, err)
 	defer response.Body.Close()
 	bar := pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 	bar.Start()
@@ -149,8 +135,8 @@ func download(t templ, kurjun *http.Client, token string) bool {
 		out, err = os.Create(config.Agent.LxcPrefix + "tmpdir/" + t.file)
 		log.Check(log.FatalLevel, "Creating file "+t.file, err)
 		defer out.Close()
-		response, err = kurjun.Get(url)
-		log.Check(log.FatalLevel, "Getting "+url, err)
+		response, err = kurjun.Get(config.Cdn.Kurjun + "/template/download?id=" + t.Id)
+		log.Check(log.FatalLevel, "Getting "+config.Cdn.Kurjun+"/template/download?id="+t.Id, err)
 		defer response.Body.Close()
 		bar = pb.New(int(response.ContentLength)).SetUnits(pb.U_BYTES)
 		bar.Start()
@@ -159,29 +145,11 @@ func download(t templ, kurjun *http.Client, token string) bool {
 
 	log.Check(log.FatalLevel, "Writing response body to file", err)
 
-	if id := strings.Split(t.id, "."); len(id) > 0 && id[len(id)-1] == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
+	if t.hash == md5sum(config.Agent.LxcPrefix+"tmpdir/"+t.file) {
 		return true
 	}
+	log.Error("Failed to check MD5 after download. Please check your connection and try again.")
 	return false
-}
-
-func idToName(id string, kurjun *http.Client, token string) string {
-	var meta metainfo
-
-	//Since only kurjun knows template's ID, we cannot define if we have template already installed in system by ID as we do it by name, so unreachable kurjun in this case is a deadend for us
-	//To omit this issue we should add ID into template config and use this ID as a "primary key" to any request
-	response, err := kurjun.Get(config.Cdn.Kurjun + "/template/info?id=" + id + "&token=" + token)
-	log.Check(log.ErrorLevel, "Getting kurjun response", err)
-	defer response.Body.Close()
-
-	body, err := ioutil.ReadAll(response.Body)
-
-	if string(body) == "Not found" {
-		log.Error("Template with id \"" + id + "\" not found")
-	}
-	log.Check(log.ErrorLevel, "Parsing response body", json.Unmarshal(body, &meta))
-
-	return meta.Name
 }
 
 func lockSubutai(file string) bool {
@@ -203,37 +171,25 @@ func unlockSubutai() {
 }
 
 func LxcImport(name, version, token string) {
-	var kurjun *http.Client
-
 	if container.IsContainer(name) && name == "management" && len(token) > 1 {
 		gpg.ExchageAndEncrypt("management", token)
 		return
 	}
 
-	if id := strings.Split(name, "id:"); len(id) > 1 {
-		kurjun, _ = config.CheckKurjun()
-		name = idToName(id[1], kurjun, token)
+	log.Info("Importing " + name)
+	for !lockSubutai(name + ".import") {
+		time.Sleep(time.Second * 1)
+	}
+	defer unlockSubutai()
+
+	if container.IsContainer(name) {
+		log.Info(name + " instance exist")
+		return
 	}
 
 	var t templ
 
 	t.name = name
-	if line := strings.Split(t.name, "/"); len(line) > 1 {
-		t.name = line[1]
-		t.owner = append(t.owner, line[0])
-	}
-
-	log.Info("Importing " + name)
-	for !lockSubutai(t.name + ".import") {
-		time.Sleep(time.Second * 1)
-	}
-	defer unlockSubutai()
-
-	if container.IsContainer(t.name) {
-		log.Info(t.name + " instance exist")
-		return
-	}
-
 	t.version = config.Template.Version
 	t.branch = config.Template.Branch
 	if len(version) != 0 {
@@ -264,51 +220,15 @@ func LxcImport(name, version, token string) {
 		t.file = t.name + "-subutai-template_" + t.version + "-" + t.branch + "_" + config.Template.Arch + ".tar.gz"
 	}
 
-	if kurjun == nil {
-		kurjun, _ = config.CheckKurjun()
-	}
-	if kurjun != nil {
-		templId(&t, kurjun, token)
-	} else {
-		log.Info("Trying to import from local storage")
+	kurjun := config.CheckKurjun()
+	t.Id = templId(t, runtime.GOARCH, kurjun)
+	if len(strings.Split(t.Id, ".")) > 1 {
+		t.hash = strings.Split(t.Id, ".")[1]
 	}
 
-	if len(t.id) != 0 && len(t.signature) == 0 {
-		log.Warn("Template is not signed")
+	if !checkLocal(t) && !download(t, kurjun) {
+		log.Error(t.name + " template not found")
 	}
-
-	for owner, signature := range t.signature {
-		// if v.Author == "public" || v.Author == "subutai" || v.Author == "jenkins" {
-		signedhash := gpg.VerifySignature(gpg.KurjunUserPK(owner), signature)
-		if t.id != signedhash {
-			log.Error("Signature does not match with template hash")
-		}
-		log.Info("Digital signature and file integrity verified")
-		log.Debug("Signature belongs to " + owner)
-		break
-		// }
-	}
-
-	if !checkLocal(t) {
-		log.Info("Downloading " + t.name)
-		downloaded := false
-		if len(t.owner) == 0 {
-			for _, owner := range owners {
-				if t.owner = []string{owner}; len(owner) == 0 {
-					t.owner = []string{}
-				}
-				if download(t, kurjun, token) {
-					downloaded = true
-					break
-				}
-			}
-		}
-		if !downloaded && !download(t, kurjun, token) {
-			log.Error("Failed to download template " + t.name)
-		}
-	}
-
-	time.Sleep(time.Millisecond * 200) // Added sleep to prevent output collision with progress bar.
 
 	log.Info("Unpacking template " + t.name)
 	tgz := extractor.NewTgz()
