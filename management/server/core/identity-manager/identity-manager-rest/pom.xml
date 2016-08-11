@@ -6,7 +6,7 @@
   <parent>
     <artifactId>identity-manager-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.2</version>
+    <version>4.0.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>identity-manager-rest</artifactId>
