@@ -12,6 +12,7 @@ function consoleService($http, environmentService) {
 		getEnvironments: getEnvironments,
 		sendCommand: sendCommand,
 		getSSH: getSSH,
+		getResourceHosts: getResourceHosts
 	};
 
 	return consoleService;
@@ -20,6 +21,10 @@ function consoleService($http, environmentService) {
 
 	function getEnvironments() {
 		return environmentService.getEnvironments();
+	}
+
+	function getResourceHosts(){
+	   return environmentService.getResourceHosts();
 	}
 
 	function getSSH(environmentId, hostId, period) {

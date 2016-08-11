@@ -31,7 +31,7 @@ public interface RestService
     @Path( "/register" )
     @Produces( { MediaType.APPLICATION_JSON } )
     public Response register( @FormParam( "hubIp" ) String hubIp, @FormParam( "email" ) String email,
-                              @FormParam( "password" ) String password );
+                              @FormParam( "password" ) String password, @FormParam( "peerName" ) String peerName );
 
     //Send resource host configurations
     @POST
