@@ -6,14 +6,15 @@ angular.module('subutai.nav-menu', [])
 function NavMenu() {
     return {
         restrict: 'E',
-        scope: {adminMenus : '=', activeState : '='},
+        scope: {adminMenus : '=adminMenus', activeState : '@activeState'},
         bindToController: true,
         templateUrl: 'subutai-app/common/partials/nav-menu.html',
         controller: ['$scope', function( $scope ) {
-            $scope.adminMenus = "";
-            $scope.activeState = "";
-            console.log( $scope.adminMenus );
-            console.log( $scope.activeState )
+			console.log($scope);
+            /*$scope.adminMenus = "";
+            $scope.activeState = "";*/
+            console.log( $scope.dir.adminMenus );
+            console.log( $scope.dir.activeState )
         }],
         controllerAs: 'dir'
     }
