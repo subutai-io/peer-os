@@ -311,17 +311,17 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendResourceHostInfo() throws Exception
     {
-        resourceHostDataProcessor.process(false);
+        resourceHostDataProcessor.process( false );
     }
 
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String hupIp, String email, String password ) throws Exception
+    public void registerPeer( String hupIp, String email, String password, String peerName ) throws Exception
     {
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
-        registrationManager.registerPeer( email, password );
+        registrationManager.registerPeer( email, password, peerName );
 
         generateChecksum();
 
