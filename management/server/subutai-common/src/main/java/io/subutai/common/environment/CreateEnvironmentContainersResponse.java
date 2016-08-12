@@ -31,7 +31,7 @@ public class CreateEnvironmentContainersResponse
             if ( task.getTaskState() == HostUtil.Task.TaskState.SUCCEEDED )
             {
                 responses.add( new CloneResponse( task.getHost().getId(), request.getHostname(),
-                        request.getContainerName(), request.getTemplateName(), request.getTemplateArch(),
+                        request.getContainerName(), request.getTemplateId(), request.getTemplateArch(),
                         request.getIp(), cloneContainerTask.getResult(), task.getDuration(),
                         request.getContainerSize() ) );
 

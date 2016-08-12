@@ -38,6 +38,7 @@ public class Node
     @JsonProperty( "hostname" )
     private String hostname;
 
+    @JsonProperty
     private String templateId;
 
 
@@ -46,6 +47,7 @@ public class Node
     }
 
 
+    //TODO:TEMPLATE replace templateName with templateId when UI side is ready
     public Node( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
                  @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
                  @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId )

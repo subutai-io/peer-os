@@ -118,15 +118,15 @@ public class RestServiceImplTest
     {
         Template template = mock( Template.class );
 
-        when( localPeer.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+        when( localPeer.getTemplateByName( TEMPLATE_NAME ) ).thenReturn( template );
 
-        restService.getTemplate( TEMPLATE_NAME );
+        restService.getTemplateByName( TEMPLATE_NAME );
 
         verify( jsonUtil ).to( template );
 
-        doThrow( exception ).when( localPeer ).getTemplate( TEMPLATE_NAME );
+        doThrow( exception ).when( localPeer ).getTemplateByName( TEMPLATE_NAME );
 
-        Template response1 = restService.getTemplate( TEMPLATE_NAME );
+        Template response1 = restService.getTemplateByName( TEMPLATE_NAME );
 
         assertNotNull( response1 );
     }

@@ -43,14 +43,6 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     }
 
 
-    public ExamplePlacementStrategy()
-    {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
-    }
-
-
     @Override
     public String getId()
     {
@@ -66,27 +58,11 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
 
     @Override
-    public Topology distribute( final String environmentName, PeerGroupResources peerGroupResources,
-                                Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
-    {
-        Topology result = new Topology( environmentName );
-
-        Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
-        for ( Node node : nodes )
-        {
-            result.addNodePlacement( node.getPeerId(), node );
-        }
-
-        return result;
-    }
-
-
-    @Override
     public Topology distribute( final String environmentName, final List<NodeSchema> nodeSchema,
                                 final PeerGroupResources peerGroupResources,
                                 final Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
-        Topology result = new Topology( environmentName/*, sshGroupId, hostGroupId*/ );
+        Topology result = new Topology( environmentName );
 
         Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
         for ( Node node : ng )
@@ -131,9 +107,8 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             boolean allocated = false;
             for ( ResourceAllocator resourceAllocator : preferredAllocators )
             {
-                allocated = resourceAllocator
-                        .allocate( containerName, nodeSchema.getTemplateName(), nodeSchema.getSize(),
-                                quotas.get( nodeSchema.getSize() ) );
+                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
+                        quotas.get( nodeSchema.getSize() ) );
                 if ( allocated )
                 {
                     break;
@@ -151,13 +126,16 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
         for ( ResourceAllocator resourceAllocator : allocators )
         {
-            List<ResourceAllocator.AllocatedContainer> containers = resourceAllocator.getContainers();
+            List<AllocatedContainer> containers = resourceAllocator.getContainers();
             if ( !containers.isEmpty() )
             {
-                for ( ResourceAllocator.AllocatedContainer container : containers )
+                for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
-                            container.getSize(), container.getPeerId(), container.getHostId() );
+                    //TODO:TEMPLATE replace templateName with templateId when UI is ready
+                    Node node = new Node( container.getName(), container.getName(), "TODO-REMOVE", container.getSize(),
+                            container.getPeerId(), container.getHostId() );
+                    node.setTemplateId( container.getTemplateId() );
+
                     nodes.add( node );
                 }
             }

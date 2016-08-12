@@ -13,6 +13,7 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.settings.Common;
 import io.subutai.common.task.CloneRequest;
 import io.subutai.common.util.HostUtil;
@@ -24,20 +25,23 @@ public class CloneContainerTask extends HostUtil.Task<String>
     private static final int DEFAULT_PARALLEL_CLONE_TASK_AMOUNT = 2;
 
     private final CloneRequest request;
+    private final Template template;
     private final ResourceHost resourceHost;
     private final NetworkResource networkResource;
     private final LocalPeer localPeer;
 
 
-    public CloneContainerTask( final CloneRequest request, final ResourceHost resourceHost,
+    public CloneContainerTask( final CloneRequest request, final Template template, final ResourceHost resourceHost,
                                final NetworkResource networkResource, final LocalPeer localPeer )
     {
         Preconditions.checkNotNull( request );
+        Preconditions.checkNotNull( template );
         Preconditions.checkNotNull( resourceHost );
         Preconditions.checkNotNull( networkResource );
         Preconditions.checkNotNull( localPeer );
 
         this.request = request;
+        this.template = template;
         this.resourceHost = resourceHost;
         this.networkResource = networkResource;
         this.localPeer = localPeer;
@@ -69,7 +73,7 @@ public class CloneContainerTask extends HostUtil.Task<String>
     @Override
     public String name()
     {
-        return String.format( "Clone %s from %s", request.getHostname(), request.getTemplateName() );
+        return String.format( "Clone %s from %s", request.getHostname(), template.getName() );
     }
 
 
@@ -85,8 +89,8 @@ public class CloneContainerTask extends HostUtil.Task<String>
         request.setContainerName( request.getHostname() );
 
         String containerId = resourceHost
-                .cloneContainer( request.getTemplateName(), request.getHostname(), request.getIp(),
-                        networkResource.getVlan(), networkResource.getEnvironmentId() );
+                .cloneContainer( template, request.getHostname(), request.getIp(), networkResource.getVlan(),
+                        networkResource.getEnvironmentId() );
 
         //wait for container connection
         boolean connected = false;

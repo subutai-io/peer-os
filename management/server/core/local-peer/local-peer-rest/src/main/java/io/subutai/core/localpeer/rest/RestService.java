@@ -57,7 +57,7 @@ public interface RestService
     @GET
     @Path( "template/{templateName}/get" )
     @Produces( MediaType.APPLICATION_JSON )
-    public Template getTemplate( @PathParam( "templateName" ) String templateName );
+    public Template getTemplateByName( @PathParam( "templateName" ) String templateName );
 
 
     @POST

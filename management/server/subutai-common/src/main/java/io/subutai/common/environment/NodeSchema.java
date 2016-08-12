@@ -20,9 +20,11 @@ public class NodeSchema
     @JsonProperty( "templateName" )
     private String templateName;
 
+    @JsonProperty
     private String templateId;
 
 
+    //TODO:TEMPLATE replace templateName with templateId when UI side is ready
     public NodeSchema( @JsonProperty( "name" ) final String name, @JsonProperty( "size" ) final ContainerSize size,
                        @JsonProperty( "templateName" ) final String templateName )
     {

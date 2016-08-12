@@ -43,14 +43,6 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     }
 
 
-    public UnlimitedPlacementStrategy()
-    {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop" ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra" ) );
-    }
-
-
     @Override
     public String getId()
     {
@@ -62,22 +54,6 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
     public String getTitle()
     {
         return "Unlimited container placement strategy.";
-    }
-
-
-    @Override
-    public Topology distribute( final String environmentName, PeerGroupResources peerGroupResources,
-                                Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
-    {
-        Topology result = new Topology( environmentName );
-
-        Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
-        for ( Node node : nodes )
-        {
-            result.addNodePlacement( node.getPeerId(), node );
-        }
-
-        return result;
     }
 
 
@@ -132,9 +108,8 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
             boolean allocated = false;
             for ( RandomAllocator resourceAllocator : preferredAllocators )
             {
-                allocated = resourceAllocator
-                        .allocate( containerName, nodeSchema.getTemplateName(), nodeSchema.getSize(),
-                                quotas.get( nodeSchema.getSize() ) );
+                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
+                        quotas.get( nodeSchema.getSize() ) );
                 if ( allocated )
                 {
                     break;
@@ -152,13 +127,16 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
         for ( RandomAllocator resourceAllocator : allocators )
         {
-            List<RandomAllocator.AllocatedContainer> containers = resourceAllocator.getContainers();
+            List<AllocatedContainer> containers = resourceAllocator.getContainers();
             if ( !containers.isEmpty() )
             {
-                for ( RandomAllocator.AllocatedContainer container : containers )
+                for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
-                            container.getSize(), container.getPeerId(), container.getHostId() );
+                    //TODO:TEMPLATE replace templateName with templateId when UI is ready
+                    Node node = new Node( container.getName(), container.getName(), "TODO-REMOVE", container.getSize(),
+                            container.getPeerId(), container.getHostId() );
+                    node.setTemplateId( container.getTemplateId() );
+
                     nodes.add( node );
                 }
             }

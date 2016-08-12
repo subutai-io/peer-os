@@ -129,13 +129,13 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Template getTemplate( final String templateName )
+    public Template getTemplateByName( final String templateName )
     {
         try
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
 
-            return localPeer.getTemplate( templateName );
+            return localPeer.getTemplateByName( templateName );
         }
         catch ( Exception e )
         {

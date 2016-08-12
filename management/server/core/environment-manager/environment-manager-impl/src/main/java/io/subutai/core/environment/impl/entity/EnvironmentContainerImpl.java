@@ -52,6 +52,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
@@ -61,6 +62,7 @@ import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.identity.api.IdentityManager;
@@ -100,9 +102,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonIgnore
     private String creatorPeerId;
 
-    @Column( name = "template_name", nullable = false )
+    @Column( name = "template_id", nullable = false )
     @JsonProperty( "template" )
-    private String templateName;
+    private String templateId;
 
     @Column( name = "template_arch", nullable = false )
     @JsonIgnore
@@ -168,14 +170,14 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     public EnvironmentContainerImpl( final String creatorPeerId, final String peerId,
-                                     final ContainerHostInfoModel hostInfo, final String templateName,
+                                     final ContainerHostInfoModel hostInfo, final String templateId,
                                      final HostArchitecture templateArch, String domainName,
                                      ContainerSize containerSize, String resourceHostId, final String containerName )
     {
         Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
         Preconditions.checkNotNull( hostInfo );
-        Preconditions.checkNotNull( templateName );
+        Preconditions.checkNotNull( templateId );
         Preconditions.checkNotNull( containerSize );
 
         this.creatorPeerId = creatorPeerId;
@@ -184,7 +186,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.hostname = hostInfo.getHostname();
         this.containerName = containerName;
         this.hostArchitecture = hostInfo.getArch();
-        this.templateName = templateName;
+        this.templateId = templateId;
         this.templateArch = templateArch;
         this.domainName = domainName;
         this.containerSize = containerSize;
@@ -334,17 +336,32 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+    }
+
+
     @Override
     public Template getTemplate() throws PeerException
     {
-        return getPeer().getTemplate( this.templateName );
+        return getLocalPeer().getTemplateById( templateId );
     }
 
 
     @Override
     public String getTemplateName()
     {
-        return this.templateName;
+        try
+        {
+            return getTemplate().getName();
+        }
+        catch ( PeerException e )
+        {
+            logger.error( "Failed to get template by id", e.getMessage() );
+        }
+
+        return null;
     }
 
 
@@ -626,7 +643,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         String envId = parent != null ? parent.getId() : null;
 
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
-                          .add( "creatorPeerId", creatorPeerId ).add( "templateName", templateName )
+                          .add( "creatorPeerId", creatorPeerId ).add( "templateId", templateId )
                           .add( "environmentId", envId ).add( "domainName", domainName ).add( "tags", tags )
                           .add( "templateArch", templateArch ).add( "hostArchitecture", hostArchitecture )
                           .add( "resourceHostId", resourceHostId ).toString();

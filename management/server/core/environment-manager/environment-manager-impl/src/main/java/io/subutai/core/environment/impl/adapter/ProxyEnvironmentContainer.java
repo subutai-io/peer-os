@@ -22,6 +22,8 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
@@ -39,6 +41,7 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
 
     ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
     {
+        //TODO:TEMPLATE pass templateId instead of templateName
         super( "hub", json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
@@ -49,6 +52,12 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
         local = localContainerIds.contains( getId() );
 
         setEnvironmentManager( environmentManager );
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 

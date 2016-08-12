@@ -14,7 +14,7 @@ public class CloneResponse implements TaskResponse
 
     private String resourceHostId;
     private String hostname;
-    private String templateName;
+    private String templateId;
     private HostArchitecture templateArch;
     private String containerName;
     private String ip;
@@ -24,12 +24,12 @@ public class CloneResponse implements TaskResponse
 
 
     public CloneResponse( final String resourceHostId, final String hostname, final String containerName,
-                          final String templateName, final HostArchitecture templateArch, final String ip,
+                          final String templateId, final HostArchitecture templateArch, final String ip,
                           final String containerId, final long elapsedTime, final ContainerSize containerSize )
     {
         this.resourceHostId = resourceHostId;
         this.hostname = hostname;
-        this.templateName = templateName;
+        this.templateId = templateId;
         this.templateArch = templateArch;
         this.containerName = containerName;
         this.ip = ip;
@@ -70,9 +70,9 @@ public class CloneResponse implements TaskResponse
     }
 
 
-    public String getTemplateName()
+    public String getTemplateId()
     {
-        return templateName;
+        return templateId;
     }
 
 
@@ -99,7 +99,7 @@ public class CloneResponse implements TaskResponse
     public String toString()
     {
         return "CloneResponse{" + "resourceHostId='" + resourceHostId + '\'' + ", hostname='" + hostname + '\''
-                + ", templateName='" + templateName + '\'' + ", templateArch=" + templateArch + ", containerName='"
+                + ", templateId='" + templateId + '\'' + ", templateArch=" + templateArch + ", containerName='"
                 + containerName + '\'' + ", ip='" + ip + '\'' + ", containerId='" + containerId + '\'' + '}';
     }
 }
