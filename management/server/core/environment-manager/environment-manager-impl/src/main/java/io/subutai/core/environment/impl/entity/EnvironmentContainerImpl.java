@@ -366,6 +366,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
+    public String getTemplateId()
+    {
+        return templateId;
+    }
+
+
+    @Override
     public EnvironmentContainerHost addTag( final String tag )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( tag ) );

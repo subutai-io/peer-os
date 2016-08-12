@@ -198,6 +198,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    @Override
+    public String getTemplateId()
+    {
+        return templateId;
+    }
+
+
     public String getTemplateArch()
     {
         return templateArch;
