@@ -45,9 +45,9 @@ public class UnlimitedPlacementStrategy implements UnlimitedStrategy
 
     public UnlimitedPlacementStrategy()
     {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master", 0, 0 ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop", 0, 0 ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra", 0, 0 ) );
+        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
+        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop" ) );
+        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra" ) );
     }
 
 

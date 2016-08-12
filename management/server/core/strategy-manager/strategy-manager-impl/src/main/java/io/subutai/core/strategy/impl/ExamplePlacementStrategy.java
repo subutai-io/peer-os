@@ -45,9 +45,9 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
     public ExamplePlacementStrategy()
     {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master", 0, 0 ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop", 0, 0 ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra", 0, 0 ) );
+        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master" ) );
+        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop" ) );
+        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra" ) );
     }
 
 

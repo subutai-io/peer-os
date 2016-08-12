@@ -10,20 +10,20 @@ import io.subutai.core.registration.api.service.RequestedHost;
 
 public interface RegistrationManager
 {
-    public List<RequestedHost> getRequests();
+    List<RequestedHost> getRequests();
 
-    public RequestedHost getRequest( String requestId );
+    RequestedHost getRequest( String requestId );
 
-    public void queueRequest( RequestedHost requestedHost ) throws HostRegistrationException;
+    void queueRequest( RequestedHost requestedHost ) throws HostRegistrationException;
 
-    public void rejectRequest( String requestId ) throws HostRegistrationException;
+    void rejectRequest( String requestId ) throws HostRegistrationException;
 
-    public void approveRequest( String requestId ) throws HostRegistrationException;
+    void approveRequest( String requestId ) throws HostRegistrationException;
 
-    public void removeRequest( String requestId ) throws HostRegistrationException;
+    void removeRequest( String requestId ) throws HostRegistrationException;
 
-    public ContainerToken generateContainerTTLToken( long ttlInMs ) throws HostRegistrationException;
+    ContainerToken generateContainerTTLToken( long ttlInMs ) throws HostRegistrationException;
 
-    public ContainerToken verifyToken( String token, String containerHostId, String publicKey )
+    ContainerToken verifyToken( String token, String containerHostId, String publicKey )
             throws HostRegistrationException;
 }

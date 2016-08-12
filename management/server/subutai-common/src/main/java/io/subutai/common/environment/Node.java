@@ -38,6 +38,8 @@ public class Node
     @JsonProperty( "hostname" )
     private String hostname;
 
+    private String templateId;
+
 
     private Node()
     {
@@ -112,5 +114,17 @@ public class Node
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
 
         this.hostname = hostname.replaceAll( "\\s+", "" );
+    }
+
+
+    public String getTemplateId()
+    {
+        return templateId;
+    }
+
+
+    public void setTemplateId( final String templateId )
+    {
+        this.templateId = templateId;
     }
 }
