@@ -216,7 +216,7 @@ public class BuildContainerStateHandler extends StateHandler
     {
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-        //TODO:TEMPLATE
+        //TODO:TEMPLATE receive templateId instead of templateName from Hub, this is a workaround for now
         CloneRequest cloneRequest =
                 new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
                         nodeDto.getContainerName(), nodeDto.getIp(),
