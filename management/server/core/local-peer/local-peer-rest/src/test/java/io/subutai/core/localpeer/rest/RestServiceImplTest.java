@@ -8,7 +8,6 @@ import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -23,20 +22,15 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 
-import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -110,24 +104,5 @@ public class RestServiceImplTest
         when( jsonUtil.from( JSON, PeerInfo.class ) ).thenReturn( peerInfo );
         when( localPeer.getContainerHostById( CONTAINER_ID ) ).thenReturn( containerHost );
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
-    }
-
-
-    @Test
-    public void testGetTemplate() throws Exception
-    {
-        Template template = mock( Template.class );
-
-        when( localPeer.getTemplateByName( TEMPLATE_NAME ) ).thenReturn( template );
-
-        restService.getTemplateByName( TEMPLATE_NAME );
-
-        verify( jsonUtil ).to( template );
-
-        doThrow( exception ).when( localPeer ).getTemplateByName( TEMPLATE_NAME );
-
-        Template response1 = restService.getTemplateByName( TEMPLATE_NAME );
-
-        assertNotNull( response1 );
     }
 }

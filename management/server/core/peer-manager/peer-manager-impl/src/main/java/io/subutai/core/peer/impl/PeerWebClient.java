@@ -27,7 +27,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
@@ -617,33 +616,5 @@ public class PeerWebClient
         }
 
         return WebClientBuilder.checkResponse( response, Integer.class );
-    }
-
-
-    public Template getTemplate( final String templateName ) throws PeerException
-    {
-        WebClient client = null;
-        Response response;
-        try
-        {
-            String path = String.format( "/template/%s/get", templateName );
-
-            client = WebClientBuilder.buildPeerWebClient( peerInfo, path, provider );
-
-            client.accept( MediaType.APPLICATION_JSON );
-
-            response = client.get();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( e.getMessage(), e );
-            throw new PeerException( String.format( "Error obtaining template : %s", e.getMessage() ) );
-        }
-        finally
-        {
-            WebClientBuilder.close( client );
-        }
-
-        return WebClientBuilder.checkResponse( response, Template.class );
     }
 }

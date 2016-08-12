@@ -39,13 +39,15 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     private final boolean local;
 
 
-    ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
+    //temporary workaround until we get template id from Hub
+    ProxyEnvironmentContainer( JsonNode json, String templateId, EnvironmentManagerImpl environmentManager,
+                               Set<String> localContainerIds )
     {
-        //TODO:TEMPLATE pass templateId instead of templateName
+
         super( "hub", json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING ), json.get( "templateName" ).asText(), HostArchitecture.AMD64,
+                        ContainerHostState.RUNNING ), templateId, HostArchitecture.AMD64,
                 json.get( "domainName" ).asText(), parseSize( json ), json.get( "hostId" ).asText(),
                 json.get( "name" ).asText() );
 

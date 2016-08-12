@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
@@ -54,6 +56,12 @@ public class ProxyEnvironment extends EnvironmentImpl
     }
 
 
+    protected LocalPeer getLocaPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+    }
+
+
     private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager,
                                                            ProxyContainerHelper proxyContainerHelper )
     {
@@ -67,8 +75,10 @@ public class ProxyEnvironment extends EnvironmentImpl
         {
             for ( JsonNode node : arr )
             {
-                ProxyEnvironmentContainer ch =
-                        new ProxyEnvironmentContainer( node, environmentManager, localContainerIds );
+                //TODO:TEMPLATE pass templateId instead of templateName
+                ProxyEnvironmentContainer ch = new ProxyEnvironmentContainer( node,
+                        getLocaPeer().getTemplateByName( node.get( "templateName" ).asText() ).getId(),
+                        environmentManager, localContainerIds );
 
                 ch.setEnvironment( this );
 

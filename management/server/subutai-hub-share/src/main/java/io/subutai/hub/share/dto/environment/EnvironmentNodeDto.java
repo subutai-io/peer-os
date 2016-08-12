@@ -4,7 +4,7 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
-
+//TODO:TEMPLATE add templateId
 public class EnvironmentNodeDto
 {
     private String hostId;
@@ -47,21 +47,9 @@ public class EnvironmentNodeDto
     }
 
 
-    public void setHostId( final String hostId )
-    {
-        this.hostId = hostId;
-    }
-
-
     public String getHostName()
     {
         return hostName;
-    }
-
-
-    public void setHostName( final String hostName )
-    {
-        this.hostName = hostName;
     }
 
 
@@ -71,57 +59,9 @@ public class EnvironmentNodeDto
     }
 
 
-    public void setContainerName( final String containerName )
-    {
-        this.containerName = containerName;
-    }
-
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
-    }
-
-
-    public void setEnvironmentId( final String environmentId )
-    {
-        this.environmentId = environmentId;
-    }
-
-
-    public String getOwnerId()
-    {
-        return ownerId;
-    }
-
-
-    public void setOwnerId( final String ownerId )
-    {
-        this.ownerId = ownerId;
-    }
-
-
     public String getTemplateName()
     {
         return templateName;
-    }
-
-
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
-
-
-    public String getTemplateArch()
-    {
-        return templateArch;
-    }
-
-
-    public void setTemplateArch( final String templateArch )
-    {
-        this.templateArch = templateArch;
     }
 
 
@@ -131,33 +71,9 @@ public class EnvironmentNodeDto
     }
 
 
-    public void setContainerSize( final String containerSize )
-    {
-        this.containerSize = containerSize;
-    }
-
-
-    public int getIpAddressOffset()
-    {
-        return ipAddressOffset;
-    }
-
-
-    public void setIpAddressOffset( final int ipAddressOffset )
-    {
-        this.ipAddressOffset = ipAddressOffset;
-    }
-
-
     public String getIp()
     {
         return ip;
-    }
-
-
-    public void setIp( final String ip )
-    {
-        this.ip = ip;
     }
 
 
@@ -170,18 +86,6 @@ public class EnvironmentNodeDto
     public void setContainerId( final String containerId )
     {
         this.containerId = containerId;
-    }
-
-
-    public long getElapsedTime()
-    {
-        return elapsedTime;
-    }
-
-
-    public void setElapsedTime( final long elapsedTime )
-    {
-        this.elapsedTime = elapsedTime;
     }
 
 
@@ -200,12 +104,6 @@ public class EnvironmentNodeDto
     public Set<String> getSshKeys()
     {
         return sshKeys;
-    }
-
-
-    public void setSshKeys( final Set<String> sshKeys )
-    {
-        this.sshKeys = sshKeys;
     }
 
 
