@@ -216,7 +216,7 @@ public class HubManagerImpl implements HubManager
                     new RegistrationRequestProcessor( this, peerManager, registrationManager, restClient );
 
             registrationRequestExecutor
-                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 30, TimeUnit.SECONDS );
 
             EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                     new EnvironmentTelemetryProcessor( this, peerManager, configManager );
