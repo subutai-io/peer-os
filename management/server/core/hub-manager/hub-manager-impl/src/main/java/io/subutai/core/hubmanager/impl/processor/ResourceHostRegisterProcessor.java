@@ -11,24 +11,31 @@ import org.slf4j.LoggerFactory;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
+import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.hub.share.dto.ResourceHostDataDto;
+import io.subutai.hub.share.dto.host.RequestedHostDto;
+
+import static java.lang.String.format;
 
 
 public class ResourceHostRegisterProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostRegisterProcessor.class.getName() );
+
     private RegistrationManager registrationManager;
     private HubRestClient restClient;
+    private PeerManager peerManager;
 
-    private static final Pattern RH_DATA_PATTERN = Pattern.compile( "/rest/v1/system-info/" + "." );
+    private static final Pattern RH_DATA_PATTERN = Pattern.compile( "/rest/v1/peers/.*/requested-hosts/.*" );
 
 
-    public ResourceHostRegisterProcessor( final RegistrationManager registrationManager,
+    public ResourceHostRegisterProcessor( final RegistrationManager registrationManager, final PeerManager peerManager,
                                           final HubRestClient restClient )
     {
         this.registrationManager = registrationManager;
+        this.peerManager = peerManager;
         this.restClient = restClient;
     }
 
@@ -79,11 +86,47 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
         switch ( resourceHostDataDto.getState() )
         {
             case APPROVE:
-                registrationManager.approveRequest( resourceHostDataDto.getResourceHostId() );
+                registrationManager.approveRequest( resourceHostDataDto.getRequestId() );
+                resourceHostDataDto.setStatus( RequestedHostDto.Status.APPROVED );
+                updateResourceHostData( resourceHostDataDto );
+                break;
             case REJECT:
-                registrationManager.rejectRequest( resourceHostDataDto.getResourceHostId() );
+                registrationManager.rejectRequest( resourceHostDataDto.getRequestId() );
+                resourceHostDataDto.setStatus( RequestedHostDto.Status.REJECTED );
+                updateResourceHostData( resourceHostDataDto );
+                break;
             case REMOVE:
-                registrationManager.removeRequest( resourceHostDataDto.getResourceHostId() );
+                registrationManager.removeRequest( resourceHostDataDto.getRequestId() );
+                deleteResourceHostData( resourceHostDataDto );
+                break;
+        }
+    }
+
+
+    public void updateResourceHostData( ResourceHostDataDto resourceHostDataDto )
+    {
+
+        String path = format( "/rest/v1/peers/%s/requested-hosts/%s", peerManager.getLocalPeer().getId(),
+                resourceHostDataDto.getRequestId() );
+
+        RestResult<Object> restResult = restClient.post( path, resourceHostDataDto );
+        if ( !restResult.isSuccess() )
+        {
+            LOG.error( "Error on sending requested host data: " + restResult.getError() );
+        }
+    }
+
+
+    public void deleteResourceHostData( ResourceHostDataDto resourceHostDataDto )
+    {
+
+        String path = format( "/rest/v1/peers/%s/requested-hosts/%s", peerManager.getLocalPeer().getId(),
+                resourceHostDataDto.getRequestId() );
+
+        RestResult<Object> restResult = restClient.delete( path );
+        if ( !restResult.isSuccess() )
+        {
+            LOG.error( "Error on sending requested host data: " + restResult.getError() );
         }
     }
 }

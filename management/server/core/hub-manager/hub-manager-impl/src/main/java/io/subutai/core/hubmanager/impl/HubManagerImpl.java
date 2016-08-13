@@ -136,6 +136,8 @@ public class HubManagerImpl implements HubManager
 
     private VersionInfoProcessor versionInfoProcessor;
 
+    private RegistrationRequestProcessor registrationRequestProcessor;
+
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
     private String checksum = "";
@@ -210,11 +212,11 @@ public class HubManagerImpl implements HubManager
 
             versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
-            RegistrationRequestProcessor registrationRequestProcessor =
+            registrationRequestProcessor =
                     new RegistrationRequestProcessor( this, peerManager, registrationManager, restClient );
 
             registrationRequestExecutor
-                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 120, TimeUnit.SECONDS );
+                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 60, TimeUnit.SECONDS );
 
             EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                     new EnvironmentTelemetryProcessor( this, peerManager, configManager );
@@ -265,7 +267,7 @@ public class HubManagerImpl implements HubManager
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
         StateLinkProcessor resourceHostRegisterProcessor =
-                new ResourceHostRegisterProcessor( registrationManager, restClient );
+                new ResourceHostRegisterProcessor( registrationManager, peerManager, restClient );
 
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
@@ -345,6 +347,8 @@ public class HubManagerImpl implements HubManager
         notifyRegistrationListeners();
 
         sendResourceHostInfo();
+
+        registrationRequestProcessor.run();
     }
 
 

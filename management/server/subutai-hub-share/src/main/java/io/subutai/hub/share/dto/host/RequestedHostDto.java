@@ -11,19 +11,21 @@ public class RequestedHostDto
 
     private String hostname;
 
-    private Status state;
+    private Status status;
 
+    private Boolean management;
 
     public RequestedHostDto()
     {
+        management = false;
     }
 
 
-    public RequestedHostDto( final String id, final String hostname, final Status state )
+    public RequestedHostDto( final String id, final String hostname, final Status status )
     {
         this.id = id;
         this.hostname = hostname;
-        this.state = state;
+        this.status = status;
     }
 
 
@@ -51,14 +53,26 @@ public class RequestedHostDto
     }
 
 
-    public Status getState()
+    public Status getStatus()
     {
-        return state;
+        return status;
     }
 
 
-    public void setState( final Status state )
+    public void setStatus( final Status state )
     {
-        this.state = state;
+        this.status = state;
+    }
+
+
+    public Boolean getManagement()
+    {
+        return management;
+    }
+
+
+    public void setManagement( final Boolean management )
+    {
+        this.management = management;
     }
 }

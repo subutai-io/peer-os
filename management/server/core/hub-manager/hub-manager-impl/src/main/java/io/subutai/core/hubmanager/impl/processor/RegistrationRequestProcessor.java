@@ -6,12 +6,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.registration.api.RegistrationManager;
-import io.subutai.core.registration.api.RegistrationStatus;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.hub.share.dto.host.RequestedHostDto;
 import io.subutai.hub.share.dto.host.RequestedHostsDto;
@@ -62,23 +63,27 @@ public class RegistrationRequestProcessor implements Runnable
     {
         if ( manager.isRegistered() )
         {
-            String path = format( "/rest/v1/peers/%s/resource-hosts/requests", peerManager.getLocalPeer().getId() );
+            String path = format( "/rest/v1/peers/%s/requested-hosts", peerManager.getLocalPeer().getId() );
 
+            LocalPeer localPeer = peerManager.getLocalPeer();
             RequestedHostsDto requestedHostsDto = new RequestedHostsDto();
-            requestedHostsDto.setPeerId( peerManager.getLocalPeer().getId() );
+            requestedHostsDto.setPeerId( localPeer.getId() );
 
             List<RequestedHost> requestedHosts = registrationManager.getRequests();
+            ResourceHost managementHost = localPeer.getManagementHost();
+
             for ( RequestedHost requestedHost : requestedHosts )
             {
-                if ( requestedHost.getStatus().equals( RegistrationStatus.REQUESTED ) )
+                RequestedHostDto requestedHostDto = new RequestedHostDto();
+                if ( managementHost.getId().equalsIgnoreCase( requestedHost.getId() ) )
                 {
-                    RequestedHostDto requestedHostDto = new RequestedHostDto();
-                    requestedHostDto.setHostname( requestedHost.getHostname() );
-                    requestedHostDto.setId( requestedHost.getId() );
-                    requestedHostDto.setState( RequestedHostDto.Status.valueOf( requestedHost.getStatus().name() ) );
-
-                    requestedHostsDto.addRequestedHostsDto( requestedHostDto );
+                    requestedHostDto.setManagement( true );
                 }
+                requestedHostDto.setHostname( requestedHost.getHostname() );
+                requestedHostDto.setId( requestedHost.getId() );
+                requestedHostDto.setStatus( RequestedHostDto.Status.valueOf( requestedHost.getStatus().name() ) );
+
+                requestedHostsDto.addRequestedHostsDto( requestedHostDto );
             }
 
             RestResult<Object> restResult = restClient.post( path, requestedHostsDto );

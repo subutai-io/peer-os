@@ -17,7 +17,7 @@ public class ResourceHostDataDto
 
     private String peerId;
 
-    private String resourceHostId;
+    private String requestId;
 
 
     public ResourceHostDataDto()
@@ -49,15 +49,15 @@ public class ResourceHostDataDto
     }
 
 
-    public String getResourceHostId()
+    public String getRequestId()
     {
-        return resourceHostId;
+        return requestId;
     }
 
 
-    public void setResourceHostId( final String resourceHostId )
+    public void setRequestId( final String requestId )
     {
-        this.resourceHostId = resourceHostId;
+        this.requestId = requestId;
     }
 
 
