@@ -1,6 +1,6 @@
 package io.subutai.hub.share.dto;
 
-
+@Deprecated
 public class ResourceHostMetricDto
 {
     private String peerId;
