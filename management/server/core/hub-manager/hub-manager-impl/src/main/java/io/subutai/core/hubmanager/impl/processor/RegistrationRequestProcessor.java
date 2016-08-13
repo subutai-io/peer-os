@@ -51,7 +51,7 @@ public class RegistrationRequestProcessor implements Runnable
         }
         catch ( Exception e )
         {
-            log.debug( "Sending resource host registration request failed." );
+            log.debug( "Sending host requests failed." );
 
             log.error( e.getMessage(), e );
         }
