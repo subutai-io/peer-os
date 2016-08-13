@@ -65,6 +65,7 @@ public class RegistrationRequestProcessor implements Runnable
             String path = format( "/rest/v1/peers/%s/resource-hosts/requests", peerManager.getLocalPeer().getId() );
 
             RequestedHostsDto requestedHostsDto = new RequestedHostsDto();
+            requestedHostsDto.setPeerId( peerManager.getLocalPeer().getId() );
 
             List<RequestedHost> requestedHosts = registrationManager.getRequests();
             for ( RequestedHost requestedHost : requestedHosts )

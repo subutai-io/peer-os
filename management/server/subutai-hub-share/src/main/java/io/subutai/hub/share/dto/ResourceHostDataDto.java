@@ -1,14 +1,19 @@
 package io.subutai.hub.share.dto;
 
 
+import io.subutai.hub.share.dto.host.RequestedHostDto;
+
+
 public class ResourceHostDataDto
 {
     public enum State
     {
-        APPROVE, REJECT, REMOVE
+        APPROVE, REJECT, REMOVE, NO_STATE
     }
 
     private State state;
+
+    private RequestedHostDto.Status status;
 
     private String peerId;
 
@@ -53,5 +58,17 @@ public class ResourceHostDataDto
     public void setResourceHostId( final String resourceHostId )
     {
         this.resourceHostId = resourceHostId;
+    }
+
+
+    public RequestedHostDto.Status getStatus()
+    {
+        return status;
+    }
+
+
+    public void setStatus( final RequestedHostDto.Status status )
+    {
+        this.status = status;
     }
 }

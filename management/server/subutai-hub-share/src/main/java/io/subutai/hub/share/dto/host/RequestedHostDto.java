@@ -4,7 +4,7 @@ public class RequestedHostDto
 {
     public enum Status
     {
-        APPROVED, REJECTED, REMOVED
+        REQUESTED, APPROVED, REJECTED
     }
 
     private String id;
