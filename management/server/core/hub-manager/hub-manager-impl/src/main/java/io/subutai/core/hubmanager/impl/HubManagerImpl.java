@@ -122,6 +122,8 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
+    private io.subutai.core.registration.api.RegistrationManager registrationManager;
+
     private HeartbeatProcessor heartbeatProcessor;
 
     private ResourceHostDataProcessor resourceHostDataProcessor;
@@ -665,6 +667,11 @@ public class HubManagerImpl implements HubManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+    public void setRegistrationManager( final io.subutai.core.registration.api.RegistrationManager registrationManager)
+    {
+        this.registrationManager = registrationManager;
     }
 
 
