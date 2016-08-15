@@ -1003,6 +1003,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     var container2Build = {
                         "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
+                        //todo get template id from currentElement.get('templateId'), implement
                         "templateId": getTemplateIdByName(currentElement.get('templateName')),
                         "name": currentElement.get('containerName'),
                         "peerId": currentElement.get('parentPeerId'),

@@ -323,6 +323,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
 				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
 				"position": vm.currentEnvironment.includedContainers[i].get('position'),
+				//todo get template id from vm.currentEnvironment.includedContainers[i].get('templateId'), implement
 				"templateId" : getTemplateIdByName(vm.currentEnvironment.includedContainers[i].get('templateName'))
 			});
 		}
@@ -822,6 +823,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 "size": currentElement.get('quotaSize'),
                 "templateName": currentElement.get('templateName'),
                 "name": currentElement.get('containerName'),
+                //todo get template id from currentElement.get('templateId'), implement
                 "templateId" : getTemplateIdByName(currentElement.get('templateName')),
                 "position": currentElement.get('position')
             };
