@@ -144,10 +144,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public RequestedHostImpl getRequestedHost()
-    {
-        return requestedHost;
-    }
 
 
     public void setRequestedHost( final RequestedHostImpl requestedHost )
@@ -204,10 +200,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
 
 
     @Override
@@ -217,10 +209,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public void setPublicKey( final String publicKey )
-    {
-        this.publicKey = publicKey;
-    }
 
 
     @Override
@@ -237,10 +225,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     }
 
 
-    public void setGateway( final String gateway )
-    {
-        this.gateway = gateway;
-    }
 
 
     @Override
@@ -249,11 +233,6 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
         return hostname.compareTo( o.getHostname() );
     }
 
-
-    public void setVlan( final Integer vlan )
-    {
-        this.vlan = vlan;
-    }
 
 
     @Override

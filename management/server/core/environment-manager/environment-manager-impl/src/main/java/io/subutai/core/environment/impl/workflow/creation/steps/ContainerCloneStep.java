@@ -171,7 +171,7 @@ public class ContainerCloneStep
                         cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
                         ContainerHostState.RUNNING );
 
-        return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateName(),
+        return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateId(),
                 cloneResponse.getTemplateArch(), defaultDomain, cloneResponse.getContainerSize(),
                 cloneResponse.getResourceHostId(), cloneResponse.getContainerName() );
     }

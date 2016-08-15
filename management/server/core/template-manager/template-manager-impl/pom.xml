@@ -10,6 +10,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>template-manager-impl</artifactId>
+  <packaging>bundle</packaging>
+  <name>Template Manager Impl</name>
+  <description>Template Manager Impl</description>
 
   <dependencies>
     <dependency>
@@ -31,4 +34,26 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.core.template.impl</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+            <Import-Package>*</Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

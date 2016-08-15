@@ -10,7 +10,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>template-manager</artifactId>
+  <name>Template Manager Parent</name>
+  <description>Template Manager Parent</description>
   <packaging>pom</packaging>
+
   <modules>
     <module>template-manager-api</module>
     <module>template-manager-impl</module>

@@ -169,5 +169,9 @@ public interface LocalPeer extends Peer
     Set<ContainerHost> listOrphanContainers();
 
     void removeOrphanContainers();
+
+    Template getTemplateByName( String templateName ) throws PeerException;
+
+    Template getTemplateById( String templateId ) throws PeerException;
 }
 
