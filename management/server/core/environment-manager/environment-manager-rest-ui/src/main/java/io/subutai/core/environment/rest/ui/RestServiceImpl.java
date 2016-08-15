@@ -190,9 +190,6 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-            //TODO fix this (this is a temporary workaround until UI will supply template ids here)
-            schema.forEach( s -> s.setTemplateId( templateManager.getTemplateByName( s.getTemplateName() ).getId() ) );
-
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
@@ -274,8 +271,6 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-            //TODO fix this (this is a temporary workaround until UI will supply template ids here)
-            schema.forEach( s -> s.setTemplateId( templateManager.getTemplateByName( s.getTemplateName() ).getId() ) );
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
             {
