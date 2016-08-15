@@ -976,7 +976,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     }
 
     //workaround issue #974
-    //to implement properly, id should be taken from the same template object b/c template name are not unique
+    //to implement properly, id should be taken from the same template object b/c template names are not unique
     function getTemplateIdByName(name) {
         var arr = jQuery.grep(vm.templatesList, function (e) {
             return ( e.name == name);

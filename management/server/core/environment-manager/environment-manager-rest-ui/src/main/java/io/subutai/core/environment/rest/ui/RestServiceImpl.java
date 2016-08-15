@@ -228,8 +228,6 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-            //TODO fix this (this is a temporary workaround until UI will supply template ids here)
-            schema.forEach( s -> s.setTemplateId( templateManager.getTemplateByName( s.getTemplateName() ).getId() ) );
 
             Topology topology = new Topology( name );
 
@@ -327,9 +325,6 @@ public class RestServiceImpl implements RestService
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
             {
             }.getType() );
-
-            //TODO fix this (this is a temporary workaround until UI will supply template ids here)
-            schema.forEach( s -> s.setTemplateId( templateManager.getTemplateByName( s.getTemplateName() ).getId() ) );
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
             {

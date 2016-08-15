@@ -1003,6 +1003,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     var container2Build = {
                         "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
+                        "templateId": getTemplateIdByName(currentElement.get('templateName')),
                         "name": currentElement.get('containerName'),
                         "peerId": currentElement.get('parentPeerId'),
                         "hostId": currentElement.get('parentHostId'),
@@ -1019,6 +1020,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     result.containersObj[currentElement.get('templateName')].sizes = {};
                     result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
                     result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
+                    result.containersObj[currentElement.get('templateName')].id = getTemplateIdByName(result.containersObj[currentElement.get('templateName')].name);
                 } else {
                     result.containersObj[currentElement.get('templateName')].count++;
                     if (result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
@@ -1090,6 +1092,20 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
         if (arr.length > 0 && arr[0].name.length > 0) {
             return arr[0].name;
+        }
+
+        return id;
+    }
+
+    //workaround issue #974
+    //to implement properly, id should be taken from the same template object b/c template names are not unique
+    function getTemplateIdByName(name) {
+        var arr = jQuery.grep(vm.templatesList, function (e) {
+            return ( e.name == name);
+        });
+
+        if (arr.length > 0 && arr[0].name.length > 0) {
+            return arr[0].id;
         }
 
         return id;
