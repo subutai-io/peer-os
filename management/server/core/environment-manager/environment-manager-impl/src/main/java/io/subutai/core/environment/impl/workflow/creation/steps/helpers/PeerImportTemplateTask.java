@@ -6,15 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.tracker.TrackerOperation;
 
@@ -56,15 +52,10 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
             templates.add( node.getTemplateId() );
         }
 
-        //todo remove
-        Thread thread = new Thread( new TempRunnable() );
-        thread.start();
 
         PrepareTemplatesResponse response =
                 peer.prepareTemplates( new PrepareTemplatesRequest( environmentId, rhTemplates ) );
 
-        //todo remove
-        thread.interrupt();
 
         for ( String message : response.getMessages() )
         {
@@ -84,35 +75,5 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
         }
 
         return response;
-    }
-
-
-    //todo remove after tests
-    class TempRunnable implements Runnable
-    {
-        Logger logger = LoggerFactory.getLogger( this.getClass() );
-
-
-        @Override
-        public void run()
-        {
-            while ( !Thread.interrupted() )
-            {
-                try
-                {
-                    Thread.sleep( 1000 );
-
-                    logger.info( peer.getTemplateDownloadProgress( new EnvironmentId( environmentId ) ).toString() );
-                }
-                catch ( InterruptedException e )
-                {
-                    return;
-                }
-                catch ( Exception e )
-                {
-                    logger.error( "Error obtaining template download progress", e );
-                }
-            }
-        }
     }
 }
