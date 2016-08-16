@@ -3,6 +3,7 @@ package io.subutai.core.localpeer.impl.entity;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -28,12 +29,14 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.CommandUtil;
 import io.subutai.common.environment.RhP2pIp;
+import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
@@ -70,6 +73,7 @@ import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostRegistry;
 import io.subutai.core.localpeer.impl.ResourceHostCommands;
+import io.subutai.core.localpeer.impl.command.TemplateDownloadTracker;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
@@ -89,6 +93,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
     private static final Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
+    private final Map<String, Map<String, Integer>> envTemplatesDownloadPercent = Maps.newConcurrentMap();
 
 
     @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER,
@@ -745,19 +750,49 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final Template template ) throws ResourceHostException
+    public void importTemplate( final Template template, final String environmentId ) throws ResourceHostException
     {
         Preconditions.checkNotNull( template, "Invalid template" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId() ), this );
+            updateTemplateDownloadProgress( environmentId, template.getName(), 0 );
+
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId() ), this,
+                    new TemplateDownloadTracker( this, environmentId ) );
         }
         catch ( Exception e )
         {
             throw new ResourceHostException(
                     String.format( "Error importing template %s: %s", template.getName(), e.getMessage() ), e );
         }
+    }
+
+
+    @Override
+    public RhTemplatesDownloadProgress getTemplateDownloadProgress( final String environmentId )
+    {
+        Map<String, Integer> templateDownloadPercent = envTemplatesDownloadPercent.get( environmentId );
+
+        return new RhTemplatesDownloadProgress(
+                templateDownloadPercent == null ? Maps.<String, Integer>newHashMap() : templateDownloadPercent );
+    }
+
+
+    public void updateTemplateDownloadProgress( String environmentId, String templateName, int downloadPercent )
+    {
+        Map<String, Integer> templateDownloadPercent = envTemplatesDownloadPercent.get( environmentId );
+
+        if ( templateDownloadPercent == null )
+        {
+            templateDownloadPercent = Maps.newHashMap();
+        }
+
+        templateDownloadPercent.put( templateName, downloadPercent );
+
+        envTemplatesDownloadPercent.put( environmentId, templateDownloadPercent );
     }
 
 

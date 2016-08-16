@@ -17,5 +17,12 @@
       </action>
     </command>
   </command-bundle>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+    <command name="command/template-test">
+      <action class="io.subutai.core.executor.cli.TemplateTestCommand">
+        <argument ref="executor" />
+      </action>
+    </command>
+  </command-bundle>
 
 </blueprint>

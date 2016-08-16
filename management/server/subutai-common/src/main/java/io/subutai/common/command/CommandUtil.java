@@ -67,6 +67,24 @@ public class CommandUtil
     }
 
 
+    public CommandResult execute( RequestBuilder requestBuilder, Host host, CommandCallback callback )
+            throws CommandException
+    {
+
+        Preconditions.checkNotNull( requestBuilder );
+        Preconditions.checkNotNull( host );
+
+        CommandResult result = host.execute( requestBuilder, callback );
+
+        if ( !result.hasSucceeded() )
+        {
+            throw new CommandException( String.format( "Error executing command on host %s: %s", host.getHostname(),
+                    result.hasCompleted() ? result.getStdErr() : "Command timed out" ) );
+        }
+        return result;
+    }
+
+
     /**
      * Execute request on host with callback. Allows to stop callback from being triggered by calling stop() from inside
      * a callback. Please make sure that the command is not a daemon command (command which forks a daemon process).
