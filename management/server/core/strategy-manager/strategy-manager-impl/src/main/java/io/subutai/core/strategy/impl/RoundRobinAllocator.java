@@ -32,12 +32,12 @@ public class RoundRobinAllocator extends PeerResources
     }
 
 
-    public boolean allocate( final String containerName, final String templateName, final ContainerSize size,
+    public boolean allocate( final String containerName, final String templateId, final ContainerSize size,
                              ContainerQuota containerQuota )
     {
         HostResources hostResources = iterator.next();
         AllocatedContainer container =
-                new AllocatedContainer( containerName, templateName, size, getPeerId(), hostResources.getHostId() );
+                new AllocatedContainer( containerName, templateId, size, getPeerId(), hostResources.getHostId() );
         containers.add( container );
 
         return true;

@@ -322,7 +322,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				"size": vm.currentEnvironment.includedContainers[i].get('quotaSize'),
 				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
 				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
-				"position": vm.currentEnvironment.includedContainers[i].get('position')
+				"position": vm.currentEnvironment.includedContainers[i].get('position'),
+				"templateId" : vm.currentEnvironment.includedContainers[i].get('templateId')
 			});
 		}
 
@@ -524,7 +525,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         this.model.attributes.templateName,
                         false,
                         this.model.attributes.quotaSize,
-                        getTemplateNameById(this.model.attributes.templateName)
+                        getTemplateNameById(this.model.attributes.templateName),
+                        this.model.attributes.templateId
                     );
 
                     return;
@@ -620,6 +622,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         vm.selectedPlugin.selected = true;
     }
 
+    //todo make plugins expose template ids in requirements
     function setTemplatesByPlugin() {
 
         if (vm.selectedPlugin.requirement !== undefined) {
@@ -652,7 +655,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     }
 
 	var containerCounter = 1;
-	function addContainer(template, $event, size, templateImg) {
+	function addContainer(template, $event, size, templateImg, templateId) {
 
 		if($event === undefined || $event === null) $event = false;
 
@@ -662,6 +665,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 size = 'HUGE';
             }
         }
+
+        //workaround issue #974
+        //to implement properly, plugins should expose template id requirement
+        if(templateId == undefined || templateId == null){
+            templateId = getTemplateIdByName(template);
+        }
+
         if (templateImg === undefined || templateImg === null) templateImg = template;
 
         var pos = findEmptyCubePostion();
@@ -681,6 +691,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			templateName: template,
 			quotaSize: size,
 			containerName: containerName,
+			templateId: templateId,
 			attrs: {
 				image: { 'xlink:href': img },
 				'rect.b-magnet': {fill: vm.colors[size]},
@@ -821,6 +832,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 "size": currentElement.get('quotaSize'),
                 "templateName": currentElement.get('templateName'),
                 "name": currentElement.get('containerName'),
+                "templateId" : currentElement.get('templateId'),
                 "position": currentElement.get('position')
             };
 
@@ -830,6 +842,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 vm.env2Build[currentElement.get('templateName')].sizes = {};
                 vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
                 vm.env2Build[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
+                vm.env2Build[currentElement.get('templateName')].id = currentElement.get('templateId');
             } else {
                 vm.env2Build[currentElement.get('templateName')].count++;
                 if (vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
@@ -891,6 +904,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
 				containerName: environment.containers[container].hostname,
+				templateId : environment.containers[container].templateId,
 				attrs: {
 					image: { 'xlink:href': img },
 					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
@@ -966,6 +980,20 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
         if (arr.length > 0 && arr[0].name.length > 0) {
             return arr[0].name;
+        }
+
+        return id;
+    }
+
+    //workaround issue #974
+    //to implement properly, id should be taken from the same template object b/c template names are not unique
+    function getTemplateIdByName(name) {
+        var arr = jQuery.grep(vm.templatesList, function (e) {
+            return ( e.name == name);
+        });
+
+        if (arr.length > 0 && arr[0].name.length > 0) {
+            return arr[0].id;
         }
 
         return id;

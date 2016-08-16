@@ -274,7 +274,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
         peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
         peerInfo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-        peerInfo.setName("Local Peer" );
+        peerInfo.setName( "Local Peer" );
     }
 
 
@@ -715,9 +715,11 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             final ResourceHost resourceHost = getResourceHostById( resourceHostId );
 
-            for ( final String templateName : request.getTemplates().get( resourceHostId ) )
+            for ( final String templateId : request.getTemplates().get( resourceHostId ) )
             {
-                HostUtil.Task<Object> importTask = new ImportTemplateTask( templateName, resourceHost );
+                Template template = templateManager.getTemplate( templateId );
+
+                HostUtil.Task<Object> importTask = new ImportTemplateTask( template, resourceHost );
 
                 tasks.addTask( resourceHost, importTask );
             }
@@ -754,7 +756,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ResourceHost resourceHost = getResourceHostById( request.getResourceHostId() );
 
-            CloneContainerTask task = new CloneContainerTask( request, resourceHost, reservedNetworkResource, this );
+            CloneContainerTask task =
+                    new CloneContainerTask( request, templateManager.getTemplate( request.getTemplateId() ),
+                            resourceHost, reservedNetworkResource, this );
 
             cloneTasks.addTask( resourceHost, task );
         }
@@ -779,7 +783,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ContainerHostEntity containerHostEntity =
                         new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
                                 request.getHostname(), request.getTemplateArch(), interfaces, request.getHostname(),
-                                request.getTemplateName(), request.getTemplateArch().name(),
+                                request.getTemplateId(), request.getTemplateArch().name(),
                                 requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
                                 requestGroup.getInitiatorPeerId(), request.getContainerSize() );
 
@@ -2342,11 +2346,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Template getTemplate( final String templateName )
+    public Template getTemplateByName( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
-        return templateManager.getTemplate( templateName );
+        return templateManager.getTemplateByName( templateName );
+    }
+
+
+    @Override
+    public Template getTemplateById( final String templateId ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateId ), "Invalid template id" );
+
+        return templateManager.getTemplate( templateId );
     }
 
 

@@ -30,7 +30,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
@@ -119,23 +118,6 @@ public class RestServiceImpl implements RestService
         try
         {
             return localPeer.getPeerInfo();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public Template getTemplate( final String templateName )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
-
-            return localPeer.getTemplate( templateName );
         }
         catch ( Exception e )
         {

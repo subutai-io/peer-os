@@ -20,24 +20,17 @@ public class NodeSchema
     @JsonProperty( "templateName" )
     private String templateName;
 
-    @JsonProperty( "sshGroupId" )
-    private int sshGroupId;
-
-    @JsonProperty( "hostGroupId" )
-    private int hostGroupId;
+    @JsonProperty
+    private String templateId;
 
 
+    //TODO:TEMPLATE replace templateName with templateId when UI side is ready
     public NodeSchema( @JsonProperty( "name" ) final String name, @JsonProperty( "size" ) final ContainerSize size,
-                       @JsonProperty( "templateName" ) final String templateName,
-                       @JsonProperty( "sshGroupId" ) int sshGroupId,
-
-                       @JsonProperty( "hostGroupId" ) int hostGroupId )
+                       @JsonProperty( "templateName" ) final String templateName )
     {
         this.name = name;
         this.size = size;
         this.templateName = templateName;
-        this.sshGroupId = sshGroupId;
-        this.hostGroupId = hostGroupId;
     }
 
 
@@ -59,14 +52,14 @@ public class NodeSchema
     }
 
 
-    public int getSshGroupId()
+    public String getTemplateId()
     {
-        return sshGroupId;
+        return templateId;
     }
 
 
-    public int getHostGroupId()
+    public void setTemplateId( final String templateId )
     {
-        return hostGroupId;
+        this.templateId = templateId;
     }
 }

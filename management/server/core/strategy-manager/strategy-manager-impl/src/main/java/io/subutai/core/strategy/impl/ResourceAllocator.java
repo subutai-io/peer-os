@@ -27,7 +27,7 @@ public class ResourceAllocator extends PeerResources
     }
 
 
-    public boolean allocate( final String containerName, final String templateName, final ContainerSize size,
+    public boolean allocate( final String containerName, final String templateId, final ContainerSize size,
                              ContainerQuota containerQuota )
     {
         final Collection<HostResources> preferredHosts = getPreferredHosts();
@@ -35,7 +35,7 @@ public class ResourceAllocator extends PeerResources
         {
             if ( hostResources.allocate( containerQuota ) )
             {
-                AllocatedContainer container = new AllocatedContainer( containerName, templateName, size, getPeerId(),
+                AllocatedContainer container = new AllocatedContainer( containerName, templateId, size, getPeerId(),
                         hostResources.getHostId() );
                 containers.add( container );
                 return true;
@@ -51,57 +51,6 @@ public class ResourceAllocator extends PeerResources
         List<HostResources> result = new ArrayList<>( getHostResources() );
         Collections.shuffle( result );
         return result;
-    }
-
-
-    public class AllocatedContainer
-    {
-        private final String name;
-        private String templateName;
-        private ContainerSize size;
-        private String hostId;
-        private String peerId;
-
-
-        public AllocatedContainer( final String name, final String templateName, final ContainerSize size,
-                                   final String peerId, final String hostId )
-        {
-            this.name = name;
-            this.templateName = templateName;
-            this.size = size;
-            this.hostId = hostId;
-            this.peerId = peerId;
-        }
-
-
-        public String getName()
-        {
-            return name;
-        }
-
-
-        public String getTemplateName()
-        {
-            return templateName;
-        }
-
-
-        public ContainerSize getSize()
-        {
-            return size;
-        }
-
-
-        public String getHostId()
-        {
-            return hostId;
-        }
-
-
-        public String getPeerId()
-        {
-            return peerId;
-        }
     }
 
 

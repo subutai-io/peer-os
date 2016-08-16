@@ -51,11 +51,13 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 import io.subutai.common.quota.ContainerQuota;
@@ -743,27 +745,27 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
 
     @Override
-    public void importTemplate( final String templateName ) throws ResourceHostException
+    public void importTemplate( final Template template ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkNotNull( template, "Invalid template" );
 
         try
         {
-            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( templateName ), this );
+            commandUtil.execute( resourceHostCommands.getImportTemplateCommand( template.getId() ), this );
         }
         catch ( Exception e )
         {
             throw new ResourceHostException(
-                    String.format( "Error importing template %s: %s", templateName, e.getMessage() ), e );
+                    String.format( "Error importing template %s: %s", template.getName(), e.getMessage() ), e );
         }
     }
 
 
     @Override
-    public String cloneContainer( final String templateName, final String hostname, final String ip, final int vlan,
+    public String cloneContainer( final Template template, final String hostname, final String ip, final int vlan,
                                   final String environmentId ) throws ResourceHostException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
+        Preconditions.checkNotNull( template, "Invalid template" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( ip ), "Invalid ip" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
@@ -777,7 +779,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
             String token = getRegistrationManager().generateContainerTTLToken( 30 * 60 * 1000L ).getToken();
 
             CommandResult result = commandUtil.execute( resourceHostCommands
-                    .getCloneContainerCommand( templateName, hostname, ip, vlan, environmentId, token ), this );
+                    .getCloneContainerCommand( template.getId(), hostname, ip, vlan, environmentId, token ), this );
 
             //parse ID from output
 
@@ -857,13 +859,22 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
                     if ( !mhAlreadyRegistered && Common.MANAGEMENT_HOSTNAME.equals( info.getHostname() ) )
                     {
-                        containerHost =
-                                new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
-                                        info.getHostInterfaces(), info.getContainerName(), Common.MANAGEMENT_HOSTNAME,
-                                        info.getArch().name(), Common.MANAGEMENT_HOSTNAME, null, null,
-                                        ContainerSize.SMALL );
+                        try
+                        {
+                            containerHost =
+                                    new ContainerHostEntity( peerId, info.getId(), info.getHostname(), info.getArch(),
+                                            info.getHostInterfaces(), info.getContainerName(),
+                                            getLocalPeer().getTemplateByName( Common.MANAGEMENT_HOSTNAME ).getId(),
+                                            info.getArch().name(), Common.MANAGEMENT_HOSTNAME, null, null,
+                                            ContainerSize.SMALL );
 
-                        addContainerHost( containerHost );
+                            addContainerHost( containerHost );
+                        }
+                        catch ( PeerException e1 )
+                        {
+                            LOG.warn( "Could not register management host, error obtaining management template info",
+                                    e );
+                        }
                     }
                     else
                     {
