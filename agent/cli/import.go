@@ -24,7 +24,7 @@ import (
 
 var (
 	lock   lockfile.Lockfile
-	owners = []string{"subutai", "public", "jenkins", "docker", ""}
+	owners = []string{"subutai", "jenkins", "docker", ""}
 )
 
 type templ struct {
@@ -274,7 +274,7 @@ func LxcImport(name, version, token string) {
 	}
 
 	if len(t.id) != 0 && len(t.signature) == 0 {
-		log.Warn("Template is not signed")
+		log.Error("Template is not signed")
 	}
 
 	for owner, signature := range t.signature {
