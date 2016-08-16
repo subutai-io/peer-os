@@ -5,7 +5,7 @@
   <parent>
     <artifactId>hub-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.3-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -76,6 +76,12 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>hub-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>host-registration-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

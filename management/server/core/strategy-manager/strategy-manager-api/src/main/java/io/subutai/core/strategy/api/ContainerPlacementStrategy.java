@@ -22,9 +22,6 @@ public interface ContainerPlacementStrategy
 
     List<NodeSchema> getScheme();
 
-    Topology distribute( String environmentName, PeerGroupResources peerGroupResources,
-                         Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException;
-
     Topology distribute( String environmentName, List<NodeSchema> nodegroups, PeerGroupResources peerGroupResources,
                          Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException;
 }

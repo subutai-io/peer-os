@@ -49,7 +49,7 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
                 rhTemplates.put( node.getHostId(), templates );
             }
 
-            templates.add( node.getTemplateName() );
+            templates.add( node.getTemplateId() );
         }
 
         PrepareTemplatesResponse response =

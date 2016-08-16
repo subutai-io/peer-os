@@ -59,7 +59,6 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
@@ -220,15 +219,6 @@ public class RemotePeerImpl implements RemotePeer
     public RegistrationStatus getStatus()
     {
         return peerManager.getRemoteRegistrationStatus( peerInfo.getId() );
-    }
-
-
-    @Override
-    public Template getTemplate( final String templateName ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-
-        return peerWebClient.getTemplate( templateName );
     }
 
 

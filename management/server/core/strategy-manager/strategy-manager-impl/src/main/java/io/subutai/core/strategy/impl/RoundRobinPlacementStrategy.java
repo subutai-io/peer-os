@@ -45,14 +45,6 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     }
 
 
-    public RoundRobinPlacementStrategy()
-    {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master", 0, 0 ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop", 0, 0 ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra", 0, 0 ) );
-    }
-
-
     @Override
     public String getId()
     {
@@ -64,22 +56,6 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     public String getTitle()
     {
         return "Unlimited container placement strategy.";
-    }
-
-
-    @Override
-    public Topology distribute( final String environmentName, PeerGroupResources peerGroupResources,
-                                Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
-    {
-        Topology result = new Topology( environmentName );
-
-        Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
-        for ( Node node : nodes )
-        {
-            result.addNodePlacement( node.getPeerId(), node );
-        }
-
-        return result;
     }
 
 
@@ -135,9 +111,8 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             {
 
                 final RoundRobinAllocator resourceAllocator = iterator.next();
-                allocated = resourceAllocator
-                        .allocate( containerName, nodeSchema.getTemplateName(), nodeSchema.getSize(),
-                                quotas.get( nodeSchema.getSize() ) );
+                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
+                        quotas.get( nodeSchema.getSize() ) );
                 if ( allocated )
                 {
                     break;
@@ -161,8 +136,11 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             {
                 for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
-                            container.getSize(), container.getPeerId(), container.getHostId() );
+                    //TODO:TEMPLATE replace templateName with templateId when UI is ready
+                    Node node = new Node( container.getName(), container.getName(), "TODO-REMOVE", container.getSize(),
+                            container.getPeerId(), container.getHostId() );
+                    node.setTemplateId( container.getTemplateId() );
+
                     nodes.add( node );
                 }
             }

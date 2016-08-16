@@ -10,17 +10,17 @@ import io.subutai.common.peer.ContainerSize;
 public class AllocatedContainer
     {
         private final String name;
-        private String templateName;
+        private String templateId;
         private ContainerSize size;
         private String hostId;
         private String peerId;
 
 
-        public AllocatedContainer( final String name, final String templateName, final ContainerSize size,
+        public AllocatedContainer( final String name, final String templateId, final ContainerSize size,
                                    final String peerId, final String hostId )
         {
             this.name = name;
-            this.templateName = templateName;
+            this.templateId = templateId;
             this.size = size;
             this.hostId = hostId;
             this.peerId = peerId;
@@ -33,9 +33,9 @@ public class AllocatedContainer
         }
 
 
-        public String getTemplateName()
+        public String getTemplateId()
         {
-            return templateName;
+            return templateId;
         }
 
 

@@ -49,19 +49,20 @@ public class ResourceHostCommands
     }
 
 
-    public RequestBuilder getImportTemplateCommand( final String templateName )
+    public RequestBuilder getImportTemplateCommand( final String templateId )
     {
-        return new RequestBuilder( String.format( "subutai import %s", templateName ) )
+        return new RequestBuilder( String.format( "subutai import id:%s", templateId ) )
                 .withTimeout( Common.TEMPLATE_DOWNLOAD_TIMEOUT_SEC );
     }
 
 
-    public RequestBuilder getCloneContainerCommand( final String templateName, String hostName, String ip, int vlan,
+    public RequestBuilder getCloneContainerCommand( final String templateId, String hostName, String ip, int vlan,
                                                     String environmentId, String token )
     {
         return new RequestBuilder( "subutai clone" ).withCmdArgs(
-                Lists.newArrayList( templateName, hostName, "-i", String.format( "\"%s %d\"", ip, vlan ), "-e",
-                        environmentId, "-t", token ) ).withTimeout( Common.CLONE_TIMEOUT_SEC );
+                Lists.newArrayList( String.format( "id:%s", templateId ), hostName, "-i",
+                        String.format( "\"%s %d\"", ip, vlan ), "-e", environmentId, "-t", token ) )
+                                                    .withTimeout( Common.CLONE_TIMEOUT_SEC );
     }
 
 

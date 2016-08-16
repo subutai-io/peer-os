@@ -35,6 +35,7 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     String getTemplateName();
 
+    String getTemplateId();
 
     boolean isLocal();
 

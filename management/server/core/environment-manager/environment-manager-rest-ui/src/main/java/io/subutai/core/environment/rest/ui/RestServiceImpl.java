@@ -190,7 +190,6 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-
             final PeerGroupResources peerGroupResources = peerManager.getPeerGroupResources();
             final Map<ContainerSize, ContainerQuota> quotas = quotaManager.getDefaultQuotas();
 
@@ -228,6 +227,7 @@ public class RestServiceImpl implements RestService
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
             {
             }.getType() );
+
 
             Topology topology = new Topology( name );
 
@@ -268,6 +268,7 @@ public class RestServiceImpl implements RestService
             List<NodeSchema> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<NodeSchema>>()
             {
             }.getType() );
+
 
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
             {
@@ -324,6 +325,7 @@ public class RestServiceImpl implements RestService
             List<Node> schema = JsonUtil.fromJson( topologyJson, new TypeToken<List<Node>>()
             {
             }.getType() );
+
             List<String> containers = JsonUtil.fromJson( removedContainers, new TypeToken<List<String>>()
             {
             }.getType() );
@@ -340,7 +342,6 @@ public class RestServiceImpl implements RestService
             }
 
             Topology topology = new Topology( name );
-
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
@@ -965,7 +966,7 @@ public class RestServiceImpl implements RestService
                         containerHost.getTemplateName(), containerHost.getContainerSize(),
                         containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
                         containerHost.getResourceHostId().getId(), containerHost.isLocal(),
-                        containerHost.getClass().getName() ) );
+                        containerHost.getClass().getName(), containerHost.getTemplateId() ) );
             }
             catch ( Exception e )
             {
@@ -973,7 +974,8 @@ public class RestServiceImpl implements RestService
                         containerHost.getEnvironmentId().getId(), containerHost.getHostname(), "UNKNOWN",
                         containerHost.getTemplateName(), containerHost.getContainerSize(),
                         containerHost.getArch().toString(), containerHost.getTags(), containerHost.getPeerId(),
-                        "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName() ) );
+                        "UNKNOWN", containerHost.isLocal(), containerHost.getClass().getName(),
+                        containerHost.getTemplateId() ) );
             }
         }
 
