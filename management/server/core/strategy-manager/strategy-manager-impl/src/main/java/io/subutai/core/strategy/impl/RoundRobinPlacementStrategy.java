@@ -136,10 +136,8 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             {
                 for ( AllocatedContainer container : containers )
                 {
-                    //TODO:TEMPLATE replace templateName with templateId when UI is ready
                     Node node = new Node( container.getName(), container.getName(), "TODO-REMOVE", container.getSize(),
-                            container.getPeerId(), container.getHostId() );
-                    node.setTemplateId( container.getTemplateId() );
+                            container.getPeerId(), container.getHostId() ,container.getTemplateId() );
 
                     nodes.add( node );
                 }

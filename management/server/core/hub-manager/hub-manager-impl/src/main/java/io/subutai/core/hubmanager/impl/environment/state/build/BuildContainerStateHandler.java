@@ -103,12 +103,12 @@ public class BuildContainerStateHandler extends StateHandler
             log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
                     nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
+            //TODO:TEMPLATE receive templateId instead of templateName from Hub, this is a workaround for now
             Node node =
                     new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize,
-                            peerDto.getPeerId(), nodeDto.getHostId() );
+                            peerDto.getPeerId(), nodeDto.getHostId(),
+                            ctx.localPeer.getTemplateByName( nodeDto.getTemplateName() ).getId() );
 
-            //TODO:TEMPLATE receive templateId instead of templateName from Hub, this is a workaround for now
-            node.setTemplateId( ctx.localPeer.getTemplateByName( nodeDto.getTemplateName() ).getId() );
             nodes.add( node );
         }
 

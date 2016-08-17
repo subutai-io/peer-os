@@ -30,7 +30,6 @@ public class ContainerDto
     private String dataSource;
 
 
-    //TODO:TEMPLATE add templateId
     public ContainerDto( final String id, final String name, final String environmentId, final String hostname,
                          final String ip, final String templateName, final ContainerSize type, final String arch,
                          final Set<String> tags, final String peerId, final String hostId, boolean local,
