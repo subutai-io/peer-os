@@ -1273,7 +1273,6 @@ function addContainerToHost(model, template, img, size, containerId, name, templ
 
 	if(templateId == undefined || templateId == null) {
 		var templateId = getTemplateIdByName(template, templatesList);	
-		console.log(templateId);
 	}
 
 	var containerName = ( name == undefined || name == null ? 'Container ' + (containerCounter++).toString() : name );
