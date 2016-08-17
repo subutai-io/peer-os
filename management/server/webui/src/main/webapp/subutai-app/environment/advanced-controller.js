@@ -1253,7 +1253,7 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template, img);
+            addContainerToHost(models[i], template, img, null, templateId);
         }
     }
 }
