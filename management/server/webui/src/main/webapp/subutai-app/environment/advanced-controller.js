@@ -1220,7 +1220,7 @@ function startDrag(event) {
     }
 
     event.dataTransfer.setData("template", $(event.target).data('template'));
-    event.dataTransfer.setData("templateId", $(event.target).data('templateId'));
+    event.dataTransfer.setData("templateId", $(event.target).data('template-id'));
     event.dataTransfer.setData("img", containerImage.attr('src'));
 }
 
