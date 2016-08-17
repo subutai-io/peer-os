@@ -1,6 +1,6 @@
 APP=subutai
 CC=go
-VERSION=4.0.2
+VERSION=4.0.3-SNAPSHOT
 LDFLAGS=-ldflags "-r /apps/subutai/current/lib -w -s -X main.Version=${VERSION}"
 
 all:
