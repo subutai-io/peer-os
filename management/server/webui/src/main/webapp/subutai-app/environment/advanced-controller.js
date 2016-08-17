@@ -1002,6 +1002,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 if (getRemoved) {
                     result.containersList.push(currentElement.get('containerId'));
                 } else {
+					console.log(currentElement.get('templateId'));
                     var container2Build = {
                         "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
@@ -1220,7 +1221,7 @@ function startDrag(event) {
     }
 
     event.dataTransfer.setData("template", $(event.target).data('template'));
-    event.dataTransfer.setData("templateId", $(event.target).data('templateId'));
+    event.dataTransfer.setData("templateId", $(event.target).data('template-id'));
     event.dataTransfer.setData("img", containerImage.attr('src'));
 }
 
