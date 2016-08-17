@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-//TODO:TEMPLATE add templateId
 public class EnvironmentNodeDto
 {
     private String hostId;
@@ -44,9 +43,22 @@ public class EnvironmentNodeDto
     }
 
 
+
+    public void setHostId( final String hostId )
+    {
+        this.hostId = hostId;
+    }
+
+
     public String getHostId()
     {
         return hostId;
+    }
+
+
+    public void setHostName( final String hostName )
+    {
+        this.hostName = hostName;
     }
 
 
@@ -56,9 +68,21 @@ public class EnvironmentNodeDto
     }
 
 
+    public void setContainerName( final String containerName )
+    {
+        this.containerName = containerName;
+    }
+
+
     public String getContainerName()
     {
         return containerName;
+    }
+
+
+    public void setTemplateName( final String templateName )
+    {
+        this.templateName = templateName;
     }
 
 
@@ -80,9 +104,21 @@ public class EnvironmentNodeDto
     }
 
 
+    public void setContainerSize( final String containerSize )
+    {
+        this.containerSize = containerSize;
+    }
+
+
     public String getContainerSize()
     {
         return containerSize;
+    }
+
+
+    public void setIp( final String ip )
+    {
+        this.ip = ip;
     }
 
 
@@ -116,6 +152,12 @@ public class EnvironmentNodeDto
     }
 
 
+    public void setSshKeys( final Set<String> sshKeys )
+    {
+        this.sshKeys = sshKeys;
+    }
+
+
     public Set<String> getSshKeys()
     {
         return sshKeys;
@@ -133,5 +175,65 @@ public class EnvironmentNodeDto
             this.sshKeys = new HashSet<>();
             this.sshKeys.add( sshKey );
         }
+    }
+
+
+    public String getEnvironmentId()
+    {
+        return environmentId;
+    }
+
+
+    public void setEnvironmentId( final String environmentId )
+    {
+        this.environmentId = environmentId;
+    }
+
+
+    public String getOwnerId()
+    {
+        return ownerId;
+    }
+
+
+    public void setOwnerId( final String ownerId )
+    {
+        this.ownerId = ownerId;
+    }
+
+
+    public String getTemplateArch()
+    {
+        return templateArch;
+    }
+
+
+    public void setTemplateArch( final String templateArch )
+    {
+        this.templateArch = templateArch;
+    }
+
+
+    public long getElapsedTime()
+    {
+        return elapsedTime;
+    }
+
+
+    public void setElapsedTime( final long elapsedTime )
+    {
+        this.elapsedTime = elapsedTime;
+    }
+
+
+    public int getIpAddressOffset()
+    {
+        return ipAddressOffset;
+    }
+
+
+    public void setIpAddressOffset( final int ipAddressOffset )
+    {
+        this.ipAddressOffset = ipAddressOffset;
     }
 }
