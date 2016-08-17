@@ -4,6 +4,7 @@ package io.subutai.common.peer;
 import java.util.Date;
 import java.util.Set;
 
+import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
@@ -88,7 +89,7 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
-    void importTemplate( Template template ) throws ResourceHostException;
+    void importTemplate( Template template, String environmentId ) throws ResourceHostException;
 
     /**
      * Clones container based on the specified arguments
@@ -114,4 +115,6 @@ public interface ResourceHost extends Host, ResourceHostInfo
     int getVlan() throws ResourceHostException;
 
     boolean isManagementHost();
+
+    RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
 }

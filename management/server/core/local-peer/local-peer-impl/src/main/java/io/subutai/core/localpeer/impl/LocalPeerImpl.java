@@ -32,6 +32,7 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
@@ -719,7 +720,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             {
                 Template template = templateManager.getTemplate( templateId );
 
-                HostUtil.Task<Object> importTask = new ImportTemplateTask( template, resourceHost );
+                HostUtil.Task<Object> importTask =
+                        new ImportTemplateTask( template, resourceHost, request.getEnvironmentId() );
 
                 tasks.addTask( resourceHost, importTask );
             }
@@ -2754,6 +2756,27 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
     }
+
+
+    @Override
+    public PeerTemplatesDownloadProgress getTemplateDownloadProgress( final EnvironmentId environmentId )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        PeerTemplatesDownloadProgress downloadProgress = new PeerTemplatesDownloadProgress();
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            downloadProgress.addRhTemplateDownloadProgress( resourceHost.getId(),
+                    resourceHost.getTemplateDownloadProgress( environmentId.getId() ) );
+        }
+
+        return downloadProgress;
+    }
+
+
+    //**************************
 
 
     @Override

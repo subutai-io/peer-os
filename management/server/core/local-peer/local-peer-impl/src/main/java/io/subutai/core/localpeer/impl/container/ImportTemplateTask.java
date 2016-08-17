@@ -2,6 +2,7 @@ package io.subutai.core.localpeer.impl.container;
 
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.protocol.Template;
@@ -12,15 +13,18 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
 {
     private final Template template;
     private final ResourceHost resourceHost;
+    private final String environmentId;
 
 
-    public ImportTemplateTask( final Template template, final ResourceHost resourceHost )
+    public ImportTemplateTask( final Template template, final ResourceHost resourceHost, final String environmentId )
     {
         Preconditions.checkNotNull( template );
         Preconditions.checkNotNull( resourceHost );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ) );
 
         this.template = template;
         this.resourceHost = resourceHost;
+        this.environmentId = environmentId;
     }
 
 
@@ -41,7 +45,7 @@ public class ImportTemplateTask extends HostUtil.Task<Object>
     @Override
     public Object call() throws Exception
     {
-        resourceHost.importTemplate( template );
+        resourceHost.importTemplate( template, environmentId );
 
         return null;
     }
