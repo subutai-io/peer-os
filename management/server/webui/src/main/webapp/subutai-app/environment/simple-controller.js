@@ -525,7 +525,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         this.model.attributes.templateName,
                         false,
                         this.model.attributes.quotaSize,
-                        getTemplateNameById(this.model.attributes.templateName),
+                        getTemplateNameById(this.model.attributes.templateName, vm.templatesList),
                         this.model.attributes.templateId
                     );
 
@@ -669,7 +669,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         //workaround issue #974
         //to implement properly, plugins should expose template id requirement
         if(templateId == undefined || templateId == null){
-            templateId = getTemplateIdByName(template);
+            templateId = getTemplateIdByName(template, vm.templatesList);
         }
 
         if (templateImg === undefined || templateImg === null) templateImg = template;
@@ -841,7 +841,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 vm.env2Build[currentElement.get('templateName')].count = 1;
                 vm.env2Build[currentElement.get('templateName')].sizes = {};
                 vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
-                vm.env2Build[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
+                vm.env2Build[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'), vm.templatesList);
                 vm.env2Build[currentElement.get('templateName')].id = currentElement.get('templateId');
             } else {
                 vm.env2Build[currentElement.get('templateName')].count++;
@@ -961,41 +961,4 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		}
 	}
 
-    function getElementByField(field, value, collection) {
-        for (var index = 0; index < collection.length; index++) {
-            if (collection[index][field] === value) {
-                return {
-                    container: collection[index],
-                    index: index
-                };
-            }
-        }
-        return null;
-    }
-
-    function getTemplateNameById(id) {
-        var arr = jQuery.grep(vm.templatesList, function (e) {
-            return ( e.id == id );
-        });
-
-        if (arr.length > 0 && arr[0].name.length > 0) {
-            return arr[0].name;
-        }
-
-        return id;
-    }
-
-    //workaround issue #974
-    //to implement properly, id should be taken from the same template object b/c template names are not unique
-    function getTemplateIdByName(name) {
-        var arr = jQuery.grep(vm.templatesList, function (e) {
-            return ( e.name == name);
-        });
-
-        if (arr.length > 0 && arr[0].name.length > 0) {
-            return arr[0].id;
-        }
-
-        return id;
-    }
 }

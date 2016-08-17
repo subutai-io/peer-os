@@ -674,6 +674,44 @@ function EnvironmentViewCtrl($scope, $rootScope, environmentService, trackerSrv,
 	}
 }
 
+function getElementByField(field, value, collection) {
+	for (var index = 0; index < collection.length; index++) {
+		if (collection[index][field] === value) {
+			return {
+				container: collection[index],
+				index: index
+			};
+		}
+	}
+	return null;
+}
+
+function getTemplateNameById(id, templatesList) {
+	var arr = jQuery.grep(templatesList, function (e) {
+		return ( e.id == id );
+	});
+
+	if (arr.length > 0 && arr[0].name.length > 0) {
+		return arr[0].name;
+	}
+
+	return id;
+}
+
+//workaround issue #974
+//to implement properly, id should be taken from the same template object b/c template names are not unique
+function getTemplateIdByName(name, templatesList) {
+	var arr = jQuery.grep(templatesList, function (e) {
+		return ( e.name == name);
+	});
+
+	if (arr.length > 0 && arr[0].name.length > 0) {
+		return arr[0].id;
+	}
+
+	return id;
+}
+
 function imageExists(image_url){
 	var http = new XMLHttpRequest();
 

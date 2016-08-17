@@ -16,6 +16,7 @@ var PEER_SPACE = 30;
 
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
+var templatesList = [];
 
 function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
@@ -82,6 +83,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 vm.templatesList = vm.templatesList.concat(vm.templates[i]);
             }
         }
+		templatesList = vm.templatesList;
     }
 
     function getPeers() {
@@ -1003,8 +1005,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     var container2Build = {
                         "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
-                        //todo get template id from currentElement.get('templateId'), implement
-                        "templateId": getTemplateIdByName(currentElement.get('templateName')),
+                        "templateId": currentElement.get('templateId'),
                         "name": currentElement.get('containerName'),
                         "peerId": currentElement.get('parentPeerId'),
                         "hostId": currentElement.get('parentHostId'),
@@ -1020,8 +1021,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     result.containersObj[currentElement.get('templateName')].count = 1;
                     result.containersObj[currentElement.get('templateName')].sizes = {};
                     result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
-                    result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
-                    result.containersObj[currentElement.get('templateName')].id = getTemplateIdByName(result.containersObj[currentElement.get('templateName')].name);
+                    result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'), vm.templatesList);
+                    result.containersObj[currentElement.get('templateName')].id = getTemplateIdByName(result.containersObj[currentElement.get('templateName')].name, vm.templatesList);
                 } else {
                     result.containersObj[currentElement.get('templateName')].count++;
                     if (result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
@@ -1086,31 +1087,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         }
     }
 
-    function getTemplateNameById(id) {
-        var arr = jQuery.grep(vm.templatesList, function (e) {
-            return ( e.id == id );
-        });
-
-        if (arr.length > 0 && arr[0].name.length > 0) {
-            return arr[0].name;
-        }
-
-        return id;
-    }
-
-    //workaround issue #974
-    //to implement properly, id should be taken from the same template object b/c template names are not unique
-    function getTemplateIdByName(name) {
-        var arr = jQuery.grep(vm.templatesList, function (e) {
-            return ( e.name == name);
-        });
-
-        if (arr.length > 0 && arr[0].name.length > 0) {
-            return arr[0].id;
-        }
-
-        return id;
-    }
 }
 
 function placeRhSimple(model) {
@@ -1244,6 +1220,7 @@ function startDrag(event) {
     }
 
     event.dataTransfer.setData("template", $(event.target).data('template'));
+    event.dataTransfer.setData("templateId", $(event.target).data('templateId'));
     event.dataTransfer.setData("img", containerImage.attr('src'));
 }
 
@@ -1264,6 +1241,7 @@ function drop(event) {
     //event.preventDefault();
 
     var template = event.dataTransfer.getData("template");
+    var templateId = event.dataTransfer.getData("templateId");
     var img = event.dataTransfer.getData("img");
 
     var posX = event.offsetX;
@@ -1273,12 +1251,12 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template, img);
+            addContainerToHost(models[i], template, img, null, null, null, templateId);
         }
     }
 }
 
-function addContainerToHost(model, template, img, size, containerId, name) {
+function addContainerToHost(model, template, img, size, containerId, name, templateId) {
 	if(size === undefined || size === null) {
 		size = 'SMALL';
 		if(template == 'appscale') {
@@ -1293,10 +1271,15 @@ function addContainerToHost(model, template, img, size, containerId, name) {
     var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
     var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
 
+	if(templateId == undefined || templateId == null) {
+		var templateId = getTemplateIdByName(template, templatesList);	
+	}
+
 	var containerName = ( name == undefined || name == null ? 'Container ' + (containerCounter++).toString() : name );
 	var devElement = new joint.shapes.tm.devElement({
 		position: { x: x, y: y },
 		templateName: template,
+		templateId: templateId,
 		parentPeerId: model.get('peerId'),
 		parentHostId: model.get('hostId'),
 		quotaSize: size,
