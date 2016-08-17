@@ -1244,6 +1244,7 @@ function drop(event) {
     var img = event.dataTransfer.getData("img");
 
 	var templateId = getTemplateIdByName(template, templatesList);	
+	console.log(templateId);
 
     var posX = event.offsetX;
     var posY = event.offsetY;
