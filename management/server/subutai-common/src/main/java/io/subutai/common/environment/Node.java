@@ -38,7 +38,7 @@ public class Node
     @JsonProperty( "hostname" )
     private String hostname;
 
-    @JsonProperty
+    @JsonProperty( "templateId" )
     private String templateId;
 
 
