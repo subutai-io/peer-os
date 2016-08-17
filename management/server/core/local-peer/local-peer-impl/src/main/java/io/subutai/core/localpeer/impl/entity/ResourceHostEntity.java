@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,8 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -93,7 +96,8 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     private static final String PRECONDITION_CONTAINER_IS_NULL_MSG = "Container host is null";
     private static final String CONTAINER_EXCEPTION_MSG_FORMAT = "Container with name %s does not exist";
     private static final Pattern CLONE_OUTPUT_PATTERN = Pattern.compile( "with ID (.*) successfully cloned" );
-    private final Map<String, Map<String, Integer>> envTemplatesDownloadPercent = Maps.newConcurrentMap();
+    private final Cache<String, Map<String, Integer>> envTemplatesDownloadPercent = CacheBuilder.newBuilder().
+            expireAfterAccess( 24, TimeUnit.HOURS ).build();
 
 
     @OneToMany( mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.EAGER,
@@ -774,7 +778,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     @Override
     public RhTemplatesDownloadProgress getTemplateDownloadProgress( final String environmentId )
     {
-        Map<String, Integer> templateDownloadPercent = envTemplatesDownloadPercent.get( environmentId );
+        Map<String, Integer> templateDownloadPercent = envTemplatesDownloadPercent.getIfPresent( environmentId );
 
         return new RhTemplatesDownloadProgress(
                 templateDownloadPercent == null ? Maps.<String, Integer>newHashMap() : templateDownloadPercent );
@@ -783,12 +787,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
 
     public void updateTemplateDownloadProgress( String environmentId, String templateName, int downloadPercent )
     {
-        Map<String, Integer> templateDownloadPercent = envTemplatesDownloadPercent.get( environmentId );
-
-        if ( templateDownloadPercent == null )
-        {
-            templateDownloadPercent = Maps.newHashMap();
-        }
+        Map<String, Integer> templateDownloadPercent = Maps.newHashMap();
 
         templateDownloadPercent.put( templateName, downloadPercent );
 
