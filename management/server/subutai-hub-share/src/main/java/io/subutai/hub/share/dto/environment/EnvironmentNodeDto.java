@@ -4,6 +4,7 @@ package io.subutai.hub.share.dto.environment;
 import java.util.HashSet;
 import java.util.Set;
 
+
 //TODO:TEMPLATE add templateId
 public class EnvironmentNodeDto
 {
@@ -18,6 +19,8 @@ public class EnvironmentNodeDto
     private String ownerId;
 
     private String templateName;
+
+    private String templateId;
 
     private String templateArch;
 
@@ -62,6 +65,18 @@ public class EnvironmentNodeDto
     public String getTemplateName()
     {
         return templateName;
+    }
+
+
+    public String getTemplateId()
+    {
+        return templateId;
+    }
+
+
+    public void setTemplateId( final String templateId )
+    {
+        this.templateId = templateId;
     }
 
 
