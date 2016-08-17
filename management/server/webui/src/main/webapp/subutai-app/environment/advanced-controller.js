@@ -1002,7 +1002,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 if (getRemoved) {
                     result.containersList.push(currentElement.get('containerId'));
                 } else {
-					console.log(currentElement.get('templateId'));
                     var container2Build = {
                         "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
