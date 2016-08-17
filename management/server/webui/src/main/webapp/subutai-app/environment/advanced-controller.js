@@ -16,6 +16,7 @@ var PEER_SPACE = 30;
 
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
+var templatesList = [];
 
 function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
@@ -82,6 +83,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 vm.templatesList = vm.templatesList.concat(vm.templates[i]);
             }
         }
+		templatesList = vm.templatesList;
     }
 
     function getPeers() {
@@ -1240,6 +1242,8 @@ function drop(event) {
 
     var template = event.dataTransfer.getData("template");
     var img = event.dataTransfer.getData("img");
+
+	var templateId = getTemplateIdByName(template, templatesList);	
 
     var posX = event.offsetX;
     var posY = event.offsetY;
