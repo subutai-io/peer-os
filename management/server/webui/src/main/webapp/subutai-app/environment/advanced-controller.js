@@ -1005,8 +1005,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     var container2Build = {
                         "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
-                        //todo get template id from currentElement.get('templateId'), implement
-                        "templateId": getTemplateIdByName(currentElement.get('templateName'), vm.templatesList),
+                        "templateId": currentElement.get('templateId'),
                         "name": currentElement.get('containerName'),
                         "peerId": currentElement.get('parentPeerId'),
                         "hostId": currentElement.get('parentHostId'),
@@ -1221,6 +1220,7 @@ function startDrag(event) {
     }
 
     event.dataTransfer.setData("template", $(event.target).data('template'));
+    event.dataTransfer.setData("templateId", $(event.target).data('templateId'));
     event.dataTransfer.setData("img", containerImage.attr('src'));
 }
 
@@ -1241,10 +1241,8 @@ function drop(event) {
     //event.preventDefault();
 
     var template = event.dataTransfer.getData("template");
+    var templateId = event.dataTransfer.getData("templateId");
     var img = event.dataTransfer.getData("img");
-
-	var templateId = getTemplateIdByName(template, templatesList);	
-	console.log(templateId);
 
     var posX = event.offsetX;
     var posY = event.offsetY;
@@ -1253,12 +1251,12 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template, img, null, templateId);
+            addContainerToHost(models[i], template, img, null, null, null, templateId);
         }
     }
 }
 
-function addContainerToHost(model, template, img, size, containerId, name) {
+function addContainerToHost(model, template, img, size, containerId, name, templateId) {
 	if(size === undefined || size === null) {
 		size = 'SMALL';
 		if(template == 'appscale') {
@@ -1273,10 +1271,16 @@ function addContainerToHost(model, template, img, size, containerId, name) {
     var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
     var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
 
+	if(templateId == undefined || templateId == null) {
+		var templateId = getTemplateIdByName(template, templatesList);	
+		console.log(templateId);
+	}
+
 	var containerName = ( name == undefined || name == null ? 'Container ' + (containerCounter++).toString() : name );
 	var devElement = new joint.shapes.tm.devElement({
 		position: { x: x, y: y },
 		templateName: template,
+		templateId: templateId,
 		parentPeerId: model.get('peerId'),
 		parentHostId: model.get('hostId'),
 		quotaSize: size,
