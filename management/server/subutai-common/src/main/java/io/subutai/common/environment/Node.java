@@ -47,10 +47,10 @@ public class Node
     }
 
 
-    //TODO:TEMPLATE replace templateName with templateId when UI side is ready
     public Node( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
                  @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
-                 @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId )
+                 @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId,
+                 @JsonProperty( "templateId" ) String templateId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
@@ -64,6 +64,7 @@ public class Node
         this.type = type;
         this.peerId = peerId;
         this.hostId = hostId;
+        this.templateId = templateId;
     }
 
 
@@ -122,11 +123,5 @@ public class Node
     public String getTemplateId()
     {
         return templateId;
-    }
-
-
-    public void setTemplateId( final String templateId )
-    {
-        this.templateId = templateId;
     }
 }

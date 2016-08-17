@@ -24,13 +24,14 @@ public class NodeSchema
     private String templateId;
 
 
-    //TODO:TEMPLATE replace templateName with templateId when UI side is ready
     public NodeSchema( @JsonProperty( "name" ) final String name, @JsonProperty( "size" ) final ContainerSize size,
-                       @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "templateId" ) final String templateId )
+                       @JsonProperty( "templateName" ) final String templateName,
+                       @JsonProperty( "templateId" ) final String templateId )
     {
         this.name = name;
         this.size = size;
         this.templateName = templateName;
+        this.templateId = templateId;
     }
 
 
@@ -55,11 +56,5 @@ public class NodeSchema
     public String getTemplateId()
     {
         return templateId;
-    }
-
-
-    public void setTemplateId( final String templateId )
-    {
-        this.templateId = templateId;
     }
 }

@@ -1022,7 +1022,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     result.containersObj[currentElement.get('templateName')].sizes = {};
                     result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
                     result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'), vm.templatesList);
-                    result.containersObj[currentElement.get('templateName')].id = getTemplateIdByName(result.containersObj[currentElement.get('templateName')].name, vm.templatesList);
+                    result.containersObj[currentElement.get('templateName')].id = currentElement.get('templateId');
                 } else {
                     result.containersObj[currentElement.get('templateName')].count++;
                     if (result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
