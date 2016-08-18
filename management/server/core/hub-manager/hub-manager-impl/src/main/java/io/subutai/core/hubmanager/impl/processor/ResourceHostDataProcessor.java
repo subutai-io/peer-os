@@ -1,12 +1,15 @@
 package io.subutai.core.hubmanager.impl.processor;
 
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -59,6 +62,8 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
     private Date p2pLogsEndDate;
 
     private static Set<HostInterfaceDto> interfaces = new HashSet<>();
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
 
     public ResourceHostDataProcessor( HubManagerImpl hubManager, LocalPeer localPeer, Monitor monitor,
@@ -136,6 +141,14 @@ public class ResourceHostDataProcessor implements Runnable, HostListener
         metrics.put( "rh_metrics", rhMetrics );
         metrics.put( "ch_metrics", chMetrics );
 
+        try
+        {
+            metrics.put( "peer_resources", objectMapper.writeValueAsString( localPeer.getResources() ) );
+        }
+        catch ( IOException e )
+        {
+            log.error( e.getMessage(), e );
+        }
 
         String path = format( "/rest/v1/peers/%s/metrics/save", localPeer.getId() );
 
