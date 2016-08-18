@@ -37,6 +37,7 @@ import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
+import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -2820,15 +2821,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        PeerTemplatesDownloadProgress downloadProgress = new PeerTemplatesDownloadProgress();
+        PeerTemplatesDownloadProgress peerProgress = new PeerTemplatesDownloadProgress();
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
-            downloadProgress.addRhTemplateDownloadProgress( resourceHost.getId(),
-                    resourceHost.getTemplateDownloadProgress( environmentId.getId() ) );
+            RhTemplatesDownloadProgress rhProgress = resourceHost.getTemplateDownloadProgress( environmentId.getId() );
+
+            //add only RH with existing progress
+            if ( !rhProgress.getTemplatesDownloadProgressMap().isEmpty() )
+            {
+                peerProgress.addRhTemplateDownloadProgress( resourceHost.getId(), rhProgress );
+            }
         }
 
-        return downloadProgress;
+        return peerProgress;
     }
 
 
