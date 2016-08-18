@@ -34,25 +34,25 @@ public class TestCommand extends SubutaiShellCommandSupport
 
             for ( Environment environment : environmentManager.getEnvironments() )
             {
-                System.out.format( "Environment %s:%n", environment.getName() );
+                System.out.format( "Environment \"%s\":%n", environment.getName() );
 
                 for ( Peer peer : environment.getPeers() )
                 {
                     PeerTemplatesDownloadProgress downloadProgress =
                             peer.getTemplateDownloadProgress( environment.getEnvironmentId() );
 
-                    System.out.format( "\tPeer %s%n", peer.getName() );
+                    System.out.format( "\tPeer \"%s\":%n", peer.getName() );
 
                     for ( Map.Entry<HostId, RhTemplatesDownloadProgress> rhProgress : downloadProgress
                             .getPeerTemplatesDownloadProgressMap().entrySet() )
                     {
-                        System.out.format( "\t\tRH %s%n", rhProgress.getKey().getId() );
+                        System.out.format( "\t\tRH \"%s\":%n", rhProgress.getKey().getId() );
 
                         for ( Map.Entry<String, Integer> templateProgress : rhProgress.getValue()
                                                                                       .getTemplatesDownloadProgressMap()
                                                                                       .entrySet() )
                         {
-                            System.out.format( "\t\t\tTemplate %s -> %d%n", templateProgress.getKey(),
+                            System.out.format( "\t\t\tTemplate \"%s\" -> %d%% downloaded%n", templateProgress.getKey(),
                                     templateProgress.getValue() );
                         }
                     }
