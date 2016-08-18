@@ -37,6 +37,10 @@
       <artifactId>org.apache.karaf.bundle.core</artifactId>
       <version>${karaf.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>environment-manager-api</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

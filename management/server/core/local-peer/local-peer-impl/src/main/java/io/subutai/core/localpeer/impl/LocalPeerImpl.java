@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -36,6 +37,7 @@ import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
+import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -49,6 +51,7 @@ import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -80,8 +83,12 @@ import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
+import io.subutai.common.resource.CpuResource;
+import io.subutai.common.resource.DiskResource;
 import io.subutai.common.resource.HistoricalMetrics;
+import io.subutai.common.resource.HostResources;
 import io.subutai.common.resource.PeerResources;
+import io.subutai.common.resource.RamResource;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -2341,6 +2348,56 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public PeerResources getResources()
+    {
+        int environmentLimit = 100;
+        int containerLimit = 200;
+        int networkLimit = 100;
+
+        List<HostResources> resources = new ArrayList<>();
+        try
+        {
+            for ( ResourceHostMetric resourceHostMetric : getResourceHostMetrics().getResources() )
+            {
+                try
+                {
+                    ResourceHost resourceHost = getResourceHostByName( resourceHostMetric.getHostName() );
+
+                    BigDecimal cpuLimit = new BigDecimal( "100.00" );
+
+                    BigDecimal ramLimit = new BigDecimal( resourceHostMetric.getTotalRam() );
+
+                    BigDecimal diskLimit = new BigDecimal( resourceHostMetric.getTotalSpace() );
+
+                    CpuResource cpuResource =
+                            new CpuResource( cpuLimit, 0.0, "UNKNOWN", resourceHostMetric.getCpuCore(), 0, 0, 0,
+                                    resourceHostMetric.getCpuFrequency(), 0 );
+
+                    RamResource ramResource = new RamResource( ramLimit, 0.0 );
+
+                    DiskResource diskResource = new DiskResource( diskLimit, 0.0, "UNKNOWN", 0.0, 0.0, false );
+
+
+                    HostResources hostResources =
+                            new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
+                    resources.add( hostResources );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    // ignore
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.debug( e.getMessage(), e );
+        }
+
+        return new PeerResources( getId(), environmentLimit, containerLimit, networkLimit, resources );
+    }
+
+
+    @Override
     public Set<Template> getTemplates()
     {
         return templateManager.getTemplates();
@@ -2764,15 +2821,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        PeerTemplatesDownloadProgress downloadProgress = new PeerTemplatesDownloadProgress();
+        PeerTemplatesDownloadProgress peerProgress = new PeerTemplatesDownloadProgress();
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
-            downloadProgress.addRhTemplateDownloadProgress( resourceHost.getId(),
-                    resourceHost.getTemplateDownloadProgress( environmentId.getId() ) );
+            RhTemplatesDownloadProgress rhProgress = resourceHost.getTemplateDownloadProgress( environmentId.getId() );
+
+            //add only RH with existing progress
+            if ( !rhProgress.getTemplatesDownloadProgressMap().isEmpty() )
+            {
+                peerProgress.addRhTemplateDownloadProgress( resourceHost.getId(), rhProgress );
+            }
         }
 
-        return downloadProgress;
+        return peerProgress;
     }
 
 
