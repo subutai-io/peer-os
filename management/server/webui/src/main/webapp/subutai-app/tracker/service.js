@@ -16,6 +16,8 @@ function trackerSrv($http) {
 		getOperations: getOperations,
 		getOperation: getOperation,
 
+		getDownloadProgress: getDownloadProgress,
+
 		getNotifications: getNotifications,
 		deleteNotification: deleteNotification,
 		deleteAllNotifications: deleteAllNotifications,
@@ -38,6 +40,12 @@ function trackerSrv($http) {
 		var $url = OPERATIONS_URL + module + '/' + id;
 		return $http.get($url, {withCredentials: true, headers: {'Content-Type': 'application/json'}});
 	}	
+
+
+	function getDownloadProgress(id) {
+		return $http.get(SERVER_URL + "rest/ui/environments/" + id + "/download");
+	}
+
 
 	function getNotifications() {
 		return $http.get(NOTIFICATIONS_URL, {withCredentials: true, headers: {'Content-Type': 'application/json'}});

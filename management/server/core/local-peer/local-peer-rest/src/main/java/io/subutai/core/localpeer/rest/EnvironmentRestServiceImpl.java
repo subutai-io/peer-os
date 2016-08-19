@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -375,6 +376,26 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             final SshKey key = localPeer
                     .createSshKey( environmentId, JsonUtil.fromJson( containerId, ContainerId.class ), encryptionType );
             return Response.ok( key ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response getTemplateDownloadProgress( final EnvironmentId environmentId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+
+            PeerTemplatesDownloadProgress downloadProgress =
+                    localPeer.getTemplateDownloadProgress( environmentId );
+
+            return Response.ok( downloadProgress ).build();
         }
         catch ( Exception e )
         {

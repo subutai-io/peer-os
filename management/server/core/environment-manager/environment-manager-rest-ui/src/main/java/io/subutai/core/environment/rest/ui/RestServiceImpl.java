@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
+import io.subutai.common.environment.*;
+import io.subutai.common.host.HostId;
+import io.subutai.common.peer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,22 +37,9 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import io.subutai.common.environment.ContainerHostNotFoundException;
-import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.EnvironmentModificationException;
-import io.subutai.common.environment.EnvironmentNotFoundException;
-import io.subutai.common.environment.Node;
-import io.subutai.common.environment.NodeSchema;
-import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
-import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.peer.Peer;
-import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
@@ -948,6 +938,30 @@ public class RestServiceImpl implements RestService
         }
 
         return null;
+    }
+
+
+    public Response getDownloadProgress( String environmentId )
+    {
+        try
+        {
+            Set<Map<HostId, RhTemplatesDownloadProgress>> set = peerManager.getPeers().stream().map(p -> {
+                try {
+                    return p.getTemplateDownloadProgress(new EnvironmentId(environmentId)).getPeerTemplatesDownloadProgressMap();
+                } catch (Exception e) {
+                    return new HashMap<HostId, RhTemplatesDownloadProgress>();
+                }
+            }).collect( Collectors.toSet() );
+
+            if( set.stream().filter( s -> s.size() > 0 ).count() == 0 )
+                return Response.ok().build();
+
+            return Response.ok( set ).build();
+        }
+        catch (Exception e)
+        {
+            return Response.serverError().entity( e.toString() ).build();
+        }
     }
 
 

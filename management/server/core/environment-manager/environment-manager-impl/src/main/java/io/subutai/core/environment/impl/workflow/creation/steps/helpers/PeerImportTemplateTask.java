@@ -52,8 +52,10 @@ public class PeerImportTemplateTask implements Callable<PrepareTemplatesResponse
             templates.add( node.getTemplateId() );
         }
 
+
         PrepareTemplatesResponse response =
                 peer.prepareTemplates( new PrepareTemplatesRequest( environmentId, rhTemplates ) );
+
 
         for ( String message : response.getMessages() )
         {

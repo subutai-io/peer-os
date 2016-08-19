@@ -24,6 +24,8 @@ public class ContainerDto
     private String ip;
     @JsonProperty( "templateName" )
     private String templateName;
+    @JsonProperty( "templateId" )
+    private String templateId;
     @JsonProperty( "type" )
     private ContainerSize type;
     @JsonProperty( "arch" )
@@ -44,7 +46,6 @@ public class ContainerDto
     private String dataSource;
 
 
-    //TODO:TEMPLATE add templateId
     public ContainerDto( @JsonProperty( "id" ) final String id,
                          @JsonProperty( "environmentId" ) final String environmentId,
                          @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "ip" ) final String ip,
@@ -53,7 +54,8 @@ public class ContainerDto
                          @JsonProperty( "tags" ) final Set<String> tags, @JsonProperty( "peerId" ) final String peerId,
                          @JsonProperty( "hostId" ) final String hostId, @JsonProperty( "local" ) boolean local,
                          @JsonProperty( "dataSource" ) String dataSource,
-                         @JsonProperty( "state" ) ContainerHostState state )
+                         @JsonProperty( "state" ) ContainerHostState state,
+                         @JsonProperty( "templateId" ) String templateId )
     {
         this.id = id;
         this.environmentId = environmentId;
@@ -66,7 +68,7 @@ public class ContainerDto
         this.peerId = peerId;
         this.hostId = hostId;
         this.local = local;
-
+        this.templateId = templateId;
         this.dataSource = dataSource;
         this.state = state;
     }
