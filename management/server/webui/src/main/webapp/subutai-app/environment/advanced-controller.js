@@ -266,7 +266,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 vm.logMessages.push(currentLog);
 
                 //var logId = getLogsFromTracker(vm.environment2BuildName);
-                getLogById(data, true);
+                getLogById(data.trackerId, true);
                 initScrollbar();
 
                 $rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuild';

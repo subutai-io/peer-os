@@ -236,7 +236,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 vm.logMessages.push(currentLog);
 
                 //var logId = getLogsFromTracker(vm.environment2BuildName);
-                getLogById(data, true);
+                getLogById(data.trackerId, true);
                 initScrollbar();
 
                 $rootScope.notificationsUpdate = 'buildEnvironment';
@@ -262,6 +262,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
         vm.currentEnvironment.includedContainersByQuota =
             getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
+		console.log(vm.currentEnvironment);
 
         vm.currentEnvironment.numChangedContainers = 0;
         for (var key in vm.currentEnvironment.changingContainers) {
