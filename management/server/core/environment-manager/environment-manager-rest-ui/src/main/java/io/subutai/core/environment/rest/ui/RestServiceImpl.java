@@ -168,7 +168,7 @@ public class RestServiceImpl implements RestService
     public Response build( final String name, final String topologyJson )
     {
 
-        UUID eventId;
+        Map<String, String> eventId;
 
         try
         {
@@ -208,7 +208,7 @@ public class RestServiceImpl implements RestService
     @Override
     public Response buildAdvanced( final String name, final String topologyJson )
     {
-        UUID eventId;
+        Map<String, String> eventId;
 
         try
         {
@@ -945,7 +945,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Set<Map<HostId, RhTemplatesDownloadProgress>> set = peerManager.getPeers().stream().map(p -> {
+
+
+            Set<Map<HostId, RhTemplatesDownloadProgress>> set = environmentManager.loadEnvironment(environmentId).getPeers().stream().map(p -> {
                 try {
                     return p.getTemplateDownloadProgress(new EnvironmentId(environmentId)).getPeerTemplatesDownloadProgressMap();
                 } catch (Exception e) {
@@ -956,7 +958,7 @@ public class RestServiceImpl implements RestService
             if( set.stream().filter( s -> s.size() > 0 ).count() == 0 )
                 return Response.ok().build();
 
-            return Response.ok( set ).build();
+            return Response.ok( JsonUtil.toJson( set ) ).build();
         }
         catch (Exception e)
         {

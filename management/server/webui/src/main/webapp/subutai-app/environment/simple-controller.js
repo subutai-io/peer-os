@@ -86,7 +86,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             .success(function (data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].description.includes(environmentId)) {
-                        getLogById(data[i].id, true);
+                        getLogById(data[i].id, true, undefined, environmentId);
                         break;
                     }
                 }
@@ -118,11 +118,11 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         }
     }
 
-    function getLogById(id, checkLast, prevLogs) {
+    function getLogById(id, checkLast, prevLogs, envId) {
         if (checkLast === undefined || checkLast === null) checkLast = false;
         if (prevLogs === undefined || prevLogs === null) prevLogs = false;
 
-        trackerSrv.getDownloadProgress(id)
+        trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
                 if( data.length > 0 )
                     vm.downloadProgress = data;
@@ -181,7 +181,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                     vm.logMessages = vm.logMessages.concat(result);
 
                     setTimeout(function () {
-                        getLogById(id, false, logs);
+                        getLogById(id, false, logs, envId);
                     }, 2000);
 
                     return result;
@@ -249,7 +249,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 vm.logMessages.push(currentLog);
 
                 //var logId = getLogsFromTracker(vm.environment2BuildName);
-                getLogById(data.trackerId, true);
+                getLogById(data.trackerId, true, undefined, data.environmentId);
                 initScrollbar();
 
                 $rootScope.notificationsUpdate = 'buildEnvironment';
@@ -381,7 +381,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             clearWorkspace();
             vm.isApplyingChanges = false;
 
-            getLogById(data, true);
+            getLogById(data, true, undefined, vm.currentEnvironment.modificationData.environmentId);
             initScrollbar();
             $rootScope.notificationsUpdate = 'modifyEnvironment';
         }).error(function (data) {
