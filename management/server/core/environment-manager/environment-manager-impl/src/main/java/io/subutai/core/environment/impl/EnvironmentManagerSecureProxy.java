@@ -2,13 +2,7 @@ package io.subutai.core.environment.impl;
 
 
 import java.security.AccessControlException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -214,7 +208,7 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Write" )
-    public UUID createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
+    public Map<String, String> createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -225,9 +219,12 @@ public class EnvironmentManagerSecureProxy
         TrackerOperation operationTracker = tracker.createTrackerOperation( EnvironmentManagerImpl.MODULE_NAME,
                 String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
 
-        environmentManager.createEnvironment( topology, async, operationTracker );
 
-        return operationTracker.getId();
+        Map<String, String> output = new HashMap<>();
+        output.put("trackerId", operationTracker.getId().toString());
+        output.put("environmentId", environmentManager.createEnvironment( topology, async, operationTracker ).getId());
+
+        return output;
     }
 
 

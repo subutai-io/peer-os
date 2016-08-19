@@ -2,15 +2,7 @@ package io.subutai.core.environment.impl;
 
 
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -416,7 +408,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public UUID createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
+    public Map<String, String> createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -429,9 +421,15 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         operationTracker.addLog( "Logger initialized" );
 
-        createEnvironment( topology, async, operationTracker );
 
-        return operationTracker.getId();
+        // @todo workaround, need to review creation process, as to get download template info we need envId,
+        // @todo moreover logId doesn't have relation with envId
+        Map<String, String> output = new HashMap<>();
+        output.put("trackerId", operationTracker.getId().toString());
+        output.put("environmentId", createEnvironment( topology, async, operationTracker ).getId());
+
+
+        return output;
     }
 
 

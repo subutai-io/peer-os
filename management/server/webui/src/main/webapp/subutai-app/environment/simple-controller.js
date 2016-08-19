@@ -85,7 +85,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             .success(function (data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].description.includes(environmentId)) {
-                        getLogById(data[i].id, true);
+                        getLogById(data[i].id, true, undefined, environmentId);
                         break;
                     }
                 }
@@ -117,9 +117,52 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         }
     }
 
-    function getLogById(id, checkLast, prevLogs) {
+    function getLogById(id, checkLast, prevLogs, envId) {
         if (checkLast === undefined || checkLast === null) checkLast = false;
         if (prevLogs === undefined || prevLogs === null) prevLogs = false;
+
+        trackerSrv.getDownloadProgress(envId)
+            .success(function (data) {
+
+                if( data.length > 0 )
+                {
+                    var output = '';
+                    var checker = false;
+                    for( var i = 0; i < data.length; i++ )
+                    {
+                        var p = data[i];
+                        for (var key in p) {
+                            if (p.hasOwnProperty(key))
+                            {
+                                output += 'Peer ' + key + ':<br/>';
+                                for( var tpl in p[key]['templatesDownloadProgressMap'] )
+                                {
+                                    output += '<span class="g-text-blue">' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p[key]['templatesDownloadProgressMap'][tpl] + ' %</span>';
+                                    if( p[key]['templatesDownloadProgressMap'][tpl] != 100 )
+                                    {
+                                        checker = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if( checker == true )
+                    {
+                        $('.js-download-progress').html(output);
+                    }
+                    else
+                    {
+                        $('.js-download-progress').html('');
+                    }
+                }
+                else
+                    $('.js-download-progress').html('');
+            })
+            .error(function (data) {
+                $('.js-download-progress').html('');
+            });
+
         trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
             .success(function (data) {
                 if (data.state == 'RUNNING') {
@@ -168,13 +211,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                     vm.logMessages = vm.logMessages.concat(result);
 
                     setTimeout(function () {
-                        getLogById(id, false, logs);
+                        getLogById(id, false, logs, envId);
                     }, 2000);
 
                     return result;
                 } else {
                     if (data.state == 'FAILED') {
                         checkLastLog(false);
+                        $('.js-download-progress').html('');
                     } else {
                         //SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 
@@ -197,6 +241,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         vm.isEditing = false;
                     }
 
+                    $('.js-download-progress').html('');
                     $rootScope.notificationsUpdate = 'getLogById';
                     $scope.$emit('reloadEnvironmentsList');
                     clearWorkspace();
@@ -236,7 +281,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 vm.logMessages.push(currentLog);
 
                 //var logId = getLogsFromTracker(vm.environment2BuildName);
-                getLogById(data, true);
+                getLogById(data.trackerId, true, undefined, data.environmentId);
                 initScrollbar();
 
                 $rootScope.notificationsUpdate = 'buildEnvironment';
@@ -262,6 +307,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
         vm.currentEnvironment.includedContainersByQuota =
             getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
+		console.log(vm.currentEnvironment);
 
         vm.currentEnvironment.numChangedContainers = 0;
         for (var key in vm.currentEnvironment.changingContainers) {
@@ -367,7 +413,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             clearWorkspace();
             vm.isApplyingChanges = false;
 
-            getLogById(data, true);
+            getLogById(data, true, undefined, vm.currentEnvironment.modificationData.environmentId);
             initScrollbar();
             $rootScope.notificationsUpdate = 'modifyEnvironment';
         }).error(function (data) {

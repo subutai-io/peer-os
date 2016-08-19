@@ -46,7 +46,7 @@ public interface EnvironmentManager
 
 
     @RolesAllowed( "Environment-Management|Write" )
-    UUID createEnvironmentAndGetTrackerID( Topology topology, boolean async ) throws EnvironmentCreationException;
+    Map<String, String> createEnvironmentAndGetTrackerID( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     //used in plugins, kept for backward compatibility
     Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,

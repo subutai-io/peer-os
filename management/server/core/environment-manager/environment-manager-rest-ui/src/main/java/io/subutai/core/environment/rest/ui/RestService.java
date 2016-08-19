@@ -226,4 +226,9 @@ public interface RestService
     @POST
     @Path( "{environmentId}/share" )
     Response share( @FormParam( "users" ) String users, @PathParam( "environmentId" ) String environmentId );
+
+
+    @GET
+    @Path( "{environmentId}/download" )
+    Response getDownloadProgress( @PathParam( "environmentId" ) String environmentId );
 }
