@@ -5,13 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
@@ -46,7 +46,7 @@ public interface EnvironmentManager
 
 
     @RolesAllowed( "Environment-Management|Write" )
-    Map<String, String> createEnvironmentAndGetTrackerID( Topology topology, boolean async ) throws EnvironmentCreationException;
+    EnvironmentCreationRef createEnvironment( Topology topology, boolean async ) throws EnvironmentCreationException;
 
     //used in plugins, kept for backward compatibility
     Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
@@ -54,8 +54,10 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     @RolesAllowed( "Environment-Management|Write" )
-    UUID modifyEnvironmentAndGetTrackerID( String environmentId, Topology topology, List<String> removedContainers,
-                                           Map<String, ContainerSize> changedContainers, boolean async )
+    EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology,
+                                              List<String> removedContainers,
+                                              Map<String, ContainerSize> changedContainers,
+                                              boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 
