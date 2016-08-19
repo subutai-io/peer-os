@@ -11,7 +11,6 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.RhTemplatesDownloadProgress;
-import io.subutai.common.host.HostId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -43,13 +42,11 @@ public class TestCommand extends SubutaiShellCommandSupport
 
                     System.out.format( "\tPeer \"%s\":%n", peer.getName() );
 
-                    for ( Map.Entry<HostId, RhTemplatesDownloadProgress> rhProgress : downloadProgress
-                            .getPeerTemplatesDownloadProgressMap().entrySet() )
+                    for ( RhTemplatesDownloadProgress rhProgress : downloadProgress.getTemplatesDownloadProgresses() )
                     {
-                        System.out.format( "\t\tRH \"%s\":%n", rhProgress.getKey().getId() );
+                        System.out.format( "\t\tRH \"%s\":%n", rhProgress.getRhId() );
 
-                        for ( Map.Entry<String, Integer> templateProgress : rhProgress.getValue()
-                                                                                      .getTemplatesDownloadProgressMap()
+                        for ( Map.Entry<String, Integer> templateProgress : rhProgress.getTemplatesDownloadProgresses()
                                                                                       .entrySet() )
                         {
                             System.out.format( "\t\t\tTemplate \"%s\" -> %d%% downloaded%n", templateProgress.getKey(),

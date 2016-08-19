@@ -131,18 +131,19 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                     var checker = false;
                     for( var i = 0; i < data.length; i++ )
                     {
-                        var p = data[i];
-                        for (var key in p) {
-                            if (p.hasOwnProperty(key))
-                            {
-                                output += 'Peer ' + key + ':<br/>';
-                                for( var tpl in p[key]['templatesDownloadProgressMap'] )
+
+                        output += 'Peer ' + shortenIdName(data[i].peerId, 3) + ':<br/>';
+                        for( var j = 0; j < data[i].templatesDownloadProgress.length; j++ )
+                        {
+                            var p = data[i].templatesDownloadProgress[j];
+
+                            output += '&nbsp;&nbsp;RH ' + shortenIdName(p.rhId, 3) + ':<br/>';
+
+                            for (var tpl in p.templatesDownloadProgress) {
+                                output += '<span class="g-text-blue">&nbsp;&nbsp;&nbsp;' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p.templatesDownloadProgress[tpl] + ' %</span><br/>';
+                                if( p.templatesDownloadProgress[tpl] != 100 )
                                 {
-                                    output += '<span class="g-text-blue">' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p[key]['templatesDownloadProgressMap'][tpl] + ' %</span><br/>';
-                                    if( p[key]['templatesDownloadProgressMap'][tpl] != 100 )
-                                    {
-                                        checker = true;
-                                    }
+                                    checker = true;
                                 }
                             }
                         }
@@ -1008,4 +1009,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		}
 	}
 
+}
+
+function shortenIdName( name, factor )
+{
+    return name.substring(0, factor) + '..' + name.substring(name.length - factor, name.length);
 }
