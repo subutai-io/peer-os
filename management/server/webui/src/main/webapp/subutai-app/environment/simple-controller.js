@@ -210,6 +210,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         vm.isEditing = false;
                     }
 
+                    vm.downloadProgress = '';
                     $rootScope.notificationsUpdate = 'getLogById';
                     $scope.$emit('reloadEnvironmentsList');
                     clearWorkspace();
