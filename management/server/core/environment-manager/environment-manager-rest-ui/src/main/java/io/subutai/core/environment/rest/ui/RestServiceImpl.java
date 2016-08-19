@@ -973,7 +973,7 @@ public class RestServiceImpl implements RestService
                         try
                         {
                             return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) )
-                                    .getPeerTemplatesDownloadProgressMap();
+                                    .getTemplatesDownloadProgresses();
                         }
                         catch ( Exception e )
                         {

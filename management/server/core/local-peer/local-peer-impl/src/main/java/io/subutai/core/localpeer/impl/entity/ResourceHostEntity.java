@@ -780,7 +780,7 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         Map<String, Integer> templateDownloadPercent = envTemplatesDownloadPercent.getIfPresent( environmentId );
 
-        return new RhTemplatesDownloadProgress(
+        return new RhTemplatesDownloadProgress( getId(),
                 templateDownloadPercent == null ? Maps.<String, Integer>newHashMap() : templateDownloadPercent );
     }
 
