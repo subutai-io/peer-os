@@ -51,6 +51,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.selectedPlugin = false;
     vm.editingEnv = false;
     vm.isEditing = false;
+    vm.downloadProgress = '';
 
     // functions
 

@@ -37,6 +37,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     vm.environment2BuildName = '';
     vm.buildCompleted = false;
     vm.selectedPlugin = false;
+    vm.downloadProgress = '';
 
     // functions
 
@@ -120,6 +121,18 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     function getLogById(id, checkLast, prevLogs) {
         if (checkLast === undefined || checkLast === null) checkLast = false;
         if (prevLogs === undefined || prevLogs === null) prevLogs = false;
+
+        trackerSrv.getDownloadProgress(id)
+            .success(function (data) {
+                if( data.length > 0 )
+                    vm.downloadProgress = data;
+                else
+                    vm.downloadProgress = '';
+            })
+            .error(function (data) {
+                vm.downloadProgress = '';
+            });
+
         trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
             .success(function (data) {
                 if (data.state == 'RUNNING') {
