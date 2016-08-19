@@ -156,6 +156,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
 
+                data.sort();
                 if( data.length > 0 )
                 {
                     var output = '';
