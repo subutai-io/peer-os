@@ -124,13 +124,44 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 
         trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
+
                 if( data.length > 0 )
-                    vm.downloadProgress = data;
+                {
+                    var output = '';
+                    var checker = false;
+                    for( var i = 0; i < data.length; i++ )
+                    {
+                        var p = data[i];
+                        for (var key in p) {
+                            if (p.hasOwnProperty(key))
+                            {
+                                output += 'Peer ' + key + ':<br/>';
+                                for( var tpl in p[key]['templatesDownloadProgressMap'] )
+                                {
+                                    output += '<span class="g-text-blue">' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p[key]['templatesDownloadProgressMap'][tpl] + ' %</span>';
+                                    if( p[key]['templatesDownloadProgressMap'][tpl] != 100 )
+                                    {
+                                        checker = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if( checker == true )
+                    {
+                        $('.js-download-progress').html(output);
+                    }
+                    else
+                    {
+                        $('.js-download-progress').html('');
+                    }
+                }
                 else
-                    vm.downloadProgress = '';
+                    $('.js-download-progress').html('');
             })
             .error(function (data) {
-                vm.downloadProgress = '';
+                $('.js-download-progress').html('');
             });
 
         trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
