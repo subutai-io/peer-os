@@ -100,7 +100,7 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         topology.addNodePlacement( peerId, node );
 
 
-        environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, null, null, async );
+        environmentManager.modifyEnvironment( environmentId, topology, null, null, async );
 
         System.out.println( "Environment creation started" );
 
