@@ -1,13 +1,8 @@
 package io.subutai.core.test.cli;
 
 
-import java.util.Map;
-
-import com.google.common.collect.Maps;
-
-import io.subutai.common.environment.PeerTemplatesDownloadProgress;
-import io.subutai.common.environment.RhTemplatesDownloadProgress;
-import io.subutai.common.util.JsonUtil;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Test
@@ -16,19 +11,15 @@ public class Test
     @org.junit.Test
     public void name() throws Exception
     {
-        Map<String, Integer> map1 = Maps.newHashMap();
-        map1.put( "apache", 45 );
-        map1.put( "casandra", 55 );
-        Map<String, Integer> map2 = Maps.newHashMap();
-        map2.put( "mongo", 45 );
-        map2.put( "xk", 55 );
-        RhTemplatesDownloadProgress rhTemplatesDownloadProgress = new RhTemplatesDownloadProgress( "rh1", map1 );
-        RhTemplatesDownloadProgress rhTemplatesDownloadProgress2 = new RhTemplatesDownloadProgress( "rh2", map2 );
+        String TEMPLATE_IS_BEING_DOWNLOADED_PATTERN = "\\[Downloading (.+)\\]";
+        Pattern templateIsBeingDownloadedPattern = Pattern.compile( TEMPLATE_IS_BEING_DOWNLOADED_PATTERN );
+        String line = "time=\"2016-08-19 13:34:58\" level=info msg=\"[Downloading cassandra]";
 
-        PeerTemplatesDownloadProgress peerTemplatesDownloadProgress = new PeerTemplatesDownloadProgress( "peer123" );
-        peerTemplatesDownloadProgress.addTemplateDownloadProgress( rhTemplatesDownloadProgress );
-        peerTemplatesDownloadProgress.addTemplateDownloadProgress( rhTemplatesDownloadProgress2 );
+        Matcher downloadingMatcher = templateIsBeingDownloadedPattern.matcher( line );
 
-        System.out.println( JsonUtil.toJson( peerTemplatesDownloadProgress ) );
+        if ( downloadingMatcher.groupCount() > 0 && downloadingMatcher.find() )
+        {
+            System.out.println(downloadingMatcher.group( 1 ));
+        }
     }
 }

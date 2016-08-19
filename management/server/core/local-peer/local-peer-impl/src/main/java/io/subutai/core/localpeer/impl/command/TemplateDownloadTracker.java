@@ -18,7 +18,7 @@ public class TemplateDownloadTracker implements CommandCallback
 
     final static String TEMPLATE_EXISTS_PATTERN = "\\[(\\w+) instance exist\\]";
     final static String TEMPLATE_IS_BEING_INSTALLED_PATTERN = "\\[Installing template (\\w+)\\]";
-    final static String TEMPLATE_IS_BEING_DOWNLOADED_PATTERN = "\\[Downloading (\\w+)\\]";
+    final static String TEMPLATE_IS_BEING_DOWNLOADED_PATTERN = "\\[Downloading (.+)\\]";
     final static String TEMPLATE_DOWNLOAD_PERCENT_PATTERN = "(\\d+\\.\\d+)%";
     final static Pattern templateExistsPattern = Pattern.compile( TEMPLATE_EXISTS_PATTERN, Pattern.MULTILINE );
     final static Pattern templateIsBeingInstalledPattern =
