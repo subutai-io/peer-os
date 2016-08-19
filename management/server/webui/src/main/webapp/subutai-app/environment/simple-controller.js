@@ -37,7 +37,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     vm.environment2BuildName = '';
     vm.buildCompleted = false;
     vm.selectedPlugin = false;
-    vm.downloadProgress = '';
 
     // functions
 
@@ -219,6 +218,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 } else {
                     if (data.state == 'FAILED') {
                         checkLastLog(false);
+                        $('.js-download-progress').html('');
                     } else {
                         //SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 
@@ -241,7 +241,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         vm.isEditing = false;
                     }
 
-                    vm.downloadProgress = '';
+                    $('.js-download-progress').html('');
                     $rootScope.notificationsUpdate = 'getLogById';
                     $scope.$emit('reloadEnvironmentsList');
                     clearWorkspace();

@@ -275,6 +275,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
                     }
 
+                    $('.js-download-progress').html('');
                     $rootScope.notificationsUpdate = 'getLogByIdAdv';
                     $scope.$emit('reloadEnvironmentsList');
                     clearWorkspace();
