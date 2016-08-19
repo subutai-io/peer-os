@@ -169,7 +169,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                                 output += 'Peer ' + key + ':<br/>';
                                 for( var tpl in p[key]['templatesDownloadProgressMap'] )
                                 {
-                                    output += '<span class="g-text-blue">' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p[key]['templatesDownloadProgressMap'][tpl] + ' %</span>';
+                                    output += '<span class="g-text-blue">' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p[key]['templatesDownloadProgressMap'][tpl] + ' %</span><br/>';
                                     if( p[key]['templatesDownloadProgressMap'][tpl] != 100 )
                                     {
                                         checker = true;
