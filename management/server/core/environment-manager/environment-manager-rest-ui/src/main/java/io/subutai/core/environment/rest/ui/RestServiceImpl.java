@@ -40,16 +40,13 @@ import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
-import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
-import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentContainerHost;
-import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -966,28 +963,31 @@ public class RestServiceImpl implements RestService
     {
         try
         {
+            //TODO reimplement
 
+            //            Set<Map<HostId, RhTemplatesDownloadProgress>> set =
+            //                    environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p -> {
+            //                        try
+            //                        {
+            //                            return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) )
+            //                                    .getTemplatesDownloadProgresses();
+            //                        }
+            //                        catch ( Exception e )
+            //                        {
+            //                            return new HashMap<HostId, RhTemplatesDownloadProgress>();
+            //                        }
+            //                    } ).collect( Collectors.toSet() );
+            //
+            //            if ( set.stream().filter( s -> s.size() > 0 ).count() == 0 )
+            //            {
+            //                return Response.ok().build();
+            //            }
 
-            Set<Map<HostId, RhTemplatesDownloadProgress>> set =
-                    environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p -> {
-                        try
-                        {
-                            return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) )
-                                    .getTemplatesDownloadProgresses();
-                        }
-                        catch ( Exception e )
-                        {
-                            return new HashMap<HostId, RhTemplatesDownloadProgress>();
-                        }
-                    } ).collect( Collectors.toSet() );
+            //            return Response.ok( JsonUtil.toJson( set ) ).build();
 
-            if ( set.stream().filter( s -> s.size() > 0 ).count() == 0 )
-            {
-                return Response.ok().build();
-            }
-
-            return Response.ok( JsonUtil.toJson( set ) ).build();
+            return Response.ok().build();
         }
+
         catch ( Exception e )
         {
             return Response.serverError().entity( e.toString() ).build();

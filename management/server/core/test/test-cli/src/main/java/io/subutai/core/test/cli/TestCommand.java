@@ -42,10 +42,9 @@ public class TestCommand extends SubutaiShellCommandSupport
 
                     System.out.format( "\tPeer \"%s\":%n", peer.getName() );
 
-                    for ( RhTemplatesDownloadProgress rhProgress : downloadProgress
-                            .getTemplatesDownloadProgresses() )
+                    for ( RhTemplatesDownloadProgress rhProgress : downloadProgress.getTemplatesDownloadProgresses() )
                     {
-                        System.out.format( "\t\tRH \"%s\":%n", rhProgress.getRhId().getId() );
+                        System.out.format( "\t\tRH \"%s\":%n", rhProgress.getRhId() );
 
                         for ( Map.Entry<String, Integer> templateProgress : rhProgress.getTemplatesDownloadProgresses()
                                                                                       .entrySet() )

@@ -9,13 +9,11 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.subutai.common.host.HostId;
-
 
 public class RhTemplatesDownloadProgress
 {
     @JsonProperty( "rhId" )
-    private HostId rhId;
+    private String rhId;
 
     @JsonProperty( "templatesDownloadProgress" )
     private Map<String, Integer> templatesDownloadProgress;
@@ -28,7 +26,7 @@ public class RhTemplatesDownloadProgress
         Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
         Preconditions.checkNotNull( templatesDownloadProgress );
 
-        this.rhId = new HostId( rhId );
+        this.rhId = rhId;
         this.templatesDownloadProgress = templatesDownloadProgress;
     }
 
@@ -41,7 +39,7 @@ public class RhTemplatesDownloadProgress
 
 
     @JsonIgnore
-    public HostId getRhId()
+    public String getRhId()
     {
         return rhId;
     }
