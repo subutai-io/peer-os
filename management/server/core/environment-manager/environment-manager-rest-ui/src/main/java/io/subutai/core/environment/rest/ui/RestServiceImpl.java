@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -20,9 +19,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.environment.*;
-import io.subutai.common.host.HostId;
-import io.subutai.common.peer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +33,26 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentCreationRef;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.NodeSchema;
+import io.subutai.common.environment.RhTemplatesDownloadProgress;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
+import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
@@ -168,7 +181,7 @@ public class RestServiceImpl implements RestService
     public Response build( final String name, final String topologyJson )
     {
 
-        Map<String, String> eventId;
+        Map<String, String> envCreationRef = Maps.newHashMap();
 
         try
         {
@@ -185,7 +198,10 @@ public class RestServiceImpl implements RestService
 
             Topology topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
 
-            eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
+            EnvironmentCreationRef ref = environmentManager.createEnvironment( topology, true );
+
+            envCreationRef.put( "trackerId", ref.getTrackerId() );
+            envCreationRef.put( "environmentId", ref.getEnvironmentId() );
         }
         catch ( Exception e )
         {
@@ -201,14 +217,14 @@ public class RestServiceImpl implements RestService
                            .build();
         }
 
-        return Response.ok( JsonUtil.toJson( eventId ) ).build();
+        return Response.ok( JsonUtil.toJson( envCreationRef ) ).build();
     }
 
 
     @Override
     public Response buildAdvanced( final String name, final String topologyJson )
     {
-        Map<String, String> eventId;
+        Map<String, String> envCreationRef = Maps.newHashMap();
 
         try
         {
@@ -218,12 +234,14 @@ public class RestServiceImpl implements RestService
             {
             }.getType() );
 
-
             Topology topology = new Topology( name );
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
-            eventId = environmentManager.createEnvironmentAndGetTrackerID( topology, true );
+            EnvironmentCreationRef ref = environmentManager.createEnvironment( topology, true );
+
+            envCreationRef.put( "trackerId", ref.getTrackerId() );
+            envCreationRef.put( "environmentId", ref.getEnvironmentId() );
         }
         catch ( Exception e )
         {
@@ -237,7 +255,7 @@ public class RestServiceImpl implements RestService
             return Response.serverError().entity( JsonUtil.toJson( ERROR_KEY, e.getMessage() ) ).build();
         }
 
-        return Response.ok( JsonUtil.toJson( eventId ) ).build();
+        return Response.ok( JsonUtil.toJson( envCreationRef ) ).build();
     }
 
 
@@ -245,7 +263,8 @@ public class RestServiceImpl implements RestService
     public Response modify( final String environmentId, final String topologyJson, final String removedContainers,
                             final String quotaContainers )
     {
-        UUID eventId;
+        String trackerId;
+
         try
         {
             String name = environmentManager.getEnvironments().stream()
@@ -286,9 +305,10 @@ public class RestServiceImpl implements RestService
                 topology = placementStrategy.distribute( name, schema, peerGroupResources, quotas );
             }
 
-            eventId = environmentManager
-                    .modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered,
-                            true );
+            EnvironmentCreationRef ref = environmentManager
+                    .modifyEnvironment( environmentId, topology, containers, changedContainersFiltered, true );
+
+            trackerId = ref.getTrackerId();
         }
         catch ( Exception e )
         {
@@ -296,7 +316,7 @@ public class RestServiceImpl implements RestService
                            .build();
         }
 
-        return Response.ok( JsonUtil.toJson( eventId ) ).build();
+        return Response.ok( JsonUtil.toJson( trackerId ) ).build();
     }
 
 
@@ -304,7 +324,7 @@ public class RestServiceImpl implements RestService
     public Response modifyAdvanced( final String environmentId, final String topologyJson,
                                     final String removedContainers, final String quotaContainers )
     {
-        UUID eventId;
+        String trackerId;
 
         try
         {
@@ -335,9 +355,10 @@ public class RestServiceImpl implements RestService
 
             schema.forEach( s -> topology.addNodePlacement( s.getPeerId(), s ) );
 
-            eventId = environmentManager
-                    .modifyEnvironmentAndGetTrackerID( environmentId, topology, containers, changedContainersFiltered,
-                            true );
+            EnvironmentCreationRef ref = environmentManager
+                    .modifyEnvironment( environmentId, topology, containers, changedContainersFiltered, true );
+
+            trackerId = ref.getTrackerId();
         }
         catch ( Exception e )
         {
@@ -345,7 +366,7 @@ public class RestServiceImpl implements RestService
                            .build();
         }
 
-        return Response.ok( JsonUtil.toJson( eventId ) ).build();
+        return Response.ok( JsonUtil.toJson( trackerId ) ).build();
     }
 
 
@@ -947,20 +968,27 @@ public class RestServiceImpl implements RestService
         {
 
 
-            Set<Map<HostId, RhTemplatesDownloadProgress>> set = environmentManager.loadEnvironment(environmentId).getPeers().stream().map(p -> {
-                try {
-                    return p.getTemplateDownloadProgress(new EnvironmentId(environmentId)).getPeerTemplatesDownloadProgressMap();
-                } catch (Exception e) {
-                    return new HashMap<HostId, RhTemplatesDownloadProgress>();
-                }
-            }).collect( Collectors.toSet() );
+            Set<Map<HostId, RhTemplatesDownloadProgress>> set =
+                    environmentManager.loadEnvironment( environmentId ).getPeers().stream().map( p -> {
+                        try
+                        {
+                            return p.getTemplateDownloadProgress( new EnvironmentId( environmentId ) )
+                                    .getPeerTemplatesDownloadProgressMap();
+                        }
+                        catch ( Exception e )
+                        {
+                            return new HashMap<HostId, RhTemplatesDownloadProgress>();
+                        }
+                    } ).collect( Collectors.toSet() );
 
-            if( set.stream().filter( s -> s.size() > 0 ).count() == 0 )
+            if ( set.stream().filter( s -> s.size() > 0 ).count() == 0 )
+            {
                 return Response.ok().build();
+            }
 
             return Response.ok( JsonUtil.toJson( set ) ).build();
         }
-        catch (Exception e)
+        catch ( Exception e )
         {
             return Response.serverError().entity( e.toString() ).build();
         }

@@ -43,7 +43,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            environmentManager.createEnvironmentAndGetTrackerID( topology, true );
+            environmentManager.createEnvironment( topology, true );
 
             return Response.ok().build();
         }
@@ -61,7 +61,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, null, null, true );
+            environmentManager.modifyEnvironment( environmentId, topology, null, null, true );
 
             return Response.ok().build();
         }

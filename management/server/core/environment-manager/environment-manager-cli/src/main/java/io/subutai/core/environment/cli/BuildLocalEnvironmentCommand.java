@@ -89,7 +89,7 @@ public class BuildLocalEnvironmentCommand extends SubutaiShellCommandSupport
         Topology topology = new Topology( "Dummy environment name" );
         topology.addNodePlacement( peerId, node );
 
-        environmentManager.createEnvironmentAndGetTrackerID( topology, async );
+        environmentManager.createEnvironment( topology, async );
 
         System.out.println( "Environment creation started" );
 
