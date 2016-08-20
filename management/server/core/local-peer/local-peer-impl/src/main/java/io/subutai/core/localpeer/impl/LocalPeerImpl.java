@@ -2821,16 +2821,16 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        PeerTemplatesDownloadProgress peerProgress = new PeerTemplatesDownloadProgress();
+        PeerTemplatesDownloadProgress peerProgress = new PeerTemplatesDownloadProgress( getId() );
 
         for ( ResourceHost resourceHost : getResourceHosts() )
         {
             RhTemplatesDownloadProgress rhProgress = resourceHost.getTemplateDownloadProgress( environmentId.getId() );
 
             //add only RH with existing progress
-            if ( !rhProgress.getTemplatesDownloadProgressMap().isEmpty() )
+            if ( !rhProgress.getTemplatesDownloadProgresses().isEmpty() )
             {
-                peerProgress.addRhTemplateDownloadProgress( resourceHost.getId(), rhProgress );
+                peerProgress.addTemplateDownloadProgress( rhProgress );
             }
         }
 

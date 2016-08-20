@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -780,18 +782,35 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     {
         Map<String, Integer> templateDownloadPercent = envTemplatesDownloadPercent.getIfPresent( environmentId );
 
-        return new RhTemplatesDownloadProgress(
+        return new RhTemplatesDownloadProgress( getId(),
                 templateDownloadPercent == null ? Maps.<String, Integer>newHashMap() : templateDownloadPercent );
     }
 
 
-    public void updateTemplateDownloadProgress( String environmentId, String templateName, int downloadPercent )
+    public void updateTemplateDownloadProgress( String environmentId, final String templateName,
+                                                final int downloadPercent )
     {
-        Map<String, Integer> templateDownloadPercent = Maps.newHashMap();
+        try
+        {
+            Map<String, Integer> templateDownloadPercent =
 
-        templateDownloadPercent.put( templateName, downloadPercent );
+                    envTemplatesDownloadPercent.get( environmentId, new Callable<Map<String, Integer>>()
+                    {
+                        @Override
+                        public Map<String, Integer> call() throws Exception
+                        {
 
-        envTemplatesDownloadPercent.put( environmentId, templateDownloadPercent );
+                            return Maps.newConcurrentMap();
+                        }
+                    } );
+
+
+            templateDownloadPercent.put( templateName, downloadPercent );
+        }
+        catch ( ExecutionException e )
+        {
+            LOG.error( "Error updating template download progress", e );
+        }
     }
 
 

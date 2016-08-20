@@ -6,36 +6,41 @@ import java.util.Map;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 
 public class RhTemplatesDownloadProgress
 {
-    @JsonProperty( "rhDownloadMap" )
-    private Map<String, Integer> templatesDownloadProgressMap;
+    @JsonProperty( "rhId" )
+    private String rhId;
+
+    @JsonProperty( "templatesDownloadProgress" )
+    private Map<String, Integer> templatesDownloadProgress;
 
 
-    public RhTemplatesDownloadProgress(
-            @JsonProperty( "rhDownloadMap" ) final Map<String, Integer> templatesDownloadProgressMap )
+    public RhTemplatesDownloadProgress( @JsonProperty( "rhId" ) final String rhId,
+                                        @JsonProperty( "templatesDownloadProgress" )
+                                        final Map<String, Integer> templatesDownloadProgress )
     {
-        Preconditions.checkNotNull( templatesDownloadProgressMap );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
+        Preconditions.checkNotNull( templatesDownloadProgress );
 
-        this.templatesDownloadProgressMap = templatesDownloadProgressMap;
+        this.rhId = rhId;
+        this.templatesDownloadProgress = templatesDownloadProgress;
     }
 
 
     @JsonIgnore
-    public Map<String, Integer> getTemplatesDownloadProgressMap()
+    public Map<String, Integer> getTemplatesDownloadProgresses()
     {
-        return templatesDownloadProgressMap;
+        return templatesDownloadProgress;
     }
 
 
-    @Override
-    public String toString()
+    @JsonIgnore
+    public String getRhId()
     {
-        return MoreObjects.toStringHelper( this )
-                          .add( "peerTemplatesDownloadProgressMap", templatesDownloadProgressMap ).toString();
+        return rhId;
     }
 }

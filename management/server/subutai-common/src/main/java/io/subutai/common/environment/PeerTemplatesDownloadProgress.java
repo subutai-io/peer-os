@@ -1,46 +1,52 @@
 package io.subutai.common.environment;
 
 
-import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-
-import io.subutai.common.host.HostId;
+import com.google.common.collect.Sets;
 
 
 public class PeerTemplatesDownloadProgress
 {
-    @JsonProperty( "peerDownloadMap" )
-    Map<HostId, RhTemplatesDownloadProgress> peerTemplatesDownloadProgressMap = Maps.newHashMap();
+    @JsonProperty( "peerId" )
+    String peerId;
+
+    @JsonProperty( "templatesDownloadProgress" )
+    Set<RhTemplatesDownloadProgress> templatesDownloadProgress = Sets.newHashSet();
+
+
+    public PeerTemplatesDownloadProgress( @JsonProperty( "peerId" ) final String peerId )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
+
+        this.peerId = peerId;
+    }
 
 
     @JsonIgnore
-    public void addRhTemplateDownloadProgress( String rhId, RhTemplatesDownloadProgress downloadProgress )
+    public void addTemplateDownloadProgress( RhTemplatesDownloadProgress downloadProgress )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( rhId ) );
         Preconditions.checkNotNull( downloadProgress );
 
-        peerTemplatesDownloadProgressMap.put( new HostId( rhId ), downloadProgress );
+        templatesDownloadProgress.add( downloadProgress );
     }
 
 
     @JsonIgnore
-    public Map<HostId, RhTemplatesDownloadProgress> getPeerTemplatesDownloadProgressMap()
+    public Set<RhTemplatesDownloadProgress> getTemplatesDownloadProgresses()
     {
-        return peerTemplatesDownloadProgressMap;
+        return templatesDownloadProgress;
     }
 
 
-    @Override
-    public String toString()
+    @JsonIgnore
+    public String getPeerId()
     {
-        return MoreObjects.toStringHelper( this )
-                          .add( "peerTemplatesDownloadProgressMap", peerTemplatesDownloadProgressMap ).toString();
+        return peerId;
     }
 }
