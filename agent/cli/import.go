@@ -24,7 +24,7 @@ import (
 
 var (
 	lock   lockfile.Lockfile
-	owners = []string{"subutai", "public", "jenkins", "docker", ""}
+	owners = []string{"subutai", "jenkins", "docker", ""}
 )
 
 type templ struct {
@@ -281,9 +281,9 @@ func LxcImport(name, version, token string) {
 		// if v.Author == "public" || v.Author == "subutai" || v.Author == "jenkins" {
 		signedhash := gpg.VerifySignature(gpg.KurjunUserPK(owner), signature)
 		if t.id != signedhash {
-			log.Error("Signature does not match with template hash")
+			log.Error("Signature does not match with template id")
 		}
-		log.Info("Digital signature and file integrity verified")
+		log.Info("Template's owner signature verified")
 		log.Debug("Signature belongs to " + owner)
 		break
 		// }
@@ -304,9 +304,10 @@ func LxcImport(name, version, token string) {
 			}
 		}
 		if !downloaded && !download(t, kurjun, token) {
-			log.Error("Failed to download template " + t.name)
+			log.Error("Failed to download or verify template " + t.name)
 		}
 	}
+	log.Info("File integrity verified")
 
 	time.Sleep(time.Millisecond * 200) // Added sleep to prevent output collision with progress bar.
 
