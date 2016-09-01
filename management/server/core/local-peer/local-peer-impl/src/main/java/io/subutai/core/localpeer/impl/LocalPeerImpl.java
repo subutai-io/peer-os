@@ -1,6 +1,7 @@
 package io.subutai.core.localpeer.impl;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -32,9 +33,11 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.environment.RhP2pIp;
+import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.exception.DaoException;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.ContainerHostInfoModel;
@@ -48,6 +51,7 @@ import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.ProcessResourceUsage;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -79,8 +83,12 @@ import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.quota.QuotaException;
+import io.subutai.common.resource.CpuResource;
+import io.subutai.common.resource.DiskResource;
 import io.subutai.common.resource.HistoricalMetrics;
+import io.subutai.common.resource.HostResources;
 import io.subutai.common.resource.PeerResources;
+import io.subutai.common.resource.RamResource;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -274,7 +282,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
         peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
         peerInfo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-        peerInfo.setName("Local Peer" );
+        peerInfo.setName( "Local Peer" );
     }
 
 
@@ -715,9 +723,12 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             final ResourceHost resourceHost = getResourceHostById( resourceHostId );
 
-            for ( final String templateName : request.getTemplates().get( resourceHostId ) )
+            for ( final String templateId : request.getTemplates().get( resourceHostId ) )
             {
-                HostUtil.Task<Object> importTask = new ImportTemplateTask( templateName, resourceHost );
+                Template template = templateManager.getTemplate( templateId );
+
+                HostUtil.Task<Object> importTask =
+                        new ImportTemplateTask( template, resourceHost, request.getEnvironmentId() );
 
                 tasks.addTask( resourceHost, importTask );
             }
@@ -754,7 +765,9 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         {
             ResourceHost resourceHost = getResourceHostById( request.getResourceHostId() );
 
-            CloneContainerTask task = new CloneContainerTask( request, resourceHost, reservedNetworkResource, this );
+            CloneContainerTask task =
+                    new CloneContainerTask( request, templateManager.getTemplate( request.getTemplateId() ),
+                            resourceHost, reservedNetworkResource, this );
 
             cloneTasks.addTask( resourceHost, task );
         }
@@ -779,7 +792,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
                 ContainerHostEntity containerHostEntity =
                         new ContainerHostEntity( getId(), ( ( CloneContainerTask ) cloneTask ).getResult(),
                                 request.getHostname(), request.getTemplateArch(), interfaces, request.getHostname(),
-                                request.getTemplateName(), request.getTemplateArch().name(),
+                                request.getTemplateId(), request.getTemplateArch().name(),
                                 requestGroup.getEnvironmentId(), requestGroup.getOwnerId(),
                                 requestGroup.getInitiatorPeerId(), request.getContainerSize() );
 
@@ -2335,6 +2348,56 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public PeerResources getResources()
+    {
+        int environmentLimit = 100;
+        int containerLimit = 200;
+        int networkLimit = 100;
+
+        List<HostResources> resources = new ArrayList<>();
+        try
+        {
+            for ( ResourceHostMetric resourceHostMetric : getResourceHostMetrics().getResources() )
+            {
+                try
+                {
+                    ResourceHost resourceHost = getResourceHostByName( resourceHostMetric.getHostName() );
+
+                    BigDecimal cpuLimit = new BigDecimal( "100.00" );
+
+                    BigDecimal ramLimit = new BigDecimal( resourceHostMetric.getTotalRam() );
+
+                    BigDecimal diskLimit = new BigDecimal( resourceHostMetric.getTotalSpace() );
+
+                    CpuResource cpuResource =
+                            new CpuResource( cpuLimit, 0.0, "UNKNOWN", resourceHostMetric.getCpuCore(), 0, 0, 0,
+                                    resourceHostMetric.getCpuFrequency(), 0 );
+
+                    RamResource ramResource = new RamResource( ramLimit, 0.0 );
+
+                    DiskResource diskResource = new DiskResource( diskLimit, 0.0, "UNKNOWN", 0.0, 0.0, false );
+
+
+                    HostResources hostResources =
+                            new HostResources( resourceHost.getId(), cpuResource, ramResource, diskResource );
+                    resources.add( hostResources );
+                }
+                catch ( HostNotFoundException e )
+                {
+                    // ignore
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            LOG.debug( e.getMessage(), e );
+        }
+
+        return new PeerResources( getId(), environmentLimit, containerLimit, networkLimit, resources );
+    }
+
+
+    @Override
     public Set<Template> getTemplates()
     {
         return templateManager.getTemplates();
@@ -2342,11 +2405,20 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
-    public Template getTemplate( final String templateName )
+    public Template getTemplateByName( final String templateName )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
 
-        return templateManager.getTemplate( templateName );
+        return templateManager.getTemplateByName( templateName );
+    }
+
+
+    @Override
+    public Template getTemplateById( final String templateId ) throws PeerException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateId ), "Invalid template id" );
+
+        return templateManager.getTemplate( templateId );
     }
 
 
@@ -2741,6 +2813,32 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
             }
         }
     }
+
+
+    @Override
+    public PeerTemplatesDownloadProgress getTemplateDownloadProgress( final EnvironmentId environmentId )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        PeerTemplatesDownloadProgress peerProgress = new PeerTemplatesDownloadProgress( getId() );
+
+        for ( ResourceHost resourceHost : getResourceHosts() )
+        {
+            RhTemplatesDownloadProgress rhProgress = resourceHost.getTemplateDownloadProgress( environmentId.getId() );
+
+            //add only RH with existing progress
+            if ( !rhProgress.getTemplatesDownloadProgresses().isEmpty() )
+            {
+                peerProgress.addTemplateDownloadProgress( rhProgress );
+            }
+        }
+
+        return peerProgress;
+    }
+
+
+    //**************************
 
 
     @Override

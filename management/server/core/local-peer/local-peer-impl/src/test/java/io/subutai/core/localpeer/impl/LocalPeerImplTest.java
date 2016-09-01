@@ -266,7 +266,7 @@ public class LocalPeerImplTest
         when( resourceHost.getHostname() ).thenReturn( RESOURCE_HOST_NAME );
         when( securityManager.getKeyManager() ).thenReturn( keyManager );
         when( resourceHostDataService.getAll() ).thenReturn( Sets.newHashSet( resourceHost ) );
-        when( templateRegistry.getTemplate( TEMPLATE_NAME ) ).thenReturn( template );
+        when( templateRegistry.getTemplateByName( TEMPLATE_NAME ) ).thenReturn( template );
         when( template.getName() ).thenReturn( TEMPLATE_NAME );
         when( resourceHost.isConnected() ).thenReturn( true );
         when( hostRegistry.getContainerHostInfoById( CONTAINER_HOST_ID ) ).thenReturn( containerHostInfo );

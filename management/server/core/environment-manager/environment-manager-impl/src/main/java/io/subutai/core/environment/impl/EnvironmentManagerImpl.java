@@ -40,6 +40,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
@@ -416,7 +417,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public UUID createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
+    public EnvironmentCreationRef createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
@@ -429,9 +430,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         operationTracker.addLog( "Logger initialized" );
 
-        createEnvironment( topology, async, operationTracker );
-
-        return operationTracker.getId();
+        return new EnvironmentCreationRef( operationTracker.getId().toString(),
+                createEnvironment( topology, async, operationTracker ).getId() );
     }
 
 
@@ -446,7 +446,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
         final Set<EnvironmentContainerHost> oldContainers = Sets.newHashSet( environment.getContainerHosts() );
 
-        modifyEnvironmentAndGetTrackerID( environmentId, topology, null, null, async );
+        modifyEnvironment( environmentId, topology, null, null, async );
 
         Set<EnvironmentContainerHost> newContainers = Sets.newHashSet();
 
@@ -462,10 +462,10 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
     @RolesAllowed( "Environment-Management|Write" )
     @Override
-    public UUID modifyEnvironmentAndGetTrackerID( final String environmentId, final Topology topology,
-                                                  final List<String> removedContainers,
-                                                  final Map<String, ContainerSize> changedContainers,
-                                                  final boolean async )
+    public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
+                                                     final List<String> removedContainers,
+                                                     final Map<String, ContainerSize> changedContainers,
+                                                     final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
 
@@ -572,7 +572,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         }
 
-        return operationTracker.getId();
+        return new EnvironmentCreationRef( operationTracker.getId().toString(), environmentId );
     }
 
 

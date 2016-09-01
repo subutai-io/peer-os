@@ -13,17 +13,6 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/error">
-      <action class="io.subutai.core.test.cli.TestCommand" />
-    </command>
-  </command-bundle>
-
-  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
-    <command name="test/verify">
-      <action class="io.subutai.core.test.cli.TestRoleValidation" />
-    </command>
-  </command-bundle>
 
   <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor" />
   <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
@@ -46,6 +35,9 @@
   <reference id="identityManager"
              interface="io.subutai.core.identity.api.IdentityManager" />
 
+  <reference id="registrationManager"
+             interface="io.subutai.core.registration.api.RegistrationManager" />
+
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />
 
@@ -61,6 +53,7 @@
     <property name="peerManager" ref="peerManager" />
     <property name="environmentManager" ref="environmentManager" />
     <property name="identityManager" ref="identityManager" />
+    <property name="registrationManager" ref="registrationManager" />
     <property name="monitor" ref="monitor" />
     <property name="commandExecutor" ref="commandExecutor" />
     <argument ref="daoManagerHub" />

@@ -60,11 +60,11 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response register( final String hubIp, final String email, final String password )
+    public Response register( final String hubIp, final String email, final String password, final String peerName )
     {
         try
         {
-            hubManager.registerPeer( hubIp, email, password );
+            hubManager.registerPeer( hubIp, email, password, peerName );
             return Response.ok().build();
         }
         catch ( Exception e )

@@ -301,7 +301,7 @@ func LxcImport(name, version, token string, torrent bool) {
 	}
 
 	if len(t.id) != 0 && len(t.signature) == 0 {
-		log.Warn("Template is not signed")
+		log.Error("Template is not signed")
 	}
 
 	for owner, signature := range t.signature {

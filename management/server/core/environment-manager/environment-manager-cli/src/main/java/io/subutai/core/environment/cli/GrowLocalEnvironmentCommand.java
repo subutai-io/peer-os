@@ -92,13 +92,15 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         String hostId = resourceHosts.iterator().next().getId();
         Environment environment = environmentManager.loadEnvironment( environmentId );
         String containerName = String.format( "Container%d", new Random().nextInt( 999 ) );
-        Node node = new Node( containerName, containerName, templateName, ContainerSize.TINY, peerId, hostId );
-        //
+
+        Node node = new Node( containerName, containerName, templateName, ContainerSize.TINY, peerId, hostId,
+                peerManager.getLocalPeer().getTemplateByName( templateName ).getId() );
+
         Topology topology = new Topology( environment.getName() );
         topology.addNodePlacement( peerId, node );
 
 
-        environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, null, null, async );
+        environmentManager.modifyEnvironment( environmentId, topology, null, null, async );
 
         System.out.println( "Environment creation started" );
 

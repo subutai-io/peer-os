@@ -29,6 +29,7 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
@@ -59,7 +60,6 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
@@ -220,15 +220,6 @@ public class RemotePeerImpl implements RemotePeer
     public RegistrationStatus getStatus()
     {
         return peerManager.getRemoteRegistrationStatus( peerInfo.getId() );
-    }
-
-
-    @Override
-    public Template getTemplate( final String templateName ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-
-        return peerWebClient.getTemplate( templateName );
     }
 
 
@@ -987,6 +978,19 @@ public class RemotePeerImpl implements RemotePeer
 
         environmentWebClient.setContainerHostName( containerId, hostname );
     }
+
+
+    @Override
+    public PeerTemplatesDownloadProgress getTemplateDownloadProgress( final EnvironmentId environmentId )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        return environmentWebClient.getTemplateDownloadProgress(environmentId);
+    }
+
+
+    //********************************
 
 
     @Override

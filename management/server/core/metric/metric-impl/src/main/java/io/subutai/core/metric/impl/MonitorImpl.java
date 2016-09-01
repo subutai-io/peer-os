@@ -504,7 +504,7 @@ public class MonitorImpl implements Monitor, HostListener
 
         for ( final ResourceHost resourceHost : peerManager.getLocalPeer().getResourceHosts() )
         {
-            P2Pinfo info = new P2PInfoPojo();
+            P2PInfoPojo info = new P2PInfoPojo();
 
             try
             {
@@ -566,7 +566,7 @@ public class MonitorImpl implements Monitor, HostListener
                 }
 
                 info.setRhId( resourceHost.getId() );
-
+                info.setRhName( resourceHost.getHostname() );
                 info.setRhVersion( resourceHost.getRhVersion().replace( "Subutai version", "" ).trim() );
                 info.setP2pVersion( resourceHost.getP2pVersion().replace( "p2p Cloud project", "" ).trim() );
                 info.setState( stateList );

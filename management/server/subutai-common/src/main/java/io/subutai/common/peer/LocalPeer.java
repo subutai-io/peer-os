@@ -8,6 +8,7 @@ import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.protocol.Template;
+import io.subutai.common.resource.PeerResources;
 import io.subutai.common.util.HostUtil;
 
 
@@ -138,6 +139,8 @@ public interface LocalPeer extends Peer
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
 
+    PeerResources getResources();
+
     Set<Template> getTemplates();
 
     SshTunnel setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
@@ -169,5 +172,9 @@ public interface LocalPeer extends Peer
     Set<ContainerHost> listOrphanContainers();
 
     void removeOrphanContainers();
+
+    Template getTemplateByName( String templateName ) throws PeerException;
+
+    Template getTemplateById( String templateId ) throws PeerException;
 }
 

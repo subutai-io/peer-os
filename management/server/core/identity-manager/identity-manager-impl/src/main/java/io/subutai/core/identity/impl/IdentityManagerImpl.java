@@ -1253,6 +1253,12 @@ public class IdentityManagerImpl implements IdentityManager
     @Override
     public User modifyUser( User user, String password ) throws Exception
     {
+        //******Cannot update Internal User *************
+        if ( user.getType() == UserType.System.getId() )
+        {
+            throw new AccessControlException( "Internal User cannot be updated" );
+        }
+
         try
         {
 

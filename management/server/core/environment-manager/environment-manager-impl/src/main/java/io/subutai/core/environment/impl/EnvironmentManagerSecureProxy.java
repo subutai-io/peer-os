@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -24,6 +23,7 @@ import com.google.common.collect.Maps;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
@@ -52,7 +52,6 @@ import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
-import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -214,29 +213,23 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Write" )
-    public UUID createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
+    public EnvironmentCreationRef createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( EnvironmentManagerImpl.MODULE_NAME,
-                String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
-
-        environmentManager.createEnvironment( topology, async, operationTracker );
-
-        return operationTracker.getId();
+        return environmentManager.createEnvironment( topology, async );
     }
 
 
     @Override
     @RolesAllowed( "Environment-Management|Write" )
-    public UUID modifyEnvironmentAndGetTrackerID( final String environmentId, final Topology topology,
-                                                  final List<String> removedContainers,
-                                                  final Map<String, ContainerSize> changedContainers,
-                                                  final boolean async )
+    public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
+                                                     final List<String> removedContainers,
+                                                     final Map<String, ContainerSize> changedContainers,
+                                                     final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
@@ -248,9 +241,9 @@ public class EnvironmentManagerSecureProxy
         {
             throw new EnvironmentNotFoundException();
         }
+
         return environmentManager
-                .modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, changedContainers,
-                        async );
+                .modifyEnvironment( environmentId, topology, removedContainers, changedContainers, async );
     }
 
 

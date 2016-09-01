@@ -103,9 +103,11 @@ public class BuildContainerStateHandler extends StateHandler
             log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
                     nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
+            //TODO:TEMPLATE receive templateId instead of templateName from Hub, this is a workaround for now
             Node node =
                     new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize,
-                            peerDto.getPeerId(), nodeDto.getHostId() );
+                            peerDto.getPeerId(), nodeDto.getHostId(),
+                            ctx.localPeer.getTemplateByName( nodeDto.getTemplateName() ).getId() );
 
             nodes.add( node );
         }
@@ -122,7 +124,7 @@ public class BuildContainerStateHandler extends StateHandler
                 rhTemplates.put( node.getHostId(), templates );
             }
 
-            templates.add( node.getTemplateName() );
+            templates.add( node.getTemplateId() );
         }
 
         ctx.localPeer
@@ -182,7 +184,7 @@ public class BuildContainerStateHandler extends StateHandler
 
 
     private CreateEnvironmentContainersRequest createCloneRequests( EnvironmentPeerDto peerDto,
-                                                                    EnvironmentNodesDto envNodes )
+                                                                    EnvironmentNodesDto envNodes ) throws Exception
     {
         String envId = peerDto.getEnvironmentInfo().getId();
 
@@ -210,13 +212,18 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto )
+    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws Exception
     {
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-        return new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
-                nodeDto.getContainerName(), nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64,
-                contSize );
+        //TODO:TEMPLATE receive templateId instead of templateName from Hub, this is a workaround for now
+        CloneRequest cloneRequest =
+                new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
+                        nodeDto.getContainerName(), nodeDto.getIp(),
+                        ctx.localPeer.getTemplateByName( nodeDto.getTemplateName() ).getId(), HostArchitecture.AMD64,
+                        contSize );
+
+        return cloneRequest;
     }
 
 

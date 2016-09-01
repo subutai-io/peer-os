@@ -14,6 +14,7 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
@@ -27,7 +28,6 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.resource.PeerResources;
@@ -135,11 +135,6 @@ public interface Peer extends RelationLink
      */
     boolean isLocal();
 
-
-    /**
-     * Returns template by name
-     */
-    Template getTemplate( String templateName ) throws PeerException;
 
     /**
      * Returns true of the peer is reachable online, false otherwise
@@ -290,4 +285,6 @@ public interface Peer extends RelationLink
     void setContainerHostname( ContainerId containerId, String hostname ) throws PeerException;
 
     RegistrationStatus getStatus();
+
+    PeerTemplatesDownloadProgress getTemplateDownloadProgress( EnvironmentId environmentId ) throws PeerException;
 }

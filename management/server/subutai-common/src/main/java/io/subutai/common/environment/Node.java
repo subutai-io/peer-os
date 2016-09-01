@@ -38,6 +38,9 @@ public class Node
     @JsonProperty( "hostname" )
     private String hostname;
 
+    @JsonProperty( "templateId" )
+    private String templateId;
+
 
     private Node()
     {
@@ -46,7 +49,8 @@ public class Node
 
     public Node( @JsonProperty( "hostname" ) final String hostname, @JsonProperty( "name" ) final String name,
                  @JsonProperty( "templateName" ) final String templateName, @JsonProperty( "type" ) ContainerSize type,
-                 @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId )
+                 @JsonProperty( "peerId" ) final String peerId, @JsonProperty( "hostId" ) final String hostId,
+                 @JsonProperty( "templateId" ) String templateId )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Invalid node group name" );
@@ -60,6 +64,7 @@ public class Node
         this.type = type;
         this.peerId = peerId;
         this.hostId = hostId;
+        this.templateId = templateId;
     }
 
 
@@ -112,5 +117,11 @@ public class Node
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid host name" );
 
         this.hostname = hostname.replaceAll( "\\s+", "" );
+    }
+
+
+    public String getTemplateId()
+    {
+        return templateId;
     }
 }

@@ -31,8 +31,7 @@ public class Blueprint
     private List<NodeSchema> nodes;
 
 
-    public Blueprint( @JsonProperty( "name" ) final String name,/*, @JsonProperty( "sshGroupId" ) final int sshGroupId,
-                      @JsonProperty( "hostGroupId" ) final int hostGroupId,*/
+    public Blueprint( @JsonProperty( "name" ) final String name,
                       @JsonProperty( "nodes" ) List<NodeSchema> nodes )
     {
 

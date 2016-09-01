@@ -5,15 +5,41 @@
   <parent>
     <artifactId>template-manager</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>template-manager-api</artifactId>
+  <packaging>bundle</packaging>
+  <name>Template Manager Api</name>
+  <description>Template Manager Api</description>
+
   <dependencies>
     <dependency>
       <groupId>io.subutai</groupId>
       <artifactId>subutai-common</artifactId>
     </dependency>
   </dependencies>
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.groupId}.core.template.api</Bundle-SymbolicName>
+            <Export-Package>
+              {local-packages};version=${project.version};-noimport:=true
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
