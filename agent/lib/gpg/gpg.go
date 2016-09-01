@@ -249,8 +249,8 @@ func ParsePem(cert string) (crt, key []byte) {
 }
 
 func KurjunUserPK(owner string) string {
-	config.CheckKurjun()
-	response, err := http.Get(config.Cdn.Kurjun + "/auth/key?user=" + owner)
+	kurjun, _ := config.CheckKurjun()
+	response, err := kurjun.Get(config.Cdn.Kurjun + "/auth/key?user=" + owner)
 	log.Check(log.FatalLevel, "Getting owner public key", err)
 	defer response.Body.Close()
 	key, err := ioutil.ReadAll(response.Body)
