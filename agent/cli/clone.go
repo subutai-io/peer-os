@@ -19,7 +19,7 @@ func LxcClone(parent, child, envId, addr, token string) {
 	}
 
 	if !container.IsTemplate(parent) {
-		LxcImport(parent, "", token)
+		LxcImport(parent, "", token, false)
 	}
 	if container.IsContainer(child) {
 		log.Error("Container " + child + " already exist")
