@@ -58,6 +58,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.RelationMeta;
@@ -593,6 +594,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public String getOwnerId()
     {
         throw new UnsupportedOperationException( "Not implemented yet." );
+    }
+
+
+    @Override
+    public SshKeys getAuthorizedKeys() throws PeerException
+    {
+        return getPeer().getContainerAuthorizedKeys( this.getContainerId() );
     }
 
 
