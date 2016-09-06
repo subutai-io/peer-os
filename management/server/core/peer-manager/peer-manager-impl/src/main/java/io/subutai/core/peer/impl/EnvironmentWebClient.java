@@ -542,6 +542,37 @@ public class EnvironmentWebClient
     }
 
 
+    public SshKeys getContainerAuthorizedKeys( final ContainerId containerId ) throws PeerException
+    {
+        WebClient client = null;
+        Response response;
+        try
+        {
+            String path = String.format( "/%s/container/%s/sshkeys", containerId.getEnvironmentId().getId(),
+                    containerId.getId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.type( MediaType.APPLICATION_JSON );
+            client.accept( MediaType.APPLICATION_JSON );
+
+            response = client.get();
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+
+            throw new PeerException( "Error reading authorized keys of container: " + e.getMessage() );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        return WebClientBuilder.checkResponse( response, SshKeys.class );
+    }
+
+
     public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
                                 final SshEncryptionType sshEncryptionType ) throws PeerException
     {

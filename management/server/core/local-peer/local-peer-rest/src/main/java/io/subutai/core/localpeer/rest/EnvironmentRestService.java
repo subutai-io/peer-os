@@ -103,6 +103,13 @@ public interface EnvironmentRestService
     SshKeys generateSshKeysForEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId,
                                            @PathParam( "encType" ) SshEncryptionType sshKeyType );
 
+
+    @GET
+    @Path( "{environmentId}/container/{containerId}/sshkeys" )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    SshKeys getContainerAuthorizedKeys( @PathParam( "containerId" ) ContainerId containerId );
+
     @POST
     @Path( "{environmentId}/containers/sshkey/add" )
     void addSshKey( @PathParam( "environmentId" ) EnvironmentId environmentId, String sshPublicKey );
