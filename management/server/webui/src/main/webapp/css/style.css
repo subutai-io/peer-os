@@ -1598,6 +1598,24 @@ td.b-main-table__status-col {
 	padding-right: 7px;
 }
 
+.b-main-table_progrss {
+	border: 1px solid #CCCEEE;
+}
+
+.b-main-table_progrss tr {
+	border-bottom: 1px solid #CCCEEE;
+}
+
+.b-main-table_progrss th,
+.b-main-table_progrss td {
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+.b-main-table_progrss td:first-child {
+	padding: 5px 10px;
+}
+
 .b-load-icon {
     display: inline-block;
     width: 25px;
@@ -2790,12 +2808,35 @@ td.b-main-table__status-col {
     position: relative;
     overflow: hidden;
 }
+
+.b-progress-cloud_white {
+	background-color: #FFF;
+}
+
+.b-progress-cloud_big {
+	height: 20px;
+	line-height: 20px;
+	color: #04346E;
+	text-align: center;
+	font-size: 11px;
+}
+
 .b-progress-cloud-fill {
     position: absolute;
     left: 0;
     height: 100%;
     background-color: #FFF;
 }
+
+.b-progress-cloud-text {
+	position: relative;
+	z-index: 10;
+}
+
+.b-progress-cloud_white .b-progress-cloud-fill {
+	background-color: #078DD0;
+}
+
 .b-progress-text {
     font-size: 11px;
     color: #04346E;

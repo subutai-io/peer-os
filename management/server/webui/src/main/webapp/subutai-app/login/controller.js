@@ -64,33 +64,66 @@ function LoginCtrl( loginSrv, $http, $rootScope )
 		if( vm.newPass.length > 0 ) {
 			if( vm.newPass !== vm.passConf ) {
 				vm.errorMessage = "New password doesn't match the 'Confirm password' field";
-			}
-			else {
+			} else {
 				postData += '&newpassword=' + vm.newPass;
 
 				loginSrv.login( postData ).success(function(data){
 					$rootScope.currentUser = vm.name;
 					$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 					//$state.go('home');
-					window.location = '/';
+					checkUserPermissions();
 				}).error(function(error){
 					vm.errorMessage = error;
 				});
 			}
-		}
-		else {
+		} else {
 			loginSrv.login( postData ).success(function(data){
 				$rootScope.currentUser = vm.name;
 				$http.defaults.headers.common['sptoken'] = getCookie('sptoken');
 				sessionStorage.removeItem('notifications');
 				//$state.go('home');
-				window.location = '/';
+				checkUserPermissions();
 			}).error(function(error, status){
 				vm.errorMessage = error;
 
 				if( status == 412 )
 					vm.passExpired = true;
 			});
+		}
+	}
+
+	function checkUserPermissions() {
+		if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null
+			|| localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {
+
+			LOADING_SCREEN();
+			$http.get(SERVER_URL + "rest/ui/identity/user", {
+				withCredentials: true,
+				headers: {'Content-Type': 'application/json'}
+			}).success(function (data) {
+
+				localStorage.removeItem('currentUser');
+				localStorage.removeItem('currentUserPermissions');
+				localStorage.removeItem('currentUserToken');
+
+				localStorage.setItem('currentUser', data.userName);
+				localStorage.setItem('currentUserToken', getCookie('sptoken'));
+
+				var perms = [];
+				for( var i = 0; i < data.roles.length; i++ ) {
+					for( var j = 0; j < data.roles[i].permissions.length; j++ ) {
+						perms.push(data.roles[i].permissions[j].object);
+					}
+				}
+
+				localStorage.setItem('currentUserPermissions', perms);
+
+				window.location = '/';
+			}).error(function(error) {
+				window.location = '/';
+			});
+		} else {
+			window.location = '/';
 		}
 	}
 }
