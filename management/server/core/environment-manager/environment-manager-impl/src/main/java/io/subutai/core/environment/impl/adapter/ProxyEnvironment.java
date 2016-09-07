@@ -75,10 +75,9 @@ public class ProxyEnvironment extends EnvironmentImpl
         {
             for ( JsonNode node : arr )
             {
-                //TODO:TEMPLATE pass templateId instead of templateName
-                ProxyEnvironmentContainer ch = new ProxyEnvironmentContainer( node,
-                        getLocaPeer().getTemplateByName( node.get( "templateName" ).asText() ).getId(),
-                        environmentManager, localContainerIds );
+                ProxyEnvironmentContainer ch =
+                        new ProxyEnvironmentContainer( node, node.get( "templateId" ).asText(), environmentManager,
+                                localContainerIds );
 
                 ch.setEnvironment( this );
 

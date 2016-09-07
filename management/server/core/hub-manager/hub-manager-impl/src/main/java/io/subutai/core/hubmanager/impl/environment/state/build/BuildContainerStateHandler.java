@@ -103,11 +103,9 @@ public class BuildContainerStateHandler extends StateHandler
             log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
                     nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
-            //TODO:TEMPLATE receive templateId instead of templateName from Hub, this is a workaround for now
             Node node =
                     new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize,
-                            peerDto.getPeerId(), nodeDto.getHostId(),
-                            ctx.localPeer.getTemplateByName( nodeDto.getTemplateName() ).getId() );
+                            peerDto.getPeerId(), nodeDto.getHostId(), nodeDto.getTemplateId() );
 
             nodes.add( node );
         }
@@ -216,11 +214,9 @@ public class BuildContainerStateHandler extends StateHandler
     {
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-        //TODO:TEMPLATE receive templateId instead of templateName from Hub, this is a workaround for now
         CloneRequest cloneRequest =
                 new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
-                        nodeDto.getContainerName(), nodeDto.getIp(),
-                        ctx.localPeer.getTemplateByName( nodeDto.getTemplateName() ).getId(), HostArchitecture.AMD64,
+                        nodeDto.getContainerName(), nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64,
                         contSize );
 
         return cloneRequest;
