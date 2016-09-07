@@ -40,7 +40,21 @@ public class DomainStateHandler extends StateHandler
         {
             ProxyLoadBalanceStrategy balanceStrategy = ProxyLoadBalanceStrategy.LOAD_BALANCE;
 
-            ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
+            String existingDomain = ctx.localPeer.getVniDomain( env.getVni() );
+
+            if ( existingDomain != null )
+            {
+                if ( !existingDomain.trim().equalsIgnoreCase( env.getDomainName().trim() ) )
+                {
+                    ctx.localPeer.removeVniDomain( env.getVni() );
+                    ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName().trim(), balanceStrategy,
+                            env.getSslCertPath() );
+                }
+            }
+            else
+            {
+                ctx.localPeer.setVniDomain( env.getVni(), env.getDomainName(), balanceStrategy, env.getSslCertPath() );
+            }
 
             for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
             {
@@ -50,7 +64,12 @@ public class DomainStateHandler extends StateHandler
                     {
                         try
                         {
-                            ctx.localPeer.addIpToVniDomain( nodeDto.getIp().replace( "/24", "" ), env.getVni() );
+                            String ip = nodeDto.getIp().replace( "/24", "" );
+
+                            if ( !ctx.localPeer.isIpInVniDomain( ip, env.getVni() ) )
+                            {
+                                ctx.localPeer.addIpToVniDomain( ip, env.getVni() );
+                            }
                         }
                         catch ( Exception e )
                         {

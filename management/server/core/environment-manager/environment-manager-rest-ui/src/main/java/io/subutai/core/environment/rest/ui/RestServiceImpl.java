@@ -3,7 +3,11 @@ package io.subutai.core.environment.rest.ui;
 
 import java.io.File;
 import java.security.AccessControlException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -15,8 +19,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
-import io.subutai.common.environment.*;
-import io.subutai.common.peer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +33,25 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import io.subutai.common.environment.ContainerHostNotFoundException;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentCreationRef;
+import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
+import io.subutai.common.environment.Node;
+import io.subutai.common.environment.NodeSchema;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
+import io.subutai.common.environment.Topology;
 import io.subutai.common.gson.required.RequiredDeserializer;
 import io.subutai.common.metric.ResourceHostMetric;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.resource.PeerGroupResources;
@@ -116,15 +134,6 @@ public class RestServiceImpl implements RestService
                                                          "zookeeper16" ) ).collect( Collectors.toSet() );
 
         return Response.ok().entity( gson.toJson( templates ) ).build();
-    }
-
-
-    /** Domain **************************************************** */
-
-    @Override
-    public Response getDefaultDomainName()
-    {
-        return Response.ok( environmentManager.getDefaultDomainName() ).build();
     }
 
 
@@ -955,7 +964,7 @@ public class RestServiceImpl implements RestService
                         }
                         catch ( Exception e )
                         {
-                            return new PeerTemplatesDownloadProgress("NONE");
+                            return new PeerTemplatesDownloadProgress( "NONE" );
                         }
                     } ).collect( Collectors.toSet() );
 

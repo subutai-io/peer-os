@@ -54,10 +54,8 @@ public interface EnvironmentManager
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
     @RolesAllowed( "Environment-Management|Write" )
-    EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology,
-                                              List<String> removedContainers,
-                                              Map<String, ContainerSize> changedContainers,
-                                              boolean async )
+    EnvironmentCreationRef modifyEnvironment( String environmentId, Topology topology, List<String> removedContainers,
+                                              Map<String, ContainerSize> changedContainers, boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException;
 
 
@@ -162,14 +160,6 @@ public interface EnvironmentManager
      * @throws EnvironmentNotFoundException - thrown if environment not found
      */
     Environment loadEnvironment( String environmentId ) throws EnvironmentNotFoundException;
-
-
-    /**
-     * Get default domain name defaultDomainName: intra.lan
-     *
-     * @return - default domain name
-     */
-    String getDefaultDomainName();
 
 
     /**

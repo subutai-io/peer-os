@@ -988,13 +988,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @Override
-    public String getDefaultDomainName()
-    {
-        return Common.DEFAULT_DOMAIN_NAME;
-    }
-
-
     @RolesAllowed( "Environment-Management|Update" )
     @Override
     public void removeEnvironmentDomain( final String environmentId )
