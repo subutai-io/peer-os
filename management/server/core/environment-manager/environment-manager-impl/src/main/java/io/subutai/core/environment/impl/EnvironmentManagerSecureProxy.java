@@ -458,13 +458,6 @@ public class EnvironmentManagerSecureProxy
 
 
     @Override
-    public String getDefaultDomainName()
-    {
-        return environmentManager.getDefaultDomainName();
-    }
-
-
-    @Override
     @RolesAllowed( "Environment-Management|Update" )
     public void removeEnvironmentDomain( final String environmentId )
             throws EnvironmentModificationException, EnvironmentNotFoundException
