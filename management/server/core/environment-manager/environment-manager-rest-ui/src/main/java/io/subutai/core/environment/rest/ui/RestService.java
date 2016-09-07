@@ -27,12 +27,6 @@ public interface RestService
     Response listTemplates();
 
 
-    /** Domain **************************************************** */
-
-    @GET
-    @Path( "domains" )
-    @Produces( { MediaType.TEXT_PLAIN } )
-    Response getDefaultDomainName();
 
 
     /** Environments **************************************************** */
