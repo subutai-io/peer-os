@@ -108,8 +108,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     }
 
     function closePopup() {
-        vm.buildCompleted = false;
         resetPlugin();
+        vm.buildCompleted = false;
         ngDialog.closeAll();
     }
 
@@ -156,30 +156,46 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         trackerSrv.getDownloadProgress(envId)
             .success(function (data) {
 
-                data.sort();
-                if( data.length > 0 )
-                {
-                    var output = '';
-                    var checker = false;
-                    for( var i = 0; i < data.length; i++ )
-                    {
+                if( data.length > 0 ) {
 
-                        output += 'Peer ' + shortenIdName(data[i].peerId, 3) + ':<br/>';
-                        for( var j = 0; j < data[i].templatesDownloadProgress.length; j++ )
-                        {
-                            var p = data[i].templatesDownloadProgress[j];
+					data.sort();
 
-                            output += '&nbsp;&nbsp;RH ' + shortenIdName(p.rhId, 3) + ':<br/>';
+					var output = '<table class="b-main-table b-main-table_progrss">';
+					var checker = false;
+					for( var i = 0; i < data.length; i++ ) {
 
-                            for (var tpl in p.templatesDownloadProgress) {
-                                output += '<span class="g-text-blue">&nbsp;&nbsp;&nbsp;' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p.templatesDownloadProgress[tpl] + ' %</span><br/>';
-                                if( p.templatesDownloadProgress[tpl] != 100 )
-                                {
-                                    checker = true;
-                                }
-                            }
-                        }
-                    }
+						output += [
+							'<tr>',
+								'<th colspan="2">',
+									'Peer ' + shortenIdName(data[i].peerId, 3),
+								'</th>',
+							'</tr>',
+						].join('');
+						for( var j = 0; j < data[i].templatesDownloadProgress.length; j++ ) {
+							var p = data[i].templatesDownloadProgress[j];
+
+							for (var tpl in p.templatesDownloadProgress) {
+								output += [
+									'<tr>',
+										'<td>',
+											'RH ' + shortenIdName(p.rhId, 3),
+										'</td>',
+										'<td>',
+											'<div class="b-progress-cloud b-progress-cloud_white b-progress-cloud_big">',
+												'<div class="b-progress-cloud-fill" style="width: ' + p.templatesDownloadProgress[tpl] + '%;"></div>',
+												'<span class="b-progress-cloud-text">' + tpl + '</span>',
+											'</div>',
+										'</td>',
+									'</tr>'
+								].join('');
+								if( p.templatesDownloadProgress[tpl] != 100 ) {
+									checker = true;
+								}
+							}
+						}
+					}
+					output += '</table>';
+
 
                     if( checker == true )
                     {
@@ -879,8 +895,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             scope: $scope,
             className: 'b-build-environment-info',
             preCloseCallback: function (value) {
+				if(vm.buildCompleted) {
+					resetPlugin();
+				}
                 vm.buildCompleted = false;
-                resetPlugin();
             }
         });
     }
@@ -1102,6 +1120,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         vm.editingEnv = false;
         graph.resetCells();
         $('.b-resource-host').remove();
+		filterPluginsList();
     }
 
     function addSettingsToTemplate(settings) {
