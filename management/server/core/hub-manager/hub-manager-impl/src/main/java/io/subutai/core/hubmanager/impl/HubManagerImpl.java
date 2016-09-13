@@ -2,8 +2,6 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Date;
@@ -31,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
@@ -445,10 +442,6 @@ public class HubManagerImpl implements HubManager
     @Override
     public void installPlugin( String url, String name, String uid ) throws Exception
     {
-
-        //remove existing plugin with the same name if any to avoid corruptions
-        uninstallPlugin( name, null );
-
         WebClient webClient = RestUtil.createTrustedWebClient( url );
         File product = webClient.get( File.class );
         InputStream initialStream = FileUtils.openInputStream( product );
@@ -485,38 +478,13 @@ public class HubManagerImpl implements HubManager
     public void uninstallPlugin( final String name, final String uid )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-        log.info( file.getAbsolutePath() );
-        File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
-        File[] dirs = repo.listFiles( new FileFilter()
-        {
-            @Override
-            public boolean accept( File pathname )
-            {
-                return pathname.getName().matches( ".*" + name.toLowerCase() + ".*" );
-            }
-        } );
-        if ( dirs != null )
-        {
-            for ( File f : dirs )
-            {
-                log.info( f.getAbsolutePath() );
-                try
-                {
-                    FileUtils.deleteDirectory( f );
-                    log.debug( f.getName() + " is removed." );
-                }
-                catch ( IOException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
+
         if ( file.delete() )
         {
             log.debug( file.getName() + " is removed." );
         }
 
-        if ( !Strings.isNullOrEmpty( uid ) && isRegistered() )
+        if ( isRegistered() )
         {
             ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
