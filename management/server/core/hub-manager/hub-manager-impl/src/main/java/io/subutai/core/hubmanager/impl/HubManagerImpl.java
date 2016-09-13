@@ -31,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.dao.DaoManager;
@@ -444,57 +445,10 @@ public class HubManagerImpl implements HubManager
     @Override
     public void installPlugin( String url, String name, String uid ) throws Exception
     {
-        /*try
-        {
-            TrustManager[] trustAllCerts = new TrustManager[] {
-                    new X509TrustManager()
-                    {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers()
-                        {
-                            return null;
-                        }
 
+        //remove existing plugin with the same name if any to avoid corruptions
+        uninstallPlugin( name, null );
 
-                        public void checkClientTrusted( java.security.cert.X509Certificate[] certs, String authType )
-                        {
-                        }
-
-
-                        public void checkServerTrusted( java.security.cert.X509Certificate[] certs, String authType )
-                        {
-                        }
-                    }
-            };
-
-            // Activate the new trust manager
-            try
-            {
-                SSLContext sc = SSLContext.getInstance( "SSL" );
-                sc.init( null, trustAllCerts, new java.security.SecureRandom() );
-                HttpsURLConnection.setDefaultSSLSocketFactory( sc.getSocketFactory() );
-            }
-            catch ( Exception e )
-            {
-            }
-
-            // And as before now you can use URL and URLConnection
-
-
-            File file =
-                    new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-            URL website = new URL( url );
-            URLConnection connection = website.openConnection();
-            InputStream in = connection.getInputStream();
-            OutputStream out = new FileOutputStream( file );
-            IOUtils.copy( in, out );
-            in.close();
-            out.close();
-            //            FileUtils.copyURLToFile( website, file );
-        }
-        catch ( IOException e )
-        {
-            throw new Exception( "Could not install plugin", e );
-        }*/
         WebClient webClient = RestUtil.createTrustedWebClient( url );
         File product = webClient.get( File.class );
         InputStream initialStream = FileUtils.openInputStream( product );
@@ -562,7 +516,7 @@ public class HubManagerImpl implements HubManager
             log.debug( file.getName() + " is removed." );
         }
 
-        if ( isRegistered() )
+        if ( !Strings.isNullOrEmpty( uid ) && isRegistered() )
         {
             ProductProcessor productProcessor = new ProductProcessor( this.configManager, this.hubEventListeners );
             PeerProductDataDto peerProductDataDto = new PeerProductDataDto();
