@@ -52,34 +52,34 @@ function CurrentUserCtrl($location, $scope, $rootScope, $http, SweetAlert, ngDia
     };
 
 	if ((localStorage.getItem('currentUser') == undefined || localStorage.getItem('currentUser') == null
-        || localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {
-	    console.log("get login details");
+		|| localStorage.getItem('currentUserToken') != getCookie('sptoken')) && getCookie('sptoken')) {
+		console.log("get login details");
 		$http.get(SERVER_URL + "rest/ui/identity/user", {
 			withCredentials: true,
 			headers: {'Content-Type': 'application/json'}
 		}).success(function (data) {
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('currentUserPermissions');
-            localStorage.removeItem('currentUserToken');
 
+			localStorage.removeItem('currentUser');
+			localStorage.removeItem('currentUserPermissions');
+			localStorage.removeItem('currentUserToken');
 
 			localStorage.setItem('currentUser', data.userName);
-            localStorage.setItem('currentUserToken', getCookie('sptoken'));
+			localStorage.setItem('currentUserToken', getCookie('sptoken'));
 
-            var perms = [];
-            for( var i = 0; i < data.roles.length; i++ )
-            {
-                for( var j = 0; j < data.roles[i].permissions.length; j++ )
-                {
-                    perms.push(data.roles[i].permissions[j].object);
-                }
-            }
+			var perms = [];
+			for( var i = 0; i < data.roles.length; i++ ) {
+				for( var j = 0; j < data.roles[i].permissions.length; j++ ) {
+					perms.push(data.roles[i].permissions[j].object);
+				}
+			}
 
-            localStorage.setItem('currentUserPermissions', perms);
-            vm.currentUser = localStorage.getItem('currentUser');
+			localStorage.setItem('currentUserPermissions', perms);
+			vm.currentUser = localStorage.getItem('currentUser');
 
-            location.reload();
+			location.reload();
 		});
+	} else {
+		vm.currentUser = localStorage.getItem('currentUser');
 	}
 
     function checkIfRegistered(afterRegistration) {

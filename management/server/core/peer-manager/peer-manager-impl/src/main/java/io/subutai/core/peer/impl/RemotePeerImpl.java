@@ -355,6 +355,15 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public SshKeys getContainerAuthorizedKeys( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+
+        return environmentWebClient.getContainerAuthorizedKeys( containerId );
+    }
+
+
+    @Override
     public SshKey createSshKey( final EnvironmentId environmentId, final ContainerId containerId,
                                 final SshEncryptionType sshEncryptionType ) throws PeerException
     {
@@ -986,7 +995,7 @@ public class RemotePeerImpl implements RemotePeer
     {
         Preconditions.checkNotNull( environmentId, "Invalid environment id" );
 
-        return environmentWebClient.getTemplateDownloadProgress(environmentId);
+        return environmentWebClient.getTemplateDownloadProgress( environmentId );
     }
 
 

@@ -22,13 +22,15 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -189,7 +191,7 @@ public class EnvironmentAdapter
     {
         ArrayNode contNode = json.putArray( "containers" );
 
-        for ( ContainerHost ch : env.getContainerHosts() )
+        for ( EnvironmentContainerHost ch : env.getContainerHosts() )
         {
             ObjectNode peerJson = JsonUtil.createNode( "id", ch.getId() );
 
@@ -210,6 +212,16 @@ public class EnvironmentAdapter
             String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
             peerJson.put( "ip", ip );
+
+
+            ArrayNode sshKeys = peerJson.putArray( "sshkeys" );
+
+            SshKeys chSshKeys = ch.getAuthorizedKeys();
+
+            for ( SshKey sshKey : chSshKeys.getKeys() )
+            {
+                sshKeys.add( sshKey.getPublicKey() );
+            }
 
             contNode.add( peerJson );
         }
@@ -276,6 +288,7 @@ public class EnvironmentAdapter
     {
         hubAdapter.onContainerStop( envId, contId );
     }
+
 
     public HubAdapter getHubAdapter()
     {

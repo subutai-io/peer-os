@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -601,6 +602,42 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         }
 
         return sshKeys;
+    }
+
+
+    @Override
+    public SshKeys getContainerAuthorizedKeys( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+
+        ContainerHost containerHost = getContainerHostById( containerId.getId() );
+
+
+        try
+        {
+            CommandResult commandResult = execute( localPeerCommands.getReadAuthorizedKeysFile(), containerHost );
+
+            StringTokenizer tokenizer = new StringTokenizer( commandResult.getStdOut(), System.lineSeparator() );
+
+            SshKeys sshKeys = new SshKeys();
+
+            while ( tokenizer.hasMoreTokens() )
+            {
+                String sshKey = tokenizer.nextToken();
+
+                if ( !sshKey.trim().isEmpty() )
+                {
+                    sshKeys.addKey(
+                            new SshKey( containerId.getId(), SshEncryptionType.parseTypeFromKey( sshKey ), sshKey ) );
+                }
+            }
+
+            return sshKeys;
+        }
+        catch ( CommandException e )
+        {
+            throw new PeerException( "Error obtaining authorized keys", e );
+        }
     }
 
 

@@ -170,6 +170,23 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
+    public SshKeys getContainerAuthorizedKeys( final ContainerId containerId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+
+            return localPeer.getContainerAuthorizedKeys( containerId );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public void addSshKey( final EnvironmentId environmentId, final String sshPublicKey )
     {
         try
@@ -392,8 +409,7 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         {
             Preconditions.checkNotNull( environmentId );
 
-            PeerTemplatesDownloadProgress downloadProgress =
-                    localPeer.getTemplateDownloadProgress( environmentId );
+            PeerTemplatesDownloadProgress downloadProgress = localPeer.getTemplateDownloadProgress( environmentId );
 
             return Response.ok( downloadProgress ).build();
         }

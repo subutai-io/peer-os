@@ -76,7 +76,6 @@ function MonitoringCtrl($scope, monitoringSrv, cfpLoadingBar, $http, $sce, ngDia
 			vm.info = data.p2pList;
 			for(var i = 0; i < vm.info.length; i++) {
 
-				console.log(vm.info[i]);
 				switch(vm.info[i].p2pStatus) {
 					case 0:
 						vm.statusTable.p2pStatuses.healthy++;

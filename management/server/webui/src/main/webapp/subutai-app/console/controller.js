@@ -224,6 +224,7 @@ function ConsoleViewCtrl($scope, consoleService, $stateParams, ngDialog, cfpLoad
 				LOADING_SCREEN('none');
 			}).error(function(error){
 				console.log(error);
+				SweetAlert.swal("ERROR!", error, "error");
 				LOADING_SCREEN('none');
 			});
 		}

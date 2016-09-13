@@ -116,4 +116,10 @@ public class LocalPeerCommands
                 "echo '    StrictHostKeyChecking no' >> %1$s/config && " +
                 "chmod 644 %1$s/config", Common.CONTAINER_SSH_FOLDER ) );
     }
+
+
+    protected RequestBuilder getReadAuthorizedKeysFile()
+    {
+        return new RequestBuilder( String.format( "cat %s", Common.CONTAINER_SSH_FILE ) );
+    }
 }
