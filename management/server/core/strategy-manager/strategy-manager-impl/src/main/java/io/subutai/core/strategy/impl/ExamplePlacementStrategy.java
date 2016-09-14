@@ -131,7 +131,7 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             {
                 for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), "TODO-REMOVE", container.getSize(),
+                    Node node = new Node( container.getName(), container.getName(), container.getSize(),
                             container.getPeerId(), container.getHostId(), container.getTemplateId() );
 
                     nodes.add( node );
