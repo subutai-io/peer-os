@@ -161,11 +161,10 @@ public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleLi
     {
         if ( event.getType() == BundleEvent.STARTED )
         {
-            // bundle name in form: Subutai Cassandra Plugin Web UI
+            // bundle name e.g. Subutai Cassandra Plugin Web UI
             String bundleName = event.getBundle().getHeaders().get( "Bundle-Name" );
-            // version
+            // bundle version
             String version = event.getBundle().getVersion().toString();
-            LOG.error( "{} is >>>>>> {}", event.getBundle().getHeaders().get( "Bundle-Name" ), event.getType() );
         }
     }
 }

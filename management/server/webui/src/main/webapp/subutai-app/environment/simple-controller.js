@@ -75,8 +75,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 	}
 
 	function closePopup() {
-		vm.buildCompleted = false;
 		resetPlugin();
+		vm.buildCompleted = false;
 		ngDialog.closeAll();
 	}
 
@@ -334,7 +334,6 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			className: 'b-build-environment-info',
 			preCloseCallback: function (value) {
 				vm.buildCompleted = false;
-				resetPlugin();
 			}
 		});
 	}
@@ -405,8 +404,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			scope: $scope,
 			className: 'b-build-environment-info',
 			preCloseCallback: function (value) {
+				//resetPlugin();
 				vm.buildCompleted = false;
-				resetPlugin();
 			}
 		});
 
@@ -920,8 +919,10 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			scope: $scope,
 			className: 'b-build-environment-info',
 			preCloseCallback: function (value) {
+				if(vm.buildCompleted) {
+					resetPlugin();
+				}
 				vm.buildCompleted = false;
-				resetPlugin();
 			}
 		});
 	}
