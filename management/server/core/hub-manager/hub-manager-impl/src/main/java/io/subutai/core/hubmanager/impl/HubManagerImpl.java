@@ -328,7 +328,7 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendResourceHostInfo() throws Exception
     {
-        resourceHostDataProcessor.process( false );
+        resourceHostDataProcessor.process( true );
     }
 
 
