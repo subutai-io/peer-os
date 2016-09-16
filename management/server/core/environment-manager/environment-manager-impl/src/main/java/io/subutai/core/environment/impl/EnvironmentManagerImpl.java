@@ -857,10 +857,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             return;
         }
-        else
-        {
-            environmentAdapter.getHubAdapter().destroyContainer( environmentId, containerId );
-        }
 
 
         TrackerOperation operationTracker =
@@ -897,6 +893,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             @Override
             public void run()
             {
+                notifyOnContainerDestroyed( environment, containerId );
+
                 removeActiveWorkflow( environment.getId() );
             }
         } );
