@@ -128,8 +128,7 @@
     <!-- JWT lib -->
     <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
     <!-- Jackson JSON lib lib -->
-    <jackson.version>2.6.1</jackson.version>
-<!--    <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>-->
+    <jackson.version>2.6.3</jackson.version>
 
     <!-- Database  -->
     <openjpa.version>2.3.0</openjpa.version>

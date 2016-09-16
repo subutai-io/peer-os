@@ -16,7 +16,7 @@
       <ref component-id="environmentManagerService" />
     </jaxrs:serviceBeans>
     <jaxrs:providers>
-      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+      <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
     </jaxrs:providers>
   </jaxrs:server>
 

@@ -18,8 +18,6 @@
     </jaxrs:serviceBeans>
   </jaxrs:server>
 
-  <!--<bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
-
   <bean id="registrationServiceImpl" class="io.subutai.core.object.relation.rest.RelationManagerRestImpl">
     <argument ref="relationManager" />
   </bean>

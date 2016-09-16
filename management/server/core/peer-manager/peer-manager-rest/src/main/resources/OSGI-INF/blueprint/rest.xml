@@ -17,11 +17,10 @@
       <ref component-id="registrationServiceImpl" />
     </jaxrs:serviceBeans>
     <jaxrs:providers>
-      <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+      <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
     </jaxrs:providers>
   </jaxrs:server>
 
-  <!--<bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
 
   <bean id="registrationServiceImpl" class="io.subutai.core.peer.rest.RegistrationServiceImpl">
     <argument ref="peerManager" />
