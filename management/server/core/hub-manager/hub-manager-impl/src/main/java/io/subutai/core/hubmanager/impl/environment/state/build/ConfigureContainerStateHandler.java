@@ -3,6 +3,7 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,11 +12,14 @@ import com.google.common.collect.Maps;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshKeys;
+import io.subutai.common.util.PeerUtil;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -61,7 +65,7 @@ public class ConfigureContainerStateHandler extends StateHandler
 
     public EnvironmentPeerDto configureSsh( EnvironmentPeerDto peerDto, EnvironmentDto envDto ) throws Exception
     {
-        SshKeys sshKeys = new SshKeys();
+        final SshKeys sshKeys = new SshKeys();
         String[] currentSshKeys = null;
         boolean isSshKeysCleaned = false;
 
@@ -84,7 +88,28 @@ public class ConfigureContainerStateHandler extends StateHandler
             }
         }
 
-        ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
+        final Environment environment = ctx.envManager.loadEnvironment( envDto.getId() );
+        if ( environment.getPeerId() != null ) //TODO clarify for check initiator peer ID
+        {
+            Set<Peer> peers = environment.getPeers();
+            PeerUtil<Object> keyUtil = new PeerUtil<>();
+            for ( final Peer peer : peers )
+            {
+                keyUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+                {
+                    @Override
+                    public Object call() throws Exception
+                    {
+                        peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                        return null;
+                    }
+                } ) );
+            }
+        }
+        else
+        {
+            ctx.localPeer.configureSshInEnvironment( envId, sshKeys );
+        }
 
         for ( SSHKeyDto sshKeyDto : peerDto.getEnvironmentInfo().getSshKeys() )
         {
