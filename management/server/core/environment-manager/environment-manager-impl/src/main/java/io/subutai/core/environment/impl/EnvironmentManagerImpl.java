@@ -893,8 +893,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             @Override
             public void run()
             {
-                notifyOnContainerDestroyed( environment, containerId );
-
                 removeActiveWorkflow( environment.getId() );
             }
         } );
