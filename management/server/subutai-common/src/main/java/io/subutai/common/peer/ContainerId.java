@@ -1,7 +1,7 @@
 package io.subutai.common.peer;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.HostId;
 

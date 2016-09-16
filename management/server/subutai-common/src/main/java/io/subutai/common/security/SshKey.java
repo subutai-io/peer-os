@@ -1,7 +1,7 @@
 package io.subutai.common.security;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class SshKey

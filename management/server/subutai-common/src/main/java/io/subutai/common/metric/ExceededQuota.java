@@ -3,10 +3,11 @@ package io.subutai.common.metric;
 
 import java.math.BigDecimal;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.HostId;
 import io.subutai.common.quota.ContainerCpuResource;
