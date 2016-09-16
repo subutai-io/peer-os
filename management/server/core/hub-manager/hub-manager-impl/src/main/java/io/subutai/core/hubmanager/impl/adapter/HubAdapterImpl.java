@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,17 +16,21 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.subutai.common.dao.DaoManager;
-import io.subutai.hub.share.common.HubAdapter;
+import io.subutai.common.environment.Environment;
+import io.subutai.common.peer.EnvironmentContainerHost;
+import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.json.JsonUtil;
 
 import static java.lang.String.format;
 
+
 //TODO use HubRestClient and ConfigDataServiceimpl instead of DaoHelper and HttpClient
-public class HubAdapterImpl implements HubAdapter
+public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 {
     private static final String ENVIRONMENTS_URL = "/rest/v1/adapter/users/%s/environments";
 
@@ -298,5 +303,36 @@ public class HubAdapterImpl implements HubAdapter
         log.info( "onContainerStateChange: envId={}, contId={}, state={}", envId, contId, state );
 
         httpClient.doPost( format( CONTAINERS_STATE_URL, envId, contId, state ), null );
+    }
+
+
+    //environment events
+
+
+    @Override
+    public void onEnvironmentCreated( final Environment environment )
+    {
+        //not used
+    }
+
+
+    @Override
+    public void onEnvironmentGrown( final Environment environment, final Set<EnvironmentContainerHost> newContainers )
+    {
+        //not used
+    }
+
+
+    @Override
+    public void onContainerDestroyed( final Environment environment, final String containerId )
+    {
+        destroyContainer( environment.getId(), containerId );
+    }
+
+
+    @Override
+    public void onEnvironmentDestroyed( final String environmentId )
+    {
+        //not used
     }
 }
