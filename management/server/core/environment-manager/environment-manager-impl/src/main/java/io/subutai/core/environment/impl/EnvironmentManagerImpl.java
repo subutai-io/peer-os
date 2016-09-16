@@ -857,10 +857,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
             return;
         }
-        else
-        {
-            environmentAdapter.getHubAdapter().destroyContainer( environmentId, containerId );
-        }
 
 
         TrackerOperation operationTracker =
