@@ -4,8 +4,7 @@ package io.subutai.core.hubmanager.impl.entity;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 

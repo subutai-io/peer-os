@@ -1,7 +1,7 @@
 package io.subutai.common.metric;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInfoModel;

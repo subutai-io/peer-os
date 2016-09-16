@@ -129,7 +129,7 @@
     <nimbus.jwt.version>4.3.1</nimbus.jwt.version>
     <!-- Jackson JSON lib lib -->
     <jackson.version>2.6.1</jackson.version>
-    <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>
+<!--    <jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>-->
 
     <!-- Database  -->
     <openjpa.version>2.3.0</openjpa.version>
@@ -783,11 +783,11 @@
         <version>2.2</version>
       </dependency>
       <!-- Json Mapper -->
-      <dependency>
+<!--      <dependency>
         <groupId>org.codehaus.jackson</groupId>
         <artifactId>jackson-jaxrs</artifactId>
         <version>${jackson-jaxrs.version}</version>
-      </dependency>
+      </dependency>-->
 
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -1000,16 +1000,6 @@
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>${org.apache.commons.io.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-mapper-asl</artifactId>
-        <version>1.9.13</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-core-asl</artifactId>
-        <version>1.9.13</version>
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

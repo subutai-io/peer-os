@@ -53,11 +53,6 @@
       <artifactId>jackson-jaxrs-json-provider</artifactId>
       <version>${jackson.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-      <version>${jackson-jaxrs.version}</version>
-    </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>

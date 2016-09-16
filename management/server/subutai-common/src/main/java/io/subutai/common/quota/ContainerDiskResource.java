@@ -3,7 +3,7 @@ package io.subutai.common.quota;
 
 import java.math.BigDecimal;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.subutai.common.resource.ByteUnit;
 import io.subutai.common.resource.ByteValueResource;
