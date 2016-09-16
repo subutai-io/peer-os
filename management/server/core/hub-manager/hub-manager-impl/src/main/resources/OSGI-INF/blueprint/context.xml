@@ -13,7 +13,6 @@
   <authz:enable />
   <!-- ***************************************************************** -->
 
-
   <bean id="errLstnr" scope="singleton" class="io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor" />
   <service ref="errLstnr" interface="io.subutai.core.appender.SubutaiErrorEventListener" />
 
@@ -68,7 +67,6 @@
                         bind-method="addListener" unbind-method="removeListener" />
   </reference-list>
 
-
   <bean id="hubAdapter" class="io.subutai.core.hubmanager.impl.adapter.HubAdapterImpl" activation="eager">
     <argument ref="daoManagerHub" />
     <argument ref="securityManager" />
@@ -77,5 +75,7 @@
   </bean>
 
   <service ref="hubAdapter" interface="io.subutai.hub.share.common.HubAdapter" />
+
+  <service ref="hubAdapter" interface="io.subutai.core.environment.api.EnvironmentEventListener" />
 
 </blueprint>

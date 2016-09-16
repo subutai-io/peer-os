@@ -277,6 +277,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             final Peer peer = getPeer();
 
             peer.destroyContainer( getContainerId() );
+
             if ( parent.getContainerHostsByPeerId( getPeerId() ).size() == 0 )
             {
                 parent.removeEnvironmentPeer( getPeerId() );
