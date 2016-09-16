@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**

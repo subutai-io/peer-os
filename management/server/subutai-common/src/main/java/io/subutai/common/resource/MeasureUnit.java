@@ -3,7 +3,7 @@ package io.subutai.common.resource;
 
 import java.math.BigDecimal;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**

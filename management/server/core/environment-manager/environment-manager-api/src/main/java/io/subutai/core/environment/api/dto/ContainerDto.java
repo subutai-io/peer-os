@@ -3,7 +3,7 @@ package io.subutai.core.environment.api.dto;
 
 import java.util.Set;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.peer.ContainerSize;

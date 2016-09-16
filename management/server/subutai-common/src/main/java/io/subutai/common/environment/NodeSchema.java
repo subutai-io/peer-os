@@ -1,7 +1,7 @@
 package io.subutai.common.environment;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.peer.ContainerSize;
 

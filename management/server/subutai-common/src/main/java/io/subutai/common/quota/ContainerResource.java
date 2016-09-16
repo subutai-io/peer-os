@@ -1,7 +1,7 @@
 package io.subutai.common.quota;
 
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.ResourceValue;
