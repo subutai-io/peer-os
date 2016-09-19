@@ -20,6 +20,14 @@ func IsSubvolumeReadonly(path string) bool {
 	return false
 }
 
+func IsSubvolume(path string) bool {
+	out, _ := exec.Command("btrfs", "subvolume", "show", path).CombinedOutput()
+	if strings.Contains(string(out), "Subvolume ID") {
+		return true
+	}
+	return false
+}
+
 func SubvolumeCreate(dst string) {
 	if id(dst) == "" {
 		out, err := exec.Command("btrfs", "subvolume", "create", dst).CombinedOutput()
@@ -33,6 +41,9 @@ func SubvolumeClone(src, dst string) {
 }
 
 func SubvolumeDestroy(path string) {
+	if !IsSubvolume(path) {
+		return
+	}
 	nestedvol, err := exec.Command("btrfs", "subvolume", "list", "-o", path).Output()
 	log.Check(log.DebugLevel, "Getting nested subvolumes in "+path, err)
 	scanner := bufio.NewScanner(bytes.NewReader(nestedvol))
