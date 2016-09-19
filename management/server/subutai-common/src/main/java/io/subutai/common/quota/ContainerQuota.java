@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 
@@ -18,6 +19,11 @@ public class ContainerQuota
 {
     @JsonProperty
     private Map<ContainerResourceType, Quota> resources = new HashMap<>();
+
+
+    public ContainerQuota()
+    {
+    }
 
 
     public ContainerQuota( Quota quota )
@@ -51,6 +57,7 @@ public class ContainerQuota
     }
 
 
+    @JsonIgnore
     public Collection<Quota> getAll()
     {
         return resources.values();
