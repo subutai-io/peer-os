@@ -1,4 +1,4 @@
-package io.subutai.core.hostregistry.impl;
+package io.subutai.common.host;
 
 
 import java.util.Map;
@@ -9,10 +9,6 @@ import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
-import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.common.host.ContainerHostInfoModel;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 
