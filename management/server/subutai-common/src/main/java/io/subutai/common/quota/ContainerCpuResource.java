@@ -2,6 +2,7 @@ package io.subutai.common.quota;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.resource.NumericValueResource;
@@ -12,7 +13,7 @@ import io.subutai.common.resource.NumericValueResource;
  */
 public class ContainerCpuResource extends ContainerResource<NumericValueResource>
 {
-    public ContainerCpuResource( final NumericValueResource resourceValue )
+    public ContainerCpuResource( @JsonProperty( value = "resourceValue" )final NumericValueResource resourceValue )
     {
         super( ContainerResourceType.CPU, resourceValue );
     }
