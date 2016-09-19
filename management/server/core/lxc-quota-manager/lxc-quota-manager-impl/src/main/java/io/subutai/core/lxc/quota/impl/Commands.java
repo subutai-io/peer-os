@@ -4,11 +4,11 @@ package io.subutai.core.lxc.quota.impl;
 import com.google.common.collect.Lists;
 
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.task.Command;
 import io.subutai.common.task.CommandBatch;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.Quota;
+import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 /**

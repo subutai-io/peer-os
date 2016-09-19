@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.resource.NumericValueResource;
-import io.subutai.common.resource.ResourceValueParser;
+import io.subutai.hub.share.resource.NumericValueResource;
+import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**

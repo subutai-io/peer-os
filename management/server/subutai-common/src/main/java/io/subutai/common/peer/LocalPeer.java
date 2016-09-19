@@ -8,8 +8,8 @@ import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.util.HostUtil;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**

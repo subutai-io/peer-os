@@ -12,11 +12,11 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.resource.HistoricalMetrics;
-import io.subutai.common.resource.Series;
-import io.subutai.common.resource.SeriesBatch;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
+import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.hub.share.resource.Series;
+import io.subutai.hub.share.resource.SeriesBatch;
 
 
 /**

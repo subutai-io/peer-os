@@ -16,6 +16,10 @@
   <packaging>bundle</packaging>
 
   <dependencies>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>subutai-hub-share</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>com.google.code.gson</groupId>

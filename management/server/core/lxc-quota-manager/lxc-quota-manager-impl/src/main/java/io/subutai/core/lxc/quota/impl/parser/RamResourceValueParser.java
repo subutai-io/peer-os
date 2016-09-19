@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
 
-import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.ResourceValueParser;
+import io.subutai.hub.share.resource.ByteUnit;
+import io.subutai.hub.share.resource.ByteValueResource;
+import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**

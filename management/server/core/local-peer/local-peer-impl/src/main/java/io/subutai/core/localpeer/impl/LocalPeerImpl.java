@@ -82,14 +82,6 @@ import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.CpuResource;
-import io.subutai.common.resource.DiskResource;
-import io.subutai.common.resource.HistoricalMetrics;
-import io.subutai.common.resource.HostResources;
-import io.subutai.common.resource.PeerResources;
-import io.subutai.common.resource.RamResource;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -150,6 +142,14 @@ import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.template.api.TemplateManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.hub.share.resource.CpuResource;
+import io.subutai.hub.share.resource.DiskResource;
+import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.hub.share.resource.HostResources;
+import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.hub.share.resource.RamResource;
 
 
 /**

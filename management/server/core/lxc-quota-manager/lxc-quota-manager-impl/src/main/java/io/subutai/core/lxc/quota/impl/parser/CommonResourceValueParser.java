@@ -1,9 +1,9 @@
 package io.subutai.core.lxc.quota.impl.parser;
 
 
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.ResourceValue;
-import io.subutai.common.resource.ResourceValueParser;
+import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.ResourceValue;
+import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**
