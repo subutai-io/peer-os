@@ -3,6 +3,8 @@ package io.subutai.common.quota;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.subutai.common.resource.ByteValueResource;
 import io.subutai.common.resource.ContainerResourceType;
 
@@ -12,7 +14,7 @@ import io.subutai.common.resource.ContainerResourceType;
  */
 public class ContainerOptResource extends ContainerDiskResource
 {
-    public ContainerOptResource( final ByteValueResource value )
+    public ContainerOptResource( @JsonProperty( value = "resourceValue" ) final ByteValueResource value )
     {
         super( ContainerResourceType.OPT, value );
     }
