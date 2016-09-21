@@ -67,6 +67,9 @@ public class CommandProcessor implements RestProcessor
     protected Set<HeartbeatListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
 
+    JsonUtil jsonUtil = new JsonUtil();
+    IPUtil ipUtil = new IPUtil();
+
 
     public void addListener( HeartbeatListener listener )
     {
@@ -89,7 +92,7 @@ public class CommandProcessor implements RestProcessor
     @Override
     public void handleHeartbeat( final HeartBeat heartBeat )
     {
-        LOG.debug( String.format( "Heartbeat:%n%s", JsonUtil.toJson( heartBeat ) ) );
+        LOG.debug( String.format( "Heartbeat:%n%s", jsonUtil.to( heartBeat ) ) );
 
         for ( final HeartbeatListener listener : listeners )
         {
@@ -157,7 +160,7 @@ public class CommandProcessor implements RestProcessor
                 new CommandProcessExpiryCallback() );
         if ( !queued )
         {
-            throw new CommandException( "This command is already queued for execution" );
+            throw new CommandException( "Command id is null " );
         }
 
         //send command
@@ -165,7 +168,7 @@ public class CommandProcessor implements RestProcessor
         {
             commandProcess.start();
 
-            String command = JsonUtil.toJson( new RequestWrapper( request ) );
+            String command = jsonUtil.to( new RequestWrapper( request ) );
 
             LOG.debug( String.format( "Sending:%n%s", command ) );
 
@@ -197,7 +200,7 @@ public class CommandProcessor implements RestProcessor
                 hostRequests = Sets.newLinkedHashSet();
                 requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
             }
-            String encryptedRequest = encrypt( JsonUtil.toJsonMinified( request ), request.getId() );
+            String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
             hostRequests.add( encryptedRequest );
         }
     }
@@ -285,7 +288,7 @@ public class CommandProcessor implements RestProcessor
         Set<HostInterface> hostInterfaces = Sets.newHashSet();
         hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
 
-        HostInterface hostInterface = IPUtil.findAddressableInterface( hostInterfaces, resourceHostInfo.getId() );
+        HostInterface hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
 
         if ( hostInterface instanceof NullHostInterface )
         {
@@ -363,7 +366,7 @@ public class CommandProcessor implements RestProcessor
             }
             else
             {
-                LOG.warn( String.format( "Callback not found for response: %s", JsonUtil.toJson( response ) ) );
+                LOG.warn( String.format( "Callback not found for response: %s", jsonUtil.to( response ) ) );
             }
 
             //update rh timestamp

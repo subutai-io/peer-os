@@ -6,7 +6,6 @@ import java.security.KeyStore;
 import io.subutai.common.security.crypto.keystore.KeyStoreData;
 import io.subutai.common.security.crypto.keystore.KeyStoreTool;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.security.api.crypto.KeyStoreManager;
 
 

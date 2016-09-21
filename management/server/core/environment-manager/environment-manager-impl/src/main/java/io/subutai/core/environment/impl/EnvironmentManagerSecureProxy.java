@@ -831,4 +831,13 @@ public class EnvironmentManagerSecureProxy
     {
         environmentManager.changeContainerHostname( containerId, newHostname, async );
     }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void addSshKeyToEnvironmentEntity( final String environmentId, final String sshKey )
+            throws EnvironmentNotFoundException
+    {
+        environmentManager.addSshKeyToEnvironmentEntity( environmentId, sshKey );
+    }
 }

@@ -20,4 +20,10 @@ public class RequestWrapper
 
         this.request = request;
     }
+
+
+    public Request getRequest()
+    {
+        return request;
+    }
 }

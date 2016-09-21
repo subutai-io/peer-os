@@ -116,6 +116,12 @@ public class IPUtil
     }
 
 
+    public HostInterface findAddressableIface( Set<HostInterface> allInterfaces, String hostId )
+    {
+        return findAddressableInterface( allInterfaces, hostId );
+    }
+
+
     public static HostInterface findAddressableInterface( Set<HostInterface> allInterfaces, String hostId )
     {
         LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
