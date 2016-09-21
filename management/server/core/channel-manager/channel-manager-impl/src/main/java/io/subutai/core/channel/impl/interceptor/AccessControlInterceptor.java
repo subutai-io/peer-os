@@ -22,7 +22,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import com.google.common.base.Strings;
 
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;

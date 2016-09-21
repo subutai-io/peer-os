@@ -20,9 +20,12 @@ import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.peer.api.PeerManager;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -37,7 +40,7 @@ import static org.mockito.Mockito.when;
 public class NetworkManagerImplTest
 {
 
-    private static final String INTERFACE_NAME = "interface name";
+    private static final String P2P_HASH = "interface name";
     private static final String COMMUNITY_NAME = "community name";
     private static final String LOCAL_IP = "127.0.0.1";
     private static final String TUNNEL_NAME = "tunnel1";
@@ -79,6 +82,8 @@ public class NetworkManagerImplTest
     Commands commands;
     @Mock
     RequestBuilder requestBuilder;
+    @Mock
+    SystemSettings systemSettings2;
 
 
     private NetworkManagerImpl spyNetworkManager;
@@ -88,10 +93,26 @@ public class NetworkManagerImplTest
     private NetworkManagerImpl networkManager;
 
 
+    class NetworkManagerImplForTest extends NetworkManagerImpl
+    {
+
+        public NetworkManagerImplForTest( final PeerManager peerManager )
+        {
+            super( peerManager );
+        }
+
+
+        protected SystemSettings getSystemSettings()
+        {
+            return systemSettings2;
+        }
+    }
+
+
     @Before
     public void setUp() throws PeerException, CommandException
     {
-        networkManager = new NetworkManagerImpl( peerManager );
+        networkManager = spy( new NetworkManagerImplForTest( peerManager ) );
         networkManager.commands = commands;
         when( peerManager.getLocalPeer() ).thenReturn( localPeer );
         when( localPeer.getManagementHost() ).thenReturn( managementHost );
@@ -102,7 +123,6 @@ public class NetworkManagerImplTest
         when( resourceHost.execute( any( RequestBuilder.class ) ) ).thenReturn( commandResult );
         when( commandResult.hasSucceeded() ).thenReturn( true );
         containers = Sets.newHashSet( containerHost );
-        spyNetworkManager = spy( networkManager );
     }
 
 
@@ -117,7 +137,19 @@ public class NetworkManagerImplTest
     public void testExecute() throws Exception
     {
         when( commandResult.hasSucceeded() ).thenReturn( false );
+
         networkManager.execute( containerHost, requestBuilder );
+    }
+
+
+    @Test()
+    public void testExecuteOK() throws Exception
+    {
+        when( commandResult.hasSucceeded() ).thenReturn( true );
+
+        CommandResult result = networkManager.execute( containerHost, requestBuilder );
+
+        assertEquals( commandResult, result );
     }
 
 
@@ -125,6 +157,7 @@ public class NetworkManagerImplTest
     public void testExecute2() throws Exception
     {
         doThrow( new CommandException( "" ) ).when( containerHost ).execute( requestBuilder );
+
         networkManager.execute( containerHost, requestBuilder );
     }
 
@@ -135,5 +168,13 @@ public class NetworkManagerImplTest
         doThrow( new HostNotFoundException( "" ) ).when( localPeer ).getManagementHost();
 
         networkManager.getManagementHost();
+    }
+
+
+    @Test
+    public void testJoinP2PSwarm() throws Exception
+    {
+        networkManager.joinP2PSwarm( resourceHost, P2P_HASH, LOCAL_IP, P2P_HASH, SECRET_KEY,
+                Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
     }
 }

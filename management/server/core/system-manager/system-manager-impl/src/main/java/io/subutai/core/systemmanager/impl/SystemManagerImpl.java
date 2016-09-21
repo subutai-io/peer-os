@@ -50,6 +50,20 @@ public class SystemManagerImpl implements SystemManager
 
     protected ExecutorService notifierPool = Executors.newCachedThreadPool();
 
+    protected SystemSettings systemSettings;
+
+
+    public SystemManagerImpl()
+    {
+        this.systemSettings = getSystemSettings();
+    }
+
+
+    protected SystemSettings getSystemSettings()
+    {
+        return new SystemSettings();
+    }
+
 
     public void addListener( SettingsListener listener )
     {
@@ -96,12 +110,6 @@ public class SystemManagerImpl implements SystemManager
                 }
             } );
         }
-    }
-
-
-    public SystemManagerImpl()
-    {
-
     }
 
 
@@ -163,10 +171,10 @@ public class SystemManagerImpl implements SystemManager
     {
         NetworkSettings pojo = new NetworkSettingsPojo();
 
-        pojo.setPublicUrl( SystemSettings.getPublicUrl() );
-        pojo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
-        pojo.setStartRange( SystemSettings.getP2pPortStartRange() );
-        pojo.setEndRange( SystemSettings.getP2pPortEndRange() );
+        pojo.setPublicUrl( systemSettings.getPublicUrl() );
+        pojo.setPublicSecurePort( systemSettings.getPublicSecurePort() );
+        pojo.setStartRange( systemSettings.getP2pPortStartRange() );
+        pojo.setEndRange( systemSettings.getP2pPortEndRange() );
 
         return pojo;
     }
@@ -181,7 +189,7 @@ public class SystemManagerImpl implements SystemManager
             peerManager.setPublicUrl( peerManager.getLocalPeer().getId(), publicUrl,
                     Integer.parseInt( publicSecurePort ) );
 
-            SystemSettings.setP2pPortRange( Integer.parseInt( startRange ), Integer.parseInt( endRange ) );
+            systemSettings.setP2pPortRange( Integer.parseInt( startRange ), Integer.parseInt( endRange ) );
         }
         catch ( Exception e )
         {

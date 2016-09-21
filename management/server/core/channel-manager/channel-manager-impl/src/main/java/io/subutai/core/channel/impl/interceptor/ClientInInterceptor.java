@@ -12,7 +12,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
