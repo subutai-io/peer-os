@@ -4,6 +4,7 @@ package io.subutai.hub.share.quota;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ByteValueResource;
@@ -15,7 +16,7 @@ import io.subutai.hub.share.resource.ContainerResourceType;
  */
 public class ContainerRamResource extends ContainerResource<ByteValueResource>
 {
-    public ContainerRamResource( final ByteValueResource value )
+    public ContainerRamResource( @JsonProperty( value = "resourceValue" ) final ByteValueResource value )
     {
         super( ContainerResourceType.RAM, value );
     }
