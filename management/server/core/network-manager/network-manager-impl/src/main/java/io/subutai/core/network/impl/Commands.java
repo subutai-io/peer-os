@@ -52,6 +52,14 @@ public class Commands
     }
 
 
+    public RequestBuilder getGetP2pLogsCommand( Date from, Date till )
+    {
+        return new RequestBuilder(
+                String.format( "journalctl -u *p2p* --since \"%s\" --until " + "\"%s\"", p2pDateFormat.format( from ),
+                        p2pDateFormat.format( till ) ) );
+    }
+
+
     public RequestBuilder getCreateTunnelCommand( String tunnelName, String tunnelIp, int vlan, long vni )
     {
         return new RequestBuilder( MANAGEMENT_HOST_NETWORK_BINDING ).withCmdArgs(
@@ -127,13 +135,5 @@ public class Commands
     public RequestBuilder getSetupContainerSshTunnelCommand( final String containerIp, final int sshIdleTimeout )
     {
         return new RequestBuilder( String.format( "subutai tunnel add %s %d", containerIp, sshIdleTimeout ) );
-    }
-
-
-    public RequestBuilder getGetP2pLogsCommand( Date from, Date till )
-    {
-        return new RequestBuilder(
-                String.format( "journalctl -u *p2p* --since \"%s\" --until " + "\"%s\"", p2pDateFormat.format( from ),
-                        p2pDateFormat.format( till ) ) );
     }
 }
