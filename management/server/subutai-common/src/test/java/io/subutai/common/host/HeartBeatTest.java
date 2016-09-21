@@ -1,4 +1,4 @@
-package io.subutai.core.hostregistry.impl;
+package io.subutai.common.host;
 
 
 import java.util.UUID;
@@ -6,10 +6,6 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HeartBeat;
-import io.subutai.common.host.HostArchitecture;
-import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 
@@ -71,5 +67,4 @@ public class HeartBeatTest
         assertNotNull( resourceHostInfo );
         assertFalse( resourceHostInfo.getContainers().isEmpty() );
     }
-
 }

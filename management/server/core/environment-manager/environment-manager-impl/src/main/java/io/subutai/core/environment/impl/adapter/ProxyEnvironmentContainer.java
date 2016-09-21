@@ -122,7 +122,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     {
         this.proxyContainer = proxyContainer;
 
-        LOG.debug( "Set proxy: container={}, proxy={}", getId(), proxyContainer.getId() );
+        LOG.debug( "Set proxy: container={}, proxy={}", getId(),
+                proxyContainer == null ? "no proxy" : proxyContainer.getId() );
     }
 
 

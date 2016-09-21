@@ -1,10 +1,7 @@
-package io.subutai.core.executor.impl;
+package io.subutai.common.command;
 
 
 import org.junit.Test;
-
-import io.subutai.common.command.ResponseImpl;
-import io.subutai.common.command.ResponseWrapper;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;

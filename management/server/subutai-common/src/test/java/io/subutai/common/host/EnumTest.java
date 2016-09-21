@@ -1,9 +1,7 @@
-package io.subutai.core.hostregistry.api;
+package io.subutai.common.host;
 
 
 import org.junit.Test;
-import io.subutai.common.host.ContainerHostState;
-import io.subutai.common.host.HostArchitecture;
 
 
 public class EnumTest

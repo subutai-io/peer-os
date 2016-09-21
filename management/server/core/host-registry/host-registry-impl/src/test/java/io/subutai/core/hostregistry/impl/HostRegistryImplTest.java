@@ -6,6 +6,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.Response;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,21 +17,37 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
 import com.google.common.cache.Cache;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.host.ContainerHostInfo;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.host.ResourceHostInfo;
 import io.subutai.common.metric.QuotaAlertValue;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.util.IPUtil;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
 import io.subutai.core.hostregistry.api.HostListener;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotSame;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,22 +84,28 @@ public class HostRegistryImplTest
     @Mock
     HostListener hostListener;
 
-    HostRegistryImpl registry;
-
+    @Mock
+    ScheduledExecutorService hostUpdater;
 
     @Mock
     QuotaAlertValue quotaAlertValue;
 
+    @Mock
+    IPUtil ipUtil;
+
+    HostRegistryImpl registry;
     Set<QuotaAlertValue> alerts;
 
 
     @Before
     public void setUp() throws Exception
     {
-        registry = new HostRegistryImpl();
+        registry = spy( new HostRegistryImpl() );
         registry.hostListeners = hostListeners;
         registry.threadPool = notifier;
         registry.hosts = hosts;
+        registry.hostUpdater = hostUpdater;
+        registry.ipUtil = ipUtil;
         when( hosts.asMap() ).thenReturn( map );
         when( map.values() ).thenReturn( Sets.newHashSet( resourceHostInfo ) );
         when( resourceHostInfo.getContainers() ).thenReturn( Sets.newHashSet( containerHostInfo ) );
@@ -260,5 +286,100 @@ public class HostRegistryImplTest
         registry.dispose();
 
         verify( hosts ).invalidateAll();
+    }
+
+
+    @Test
+    public void testUpdateResourceHostEntryTimestamp() throws Exception
+    {
+        registry.updateResourceHostEntryTimestamp( HOST_ID );
+
+        verify( hosts ).getIfPresent( HOST_ID );
+    }
+
+
+    @Test
+    public void testRemoveResourceHost() throws Exception
+    {
+        registry.removeResourceHost( HOST_ID );
+
+        verify( hosts ).invalidate( HOST_ID );
+    }
+
+
+    @Test
+    public void testInit() throws Exception
+    {
+        registry.init();
+
+        verify( hostUpdater )
+                .scheduleWithFixedDelay( any( Runnable.class ), anyLong(), anyLong(), any( TimeUnit.class ) );
+
+        assertNotSame( hosts, registry.hosts );
+    }
+
+
+    @Test
+    public void testUpdateHosts() throws Exception
+    {
+
+        LocalPeer localPeer = mock( LocalPeer.class );
+        ResourceHost resourceHost = mock( ResourceHost.class );
+        doReturn( localPeer ).when( registry ).getLocalPeer();
+        doReturn( Sets.newHashSet( resourceHost ) ).when( localPeer ).getResourceHosts();
+
+        registry.updateHosts();
+
+        verify( registry, times( 2 ) ).checkAndUpdateHosts( anySet() );
+    }
+
+
+    @Test
+    public void testUpdateHost() throws Exception
+    {
+        WebClient webClient = mock( WebClient.class );
+        doReturn( webClient ).when( registry ).getWebClient( any( ResourceHostInfo.class ), anyString() );
+        Response response = mock( Response.class );
+        doReturn( response ).when( webClient ).get();
+        doReturn( Response.Status.OK.getStatusCode() ).when( response ).getStatus();
+
+        registry.updateHost( resourceHostInfo );
+
+        verify( registry ).updateResourceHostEntryTimestamp( HOST_ID );
+
+        ResourceHost resourceHost = mock( ResourceHost.class );
+        doReturn( HOST_ID ).when( resourceHost ).getId();
+
+        registry.updateHost( resourceHost );
+
+        verify( registry ).getResourceHostInfoById( HOST_ID );
+
+        doThrow( new HostDisconnectedException( null ) ).when( registry ).getResourceHostInfoById( HOST_ID );
+
+        registry.updateHost( resourceHost );
+
+        verify( registry ).requestHeartbeat( resourceHost );
+    }
+
+
+    @Test
+    public void testGetResourceHostIp() throws Exception
+    {
+        HostInterfaces hostInterfaces = mock( HostInterfaces.class );
+        HostInterface hostInterface = mock( HostInterface.class );
+        doReturn( Sets.newHashSet( hostInterface ) ).when( hostInterfaces ).getAll();
+        doReturn( hostInterfaces ).when( resourceHostInfo ).getHostInterfaces();
+        doReturn( hostInterface ).when( ipUtil ).findAddressableIface( anySet(), anyString() );
+
+        registry.getResourceHostIp( resourceHostInfo );
+
+        verify( hostInterface ).getIp();
+
+        ResourceHost resourceHost = mock( ResourceHost.class );
+        doReturn( hostInterfaces ).when( resourceHost ).getHostInterfaces();
+
+        registry.getResourceHostIp( resourceHost );
+
+        verify( hostInterface, times( 2 ) ).getIp();
     }
 }
