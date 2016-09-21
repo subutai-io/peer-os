@@ -1,6 +1,9 @@
 package io.subutai.core.executor.impl;
 
 
+import java.io.PrintStream;
+import java.util.Comparator;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
@@ -9,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
 
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
@@ -24,8 +29,13 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,6 +63,9 @@ public class CommandProcessTest
     @Mock
     Session session;
 
+
+    Set<Response> queuedResponses;
+
     CommandProcess commandProcess;
 
 
@@ -62,6 +75,15 @@ public class CommandProcessTest
         commandProcess = new CommandProcess( commandProcessor, callback, request, session );
         commandProcess.executor = executor;
         commandProcess.semaphore = semaphore;
+        queuedResponses = spy( Sets.newTreeSet( new Comparator<Response>()
+        {
+            @Override
+            public int compare( final Response o1, final Response o2 )
+            {
+                return Integer.compare( o1.getResponseNumber(), o2.getResponseNumber() );
+            }
+        } ) );
+        commandProcess.queuedResponses = queuedResponses;
     }
 
 
@@ -108,6 +130,12 @@ public class CommandProcessTest
 
         verify( semaphore ).release();
         verify( executor ).shutdown();
+
+        commandProcess.status = CommandStatus.RUNNING;
+
+        commandProcess.stop();
+
+        assertEquals( CommandStatus.TIMEOUT, commandProcess.status );
     }
 
 
@@ -116,9 +144,19 @@ public class CommandProcessTest
     {
         when( response.getResponseNumber() ).thenReturn( 1 );
 
+        Response response1 = mock( Response.class );
+        doReturn( 2 ).when( response1 ).getResponseNumber();
+        queuedResponses.add( response1 );
+
         commandProcess.processResponse( response );
 
-        verify( executor ).execute( isA( ResponseProcessor.class ) );
+        verify( executor, times( 2 ) ).execute( isA( ResponseProcessor.class ) );
+
+        when( response.getResponseNumber() ).thenReturn( 100 );
+
+        commandProcess.processResponse( response );
+
+        verify( queuedResponses ).add( response );
     }
 
 
@@ -203,5 +241,33 @@ public class CommandProcessTest
         verify( response, times( 2 ) ).getStdErr();
         verify( response ).getExitCode();
         assertEquals( CommandStatus.KILLED, commandProcess.status );
+    }
+
+
+    @Test
+    public void testProcessNextResponse() throws Exception
+    {
+        commandProcess.processNextResponse( response );
+
+        verify( executor ).execute( isA( ResponseProcessor.class ) );
+
+        //----------
+
+        RuntimeException exception = mock( RuntimeException.class );
+        doThrow( exception ).when( executor ).execute( any( ResponseProcessor.class ) );
+
+        commandProcess.processNextResponse( response );
+
+        verify( exception ).printStackTrace(any( PrintStream.class) );
+
+        //----------
+
+        reset( executor );
+        commandProcess.userSession = null;
+
+        commandProcess.processNextResponse( response );
+
+        verify( executor ).execute( isA( ResponseProcessor.class ) );
+        verify( session , times( 2 )).getSubject();
     }
 }

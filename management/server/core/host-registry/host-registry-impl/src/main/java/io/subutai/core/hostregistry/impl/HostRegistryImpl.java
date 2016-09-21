@@ -58,6 +58,8 @@ public class HostRegistryImpl implements HostRegistry
     protected ExecutorService threadPool = Executors.newCachedThreadPool();
     protected Cache<String, ResourceHostInfo> hosts;
 
+    IPUtil ipUtil = new IPUtil();
+
 
     @Override
     public void updateResourceHostEntryTimestamp( final String resourceHostId )
@@ -388,14 +390,14 @@ public class HostRegistryImpl implements HostRegistry
         {
             Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
 
-            hostInterface = IPUtil.findAddressableInterface( hostInterfaces, resourceHostInfo.getId() );
+            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
         }
         else
         {
             Set<HostInterface> hostInterfaces = Sets.newHashSet();
             hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
 
-            hostInterface = IPUtil.findAddressableInterface( hostInterfaces, resourceHostInfo.getId() );
+            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
         }
 
         if ( hostInterface instanceof NullHostInterface )
