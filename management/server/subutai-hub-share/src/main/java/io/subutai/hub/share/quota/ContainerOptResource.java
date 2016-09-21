@@ -1,4 +1,4 @@
-package io.subutai.common.quota;
+package io.subutai.hub.share.quota;
 
 
 import java.math.BigDecimal;
