@@ -184,6 +184,7 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
     private NetworkResourceDaoImpl networkResourceDao;
     private final LocalPeerCommands localPeerCommands = new LocalPeerCommands();
     private final HostUtil hostUtil = new HostUtil();
+    protected SystemSettings systemSettings;
 
 
     public LocalPeerImpl( DaoManager daoManager, TemplateManager templateManager, QuotaManager quotaManager,
@@ -197,6 +198,13 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         this.commandExecutor = commandExecutor;
         this.hostRegistry = hostRegistry;
         this.securityManager = securityManager;
+        this.systemSettings = getSystemSettings();
+    }
+
+
+    protected SystemSettings getSystemSettings()
+    {
+        return new SystemSettings();
     }
 
 
@@ -281,8 +289,8 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
         peerInfo = new PeerInfo();
         peerInfo.setId( securityManager.getKeyManager().getPeerId() );
         peerInfo.setOwnerId( securityManager.getKeyManager().getPeerOwnerId() );
-        peerInfo.setPublicUrl( SystemSettings.getPublicUrl() );
-        peerInfo.setPublicSecurePort( SystemSettings.getPublicSecurePort() );
+        peerInfo.setPublicUrl( systemSettings.getPublicUrl() );
+        peerInfo.setPublicSecurePort( systemSettings.getPublicSecurePort() );
         peerInfo.setName( "Local Peer" );
     }
 

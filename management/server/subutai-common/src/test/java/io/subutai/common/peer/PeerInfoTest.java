@@ -14,8 +14,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import io.subutai.common.settings.SystemSettings;
-
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -31,8 +29,7 @@ public class PeerInfoTest
     PeerPolicy peerPolicy;
     @Mock
     PeerPolicy peerPolicy2;
-    @Mock
-    SystemSettings systemSettings;
+
     @Mock
     PropertiesConfiguration propertiesConfiguration;
 

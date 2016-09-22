@@ -55,6 +55,7 @@ import io.subutai.common.security.relation.model.Relation;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.settings.Common;
+import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.ExceptionUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.executor.api.CommandExecutor;
@@ -224,6 +225,27 @@ public class LocalPeerImplTest
     @Mock
     Future future;
 
+    @Mock
+    SystemSettings systemSettings2;
+
+
+    class LocalPeerImplForTest extends LocalPeerImpl
+    {
+        public LocalPeerImplForTest( final DaoManager daoManager, final TemplateManager templateManager,
+                                     final QuotaManager quotaManager, final CommandExecutor commandExecutor,
+                                     final HostRegistry hostRegistry, final Monitor monitor,
+                                     final SecurityManager securityManager )
+        {
+            super( daoManager, templateManager, quotaManager, commandExecutor, hostRegistry, monitor, securityManager );
+        }
+
+
+        protected SystemSettings getSystemSettings()
+        {
+            return systemSettings2;
+        }
+    }
+
 
     @Before
     public void setUp() throws Exception
@@ -238,8 +260,8 @@ public class LocalPeerImplTest
 
         peerMap = new HashMap<>();
         peerMap.put( IP, P2P_IP );
-        localPeer = spy( new LocalPeerImpl( daoManager, templateRegistry, quotaManager, commandExecutor, hostRegistry,
-                monitor, securityManager ) );
+        localPeer = spy( new LocalPeerImplForTest( daoManager, templateRegistry, quotaManager, commandExecutor,
+                hostRegistry, monitor, securityManager ) );
         localPeer.setIdentityManager( identityManager );
         localPeer.setRelationManager( relationManager );
 

@@ -246,4 +246,11 @@ public interface EnvironmentManager
 
     void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException;
+
+    /**
+     * Adds ssh key to environment db entity. This method does not add the key to containers. This is a workaround to
+     * allow Hub module to modify list of ssh keys inside environment db record. After call to this method, caller
+     * should reload environment using EnvironmentManager@loadEnvironment
+     */
+    void addSshKeyToEnvironmentEntity( String environmentId, String sshKey ) throws EnvironmentNotFoundException;
 }

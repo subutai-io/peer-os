@@ -1821,6 +1821,21 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
+    @Override
+    public void addSshKeyToEnvironmentEntity( final String environmentId, final String sshKey )
+            throws EnvironmentNotFoundException
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( sshKey ), "Invalid ssh key" );
+
+        EnvironmentImpl environment = ( EnvironmentImpl ) loadEnvironment( environmentId );
+
+        environment.addSshKey( sshKey );
+
+        update( environment );
+    }
+
+
     // quick and dirty implementation for env p2p connectivity check.
     // todo refactor
     @RolesAllowed( "Environment-Management|Update" )
