@@ -6,10 +6,10 @@ import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.ContainerHost;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.Quota;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.Quota;
 
 
 @Command( scope = "environment", name = "get-quota", description = "gets quota information from peer for container" )

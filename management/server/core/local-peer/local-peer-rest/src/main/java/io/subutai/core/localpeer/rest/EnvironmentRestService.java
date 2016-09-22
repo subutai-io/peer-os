@@ -19,9 +19,9 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 public interface EnvironmentRestService

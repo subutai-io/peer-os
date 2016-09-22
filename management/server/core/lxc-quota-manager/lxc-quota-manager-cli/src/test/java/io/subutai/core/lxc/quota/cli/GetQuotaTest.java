@@ -12,10 +12,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ByteValueResource;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.hub.share.resource.ByteValueResource;
 
 import static org.mockito.Mockito.when;
 

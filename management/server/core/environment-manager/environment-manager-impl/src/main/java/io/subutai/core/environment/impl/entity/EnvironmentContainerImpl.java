@@ -57,7 +57,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;

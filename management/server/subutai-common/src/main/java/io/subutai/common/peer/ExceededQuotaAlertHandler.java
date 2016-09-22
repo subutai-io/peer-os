@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.metric.QuotaAlertValue;
-import io.subutai.common.quota.ContainerCpuResource;
-import io.subutai.common.quota.ContainerDiskResource;
-import io.subutai.common.quota.ContainerRamResource;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.NumericValueResource;
+import io.subutai.hub.share.quota.ContainerCpuResource;
+import io.subutai.hub.share.quota.ContainerDiskResource;
+import io.subutai.hub.share.quota.ContainerRamResource;
+import io.subutai.hub.share.resource.ByteValueResource;
+import io.subutai.hub.share.resource.NumericValueResource;
 
 
 /**

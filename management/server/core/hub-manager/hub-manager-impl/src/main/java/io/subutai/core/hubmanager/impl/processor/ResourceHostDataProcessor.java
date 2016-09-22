@@ -29,9 +29,6 @@ import io.subutai.common.network.P2pLogs;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.resource.HistoricalMetrics;
-import io.subutai.common.resource.Series;
-import io.subutai.common.resource.SeriesBatch;
 import io.subutai.core.hostregistry.api.HostListener;
 import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
@@ -42,6 +39,9 @@ import io.subutai.hub.share.dto.HostInterfaceDto;
 import io.subutai.hub.share.dto.P2PDto;
 import io.subutai.hub.share.dto.SystemLogsDto;
 import io.subutai.hub.share.dto.host.ResourceHostMetricDto;
+import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.hub.share.resource.Series;
+import io.subutai.hub.share.resource.SeriesBatch;
 
 import static java.lang.String.format;
 

@@ -55,13 +55,6 @@ public class ProxyEnvironment extends EnvironmentImpl
         setStatus( EnvironmentStatus.HEALTHY );
     }
 
-
-    protected LocalPeer getLocaPeer()
-    {
-        return ServiceLocator.getServiceNoCache( LocalPeer.class );
-    }
-
-
     private Set<EnvironmentContainerImpl> parseContainers( JsonNode json, EnvironmentManagerImpl environmentManager,
                                                            ProxyContainerHelper proxyContainerHelper )
     {

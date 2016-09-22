@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.common.test.SystemOutRedirectTest;
+import io.subutai.hub.share.resource.ContainerResourceType;
 
 import static org.junit.Assert.assertTrue;
 

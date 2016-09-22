@@ -10,7 +10,7 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.resource.PeerGroupResources;
+import io.subutai.hub.share.resource.PeerGroupResources;
 
 
 public interface PeerManager

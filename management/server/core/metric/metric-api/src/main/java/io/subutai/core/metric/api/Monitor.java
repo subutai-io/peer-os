@@ -13,8 +13,8 @@ import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.hub.share.resource.HistoricalMetrics;
 
 
 /**
