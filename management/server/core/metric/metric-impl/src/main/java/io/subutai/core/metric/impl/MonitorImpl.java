@@ -55,7 +55,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
-import io.subutai.common.resource.HistoricalMetrics;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -66,6 +65,7 @@ import io.subutai.core.metric.api.MonitorException;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
 import io.subutai.core.metric.impl.pojo.P2PInfoPojo;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.resource.HistoricalMetrics;
 
 
 /**

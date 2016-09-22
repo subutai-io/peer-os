@@ -27,13 +27,13 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.resource.HistoricalMetrics;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.WebClientBuilder;
 import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.common.security.relation.RelationVerificationException;
 import io.subutai.common.util.DateTimeParam;
+import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**

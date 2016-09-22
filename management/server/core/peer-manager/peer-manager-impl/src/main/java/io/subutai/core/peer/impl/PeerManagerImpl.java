@@ -45,8 +45,6 @@ import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
-import io.subutai.common.resource.PeerGroupResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.relation.RelationManager;
@@ -71,6 +69,8 @@ import io.subutai.core.peer.impl.dao.PeerDataService;
 import io.subutai.core.peer.impl.entity.PeerData;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.resource.PeerGroupResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**

@@ -6,11 +6,11 @@ import java.util.Set;
 
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.PeerResources;
-import io.subutai.common.resource.ResourceValueParser;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**
