@@ -39,6 +39,7 @@ public class NetworkManagerImpl implements NetworkManager
     private static final String LINE_DELIMITER = System.lineSeparator();
     private final PeerManager peerManager;
     protected Commands commands = new Commands();
+    protected SystemSettings systemSettings;
 
 
     public NetworkManagerImpl( final PeerManager peerManager )
@@ -46,8 +47,14 @@ public class NetworkManagerImpl implements NetworkManager
         Preconditions.checkNotNull( peerManager );
 
         this.peerManager = peerManager;
+        this.systemSettings = getSystemSettings();
     }
 
+
+    protected SystemSettings getSystemSettings()
+    {
+        return new SystemSettings();
+    }
 
     //---------------- P2P SECTION BEGIN ------------------------
 
@@ -67,8 +74,8 @@ public class NetworkManagerImpl implements NetworkManager
 
         execute( host, commands.getJoinP2PSwarmCommand( interfaceName, localIp, p2pHash, secretKey,
                 getUnixTimestampOffset( secretKeyTtlSec ),
-                String.format( "%d-%d", SystemSettings.getP2pPortStartRange(),
-                        SystemSettings.getP2pPortEndRange() ) ) );
+                String.format( "%d-%d", systemSettings.getP2pPortStartRange(),
+                        systemSettings.getP2pPortEndRange() ) ) );
     }
 
 

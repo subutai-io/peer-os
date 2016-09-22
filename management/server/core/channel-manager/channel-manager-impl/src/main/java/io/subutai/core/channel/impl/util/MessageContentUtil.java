@@ -26,7 +26,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
