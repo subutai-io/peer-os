@@ -2,6 +2,7 @@ package io.subutai.hub.share.resource;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -65,4 +66,25 @@ public class PeerResources
     {
         return hostResources;
     }
+
+    public HostResources findHostResources( final String hostId )
+      {
+          HostResources result = null;
+          for ( HostResources h : this.hostResources )
+          {
+              if ( h.getHostId().equals( hostId ) )
+              {
+                  result = h;
+                  break;
+              }
+          }
+          return result;
+      }
+
+
+      public List<HostResources> getEnabledHostResources()
+      {
+          return getHostResources().stream().filter( r -> r.isEnabled() ).collect( Collectors.toList() );
+      }
+
 }

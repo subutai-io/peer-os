@@ -3,6 +3,7 @@ package io.subutai.hub.share.resource;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.hub.share.quota.ContainerQuota;
@@ -21,7 +22,8 @@ public class HostResources
     private RamResource ramLimit;
     @JsonProperty( "diskLimit" )
     private DiskResource diskLimit;
-
+    @JsonIgnore
+    private boolean enabled = false;
 
     public HostResources( @JsonProperty( "hostId" ) final String hostId,
                           @JsonProperty( "cpuLimit" ) final CpuResource cpuLimit,
@@ -101,4 +103,15 @@ public class HostResources
 
         return true;
     }
+
+    public boolean isEnabled()
+     {
+         return enabled;
+     }
+
+
+     public void enable()
+     {
+         this.enabled = true;
+     }
 }

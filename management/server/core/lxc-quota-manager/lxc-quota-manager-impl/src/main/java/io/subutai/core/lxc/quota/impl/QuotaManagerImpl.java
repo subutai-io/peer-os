@@ -37,7 +37,7 @@ import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.lxc.quota.impl.dao.QuotaDataService;
-import io.subutai.core.lxc.quota.impl.parser.CommonResourceValueParser;
+import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.ContainerResource;

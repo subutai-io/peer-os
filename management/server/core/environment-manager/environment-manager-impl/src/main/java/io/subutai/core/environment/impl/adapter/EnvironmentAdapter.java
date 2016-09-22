@@ -98,7 +98,6 @@ public class EnvironmentAdapter
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
             log.error( "Error to parse json: ", e );
         }
 

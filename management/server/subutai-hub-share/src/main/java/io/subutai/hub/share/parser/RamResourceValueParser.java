@@ -1,12 +1,10 @@
-package io.subutai.core.lxc.quota.impl.parser;
+package io.subutai.hub.share.parser;
 
 
-import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ByteValueResource;
@@ -14,36 +12,32 @@ import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 /**
- * Byte value resource parser
+ * RAM value resource parser
  */
-public class DiskValueResourceParser implements ResourceValueParser
+public class RamResourceValueParser implements ResourceValueParser
 {
-    private static final String QUOTA_REGEX = "(\\d+(?:[\\.,]\\d+)?)(KiB|MiB|GiB|TiB|PiB|EiB)?";
+    private static final String QUOTA_REGEX = "(\\d+)(KiB|MiB|GiB|TiB|PiB|EiB)?";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
+    private static RamResourceValueParser instance;
 
-    private static DiskValueResourceParser instance;
 
-
-    private DiskValueResourceParser()
+    public static RamResourceValueParser getInstance()
     {
-    }
-
-
-    public static DiskValueResourceParser getInstance()
-    {
-
         if ( instance == null )
         {
-            instance = new DiskValueResourceParser();
+            instance = new RamResourceValueParser();
         }
         return instance;
     }
 
 
+    private RamResourceValueParser() {}
+
+
     @Override
     public ByteValueResource parse( String resource )
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( resource ), "Invalid resource string" );
+        Preconditions.checkNotNull( resource );
 
         Matcher quotaMatcher = QUOTA_PATTERN.matcher( resource.trim() );
         if ( quotaMatcher.matches() )
@@ -51,10 +45,9 @@ public class DiskValueResourceParser implements ResourceValueParser
             String value = quotaMatcher.group( 1 );
             String acronym = quotaMatcher.group( 2 );
             ByteUnit byteUnit = ByteUnit.parseFromAcronym( acronym );
-            ByteValueResource result = new ByteValueResource(
-                    ByteValueResource.toBytes( new BigDecimal( value ), byteUnit == null ? ByteUnit.GB : byteUnit ) );
 
-            return result;
+            return new ByteValueResource(
+                    ByteValueResource.toBytes( value, byteUnit == null ? ByteUnit.MB : byteUnit ) );
         }
         else
         {

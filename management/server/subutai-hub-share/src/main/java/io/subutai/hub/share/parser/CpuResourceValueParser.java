@@ -1,4 +1,4 @@
-package io.subutai.core.lxc.quota.impl.parser;
+package io.subutai.hub.share.parser;
 
 
 import java.util.regex.Matcher;
