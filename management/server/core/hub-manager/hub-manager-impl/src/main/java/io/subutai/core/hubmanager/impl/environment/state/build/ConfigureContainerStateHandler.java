@@ -3,7 +3,6 @@ package io.subutai.core.hubmanager.impl.environment.state.build;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,8 +17,8 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
-import io.subutai.common.util.PeerUtil;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.environment.state.StateHandler;
 import io.subutai.core.hubmanager.impl.http.RestResult;
@@ -48,6 +47,7 @@ public class ConfigureContainerStateHandler extends StateHandler
 
         peerDto = configureSsh( peerDto, envDto );
 
+        //TODO skip this section if environment is built already.
         configureHosts( envDto );
 
         logEnd();
@@ -70,6 +70,7 @@ public class ConfigureContainerStateHandler extends StateHandler
         boolean isSshKeysCleaned = false;
 
         EnvironmentId envId = new EnvironmentId( envDto.getId() );
+        final Environment environment = ctx.envManager.loadEnvironment( envDto.getId() );
 
         if ( envDto != null )
         {
@@ -88,22 +89,19 @@ public class ConfigureContainerStateHandler extends StateHandler
             }
         }
 
-        final Environment environment = ctx.envManager.loadEnvironment( envDto.getId() );
-        if ( environment.getPeerId() != null ) //TODO clarify for check initiator peer ID
+
+        if ( environment.getPeerId() != null )
         {
             Set<Peer> peers = environment.getPeers();
-            PeerUtil<Object> keyUtil = new PeerUtil<>();
             for ( final Peer peer : peers )
             {
-                keyUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
-                {
-                    @Override
-                    public Object call() throws Exception
-                    {
-                        peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
-                        return null;
-                    }
-                } ) );
+                peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+            }
+
+            for ( SshKey sshKey : sshKeys.getKeys() )
+            {
+                //TODO check if key is from default container keys
+                ctx.envManager.addSshKeyToEnvironmentEntity( environment.getId(), sshKey.getPublicKey() );
             }
         }
         else
