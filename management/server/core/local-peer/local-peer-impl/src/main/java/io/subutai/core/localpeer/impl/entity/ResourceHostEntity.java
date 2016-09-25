@@ -68,8 +68,6 @@ import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.QuotaException;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.NumUtil;
@@ -83,6 +81,8 @@ import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
 import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.QuotaException;
 
 
 /**

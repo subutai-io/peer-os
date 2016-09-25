@@ -53,8 +53,6 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.protocol.Template;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.PeerGroupResources;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -71,6 +69,8 @@ import io.subutai.core.strategy.api.ContainerPlacementStrategy;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyManager;
 import io.subutai.core.template.api.TemplateManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.PeerGroupResources;
 
 
 public class RestServiceImpl implements RestService

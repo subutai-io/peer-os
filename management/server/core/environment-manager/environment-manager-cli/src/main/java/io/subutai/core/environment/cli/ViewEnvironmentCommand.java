@@ -9,12 +9,12 @@ import com.google.common.base.Preconditions;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.RegistrationStatus;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.Quota;
 import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.Quota;
 
 
 /**

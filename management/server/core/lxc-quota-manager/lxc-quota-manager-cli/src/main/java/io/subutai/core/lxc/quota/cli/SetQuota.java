@@ -10,15 +10,15 @@ import org.apache.karaf.shell.commands.Command;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.ContainerResource;
-import io.subutai.common.quota.ContainerResourceFactory;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.ResourceValue;
-import io.subutai.common.resource.ResourceValueParser;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.lxc.quota.api.QuotaManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerResource;
+import io.subutai.hub.share.quota.ContainerResourceFactory;
+import io.subutai.hub.share.quota.Quota;
+import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.ResourceValue;
+import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 @Command( scope = "quota", name = "set", description = "Sets specified quota to container" )

@@ -10,17 +10,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.subutai.common.host.HostId;
-import io.subutai.common.quota.ContainerCpuResource;
-import io.subutai.common.quota.ContainerHomeResource;
-import io.subutai.common.quota.ContainerOptResource;
-import io.subutai.common.quota.ContainerRamResource;
-import io.subutai.common.quota.ContainerResource;
-import io.subutai.common.quota.ContainerRootfsResource;
-import io.subutai.common.quota.ContainerVarResource;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.NumericValueResource;
-import io.subutai.common.resource.ResourceValue;
+import io.subutai.hub.share.quota.ContainerCpuResource;
+import io.subutai.hub.share.quota.ContainerHomeResource;
+import io.subutai.hub.share.quota.ContainerOptResource;
+import io.subutai.hub.share.quota.ContainerRamResource;
+import io.subutai.hub.share.quota.ContainerResource;
+import io.subutai.hub.share.quota.ContainerRootfsResource;
+import io.subutai.hub.share.quota.ContainerVarResource;
+import io.subutai.hub.share.resource.ByteValueResource;
+import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.NumericValueResource;
+import io.subutai.hub.share.resource.ResourceValue;
 
 
 /**

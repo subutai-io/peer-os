@@ -28,15 +28,15 @@ import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.HistoricalMetrics;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.relation.RelationLink;
 import io.subutai.common.security.relation.RelationLinkDto;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**

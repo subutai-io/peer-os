@@ -34,24 +34,24 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerPolicy;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.quota.ContainerResource;
-import io.subutai.common.quota.ContainerResourceFactory;
-import io.subutai.common.quota.Quota;
-import io.subutai.common.quota.QuotaException;
-import io.subutai.common.resource.ContainerResourceType;
-import io.subutai.common.resource.CpuResource;
-import io.subutai.common.resource.DiskResource;
-import io.subutai.common.resource.HostResources;
-import io.subutai.common.resource.PeerResources;
-import io.subutai.common.resource.RamResource;
-import io.subutai.common.resource.ResourceValue;
-import io.subutai.common.resource.ResourceValueParser;
 import io.subutai.common.util.CollectionUtil;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.lxc.quota.impl.dao.QuotaDataService;
-import io.subutai.core.lxc.quota.impl.parser.CommonResourceValueParser;
+import io.subutai.hub.share.parser.CommonResourceValueParser;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.quota.ContainerResource;
+import io.subutai.hub.share.quota.ContainerResourceFactory;
+import io.subutai.hub.share.quota.Quota;
+import io.subutai.hub.share.quota.QuotaException;
+import io.subutai.hub.share.resource.ContainerResourceType;
+import io.subutai.hub.share.resource.CpuResource;
+import io.subutai.hub.share.resource.DiskResource;
+import io.subutai.hub.share.resource.HostResources;
+import io.subutai.hub.share.resource.PeerResources;
+import io.subutai.hub.share.resource.RamResource;
+import io.subutai.hub.share.resource.ResourceValue;
+import io.subutai.hub.share.resource.ResourceValueParser;
 
 
 public class QuotaManagerImpl implements QuotaManager

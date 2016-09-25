@@ -9,11 +9,11 @@ import io.subutai.common.metric.ExceededQuota;
 import io.subutai.common.metric.QuotaAlert;
 import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.metric.ResourceHostMetric;
-import io.subutai.common.resource.ByteUnit;
-import io.subutai.common.resource.ByteValueResource;
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.metric.api.Monitor;
+import io.subutai.hub.share.resource.ByteUnit;
+import io.subutai.hub.share.resource.ByteValueResource;
+import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 @Command( scope = "alert", name = "put" )

@@ -21,8 +21,8 @@ import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.quota.ContainerQuota;
 import io.subutai.core.hostregistry.api.HostRegistry;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
