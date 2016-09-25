@@ -1,6 +1,8 @@
 package io.subutai.core.hubmanager.impl.environment.state.build;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.EnvironmentId;
@@ -47,7 +50,6 @@ public class ConfigureContainerStateHandler extends StateHandler
 
         peerDto = configureSsh( peerDto, envDto );
 
-        //TODO skip this section if environment is built already.
         configureHosts( envDto );
 
         logEnd();
@@ -67,40 +69,68 @@ public class ConfigureContainerStateHandler extends StateHandler
     {
         final SshKeys sshKeys = new SshKeys();
         String[] currentSshKeys = null;
+        Set<String> currentSshKeysSet = new HashSet<>();
         boolean isSshKeysCleaned = false;
 
         EnvironmentId envId = new EnvironmentId( envDto.getId() );
-        final Environment environment = ctx.envManager.loadEnvironment( envDto.getId() );
 
         if ( envDto != null )
         {
             currentSshKeys = getCurrnetSshKeys( envDto.getId() );
+            currentSshKeysSet = new HashSet<>( Arrays.asList( currentSshKeys ) );
         }
 
+        Set<String> keys = new HashSet<>();
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
             {
                 if ( nodeDto.getSshKeys() != null )
                 {
-                    sshKeys.addStringKeys( nodeDto.getSshKeys() );
+                    Set<String> existingKeys = new HashSet<>();
+                    keys.addAll( nodeDto.getSshKeys() );
+                    for ( String sshKey : nodeDto.getSshKeys() )
+                    {
+                        if ( currentSshKeysSet.contains( sshKey ) )
+                        {
+                            existingKeys.add( sshKey );
+                        }
+                    }
+                    keys.removeAll( existingKeys );
                     removeKeys( envId, nodeDto.getSshKeys(), currentSshKeys, isSshKeysCleaned );
                 }
             }
         }
 
+        if ( keys.isEmpty() )
+        {
+            return peerDto;
+        }
+        sshKeys.addStringKeys( keys );
 
-        if ( environment.getPeerId() != null )
+        Environment environment = null;
+        try
+        {
+            environment = ctx.envManager.loadEnvironment( envDto.getId() );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            log.info( e.getMessage() );
+        }
+
+        if ( environment != null && !environment.getPeerId().equals( "hub" ) )
         {
             Set<Peer> peers = environment.getPeers();
             for ( final Peer peer : peers )
             {
-                peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                if ( peer.isOnline() )
+                {
+                    peer.configureSshInEnvironment( environment.getEnvironmentId(), sshKeys );
+                }
             }
 
             for ( SshKey sshKey : sshKeys.getKeys() )
             {
-                //TODO check if key is from default container keys
                 ctx.envManager.addSshKeyToEnvironmentEntity( environment.getId(), sshKey.getPublicKey() );
             }
         }
@@ -198,7 +228,14 @@ public class ConfigureContainerStateHandler extends StateHandler
             }
         }
 
-        ctx.localPeer
-                .configureHostsInEnvironment( new EnvironmentId( envDto.getId() ), new HostAddresses( hostAddresses ) );
+        try
+        {
+            ctx.localPeer.configureHostsInEnvironment( new EnvironmentId( envDto.getId() ),
+                    new HostAddresses( hostAddresses ) );
+        }
+        catch ( Exception e )
+        {
+            log.error( e.getMessage() );
+        }
     }
 }
