@@ -17,7 +17,8 @@ import org.apache.log4j.spi.LoggingEvent;
 public class SubutaiAppender extends AppenderSkeleton
 {
 
-    private static final Level MIN_REPORT_LOG_LEVEL = Level.ERROR;
+    public static final Level MIN_REPORT_LOG_LEVEL = Level.ERROR;
+
     protected static Set<SubutaiErrorEventListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<SubutaiErrorEventListener, Boolean>() );
 

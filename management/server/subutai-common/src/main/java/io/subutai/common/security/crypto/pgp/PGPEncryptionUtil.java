@@ -3,7 +3,6 @@ package io.subutai.common.security.crypto.pgp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1238,19 +1237,6 @@ public class PGPEncryptionUtil
     }
 
 
-    private static int getLengthWithoutSeparatorOrTrailingWhitespace( byte[] line )
-    {
-        int end = line.length - 1;
-
-        while ( end >= 0 && isWhiteSpace( line[end] ) )
-        {
-            end--;
-        }
-
-        return end + 1;
-    }
-
-
     public static PGPPublicKey findPublicKeyById( InputStream publicKeyRing, String keyId ) throws PGPException
     {
         try
@@ -1429,57 +1415,12 @@ public class PGPEncryptionUtil
         }
         catch ( final Exception e )
         {
-            // Don't print the passphrase but do print null if thats what it was
+            // Don't print the passphrase but do print null if that's what it was
             final String passphraseMessage = ( secretPwd == null ) ? "null" : "supplied";
             System.err.println(
                     "Unable to extract key " + secretKey.getKeyID() + " using " + passphraseMessage + " passphrase" );
         }
         return null;
-    }
-
-
-    private static PGPSecretKey findSecretKey( InputStream secretKeyRing ) throws IOException, PGPException
-    {
-        PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secretKeyRing ),
-                new JcaKeyFingerprintCalculator() );
-
-        Iterator<PGPSecretKeyRing> it = keyrings.getKeyRings();
-        while ( it.hasNext() )
-        {
-            PGPSecretKeyRing keyRing = it.next();
-
-            Iterator<PGPSecretKey> pkIt = keyRing.getSecretKeys();
-
-            while ( pkIt.hasNext() )
-            {
-                PGPSecretKey secretKey = pkIt.next();
-
-                if ( secretKey.isSigningKey() )
-                {
-                    return secretKey;
-                }
-            }
-        }
-
-        throw new PGPException( "Key not found" );
-    }
-
-
-    /* **********************************************************
-     * Load Keyring  file into InputStream.
-     */
-    public static InputStream getFileInputStream( String keyringFile )
-    {
-        try
-        {
-            FileInputStream keyIn = new FileInputStream( keyringFile );
-
-            return keyIn;
-        }
-        catch ( IOException ex )
-        {
-            return null;
-        }
     }
 
 
@@ -1585,46 +1526,6 @@ public class PGPEncryptionUtil
     }
 
 
-    /**
-     * Verifies that a public key is signed with another public key
-     *
-     * @param keyToVerify the public key to verify
-     * @param keyToVerifyWith the key to verify with
-     *
-     * @return true if verified, false otherwise
-     */
-    public static boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith ) throws PGPException
-    {
-        try
-        {
-            Iterator<PGPSignature> signIterator = keyToVerify.getSignatures();
-            while ( signIterator.hasNext() )
-            {
-                PGPSignature signature = signIterator.next();
-                signature.init( new JcaPGPContentVerifierBuilderProvider().setProvider( provider ), keyToVerifyWith );
-                if ( signature.verifyCertification( keyToVerify ) )
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        catch ( Exception e )
-        {
-            //throw custom  exception
-            throw new PGPException( "Error verifying public key", e );
-        }
-    }
-
-
-    /**
-     * Verifies that a public key is signed with another public key
-     *
-     * @param keyToRemoveFrom the public key to verify
-     * @param id id of the sugnature
-     *
-     * @return true if verified, false otherwise
-     */
     public static PGPPublicKeyRing removeSignature( PGPPublicKeyRing keyToRemoveFrom, String id ) throws PGPException
     {
         try
