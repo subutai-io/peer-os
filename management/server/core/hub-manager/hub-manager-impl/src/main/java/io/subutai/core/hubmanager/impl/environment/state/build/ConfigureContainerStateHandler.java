@@ -76,7 +76,7 @@ public class ConfigureContainerStateHandler extends StateHandler
 
         if ( envDto != null )
         {
-            currentSshKeys = getCurrnetSshKeys( envDto.getId() );
+            currentSshKeys = getCurrentSshKeys( envDto.getId() );
             currentSshKeysSet = new HashSet<>( Arrays.asList( currentSshKeys ) );
         }
 
@@ -175,25 +175,35 @@ public class ConfigureContainerStateHandler extends StateHandler
     }
 
 
-    private String[] getCurrnetSshKeys( String envId )
+    private String[] getCurrentSshKeys( String envId )
     {
-        Set<ContainerHost> containerHosts = ctx.localPeer.findContainersByEnvironmentId( envId );
         String currentKeys = "";
-
-        for ( ContainerHost containerHost : containerHosts )
+        try
         {
-            try
+            Environment environment = ctx.envManager.loadEnvironment( envId );
+
+            for ( ContainerHost containerHost : environment.getContainerHosts() )
             {
-                CommandResult result =
-                        containerHost.execute( new RequestBuilder( "sudo cat /root/.ssh/authorized_keys" ) );
-                if ( result.getExitCode() == 0 && !currentKeys.contains( result.getStdOut().trim() ) )
+                String key = getAuthorizedKeysFromContainer( containerHost );
+                if ( key != null && !currentKeys.contains( key ) )
                 {
-                    currentKeys += result.getStdOut().trim();
+                    currentKeys += key;
                 }
             }
-            catch ( CommandException e )
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+            log.info( e.getMessage() );
+
+            Set<ContainerHost> containerHosts = ctx.localPeer.findContainersByEnvironmentId( envId );
+
+            for ( ContainerHost containerHost : containerHosts )
             {
-                log.error( e.getMessage() );
+                String key = getAuthorizedKeysFromContainer( containerHost );
+                if ( key != null && !currentKeys.contains( key ) )
+                {
+                    currentKeys += key;
+                }
             }
         }
 
@@ -203,6 +213,25 @@ public class ConfigureContainerStateHandler extends StateHandler
         }
 
         return new String[] {};
+    }
+
+
+    public String getAuthorizedKeysFromContainer( ContainerHost containerHost )
+    {
+        try
+        {
+            CommandResult result = containerHost.execute( new RequestBuilder( "sudo cat /root/.ssh/authorized_keys" ) );
+            if ( result.getExitCode() == 0 )
+            {
+                return result.getStdOut().trim();
+            }
+        }
+        catch ( CommandException e )
+        {
+            log.error( e.getMessage() );
+        }
+
+        return null;
     }
 
 
