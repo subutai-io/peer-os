@@ -10,13 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Maps;
 
-import io.subutai.common.command.CommandException;
-import io.subutai.common.command.CommandResult;
-import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
@@ -182,29 +179,21 @@ public class ConfigureContainerStateHandler extends StateHandler
         {
             Environment environment = ctx.envManager.loadEnvironment( envId );
 
-            for ( ContainerHost containerHost : environment.getContainerHosts() )
+            for ( EnvironmentContainerHost containerHost : environment.getContainerHosts() )
             {
-                String key = getAuthorizedKeysFromContainer( containerHost );
-                if ( key != null && !currentKeys.contains( key ) )
+                SshKeys sshKeys = containerHost.getAuthorizedKeys();
+                for ( SshKey sshKey : sshKeys.getKeys() )
                 {
-                    currentKeys += key;
+                    if ( !currentKeys.contains( sshKey.getPublicKey() ) )
+                    {
+                        currentKeys += sshKey.getPublicKey();
+                    }
                 }
             }
         }
-        catch ( EnvironmentNotFoundException e )
+        catch ( EnvironmentNotFoundException | PeerException e )
         {
             log.info( e.getMessage() );
-
-            Set<ContainerHost> containerHosts = ctx.localPeer.findContainersByEnvironmentId( envId );
-
-            for ( ContainerHost containerHost : containerHosts )
-            {
-                String key = getAuthorizedKeysFromContainer( containerHost );
-                if ( key != null && !currentKeys.contains( key ) )
-                {
-                    currentKeys += key;
-                }
-            }
         }
 
         if ( !currentKeys.isEmpty() )
@@ -213,25 +202,6 @@ public class ConfigureContainerStateHandler extends StateHandler
         }
 
         return new String[] {};
-    }
-
-
-    public String getAuthorizedKeysFromContainer( ContainerHost containerHost )
-    {
-        try
-        {
-            CommandResult result = containerHost.execute( new RequestBuilder( "sudo cat /root/.ssh/authorized_keys" ) );
-            if ( result.getExitCode() == 0 )
-            {
-                return result.getStdOut().trim();
-            }
-        }
-        catch ( CommandException e )
-        {
-            log.error( e.getMessage() );
-        }
-
-        return null;
     }
 
 
