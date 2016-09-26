@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.HostAddresses;
 import io.subutai.common.peer.EnvironmentContainerHost;
@@ -71,13 +72,11 @@ public class ConfigureContainerStateHandler extends StateHandler
 
         EnvironmentId envId = new EnvironmentId( envDto.getId() );
 
-        if ( envDto != null )
-        {
-            currentSshKeys = getCurrentSshKeys( envDto.getId() );
-            currentSshKeysSet = new HashSet<>( Arrays.asList( currentSshKeys ) );
-        }
+        currentSshKeys = getCurrentSshKeys( envDto.getId() );
+        currentSshKeysSet = new HashSet<>( Arrays.asList( currentSshKeys ) );
 
         Set<String> keys = new HashSet<>();
+        Set<String> allKeys = new HashSet<>();
         for ( EnvironmentNodesDto nodesDto : envDto.getNodes() )
         {
             for ( EnvironmentNodeDto nodeDto : nodesDto.getNodes() )
@@ -86,6 +85,7 @@ public class ConfigureContainerStateHandler extends StateHandler
                 {
                     Set<String> existingKeys = new HashSet<>();
                     keys.addAll( nodeDto.getSshKeys() );
+                    allKeys.addAll( nodeDto.getSshKeys() );
                     for ( String sshKey : nodeDto.getSshKeys() )
                     {
                         if ( currentSshKeysSet.contains( sshKey ) )
@@ -94,10 +94,11 @@ public class ConfigureContainerStateHandler extends StateHandler
                         }
                     }
                     keys.removeAll( existingKeys );
-                    removeKeys( envId, nodeDto.getSshKeys(), currentSshKeys, isSshKeysCleaned );
                 }
             }
         }
+
+        removeKeys( envId, allKeys, currentSshKeys, isSshKeysCleaned );
 
         if ( keys.isEmpty() )
         {
@@ -153,22 +154,22 @@ public class ConfigureContainerStateHandler extends StateHandler
             return;
         }
 
-        for ( String sshKey : currentSshKeys )
+        try
         {
-            if ( !sshKeys.contains( sshKey.trim() ) )
+            Environment environment = ctx.envManager.loadEnvironment( envId.toString() );
+
+            for ( String sshKey : currentSshKeys )
             {
-                try
+                if ( !sshKeys.contains( sshKey.trim() ) )
                 {
-                    ctx.localPeer.removeFromAuthorizedKeys( envId, sshKey );
-                }
-                catch ( PeerException e )
-                {
-                    log.error( e.getMessage() );
+                    environment.removeSshKey( sshKey, true );
                 }
             }
         }
-
-        isSshKeysCleaned = true;
+        catch ( EnvironmentModificationException | EnvironmentNotFoundException e )
+        {
+            log.info( e.getMessage() );
+        }
     }
 
 
@@ -186,7 +187,7 @@ public class ConfigureContainerStateHandler extends StateHandler
                 {
                     if ( !currentKeys.contains( sshKey.getPublicKey() ) )
                     {
-                        currentKeys += sshKey.getPublicKey();
+                        currentKeys += sshKey.getPublicKey() + System.lineSeparator();
                     }
                 }
             }
