@@ -24,7 +24,6 @@ import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.jcajce.JcaPGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.jcajce.JcaPGPKeyConverter;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +32,21 @@ import org.apache.commons.io.IOUtils;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+
 
 //TODO this is for temporary period
-@Ignore
+//@Ignore
 public class PGPEncryptionUtilTest
 {
     private static final Logger logger = LoggerFactory.getLogger( PGPEncryptionUtilTest.class );
 
     private static final String MESSAGE = "hello";
-    private static final String PUBLIC_KEYRING = "dummy.pkr";
-    private static final String SECRET_KEYRING = "dummy.skr";
+    protected static final String PUBLIC_KEYRING = "dummy.pkr";
+    protected static final String SECRET_KEYRING = "dummy.skr";
 
     private static final String PLUGIN_PUBLIC_KEY = "public.asc";
     private static final String PLUGIN_PUBLIC_KEY_FINGERPRINT = "FC1F3E708FD85E7431FA996D8DD661979B15E409";
@@ -51,7 +54,7 @@ public class PGPEncryptionUtilTest
     private static final String PLUGIN_PRIVATE_KEY_FINGERPRINT = "FC1F3E708FD85E7431FA996D8DD661979B15E409";
 
     private static final String SECRET_PWD = "12345678";
-    private static final String PUBLIC_KEY_ID = "e2451337c277dbf1";
+    protected static final String PUBLIC_KEY_ID = "e2451337c277dbf1";
     private static final String SECRET_KEY_ID = "d558f9a4a0b450b3";
     private static final String USER_ID = "user@mail.org";
     private static final String PUBLIC_KEY_FINGERPRINT = "8338133EF14DE47D4B1646BEE2451337C277DBF1";
@@ -116,6 +119,56 @@ public class PGPEncryptionUtilTest
 
 
     @Test
+    public void testVerifySignature() throws Exception
+    {
+        PGPPublicKey encryptingKey =
+                PGPEncryptionUtil.findPublicKeyByFingerprint( findFile( PUBLIC_KEYRING ), PUBLIC_KEY_FINGERPRINT );
+
+        PGPSecretKeyRing secretKeys = PGPKeyUtil.readSecretKeyRing( findFile( SECRET_KEYRING ) );
+
+
+        byte[] signedAndEncryptedMessage = PGPEncryptionUtil
+                .signAndEncrypt( MESSAGE.getBytes(), secretKeys.getSecretKey(), SECRET_PWD, encryptingKey, true );
+
+        ContentAndSignatures contentAndSignatures =
+                PGPEncryptionUtil.decryptAndReturnSignatures( signedAndEncryptedMessage, secretKeys, SECRET_PWD );
+
+        assertTrue( PGPEncryptionUtil.verifySignature( contentAndSignatures, secretKeys.getPublicKey() ) );
+    }
+
+
+    @Test
+    public void testArmorByteArray() throws Exception
+    {
+
+        String armored = new String( PGPEncryptionUtil.armorByteArray( "test".getBytes() ) );
+
+        assertThat( armored, startsWith( "-----BEGIN PGP MESSAGE-----" ) );
+    }
+
+
+    @Test
+    public void testGetPrivateKey() throws Exception
+    {
+        PGPSecretKey secretKey =
+                PGPEncryptionUtil.findSecretKeyByFingerprint( findFile( SECRET_KEYRING ), SECRET_KEY_FINGERPRINT );
+
+        assertNotNull( PGPEncryptionUtil.getPrivateKey( secretKey, SECRET_PWD ) );
+
+        assertNull( PGPEncryptionUtil.getPrivateKey( secretKey, "" ) );
+    }
+
+
+    @Test
+    public void testArmorByteArrayToString() throws Exception
+    {
+        String armored = PGPEncryptionUtil.armorByteArrayToString( "test".getBytes() );
+
+        assertThat( armored, startsWith( "-----BEGIN PGP MESSAGE-----" ) );
+    }
+
+
+    @Test
     public void testGenerateKeyPair() throws Exception
     {
         KeyPair keyPair = PGPEncryptionUtil.generateKeyPair( USER_ID, SECRET_PWD, false );
@@ -151,6 +204,21 @@ public class PGPEncryptionUtilTest
         JcaPGPKeyConverter c = new JcaPGPKeyConverter();
         PublicKey publicKey = c.getPublicKey( pgpSecretKey.getPublicKey() );
         x509Certificate.verify( publicKey, new BouncyCastleProvider() );
+    }
+
+
+    @Test
+    public void testVerifyKey() throws Exception
+    {
+
+        PGPPublicKeyRing pgpPublicKey = PGPKeyUtil.readPublicKeyRing( findFile( PUBLIC_KEYRING ) );
+        PGPSecretKey pgpSecretKey = PGPEncryptionUtil.findSecretKeyById( findFile( SECRET_KEYRING ), SECRET_KEY_ID );
+
+        PGPPublicKeyRing signedPubKey =
+                PGPEncryptionUtil.signPublicKey( pgpPublicKey, USER_ID, pgpSecretKey, SECRET_PWD );
+
+        assertTrue( PGPEncryptionUtil
+                .verifyPublicKey( signedPubKey.getPublicKey(), USER_ID, pgpSecretKey.getPublicKey() ) );
     }
 
 
@@ -254,8 +322,8 @@ public class PGPEncryptionUtilTest
                 new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secondSecretStream ),
                         new JcaKeyFingerprintCalculator() );
 
-        PGPSecretKeyRing secretKeyRing =
-                secretKeyRingCollection.getSecretKeyRing( secretKeyRingCollection.iterator().next().getSecretKey().getKeyID() );
+        PGPSecretKeyRing secretKeyRing = secretKeyRingCollection
+                .getSecretKeyRing( secretKeyRingCollection.iterator().next().getSecretKey().getKeyID() );
 
         PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
 
@@ -277,7 +345,7 @@ public class PGPEncryptionUtilTest
         String signedMessage = new String( signedMessageArmor, "UTF-8" );
 
         logger.info( "\n" + signedMessage );
-        logger.info( "\n======================");
+        logger.info( "\n======================" );
 
         boolean result = PGPEncryptionUtil.verifyClearSign( signedMessageArmor, pgpKeyring );
         if ( result )
@@ -307,8 +375,8 @@ public class PGPEncryptionUtilTest
                 new PGPSecretKeyRingCollection( PGPUtil.getDecoderStream( secondSecretStream ),
                         new JcaKeyFingerprintCalculator() );
 
-        PGPSecretKeyRing secretKeyRing =
-                secretKeyRingCollection.getSecretKeyRing( secretKeyRingCollection.iterator().next().getPublicKey().getKeyID() );
+        PGPSecretKeyRing secretKeyRing = secretKeyRingCollection
+                .getSecretKeyRing( secretKeyRingCollection.iterator().next().getPublicKey().getKeyID() );
 
         PGPSecretKey secondSecretKey = secretKeyRing.getSecretKey();
 
@@ -320,8 +388,9 @@ public class PGPEncryptionUtilTest
         PGPPublicKeyRing pgpKeyring = secondPublicKeyRingCollection
                 .getPublicKeyRing( secondPublicKeyRingCollection.iterator().next().getPublicKey().getKeyID() );
 
-        byte[] signedMessageArmor =
-                PGPEncryptionUtil.clearSign( IOUtils.toString( findFile( "message.txt" ) ).getBytes(), secondSecretKey, "123".toCharArray(), "" );
+        byte[] signedMessageArmor = PGPEncryptionUtil
+                .clearSign( IOUtils.toString( findFile( "message.txt" ) ).getBytes(), secondSecretKey,
+                        "123".toCharArray(), "" );
 
         String signedMessage = new String( signedMessageArmor, "UTF-8" );
 
@@ -339,6 +408,7 @@ public class PGPEncryptionUtilTest
 
         assertEquals( true, result );
     }
+
 
     @Test
     public void testVerifyClearSign() throws Exception
@@ -398,11 +468,10 @@ public class PGPEncryptionUtilTest
                 }
             }
         }
-        catch(Exception e)
+        catch ( Exception e )
         {
             e.printStackTrace();
         }
-
     }
 
 
@@ -410,11 +479,10 @@ public class PGPEncryptionUtilTest
     public void verifySignature() throws Exception
     {
         String message = getSignedMessage();
-        PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( getPublicKey());
+        PGPPublicKeyRing pubKeyRing = PGPKeyUtil.readPublicKeyRing( getPublicKey() );
 
         assertTrue( PGPEncryptionUtil.verifyClearSign( message.getBytes(), pubKeyRing ) );
     }
-
 
 
     private String getSignedMessage()
@@ -491,5 +559,4 @@ public class PGPEncryptionUtilTest
 
         return pubKeySTR;
     }
-
 }

@@ -38,12 +38,6 @@ public interface EncryptionTool
     /* *****************************************
      *
      */
-    boolean verifyPublicKey( PGPPublicKey keyToVerify, PGPPublicKey keyToVerifyWith );
-
-
-    /* *****************************************
-     *
-     */
     PGPPublicKeyRing removeSignature( String id, PGPPublicKeyRing keyToRemoveFrom );
 
 
