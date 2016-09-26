@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.security.AccessControlException;
 
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -24,8 +23,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -78,25 +75,6 @@ public class MessageContentUtil
         }
 
         message.getInterceptorChain().abort();
-    }
-
-
-    //***************************************************************************
-    public static int checkUrlAccessibility( HttpServletRequest req )
-    {
-        int inPort = req.getLocalPort();
-        String basePath = req.getRequestURI();
-
-
-        if ( inPort == Common.DEFAULT_PUBLIC_PORT )
-        {
-            if ( !ChannelSettings.checkURLAccess( basePath ) )
-            {
-                return 1;
-            }
-        }
-
-        return 0;
     }
 
 

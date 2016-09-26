@@ -7,7 +7,7 @@ package io.subutai.common.settings;
 public class ChannelSettings
 {
 
-    private static final String[] URL_ACCESS_PX1 = {
+    public static final String[] URL_ACCESS_PX1 = {
 
             "/rest/v1/identity/auth", "/rest/v1/identity/authid", "/rest/v1/identity/gettoken", "/rest/v1/peer/id",
             "/rest/v1/peer/inited", "/rest/v1/peer/mhpresent", "/rest/v1/peer/ready", "/rest/v1/pks/{$}",

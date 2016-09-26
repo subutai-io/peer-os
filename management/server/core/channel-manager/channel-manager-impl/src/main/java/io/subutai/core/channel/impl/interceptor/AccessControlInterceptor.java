@@ -8,9 +8,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
@@ -21,6 +18,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import com.google.common.base.Strings;
 
+import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
@@ -33,7 +31,6 @@ import io.subutai.core.identity.api.model.Session;
  */
 public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( AccessControlInterceptor.class );
     private ChannelManagerImpl channelManagerImpl = null;
 
 
@@ -60,23 +57,21 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
                 if ( req.getLocalPort() == Common.DEFAULT_PUBLIC_SECURE_PORT )
                 {
-                    userSession = authenticateAccess( null, null ); // auth with system user
+                    // auth with system user since bi-SSL port is already secured
+                    userSession = authenticateAccess( null, null );
                 }
                 else
                 {
-                    int status = MessageContentUtil.checkUrlAccessibility( req );
-                    //----------------------------------------------------------------------------------------------
-                    if ( status == 1 ) //require tokenauth
+
+                    if ( ChannelSettings.checkURLAccess( req.getRequestURI() ) )
                     {
-                        userSession = authenticateAccess( message, req );
-                    }
-                    else if ( status == 0 ) // auth with system user
-                    {
+                        // auth with system user b/c this is a public endpoint
                         userSession = authenticateAccess( null, null );
                     }
                     else
                     {
-                        MessageContentUtil.abortChain( message, 403, "Permission denied" );
+                        //require token auth
+                        userSession = authenticateAccess( message, req );
                     }
                 }
 
@@ -116,7 +111,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 
 
     //******************************************************************
-    private Session authenticateAccess( Message message, HttpServletRequest req )
+    protected Session authenticateAccess( Message message, HttpServletRequest req )
     {
         String sptoken = "";
 

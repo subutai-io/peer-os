@@ -1,17 +1,16 @@
 package io.subutai.core.channel.impl;
 
 
-import javax.persistence.EntityManagerFactory;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import io.subutai.common.dao.DaoManager;
+import io.subutai.core.identity.api.IdentityManager;
+import io.subutai.core.security.api.SecurityManager;
 
-import static org.mockito.Mockito.when;
+import static junit.framework.TestCase.assertEquals;
 
 
 @RunWith( MockitoJUnitRunner.class )
@@ -20,37 +19,30 @@ public class ChannelManagerImplTest
     private ChannelManagerImpl channelManager;
 
     @Mock
-    DaoManager daoManager;
+    SecurityManager securityManager;
     @Mock
-    EntityManagerFactory entityManagerFactory;
+    IdentityManager identityManager;
+
 
     @Before
     public void setUp() throws Exception
     {
         channelManager = new ChannelManagerImpl();
-    }
-
-
-    @Test
-    public void testInit() throws Exception
-    {
-        when(daoManager.getEntityManagerFactory()).thenReturn( entityManagerFactory );
-
-
-        channelManager.init();
-    }
-
-
-    @Test
-    public void testDestroy() throws Exception
-    {
-        channelManager.destroy();
+        channelManager.setIdentityManager( identityManager );
+        channelManager.setSecurityManager( securityManager );
     }
 
 
     @Test
     public void testGetIdentityManager() throws Exception
     {
-        channelManager.getIdentityManager();
+        assertEquals( identityManager, channelManager.getIdentityManager() );
+    }
+
+
+    @Test
+    public void testGetSecurityManager() throws Exception
+    {
+        assertEquals( securityManager, channelManager.getSecurityManager() );
     }
 }
