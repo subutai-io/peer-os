@@ -3,9 +3,11 @@ package io.subutai.core.channel.impl.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
+
 import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
@@ -35,13 +37,13 @@ public class ServerBusListener extends AbstractFeature
         // initialise the feature on the bus, which will add the interceptors
 
         //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new AccessControlInterceptor( channelManagerImpl ) );
+        bus.getInInterceptors().add( new AccessControlInterceptor( channelManagerImpl.getIdentityManager() ) );
 
         //***** PRE_STREAM **********************************
         bus.getOutInterceptors().add( new ClientOutInterceptor( channelManagerImpl, peerManager ) );
 
         //***** POST_LOGICAL **********************************
-        bus.getOutInterceptors().add( new ClientHeaderInterceptor( channelManagerImpl, peerManager ) );
+        bus.getOutInterceptors().add( new ClientHeaderInterceptor( peerManager ) );
 
         //***** RECEIVE    **********************************
         bus.getInInterceptors().add( new ServerInInterceptor( channelManagerImpl, peerManager ) );
@@ -50,7 +52,7 @@ public class ServerBusListener extends AbstractFeature
         bus.getOutInterceptors().add( new ServerOutInterceptor( channelManagerImpl, peerManager ) );
 
         //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new ClientInInterceptor( channelManagerImpl, peerManager ) );
+        bus.getInInterceptors().add( new ClientInInterceptor( channelManagerImpl.getSecurityManager(), peerManager ) );
 
 
         LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus.getId() );
@@ -73,5 +75,4 @@ public class ServerBusListener extends AbstractFeature
     {
         this.peerManager = peerManager;
     }
-
 }

@@ -20,9 +20,9 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
-import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.Session;
 
 
@@ -31,13 +31,13 @@ import io.subutai.core.identity.api.model.Session;
  */
 public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    private ChannelManagerImpl channelManagerImpl = null;
+    private IdentityManager identityManager = null;
 
 
-    public AccessControlInterceptor( ChannelManagerImpl channelManagerImpl )
+    public AccessControlInterceptor( IdentityManager identityManager )
     {
         super( Phase.RECEIVE );
-        this.channelManagerImpl = channelManagerImpl;
+        this.identityManager = identityManager;
     }
 
 
@@ -53,7 +53,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             if ( InterceptorState.SERVER_IN.isActive( message ) )
             {
                 HttpServletRequest req = ( HttpServletRequest ) message.get( AbstractHTTPDestination.HTTP_REQUEST );
-                Session userSession = null;
+                Session userSession;
 
                 if ( req.getLocalPort() == Common.DEFAULT_PUBLIC_SECURE_PORT )
                 {
@@ -118,7 +118,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
         if ( message == null )
         {
             //***********internal auth ********* for registration , 8444 port and 8443 open REST endpoints
-            return channelManagerImpl.getIdentityManager().loginSystemUser();
+            return identityManager.loginSystemUser();
         }
         else
         {
@@ -150,7 +150,7 @@ public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
             }
             else
             {
-                return channelManagerImpl.getIdentityManager().login( "token", sptoken );
+                return identityManager.login( "token", sptoken );
             }
         }
     }

@@ -22,7 +22,7 @@ public class InterceptorStateTest
     {
         interceptorState = InterceptorState.CLIENT_OUT;
 
-        assertTrue( interceptorState.isActive( InterceptorStateHelper.getMessage( InterceptorState.CLIENT_IN ) ) );
+        assertTrue( interceptorState.isActive( InterceptorStateHelper.getMessage( InterceptorState.CLIENT_OUT ) ) );
     }
 
 
@@ -31,7 +31,7 @@ public class InterceptorStateTest
     {
         interceptorState = InterceptorState.CLIENT_IN;
 
-        assertTrue( interceptorState.isActive( InterceptorStateHelper.getMessage( InterceptorState.CLIENT_OUT ) ) );
+        assertTrue( interceptorState.isActive( InterceptorStateHelper.getMessage( InterceptorState.CLIENT_IN ) ) );
     }
 
 

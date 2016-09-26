@@ -19,7 +19,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.ChannelSettings;
 import io.subutai.common.settings.Common;
-import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.identity.api.IdentityManager;
 
@@ -34,8 +33,6 @@ import static org.mockito.Mockito.verify;
 @RunWith( MockitoJUnitRunner.class )
 public class AccessControlInterceptorTest
 {
-    @Mock
-    ChannelManagerImpl channelManager;
     @Mock
     Message message;
     @Mock
@@ -58,8 +55,7 @@ public class AccessControlInterceptorTest
     @Before
     public void setUp() throws Exception
     {
-        accessControlInterceptor = spy( new AccessControlInterceptor( channelManager ) );
-        doReturn( identityManager ).when( channelManager ).getIdentityManager();
+        accessControlInterceptor = spy( new AccessControlInterceptor( identityManager ) );
         doReturn( exchange ).when( message ).getExchange();
         doReturn( message ).when( exchange ).getInMessage();
         doReturn( new Cookie[] { cookie } ).when( request ).getCookies();
