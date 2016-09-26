@@ -31,7 +31,7 @@ import io.subutai.core.identity.api.model.Session;
  */
 public class AccessControlInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    private IdentityManager identityManager = null;
+    private final IdentityManager identityManager;
 
 
     public AccessControlInterceptor( IdentityManager identityManager )

@@ -21,8 +21,8 @@ import io.subutai.core.security.api.SecurityManager;
 public class ClientInInterceptor extends AbstractPhaseInterceptor<Message>
 {
 
-    private SecurityManager securityManager = null;
-    private PeerManager peerManager;
+    private final SecurityManager securityManager;
+    private final PeerManager peerManager;
 
 
     //******************************************************************
