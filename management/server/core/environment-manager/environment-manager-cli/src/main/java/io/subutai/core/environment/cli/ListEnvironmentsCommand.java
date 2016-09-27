@@ -8,7 +8,7 @@ import org.apache.karaf.shell.commands.Command;
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
@@ -44,9 +44,9 @@ public class ListEnvironmentsCommand extends SubutaiShellCommandSupport
             System.out.println( String.format( "Environment status %s", environment.getStatus() ) );
             System.out.println( String.format( "Subnet CIDR %s", environment.getSubnetCidr() ) );
 
-            for ( PeerConf peerConf : environment.getPeerConfs() )
+            for ( EnvironmentPeer environmentPeer : environment.getEnvironmentPeers() )
             {
-                System.out.println( String.format( "\t%s\t%s", peerConf.getPeerId(), environment.getP2PHash() ) );
+                System.out.println( String.format( "\t%s\t%s", environmentPeer.getPeerId(), environment.getP2PHash() ) );
             }
 
             System.out.println( "-----------------------------------------------------------------" );

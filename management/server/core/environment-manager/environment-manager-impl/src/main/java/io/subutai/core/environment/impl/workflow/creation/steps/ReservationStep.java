@@ -19,7 +19,7 @@ import io.subutai.common.util.P2PUtil;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.environment.impl.entity.PeerConfImpl;
+import io.subutai.core.environment.impl.entity.EnvironmentPeerImpl;
 import io.subutai.core.peer.api.PeerManager;
 
 
@@ -152,7 +152,7 @@ public class ReservationStep
                         netReservationResult.getPeer().getName() ) );
 
                 environment.addEnvironmentPeer(
-                        new PeerConfImpl( netReservationResult.getPeer().getId(), netReservationResult.getResult() ) );
+                        new EnvironmentPeerImpl( netReservationResult.getPeer().getId(), netReservationResult.getResult() ) );
             }
             else
             {

@@ -15,7 +15,7 @@
     <class>io.subutai.core.environment.impl.entity.HostInterfaceImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentAlertHandlerImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentImpl</class>
-    <class>io.subutai.core.environment.impl.entity.PeerConfImpl</class>
+    <class>io.subutai.core.environment.impl.entity.EnvironmentPeerImpl</class>
     <class>io.subutai.core.environment.impl.entity.EnvironmentContainerImpl</class>
     <class>io.subutai.core.environment.impl.entity.RhP2PIpEntity</class>
 

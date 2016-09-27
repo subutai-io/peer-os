@@ -44,7 +44,7 @@ import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.mdc.SubutaiExecutors;
@@ -249,7 +249,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                 return true;
             }
 
-            for ( PeerConf p : e.getPeerConfs() )
+            for ( EnvironmentPeer p : e.getEnvironmentPeers() )
             {
                 if ( peerId.equals( p.getPeerId() ) )
                 {

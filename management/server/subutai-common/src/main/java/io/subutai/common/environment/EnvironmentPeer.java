@@ -4,7 +4,7 @@ package io.subutai.common.environment;
 import java.util.Set;
 
 
-public interface PeerConf
+public interface EnvironmentPeer
 {
     String getPeerId();
 
