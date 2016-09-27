@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps.helpers;
 
 import java.util.concurrent.Callable;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
@@ -45,17 +46,23 @@ public class PeerEnvironmentKeyTask implements Callable<Peer>
         RelationLinkDto relationLinkDto = new RelationLinkDto( environment );
         PublicKeyContainer publicKeyContainer = peer.createPeerEnvironmentKeyPair( relationLinkDto );
 
-        PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
+        PGPPublicKeyRing pubRing = getPublicKey( publicKeyContainer );
 
         PGPPublicKeyRing signedPEK = keyManager.setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
 
         peer.updatePeerEnvironmentPubKey( environment.getEnvironmentId(), signedPEK );
         peer.addPeerEnvironmentPubKey( localPeer.getId() + "_" + environment.getEnvironmentId().getId(),
-                localPeerSignedPEK   );
+                localPeerSignedPEK );
 
         localPeer.addPeerEnvironmentPubKey( peer.getId() + "_" + environment.getEnvironmentId().getId(), signedPEK );
 
         return peer;
+    }
+
+
+    protected PGPPublicKeyRing getPublicKey( PublicKeyContainer container ) throws PGPException
+    {
+        return PGPKeyUtil.readPublicKeyRing( container.getKey() );
     }
 }
 
