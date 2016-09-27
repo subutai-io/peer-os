@@ -15,16 +15,6 @@ public class ChannelManagerImpl implements ChannelManager
     private SecurityManager securityManager = null;
 
 
-    public void init()
-    {
-    }
-
-
-    public void destroy()
-    {
-    }
-
-
     public IdentityManager getIdentityManager()
     {
         return identityManager;

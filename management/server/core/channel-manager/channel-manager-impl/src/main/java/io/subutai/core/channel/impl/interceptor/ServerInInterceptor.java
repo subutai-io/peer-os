@@ -12,10 +12,10 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 import io.subutai.common.settings.Common;
-import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -23,14 +23,14 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    private ChannelManagerImpl channelManagerImpl = null;
-    private PeerManager peerManager;
+    private final SecurityManager securityManager ;
+    private final PeerManager peerManager;
 
 
-    public ServerInInterceptor( ChannelManagerImpl channelManagerImpl, PeerManager peerManager )
+    public ServerInInterceptor( SecurityManager securityManager, PeerManager peerManager )
     {
         super( Phase.PRE_STREAM );
-        this.channelManagerImpl = channelManagerImpl;
+        this.securityManager = securityManager;
         this.peerManager = peerManager;
     }
 
@@ -81,19 +81,19 @@ public class ServerInInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
-    private void handlePeerMessage( final String targetId, final Message message )
+    protected void handlePeerMessage( final String targetId, final Message message )
     {
         String sourceId = peerManager.getLocalPeer().getId();
 
-        MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
+        MessageContentUtil.decryptContent( securityManager, message, sourceId, targetId );
     }
 
 
-    private void handleEnvironmentMessage( final String peerId, final String environmentId, final Message message )
+    protected void handleEnvironmentMessage( final String peerId, final String environmentId, final Message message )
     {
         String targetId = peerId + "_" + environmentId;
         String sourceId = peerManager.getLocalPeer().getId() + "_" + environmentId;
 
-        MessageContentUtil.decryptContent( channelManagerImpl.getSecurityManager(), message, sourceId, targetId );
+        MessageContentUtil.decryptContent( securityManager, message, sourceId, targetId );
     }
 }

@@ -3,19 +3,16 @@ package io.subutai.core.channel.impl.interceptor;
 
 import java.net.URL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 import io.subutai.common.peer.PeerException;
-import io.subutai.core.channel.impl.ChannelManagerImpl;
 import io.subutai.core.channel.impl.util.InterceptorState;
 import io.subutai.core.channel.impl.util.MessageContentUtil;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -23,17 +20,16 @@ import io.subutai.core.peer.api.PeerManager;
  */
 public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ClientOutInterceptor.class );
     private final PeerManager peerManager;
 
-    private ChannelManagerImpl channelManagerImpl = null;
+    private final SecurityManager securityManager;
 
 
     //******************************************************************
-    public ClientOutInterceptor( ChannelManagerImpl channelManagerImpl, PeerManager peerManager )
+    public ClientOutInterceptor( SecurityManager securityManager, PeerManager peerManager )
     {
         super( Phase.PRE_STREAM );
-        this.channelManagerImpl = channelManagerImpl;
+        this.securityManager = securityManager;
         this.peerManager = peerManager;
     }
     //******************************************************************
@@ -80,7 +76,7 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
-    private String getPeerIdByIp( String ip )
+    protected String getPeerIdByIp( String ip )
     {
         try
         {
@@ -93,19 +89,19 @@ public class ClientOutInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
 
-    private void handlePeerMessage( final String targetId, final Message message )
+    protected void handlePeerMessage( final String targetId, final Message message )
     {
         String sourceId = peerManager.getLocalPeer().getId();
 
-        MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
+        MessageContentUtil.encryptContent( securityManager, sourceId, targetId, message );
     }
 
 
-    private void handleEnvironmentMessage( final String peerId, final String environmentId, final Message message )
+    protected void handleEnvironmentMessage( final String peerId, final String environmentId, final Message message )
     {
         String sourceId = peerManager.getLocalPeer().getId() + "_" + environmentId;
         String targetId = peerId + "_" + environmentId;
 
-        MessageContentUtil.encryptContent( channelManagerImpl.getSecurityManager(), sourceId, targetId, message );
+        MessageContentUtil.encryptContent( securityManager, sourceId, targetId, message );
     }
 }

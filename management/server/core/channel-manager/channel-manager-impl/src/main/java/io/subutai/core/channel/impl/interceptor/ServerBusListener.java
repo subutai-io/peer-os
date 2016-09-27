@@ -3,11 +3,14 @@ package io.subutai.core.channel.impl.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.http.asyncclient.AsyncHTTPConduit;
-import io.subutai.core.channel.impl.ChannelManagerImpl;
+
+import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.security.api.SecurityManager;
 
 
 /**
@@ -16,7 +19,8 @@ import io.subutai.core.peer.api.PeerManager;
 public class ServerBusListener extends AbstractFeature
 {
     private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
-    private ChannelManagerImpl channelManagerImpl = null;
+    private SecurityManager securityManager;
+    private IdentityManager identityManager;
     private PeerManager peerManager;
 
 
@@ -35,37 +39,37 @@ public class ServerBusListener extends AbstractFeature
         // initialise the feature on the bus, which will add the interceptors
 
         //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new AccessControlInterceptor( channelManagerImpl ) );
+        bus.getInInterceptors().add( new AccessControlInterceptor( identityManager ) );
 
         //***** PRE_STREAM **********************************
-        bus.getOutInterceptors().add( new ClientOutInterceptor( channelManagerImpl, peerManager ) );
+        bus.getOutInterceptors().add( new ClientOutInterceptor( securityManager, peerManager ) );
 
         //***** POST_LOGICAL **********************************
-        bus.getOutInterceptors().add( new ClientHeaderInterceptor( channelManagerImpl, peerManager ) );
+        bus.getOutInterceptors().add( new ClientHeaderInterceptor( peerManager ) );
 
         //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new ServerInInterceptor( channelManagerImpl, peerManager ) );
+        bus.getInInterceptors().add( new ServerInInterceptor( securityManager, peerManager ) );
 
         //***** PRE_STREAM **********************************
-        bus.getOutInterceptors().add( new ServerOutInterceptor( channelManagerImpl, peerManager ) );
+        bus.getOutInterceptors().add( new ServerOutInterceptor( securityManager, peerManager ) );
 
         //***** RECEIVE    **********************************
-        bus.getInInterceptors().add( new ClientInInterceptor( channelManagerImpl, peerManager ) );
+        bus.getInInterceptors().add( new ClientInInterceptor( securityManager, peerManager ) );
 
 
         LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus.getId() );
     }
 
 
-    public ChannelManagerImpl getChannelManagerImpl()
+    public void setSecurityManager( final SecurityManager securityManager )
     {
-        return channelManagerImpl;
+        this.securityManager = securityManager;
     }
 
 
-    public void setChannelManager( final ChannelManagerImpl channelManagerImpl )
+    public void setIdentityManager( final IdentityManager identityManager )
     {
-        this.channelManagerImpl = channelManagerImpl;
+        this.identityManager = identityManager;
     }
 
 
@@ -73,5 +77,4 @@ public class ServerBusListener extends AbstractFeature
     {
         this.peerManager = peerManager;
     }
-
 }
