@@ -48,7 +48,7 @@ public interface Environment extends RelationLink
      */
     long getCreationTimestamp();
 
-    Set<PeerConf> getPeerConfs();
+    Set<EnvironmentPeer> getEnvironmentPeers();
 
 
     /**

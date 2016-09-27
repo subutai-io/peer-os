@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerHost;
@@ -256,18 +256,18 @@ public class EnvironmentAdapter
 
             peerJson.put( "online", peer.isOnline() );
 
-            putPeerResourceHostsJson( peerJson, env.getPeerConf( peer.getId() ) );
+            putPeerResourceHostsJson( peerJson, env.getEnvironmentPeer( peer.getId() ) );
 
             peers.add( peerJson );
         }
     }
 
 
-    private void putPeerResourceHostsJson( ObjectNode peerJson, PeerConf peerConf )
+    private void putPeerResourceHostsJson( ObjectNode peerJson, EnvironmentPeer environmentPeer )
     {
         ArrayNode rhs = peerJson.putArray( "resourceHosts" );
 
-        for ( RhP2pIp rh : peerConf.getRhP2pIps() )
+        for ( RhP2pIp rh : environmentPeer.getRhP2pIps() )
         {
             ObjectNode rhJson = JsonUtil.createNode( "id", rh.getRhId() );
 

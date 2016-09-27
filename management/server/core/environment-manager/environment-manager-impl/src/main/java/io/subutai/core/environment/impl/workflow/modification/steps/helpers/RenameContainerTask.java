@@ -34,7 +34,7 @@ public class RenameContainerTask extends TaskUtil.Task<EnvironmentContainerImpl>
                 ( EnvironmentContainerImpl ) environment.getContainerHostById( containerId.getId() );
 
         newFullHostname = String.format( "%s-%d-%s", newHostname.replaceAll( "\\s+", "" ),
-                environment.getPeerConf( environmentContainer.getPeerId() ).getVlan(),
+                environment.getEnvironmentPeer( environmentContainer.getPeerId() ).getVlan(),
                 StringUtils.substringAfterLast( environmentContainer.getIp(), "." ) );
 
         oldHostname = environmentContainer.getHostname();

@@ -23,14 +23,14 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
-import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.RhP2pIp;
 
 
 @Entity
 @Table( name = "env_peer" )
 @Access( AccessType.FIELD )
-public class PeerConfImpl implements PeerConf, Serializable
+public class EnvironmentPeerImpl implements EnvironmentPeer, Serializable
 {
     @Id
     @Column( name = "id" )
@@ -54,7 +54,7 @@ public class PeerConfImpl implements PeerConf, Serializable
     private Environment environment;
 
 
-    public PeerConfImpl( final String peerId, final Integer vlan )
+    public EnvironmentPeerImpl( final String peerId, final Integer vlan )
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( peerId ) );
         Preconditions.checkNotNull( vlan );
@@ -65,7 +65,7 @@ public class PeerConfImpl implements PeerConf, Serializable
     }
 
 
-    public PeerConfImpl()
+    public EnvironmentPeerImpl()
     {
     }
 
@@ -142,12 +142,12 @@ public class PeerConfImpl implements PeerConf, Serializable
         {
             return true;
         }
-        if ( !( o instanceof PeerConfImpl ) )
+        if ( !( o instanceof EnvironmentPeerImpl ) )
         {
             return false;
         }
 
-        final PeerConfImpl peerConf = ( PeerConfImpl ) o;
+        final EnvironmentPeerImpl peerConf = ( EnvironmentPeerImpl ) o;
 
         if ( !peerId.equals( peerConf.peerId ) )
         {

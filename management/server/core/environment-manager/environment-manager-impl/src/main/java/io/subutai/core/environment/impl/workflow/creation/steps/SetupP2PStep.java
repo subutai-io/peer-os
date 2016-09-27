@@ -105,7 +105,7 @@ public class SetupP2PStep
         {
             if ( p2pResult.hasSucceeded() )
             {
-                environment.getPeerConf( p2pResult.getPeer().getId() )
+                environment.getEnvironmentPeer( p2pResult.getPeer().getId() )
                            .addRhP2pIps( p2pResult.getResult().getRhP2pIps() );
 
                 trackerOperation
