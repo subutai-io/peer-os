@@ -118,7 +118,7 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
-    private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
+    protected static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
                                        byte[] data ) throws PGPException
     {
 
@@ -132,7 +132,6 @@ public class MessageContentUtil
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
 
-                //encTool.
 
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPSecretKeyRing secKey = keyMan.getSecretKeyRing( hostIdSource );
@@ -157,11 +156,6 @@ public class MessageContentUtil
         }
     }
 
-
-    private static URL getURL( final Message message ) throws MalformedURLException
-    {
-        return new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
-    }
 
 
     /* ******************************************************

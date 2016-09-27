@@ -18,9 +18,9 @@
   <reference-list id="busListener" interface="org.apache.cxf.Bus" availability="optional">
     <reference-listener bind-method="busRegistered">
       <bean class="io.subutai.core.channel.impl.interceptor.ServerBusListener">
-        <property name="identityManager" ref="identityManager" />
-        <property name="securityManager" ref="securityManager" />
-        <property name="peerManager" ref="peerManager" />
+        <argument ref="securityManager" />
+        <argument ref="identityManager" />
+        <argument ref="peerManager" />
       </bean>
     </reference-listener>
   </reference-list>
