@@ -19,6 +19,10 @@ public interface HubAdapter
 
     void removeEnvironment( String envId );
 
+    void removeSshKey( String envId, String sshKey );
+
+    void addSshKey( String envId, String sshKey );
+
     //
     // Plugins
     //

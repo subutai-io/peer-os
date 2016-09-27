@@ -290,6 +290,18 @@ public class EnvironmentAdapter
     }
 
 
+    public void removeSshKey( String envId, String sshKey )
+    {
+        hubAdapter.removeSshKey( envId, sshKey );
+    }
+
+
+    public void addSshKey( String envId, String sshKey )
+    {
+        hubAdapter.addSshKey( envId, sshKey );
+    }
+
+
     public HubAdapter getHubAdapter()
     {
         return hubAdapter;

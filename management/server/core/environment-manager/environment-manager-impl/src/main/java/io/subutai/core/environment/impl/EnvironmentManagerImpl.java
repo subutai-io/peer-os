@@ -613,7 +613,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             }
         } );
 
-
         //wait
         if ( !async )
         {
@@ -625,6 +624,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                         exceptionUtil.getRootCause( sshKeyAdditionWorkflow.getFailedException() ) );
             }
         }
+
+        environmentAdapter.addSshKey( environmentId, sshKey );
     }
 
 
@@ -675,6 +676,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
                         exceptionUtil.getRootCause( sshKeyRemovalWorkflow.getFailedException() ) );
             }
         }
+
+        environmentAdapter.removeSshKey( environmentId, sshKey );
     }
 
 

@@ -125,6 +125,20 @@ public class Login extends HttpServlet
         Cookie fingerprint = new Cookie( "su_fingerprint", user.getFingerprint() );
         //                    fingerprint.setMaxAge( 3600 * 24 * 7 * 365 * 10 );
 
+
+        if ( Strings.isNullOrEmpty( sptoken ) )
+        {
+            Cookie[] cookies = request.getCookies();
+            for ( final Cookie cookie : cookies )
+            {
+                if ( cookie.getName().equals( "sptoken" ) )
+                {
+                    cookie.setValue( "" );
+                    cookie.setPath( "/" );
+                }
+            }
+        }
+
         response.addCookie( ctoken );
         response.addCookie( fingerprint );
     }
