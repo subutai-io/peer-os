@@ -19,9 +19,18 @@ import io.subutai.core.security.api.SecurityManager;
 public class ServerBusListener extends AbstractFeature
 {
     private final static Logger LOG = LoggerFactory.getLogger( ServerBusListener.class );
-    private SecurityManager securityManager;
-    private IdentityManager identityManager;
-    private PeerManager peerManager;
+    private final SecurityManager securityManager;
+    private final IdentityManager identityManager;
+    private final PeerManager peerManager;
+
+
+    public ServerBusListener( final SecurityManager securityManager, final IdentityManager identityManager,
+                              final PeerManager peerManager )
+    {
+        this.securityManager = securityManager;
+        this.identityManager = identityManager;
+        this.peerManager = peerManager;
+    }
 
 
     public void busRegistered( Bus bus )
@@ -58,23 +67,5 @@ public class ServerBusListener extends AbstractFeature
 
 
         LOG.info( "Successfully added LoggingFeature interceptor on bus: " + bus.getId() );
-    }
-
-
-    public void setSecurityManager( final SecurityManager securityManager )
-    {
-        this.securityManager = securityManager;
-    }
-
-
-    public void setIdentityManager( final IdentityManager identityManager )
-    {
-        this.identityManager = identityManager;
-    }
-
-
-    public void setPeerManager( final PeerManager peerManager )
-    {
-        this.peerManager = peerManager;
     }
 }
