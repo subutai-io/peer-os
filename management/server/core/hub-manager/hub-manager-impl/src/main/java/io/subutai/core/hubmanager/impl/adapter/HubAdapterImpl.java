@@ -36,6 +36,8 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
     private static final String CONTAINERS_URL = "/rest/v1/adapter/environments/%s/containers/%s";
 
+    private static final String ENVIRONMENT_SSHKEY_URL = "/rest/v1/adapter/environments/%s/ssh-key";
+
     private static final String CONTAINERS_STATE_URL = "/rest/v1/adapter/environments/%s/containers/%s/%s";
 
     private static final String PLUGIN_DATA_URL = "/rest/v1/adapter/users/%s/peers/%s/plugins/%s";
@@ -139,6 +141,23 @@ public class HubAdapterImpl implements HubAdapter, EnvironmentEventListener
 
             httpClient.doDelete( path );
         }
+    }
+
+
+    @Override
+    public void removeSshKey( final String envId, final String sshKey )
+    {
+        String path = format( ENVIRONMENT_SSHKEY_URL , envId ) + "/remove";
+
+        httpClient.doPost( path, sshKey );
+    }
+
+
+    @Override
+    public void addSshKey( final String envId, final String sshKey )
+    {
+        String path = format( ENVIRONMENT_SSHKEY_URL , envId ) + "/add";
+        httpClient.doPost( path, sshKey );
     }
 
 
