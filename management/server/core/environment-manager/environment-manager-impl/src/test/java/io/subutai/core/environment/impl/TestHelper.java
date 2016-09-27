@@ -26,6 +26,7 @@ public class TestHelper
     public static final String HOSTNAME = "hostname";
     public static final String CONTAINER_NAME = "container";
     public static final String MESSAGE = "msg";
+    public static final EnvironmentId ENVIRONMENT_ID = new EnvironmentId( ENV_ID );
 
 
     public static Environment ENVIRONMENT()
