@@ -101,12 +101,6 @@ public class EnvironmentPeerImpl implements EnvironmentPeer, Serializable
     }
 
 
-    public void setId( final Long id )
-    {
-        this.id = id;
-    }
-
-
     @Override
     public Environment getEnvironment()
     {

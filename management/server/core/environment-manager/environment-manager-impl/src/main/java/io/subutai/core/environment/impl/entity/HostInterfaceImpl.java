@@ -51,19 +51,13 @@ public class HostInterfaceImpl implements HostInterface, Serializable
     public HostInterfaceImpl( final HostInterface s )
     {
         this.interfaceName = s.getName();
-        this.ip = s.getIp().replace( "addr:", "" );
+        this.ip = s.getIp();
     }
 
 
     public Long getId()
     {
         return id;
-    }
-
-
-    public void setId( final Long id )
-    {
-        this.id = id;
     }
 
 
