@@ -1,13 +1,18 @@
 package io.subutai.core.environment.impl;
 
 
+import com.google.common.collect.Sets;
+
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
+import io.subutai.common.peer.PeerException;
 import io.subutai.common.tracker.TrackerOperation;
+import io.subutai.common.util.PeerUtil;
+import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 import static org.mockito.Mockito.doReturn;
@@ -18,6 +23,8 @@ public class TestHelper
 {
     public static final String SUBNET_CIDR = "192.168.0.1/24";
     public static final String CONTAINER_ID = "123";
+    public static final String PEER_NAME = "123";
+    public static final String SSH_KEY = "123";
     public static final String RH_ID = "123";
     public static final String PEER_ID = "123";
     public static final String ENV_ID = "123";
@@ -29,9 +36,9 @@ public class TestHelper
     public static final EnvironmentId ENVIRONMENT_ID = new EnvironmentId( ENV_ID );
 
 
-    public static Environment ENVIRONMENT()
+    public static EnvironmentImpl ENVIRONMENT()
     {
-        Environment ENVIRONMENT = mock( Environment.class );
+        EnvironmentImpl ENVIRONMENT = mock( EnvironmentImpl.class );
         doReturn( new EnvironmentId( ENV_ID ) ).when( ENVIRONMENT ).getEnvironmentId();
         doReturn( ENV_ID ).when( ENVIRONMENT ).getId();
         doReturn( SUBNET_CIDR ).when( ENVIRONMENT ).getSubnetCidr();
@@ -70,6 +77,7 @@ public class TestHelper
     {
         Peer PEER = mock( Peer.class );
         doReturn( PEER_ID ).when( PEER ).getId();
+        doReturn( PEER_NAME ).when( PEER ).getName();
 
         return PEER;
     }
@@ -79,9 +87,22 @@ public class TestHelper
     {
         LocalPeer LOCAL_PEER = mock( LocalPeer.class );
         doReturn( PEER_ID ).when( LOCAL_PEER ).getId();
+        doReturn( PEER_NAME ).when( LOCAL_PEER ).getName();
         doReturn( OWNER_ID ).when( LOCAL_PEER ).getOwnerId();
 
 
         return LOCAL_PEER;
+    }
+
+
+    public static void bind( Environment environment, Peer peer, PeerUtil peerUtil,
+                             PeerUtil.PeerTaskResults peerTaskResults, PeerUtil.PeerTaskResult peerTaskResult )
+            throws PeerException
+    {
+
+        doReturn( Sets.newHashSet( peer ) ).when( environment ).getPeers();
+        doReturn( peerTaskResults ).when( peerUtil ).executeParallel();
+        doReturn( Sets.newHashSet( peerTaskResult ) ).when( peerTaskResults ).getPeerTaskResults();
+        doReturn( peer ).when( peerTaskResult ).getPeer();
     }
 }
