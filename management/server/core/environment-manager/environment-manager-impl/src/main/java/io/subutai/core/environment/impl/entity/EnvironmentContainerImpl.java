@@ -57,7 +57,6 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.protocol.Template;
-import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.security.relation.RelationManager;
@@ -69,6 +68,7 @@ import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
@@ -107,9 +107,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @JsonProperty( "template" )
     private String templateId;
 
-    @Column( name = "template_arch", nullable = false )
-    @JsonIgnore
-    private HostArchitecture templateArch;
 
     @Column( name = "rh_id", nullable = false )
     @JsonProperty( "resourceHostId" )
@@ -156,6 +153,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     @Transient
     private Environment parent;
 
+    @Transient
     private EnvironmentAdapter envAdapter;
 
 
@@ -171,9 +169,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     public EnvironmentContainerImpl( final String creatorPeerId, final String peerId,
-                                     final ContainerHostInfoModel hostInfo, final String templateId,
-                                     final HostArchitecture templateArch, String domainName,
-                                     ContainerSize containerSize, String resourceHostId, final String containerName )
+                                     final ContainerHostInfoModel hostInfo, final String templateId, String domainName,
+                                     ContainerSize containerSize, String resourceHostId )
     {
         Preconditions.checkNotNull( peerId );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( domainName ) );
@@ -185,10 +182,9 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         this.peerId = peerId;
         this.hostId = hostInfo.getId();
         this.hostname = hostInfo.getHostname();
-        this.containerName = containerName;
+        this.containerName = hostInfo.getContainerName();
         this.hostArchitecture = hostInfo.getArch();
         this.templateId = templateId;
-        this.templateArch = templateArch;
         this.domainName = domainName;
         this.containerSize = containerSize;
         this.resourceHostId = resourceHostId;
@@ -246,6 +242,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
             logger.warn( "Error getting container state #getState" );
             return ContainerHostState.UNKNOWN;
         }
+    }
+
+
+    @Override
+    public String getHostname()
+    {
+        return this.hostname;
     }
 
 
@@ -417,13 +420,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    @Override
-    public String getHostname()
-    {
-        return this.hostname;
-    }
-
-
     public EnvironmentContainerHost setHostname( final String hostname ) throws PeerException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
@@ -441,7 +437,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    private void validateTrustChain() throws CommandException
+    protected void validateTrustChain() throws CommandException
     {
         if ( environmentManager != null )
         {
@@ -524,7 +520,7 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     }
 
 
-    public void setHostInterfaces( HostInterfaces hostInterfaces )
+    private void setHostInterfaces( HostInterfaces hostInterfaces )
     {
         Preconditions.checkNotNull( hostInterfaces );
 
@@ -570,6 +566,13 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
     public void setQuota( final ContainerQuota containerQuota ) throws PeerException
     {
         getPeer().setQuota( this.getContainerId(), containerQuota );
+    }
+
+
+    @Override
+    public ContainerSize getContainerSize()
+    {
+        return containerSize;
     }
 
 
@@ -640,13 +643,6 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
 
 
     @Override
-    public ContainerSize getContainerSize()
-    {
-        return containerSize;
-    }
-
-
-    @Override
     public int hashCode()
     {
         return hostId != null ? hostId.hashCode() : 0;
@@ -661,8 +657,8 @@ public class EnvironmentContainerImpl implements EnvironmentContainerHost, Seria
         return MoreObjects.toStringHelper( this ).add( "hostId", hostId ).add( "hostname", hostname )
                           .add( "creatorPeerId", creatorPeerId ).add( "templateId", templateId )
                           .add( "environmentId", envId ).add( "domainName", domainName ).add( "tags", tags )
-                          .add( "templateArch", templateArch ).add( "hostArchitecture", hostArchitecture )
-                          .add( "resourceHostId", resourceHostId ).toString();
+                          .add( "hostArchitecture", hostArchitecture ).add( "resourceHostId", resourceHostId )
+                          .toString();
     }
 
 
