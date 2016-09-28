@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.Set;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
@@ -31,6 +32,7 @@ public class PEKGenerationStep
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Peer> pekUtil = new PeerUtil<>();
 
 
     public PEKGenerationStep( final Topology topology, final Environment environment, final PeerManager peerManager,
@@ -57,10 +59,9 @@ public class PEKGenerationStep
         try
         {
             RelationLinkDto envLink = new RelationLinkDto( environment );
-            PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
+            PublicKeyContainer publicKeyContainer = peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
-            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
+            PGPPublicKeyRing pubRing = readPublicKeyRing( publicKeyContainer );
 
             localPeerSignedPEK =
                     securityManager.getKeyManager().setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
@@ -80,7 +81,6 @@ public class PEKGenerationStep
             return;
         }
 
-        PeerUtil<Peer> pekUtil = new PeerUtil<>();
 
         // creating PEK on remote peers
         for ( final Peer peer : peers )
@@ -114,7 +114,13 @@ public class PEKGenerationStep
     }
 
 
-    private PGPSecretKeyRing getEnvironmentKeyRing()
+    protected PGPPublicKeyRing readPublicKeyRing( final PublicKeyContainer publicKeyContainer ) throws PGPException
+    {
+        return PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
+    }
+
+
+    protected PGPSecretKeyRing getEnvironmentKeyRing()
     {
         return securityManager.getKeyManager().getSecretKeyRing( environment.getEnvironmentId().getId() );
     }

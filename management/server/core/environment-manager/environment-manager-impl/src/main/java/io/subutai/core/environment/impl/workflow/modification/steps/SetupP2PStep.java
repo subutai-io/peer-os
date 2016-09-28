@@ -150,7 +150,7 @@ public class SetupP2PStep
         // tunnel setup
         P2pIps p2pIps = environment.getP2pIps();
 
-        PeerUtil<Boolean> tunnelUtil = new PeerUtil<>();
+        PeerUtil<Object> tunnelUtil = new PeerUtil<>();
 
         for ( Peer peer : peers )
         {
@@ -158,7 +158,7 @@ public class SetupP2PStep
                     new PeerUtil.PeerTask<>( peer, new SetupTunnelTask( peer, environment.getId(), p2pIps ) ) );
         }
 
-        PeerUtil.PeerTaskResults<Boolean> tunnelResults = tunnelUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> tunnelResults = tunnelUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults.getPeerTaskResults() )
         {

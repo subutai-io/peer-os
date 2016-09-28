@@ -19,6 +19,7 @@ public class RemoveSshKeyStep
     private final String sshKey;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> keyUtil = new PeerUtil<>();
 
 
     public RemoveSshKeyStep( final String sshKey, final EnvironmentImpl environment,
@@ -36,7 +37,6 @@ public class RemoveSshKeyStep
         if ( !Strings.isNullOrEmpty( sshKey ) )
         {
 
-            PeerUtil<Object> keyUtil = new PeerUtil<>();
 
             Set<Peer> peers = environment.getPeers();
 

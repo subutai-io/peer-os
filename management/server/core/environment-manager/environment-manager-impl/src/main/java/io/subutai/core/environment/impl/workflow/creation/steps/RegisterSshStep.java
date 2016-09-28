@@ -23,6 +23,7 @@ public class RegisterSshStep
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public RegisterSshStep( final Topology topology, final EnvironmentImpl environment,
@@ -76,11 +77,10 @@ public class RegisterSshStep
     {
         Set<Peer> peers = environment.getPeers();
 
-        PeerUtil<Object> appendUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            appendUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Object call() throws Exception
@@ -92,7 +92,7 @@ public class RegisterSshStep
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Object> appendResults = appendUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> appendResults = peerUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult appendResult : appendResults.getPeerTaskResults() )
         {
@@ -122,11 +122,10 @@ public class RegisterSshStep
 
         Set<Peer> peers = environment.getPeers();
 
-        PeerUtil<Object> createUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            createUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Object call() throws Exception
@@ -141,7 +140,7 @@ public class RegisterSshStep
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Object> createResults = createUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> createResults = peerUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult createResult : createResults.getPeerTaskResults() )
         {
