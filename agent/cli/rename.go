@@ -31,4 +31,6 @@ func LxcRename(src, dst string) {
 	if run {
 		container.Start(dst)
 	}
+
+	log.Info("Container " + src + " successfully renamed to " + dst)
 }
