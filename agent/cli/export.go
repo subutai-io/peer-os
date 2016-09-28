@@ -11,9 +11,19 @@ import (
 	"runtime"
 )
 
+var (
+	allsizes = []string{"tiny", "small", "medium", "large", "huge"}
+)
+
 // cfg declared in promote.go
 // LxcExport exports the given name if it suits the needs.
-func LxcExport(name, version string) {
+func LxcExport(name, version, prefsize string) {
+	size := "tiny"
+	for _, s := range allsizes {
+		if prefsize == s {
+			size = prefsize
+		}
+	}
 	srcver := container.GetConfigItem(config.Agent.LxcPrefix+name+"/config", "subutai.template.version")
 	if len(version) == 0 {
 		version = srcver
@@ -43,6 +53,7 @@ func LxcExport(name, version string) {
 	container.SetContainerConf(name, [][]string{
 		{"subutai.template.package", dst + ".tar.gz"},
 		{"subutai.template.version", version},
+		{"subutai.template.size", size},
 	})
 
 	src := config.Agent.LxcPrefix + name

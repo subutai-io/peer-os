@@ -115,9 +115,10 @@ func main() {
 
 		Name: "export", Usage: "export Subutai container",
 		Flags: []cli.Flag{
-			cli.StringFlag{Name: "v", Usage: "template version"}},
+			cli.StringFlag{Name: "v", Usage: "template version"},
+			cli.StringFlag{Name: "s", Usage: "template preferred size"}},
 		Action: func(c *cli.Context) error {
-			lib.LxcExport(c.Args().Get(0), c.String("v"))
+			lib.LxcExport(c.Args().Get(0), c.String("v"), c.String("s"))
 			return nil
 		}}, {
 
