@@ -31,6 +31,7 @@ public class PrepareTemplatesStep
     private final Topology topology;
     private final PeerManager peerManager;
     private final TrackerOperation operationTracker;
+    protected PeerUtil<PrepareTemplatesResponse> templateUtil = new PeerUtil<>();
 
 
     public PrepareTemplatesStep( final Environment environment, final PeerManager peerManager, final Topology topology,
@@ -47,7 +48,6 @@ public class PrepareTemplatesStep
     {
         Map<String, Set<Node>> placement = topology.getNodeGroupPlacement();
 
-        PeerUtil<PrepareTemplatesResponse> templateUtil = new PeerUtil<>();
 
         for ( Map.Entry<String, Set<Node>> peerPlacement : placement.entrySet() )
         {

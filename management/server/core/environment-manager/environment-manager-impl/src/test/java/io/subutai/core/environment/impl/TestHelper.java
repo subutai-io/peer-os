@@ -135,6 +135,7 @@ public class TestHelper
 
         doReturn( Sets.newHashSet( peer ) ).when( environment ).getPeers();
         doReturn( peerTaskResults ).when( peerUtil ).executeParallel();
+        doReturn( peerTaskResults ).when( peerUtil ).executeParallelFailFast();
         doReturn( Sets.newHashSet( peerTaskResult ) ).when( peerTaskResults ).getPeerTaskResults();
         doReturn( peer ).when( peerTaskResult ).getPeer();
     }
