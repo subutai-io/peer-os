@@ -14,6 +14,9 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.SshEncryptionType;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
@@ -52,9 +55,18 @@ public class TestHelper
         doReturn( new EnvironmentId( ENV_ID ) ).when( ENVIRONMENT ).getEnvironmentId();
         doReturn( ENV_ID ).when( ENVIRONMENT ).getId();
         doReturn( SUBNET_CIDR ).when( ENVIRONMENT ).getSubnetCidr();
+        doReturn( Sets.newHashSet( SSH_KEY ) ).when( ENVIRONMENT ).getSshKeys();
 
 
         return ENVIRONMENT;
+    }
+
+
+    public static SshKeys SSH_KEYS()
+    {
+        SshKeys sshKeys =
+                new SshKeys( Sets.newHashSet( new SshKey( CONTAINER_ID, SshEncryptionType.RSA, TestHelper.SSH_KEY ) ) );
+        return sshKeys;
     }
 
 
