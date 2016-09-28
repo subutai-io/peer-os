@@ -9,7 +9,11 @@ import (
 
 //LxcRename renames the container
 func LxcRename(src, dst string) {
-	container.Stop(src)
+	run := false
+	if container.State(src) == "RUNNING" {
+		run = true
+		container.Stop(src)
+	}
 
 	err := os.Rename(config.Agent.LxcPrefix+src, config.Agent.LxcPrefix+dst)
 	log.Check(log.FatalLevel, "Renaming container "+src, err)
@@ -24,5 +28,7 @@ func LxcRename(src, dst string) {
 		{"lxc.mount.entry", config.Agent.LxcPrefix + dst + "/var  opt none bind,rw 0 0"},
 	})
 
-	container.Start(dst)
+	if run {
+		container.Start(dst)
+	}
 }
