@@ -8,7 +8,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.P2pIps;
 
 
-public class SetupTunnelTask implements Callable<Boolean>
+public class SetupTunnelTask implements Callable<Object>
 {
     private final Peer peer;
     private final String environmentId;

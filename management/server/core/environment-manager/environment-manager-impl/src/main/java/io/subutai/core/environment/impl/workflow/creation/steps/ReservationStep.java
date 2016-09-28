@@ -32,6 +32,7 @@ public class ReservationStep
     private final EnvironmentImpl environment;
     private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public ReservationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
@@ -52,11 +53,10 @@ public class ReservationStep
         //obtain reserved net resources
         final Map<Peer, UsedNetworkResources> reservedNetResources = Maps.newConcurrentMap();
 
-        PeerUtil<Object> netQueryUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            netQueryUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Object call() throws Exception
@@ -68,7 +68,7 @@ public class ReservationStep
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Object> netQueryResults = netQueryUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> netQueryResults = peerUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult netQueryResult : netQueryResults.getPeerTaskResults() )
         {
@@ -126,11 +126,10 @@ public class ReservationStep
         }
 
         //reserve network resources
-        PeerUtil<Integer> netReservationUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
-            netReservationUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Integer>()
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
             {
                 @Override
                 public Integer call() throws Exception
@@ -142,17 +141,17 @@ public class ReservationStep
             } ) );
         }
 
-        PeerUtil.PeerTaskResults<Integer> netReservationResults = netReservationUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> netReservationResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult<Integer> netReservationResult : netReservationResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<Object> netReservationResult : netReservationResults.getPeerTaskResults() )
         {
             if ( netReservationResult.hasSucceeded() )
             {
                 trackerOperation.addLog( String.format( "Reserved network resources on peer %s",
                         netReservationResult.getPeer().getName() ) );
 
-                environment.addEnvironmentPeer(
-                        new EnvironmentPeerImpl( netReservationResult.getPeer().getId(), netReservationResult.getResult() ) );
+                environment.addEnvironmentPeer( new EnvironmentPeerImpl( netReservationResult.getPeer().getId(),
+                        ( Integer ) netReservationResult.getResult() ) );
             }
             else
             {
