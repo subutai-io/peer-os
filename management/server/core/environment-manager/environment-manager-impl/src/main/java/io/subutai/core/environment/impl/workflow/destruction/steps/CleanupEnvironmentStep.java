@@ -15,6 +15,7 @@ public class CleanupEnvironmentStep
 {
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> cleanupUtil = new PeerUtil<>();
 
 
     public CleanupEnvironmentStep( final EnvironmentImpl environment, final TrackerOperation trackerOperation )
@@ -33,7 +34,6 @@ public class CleanupEnvironmentStep
             return;
         }
 
-        PeerUtil<Object> cleanupUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {

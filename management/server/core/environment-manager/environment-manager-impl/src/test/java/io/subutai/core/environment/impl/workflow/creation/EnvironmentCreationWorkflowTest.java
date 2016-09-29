@@ -10,6 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.settings.Common;
+import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.TestHelper;
@@ -47,10 +48,32 @@ public class EnvironmentCreationWorkflowTest
     Peer peer = TestHelper.PEER();
 
 
+    class EnvironmentCreationWorkflowSUT extends EnvironmentCreationWorkflow
+    {
+
+
+        public EnvironmentCreationWorkflowSUT( final String defaultDomain,
+                                               final EnvironmentManagerImpl environmentManager,
+                                               final PeerManager peerManager, final SecurityManager securityManager,
+                                               final EnvironmentImpl environment, final Topology topology,
+                                               final String sshKey, final TrackerOperation operationTracker )
+        {
+            super( defaultDomain, environmentManager, peerManager, securityManager, environment, topology, sshKey,
+                    operationTracker );
+        }
+
+
+        public void addStep( EnvironmentCreationWorkflow.EnvironmentCreationPhase stepname )
+        {
+            //no-op
+        }
+    }
+
+
     @Before
     public void setUp() throws Exception
     {
-        workflow = new EnvironmentCreationWorkflow( Common.DEFAULT_DOMAIN_NAME, environmentManager, peerManager,
+        workflow = new EnvironmentCreationWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, environmentManager, peerManager,
                 securityManager, environment, topology, TestHelper.SSH_KEY, TestHelper.TRACKER_OPERATION() );
         doReturn( environment ).when( environmentManager ).update( environment );
         TestHelper.bind( environment, peer, peerUtil, peerTaskResults, peerTaskResult );
