@@ -22,6 +22,7 @@ public class DestroyContainersStep
     private final EnvironmentManagerImpl environmentManager;
     private final List<String> removedContainers;
     private final TrackerOperation trackerOperation;
+    protected TaskUtil<Object> destroyUtil = new TaskUtil<>();
 
 
     public DestroyContainersStep( final EnvironmentImpl environment, final EnvironmentManagerImpl environmentManager,
@@ -38,7 +39,6 @@ public class DestroyContainersStep
     {
         if ( !CollectionUtil.isCollectionEmpty( removedContainers ) )
         {
-            TaskUtil<Environment> destroyUtil = new TaskUtil<>();
 
             for ( String containerId : removedContainers )
             {
@@ -47,9 +47,9 @@ public class DestroyContainersStep
                 destroyUtil.addTask( new ContainerDestroyTask( containerHost ) );
             }
 
-            TaskUtil.TaskResults<Environment> destroyResults = destroyUtil.executeParallel();
+            TaskUtil.TaskResults<Object> destroyResults = destroyUtil.executeParallel();
 
-            for ( TaskUtil.TaskResult<Environment> destroyResult : destroyResults.getTaskResults() )
+            for ( TaskUtil.TaskResult<Object> destroyResult : destroyResults.getTaskResults() )
             {
                 ContainerHost containerHost = ( ( ContainerDestroyTask ) destroyResult.getTask() ).getContainerHost();
 
