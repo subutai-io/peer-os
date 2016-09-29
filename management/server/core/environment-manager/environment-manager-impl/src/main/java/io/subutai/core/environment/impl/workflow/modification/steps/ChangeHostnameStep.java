@@ -4,7 +4,6 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.peer.ContainerId;
-import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
@@ -19,35 +18,33 @@ public class ChangeHostnameStep
     private final EnvironmentImpl environment;
     private final ContainerId containerId;
     private final String newHostname;
-    private final TrackerOperation trackerOperation;
 
     private String oldHostname;
     private String newFullHostname;
 
+    protected TaskUtil<Object> renameUtil = new TaskUtil<>();
+
 
     public ChangeHostnameStep( final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-                               final ContainerId containerId, final String newHostname,
-                               TrackerOperation trackerOperation )
+                               final ContainerId containerId, final String newHostname )
     {
         this.environmentManager = environmentManager;
         this.environment = environment;
         this.containerId = containerId;
         this.newHostname = newHostname;
-        this.trackerOperation = trackerOperation;
     }
 
 
     public Environment execute() throws Exception
     {
-        TaskUtil<EnvironmentContainerImpl> renameUtil = new TaskUtil<>();
 
         renameUtil.addTask( new RenameContainerTask( environment, containerId, newHostname ) );
 
-        TaskUtil.TaskResults<EnvironmentContainerImpl> renameResults = renameUtil.executeParallel();
+        TaskUtil.TaskResults<Object> renameResults = renameUtil.executeParallel();
 
-        TaskUtil.TaskResult<EnvironmentContainerImpl> renameResult = renameResults.getTaskResults().iterator().next();
+        TaskUtil.TaskResult<Object> renameResult = renameResults.getTaskResults().iterator().next();
 
-        EnvironmentContainerImpl container = renameResult.getResult();
+        EnvironmentContainerImpl container = ( EnvironmentContainerImpl ) renameResult.getResult();
 
         RenameContainerTask task = ( RenameContainerTask ) renameResult.getTask();
 

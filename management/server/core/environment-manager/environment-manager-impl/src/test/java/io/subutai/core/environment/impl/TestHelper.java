@@ -20,6 +20,7 @@ import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -152,5 +153,14 @@ public class TestHelper
         doReturn( peerTaskResults ).when( peerUtil ).executeParallelFailFast();
         doReturn( Sets.newHashSet( peerTaskResult ) ).when( peerTaskResults ).getPeerTaskResults();
         doReturn( peer ).when( peerTaskResult ).getPeer();
+    }
+
+
+    public static void bind( TaskUtil taskUtil, TaskUtil.TaskResults taskResults, TaskUtil.TaskResult taskResult )
+    {
+
+        doReturn( taskResults ).when( taskUtil ).executeParallel();
+        doReturn( taskResults ).when( taskUtil ).executeParallelFailFast();
+        doReturn( Sets.newHashSet( taskResult ) ).when( taskResults ).getTaskResults();
     }
 }

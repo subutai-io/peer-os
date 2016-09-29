@@ -26,6 +26,7 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTun
 
 /**
  * P2P setup step
+ * TODO refactor - split into smaller methods
  */
 public class SetupP2PStep
 {

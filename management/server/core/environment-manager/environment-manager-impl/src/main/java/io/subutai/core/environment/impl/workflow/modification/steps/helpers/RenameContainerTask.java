@@ -9,7 +9,7 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
-public class RenameContainerTask extends TaskUtil.Task<EnvironmentContainerImpl>
+public class RenameContainerTask extends TaskUtil.Task<Object>
 {
     private final EnvironmentImpl environment;
     private final HostId containerId;
