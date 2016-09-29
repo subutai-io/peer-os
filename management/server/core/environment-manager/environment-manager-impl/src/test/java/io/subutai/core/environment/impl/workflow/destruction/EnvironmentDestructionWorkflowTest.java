@@ -16,9 +16,12 @@ import io.subutai.core.environment.impl.TestHelper;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 
@@ -33,10 +36,27 @@ public class EnvironmentDestructionWorkflowTest
     TrackerOperation trackerOperation = TestHelper.TRACKER_OPERATION();
 
 
+    class EnvironmentDestructionWorkflowSUT extends EnvironmentDestructionWorkflow
+    {
+        public EnvironmentDestructionWorkflowSUT( final EnvironmentManagerImpl environmentManager,
+                                                  final EnvironmentImpl environment,
+                                                  final TrackerOperation operationTracker )
+        {
+            super( environmentManager, environment, operationTracker );
+        }
+
+
+        public void addStep( EnvironmentDestructionWorkflow.EnvironmentDestructionPhase stepname )
+        {
+            //no-op
+        }
+    }
+
+
     @Before
     public void setUp() throws Exception
     {
-        workflow = new EnvironmentDestructionWorkflow( environmentManager, environment, trackerOperation );
+        workflow = spy( new EnvironmentDestructionWorkflowSUT( environmentManager, environment, trackerOperation ) );
         doReturn( environment ).when( environmentManager ).update( environment );
     }
 
