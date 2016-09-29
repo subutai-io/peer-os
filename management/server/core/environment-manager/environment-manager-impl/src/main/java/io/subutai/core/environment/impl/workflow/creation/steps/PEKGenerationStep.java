@@ -24,6 +24,8 @@ import io.subutai.core.security.api.SecurityManager;
 
 /**
  * PEK generation step
+ *
+ * TODO refactor - split into smaller methods
  */
 public class PEKGenerationStep
 {

@@ -25,6 +25,7 @@ import io.subutai.core.peer.api.PeerManager;
 
 /**
  * Network resources reservation step
+ * TODO refactor - split into smaller methods
  */
 public class ReservationStep
 {

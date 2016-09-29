@@ -28,7 +28,7 @@ import io.subutai.core.environment.impl.entity.RhP2PIpEntity;
 import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTunnelTask;
 import io.subutai.core.environment.impl.workflow.modification.steps.helpers.SetupP2PConnectionTask;
 
-
+//TODO refactor - split into smaller methods
 public class SetupP2PStep
 {
     private final Topology topology;
