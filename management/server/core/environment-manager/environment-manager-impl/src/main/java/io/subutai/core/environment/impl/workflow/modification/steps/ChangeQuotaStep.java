@@ -18,6 +18,7 @@ public class ChangeQuotaStep
     private final EnvironmentImpl environment;
     private final Map<String, ContainerSize> changedContainers;
     private final TrackerOperation trackerOperation;
+    protected TaskUtil<Object> quotaUtil = new TaskUtil<>();
 
 
     public ChangeQuotaStep( final EnvironmentImpl environment, final Map<String, ContainerSize> changedContainers,
@@ -33,7 +34,6 @@ public class ChangeQuotaStep
     {
         if ( !CollectionUtil.isMapEmpty( changedContainers ) )
         {
-            TaskUtil<Object> quotaUtil = new TaskUtil<>();
 
             for ( final Map.Entry<String, ContainerSize> entry : changedContainers.entrySet() )
             {
