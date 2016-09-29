@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,10 @@ public class DestroyContainerStepTest
 
     @Mock
     EnvironmentContainerImpl containerHost;
+    @Mock
+    TaskUtil.TaskResults<Object> taskResults;
+    @Mock
+    TaskUtil.TaskResult<Object> taskResult;
 
 
     @Before

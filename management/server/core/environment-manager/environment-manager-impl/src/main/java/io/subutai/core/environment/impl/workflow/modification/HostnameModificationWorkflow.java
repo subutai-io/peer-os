@@ -64,8 +64,7 @@ public class HostnameModificationWorkflow
 
         operationTracker.addLog( "Modifying container hostname" );
 
-        changeHostnameStep =
-                new ChangeHostnameStep( environmentManager, environment, containerId, newHostname, operationTracker );
+        changeHostnameStep = new ChangeHostnameStep( environmentManager, environment, containerId, newHostname );
 
         try
         {
