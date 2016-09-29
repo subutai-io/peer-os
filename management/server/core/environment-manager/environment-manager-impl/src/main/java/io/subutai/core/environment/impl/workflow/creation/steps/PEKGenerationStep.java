@@ -32,7 +32,7 @@ public class PEKGenerationStep
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
     private final TrackerOperation trackerOperation;
-    protected PeerUtil<Peer> pekUtil = new PeerUtil<>();
+    protected PeerUtil<Object> pekUtil = new PeerUtil<>();
 
 
     public PEKGenerationStep( final Topology topology, final Environment environment, final PeerManager peerManager,
@@ -90,7 +90,7 @@ public class PEKGenerationStep
                             environment, peer, securityManager.getKeyManager() ) ) );
         }
 
-        PeerUtil.PeerTaskResults<Peer> pekResults = pekUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> pekResults = pekUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult pekResult : pekResults.getPeerTaskResults() )
         {

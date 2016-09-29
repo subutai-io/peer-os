@@ -1,4 +1,4 @@
-package io.subutai.core.environment.impl.workflow.creation.steps;
+package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
@@ -26,6 +26,7 @@ import io.subutai.core.security.api.crypto.KeyManager;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -58,7 +59,7 @@ public class PEKGenerationStepTest
     @Mock
     PeerUtil<Object> PEER_UTIL;
     @Mock
-    PeerUtil.PeerTaskResults<Object> peerTaskResults;
+    PeerUtil.PeerTaskResults<Peer> peerTaskResults;
     @Mock
     PeerUtil.PeerTaskResult peerTaskResult;
 
@@ -73,9 +74,9 @@ public class PEKGenerationStepTest
         doReturn( secretKeyRing ).when( step ).getEnvironmentKeyRing();
         doReturn( localPeer ).when( peerManager ).getLocalPeer();
         doReturn( publicKeyContainer ).when( localPeer ).createPeerEnvironmentKeyPair( any( RelationLinkDto.class ) );
-        doReturn( pgpPublicKeyRing ).when( step ).readPublicKeyRing( publicKeyContainer );
+        doReturn( pgpPublicKeyRing ).when( step ).getLocalPeerPek();
         doReturn( keyManager ).when( securityManager ).getKeyManager();
-        doReturn( Sets.newHashSet( peer ) ).when( peerManager ).resolve( anySet() );
+        doReturn( Sets.newHashSet( peer, TestHelper.PEER() ) ).when( peerManager ).resolve( anySet() );
         TestHelper.bind( environment, peer, PEER_UTIL, peerTaskResults, peerTaskResult );
     }
 
@@ -105,5 +106,17 @@ public class PEKGenerationStepTest
 
         verify( securityManager ).getKeyManager();
         verify( keyManager ).getSecretKeyRing( TestHelper.ENV_ID );
+    }
+
+
+    @Test
+    public void testGetLocalPeerPek() throws Exception
+    {
+
+        doCallRealMethod().when( step ).getLocalPeerPek();
+
+        step.getLocalPeerPek();
+
+        verify( keyManager ).getPublicKeyRing( anyString() );
     }
 }

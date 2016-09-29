@@ -17,7 +17,7 @@ import io.subutai.common.security.relation.RelationLinkDto;
 import io.subutai.core.security.api.crypto.KeyManager;
 
 
-public class PeerEnvironmentKeyTask implements Callable<Peer>
+public class PeerEnvironmentKeyTask implements Callable<Object>
 {
     private final LocalPeer localPeer;
     private final PGPSecretKeyRing envSecKeyRing;

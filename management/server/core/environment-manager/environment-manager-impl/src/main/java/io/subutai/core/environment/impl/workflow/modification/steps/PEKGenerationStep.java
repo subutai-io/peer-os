@@ -24,6 +24,7 @@ public class PEKGenerationStep
     private final PeerManager peerManager;
     private final TrackerOperation trackerOperation;
     private final SecurityManager securityManager;
+    protected PeerUtil<Object> pekUtil = new PeerUtil<>();
 
 
     public PEKGenerationStep( final Topology topology, final EnvironmentImpl environment, final PeerManager peerManager,
@@ -54,7 +55,6 @@ public class PEKGenerationStep
         final PGPSecretKeyRing envSecKeyRing = getEnvironmentKeyRing();
         final PGPPublicKeyRing localPeerSignedPEK = getLocalPeerPek();
 
-        PeerUtil<Peer> pekUtil = new PeerUtil<>();
 
         // creating PEK on remote peers
         for ( final Peer peer : peers )
@@ -64,7 +64,7 @@ public class PEKGenerationStep
                             environment, peer, securityManager.getKeyManager() ) ) );
         }
 
-        PeerUtil.PeerTaskResults<Peer> pekResults = pekUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> pekResults = pekUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult pekResult : pekResults.getPeerTaskResults() )
         {
@@ -88,13 +88,13 @@ public class PEKGenerationStep
     }
 
 
-    private PGPSecretKeyRing getEnvironmentKeyRing()
+    protected PGPSecretKeyRing getEnvironmentKeyRing()
     {
         return securityManager.getKeyManager().getSecretKeyRing( environment.getEnvironmentId().getId() );
     }
 
 
-    public PGPPublicKeyRing getLocalPeerPek()
+    protected PGPPublicKeyRing getLocalPeerPek()
     {
         return securityManager.getKeyManager().getPublicKeyRing(
                 peerManager.getLocalPeer().getId() + "_" + environment.getEnvironmentId().getId() );
