@@ -38,14 +38,7 @@ public class EnvironmentCreationWorkflowTest
     @Mock
     Topology topology;
 
-    @Mock
-    PeerUtil<Object> peerUtil;
-    @Mock
-    PeerUtil.PeerTaskResults<Object> peerTaskResults;
-    @Mock
-    PeerUtil.PeerTaskResult peerTaskResult;
 
-    Peer peer = TestHelper.PEER();
 
 
     class EnvironmentCreationWorkflowSUT extends EnvironmentCreationWorkflow
@@ -76,7 +69,6 @@ public class EnvironmentCreationWorkflowTest
         workflow = new EnvironmentCreationWorkflowSUT( Common.DEFAULT_DOMAIN_NAME, environmentManager, peerManager,
                 securityManager, environment, topology, TestHelper.SSH_KEY, TestHelper.TRACKER_OPERATION() );
         doReturn( environment ).when( environmentManager ).update( environment );
-        TestHelper.bind( environment, peer, peerUtil, peerTaskResults, peerTaskResult );
     }
 
 
