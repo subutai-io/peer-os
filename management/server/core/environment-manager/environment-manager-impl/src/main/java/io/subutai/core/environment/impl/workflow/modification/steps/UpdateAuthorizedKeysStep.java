@@ -17,6 +17,7 @@ public class UpdateAuthorizedKeysStep
     private final String oldHostname;
     private final String newHostname;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public UpdateAuthorizedKeysStep( final EnvironmentImpl environment, final String oldHostname,
@@ -33,8 +34,6 @@ public class UpdateAuthorizedKeysStep
     {
 
         Set<Peer> peers = environment.getPeers();
-
-        PeerUtil<Object> peerUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {
