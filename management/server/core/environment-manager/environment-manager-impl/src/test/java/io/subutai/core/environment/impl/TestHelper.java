@@ -32,9 +32,11 @@ import static org.mockito.Mockito.mock;
 
 public class TestHelper
 {
+    public static final Long USER_ID = 123L;
     public static final String SUBNET_CIDR = "192.168.0.1/24";
     public static final String CONTAINER_ID = "123";
     public static final String PEER_NAME = "peer123";
+    public static final String ENV_NAME = "env123";
     public static final String SSH_KEY = "key";
     public static final String RH_ID = "123";
     public static final String PEER_ID = "123";
@@ -58,7 +60,10 @@ public class TestHelper
         doReturn( ENV_ID ).when( ENVIRONMENT ).getId();
         doReturn( SUBNET_CIDR ).when( ENVIRONMENT ).getSubnetCidr();
         doReturn( P2P_SUBNET ).when( ENVIRONMENT ).getP2pSubnet();
+        doReturn( PEER_ID ).when( ENVIRONMENT ).getPeerId();
         doReturn( Sets.newHashSet( SSH_KEY ) ).when( ENVIRONMENT ).getSshKeys();
+        doReturn( USER_ID ).when( ENVIRONMENT ).getUserId();
+        doReturn( ENV_NAME ).when( ENVIRONMENT ).getName();
 
 
         return ENVIRONMENT;
