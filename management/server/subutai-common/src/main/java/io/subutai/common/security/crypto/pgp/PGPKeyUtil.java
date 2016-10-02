@@ -51,14 +51,6 @@ public class PGPKeyUtil
     }
 
     /**
-     * ***********************************************************************************
-     */
-    private PGPKeyUtil()
-    {
-    }
-
-
-    /**
      * *********************************************************************************** Hex encode given numeric key
      * id.
      *
@@ -296,6 +288,12 @@ public class PGPKeyUtil
     }
 
 
+    public PGPPublicKeyRing getPublicKeyRing( byte[] keyMaterial ) throws PGPException
+    {
+        return readPublicKeyRing( new ByteArrayInputStream( keyMaterial ) );
+    }
+
+
     /* *******************************************
      *
      */
@@ -349,6 +347,12 @@ public class PGPKeyUtil
      *
      */
     public static PGPSecretKeyRing readSecretKeyRing( byte[] keyMaterial ) throws PGPException
+    {
+        return readSecretKeyRing( new ByteArrayInputStream( keyMaterial ) );
+    }
+
+
+    public PGPSecretKeyRing getSecretKeyRing( byte[] keyMaterial ) throws PGPException
     {
         return readSecretKeyRing( new ByteArrayInputStream( keyMaterial ) );
     }

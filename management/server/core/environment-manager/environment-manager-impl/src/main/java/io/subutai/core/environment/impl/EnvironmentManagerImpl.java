@@ -144,6 +144,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     private EnvironmentAdapter environmentAdapter;
     private EnvironmentService environmentService;
     protected JsonUtil jsonUtil = new JsonUtil();
+    protected PGPKeyUtil pgpKeyUtil = new PGPKeyUtil();
 
 
     public EnvironmentManagerImpl( final PeerManager peerManager, SecurityManager securityManager,
@@ -1330,8 +1331,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             KeyPair keyPair = keyManager.generateKeyPair( pairId, false );
 
             //******Create PEK *****************************************************************
-            PGPSecretKeyRing secRing = PGPKeyUtil.readSecretKeyRing( keyPair.getSecKeyring() );
-            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( keyPair.getPubKeyring() );
+            PGPSecretKeyRing secRing = pgpKeyUtil.getSecretKeyRing( keyPair.getSecKeyring() );
+            PGPPublicKeyRing pubRing = pgpKeyUtil.getPublicKeyRing( keyPair.getPubKeyring() );
 
             //***************Save Keys *********************************************************
             keyManager.saveSecretKeyRing( pairId, SecurityKeyType.EnvironmentKey.getId(), secRing );
@@ -1345,6 +1346,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             throw new EnvironmentCreationException( ex );
         }
     }
+
+    //-- workflow factories start
 
 
     protected P2PSecretKeyModificationWorkflow getP2PSecretKeyModificationWorkflow( final EnvironmentImpl environment,
@@ -1419,6 +1422,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     {
         return new HostnameModificationWorkflow( environment, containerId, newHostname, operationTracker, this );
     }
+
+    //-- workflow factories end
 
 
     public void registerListener( final EnvironmentEventListener listener )
@@ -1551,6 +1556,22 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         environmentService.remove( environment.getId() );
 
         environmentAdapter.removeEnvironment( environment );
+    }
+
+
+    public synchronized EnvironmentContainerImpl update( final EnvironmentContainerImpl container )
+    {
+        Environment environment = container.getEnvironment();
+
+        EnvironmentContainerImpl envContainer = environmentService.mergeContainer( container );
+
+        envContainer.setEnvironmentManager( this );
+
+        //update cache
+        ( ( EnvironmentImpl ) environment ).removeContainer( envContainer );
+        ( ( EnvironmentImpl ) environment ).addContainers( Sets.newHashSet( envContainer ) );
+
+        return envContainer;
     }
 
 
@@ -1765,22 +1786,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     @Override
     public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
     {
-    }
-
-
-    public synchronized EnvironmentContainerImpl update( final EnvironmentContainerImpl container )
-    {
-        Environment environment = container.getEnvironment();
-
-        EnvironmentContainerImpl envContainer = environmentService.mergeContainer( container );
-
-        envContainer.setEnvironmentManager( this );
-
-        //update cache
-        ( ( EnvironmentImpl ) environment ).removeContainer( envContainer );
-        ( ( EnvironmentImpl ) environment ).addContainers( Sets.newHashSet( envContainer ) );
-
-        return envContainer;
     }
 
 

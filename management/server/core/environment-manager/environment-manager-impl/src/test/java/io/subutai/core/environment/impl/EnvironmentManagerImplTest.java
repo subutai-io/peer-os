@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import javax.security.auth.Subject;
 
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,13 @@ import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
+import io.subutai.common.peer.AlertEvent;
+import io.subutai.common.peer.AlertHandler;
+import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.ContainerSize;
+import io.subutai.common.peer.EnvironmentAlertHandler;
+import io.subutai.common.peer.EnvironmentAlertHandlers;
+import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
@@ -39,12 +46,18 @@ import io.subutai.common.peer.PeerException;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
+import io.subutai.common.security.crypto.pgp.KeyPair;
+import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.relation.RelationManager;
+import io.subutai.common.settings.Common;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.core.environment.api.CancellableWorkflow;
+import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.exception.EnvironmentCreationException;
 import io.subutai.core.environment.api.exception.EnvironmentDestructionException;
+import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.EnvironmentAdapter;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
@@ -67,6 +80,7 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerActionType;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.core.security.api.crypto.KeyManager;
 import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 
@@ -81,6 +95,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -149,9 +164,12 @@ public class EnvironmentManagerImplTest
     EnvironmentCreationRef environmentCreationRef;
     @Mock
     Map<String, CancellableWorkflow> activeWorkflows;
-
     @Mock
     ProxyEnvironment proxyEnvironment;
+    @Mock
+    KeyManager keyManager;
+    @Mock
+    PGPKeyUtil pgpKeyUtil;
 
 
     class EnvironmentManagerImplSUT extends EnvironmentManagerImpl
@@ -194,6 +212,7 @@ public class EnvironmentManagerImplTest
         environmentManager = spy( new EnvironmentManagerImplSUT( peerManager, securityManager, identityManager, tracker,
                 relationManager, hubAdapter, environmentService ) );
         environmentManager.jsonUtil = jsonUtil;
+        environmentManager.pgpKeyUtil = pgpKeyUtil;
         environmentManager.activeWorkflows = activeWorkflows;
 
         doReturn( Sets.newHashSet( environment ) ).when( environmentService ).getAll();
@@ -221,6 +240,10 @@ public class EnvironmentManagerImplTest
         doReturn( userDelegate ).when( identityManager ).getUserDelegate( TestHelper.USER_ID );
         doReturn( TestHelper.USER_ID.toString() ).when( userDelegate ).getId();
         doReturn( environment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+
+        doReturn( environmentContainer ).when( environment ).getContainerHostById( TestHelper.CONTAINER_ID );
+        doReturn( keyManager ).when( securityManager ).getKeyManager();
+        doReturn( environment ).when( environmentContainer ).getEnvironment();
     }
 
 
@@ -720,7 +743,6 @@ public class EnvironmentManagerImplTest
                                                 .getContainerDestructionWorkflow( environment, environmentContainer,
                                                         trackerOperation );
         doNothing().when( environmentManager ).registerActiveWorkflow( environment, containerDestructionWorkflow );
-        doReturn( environmentContainer ).when( environment ).getContainerHostById( TestHelper.CONTAINER_ID );
 
         environmentManager.destroyContainer( TestHelper.ENV_ID, TestHelper.CONTAINER_ID, false );
 
@@ -930,9 +952,343 @@ public class EnvironmentManagerImplTest
         environmentManager.modifyEnvironmentDomain( TestHelper.ENV_ID, null, null, null );
 
         verify( localPeer ).removeVniDomain( TestHelper.VNI );
+    }
+
+
+    @Test( expected = EnvironmentManagerException.class )
+    public void testGetEnvironmentDomain() throws Exception
+    {
+        environmentManager.getEnvironmentDomain( TestHelper.ENV_ID );
+
+        verify( localPeer ).getVniDomain( TestHelper.VNI );
+
+        doThrow( new PeerException() ).when( localPeer ).getVniDomain( TestHelper.VNI );
+
+        environmentManager.getEnvironmentDomain( TestHelper.ENV_ID );
+    }
+
+
+    @Test( expected = EnvironmentManagerException.class )
+    public void testIsContainerInEnvironmentDomain() throws Exception
+    {
+
+        environmentManager.isContainerInEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+
+        verify( localPeer ).isIpInVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+
+        doThrow( new ContainerHostNotFoundException( "" ) ).when( environment )
+                                                           .getContainerHostById( TestHelper.CONTAINER_ID );
+
+        environmentManager.isContainerInEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+    }
+
+
+    @Test
+    public void testAddContainerToEnvironmentDomain() throws Exception
+    {
+        environmentManager.addContainerToEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+    }
+
+
+    @Test
+    public void testRemoveContainerFromEnvironmentDomain() throws Exception
+    {
+        environmentManager.removeContainerFromEnvironmentDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+
+        verify( environmentManager ).toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+    }
+
+
+    @Test
+    public void testToggleContainerDomain() throws Exception
+    {
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, true );
+
+        verify( localPeer ).addIpToVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+
+        environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+
+        verify( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+
+        doThrow( new PeerException() ).when( localPeer ).removeIpFromVniDomain( Common.LOCAL_HOST_IP, TestHelper.VNI );
+
+        try
+        {
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+
+            fail( "Expected EnvironmentModificationException" );
+        }
+        catch ( EnvironmentModificationException e )
+        {
+        }
+
+        doReturn( EnvironmentStatus.UNDER_MODIFICATION ).when( environment ).getStatus();
+
+        try
+        {
+            environmentManager.toggleContainerDomain( TestHelper.CONTAINER_ID, TestHelper.ENV_ID, false );
+
+            fail( "Expected EnvironmentModificationException" );
+        }
+        catch ( EnvironmentModificationException e )
+        {
+        }
+    }
+
+
+    @Test( expected = EnvironmentModificationException.class )
+    public void testSetupSshTunnelForContainer() throws Exception
+    {
+        environmentManager.setupSshTunnelForContainer( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
+
+        verify( localPeer ).setupSshTunnelForContainer( Common.LOCAL_HOST_IP, Common.CONTAINER_SSH_TIMEOUT_SEC );
 
         //-----
 
+        doThrow( new PeerException() ).when( localPeer ).setupSshTunnelForContainer( Common.LOCAL_HOST_IP,
+                Common.CONTAINER_SSH_TIMEOUT_SEC );
 
+        environmentManager.setupSshTunnelForContainer( TestHelper.CONTAINER_ID, TestHelper.ENV_ID );
     }
+
+
+    @Test
+    public void testCreateEnvironmentKeyPair() throws Exception
+    {
+        KeyPair keyPair = mock( KeyPair.class );
+        doReturn( keyPair ).when( keyManager ).generateKeyPair( TestHelper.ENV_ID, false );
+
+        PGPSecretKeyRing secRing = mock( PGPSecretKeyRing.class );
+        PGPPublicKeyRing pubRing = mock( PGPPublicKeyRing.class );
+        doReturn( secRing ).when( pgpKeyUtil ).getSecretKeyRing( any( byte[].class ) );
+        doReturn( pubRing ).when( pgpKeyUtil ).getPublicKeyRing( any( byte[].class ) );
+
+        environmentManager.createEnvironmentKeyPair( TestHelper.ENVIRONMENT_ID, "" );
+
+        verify( keyManager ).saveSecretKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), secRing );
+        verify( keyManager ).savePublicKeyRing( TestHelper.ENV_ID, SecurityKeyType.EnvironmentKey.getId(), pubRing );
+    }
+
+
+    @Test
+    public void testRegisterListener() throws Exception
+    {
+        EnvironmentEventListener listener = mock( EnvironmentEventListener.class );
+
+        environmentManager.registerListener( listener );
+
+        assertTrue( environmentManager.listeners.contains( listener ) );
+    }
+
+
+    @Test
+    public void testUnregisterListener() throws Exception
+    {
+
+        EnvironmentEventListener listener = mock( EnvironmentEventListener.class );
+        environmentManager.listeners.add( listener );
+
+        environmentManager.unregisterListener( listener );
+
+        assertFalse( environmentManager.listeners.contains( listener ) );
+    }
+
+
+    @Test
+    public void testNotifyOnEnvironmentCreated() throws Exception
+    {
+        EnvironmentEventListener listener = mock( EnvironmentEventListener.class );
+        environmentManager.listeners.add( listener );
+
+        environmentManager.notifyOnEnvironmentCreated( environment );
+
+        verify( cachedExecutor ).submit( isA( Runnable.class ) );
+    }
+
+
+    @Test
+    public void testNotifyOnEnvironmentGrown() throws Exception
+    {
+        EnvironmentEventListener listener = mock( EnvironmentEventListener.class );
+        environmentManager.listeners.add( listener );
+
+        environmentManager.notifyOnEnvironmentGrown( environment,
+                Sets.<EnvironmentContainerHost>newHashSet( environmentContainer ) );
+
+        verify( cachedExecutor ).submit( isA( Runnable.class ) );
+    }
+
+
+    @Test
+    public void testNotifyOnContainerDestroyed() throws Exception
+    {
+        EnvironmentEventListener listener = mock( EnvironmentEventListener.class );
+        environmentManager.listeners.add( listener );
+
+        environmentManager.notifyOnContainerDestroyed( environment, TestHelper.CONTAINER_ID );
+
+        verify( cachedExecutor ).submit( isA( Runnable.class ) );
+    }
+
+
+    @Test
+    public void testNotifyOnEnvironmentDestroyed() throws Exception
+    {
+        EnvironmentEventListener listener = mock( EnvironmentEventListener.class );
+        environmentManager.listeners.add( listener );
+
+        environmentManager.notifyOnEnvironmentDestroyed( TestHelper.ENV_ID );
+
+        verify( cachedExecutor ).submit( isA( Runnable.class ) );
+    }
+
+
+    @Test
+    public void testGetUserId() throws Exception
+    {
+        environmentManager.getUserId();
+
+        verify( user ).getId();
+    }
+
+
+    @Test
+    public void testResolvePeer() throws Exception
+    {
+        environmentManager.resolvePeer( TestHelper.PEER_ID );
+
+        verify( peerManager ).getPeer( TestHelper.PEER_ID );
+    }
+
+
+    @Test
+    public void testSave() throws Exception
+    {
+        environmentManager.save( environment );
+
+        verify( environmentService ).persist( environment );
+    }
+
+
+    @Test
+    public void testUpdate() throws Exception
+    {
+        doReturn( environment ).when( environmentService ).merge( environment );
+
+        environmentManager.update( environment );
+
+        verify( environmentService ).merge( environment );
+
+        //-----
+
+        ProxyEnvironment proxyEnvironment = mock( ProxyEnvironment.class );
+        reset( environmentService );
+
+        environmentManager.update( proxyEnvironment );
+
+        verify( environmentService, never() ).merge( environment );
+    }
+
+
+    @Test
+    public void testRemove() throws Exception
+    {
+        environmentManager.remove( environment );
+
+        verify( environmentService ).remove( TestHelper.ENV_ID );
+    }
+
+
+    @Test
+    public void testUpdateContainer() throws Exception
+    {
+
+        doReturn( environmentContainer ).when( environmentService ).mergeContainer( environmentContainer );
+
+        environmentManager.update( environmentContainer );
+
+        verify( environmentService ).mergeContainer( environmentContainer );
+    }
+
+
+    @Test
+    public void testAddAlertHandler() throws Exception
+    {
+        AlertHandler alertHandler = mock( AlertHandler.class );
+
+        environmentManager.addAlertHandler( alertHandler );
+
+        assertFalse( environmentManager.alertHandlers.containsValue( alertHandler ) );
+
+        //-----
+
+        doReturn( "ID" ).when( alertHandler ).getId();
+
+        environmentManager.addAlertHandler( alertHandler );
+
+        assertTrue( environmentManager.alertHandlers.containsValue( alertHandler ) );
+    }
+
+
+    @Test
+    public void testRemoveAlertHandler() throws Exception
+    {
+        AlertHandler alertHandler = mock( AlertHandler.class );
+        environmentManager.alertHandlers.put( "ID", alertHandler );
+        doReturn( "ID" ).when( alertHandler ).getId();
+
+        environmentManager.removeAlertHandler( alertHandler );
+
+        assertFalse( environmentManager.alertHandlers.containsValue( alertHandler ) );
+    }
+
+
+    @Test
+    public void testGetRegisteredAlertHandlers() throws Exception
+    {
+        AlertHandler alertHandler = mock( AlertHandler.class );
+        environmentManager.alertHandlers.put( "ID", alertHandler );
+        doReturn( "ID" ).when( alertHandler ).getId();
+
+        assertFalse( environmentManager.getRegisteredAlertHandlers().isEmpty() );
+    }
+
+
+    @Test
+    public void testGetId() throws Exception
+    {
+        assertNotNull( environmentManager.getId() );
+    }
+
+
+    @Test
+    public void testOnAlert() throws Exception
+    {
+        AlertEvent alertEvent = mock( AlertEvent.class );
+        doReturn( TestHelper.ENV_ID ).when( alertEvent ).getEnvironmentId();
+
+        environmentManager.onAlert( alertEvent );
+
+        verify( environmentManager ).handleAlertPack( eq( alertEvent ), isA( EnvironmentAlertHandlers.class ) );
+    }
+
+
+    @Test
+    public void testGetEnvironmentAlertHandlers() throws Exception
+    {
+        EnvironmentAlertHandler environmentAlertHandler = mock( EnvironmentAlertHandler.class );
+        doReturn( Sets.newHashSet( environmentAlertHandler ) ).when( environment ).getAlertHandlers();
+        doReturn( "ID" ).when( environmentAlertHandler ).getAlertHandlerId();
+        doReturn( AlertHandlerPriority.HIGH ).when( environmentAlertHandler ).getAlertHandlerPriority();
+        AlertHandler alertHandler = mock( AlertHandler.class );
+        environmentManager.alertHandlers.put( "ID", alertHandler );
+
+
+        assertFalse( environmentManager.getEnvironmentAlertHandlers( TestHelper.ENVIRONMENT_ID ).getAllHandlers()
+                                       .isEmpty() );
+    }
+
+
 }
