@@ -1,6 +1,8 @@
 package io.subutai.core.environment.impl;
 
 
+import java.util.UUID;
+
 import com.google.common.collect.Sets;
 
 import io.subutai.common.environment.Environment;
@@ -14,6 +16,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.peer.PeerId;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -49,7 +52,8 @@ public class TestHelper
     public static final String MESSAGE = "msg";
     public static final EnvironmentId ENVIRONMENT_ID = new EnvironmentId( ENV_ID );
     public static final HostId RES_HOST_ID = new HostId( RH_ID );
-    public static final ContainerId CONT_HOST_ID = new ContainerId( CONTAINER_ID );
+    public static final PeerId P_ID = new PeerId( PEER_ID );
+    public static final ContainerId CONT_HOST_ID = new ContainerId( CONTAINER_ID, HOSTNAME, P_ID, ENVIRONMENT_ID );
     private static final String P2P_SUBNET = "10.10.10.1";
 
 
@@ -99,7 +103,10 @@ public class TestHelper
 
     public static TrackerOperation TRACKER_OPERATION()
     {
-        return mock( TrackerOperation.class );
+        TrackerOperation trackerOperation = mock( TrackerOperation.class );
+        doReturn( UUID.randomUUID() ).when( trackerOperation ).getId();
+
+        return trackerOperation;
     }
 
 

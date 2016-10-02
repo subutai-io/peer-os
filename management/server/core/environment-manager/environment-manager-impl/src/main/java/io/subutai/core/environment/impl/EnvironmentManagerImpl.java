@@ -542,6 +542,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
         catch ( PeerException e )
         {
             operationTracker.addLogFailed( e.getMessage() );
+
             throw new EnvironmentModificationException( e.getMessage() );
         }
 
@@ -551,6 +552,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             if ( !peer.isOnline() )
             {
                 operationTracker.addLogFailed( String.format( "Peer %s is offline", peer.getId() ) );
+
                 throw new EnvironmentModificationException( String.format( "Peer %s is offline", peer.getId() ) );
             }
         }
@@ -932,7 +934,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
 
 
         final ContainerDestructionWorkflow containerDestructionWorkflow =
-                getContainerDestructionWorkflow( this, environment, environmentContainer, operationTracker );
+                getContainerDestructionWorkflow( environment, environmentContainer, operationTracker );
 
         registerActiveWorkflow( environment, containerDestructionWorkflow );
 
@@ -954,6 +956,51 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
             {
                 throw new EnvironmentModificationException(
                         exceptionUtil.getRootCause( containerDestructionWorkflow.getFailedException() ) );
+            }
+        }
+    }
+
+
+    @RolesAllowed( "Environment-Management|Update" )
+    @Override
+    public void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
+    {
+        Preconditions.checkNotNull( containerId, "Invalid container id" );
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
+
+        final EnvironmentImpl environment =
+                ( EnvironmentImpl ) loadEnvironment( containerId.getEnvironmentId().getId() );
+
+        //check that container exists in the environment
+        environment.getContainerHostById( containerId.getId() );
+
+        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
+                String.format( "Changing container hostname(s) in environment %s", environment.getName() ) );
+
+        final HostnameModificationWorkflow hostnameModificationWorkflow =
+                getHostnameModificationWorkflow( environment, containerId, newHostname, operationTracker );
+
+        registerActiveWorkflow( environment, hostnameModificationWorkflow );
+
+        hostnameModificationWorkflow.onStop( new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeActiveWorkflow( environment.getId() );
+            }
+        } );
+
+        //wait
+        if ( !async )
+        {
+            hostnameModificationWorkflow.join();
+
+            if ( hostnameModificationWorkflow.isFailed() )
+            {
+                throw new EnvironmentModificationException(
+                        exceptionUtil.getRootCause( hostnameModificationWorkflow.getFailedException() ) );
             }
         }
     }
@@ -1274,51 +1321,6 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException, ContainerHostNotFoundException
-    {
-        Preconditions.checkNotNull( containerId, "Invalid container id" );
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ), "Invalid hostname" );
-
-        final EnvironmentImpl environment =
-                ( EnvironmentImpl ) loadEnvironment( containerId.getEnvironmentId().getId() );
-
-        //check that container exists in the environment
-        environment.getContainerHostById( containerId.getId() );
-
-        TrackerOperation operationTracker = tracker.createTrackerOperation( MODULE_NAME,
-                String.format( "Changing container hostname(s) in environment %s", environment.getName() ) );
-
-        final HostnameModificationWorkflow hostnameModificationWorkflow =
-                getHostnameModificationWorkflow( environment, containerId, newHostname, operationTracker );
-
-        registerActiveWorkflow( environment, hostnameModificationWorkflow );
-
-        hostnameModificationWorkflow.onStop( new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                removeActiveWorkflow( environment.getId() );
-            }
-        } );
-
-        //wait
-        if ( !async )
-        {
-            hostnameModificationWorkflow.join();
-
-            if ( hostnameModificationWorkflow.isFailed() )
-            {
-                throw new EnvironmentModificationException(
-                        exceptionUtil.getRootCause( hostnameModificationWorkflow.getFailedException() ) );
-            }
-        }
-    }
-
-
     protected PGPSecretKeyRing createEnvironmentKeyPair( EnvironmentId envId, String userSecKeyId )
             throws EnvironmentCreationException
     {
@@ -1372,11 +1374,11 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    protected ContainerDestructionWorkflow getContainerDestructionWorkflow(
-            final EnvironmentManagerImpl environmentManager, final EnvironmentImpl environment,
-            final ContainerHost containerHost, final TrackerOperation operationTracker )
+    protected ContainerDestructionWorkflow getContainerDestructionWorkflow( final EnvironmentImpl environment,
+                                                                            final ContainerHost containerHost,
+                                                                            final TrackerOperation operationTracker )
     {
-        return new ContainerDestructionWorkflow( environmentManager, environment, containerHost, operationTracker );
+        return new ContainerDestructionWorkflow( this, environment, containerHost, operationTracker );
     }
 
 
