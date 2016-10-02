@@ -138,7 +138,7 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     protected Map<String, AlertHandler> alertHandlers = new ConcurrentHashMap<>();
     private SecurityManager securityManager;
     protected ScheduledExecutorService backgroundTasksExecutorService;
-    private final Map<String, CancellableWorkflow> activeWorkflows = Maps.newConcurrentMap();
+    protected Map<String, CancellableWorkflow> activeWorkflows = Maps.newConcurrentMap();
     private Subject systemUser;
 
     private EnvironmentAdapter environmentAdapter;
@@ -1127,9 +1127,8 @@ public class EnvironmentManagerImpl implements EnvironmentManager, PeerActionLis
     }
 
 
-    public void modifyEnvironmentDomain( final String environmentId, final String domain,
-                                         final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                                         final String sslCertPath )
+    void modifyEnvironmentDomain( final String environmentId, final String domain,
+                                  final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, final String sslCertPath )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Preconditions.checkArgument( !Strings.isNullOrEmpty( environmentId ), "Invalid environment id" );

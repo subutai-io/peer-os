@@ -25,10 +25,12 @@ import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
+import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
@@ -69,6 +71,7 @@ import io.subutai.core.tracker.api.Tracker;
 import io.subutai.hub.share.common.HubAdapter;
 
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
@@ -78,10 +81,12 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -142,6 +147,11 @@ public class EnvironmentManagerImplTest
     UserDelegate userDelegate;
     @Mock
     EnvironmentCreationRef environmentCreationRef;
+    @Mock
+    Map<String, CancellableWorkflow> activeWorkflows;
+
+    @Mock
+    ProxyEnvironment proxyEnvironment;
 
 
     class EnvironmentManagerImplSUT extends EnvironmentManagerImpl
@@ -184,8 +194,10 @@ public class EnvironmentManagerImplTest
         environmentManager = spy( new EnvironmentManagerImplSUT( peerManager, securityManager, identityManager, tracker,
                 relationManager, hubAdapter, environmentService ) );
         environmentManager.jsonUtil = jsonUtil;
+        environmentManager.activeWorkflows = activeWorkflows;
 
         doReturn( Sets.newHashSet( environment ) ).when( environmentService ).getAll();
+        doReturn( environment ).when( environmentService ).find( TestHelper.ENV_ID );
         doReturn( Sets.newHashSet( environmentPeer ) ).when( environment ).getEnvironmentPeers();
         doReturn( TestHelper.PEER_ID ).when( environmentPeer ).getPeerId();
         doReturn( Lists.newArrayList( environmentContainer ) ).when( localPeer )
@@ -215,7 +227,7 @@ public class EnvironmentManagerImplTest
     @Test
     public void testDispose() throws Exception
     {
-        environmentManager.registerActiveWorkflow( environment, checkWorkflow );
+        doReturn( Sets.newHashSet( checkWorkflow ) ).when( activeWorkflows ).values();
 
         environmentManager.dispose();
 
@@ -289,7 +301,7 @@ public class EnvironmentManagerImplTest
     @Test
     public void testSetTransientFields() throws Exception
     {
-        doReturn( Sets.newHashSet(environmentContainer) ).when( environment ).getContainerHosts();
+        doReturn( Sets.newHashSet( environmentContainer ) ).when( environment ).getContainerHosts();
         environmentManager.setTransientFields( Sets.<Environment>newHashSet( environment ) );
 
         verify( environmentManager ).setEnvironmentTransientFields( environment );
@@ -692,8 +704,6 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        ProxyEnvironment proxyEnvironment = mock( ProxyEnvironment.class );
-
         doReturn( proxyEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyEnvironment( TestHelper.ENV_ID, false );
@@ -767,8 +777,6 @@ public class EnvironmentManagerImplTest
 
         //-----
 
-        ProxyEnvironment proxyEnvironment = mock( ProxyEnvironment.class );
-
         doReturn( proxyEnvironment ).when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
 
         environmentManager.destroyContainer( TestHelper.ENV_ID, TestHelper.CONTAINER_ID, false );
@@ -803,5 +811,128 @@ public class EnvironmentManagerImplTest
         catch ( EnvironmentModificationException e )
         {
         }
+    }
+
+
+    @Test( expected = IllegalStateException.class )
+    public void testRegisterActiveWorkflow() throws Exception
+    {
+        environmentManager.registerActiveWorkflow( environment, checkWorkflow );
+
+        verify( activeWorkflows ).put( TestHelper.ENV_ID, checkWorkflow );
+
+        doReturn( checkWorkflow ).when( activeWorkflows ).get( TestHelper.ENV_ID );
+
+        environmentManager.registerActiveWorkflow( environment, checkWorkflow );
+    }
+
+
+    @Test
+    public void testRemoveActiveWorkflow() throws Exception
+    {
+        environmentManager.removeActiveWorkflow( TestHelper.ENV_ID );
+
+        verify( activeWorkflows ).remove( TestHelper.ENV_ID );
+    }
+
+
+    @Test
+    public void testCancelEnvironmentWorkflow() throws Exception
+    {
+        doReturn( checkWorkflow ).when( activeWorkflows ).get( TestHelper.ENV_ID );
+
+        environmentManager.cancelEnvironmentWorkflow( TestHelper.ENV_ID );
+
+        verify( environmentManager ).removeActiveWorkflow( TestHelper.ENV_ID );
+
+        //-----
+
+        reset( activeWorkflows );
+
+        doReturn( environment ).when( environmentManager ).update( environment );
+
+        environmentManager.cancelEnvironmentWorkflow( TestHelper.ENV_ID );
+
+        verify( environment ).setStatus( EnvironmentStatus.CANCELLED );
+    }
+
+
+    @Test
+    public void getActiveWorkflows() throws Exception
+    {
+        Map workflows = environmentManager.getActiveWorkflows();
+
+        assertFalse( workflows.isEmpty() );
+    }
+
+
+    @Test
+    public void testLoadEnvironment() throws Exception
+    {
+        doCallRealMethod().when( environmentManager ).loadEnvironment( TestHelper.ENV_ID );
+
+        assertNotNull( environmentManager.loadEnvironment( TestHelper.ENV_ID ) );
+
+        //-----
+
+        doReturn( null ).when( environmentService ).find( TestHelper.ENV_ID );
+
+        try
+        {
+            environmentManager.loadEnvironment( TestHelper.ENV_ID );
+
+            fail( "Expected EnvironmentNotFoundException" );
+        }
+        catch ( EnvironmentNotFoundException e )
+        {
+        }
+
+
+        doReturn( proxyEnvironment ).when( environmentAdapter ).get( TestHelper.ENV_ID );
+        reset( environmentService );
+
+        environmentManager.loadEnvironment( TestHelper.ENV_ID );
+
+        verify( environmentService, never() ).find( TestHelper.ENV_ID );
+    }
+
+
+    @Test
+    public void testRemoveEnvironmentDomain() throws Exception
+    {
+        environmentManager.removeEnvironmentDomain( TestHelper.ENV_ID );
+
+        verify( environmentManager ).modifyEnvironmentDomain( TestHelper.ENV_ID, null, null, null );
+    }
+
+
+    @Test
+    public void testAssignEnvironmentDomain() throws Exception
+    {
+        environmentManager
+                .assignEnvironmentDomain( TestHelper.ENV_ID, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
+
+        verify( environmentManager )
+                .modifyEnvironmentDomain( TestHelper.ENV_ID, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
+    }
+
+
+    @Test
+    public void testModifyDomain() throws Exception
+    {
+        environmentManager
+                .modifyEnvironmentDomain( TestHelper.ENV_ID, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
+
+        verify( localPeer ).setVniDomain( TestHelper.VNI, "new", ProxyLoadBalanceStrategy.STICKY_SESSION, "path" );
+
+        //-----
+
+        environmentManager.modifyEnvironmentDomain( TestHelper.ENV_ID, null, null, null );
+
+        verify( localPeer ).removeVniDomain( TestHelper.VNI );
+
+        //-----
+
+
     }
 }
