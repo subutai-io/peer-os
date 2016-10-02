@@ -47,7 +47,6 @@ public class EnvironmentAlertHandlersImpl implements EnvironmentAlertHandlers
                 "Invalid environment handler id" );
         Preconditions.checkNotNull( environmentAlertHandler.getAlertHandlerPriority(),
                 "Invalid environment handler priority" );
-        Preconditions.checkNotNull( alertHandler, "Invalid alert handler" );
 
         this.handlers.put( environmentAlertHandler, alertHandler );
     }
