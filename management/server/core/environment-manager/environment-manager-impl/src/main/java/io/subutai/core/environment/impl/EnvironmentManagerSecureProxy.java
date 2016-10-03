@@ -18,7 +18,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
-import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -820,15 +819,6 @@ public class EnvironmentManagerSecureProxy
     public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
     {
         environmentManager.onPluginEvent( pluginUid, state );
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public EnvConnectivityState checkEnvironmentConnectivity( final String environmentId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException
-    {
-        return environmentManager.checkEnvironmentConnectivity( environmentId );
     }
 
 

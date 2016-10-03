@@ -31,6 +31,8 @@ import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.EnvironmentStatus;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
+import io.subutai.common.metric.Alert;
+import io.subutai.common.metric.AlertValue;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.peer.AlertEvent;
 import io.subutai.common.peer.AlertHandler;
@@ -43,6 +45,7 @@ import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
@@ -92,7 +95,9 @@ import static junit.framework.TestCase.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -1291,4 +1296,93 @@ public class EnvironmentManagerImplTest
     }
 
 
+    @Test
+    public void testHandleAlertPack() throws Exception
+    {
+        EnvironmentAlertHandlers environmentAlertHandlers = mock( EnvironmentAlertHandlers.class );
+        EnvironmentAlertHandler environmentAlertHandler = mock( EnvironmentAlertHandler.class );
+        AlertEvent alertEvent = mock( AlertEvent.class );
+        doReturn( TestHelper.ENV_ID ).when( alertEvent ).getEnvironmentId();
+        Map<EnvironmentAlertHandler, AlertEvent> handlersMap = Maps.newHashMap();
+        handlersMap.put( environmentAlertHandler, alertEvent );
+        doReturn( handlersMap ).when( environmentAlertHandlers ).getAllHandlers();
+        AlertHandler alertHandler = mock( AlertHandler.class );
+        doReturn( AlertValue.class ).when( alertHandler ).getSupportedAlertValue();
+        doReturn( alertHandler ).when( environmentAlertHandlers ).getHandler( environmentAlertHandler );
+        AlertValue alertValue = mock( AlertValue.class );
+        Alert alert = mock( Alert.class );
+        doReturn( alert ).when( alertEvent ).getResource();
+        doReturn( alertValue ).when( alert ).getAlertValue( AlertValue.class );
+
+        environmentManager.handleAlertPack( alertEvent, environmentAlertHandlers );
+
+        verify( alertHandler ).postProcess( environment, alertValue );
+    }
+
+
+    @Test
+    public void testStartMonitoring() throws Exception
+    {
+        AlertHandler alertHandler = mock( AlertHandler.class );
+        environmentManager.alertHandlers.put( "ID", alertHandler );
+        doReturn( environment ).when( environmentManager ).update( environment );
+
+        environmentManager.startMonitoring( "ID", AlertHandlerPriority.HIGH, TestHelper.ENV_ID );
+
+        verify( environmentManager ).update( environment );
+    }
+
+
+    @Test
+    public void testStopMonitoring() throws Exception
+    {
+        doReturn( environment ).when( environmentManager ).update( environment );
+
+        environmentManager.stopMonitoring( "ID", AlertHandlerPriority.HIGH, TestHelper.ENV_ID );
+
+        verify( environmentManager ).update( environment );
+    }
+
+
+    @Test
+    public void testAddReverseProxy() throws Exception
+    {
+        ReverseProxyConfig config = mock( ReverseProxyConfig.class );
+        doReturn( TestHelper.CONTAINER_ID ).when( config ).getContainerId();
+
+        environmentManager.addReverseProxy( environment, config );
+
+        verify( localPeer ).addReverseProxy( config );
+    }
+
+
+    @Test
+    public void testOnRegistrationSucceeded() throws Exception
+    {
+        environmentManager.onRegistrationSucceeded();
+
+        verify( environmentAdapter ).uploadEnvironments( anySet() );
+    }
+
+
+    @Test
+    public void testResetP2pKey() throws Exception
+    {
+        doNothing().when( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
+
+        environmentManager.resetP2Pkey();
+
+        verify( environmentManager ).resetP2PSecretKey( anyString(), anyString(), anyLong(), anyBoolean() );
+    }
+
+
+    @Test
+    public void testAddSshKeyToEnvironmentEntity() throws Exception
+    {
+        doReturn( environment ).when( environmentManager ).update( environment );
+
+        environmentManager.addSshKeyToEnvironmentEntity( TestHelper.ENV_ID, TestHelper.SSH_KEY );
+
+        verify( environment ).addSshKey( TestHelper.SSH_KEY );
+    }
 }
