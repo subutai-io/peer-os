@@ -1118,7 +1118,7 @@ public class KeyManagerImpl implements KeyManager
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {
                     String publicKeyring = response.readEntity( String.class );
-                    savePublicKeyRing( peerInfo.getId(), ( short ) 3, publicKeyring );
+                    savePublicKeyRing( peerInfo.getId(), SecurityKeyType.PeerKey.getId(), publicKeyring );
                 }
 
                 RestUtil.close( response );

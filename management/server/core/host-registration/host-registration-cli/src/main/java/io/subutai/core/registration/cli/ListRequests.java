@@ -7,7 +7,7 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
@@ -17,10 +17,10 @@ public class ListRequests extends SubutaiShellCommandSupport
     @Argument( index = 0, name = "fullInfo", multiValued = false, required = false, description = "Request full "
             + "Description" )
     private boolean fullDescription;
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
 
-    public ListRequests( final RegistrationManager registrationManager )
+    public ListRequests( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }

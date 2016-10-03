@@ -6,17 +6,17 @@ import java.util.List;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
 @Command( scope = "node", name = "clear-requests", description = "clear all request" )
 public class ClearRequests extends SubutaiShellCommandSupport
 {
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
 
-    public ClearRequests( final RegistrationManager registrationManager )
+    public ClearRequests( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }
