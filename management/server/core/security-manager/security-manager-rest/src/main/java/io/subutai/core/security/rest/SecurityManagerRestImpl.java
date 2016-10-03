@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.objects.KeyTrustLevel;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.identity.api.IdentityManager;
@@ -49,7 +50,7 @@ public class SecurityManagerRestImpl implements SecurityManagerRest
     @Override
     public Response addPublicKeyRing( final String identityId, final String keyText )
     {
-        securityManager.getKeyManager().savePublicKeyRing( identityId, ( short ) 3, keyText );
+        securityManager.getKeyManager().savePublicKeyRing( identityId, SecurityKeyType.PeerKey.getId(), keyText );
 
         return Response.ok().build();
     }

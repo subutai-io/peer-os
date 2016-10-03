@@ -23,7 +23,7 @@ import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
 
@@ -73,7 +73,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Column( name = "status" )
     @Enumerated( EnumType.STRING )
     @Expose
-    private RegistrationStatus status = RegistrationStatus.REQUESTED;
+    private ResourceHostRegistrationStatus status = ResourceHostRegistrationStatus.REQUESTED;
 
     @OneToMany( targetEntity = ContainerInfoImpl.class,
             mappedBy = "requestedHost",
@@ -115,7 +115,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         for ( final ContainerInfo containerInfo : hostInfoSet )
         {
             ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( containerInfo );
-            containerInfoImpl.setStatus( RegistrationStatus.REQUESTED );
+            containerInfoImpl.setStatus( ResourceHostRegistrationStatus.REQUESTED );
             containerInfoImpl.setRequestedHost( this );
             this.hostInfos.add( containerInfoImpl );
         }
@@ -123,7 +123,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
-                              final String publicKey, final RegistrationStatus status,
+                              final String publicKey, final ResourceHostRegistrationStatus status,
                               Set<HostInterface> interfaces )
     {
         this.id = id;
@@ -207,13 +207,13 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     @Override
-    public RegistrationStatus getStatus()
+    public ResourceHostRegistrationStatus getStatus()
     {
         return status;
     }
 
 
-    public void setStatus( final RegistrationStatus status )
+    public void setStatus( final ResourceHostRegistrationStatus status )
     {
         this.status = status;
     }

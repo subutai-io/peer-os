@@ -17,7 +17,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.core.registration.rest.transitional.RequestedHostJson;
 import io.subutai.core.security.api.SecurityManager;
@@ -28,12 +28,12 @@ public class RegistrationRestServiceImpl implements RegistrationRestService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( RegistrationRestServiceImpl.class );
     private SecurityManager securityManager;
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
 
     public RegistrationRestServiceImpl( final SecurityManager securityManager,
-                                        final RegistrationManager registrationManager )
+                                        final HostRegistrationManager registrationManager )
     {
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( registrationManager );

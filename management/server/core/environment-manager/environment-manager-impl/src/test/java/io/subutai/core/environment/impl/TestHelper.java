@@ -56,7 +56,7 @@ public class TestHelper
     public static final HostId RES_HOST_ID = new HostId( RH_ID );
     public static final PeerId P_ID = new PeerId( PEER_ID );
     public static final ContainerId CONT_HOST_ID = new ContainerId( CONTAINER_ID, HOSTNAME, P_ID, ENVIRONMENT_ID );
-    private static final String P2P_SUBNET = "10.10.10.1";
+    public static final String P2P_SUBNET = "10.10.10.1";
 
 
     public static EnvironmentImpl ENVIRONMENT()

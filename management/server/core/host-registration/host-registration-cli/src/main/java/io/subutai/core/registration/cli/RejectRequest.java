@@ -5,7 +5,7 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 
 
 @Command( scope = "node", name = "reject", description = "approve new registration request" )
@@ -15,10 +15,10 @@ public class RejectRequest extends SubutaiShellCommandSupport
     @Argument( index = 0, name = "request Id", multiValued = false, required = true, description = "Request Id" )
     private String requestId;
 
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
 
-    public RejectRequest( final RegistrationManager registrationManager )
+    public RejectRequest( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }

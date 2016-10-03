@@ -8,7 +8,7 @@ import io.subutai.core.registration.api.service.ContainerToken;
 import io.subutai.core.registration.api.service.RequestedHost;
 
 
-public interface RegistrationManager
+public interface HostRegistrationManager
 {
     List<RequestedHost> getRequests();
 

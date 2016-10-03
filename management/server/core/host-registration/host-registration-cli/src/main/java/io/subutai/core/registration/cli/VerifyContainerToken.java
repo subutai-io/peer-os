@@ -5,7 +5,7 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.ContainerToken;
 
@@ -23,10 +23,10 @@ public class VerifyContainerToken extends SubutaiShellCommandSupport
             + "key" )
     private String publicKey;
 
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
 
-    public VerifyContainerToken( final RegistrationManager registrationManager )
+    public VerifyContainerToken( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }

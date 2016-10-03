@@ -35,7 +35,7 @@
              interface="io.subutai.core.identity.api.IdentityManager" />
 
   <reference id="registrationManager"
-             interface="io.subutai.core.registration.api.RegistrationManager" />
+             interface="io.subutai.core.registration.api.HostRegistrationManager" />
 
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />

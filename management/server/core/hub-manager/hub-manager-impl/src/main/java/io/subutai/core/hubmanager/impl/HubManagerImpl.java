@@ -65,6 +65,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
@@ -124,7 +125,7 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
-    private io.subutai.core.registration.api.RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
     private HeartbeatProcessor heartbeatProcessor;
 
@@ -611,7 +612,7 @@ public class HubManagerImpl implements HubManager
     }
 
 
-    public void setRegistrationManager( final io.subutai.core.registration.api.RegistrationManager registrationManager )
+    public void setRegistrationManager( final HostRegistrationManager registrationManager )
     {
         this.registrationManager = registrationManager;
     }

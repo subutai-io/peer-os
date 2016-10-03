@@ -80,7 +80,7 @@ import io.subutai.core.localpeer.impl.command.TemplateDownloadTracker;
 import io.subutai.core.lxc.quota.api.QuotaManager;
 import io.subutai.core.network.api.NetworkManager;
 import io.subutai.core.network.api.NetworkManagerException;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.hub.share.quota.ContainerQuota;
 import io.subutai.hub.share.quota.QuotaException;
 
@@ -265,9 +265,9 @@ public class ResourceHostEntity extends AbstractSubutaiHost implements ResourceH
     }
 
 
-    protected RegistrationManager getRegistrationManager()
+    protected HostRegistrationManager getRegistrationManager()
     {
-        return ServiceLocator.getServiceNoCache( RegistrationManager.class );
+        return ServiceLocator.getServiceNoCache( HostRegistrationManager.class );
     }
 
 
