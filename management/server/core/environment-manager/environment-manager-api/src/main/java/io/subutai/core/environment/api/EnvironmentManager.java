@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.annotation.security.RolesAllowed;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
-import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -238,10 +237,6 @@ public interface EnvironmentManager
 
     void addReverseProxy( final Environment environment, final ReverseProxyConfig reverseProxyConfig )
             throws EnvironmentModificationException;
-
-
-    EnvConnectivityState checkEnvironmentConnectivity( final String environmentId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException;
 
 
     void changeContainerHostname( final ContainerId containerId, final String newHostname, final boolean async )
