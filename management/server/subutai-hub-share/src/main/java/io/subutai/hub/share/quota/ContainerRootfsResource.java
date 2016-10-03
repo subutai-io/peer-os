@@ -3,16 +3,24 @@ package io.subutai.hub.share.quota;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 /**
  * Container ROOTFS resource class
  */
+@JsonSerialize( using = ContainerResourceSerializer.class )
+@JsonTypeName( "rootfs" )
 public class ContainerRootfsResource extends ContainerDiskResource
 {
-    public ContainerRootfsResource( @JsonProperty( value = "resourceValue" ) final ByteValueResource value )
+
+    public ContainerRootfsResource( final ByteValueResource value )
     {
         super( ContainerResourceType.ROOTFS, value );
     }
@@ -21,5 +29,12 @@ public class ContainerRootfsResource extends ContainerDiskResource
     public ContainerRootfsResource()
     {
         this( new ByteValueResource( BigDecimal.ZERO ) );
+    }
+
+
+    @JsonCreator
+    public ContainerRootfsResource( @JsonProperty( "value" ) final String value )
+    {
+        super( ContainerResourceType.ROOTFS, value );
     }
 }

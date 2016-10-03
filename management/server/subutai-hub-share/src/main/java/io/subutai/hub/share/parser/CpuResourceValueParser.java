@@ -43,9 +43,9 @@ public class CpuResourceValueParser implements ResourceValueParser
         {
             String value = quotaMatcher.group( 1 );
             String acronym = quotaMatcher.group( 2 );
-            if ( acronym != null && "%".equals( acronym.trim() ) )
+            if ( acronym != null && !"%".equals( acronym.trim() ) )
             {
-                throw new IllegalArgumentException( "Invalid measure unit." );
+                throw new IllegalArgumentException( String.format( "Invalid measure unit %s.", acronym.trim() ) );
             }
             return new NumericValueResource( value );
         }

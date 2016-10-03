@@ -16,7 +16,7 @@ import io.subutai.hub.share.resource.ResourceValueParser;
  */
 public class RamResourceValueParser implements ResourceValueParser
 {
-    private static final String QUOTA_REGEX = "(\\d+)(KiB|MiB|GiB|TiB|PiB|EiB)?";
+    private static final String QUOTA_REGEX = "(\\d+)(\\.\\d+)?(KiB|MiB|GiB|TiB|PiB|EiB)?";
     private static final Pattern QUOTA_PATTERN = Pattern.compile( QUOTA_REGEX );
     private static RamResourceValueParser instance;
 
@@ -42,12 +42,14 @@ public class RamResourceValueParser implements ResourceValueParser
         Matcher quotaMatcher = QUOTA_PATTERN.matcher( resource.trim() );
         if ( quotaMatcher.matches() )
         {
-            String value = quotaMatcher.group( 1 );
-            String acronym = quotaMatcher.group( 2 );
+            String intPart = quotaMatcher.group( 1 );
+            String decPart = quotaMatcher.group( 2 );
+            String acronym = quotaMatcher.group( 3 );
             ByteUnit byteUnit = ByteUnit.parseFromAcronym( acronym );
 
-            return new ByteValueResource(
-                    ByteValueResource.toBytes( value, byteUnit == null ? ByteUnit.MB : byteUnit ) );
+
+            return new ByteValueResource( ByteValueResource.toBytes( intPart + ( decPart != null ? decPart : "" ),
+                    byteUnit == null ? ByteUnit.MB : byteUnit ) );
         }
         else
         {
