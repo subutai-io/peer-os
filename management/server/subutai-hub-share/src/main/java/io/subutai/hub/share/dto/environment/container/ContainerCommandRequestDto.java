@@ -1,6 +1,9 @@
 package io.subutai.hub.share.dto.environment.container;
 
 
+import java.util.UUID;
+
+
 /**
  * Command DTO obtained from Hub to execute on a container. Currently has a bare minimum of options but can be extended
  * to accommodate all command options of io.subutai.common.command.RequestBuilder
@@ -19,6 +22,20 @@ public class ContainerCommandRequestDto
     // command timeout in seconds.
     // Min value is 1, Max value is io.subutai.common.settings.Common.MAX_COMMAND_TIMEOUT_SEC
     private int timeout;
+
+
+    public ContainerCommandRequestDto( final String containerId, final String command )
+    {
+        this.commandId = UUID.randomUUID().toString();
+        this.containerId = containerId;
+        this.command = command;
+    }
+
+
+    public void setTimeout( final int timeout )
+    {
+        this.timeout = timeout;
+    }
 
 
     public String getCommandId()
