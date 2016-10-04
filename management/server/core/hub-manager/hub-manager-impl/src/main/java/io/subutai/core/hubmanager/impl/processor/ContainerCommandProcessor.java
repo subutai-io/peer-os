@@ -92,8 +92,6 @@ public class ContainerCommandProcessor implements StateLinkProcessor
     {
         if ( commandResponseDto != null )
         {
-            //todo implement sending of response to Hub
-
             LOG.debug( "COMMAND RESPONSE: {}", commandResponseDto );
 
             try
