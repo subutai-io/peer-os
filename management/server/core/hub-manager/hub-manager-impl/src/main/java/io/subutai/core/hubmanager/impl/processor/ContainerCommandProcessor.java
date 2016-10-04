@@ -21,8 +21,8 @@ public class ContainerCommandProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ContainerCommandProcessor.class.getName() );
 
-    //link should look like this "/rest/v2/peers/{PEER_ID}/containers/{CONTAINER_ID}/execute"
-    private static final Pattern COMMAND_PATTERN = Pattern.compile( "/rest/v2/peers/.*/containers/.*/execute" );
+    private static final String STATE_LINK_PATTERN = "/rest/v2/peers/.*/execute";
+    private static final Pattern PATTERN = Pattern.compile( STATE_LINK_PATTERN );
 
     private final Context context;
 
@@ -38,7 +38,7 @@ public class ContainerCommandProcessor implements StateLinkProcessor
     {
         for ( String link : stateLinks )
         {
-            Matcher matcher = COMMAND_PATTERN.matcher( link );
+            Matcher matcher = PATTERN.matcher( link );
             if ( matcher.matches() )
             {
                 executeCommand( link );
