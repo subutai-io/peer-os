@@ -3,17 +3,31 @@ package io.subutai.hub.share.quota;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
  * Container HOME resource class
  */
+@JsonSerialize( using = ContainerResourceSerializer.class )
+@JsonTypeName( "home" )
 public class ContainerHomeResource extends ContainerDiskResource
 {
-    public ContainerHomeResource( @JsonProperty( value = "resourceValue" ) final ByteValueResource value )
+
+    public ContainerHomeResource( final ByteValueResource value )
+    {
+        super( ContainerResourceType.HOME, value );
+    }
+
+
+    @JsonCreator
+    public ContainerHomeResource( @JsonProperty( "value" ) final String value )
     {
         super( ContainerResourceType.HOME, value );
     }

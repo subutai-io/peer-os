@@ -1,9 +1,12 @@
 package io.subutai.hub.share.quota;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.subutai.hub.share.parser.CpuResourceValueParser;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.NumericValueResource;
 
@@ -11,17 +14,27 @@ import io.subutai.hub.share.resource.NumericValueResource;
 /**
  * Container CPU resource class
  */
+@JsonSerialize( using = ContainerResourceSerializer.class )
+@JsonTypeName( "cpu" )
 public class ContainerCpuResource extends ContainerResource<NumericValueResource>
 {
-    public ContainerCpuResource( @JsonProperty( value = "resourceValue" )final NumericValueResource resourceValue )
+
+    public ContainerCpuResource( final NumericValueResource resourceValue )
     {
         super( ContainerResourceType.CPU, resourceValue );
     }
 
+
+    @JsonCreator
+    public ContainerCpuResource( @JsonProperty( "value" ) final String value )
+    {
+        super( ContainerResourceType.CPU, value );
+    }
+
+
     /**
      * Usually used to write value to CLI
      */
-    @JsonIgnore
     @Override
     public String getWriteValue()
     {
@@ -32,10 +45,16 @@ public class ContainerCpuResource extends ContainerResource<NumericValueResource
     /**
      * Usually used to display resource value
      */
-    @JsonIgnore
     @Override
     public String getPrintValue()
     {
         return String.format( "%s%%", resource.getValue().intValue() );
+    }
+
+
+    @Override
+    protected NumericValueResource parse( final String value )
+    {
+        return CpuResourceValueParser.getInstance().parse( value );
     }
 }

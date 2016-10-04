@@ -3,9 +3,12 @@ package io.subutai.hub.share.quota;
 
 import java.math.BigDecimal;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.subutai.hub.share.parser.RamResourceValueParser;
 import io.subutai.hub.share.resource.ByteUnit;
 import io.subutai.hub.share.resource.ByteValueResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
@@ -14,9 +17,19 @@ import io.subutai.hub.share.resource.ContainerResourceType;
 /**
  * Container RAM resource class
  */
+@JsonSerialize( using = ContainerResourceSerializer.class )
+@JsonTypeName( "ram" )
 public class ContainerRamResource extends ContainerResource<ByteValueResource>
 {
-    public ContainerRamResource( @JsonProperty( value = "resourceValue" ) final ByteValueResource value )
+
+    public ContainerRamResource( final ByteValueResource value )
+    {
+        super( ContainerResourceType.RAM, value );
+    }
+
+
+    @JsonCreator
+    public ContainerRamResource( @JsonProperty( "value" ) final String value )
     {
         super( ContainerResourceType.RAM, value );
     }
@@ -38,7 +51,6 @@ public class ContainerRamResource extends ContainerResource<ByteValueResource>
     /**
      * Usually used to write value to CLI
      */
-    @JsonIgnore
     public String getWriteValue()
     {
         BigDecimal v = resource.convert( ByteUnit.MB );
@@ -49,16 +61,20 @@ public class ContainerRamResource extends ContainerResource<ByteValueResource>
     /**
      * Usually used to display resource value
      */
-    @JsonIgnore
     public String getPrintValue()
     {
         return String.format( "%s%s", resource.convert( ByteUnit.MB ), ByteUnit.MB.getAcronym() );
     }
 
 
-    @JsonIgnore
     public double doubleValue( ByteUnit unit )
     {
         return getResource().getValue( unit ).doubleValue();
+    }
+
+
+    protected ByteValueResource parse( final String value )
+    {
+        return RamResourceValueParser.getInstance().parse( value );
     }
 }

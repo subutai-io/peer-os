@@ -39,16 +39,4 @@ public final class CommonResourceValueParser
         }
         return parser.parse( resource );
     }
-
-
-    public static <T> T parse( String resource, ContainerResourceType type, Class<T> format )
-    {
-        ResourceValueParser parser = getInstance( type );
-        if ( parser == null )
-        {
-            throw new IllegalArgumentException( "Resource value parser not registered for type: " + type );
-        }
-        ResourceValue resourceValue = parser.parse( resource );
-        return ( T ) resourceValue;
-    }
 }

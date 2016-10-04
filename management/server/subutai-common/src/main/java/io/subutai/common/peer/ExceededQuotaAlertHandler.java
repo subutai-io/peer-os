@@ -1,7 +1,6 @@
 package io.subutai.common.peer;
 
 
-import java.math.BigDecimal;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -12,8 +11,7 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.hub.share.quota.ContainerCpuResource;
 import io.subutai.hub.share.quota.ContainerDiskResource;
 import io.subutai.hub.share.quota.ContainerRamResource;
-import io.subutai.hub.share.resource.ByteValueResource;
-import io.subutai.hub.share.resource.NumericValueResource;
+import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 /**
@@ -43,16 +41,10 @@ public abstract class ExceededQuotaAlertHandler extends AbstractAlertHandler<Quo
     public void preProcess( final Environment environment, final QuotaAlertValue alert ) throws AlertHandlerException
     {
         findSourceHost( environment, alert.getValue().getHostId().getId() );
-        final NumericValueResource cpuValue = new NumericValueResource( new BigDecimal( 100 ) );
-        ByteValueResource ramValue =
-                new ByteValueResource( new BigDecimal( alert.getValue().getResourceHostMetric().getAvailableRam() ) );
-
-        ByteValueResource diskValue =
-                new ByteValueResource( new BigDecimal( alert.getValue().getResourceHostMetric().getAvailableSpace() ) );
-
-        cpuResource = new ContainerCpuResource( cpuValue );
-        ramResource = new ContainerRamResource( ramValue );
-        hddResource = new ContainerDiskResource( diskValue );
+        cpuResource = new ContainerCpuResource( "100%" );
+        ramResource = new ContainerRamResource( alert.getValue().getResourceHostMetric().getAvailableRam().toString() );
+        hddResource = new ContainerDiskResource( ContainerResourceType.ROOTFS,
+                alert.getValue().getResourceHostMetric().getAvailableSpace().toString() );
     }
 
 
