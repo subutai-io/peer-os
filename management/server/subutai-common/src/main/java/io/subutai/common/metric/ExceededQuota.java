@@ -80,7 +80,7 @@ public class ExceededQuota
     }
 
 
-    public <T extends ContainerResource> T getContainerResource( final Class<T> format )
+    public <T extends ContainerResource> T getContainerResourceQuota( final Class<T> format )
     {
         ContainerResource result = null;
         try
@@ -134,23 +134,8 @@ public class ExceededQuota
         throw new UnsupportedOperationException( "Used value unsupported." );
     }
 
-
     @SuppressWarnings( "unchecked" )
-    public <T> T getQuotaValue( final Class<T> format )
-    {
-        try
-        {
-            return ( T ) quotaValue;
-        }
-        catch ( ClassCastException cce )
-        {
-            return null;
-        }
-    }
-
-
-    @SuppressWarnings( "unchecked" )
-    public <T> T getCurrentValue( final Class<T> format )
+    public <T extends ResourceValue> T getCurrentValue( final Class<T> format )
     {
         try
         {

@@ -25,6 +25,12 @@ public class ContainerCpuResource extends ContainerResource<NumericValueResource
     }
 
 
+    public ContainerCpuResource( final int cpuValue )
+    {
+        super( ContainerResourceType.CPU, new NumericValueResource( cpuValue ) );
+    }
+
+
     @JsonCreator
     public ContainerCpuResource( @JsonProperty( "value" ) final String value )
     {
