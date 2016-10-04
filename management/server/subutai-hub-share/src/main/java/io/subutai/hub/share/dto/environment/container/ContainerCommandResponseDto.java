@@ -7,7 +7,10 @@ import com.google.common.base.MoreObjects;
 public class ContainerCommandResponseDto
 {
 
-    //id of corresponding command request
+    // id of target container
+    private final String containerId;
+
+    // id of corresponding command request
     private final String commandId;
 
     // can be null if command timed out, 0 indicates successful completion of command,
@@ -27,9 +30,10 @@ public class ContainerCommandResponseDto
     private String exception;
 
 
-    public ContainerCommandResponseDto( final String commandId, final Integer exitCode, final String stdOut,
-                                        final String stdErr, final boolean hasTimedOut )
+    public ContainerCommandResponseDto( final String containerId, final String commandId, final Integer exitCode,
+                                        final String stdOut, final String stdErr, final boolean hasTimedOut )
     {
+        this.containerId = containerId;
         this.commandId = commandId;
         this.exitCode = exitCode;
         this.stdOut = stdOut;
@@ -38,8 +42,9 @@ public class ContainerCommandResponseDto
     }
 
 
-    public ContainerCommandResponseDto( final String commandId, final String exception )
+    public ContainerCommandResponseDto( final String containerId, final String commandId, final String exception )
     {
+        this.containerId = containerId;
         this.commandId = commandId;
         this.exception = exception;
     }
@@ -75,17 +80,23 @@ public class ContainerCommandResponseDto
     }
 
 
-    public boolean isHasTimedOut()
+    public boolean hasTimedOut()
     {
         return hasTimedOut;
+    }
+
+
+    public String getContainerId()
+    {
+        return containerId;
     }
 
 
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper( this ).add( "commandId", commandId ).add( "exitCode", exitCode )
-                          .add( "stdOut", stdOut ).add( "stdErr", stdErr ).add( "hasTimedOut", hasTimedOut )
-                          .add( "exception", exception ).toString();
+        return MoreObjects.toStringHelper( this ).add( "containerId", containerId ).add( "commandId", commandId )
+                          .add( "exitCode", exitCode ).add( "stdOut", stdOut ).add( "stdErr", stdErr )
+                          .add( "hasTimedOut", hasTimedOut ).add( "exception", exception ).toString();
     }
 }

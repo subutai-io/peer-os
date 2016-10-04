@@ -68,17 +68,17 @@ public class ContainerCommandProcessor implements StateLinkProcessor
                         new RequestBuilder( commandRequestDto.getCommand() )
                                 .withTimeout( commandRequestDto.getTimeout() ) );
 
-                commandResponseDto =
-                        new ContainerCommandResponseDto( commandRequestDto.getCommand(), commandResult.getExitCode(),
-                                commandResult.getStdOut(), commandResult.getStdErr(), commandResult.hasTimedOut() );
+                commandResponseDto = new ContainerCommandResponseDto( commandRequestDto.getContainerId(),
+                        commandRequestDto.getCommand(), commandResult.getExitCode(), commandResult.getStdOut(),
+                        commandResult.getStdErr(), commandResult.hasTimedOut() );
             }
         }
         catch ( Exception ex )
         {
             if ( commandRequestDto != null )
             {
-                commandResponseDto =
-                        new ContainerCommandResponseDto( commandRequestDto.getCommandId(), ex.getMessage() );
+                commandResponseDto = new ContainerCommandResponseDto( commandRequestDto.getContainerId(),
+                        commandRequestDto.getCommandId(), ex.getMessage() );
             }
         }
 
