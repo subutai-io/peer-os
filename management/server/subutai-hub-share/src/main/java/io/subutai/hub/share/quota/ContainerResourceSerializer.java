@@ -9,9 +9,6 @@ import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 
-/**
- * Created by tzhamakeev on 9/30/16.
- */
 public class ContainerResourceSerializer extends StdSerializer<ContainerResource>
 {
 
@@ -41,7 +38,7 @@ public class ContainerResourceSerializer extends StdSerializer<ContainerResource
             throws IOException
     {
         typeSer.writeTypePrefixForObject( value, gen );
-        serialize( value, gen, serializers ); // call your customized serialize method
+        serialize( value, gen, serializers );
         typeSer.writeTypeSuffixForObject( value, gen );
     }
 }

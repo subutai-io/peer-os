@@ -23,7 +23,6 @@ import io.subutai.hub.share.resource.ResourceValue;
 public abstract class ContainerResource<T extends ResourceValue>
 {
     private ContainerResourceType containerResourceType;
-//    @JsonUnwrapped
     protected T resource;
 
 

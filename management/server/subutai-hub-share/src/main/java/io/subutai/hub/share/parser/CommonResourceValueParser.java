@@ -1,8 +1,6 @@
 package io.subutai.hub.share.parser;
 
 
-import io.subutai.hub.share.quota.ContainerHomeResource;
-import io.subutai.hub.share.quota.ContainerResource;
 import io.subutai.hub.share.resource.ContainerResourceType;
 import io.subutai.hub.share.resource.ResourceValue;
 import io.subutai.hub.share.resource.ResourceValueParser;
@@ -41,24 +39,4 @@ public final class CommonResourceValueParser
         }
         return parser.parse( resource );
     }
-
-//
-//    public static <T extends ContainerResource> T parse( String resource, T format )
-//    {
-//        return (T)format.parse( resource );
-//        ResourceValueParser parser = getInstance( format );
-//        if ( parser == null )
-//        {
-//            throw new IllegalArgumentException( "Resource value parser not registered for type: " + format );
-//        }
-//        ResourceValue resourceValue = parser.parse( resource );
-//        return ( T ) resourceValue;
-//    }
-//
-//
-//    private static <T> ResourceValueParser getInstance( final Class<T> format )
-//    {
-//
-//        return null;
-//    }
 }
