@@ -3,6 +3,8 @@ package io.subutai.core.executor.impl;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 
 import static org.hamcrest.CoreMatchers.containsString;

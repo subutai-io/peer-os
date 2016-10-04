@@ -1,0 +1,100 @@
+package io.subutai.core.hubmanager.impl.processor;
+
+
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.RequestBuilder;
+import io.subutai.common.peer.ContainerHost;
+import io.subutai.core.hubmanager.api.StateLinkProcessor;
+import io.subutai.core.hubmanager.impl.environment.state.Context;
+import io.subutai.hub.share.dto.environment.container.ContainerCommandRequestDto;
+import io.subutai.hub.share.dto.environment.container.ContainerCommandResponseDto;
+
+
+public class ContainerCommandProcessor implements StateLinkProcessor
+{
+    private static final Logger LOG = LoggerFactory.getLogger( ContainerCommandProcessor.class.getName() );
+
+    //link should look like this "/rest/v1/peers/{PEER_ID}/containers/{CONTAINER_ID}/execute"
+    private static final Pattern COMMAND_PATTERN = Pattern.compile( "/rest/v1/peers/.*/containers/.*/execute" );
+
+    private final Context context;
+
+
+    public ContainerCommandProcessor( final Context context )
+    {
+        this.context = context;
+    }
+
+
+    @Override
+    public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
+    {
+        for ( String link : stateLinks )
+        {
+            Matcher matcher = COMMAND_PATTERN.matcher( link );
+            if ( matcher.matches() )
+            {
+                executeCommand( link );
+            }
+        }
+
+        return false;
+    }
+
+
+    private void executeCommand( final String link )
+    {
+
+        ContainerCommandRequestDto commandRequestDto = null;
+        ContainerCommandResponseDto commandResponseDto = null;
+
+        try
+        {
+            commandRequestDto = context.restClient.getStrict( link, ContainerCommandRequestDto.class );
+
+            if ( commandRequestDto != null )
+            {
+                ContainerHost containerHost =
+                        context.localPeer.getContainerHostById( commandRequestDto.getContainerId() );
+
+                CommandResult commandResult = containerHost.execute(
+                        new RequestBuilder( commandRequestDto.getCommand() )
+                                .withTimeout( commandRequestDto.getTimeout() ) );
+
+                commandResponseDto =
+                        new ContainerCommandResponseDto( commandRequestDto.getCommand(), commandResult.getExitCode(),
+                                commandResult.getStdOut(), commandResult.getStdErr(), commandResult.hasTimedOut() );
+            }
+        }
+        catch ( Exception ex )
+        {
+            if ( commandRequestDto != null )
+            {
+                commandResponseDto =
+                        new ContainerCommandResponseDto( commandRequestDto.getCommandId(), ex.getMessage() );
+            }
+        }
+
+
+        //send response
+        sendResponse( commandResponseDto );
+    }
+
+
+    protected void sendResponse( final ContainerCommandResponseDto commandResponseDto )
+    {
+        if ( commandResponseDto != null )
+        {
+            //todo implement sending of response to Hub
+
+            LOG.debug( "COMMAND RESPONSE: {}" , commandResponseDto);
+        }
+    }
+}

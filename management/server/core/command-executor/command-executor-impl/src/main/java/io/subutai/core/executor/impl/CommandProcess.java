@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
