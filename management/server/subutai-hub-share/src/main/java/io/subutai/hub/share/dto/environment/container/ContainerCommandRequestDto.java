@@ -21,7 +21,7 @@ public class ContainerCommandRequestDto
 
     // command timeout in seconds.
     // Min value is 1, Max value is io.subutai.common.settings.Common.MAX_COMMAND_TIMEOUT_SEC
-    private int timeout;
+    private int timeout = 30;
 
 
     public ContainerCommandRequestDto( final String containerId, final String command )
