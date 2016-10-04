@@ -1,10 +1,10 @@
 package io.subutai.hub.share.dto.environment.container;
 
 
-import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 
 
 /**
@@ -12,27 +12,27 @@ import com.google.common.collect.Sets;
  */
 public class ContainerCommandBatchDto
 {
-    Set<ContainerCommandRequestDto> commandRequestDtos = Sets.newHashSet();
+    private final Set<ContainerCommandRequestDto> commandRequestDtos;
 
 
-    public ContainerCommandBatchDto( final ContainerCommandRequestDto containerCommandRequestDto )
+    public ContainerCommandBatchDto( final Set<ContainerCommandRequestDto> containerCommandRequestDtos )
     {
-        Objects.requireNonNull( containerCommandRequestDto, "Invalid container command dto" );
+        Preconditions.checkNotNull( containerCommandRequestDtos );
+        Preconditions.checkArgument( !containerCommandRequestDtos.isEmpty() );
 
-        commandRequestDtos.add( containerCommandRequestDto );
-    }
-
-
-    public void addCommandRequest( ContainerCommandRequestDto containerCommandRequestDto )
-    {
-        Objects.requireNonNull( containerCommandRequestDto, "Invalid container command dto" );
-
-        commandRequestDtos.add( containerCommandRequestDto );
+        commandRequestDtos = containerCommandRequestDtos;
     }
 
 
     public Set<ContainerCommandRequestDto> getCommandRequestDtos()
     {
         return commandRequestDtos;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return MoreObjects.toStringHelper( this ).add( "commandRequestDtos", commandRequestDtos ).toString();
     }
 }
