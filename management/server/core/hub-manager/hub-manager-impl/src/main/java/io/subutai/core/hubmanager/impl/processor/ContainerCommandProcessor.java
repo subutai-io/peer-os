@@ -84,17 +84,26 @@ public class ContainerCommandProcessor implements StateLinkProcessor
 
 
         //send response
-        sendResponse( commandResponseDto );
+        sendResponse( link, commandResponseDto );
     }
 
 
-    protected void sendResponse( final ContainerCommandResponseDto commandResponseDto )
+    protected void sendResponse( final String link, final ContainerCommandResponseDto commandResponseDto )
     {
         if ( commandResponseDto != null )
         {
             //todo implement sending of response to Hub
 
-            LOG.debug( "COMMAND RESPONSE: {}" , commandResponseDto);
+            LOG.debug( "COMMAND RESPONSE: {}", commandResponseDto );
+
+            try
+            {
+                context.restClient.post( link, commandResponseDto );
+            }
+            catch ( Exception e )
+            {
+                LOG.error( "Error sending command response to Hub: {}", e.getMessage() );
+            }
         }
     }
 }
