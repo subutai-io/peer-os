@@ -2,6 +2,8 @@ package io.subutai.core.hubmanager.impl.processor;
 
 
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +15,7 @@ import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
+import io.subutai.hub.share.dto.environment.container.ContainerCommandBatchDto;
 import io.subutai.hub.share.dto.environment.container.ContainerCommandRequestDto;
 import io.subutai.hub.share.dto.environment.container.ContainerCommandResponseDto;
 
@@ -25,6 +28,7 @@ public class ContainerCommandProcessor implements StateLinkProcessor
     private static final Pattern PATTERN = Pattern.compile( STATE_LINK_PATTERN );
 
     private final Context context;
+    private ExecutorService pool = Executors.newCachedThreadPool();
 
 
     public ContainerCommandProcessor( final Context context )
@@ -39,9 +43,10 @@ public class ContainerCommandProcessor implements StateLinkProcessor
         for ( String link : stateLinks )
         {
             Matcher matcher = PATTERN.matcher( link );
+
             if ( matcher.matches() )
             {
-                executeCommand( link );
+                process( link );
             }
         }
 
@@ -49,17 +54,48 @@ public class ContainerCommandProcessor implements StateLinkProcessor
     }
 
 
-    private void executeCommand( final String link )
+    protected void process( final String link )
     {
-
-        ContainerCommandRequestDto commandRequestDto = null;
-        ContainerCommandResponseDto commandResponseDto = null;
-
         try
         {
-            commandRequestDto = context.restClient.getStrict( link, ContainerCommandRequestDto.class );
+            ContainerCommandBatchDto commandBatchDto =
+                    context.restClient.getStrict( link, ContainerCommandBatchDto.class );
 
-            if ( commandRequestDto != null )
+            if ( commandBatchDto != null )
+            {
+                for ( ContainerCommandRequestDto commandRequestDto : commandBatchDto.getCommandRequestDtos() )
+                {
+
+                    pool.execute( new ContainerCommandTask( link, commandRequestDto ) );
+                }
+            }
+        }
+        catch ( Exception ex )
+        {
+            LOG.error( "Error obtaining command requests from Hub: {}", ex.getMessage() );
+        }
+    }
+
+
+    private class ContainerCommandTask implements Runnable
+    {
+        private final String link;
+        private final ContainerCommandRequestDto commandRequestDto;
+
+
+        ContainerCommandTask( final String link, final ContainerCommandRequestDto commandRequestDto )
+        {
+            this.link = link;
+            this.commandRequestDto = commandRequestDto;
+        }
+
+
+        @Override
+        public void run()
+        {
+            ContainerCommandResponseDto commandResponseDto;
+
+            try
             {
                 ContainerHost containerHost =
                         context.localPeer.getContainerHostById( commandRequestDto.getContainerId() );
@@ -72,35 +108,33 @@ public class ContainerCommandProcessor implements StateLinkProcessor
                         commandRequestDto.getCommandId(), commandResult.getExitCode(), commandResult.getStdOut(),
                         commandResult.getStdErr(), commandResult.hasTimedOut() );
             }
-        }
-        catch ( Exception ex )
-        {
-            if ( commandRequestDto != null )
-            {
-                commandResponseDto = new ContainerCommandResponseDto( commandRequestDto.getContainerId(),
-                        commandRequestDto.getCommandId(), ex.getMessage() );
-            }
-        }
-
-
-        //send response
-        sendResponse( link, commandResponseDto );
-    }
-
-
-    protected void sendResponse( final String link, final ContainerCommandResponseDto commandResponseDto )
-    {
-        if ( commandResponseDto != null )
-        {
-            LOG.debug( "COMMAND RESPONSE: {}", commandResponseDto );
-
-            try
-            {
-                context.restClient.post( link, commandResponseDto );
-            }
             catch ( Exception e )
             {
-                LOG.error( "Error sending command response to Hub: {}", e.getMessage() );
+                LOG.error( "Error executing Hub command {}: {}", commandRequestDto, e.getMessage() );
+
+                commandResponseDto = new ContainerCommandResponseDto( commandRequestDto.getContainerId(),
+                        commandRequestDto.getCommandId(), e.getMessage() );
+            }
+
+            //send response
+            sendResponse( link, commandResponseDto );
+        }
+
+
+        void sendResponse( final String link, final ContainerCommandResponseDto commandResponseDto )
+        {
+            if ( commandResponseDto != null )
+            {
+                LOG.debug( "COMMAND RESPONSE: {}", commandResponseDto );
+
+                try
+                {
+                    context.restClient.post( link, commandResponseDto );
+                }
+                catch ( Exception e )
+                {
+                    LOG.error( "Error sending command response {} to Hub: {}", commandResponseDto, e.getMessage() );
+                }
             }
         }
     }

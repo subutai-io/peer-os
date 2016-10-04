@@ -10,6 +10,9 @@ import java.util.UUID;
  */
 public class ContainerCommandRequestDto
 {
+    // id of target peer
+    private String peerId;
+
     // id of command on Hub to be able to match command with its response
     private String commandId;
 
@@ -24,9 +27,10 @@ public class ContainerCommandRequestDto
     private int timeout = 30;
 
 
-    public ContainerCommandRequestDto( final String containerId, final String command )
+    public ContainerCommandRequestDto( final String peerId, final String containerId, final String command )
     {
         this.commandId = UUID.randomUUID().toString();
+        this.peerId = peerId;
         this.containerId = containerId;
         this.command = command;
     }
@@ -35,6 +39,12 @@ public class ContainerCommandRequestDto
     public void setTimeout( final int timeout )
     {
         this.timeout = timeout;
+    }
+
+
+    public String getPeerId()
+    {
+        return peerId;
     }
 
 
