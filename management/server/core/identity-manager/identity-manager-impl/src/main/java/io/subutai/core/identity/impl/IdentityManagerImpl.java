@@ -798,7 +798,7 @@ public class IdentityManagerImpl implements IdentityManager
                 user.setSecurityKeyId( secId );
             }
             publicKeyASCII = publicKeyASCII.trim();
-            securityManager.getKeyManager().savePublicKeyRing( secId, 1, publicKeyASCII );
+            securityManager.getKeyManager().savePublicKeyRing( secId, SecurityKeyType.UserKey.getId(), publicKeyASCII );
             user.setFingerprint( securityManager.getKeyManager().getFingerprint( secId ) );
             identityDataService.updateUser( user );
         }
@@ -1216,7 +1216,7 @@ public class IdentityManagerImpl implements IdentityManager
             if ( generateKeyPair )
             {
                 String securityKeyId = user.getId() + "-" + UUID.randomUUID();
-                generateKeyPair( securityKeyId, 1 );
+                generateKeyPair( securityKeyId, SecurityKeyType.UserKey.getId() );
                 user.setSecurityKeyId( securityKeyId );
                 identityDataService.updateUser( user );
             }

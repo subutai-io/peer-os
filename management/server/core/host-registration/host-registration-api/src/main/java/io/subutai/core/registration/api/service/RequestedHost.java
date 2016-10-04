@@ -5,7 +5,7 @@ import java.util.Set;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 
 
 public interface RequestedHost
@@ -20,7 +20,7 @@ public interface RequestedHost
 
     HostArchitecture getArch();
 
-    RegistrationStatus getStatus();
+    ResourceHostRegistrationStatus getStatus();
 
     String getPublicKey();
 

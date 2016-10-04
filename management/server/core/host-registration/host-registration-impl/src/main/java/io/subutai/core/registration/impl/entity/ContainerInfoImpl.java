@@ -28,7 +28,7 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 
 
@@ -88,7 +88,7 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
     @Column( name = "reg_status" )
     @Enumerated( EnumType.STRING )
     @Expose
-    private RegistrationStatus status = RegistrationStatus.REQUESTED;
+    private ResourceHostRegistrationStatus status = ResourceHostRegistrationStatus.REQUESTED;
 
     @Column( name = "state" )
     @Enumerated( EnumType.STRING )
@@ -132,13 +132,13 @@ public class ContainerInfoImpl implements ContainerInfo, Serializable
 
 
     @Override
-    public RegistrationStatus getStatus()
+    public ResourceHostRegistrationStatus getStatus()
     {
         return status;
     }
 
 
-    public void setStatus( final RegistrationStatus status )
+    public void setStatus( final ResourceHostRegistrationStatus status )
     {
         this.status = status;
     }

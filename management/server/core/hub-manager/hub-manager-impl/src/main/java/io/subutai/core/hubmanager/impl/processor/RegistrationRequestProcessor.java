@@ -12,7 +12,7 @@ import io.subutai.core.hubmanager.impl.HubManagerImpl;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.service.RequestedHost;
 import io.subutai.hub.share.dto.host.RequestedHostDto;
 import io.subutai.hub.share.dto.host.RequestedHostsDto;
@@ -28,13 +28,13 @@ public class RegistrationRequestProcessor implements Runnable
 
     private PeerManager peerManager;
 
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
 
     private final HubRestClient restClient;
 
 
     public RegistrationRequestProcessor( final HubManagerImpl integration, final PeerManager peerManager,
-                                         final RegistrationManager registrationManager, final HubRestClient restClient )
+                                         final HostRegistrationManager registrationManager, final HubRestClient restClient )
     {
         this.peerManager = peerManager;
         this.manager = integration;

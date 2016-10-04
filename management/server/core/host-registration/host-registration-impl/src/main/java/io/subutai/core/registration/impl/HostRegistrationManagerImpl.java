@@ -18,10 +18,11 @@ import io.subutai.common.host.HostInfo;
 import io.subutai.common.peer.HostNotFoundException;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.ServiceLocator;
-import io.subutai.core.registration.api.RegistrationManager;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.HostRegistrationManager;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.ContainerToken;
@@ -35,17 +36,17 @@ import io.subutai.core.security.api.crypto.KeyManager;
 
 
 //TODO add security annotation
-public class RegistrationManagerImpl implements RegistrationManager
+public class HostRegistrationManagerImpl implements HostRegistrationManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger( RegistrationManagerImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( HostRegistrationManagerImpl.class );
     private SecurityManager securityManager;
-    private RequestDataService requestDataService;
-    private ContainerTokenDataService containerTokenDataService;
+    protected RequestDataService requestDataService;
+    protected ContainerTokenDataService containerTokenDataService;
     private DaoManager daoManager;
     protected ServiceLocator serviceLocator = new ServiceLocator();
 
 
-    public RegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
+    public HostRegistrationManagerImpl( final SecurityManager securityManager, final DaoManager daoManager )
     {
         Preconditions.checkNotNull( securityManager );
         Preconditions.checkNotNull( daoManager );
@@ -65,14 +66,6 @@ public class RegistrationManagerImpl implements RegistrationManager
     protected RequestDataService getRequestDataService()
     {
         return requestDataService;
-    }
-
-
-    protected void setRequestDataService( final RequestDataService requestDataService )
-    {
-        Preconditions.checkNotNull( requestDataService, "RequestDataService shouldn't be null." );
-
-        this.requestDataService = requestDataService;
     }
 
 
@@ -125,7 +118,7 @@ public class RegistrationManagerImpl implements RegistrationManager
             {
                 RequestedHostImpl registrationRequest = new RequestedHostImpl( requestedHost );
 
-                registrationRequest.setStatus( RegistrationStatus.REQUESTED );
+                registrationRequest.setStatus( ResourceHostRegistrationStatus.REQUESTED );
 
                 requestDataService.update( registrationRequest );
 
@@ -147,7 +140,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         try
         {
             RequestedHostImpl registrationRequest = requestDataService.find( requestId );
-            registrationRequest.setStatus( RegistrationStatus.REJECTED );
+            registrationRequest.setStatus( ResourceHostRegistrationStatus.REJECTED );
             requestDataService.update( registrationRequest );
         }
         catch ( Exception e )
@@ -166,23 +159,23 @@ public class RegistrationManagerImpl implements RegistrationManager
         {
             RequestedHostImpl registrationRequest = requestDataService.find( requestId );
 
-            if ( registrationRequest == null || !RegistrationStatus.REQUESTED
+            if ( registrationRequest == null || !ResourceHostRegistrationStatus.REQUESTED
                     .equals( registrationRequest.getStatus() ) )
             {
                 return;
             }
 
-            registrationRequest.setStatus( RegistrationStatus.APPROVED );
+            registrationRequest.setStatus( ResourceHostRegistrationStatus.APPROVED );
 
             requestDataService.update( registrationRequest );
 
-            importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey() );
+            importHostPublicKey( registrationRequest.getId(), registrationRequest.getPublicKey(), true );
 
             importHostSslCert( registrationRequest.getId(), registrationRequest.getCert() );
 
             for ( final ContainerInfo containerInfo : registrationRequest.getHostInfos() )
             {
-                importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey() );
+                importHostPublicKey( containerInfo.getId(), containerInfo.getPublicKey(), false );
             }
         }
         catch ( Exception e )
@@ -253,6 +246,7 @@ public class RegistrationManagerImpl implements RegistrationManager
         try
         {
             ContainerTokenImpl containerToken = containerTokenDataService.find( token );
+
             if ( containerToken == null )
             {
                 throw new HostRegistrationException( "Couldn't verify container token" );
@@ -262,14 +256,18 @@ public class RegistrationManagerImpl implements RegistrationManager
             {
                 throw new HostRegistrationException( "Container token expired" );
             }
+
             try
             {
-                securityManager.getKeyManager().savePublicKeyRing( containerHostId, ( short ) 2, publicKey );
+                securityManager.getKeyManager()
+                               .savePublicKeyRing( containerHostId, SecurityKeyType.ContainerHostKey.getId(),
+                                       publicKey );
             }
             catch ( Exception ex )
             {
                 throw new HostRegistrationException( "Failed to store container pubkey", ex );
             }
+
             return containerToken;
         }
         catch ( HostRegistrationException e )
@@ -285,32 +283,33 @@ public class RegistrationManagerImpl implements RegistrationManager
     }
 
 
-    private void importHostSslCert( String hostId, String cert )
+    protected void importHostSslCert( String hostId, String cert )
     {
         securityManager.getKeyStoreManager().importCertAsTrusted( Common.DEFAULT_PUBLIC_SECURE_PORT, hostId, cert );
         securityManager.getHttpContextManager().reloadKeyStore();
     }
 
 
-    private void importHostPublicKey( String hostId, String publicKey )
+    protected void importHostPublicKey( String hostId, String publicKey, boolean rh )
     {
         KeyManager keyManager = securityManager.getKeyManager();
-        keyManager.savePublicKeyRing( hostId, ( short ) 2, publicKey );
+        keyManager.savePublicKeyRing( hostId,
+                rh ? SecurityKeyType.ResourceHostKey.getId() : SecurityKeyType.ContainerHostKey.getId(), publicKey );
     }
 
 
-    private void checkManagement( RequestedHost requestedHost )
+    protected void checkManagement( RequestedHost requestedHost )
     {
         try
         {
-            if ( requestedHost.getStatus() == RegistrationStatus.REQUESTED && containsManagementContainer(
+            if ( requestedHost.getStatus() == ResourceHostRegistrationStatus.REQUESTED && containsManagementContainer(
                     requestedHost.getHostInfos() ) )
             {
                 boolean managementAlreadyApproved = false;
 
                 for ( RequestedHostImpl requestedHostImpl : requestDataService.getAll() )
                 {
-                    if ( requestedHostImpl.getStatus() == RegistrationStatus.APPROVED && containsManagementContainer(
+                    if ( requestedHostImpl.getStatus() == ResourceHostRegistrationStatus.APPROVED && containsManagementContainer(
                             requestedHostImpl.getHostInfos() ) )
                     {
                         managementAlreadyApproved = true;
@@ -331,7 +330,7 @@ public class RegistrationManagerImpl implements RegistrationManager
     }
 
 
-    private boolean containsManagementContainer( Set<ContainerInfo> containers )
+    protected boolean containsManagementContainer( Set<ContainerInfo> containers )
     {
         for ( HostInfo hostInfo : containers )
         {

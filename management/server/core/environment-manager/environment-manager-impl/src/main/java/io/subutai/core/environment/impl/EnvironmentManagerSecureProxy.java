@@ -12,16 +12,12 @@ import java.util.Set;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import io.subutai.common.environment.ContainerHostNotFoundException;
-import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
@@ -79,7 +75,6 @@ import io.subutai.hub.share.dto.PeerProductDataDto;
 public class EnvironmentManagerSecureProxy
         implements EnvironmentManager, PeerActionListener, AlertListener, SecureEnvironmentManager, HubEventListener
 {
-    private static final Logger LOG = LoggerFactory.getLogger( EnvironmentManagerSecureProxy.class );
     private final EnvironmentManagerImpl environmentManager;
     private final IdentityManager identityManager;
     private final Tracker tracker;
@@ -100,9 +95,16 @@ public class EnvironmentManagerSecureProxy
         this.relationManager = relationManager;
         this.tracker = tracker;
         this.identityManager = identityManager;
-        this.environmentManager =
-                new EnvironmentManagerImpl( peerManager, securityManager, identityManager, tracker, relationManager,
-                        hubAdapter, environmentService );
+        this.environmentManager = getEnvironmentManager( peerManager, securityManager, hubAdapter, environmentService );
+    }
+
+
+    protected EnvironmentManagerImpl getEnvironmentManager( PeerManager peerManager, SecurityManager securityManager,
+                                                            HubAdapter hubAdapter,
+                                                            EnvironmentService environmentService )
+    {
+        return new EnvironmentManagerImpl( peerManager, securityManager, identityManager, tracker, relationManager,
+                hubAdapter, environmentService );
     }
 
 
@@ -129,8 +131,10 @@ public class EnvironmentManagerSecureProxy
         environmentManager.unregisterListener( listener );
     }
 
+    //security checks start
 
-    private Map<String, String> traitsBuilder( String traitCollection )
+
+    protected Map<String, String> traitsBuilder( String traitCollection )
     {
         Map<String, String> keyValue = Maps.newHashMap();
         String[] traits = traitCollection.split( ";" );
@@ -143,7 +147,7 @@ public class EnvironmentManagerSecureProxy
     }
 
 
-    private void check( RelationLink source, RelationLink target, Map<String, String> traits )
+    protected void check( RelationLink source, RelationLink target, Map<String, String> traits )
             throws RelationVerificationException
     {
         RelationInfoMeta meta = new RelationInfoMeta();
@@ -160,7 +164,7 @@ public class EnvironmentManagerSecureProxy
     }
 
 
-    private void check( RelationLink source, Collection<? extends RelationLink> targets, Map<String, String> traits )
+    protected void check( RelationLink source, Collection<? extends RelationLink> targets, Map<String, String> traits )
     {
 
         for ( Iterator<?> it = targets.iterator(); it.hasNext(); )
@@ -176,6 +180,8 @@ public class EnvironmentManagerSecureProxy
             }
         }
     }
+
+    //security checks end
 
 
     @Override
@@ -812,15 +818,7 @@ public class EnvironmentManagerSecureProxy
     @Override
     public void onPluginEvent( final String pluginUid, final PeerProductDataDto.State state )
     {
-    }
-
-
-    @RolesAllowed( "Environment-Management|Update" )
-    @Override
-    public EnvConnectivityState checkEnvironmentConnectivity( final String environmentId )
-            throws EnvironmentNotFoundException, EnvironmentManagerException
-    {
-        return environmentManager.checkEnvironmentConnectivity( environmentId );
+        environmentManager.onPluginEvent( pluginUid, state );
     }
 
 

@@ -17,6 +17,7 @@ public class UpdateEtcHostsStep
     private final String oldHostname;
     private final String newHostname;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public UpdateEtcHostsStep( final EnvironmentImpl environment, final String oldHostname, final String newHostname,
@@ -33,7 +34,6 @@ public class UpdateEtcHostsStep
     {
         Set<Peer> peers = environment.getPeers();
 
-        PeerUtil<Object> peerUtil = new PeerUtil<>();
 
         for ( final Peer peer : peers )
         {

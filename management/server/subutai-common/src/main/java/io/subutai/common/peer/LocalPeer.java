@@ -143,7 +143,7 @@ public interface LocalPeer extends Peer
 
     Set<Template> getTemplates();
 
-    SshTunnel setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
+    SshTunnel setupSshTunnelForContainer( String containerIp, int sshIdleTimeout ) throws PeerException;
 
     List<ContainerHost> getPeerContainers( String peerId );
 

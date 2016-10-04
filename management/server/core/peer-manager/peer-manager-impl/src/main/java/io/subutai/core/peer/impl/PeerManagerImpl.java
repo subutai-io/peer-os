@@ -46,6 +46,7 @@ import io.subutai.common.peer.RegistrationData;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
+import io.subutai.common.security.objects.SecurityKeyType;
 import io.subutai.common.security.objects.TokenType;
 import io.subutai.common.security.relation.RelationManager;
 import io.subutai.common.security.relation.model.Relation;
@@ -270,7 +271,8 @@ public class PeerManagerImpl implements PeerManager
             Encrypted encryptedPublicKey = registrationData.getPublicKey();
             String publicKey = encryptedPublicKey.decrypt( key, String.class );
             securityManager.getKeyManager()
-                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), ( short ) 3, publicKey );
+                           .savePublicKeyRing( registrationData.getPeerInfo().getId(), SecurityKeyType.PeerKey.getId(),
+                                   publicKey );
         }
         catch ( GeneralSecurityException e )
         {

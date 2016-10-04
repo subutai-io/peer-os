@@ -12,7 +12,7 @@ import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
 import io.subutai.core.hubmanager.impl.http.RestResult;
 import io.subutai.core.peer.api.PeerManager;
-import io.subutai.core.registration.api.RegistrationManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.registration.api.exception.HostRegistrationException;
 import io.subutai.hub.share.dto.ResourceHostDataDto;
 import io.subutai.hub.share.dto.host.RequestedHostDto;
@@ -24,14 +24,14 @@ public class ResourceHostRegisterProcessor implements StateLinkProcessor
 {
     private static final Logger LOG = LoggerFactory.getLogger( ResourceHostRegisterProcessor.class.getName() );
 
-    private RegistrationManager registrationManager;
+    private HostRegistrationManager registrationManager;
     private HubRestClient restClient;
     private PeerManager peerManager;
 
     private static final Pattern RH_DATA_PATTERN = Pattern.compile( "/rest/v1/peers/.*/requested-hosts/.*" );
 
 
-    public ResourceHostRegisterProcessor( final RegistrationManager registrationManager, final PeerManager peerManager,
+    public ResourceHostRegisterProcessor( final HostRegistrationManager registrationManager, final PeerManager peerManager,
                                           final HubRestClient restClient )
     {
         this.registrationManager = registrationManager;

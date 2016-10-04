@@ -8,7 +8,7 @@ import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
 
@@ -28,7 +28,7 @@ public class RequestedHostJson implements RequestedHost
     @Expose
     private String publicKey;
     @Expose
-    private RegistrationStatus status;
+    private ResourceHostRegistrationStatus status;
     @Expose
     private String cert;
     @Expose
@@ -116,7 +116,7 @@ public class RequestedHostJson implements RequestedHost
 
 
     @Override
-    public RegistrationStatus getStatus()
+    public ResourceHostRegistrationStatus getStatus()
     {
         return status;
     }
