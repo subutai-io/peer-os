@@ -27,6 +27,11 @@ public class ContainerCommandRequestDto
     private int timeout = 30;
 
 
+    protected ContainerCommandRequestDto()
+    {
+    }
+
+
     public ContainerCommandRequestDto( final String peerId, final String containerId, final String command )
     {
         this.commandId = UUID.randomUUID().toString();
@@ -69,5 +74,19 @@ public class ContainerCommandRequestDto
     public int getTimeout()
     {
         return timeout;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        final StringBuffer sb = new StringBuffer( "ContainerCommandRequestDto{" );
+        sb.append( "peerId='" ).append( peerId ).append( '\'' );
+        sb.append( ", commandId='" ).append( commandId ).append( '\'' );
+        sb.append( ", containerId='" ).append( containerId ).append( '\'' );
+        sb.append( ", command='" ).append( command ).append( '\'' );
+        sb.append( ", timeout=" ).append( timeout );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

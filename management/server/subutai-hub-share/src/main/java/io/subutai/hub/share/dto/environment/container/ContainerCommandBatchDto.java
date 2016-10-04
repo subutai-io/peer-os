@@ -1,10 +1,8 @@
 package io.subutai.hub.share.dto.environment.container;
 
 
+import java.util.Objects;
 import java.util.Set;
-
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
 
 
 /**
@@ -12,13 +10,21 @@ import com.google.common.base.Preconditions;
  */
 public class ContainerCommandBatchDto
 {
-    private final Set<ContainerCommandRequestDto> commandRequestDtos;
+    private Set<ContainerCommandRequestDto> commandRequestDtos;
+
+
+    protected ContainerCommandBatchDto()
+    {
+    }
 
 
     public ContainerCommandBatchDto( final Set<ContainerCommandRequestDto> containerCommandRequestDtos )
     {
-        Preconditions.checkNotNull( containerCommandRequestDtos );
-        Preconditions.checkArgument( !containerCommandRequestDtos.isEmpty() );
+        Objects.requireNonNull( containerCommandRequestDtos );
+        if ( containerCommandRequestDtos.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
 
         commandRequestDtos = containerCommandRequestDtos;
     }
@@ -33,6 +39,9 @@ public class ContainerCommandBatchDto
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper( this ).add( "commandRequestDtos", commandRequestDtos ).toString();
+        final StringBuffer sb = new StringBuffer( "ContainerCommandBatchDto{" );
+        sb.append( "commandRequestDtos=" ).append( commandRequestDtos );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

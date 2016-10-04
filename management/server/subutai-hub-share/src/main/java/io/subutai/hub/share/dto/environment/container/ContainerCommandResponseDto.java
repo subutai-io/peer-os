@@ -1,17 +1,14 @@
 package io.subutai.hub.share.dto.environment.container;
 
 
-import com.google.common.base.MoreObjects;
-
-
 public class ContainerCommandResponseDto
 {
 
     // id of target container
-    private final String containerId;
+    private String containerId;
 
     // id of corresponding command request
-    private final String commandId;
+    private String commandId;
 
     // can be null if command timed out, 0 indicates successful completion of command,
     // no-zero indicates  failure
@@ -39,6 +36,11 @@ public class ContainerCommandResponseDto
         this.stdOut = stdOut;
         this.stdErr = stdErr;
         this.hasTimedOut = hasTimedOut;
+    }
+
+
+    protected ContainerCommandResponseDto()
+    {
     }
 
 
@@ -95,8 +97,15 @@ public class ContainerCommandResponseDto
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper( this ).add( "containerId", containerId ).add( "commandId", commandId )
-                          .add( "exitCode", exitCode ).add( "stdOut", stdOut ).add( "stdErr", stdErr )
-                          .add( "hasTimedOut", hasTimedOut ).add( "exception", exception ).toString();
+        final StringBuffer sb = new StringBuffer( "ContainerCommandResponseDto{" );
+        sb.append( "containerId='" ).append( containerId ).append( '\'' );
+        sb.append( ", commandId='" ).append( commandId ).append( '\'' );
+        sb.append( ", exitCode=" ).append( exitCode );
+        sb.append( ", stdOut='" ).append( stdOut ).append( '\'' );
+        sb.append( ", stdErr='" ).append( stdErr ).append( '\'' );
+        sb.append( ", hasTimedOut=" ).append( hasTimedOut );
+        sb.append( ", exception='" ).append( exception ).append( '\'' );
+        sb.append( '}' );
+        return sb.toString();
     }
 }
