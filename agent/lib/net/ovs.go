@@ -70,5 +70,5 @@ func GetIp() string {
 			}
 		}
 	}
-	return ""
+	return "null"
 }
