@@ -40,6 +40,8 @@ public class ContainerCommandProcessor implements StateLinkProcessor
     @Override
     public boolean processStateLinks( final Set<String> stateLinks ) throws Exception
     {
+        boolean fastMode = false;
+
         for ( String link : stateLinks )
         {
             Matcher matcher = PATTERN.matcher( link );
@@ -47,10 +49,12 @@ public class ContainerCommandProcessor implements StateLinkProcessor
             if ( matcher.matches() )
             {
                 process( link );
+
+                fastMode = true;
             }
         }
 
-        return false;
+        return fastMode;
     }
 
 
