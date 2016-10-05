@@ -3,6 +3,8 @@ package io.subutai.core.hubmanager.impl.processor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +39,13 @@ public class HeartbeatProcessor implements Runnable
 
     private long lastSentMillis = 0;
 
-    private int fastModeLeft = 0;
+    private volatile int fastModeLeft = 0;
 
     private volatile boolean inProgress = false;
 
     private String peerId;
+
+    private Executor processorPool = Executors.newCachedThreadPool();
 
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
@@ -65,7 +69,7 @@ public class HeartbeatProcessor implements Runnable
                 try
                 {
                     log.warn( "Shutting down hub manager" );
-                    String url = path+"shutdown-hook";
+                    String url = path + "shutdown-hook";
 
                     RestResult<Object> restResult = restClient.post( url, null );
 
@@ -180,25 +184,32 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    private void processStateLinks( Set<String> stateLinks )
+    private void processStateLinks( final Set<String> stateLinks )
     {
         log.info( "stateLinks: {}", stateLinks );
 
-        for ( StateLinkProcessor processor : processors )
+        for ( final StateLinkProcessor processor : processors )
         {
-            try
+            processorPool.execute( new Runnable()
             {
-                boolean fastModeAsked = processor.processStateLinks( stateLinks );
-
-                if ( fastModeAsked )
+                @Override
+                public void run()
                 {
-                    fastModeLeft = FAST_MODE_MAX;
+                    try
+                    {
+                        boolean fastModeAsked = processor.processStateLinks( stateLinks );
+
+                        if ( fastModeAsked )
+                        {
+                            fastModeLeft = FAST_MODE_MAX;
+                        }
+                    }
+                    catch ( Exception e )
+                    {
+                        log.error( "Error to process state links: ", e );
+                    }
                 }
-            }
-            catch ( Exception e )
-            {
-                log.error( "Error to process state links: ", e );
-            }
+            } );
         }
     }
 }

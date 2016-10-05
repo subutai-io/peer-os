@@ -47,6 +47,7 @@ import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
+import io.subutai.core.hubmanager.impl.processor.ContainerCommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
@@ -268,6 +269,8 @@ public class HubManagerImpl implements HubManager
         StateLinkProcessor resourceHostRegisterProcessor =
                 new ResourceHostRegisterProcessor( registrationManager, peerManager, restClient );
 
+        StateLinkProcessor containerCommandProcessor = new ContainerCommandProcessor( ctx );
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
                                                                              .addProcessor( hubEnvironmentProcessor )
@@ -278,7 +281,8 @@ public class HubManagerImpl implements HubManager
                                                                              .addProcessor(
                                                                                      environmentTelemetryProcessor )
                                                                              .addProcessor(
-                                                                                     resourceHostRegisterProcessor );
+                                                                                     resourceHostRegisterProcessor )
+                                                                             .addProcessor( containerCommandProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
