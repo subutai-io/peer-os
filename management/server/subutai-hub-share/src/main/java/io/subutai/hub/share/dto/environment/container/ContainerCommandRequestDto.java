@@ -41,9 +41,11 @@ public class ContainerCommandRequestDto
     }
 
 
-    public void setTimeout( final int timeout )
+    public ContainerCommandRequestDto setTimeout( final int timeout )
     {
         this.timeout = timeout;
+
+        return this;
     }
 
 
