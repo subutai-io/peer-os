@@ -12,6 +12,7 @@ import (
 )
 
 var Version string = "unknown"
+var Commit string = "unknown"
 
 func init() {
 	if os.Getuid() != 0 {
@@ -28,7 +29,10 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Subutai"
-	app.Version = Version
+	if len(config.Template.Branch) != 0 {
+		Commit = config.Template.Branch + "/" + Commit
+	}
+	app.Version = Version + " " + Commit
 	app.Usage = "daemon and command line interface binary"
 
 	app.Flags = []cli.Flag{cli.BoolFlag{
