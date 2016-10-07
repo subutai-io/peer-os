@@ -38,15 +38,19 @@ func MngInit() {
 	gpg.GenerateKey("management")
 	container.Start("management")
 
-	log.Info("\nSubutai Management UI will be shortly available at https://" + net.GetIp() + ":8443")
-	log.Info("Login: admin")
-	log.Info("Password: secret")
+	log.Info("********************")
+	log.Info("Subutai Management UI will be shortly available at https://" + net.GetIp() + ":8443")
+	log.Info("login: admin")
+	log.Info("password: secret")
+	log.Info("********************")
 }
 
 func MngStop() {
-	for _, port := range []string{"8443", "8444"} {
-		exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-i", "wan", "-p",
-			"tcp", "--dport", port, "-j", "DNAT", "--to-destination", "10.10.10.1:"+port).Run()
+	for _, iface := range []string{"wan", "eth1", "eth2"} {
+		for _, port := range []string{"8443", "8444"} {
+			exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-i", iface, "-p",
+				"tcp", "--dport", port, "-j", "DNAT", "--to-destination", "10.10.10.1:"+port).Run()
+		}
 	}
 }
 
