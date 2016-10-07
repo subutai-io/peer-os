@@ -40,7 +40,7 @@ func MngInit() {
 
 	log.Info("\nSubutai Management UI will be shortly available at https://" + net.GetIp() + ":8443")
 	log.Info("Login: admin")
-	log.info("Password: secret")
+	log.Info("Password: secret")
 }
 
 func MngStop() {
