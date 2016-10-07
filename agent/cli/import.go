@@ -102,16 +102,17 @@ func md5sum(filePath string) string {
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
-func checkLocal(t templ) bool {
+func checkLocal(t *templ) bool {
 	var response string
 	files, _ := ioutil.ReadDir(config.Agent.LxcPrefix + "tmpdir")
 	for _, f := range files {
-		if t.file == f.Name() {
+		if strings.HasPrefix(f.Name(), t.name+"-subutai-template") {
 			if len(t.id) == 0 {
 				fmt.Print("Cannot verify local template. Trust anyway? (y/n)")
 				_, err := fmt.Scanln(&response)
 				log.Check(log.FatalLevel, "Reading input", err)
 				if response == "y" {
+					t.file = f.Name()
 					return true
 				}
 				return false
@@ -316,7 +317,7 @@ func LxcImport(name, version, token string, torrent bool) {
 		// }
 	}
 
-	if !checkLocal(t) {
+	if !checkLocal(&t) {
 		log.Info("Downloading " + t.name)
 		downloaded := false
 		if len(t.owner) == 0 {
@@ -333,15 +334,16 @@ func LxcImport(name, version, token string, torrent bool) {
 		if !downloaded && !download(t, kurjun, token, torrent) {
 			log.Error("Failed to download or verify template " + t.name)
 		}
+		log.Info("File integrity verified")
 	}
-	log.Info("File integrity verified")
 
 	time.Sleep(time.Millisecond * 200) // Added sleep to prevent output collision with progress bar.
 
 	log.Info("Unpacking template " + t.name)
+	log.Debug(config.Agent.LxcPrefix + "tmpdir/ " + t.file + " to " + t.name)
 	tgz := extractor.NewTgz()
 	templdir := config.Agent.LxcPrefix + "tmpdir/" + t.name
-	tgz.Extract(config.Agent.LxcPrefix+"tmpdir/"+t.file, templdir)
+	log.Check(log.FatalLevel, "Extracting tgz", tgz.Extract(config.Agent.LxcPrefix+"tmpdir/"+t.file, templdir))
 	parent := container.GetConfigItem(templdir+"/config", "subutai.parent")
 	if parent != "" && parent != t.name && !container.IsTemplate(parent) {
 		log.Info("Parent template required: " + parent)
