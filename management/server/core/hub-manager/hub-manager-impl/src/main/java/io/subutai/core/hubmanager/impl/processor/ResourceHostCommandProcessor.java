@@ -12,26 +12,26 @@ import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandResult;
 import io.subutai.common.command.RequestBuilder;
-import io.subutai.common.peer.ContainerHost;
+import io.subutai.common.peer.ResourceHost;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
-import io.subutai.hub.share.dto.environment.container.ContainerCommandBatchDto;
-import io.subutai.hub.share.dto.environment.container.ContainerCommandRequestDto;
-import io.subutai.hub.share.dto.environment.container.ContainerCommandResponseDto;
+import io.subutai.hub.share.dto.host.ResourceHostCommandBatchDto;
+import io.subutai.hub.share.dto.host.ResourceHostCommandRequestDto;
+import io.subutai.hub.share.dto.host.ResourceHostCommandResponseDto;
 
 
-public class ContainerCommandProcessor implements StateLinkProcessor
+public class ResourceHostCommandProcessor implements StateLinkProcessor
 {
-    private static final Logger LOG = LoggerFactory.getLogger( ContainerCommandProcessor.class.getName() );
+    private static final Logger LOG = LoggerFactory.getLogger( ResourceHostCommandProcessor.class.getName() );
 
-    private static final String STATE_LINK_PATTERN = "/rest/v2/peers/.*/containers/execute";
+    private static final String STATE_LINK_PATTERN = "/rest/v2/peers/.*/resourcehosts/execute";
     private static final Pattern PATTERN = Pattern.compile( STATE_LINK_PATTERN );
 
     private final Context context;
     private ExecutorService pool = Executors.newCachedThreadPool();
 
 
-    public ContainerCommandProcessor( final Context context )
+    public ResourceHostCommandProcessor( final Context context )
     {
         this.context = context;
     }
@@ -62,15 +62,16 @@ public class ContainerCommandProcessor implements StateLinkProcessor
     {
         try
         {
-            ContainerCommandBatchDto commandBatchDto =
-                    context.restClient.getStrict( link, ContainerCommandBatchDto.class );
+            ResourceHostCommandBatchDto commandBatchDto =
+                    context.restClient.getStrict( link, ResourceHostCommandBatchDto.class );
 
             if ( commandBatchDto != null )
             {
-                for ( ContainerCommandRequestDto commandRequestDto : commandBatchDto.getCommandRequestDtos() )
+                for ( ResourceHostCommandRequestDto commandRequestDto : commandBatchDto
+                        .getResourceHostCommandRequestDtos() )
                 {
 
-                    pool.execute( new ContainerCommandTask( link, commandRequestDto ) );
+                    pool.execute( new ResourceHostCommandTask( link, commandRequestDto ) );
                 }
             }
         }
@@ -81,13 +82,13 @@ public class ContainerCommandProcessor implements StateLinkProcessor
     }
 
 
-    private class ContainerCommandTask implements Runnable
+    private class ResourceHostCommandTask implements Runnable
     {
         private final String link;
-        private final ContainerCommandRequestDto commandRequestDto;
+        private final ResourceHostCommandRequestDto commandRequestDto;
 
 
-        ContainerCommandTask( final String link, final ContainerCommandRequestDto commandRequestDto )
+        ResourceHostCommandTask( final String link, final ResourceHostCommandRequestDto commandRequestDto )
         {
             this.link = link;
             this.commandRequestDto = commandRequestDto;
@@ -97,18 +98,17 @@ public class ContainerCommandProcessor implements StateLinkProcessor
         @Override
         public void run()
         {
-            ContainerCommandResponseDto commandResponseDto;
+            ResourceHostCommandResponseDto commandResponseDto;
 
             try
             {
-                ContainerHost containerHost =
-                        context.localPeer.getContainerHostById( commandRequestDto.getContainerId() );
+                ResourceHost resourceHost =
+                        context.localPeer.getResourceHostById( commandRequestDto.getResourceHostId() );
 
-                CommandResult commandResult = containerHost.execute(
-                        new RequestBuilder( commandRequestDto.getCommand() )
-                                .withTimeout( commandRequestDto.getTimeout() ) );
+                CommandResult commandResult = resourceHost.execute( new RequestBuilder( commandRequestDto.getCommand() )
+                        .withTimeout( commandRequestDto.getTimeout() ) );
 
-                commandResponseDto = new ContainerCommandResponseDto( commandRequestDto.getContainerId(),
+                commandResponseDto = new ResourceHostCommandResponseDto( commandRequestDto.getResourceHostId(),
                         commandRequestDto.getCommandId(), commandResult.getExitCode(), commandResult.getStdOut(),
                         commandResult.getStdErr(), commandResult.hasTimedOut() );
             }
@@ -116,7 +116,7 @@ public class ContainerCommandProcessor implements StateLinkProcessor
             {
                 LOG.error( "Error executing Hub command {}: {}", commandRequestDto, e.getMessage() );
 
-                commandResponseDto = new ContainerCommandResponseDto( commandRequestDto.getContainerId(),
+                commandResponseDto = new ResourceHostCommandResponseDto( commandRequestDto.getResourceHostId(),
                         commandRequestDto.getCommandId(), e.getMessage() );
             }
 
@@ -125,7 +125,7 @@ public class ContainerCommandProcessor implements StateLinkProcessor
         }
 
 
-        void sendResponse( final String link, final ContainerCommandResponseDto commandResponseDto )
+        void sendResponse( final String link, final ResourceHostCommandResponseDto commandResponseDto )
         {
             if ( commandResponseDto != null )
             {

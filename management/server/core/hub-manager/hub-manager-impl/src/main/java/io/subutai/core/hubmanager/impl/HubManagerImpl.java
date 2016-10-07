@@ -54,6 +54,7 @@ import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
 import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostCommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
@@ -271,6 +272,8 @@ public class HubManagerImpl implements HubManager
 
         StateLinkProcessor containerCommandProcessor = new ContainerCommandProcessor( ctx );
 
+        StateLinkProcessor resourceHostCommandProcessor = new ResourceHostCommandProcessor( ctx );
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
                                                                              .addProcessor( hubEnvironmentProcessor )
@@ -282,7 +285,9 @@ public class HubManagerImpl implements HubManager
                                                                                      environmentTelemetryProcessor )
                                                                              .addProcessor(
                                                                                      resourceHostRegisterProcessor )
-                                                                             .addProcessor( containerCommandProcessor );
+                                                                             .addProcessor( containerCommandProcessor )
+                                                                             .addProcessor(
+                                                                                     resourceHostCommandProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
