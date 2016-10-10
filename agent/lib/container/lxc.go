@@ -378,3 +378,59 @@ func SetContainerUid(c string) {
 
 	log.Check(log.ErrorLevel, "Setting chmod 755 on lxc home", os.Chmod(config.Agent.LxcPrefix+c, 0755))
 }
+
+func SetDns(name string) {
+	dns := GetConfigItem(config.Agent.LxcPrefix+name+"/config", "lxc.network.ipv4.gateway")
+	if len(dns) == 0 {
+		dns = "10.10.0.254"
+	}
+
+	resolv := []byte("domain\tintra.lan\nsearch\tintra.lan\nnameserver\t" + dns + "\n")
+	log.Check(log.DebugLevel, "Writing resolv.conf.orig",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/original", resolv, 0644))
+	log.Check(log.DebugLevel, "Writing resolv.conf.tail",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolvconf/resolv.conf.d/tail", resolv, 0644))
+	log.Check(log.DebugLevel, "Writing resolv.conf",
+		ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/resolv.conf", resolv, 0644))
+}
+
+func SetEnvId(name, envId string) {
+	err := os.MkdirAll(config.Agent.LxcPrefix+name+"/rootfs/etc/subutai", 755)
+	log.Check(log.FatalLevel, "Creating etc/subutai directory", err)
+
+	config, err := os.Create(config.Agent.LxcPrefix + name + "/rootfs/etc/subutai/lxc-config")
+	log.Check(log.FatalLevel, "Creating lxc-config file", err)
+	defer config.Close()
+
+	_, err = config.WriteString("[Subutai-Agent]\n" + envId + "\n")
+	log.Check(log.FatalLevel, "Writing environment id to config", err)
+
+	config.Sync()
+}
+
+func SetStaticNet(name string) {
+	data, err := ioutil.ReadFile(config.Agent.LxcPrefix + name + "/rootfs/etc/network/interfaces")
+	log.Check(log.WarnLevel, "Opening /etc/network/interfaces", err)
+
+	err = ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/network/interfaces",
+		[]byte(strings.Replace(string(data), "dhcp", "manual", 1)), 0644)
+	log.Check(log.WarnLevel, "Setting internal eth0 interface to manual", err)
+}
+
+func DisableSSHPwd(name string) {
+	input, err := ioutil.ReadFile(config.Agent.LxcPrefix + name + "/rootfs/etc/ssh/sshd_config")
+	if log.Check(log.DebugLevel, "Opening sshd config", err) {
+		return
+	}
+
+	lines := strings.Split(string(input), "\n")
+
+	for i, line := range lines {
+		if strings.EqualFold(line, "#PasswordAuthentication yes") {
+			lines[i] = "PasswordAuthentication no"
+		}
+	}
+	output := strings.Join(lines, "\n")
+	err = ioutil.WriteFile(config.Agent.LxcPrefix+name+"/rootfs/etc/ssh/sshd_config", []byte(output), 0644)
+	log.Check(log.WarnLevel, "Writing new sshd config", err)
+}
