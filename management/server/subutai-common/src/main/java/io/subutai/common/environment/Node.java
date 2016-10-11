@@ -1,6 +1,7 @@
 package io.subutai.common.environment;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -12,6 +13,7 @@ import io.subutai.common.peer.ContainerSize;
 /**
  * Node
  */
+@JsonIgnoreProperties( ignoreUnknown = true )
 public class Node
 {
     @GsonRequired
