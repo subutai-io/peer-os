@@ -10,6 +10,7 @@ import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.Host;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
+import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.CollectionUtil;
@@ -131,6 +132,7 @@ public class RegisterSshStep
                 public Object call() throws Exception
                 {
                     SshKeys sshPublicKeys = peer.readOrCreateSshKeysForEnvironment( environment.getEnvironmentId(),
+                            topology.getSshKeyType() == SshEncryptionType.UNKNOWN ? SshEncryptionType.RSA :
                             topology.getSshKeyType() );
 
                     allSshKeys.addKeys( sshPublicKeys.getKeys() );
