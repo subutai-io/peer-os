@@ -56,6 +56,7 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
@@ -976,6 +977,25 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
 
         environmentWebClient.addReverseProxy( reverseProxyConfig );
+    }
+
+
+    @Override
+    public void addCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
+
+        environmentWebClient.addCustomProxy( proxyConfig );
+    }
+
+
+    @Override
+    public void removeCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
+
+
+        environmentWebClient.removeCustomProxy( proxyConfig );
     }
 
 

@@ -76,6 +76,7 @@ import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RequestListener;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.peer.ResourceHostException;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.Disposable;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
@@ -2606,8 +2607,47 @@ public class LocalPeerImpl implements LocalPeer, HostListener, Disposable
 
 
     @Override
+    public void addCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
+
+        ContainerHost containerHost = getContainerHostById( proxyConfig.getContainerId() );
+
+        try
+        {
+            getNetworkManager().addCustomProxy( proxyConfig, containerHost );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on adding custom reverse proxy: %s", e.getMessage() ) );
+        }
+    }
+
+
+    @Override
+    public void removeCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
+
+        try
+        {
+            getNetworkManager().removeCustomProxy( proxyConfig.getVlan() );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on removing custom reverse proxy: %s", e.getMessage() ) );
+        }
+    }
+
+
+    @Override
     public void addReverseProxy( final ReverseProxyConfig reverseProxyConfig ) throws PeerException
     {
+        Preconditions.checkNotNull( reverseProxyConfig, "Invalid proxy config" );
+
+
         ContainerHost containerHost = getContainerHostById( reverseProxyConfig.getContainerId() );
 
         final NetworkResource networkResource =

@@ -82,18 +82,17 @@ public class Commands
     }
 
 
-    public RequestBuilder getRemoveVlanDomainCommand( final int vLanId )
+    public RequestBuilder getRemoveVlanDomainCommand( final String vLanId )
     {
-        return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
-                .withCmdArgs( Lists.newArrayList( "del", String.valueOf( vLanId ), "-d" ) );
+        return new RequestBuilder( MANAGEMENT_PROXY_BINDING ).withCmdArgs( Lists.newArrayList( "del", vLanId, "-d" ) );
     }
 
 
-    public RequestBuilder getSetVlanDomainCommand( final int vLanId, final String domain,
+    public RequestBuilder getSetVlanDomainCommand( final String vLanId, final String domain,
                                                    final ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
                                                    final String sslCertPath )
     {
-        List<String> args = Lists.newArrayList( "add", String.valueOf( vLanId ), "-d", domain );
+        List<String> args = Lists.newArrayList( "add", vLanId, "-d", domain );
 
         if ( proxyLoadBalanceStrategy != ProxyLoadBalanceStrategy.NONE )
         {
@@ -118,10 +117,10 @@ public class Commands
     }
 
 
-    public RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final int vLanId )
+    public RequestBuilder getAddIpToVlanDomainCommand( final String hostIp, final String vLanId )
     {
         return new RequestBuilder( MANAGEMENT_PROXY_BINDING )
-                .withCmdArgs( Lists.newArrayList( "add", String.valueOf( vLanId ), "-h", hostIp ) );
+                .withCmdArgs( Lists.newArrayList( "add", vLanId, "-h", hostIp ) );
     }
 
 

@@ -92,15 +92,15 @@ public class CommandsTest
     @Test
     public void testGetRemoveVlanDomainCommand() throws Exception
     {
-        assertNotNull( commands.getRemoveVlanDomainCommand( VLAN_ID ) );
+        assertNotNull( commands.getRemoveVlanDomainCommand( VLAN_ID + "" ) );
     }
 
 
     @Test
     public void testGetSetVlanDomainCommand() throws Exception
     {
-        assertNotNull(
-                commands.getSetVlanDomainCommand( VLAN_ID, DOMAIN, ProxyLoadBalanceStrategy.STICKY_SESSION, "path" ) );
+        assertNotNull( commands.getSetVlanDomainCommand( VLAN_ID + "", DOMAIN, ProxyLoadBalanceStrategy.STICKY_SESSION,
+                "path" ) );
     }
 
 
@@ -114,7 +114,7 @@ public class CommandsTest
     @Test
     public void testGetAddIpToVlanDomainCommand() throws Exception
     {
-        assertNotNull( commands.getAddIpToVlanDomainCommand( LOCAL_IP, VLAN_ID ) );
+        assertNotNull( commands.getAddIpToVlanDomainCommand( LOCAL_IP, VLAN_ID + "" ) );
     }
 
 

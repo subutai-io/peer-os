@@ -21,6 +21,7 @@ import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerInfo;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -684,5 +685,69 @@ public class EnvironmentWebClient
         }
 
         return WebClientBuilder.checkResponse( response, PeerTemplatesDownloadProgress.class );
+    }
+
+
+    public void addCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        WebClient client = null;
+
+        Response response;
+
+        try
+        {
+            String path = String.format( "/%s/container/%s/customProxy/add", proxyConfig.getEnvironmentId(),
+                    proxyConfig.getContainerId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.accept( MediaType.APPLICATION_JSON );
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.post( path );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on adding custom proxy: %s", e.getMessage() ) );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
+    }
+
+
+    public void removeCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        WebClient client = null;
+
+        Response response;
+
+        try
+        {
+            String path = String.format( "/%s/container/%s/customProxy/remove", proxyConfig.getEnvironmentId(),
+                    proxyConfig.getContainerId() );
+
+            client = WebClientBuilder.buildEnvironmentWebClient( peerInfo, path, provider );
+
+            client.accept( MediaType.APPLICATION_JSON );
+            client.type( MediaType.APPLICATION_JSON );
+
+            response = client.post( path );
+        }
+        catch ( Exception e )
+        {
+            LOG.error( e.getMessage(), e );
+            throw new PeerException( String.format( "Error on removing custom proxy: %s", e.getMessage() ) );
+        }
+        finally
+        {
+            WebClientBuilder.close( client );
+        }
+
+        WebClientBuilder.checkResponse( response );
     }
 }
