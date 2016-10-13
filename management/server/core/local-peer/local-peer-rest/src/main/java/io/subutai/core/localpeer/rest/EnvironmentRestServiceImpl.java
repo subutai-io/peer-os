@@ -19,6 +19,7 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -350,7 +351,9 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( reverseProxyConfig );
+
             localPeer.addReverseProxy( reverseProxyConfig );
+
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -452,6 +455,44 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
 
             localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response addCustomProxy( final CustomProxyConfig proxyConfig )
+    {
+        try
+        {
+            Preconditions.checkNotNull( proxyConfig );
+
+            localPeer.addCustomProxy( proxyConfig );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response removeCustomProxy( final CustomProxyConfig proxyConfig )
+    {
+        try
+        {
+            Preconditions.checkNotNull( proxyConfig );
+
+            localPeer.removeCustomProxy( proxyConfig );
+
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
