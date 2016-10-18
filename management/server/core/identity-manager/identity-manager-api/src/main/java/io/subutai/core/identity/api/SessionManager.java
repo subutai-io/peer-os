@@ -1,6 +1,9 @@
 package io.subutai.core.identity.api;
 
 
+import java.util.Date;
+import java.util.Map;
+
 import io.subutai.core.identity.api.model.Session;
 import io.subutai.core.identity.api.model.User;
 
@@ -50,9 +53,13 @@ public interface SessionManager
 
     /* ****************************************
      */
-    void invalidateSessions();
+    void invalidateSessions(Date currentDate );
 
 
     //*****************************************
     int getSessionTimeout();
+
+
+    //*****************************************
+    Map getSessionContext();
 }
