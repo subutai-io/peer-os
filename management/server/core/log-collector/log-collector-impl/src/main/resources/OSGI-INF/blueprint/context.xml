@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+>
+
+  <bean id="logCollector" scope="singleton" init-method="init" destroy-method="dispose"
+        class="io.subutai.core.logcollector.impl.LogCollector">
+  </bean>
+
+</blueprint>

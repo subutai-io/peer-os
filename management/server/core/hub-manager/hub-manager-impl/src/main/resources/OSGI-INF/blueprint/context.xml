@@ -40,6 +40,9 @@
   <reference id="commandExecutor" availability="mandatory"
              interface="io.subutai.core.executor.api.CommandExecutor" />
 
+  <reference id="logCollector" availability="mandatory"
+             interface="io.subutai.core.logcollector.api.LogCollector" />
+
   <!-- ***************************************************************** -->
   <bean id="daoManagerHub" init-method="init" class="io.subutai.common.dao.DaoManager" scope="prototype">
     <jpa:unit unitname="hubConfigPUnit" property="entityManagerFactory" />
@@ -55,6 +58,7 @@
     <property name="registrationManager" ref="registrationManager" />
     <property name="monitor" ref="monitor" />
     <property name="commandExecutor" ref="commandExecutor" />
+    <property name="logCollector" ref="logCollector" />
     <argument ref="daoManagerHub" />
   </bean>
 

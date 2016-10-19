@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.Response;
 
+import io.subutai.core.logcollector.api.LogCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,6 +149,8 @@ public class HubManagerImpl implements HubManager
     private LocalPeer localPeer;
 
     private EnvironmentUserHelper envUserHelper;
+
+    private LogCollector logCollector;
 
 
     public HubManagerImpl( DaoManager daoManager )
@@ -717,5 +720,15 @@ public class HubManagerImpl implements HubManager
         UserDto userDto = envUserHelper.getUserDataFromHub( StringUtils.substringBefore( email, "@" ) );
 
         return userDto.getEmail();
+    }
+
+    public LogCollector getLogCollector()
+    {
+        return logCollector;
+    }
+
+    public void setLogCollector(LogCollector logCollector)
+    {
+        this.logCollector = logCollector;
     }
 }

@@ -1,0 +1,30 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+           xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+
+  http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd">
+
+  <cxf:bus id="cxfLogCollector">
+    <cxf:features>
+      <cxf:logging />
+    </cxf:features>
+  </cxf:bus>
+
+  <jaxrs:server address="/v1/collect-log" id="logCollectorRestService">
+    <jaxrs:serviceBeans>
+      <ref component-id="logCollectorRestServiceImpl" />
+    </jaxrs:serviceBeans>
+    <!--<jaxrs:providers>-->
+      <!--<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />-->
+    <!--</jaxrs:providers>-->
+  </jaxrs:server>
+
+  <bean id="logCollectorRestServiceImpl" class="io.subutai.core.logcollector.rest.RestServiceImpl">
+    <argument ref="logCollector" />
+  </bean>
+
+  <reference id="logCollector" availability="mandatory"
+             interface="io.subutai.core.logcollector.api.LogCollector" />
+
+</blueprint>
