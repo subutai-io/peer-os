@@ -1,7 +1,10 @@
 package io.subutai.common.environment;
 
 
-public class ContainerHostNotFoundException extends Exception
+import io.subutai.common.peer.HostNotFoundException;
+
+
+public class ContainerHostNotFoundException extends HostNotFoundException
 {
     public ContainerHostNotFoundException( final String message )
     {

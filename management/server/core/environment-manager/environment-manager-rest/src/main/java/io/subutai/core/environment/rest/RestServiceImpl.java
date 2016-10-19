@@ -43,9 +43,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            Environment environment = environmentManager.createEnvironment( topology, true );
+            environmentManager.createEnvironment( topology, true );
 
-            return Response.ok( environment.getEnvironmentId() ).build();
+            return Response.ok().build();
         }
         catch ( Exception e )
         {
@@ -61,7 +61,7 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            environmentManager.growEnvironment( environmentId, topology, true );
+            environmentManager.modifyEnvironment( environmentId, topology, null, null, true );
 
             return Response.ok().build();
         }
@@ -103,7 +103,8 @@ public class RestServiceImpl implements RestService
                 containers.add( new ContainerDto( host.getId(), environmentId, host.getHostname(),
                         host.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(), host.getTemplateName(),
                         host.getContainerSize(), host.getArch().name(), host.getTags(), host.getPeerId(),
-                        host.getResourceHostId().getId(), host.isLocal(), "subutai", host.getState() ) );
+                        host.getResourceHostId().getId(), host.isLocal(), "subutai", host.getState(),
+                        host.getTemplateId() ) );
             }
             EnvironmentDto environmentDto =
                     new EnvironmentDto( environment.getId(), environment.getName(), environment.getStatus(), containers,
@@ -116,5 +117,4 @@ public class RestServiceImpl implements RestService
             throw new WebApplicationException( e.getMessage() );
         }
     }
-
 }

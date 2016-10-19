@@ -25,6 +25,7 @@ import io.subutai.hub.share.pgp.key.PGPKeyHelper;
 
 import static java.lang.String.format;
 
+
 public class RegistrationManager
 {
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -51,11 +52,11 @@ public class RegistrationManager
     }
 
 
-    public void registerPeer( String email, String password ) throws Exception
+    public void registerPeer( String email, String password, String peerName ) throws Exception
     {
         registerPeerPubKey();
 
-        register( email, password );
+        register( email, password, peerName );
     }
 
 
@@ -89,13 +90,13 @@ public class RegistrationManager
     }
 
 
-    private RegistrationDto getRegistrationDto( String email, String password )
+    private RegistrationDto getRegistrationDto( String email, String password, String peerName )
     {
         PeerInfoDto peerInfoDto = new PeerInfoDto();
 
         peerInfoDto.setId( configManager.getPeerId() );
         peerInfoDto.setVersion( String.valueOf( SubutaiInfo.getVersion() ) );
-        peerInfoDto.setName( configManager.getPeerManager().getLocalPeer().getName() );
+        peerInfoDto.setName( peerName );
 
         RegistrationDto dto = new RegistrationDto( PGPKeyHelper.getFingerprint( configManager.getOwnerPublicKey() ) );
 
@@ -113,13 +114,13 @@ public class RegistrationManager
     }
 
 
-    private void register( String email, String password ) throws Exception
+    private void register( String email, String password, String peerName ) throws Exception
     {
         log.info( "Registering peer to Hub..." );
 
         String path = format( "/rest/v1/peers/%s", peerId );
 
-        RegistrationDto regDto = getRegistrationDto( email, password );
+        RegistrationDto regDto = getRegistrationDto( email, password, peerName );
 
         RestResult<Object> restResult = restClient.post( path, regDto );
 
@@ -128,7 +129,9 @@ public class RegistrationManager
             throw new Exception( "Error to register peer: " + restResult.getError() );
         }
 
-        Config config = new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ), email );
+        Config config =
+                new ConfigEntity( regDto.getPeerInfo().getId(), hubIp, hubManager.getPeerInfo().get( "OwnerId" ),
+                        email );
 
         hubManager.getConfigDataService().saveHubConfig( config );
 

@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -24,6 +23,7 @@ import com.google.common.collect.Maps;
 import io.subutai.common.environment.ContainerHostNotFoundException;
 import io.subutai.common.environment.EnvConnectivityState;
 import io.subutai.common.environment.Environment;
+import io.subutai.common.environment.EnvironmentCreationRef;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.EnvironmentNotFoundException;
 import io.subutai.common.environment.Topology;
@@ -35,10 +35,10 @@ import io.subutai.common.peer.AlertHandlerPriority;
 import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
+import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentAlertHandlers;
 import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.EnvironmentId;
-import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.protocol.ReverseProxyConfig;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKeys;
@@ -52,7 +52,6 @@ import io.subutai.common.security.relation.model.RelationInfo;
 import io.subutai.common.security.relation.model.RelationInfoMeta;
 import io.subutai.common.security.relation.model.RelationMeta;
 import io.subutai.common.security.relation.model.RelationStatus;
-import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.core.environment.api.CancellableWorkflow;
 import io.subutai.core.environment.api.EnvironmentEventListener;
 import io.subutai.core.environment.api.EnvironmentManager;
@@ -63,7 +62,6 @@ import io.subutai.core.environment.api.exception.EnvironmentDestructionException
 import io.subutai.core.environment.api.exception.EnvironmentManagerException;
 import io.subutai.core.environment.impl.adapter.ProxyEnvironment;
 import io.subutai.core.environment.impl.dao.EnvironmentService;
-import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.api.model.UserDelegate;
@@ -73,6 +71,7 @@ import io.subutai.core.peer.api.PeerActionResponse;
 import io.subutai.core.peer.api.PeerManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.tracker.api.Tracker;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
@@ -214,39 +213,47 @@ public class EnvironmentManagerSecureProxy
 
     @Override
     @RolesAllowed( "Environment-Management|Write" )
-    public Environment createEnvironment( final Topology topology, final boolean async )
-            throws EnvironmentCreationException
-    {
-        return environmentManager.createEnvironment( topology, async );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Write" )
-    public UUID createEnvironmentAndGetTrackerID( final Topology topology, final boolean async )
+    public EnvironmentCreationRef createEnvironment( final Topology topology, final boolean async )
             throws EnvironmentCreationException
     {
         Preconditions.checkNotNull( topology, "Invalid topology" );
         Preconditions.checkArgument( !Strings.isNullOrEmpty( topology.getEnvironmentName() ), "Invalid name" );
         Preconditions.checkArgument( !topology.getNodeGroupPlacement().isEmpty(), "Placement is empty" );
 
-        //create operation tracker
-        TrackerOperation operationTracker = tracker.createTrackerOperation( EnvironmentManagerImpl.MODULE_NAME,
-                String.format( "Creating environment %s ", topology.getEnvironmentName() ) );
-
-        environmentManager.createEnvironment( topology, async, operationTracker );
-
-        return operationTracker.getId();
+        return environmentManager.createEnvironment( topology, async );
     }
 
 
     @Override
     @RolesAllowed( "Environment-Management|Write" )
+    public EnvironmentCreationRef modifyEnvironment( final String environmentId, final Topology topology,
+                                                     final List<String> removedContainers,
+                                                     final Map<String, ContainerSize> changedContainers,
+                                                     final boolean async )
+            throws EnvironmentModificationException, EnvironmentNotFoundException
+    {
+        Environment environment = environmentManager.loadEnvironment( environmentId );
+        try
+        {
+            check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
+        }
+        catch ( RelationVerificationException e )
+        {
+            throw new EnvironmentNotFoundException();
+        }
+
+        return environmentManager
+                .modifyEnvironment( environmentId, topology, removedContainers, changedContainers, async );
+    }
+
+
+    @Override
     public Set<EnvironmentContainerHost> growEnvironment( final String environmentId, final Topology topology,
                                                           final boolean async )
             throws EnvironmentModificationException, EnvironmentNotFoundException
     {
         Environment environment = environmentManager.loadEnvironment( environmentId );
+
         try
         {
             check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
@@ -257,45 +264,6 @@ public class EnvironmentManagerSecureProxy
         }
 
         return environmentManager.growEnvironment( environmentId, topology, async );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Write" )
-    public UUID modifyEnvironmentAndGetTrackerID( final String environmentId, final Topology topology,
-                                                  final List<String> removedContainers, final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-        return environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, async );
-    }
-
-
-    @Override
-    @RolesAllowed( "Environment-Management|Write" )
-    public UUID modifyEnvironmentAndGetTrackerID(final String environmentId, final Topology topology,
-                                                 final List<String> removedContainers,
-                                                 final Map<String, ContainerSize> changedContainers, final boolean async )
-            throws EnvironmentModificationException, EnvironmentNotFoundException
-    {
-        Environment environment = environmentManager.loadEnvironment( environmentId );
-        try
-        {
-            check( null, environment, traitsBuilder( "ownership=Group;update=true" ) );
-        }
-        catch ( RelationVerificationException e )
-        {
-            throw new EnvironmentNotFoundException();
-        }
-        return environmentManager.modifyEnvironmentAndGetTrackerID( environmentId, topology, removedContainers, changedContainers, async );
     }
 
 

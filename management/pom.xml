@@ -11,7 +11,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.subutai</groupId>
   <artifactId>mgmt-parent</artifactId>
-  <version>4.0.1</version>
+  <version>4.0.3</version>
 
   <name>Subutai Server Project Parent</name>
 
@@ -152,9 +152,9 @@
       <!-- blueprint-authz -->
 
       <!--<dependency>-->
-        <!--<groupId>org.apache.aries.blueprint</groupId>-->
-        <!--<artifactId>org.apache.aries.blueprint.authz</artifactId>-->
-        <!--<version>1.0.1-CUSTOM</version>-->
+      <!--<groupId>org.apache.aries.blueprint</groupId>-->
+      <!--<artifactId>org.apache.aries.blueprint.authz</artifactId>-->
+      <!--<version>1.0.1-CUSTOM</version>-->
       <!--</dependency>-->
 
       <dependency>
@@ -556,20 +556,6 @@
       </dependency>
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-      <!-- hub-adapter -->
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hub-adapter-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>hub-adapter-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--Karaf-manager -->
       <dependency>
         <groupId>${project.groupId}</groupId>
@@ -592,7 +578,6 @@
         <version>${project.version}</version>
       </dependency>
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
 
       <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
       <!--system-manager -->
@@ -636,44 +621,15 @@
       </dependency>
 
       <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- kurjun Manager-->
+      <!-- Template Manager-->
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>kurjun-manager-api</artifactId>
+        <artifactId>template-manager-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
-        <artifactId>kurjun-manager-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>kurjun-manager-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- kurjun -->
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>kurjun-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>kurjun-impl</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>kurjun-rest</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>kurjun-cli</artifactId>
+        <artifactId>template-manager-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -955,16 +911,7 @@
         <artifactId>commons-codec</artifactId>
         <version>1.9</version>
       </dependency>
-      <!--<dependency>-->
-      <!--<groupId>org.apache.geronimo.specs</groupId>-->
-      <!--<artifactId>geronimo-jta_1.1_spec</artifactId>-->
-      <!--<version>1.1.1</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>org.apache.geronimo.specs</groupId>-->
-      <!--<artifactId>geronimo-jpa_2.0_spec</artifactId>-->
-      <!--<version>1.1</version>-->
-      <!--</dependency>-->
+
       <dependency>
         <groupId>commons-validator</groupId>
         <artifactId>commons-validator</artifactId>

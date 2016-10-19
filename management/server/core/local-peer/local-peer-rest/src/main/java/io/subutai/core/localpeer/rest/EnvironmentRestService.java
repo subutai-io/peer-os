@@ -92,6 +92,11 @@ public interface EnvironmentRestService
     @Consumes( MediaType.APPLICATION_JSON )
     Response configureSshInEnvironment( @PathParam( "environmentId" ) EnvironmentId environmentId, SshKeys sshKeys );
 
+    @GET
+    @Path( "{environmentId}/templatesprogress" )
+    @Produces( MediaType.APPLICATION_JSON )
+    Response getTemplateDownloadProgress( @PathParam( "environmentId" ) EnvironmentId environmentId );
+
     @PUT
     @Path( "{environmentId}/containers/sshkeys/{encType}" )
     @Produces( MediaType.APPLICATION_JSON )

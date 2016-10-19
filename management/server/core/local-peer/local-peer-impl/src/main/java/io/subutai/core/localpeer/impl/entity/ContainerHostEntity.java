@@ -12,6 +12,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 
 import io.subutai.common.host.ContainerHostInfo;
@@ -25,14 +28,16 @@ import io.subutai.common.peer.ContainerHost;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.PeerId;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.objects.PermissionObject;
 import io.subutai.common.settings.Common;
+import io.subutai.common.util.ServiceLocator;
 
 
 /**
@@ -42,7 +47,10 @@ import io.subutai.common.settings.Common;
 @Table( name = "peer_con" )
 @Access( AccessType.FIELD )
 public class ContainerHostEntity extends AbstractSubutaiHost implements ContainerHost
+
 {
+    private static final Logger logger = LoggerFactory.getLogger( ContainerHostEntity.class );
+
 
     @ManyToOne( targetEntity = ResourceHostEntity.class )
     @JoinColumn( name = "parent_id" )
@@ -67,8 +75,8 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     @Transient
     private ContainerId containerId;
 
-    @Column( name = "template_name", nullable = false )
-    private String templateName;
+    @Column( name = "template_id", nullable = false )
+    private String templateId;
 
     @Column( name = "template_arch", nullable = true )
     private String templateArch;
@@ -95,13 +103,13 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
 
     public ContainerHostEntity( final String peerId, final String hostId, final String hostname,
                                 HostArchitecture architecture, HostInterfaces hostInterfaces,
-                                final String containerName, final String templateName, final String templateArch,
+                                final String containerName, final String templateId, final String templateArch,
                                 final String environmentId, final String ownerId, final String initiatorPeerId,
                                 final ContainerSize containerSize )
     {
         super( peerId, hostId, hostname, architecture, hostInterfaces );
         this.containerName = containerName;
-        this.templateName = templateName;
+        this.templateId = templateId;
         this.templateArch = templateArch;
         this.environmentId = environmentId;
         this.initiatorPeerId = initiatorPeerId;
@@ -169,9 +177,31 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
+    }
+
+
     public String getTemplateName()
     {
-        return this.templateName;
+        try
+        {
+            return getTemplate().getName();
+        }
+        catch ( PeerException e )
+        {
+            logger.error( "Failed to get template by id", e.getMessage() );
+        }
+
+        return null;
+    }
+
+
+    @Override
+    public String getTemplateId()
+    {
+        return templateId;
     }
 
 
@@ -181,9 +211,9 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     }
 
 
-    public TemplateKurjun getTemplate() throws PeerException
+    public Template getTemplate() throws PeerException
     {
-        return getPeer().getTemplate( this.templateName );
+        return getLocalPeer().getTemplateById( templateId );
     }
 
 
@@ -250,7 +280,7 @@ public class ContainerHostEntity extends AbstractSubutaiHost implements Containe
     public void setContainerSize( final ContainerSize containerSize )
     {
         Preconditions.checkNotNull( containerSize );
-        
+
         this.containerSize = containerSize;
     }
 

@@ -54,8 +54,10 @@ import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
+import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
 import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
@@ -102,6 +104,8 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
+    private final ScheduledExecutorService registrationRequestExecutor = Executors.newSingleThreadScheduledExecutor();
+
     private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
 
     private SecurityManager securityManager;
@@ -122,6 +126,8 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
+    private io.subutai.core.registration.api.RegistrationManager registrationManager;
+
     private HeartbeatProcessor heartbeatProcessor;
 
     private ResourceHostDataProcessor resourceHostDataProcessor;
@@ -129,6 +135,8 @@ public class HubManagerImpl implements HubManager
     private ContainerEventProcessor containerEventProcessor;
 
     private VersionInfoProcessor versionInfoProcessor;
+
+    private RegistrationRequestProcessor registrationRequestProcessor;
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
@@ -204,6 +212,12 @@ public class HubManagerImpl implements HubManager
 
             versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
+            registrationRequestProcessor =
+                    new RegistrationRequestProcessor( this, peerManager, registrationManager, restClient );
+
+            registrationRequestExecutor
+                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 30, TimeUnit.SECONDS );
+
             EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                     new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
@@ -252,6 +266,9 @@ public class HubManagerImpl implements HubManager
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
+        StateLinkProcessor resourceHostRegisterProcessor =
+                new ResourceHostRegisterProcessor( registrationManager, peerManager, restClient );
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
                                                                              .addProcessor( hubEnvironmentProcessor )
@@ -260,7 +277,9 @@ public class HubManagerImpl implements HubManager
                                                                              .addProcessor( vehsProccessor )
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
-                                                                                     environmentTelemetryProcessor );
+                                                                                     environmentTelemetryProcessor )
+                                                                             .addProcessor(
+                                                                                     resourceHostRegisterProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -279,7 +298,7 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendHeartbeat() throws Exception
     {
-        resourceHostDataProcessor.process();
+        resourceHostDataProcessor.process( false );
         heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
@@ -311,23 +330,25 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendResourceHostInfo() throws Exception
     {
-        resourceHostDataProcessor.process();
+        resourceHostDataProcessor.process( false );
     }
 
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String hupIp, String email, String password ) throws Exception
+    public void registerPeer( String hupIp, String email, String password, String peerName ) throws Exception
     {
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
-        registrationManager.registerPeer( email, password );
+        registrationManager.registerPeer( email, password, peerName );
 
         generateChecksum();
 
         notifyRegistrationListeners();
 
         sendResourceHostInfo();
+
+        registrationRequestProcessor.run();
     }
 
 
@@ -665,6 +686,12 @@ public class HubManagerImpl implements HubManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public void setRegistrationManager( final io.subutai.core.registration.api.RegistrationManager registrationManager )
+    {
+        this.registrationManager = registrationManager;
     }
 
 

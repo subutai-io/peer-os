@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>local-peer-parent</artifactId>
-    <version>4.0.1</version>
+    <version>4.0.3</version>
   </parent>
 
   <artifactId>local-peer-impl</artifactId>
@@ -57,7 +57,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>kurjun-api</artifactId>
+      <artifactId>template-manager-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

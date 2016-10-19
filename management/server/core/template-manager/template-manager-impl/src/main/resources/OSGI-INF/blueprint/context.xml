@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint default-activation="eager"
+           xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+>
+  <bean id="templateManager" scope="singleton"
+        class="io.subutai.core.template.impl.TemplateManagerImpl">
+  </bean>
+
+  <service ref="templateManager" interface="io.subutai.core.template.api.TemplateManager" />
+
+</blueprint>

@@ -86,11 +86,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setGateway( final String gateway )
-    {
-        this.gateway = gateway;
-    }
-
 
     @Override
     public ContainerHostState getState()
@@ -130,11 +125,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
-
 
     @Override
     public Integer getVlan()
@@ -143,10 +133,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setVlan( final Integer vlan )
-    {
-        this.vlan = vlan;
-    }
 
 
     @Override
@@ -156,10 +142,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setPublicKey( final String publicKey )
-    {
-        this.publicKey = publicKey;
-    }
 
 
     @Override
@@ -169,10 +151,6 @@ public class ContainerInfoJson implements ContainerInfo
     }
 
 
-    public void setStatus( final RegistrationStatus status )
-    {
-        this.status = status;
-    }
 
 
     @Override

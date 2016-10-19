@@ -17,6 +17,7 @@ public class ContainerDto
     private String hostname;
     private String ip;
     private String templateName;
+    private String templateId;
     private ContainerSize type;
     private String arch;
     private Set<String> tags;
@@ -30,9 +31,9 @@ public class ContainerDto
 
 
     public ContainerDto( final String id, final String name, final String environmentId, final String hostname,
-                         final String ip, final String templateName,
-                         final ContainerSize type, final String arch, final Set<String> tags, final String peerId,
-                         final String hostId, boolean local, String className )
+                         final String ip, final String templateName, final ContainerSize type, final String arch,
+                         final Set<String> tags, final String peerId, final String hostId, boolean local,
+                         String className, final String templateId )
     {
         this.id = id;
         this.name = name;
@@ -46,155 +47,9 @@ public class ContainerDto
         this.peerId = peerId;
         this.hostId = hostId;
         this.local = local;
+
+        this.templateId = templateId;
 
         dataSource = className.contains( "ProxyEnvironment" ) ? "hub" : "subutai";
-    }
-
-
-    public String getId()
-    {
-        return id;
-    }
-
-
-    public void setId( final String id )
-    {
-        this.id = id;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public String getEnvironmentId()
-    {
-        return environmentId;
-    }
-
-
-    public void setEnvironmentId( final String environmentId )
-    {
-        this.environmentId = environmentId;
-    }
-
-
-    public String getHostname()
-    {
-        return hostname;
-    }
-
-
-    public void setHostname( final String hostname )
-    {
-        this.hostname = hostname;
-    }
-
-
-    public String getIp()
-    {
-        return ip;
-    }
-
-
-    public void setIp( final String ip )
-    {
-        this.ip = ip;
-    }
-
-
-    public String getTemplateName()
-    {
-        return templateName;
-    }
-
-
-    public void setTemplateName( final String templateName )
-    {
-        this.templateName = templateName;
-    }
-
-
-    public ContainerSize getType()
-    {
-        return type;
-    }
-
-
-    public void setType( final ContainerSize type )
-    {
-        this.type = type;
-    }
-
-
-    public Set<String> getTags()
-    {
-        return tags;
-    }
-
-
-    public void setTags( final Set<String> tags )
-    {
-        this.tags = tags;
-    }
-
-
-    public String getArch()
-    {
-        return arch;
-    }
-
-
-    public void setArch( final String arch )
-    {
-        this.arch = arch;
-    }
-
-
-    public String getPeerId()
-    {
-        return peerId;
-    }
-
-
-    public void setPeerId( String peerId )
-    {
-        this.peerId = peerId;
-    }
-
-
-    public String getHostId()
-    {
-        return hostId;
-    }
-
-
-    public void setHostId( String hostId )
-    {
-        this.hostId = hostId;
-    }
-
-
-    public boolean isLocal()
-    {
-        return local;
-    }
-
-
-    public void setLocal( boolean local )
-    {
-        this.local = local;
-    }
-
-
-    public String getDataSource()
-    {
-        return dataSource;
     }
 }

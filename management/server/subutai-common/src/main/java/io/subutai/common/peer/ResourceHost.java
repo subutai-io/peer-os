@@ -4,6 +4,7 @@ package io.subutai.common.peer;
 import java.util.Date;
 import java.util.Set;
 
+import io.subutai.common.environment.RhTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostInterface;
 import io.subutai.common.host.ResourceHostInfo;
@@ -12,6 +13,7 @@ import io.subutai.common.network.NetworkResource;
 import io.subutai.common.network.P2pLogs;
 import io.subutai.common.protocol.P2PConnections;
 import io.subutai.common.protocol.P2pIps;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.protocol.Tunnel;
 import io.subutai.common.protocol.Tunnels;
 
@@ -87,14 +89,14 @@ public interface ResourceHost extends Host, ResourceHostInfo
 
     void createTunnel( Tunnel tunnel ) throws ResourceHostException;
 
-    void importTemplate( String templateName ) throws ResourceHostException;
+    void importTemplate( Template template, String environmentId ) throws ResourceHostException;
 
     /**
      * Clones container based on the specified arguments
      *
      * @return ID of container
      */
-    String cloneContainer( String templateName, String hostname, String ip, int vlan, String environmentId )
+    String cloneContainer( Template template, String hostname, String ip, int vlan, String environmentId )
             throws ResourceHostException;
 
     void setContainerSize( ContainerHost containerHost, ContainerSize containerSize ) throws ResourceHostException;
@@ -111,4 +113,8 @@ public interface ResourceHost extends Host, ResourceHostInfo
     void setHostname( String hostname ) throws ResourceHostException;
 
     int getVlan() throws ResourceHostException;
+
+    boolean isManagementHost();
+
+    RhTemplatesDownloadProgress getTemplateDownloadProgress( String environmentId );
 }

@@ -85,7 +85,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             .success(function (data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].description.includes(environmentId)) {
-                        getLogById(data[i].id, true);
+                        getLogById(data[i].id, true, undefined, environmentId);
                         break;
                     }
                 }
@@ -117,9 +117,54 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         }
     }
 
-    function getLogById(id, checkLast, prevLogs) {
+    function getLogById(id, checkLast, prevLogs, envId) {
         if (checkLast === undefined || checkLast === null) checkLast = false;
         if (prevLogs === undefined || prevLogs === null) prevLogs = false;
+
+        trackerSrv.getDownloadProgress(envId)
+            .success(function (data) {
+
+                data.sort();
+                if( data.length > 0 )
+                {
+                    var output = '';
+                    var checker = false;
+                    for( var i = 0; i < data.length; i++ )
+                    {
+
+                        output += 'Peer ' + shortenIdName(data[i].peerId, 3) + ':<br/>';
+                        for( var j = 0; j < data[i].templatesDownloadProgress.length; j++ )
+                        {
+                            var p = data[i].templatesDownloadProgress[j];
+
+                            output += '&nbsp;&nbsp;RH ' + shortenIdName(p.rhId, 3) + ':<br/>';
+
+                            for (var tpl in p.templatesDownloadProgress) {
+                                output += '<span class="g-text-blue">&nbsp;&nbsp;&nbsp;' + tpl + '&nbsp;&nbsp;&nbsp;...&nbsp;&nbsp;&nbsp;' + p.templatesDownloadProgress[tpl] + ' %</span><br/>';
+                                if( p.templatesDownloadProgress[tpl] != 100 )
+                                {
+                                    checker = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if( checker == true )
+                    {
+                        $('.js-download-progress').html(output);
+                    }
+                    else
+                    {
+                        $('.js-download-progress').html('');
+                    }
+                }
+                else
+                    $('.js-download-progress').html('');
+            })
+            .error(function (data) {
+                $('.js-download-progress').html('');
+            });
+
         trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
             .success(function (data) {
                 if (data.state == 'RUNNING') {
@@ -168,13 +213,14 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                     vm.logMessages = vm.logMessages.concat(result);
 
                     setTimeout(function () {
-                        getLogById(id, false, logs);
+                        getLogById(id, false, logs, envId);
                     }, 2000);
 
                     return result;
                 } else {
                     if (data.state == 'FAILED') {
                         checkLastLog(false);
+                        $('.js-download-progress').html('');
                     } else {
                         //SweetAlert.swal("Success!", "Your environment has been built successfully.", "success");
 
@@ -197,6 +243,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         vm.isEditing = false;
                     }
 
+                    $('.js-download-progress').html('');
                     $rootScope.notificationsUpdate = 'getLogById';
                     $scope.$emit('reloadEnvironmentsList');
                     clearWorkspace();
@@ -236,7 +283,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 vm.logMessages.push(currentLog);
 
                 //var logId = getLogsFromTracker(vm.environment2BuildName);
-                getLogById(data, true);
+                getLogById(data.trackerId, true, undefined, data.environmentId);
                 initScrollbar();
 
                 $rootScope.notificationsUpdate = 'buildEnvironment';
@@ -262,6 +309,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             getSortedContainersByQuota(vm.currentEnvironment.excludedContainers);
         vm.currentEnvironment.includedContainersByQuota =
             getSortedContainersByQuota(vm.currentEnvironment.includedContainers);
+		console.log(vm.currentEnvironment);
 
         vm.currentEnvironment.numChangedContainers = 0;
         for (var key in vm.currentEnvironment.changingContainers) {
@@ -322,7 +370,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				"size": vm.currentEnvironment.includedContainers[i].get('quotaSize'),
 				"templateName": vm.currentEnvironment.includedContainers[i].get('templateName'),
 				"name": vm.currentEnvironment.includedContainers[i].get('containerName'),
-				"position": vm.currentEnvironment.includedContainers[i].get('position')
+				"position": vm.currentEnvironment.includedContainers[i].get('position'),
+				"templateId" : vm.currentEnvironment.includedContainers[i].get('templateId')
 			});
 		}
 
@@ -366,7 +415,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
             clearWorkspace();
             vm.isApplyingChanges = false;
 
-            getLogById(data, true);
+            getLogById(data, true, undefined, vm.currentEnvironment.modificationData.environmentId);
             initScrollbar();
             $rootScope.notificationsUpdate = 'modifyEnvironment';
         }).error(function (data) {
@@ -524,7 +573,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                         this.model.attributes.templateName,
                         false,
                         this.model.attributes.quotaSize,
-                        getTemplateNameById(this.model.attributes.templateName)
+                        getTemplateNameById(this.model.attributes.templateName, vm.templatesList),
+                        this.model.attributes.templateId
                     );
 
                     return;
@@ -620,6 +670,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
         vm.selectedPlugin.selected = true;
     }
 
+    //todo make plugins expose template ids in requirements
     function setTemplatesByPlugin() {
 
         if (vm.selectedPlugin.requirement !== undefined) {
@@ -652,7 +703,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
     }
 
 	var containerCounter = 1;
-	function addContainer(template, $event, size, templateImg) {
+	function addContainer(template, $event, size, templateImg, templateId) {
 
 		if($event === undefined || $event === null) $event = false;
 
@@ -662,6 +713,13 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 size = 'HUGE';
             }
         }
+
+        //workaround issue #974
+        //to implement properly, plugins should expose template id requirement
+        if(templateId == undefined || templateId == null){
+            templateId = getTemplateIdByName(template, vm.templatesList);
+        }
+
         if (templateImg === undefined || templateImg === null) templateImg = template;
 
         var pos = findEmptyCubePostion();
@@ -681,6 +739,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 			templateName: template,
 			quotaSize: size,
 			containerName: containerName,
+			templateId: templateId,
 			attrs: {
 				image: { 'xlink:href': img },
 				'rect.b-magnet': {fill: vm.colors[size]},
@@ -821,6 +880,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 "size": currentElement.get('quotaSize'),
                 "templateName": currentElement.get('templateName'),
                 "name": currentElement.get('containerName'),
+                "templateId" : currentElement.get('templateId'),
                 "position": currentElement.get('position')
             };
 
@@ -829,7 +889,8 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
                 vm.env2Build[currentElement.get('templateName')].count = 1;
                 vm.env2Build[currentElement.get('templateName')].sizes = {};
                 vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
-                vm.env2Build[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
+                vm.env2Build[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'), vm.templatesList);
+                vm.env2Build[currentElement.get('templateName')].id = currentElement.get('templateId');
             } else {
                 vm.env2Build[currentElement.get('templateName')].count++;
                 if (vm.env2Build[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
@@ -891,6 +952,7 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 				hostname: environment.containers[container].hostname,
 				containerId: environment.containers[container].id,
 				containerName: environment.containers[container].hostname,
+				templateId : environment.containers[container].templateId,
 				attrs: {
 					image: { 'xlink:href': img },
 					'rect.b-magnet': {fill: vm.colors[environment.containers[container].type]},
@@ -947,27 +1009,9 @@ function EnvironmentSimpleViewCtrl($scope, $rootScope, environmentService, track
 		}
 	}
 
-    function getElementByField(field, value, collection) {
-        for (var index = 0; index < collection.length; index++) {
-            if (collection[index][field] === value) {
-                return {
-                    container: collection[index],
-                    index: index
-                };
-            }
-        }
-        return null;
-    }
+}
 
-    function getTemplateNameById(id) {
-        var arr = jQuery.grep(vm.templatesList, function (e) {
-            return ( e.id == id );
-        });
-
-        if (arr.length > 0 && arr[0].name.length > 0) {
-            return arr[0].name;
-        }
-
-        return id;
-    }
+function shortenIdName( name, factor )
+{
+    return name.substring(0, factor) + '..' + name.substring(name.length - factor, name.length);
 }

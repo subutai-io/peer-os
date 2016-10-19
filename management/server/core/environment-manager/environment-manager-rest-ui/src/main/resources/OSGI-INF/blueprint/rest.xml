@@ -18,7 +18,7 @@
   <reference id="peerManager" availability="mandatory"
              interface="io.subutai.core.peer.api.PeerManager" />
   <reference id="templateRegistry" availability="mandatory"
-             interface="io.subutai.core.kurjun.api.TemplateManager" />
+             interface="io.subutai.core.template.api.TemplateManager" />
   <reference id="strategyManager" availability="mandatory"
              interface="io.subutai.core.strategy.api.StrategyManager" />
   <reference id="quotaManager" availability="mandatory"

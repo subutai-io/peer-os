@@ -46,7 +46,7 @@ function IdentityUserCtrl($scope, identitySrv, SweetAlert, ngDialog, cfpLoadingB
 	vm.addUserForm = '';
 
 	vm.userTypes = {
-		1: "Systemt",
+		1: "System",
 		2: "Regular",
 	};
 

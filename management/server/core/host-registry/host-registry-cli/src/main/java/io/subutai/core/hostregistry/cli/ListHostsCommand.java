@@ -3,6 +3,8 @@ package io.subutai.core.hostregistry.cli;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 import com.google.common.base.Preconditions;
@@ -19,6 +21,10 @@ import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 public class ListHostsCommand extends SubutaiShellCommandSupport
 {
     private final HostRegistry hostRegistry;
+
+    @Argument( index = 0, name = "abbreviate host ids", required = false, multiValued = false, description =
+            "abbreviate host ids (true/false)" )
+    boolean abbreviate = true;
 
 
     public ListHostsCommand( final HostRegistry hostRegistry )
@@ -37,7 +43,8 @@ public class ListHostsCommand extends SubutaiShellCommandSupport
         System.out.println( "Connected hosts:" );
         for ( ResourceHostInfo resourceHostInfo : resourceHostsInfo )
         {
-            System.out.println( String.format( "%s\t%s", resourceHostInfo.getHostname(), resourceHostInfo.getId() ) );
+            System.out.println( String.format( "%s\t%s", resourceHostInfo.getHostname(),
+                    abbreviate ? StringUtils.abbreviate( resourceHostInfo.getId(), 7 ) : resourceHostInfo.getId() ) );
 
             System.out.println( "\tNetwork interfaces:" );
             for ( HostInterface hostInterface : resourceHostInfo.getHostInterfaces().getAll() )
@@ -50,10 +57,10 @@ public class ListHostsCommand extends SubutaiShellCommandSupport
 
             for ( ContainerHostInfo containerHostInfo : containerHostInfos )
             {
-                System.out.println(
-                        String.format( "\t\t%s\t%s\t%s\t%s", containerHostInfo.getHostname(), containerHostInfo.getId(),
-                                containerHostInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE )
-                                                 .getIp(), containerHostInfo.getState() ) );
+                System.out.println( String.format( "\t\t%s\t%s\t%s\t%s", containerHostInfo.getHostname(),
+                        abbreviate ? StringUtils.abbreviate( containerHostInfo.getId(), 7 ) : containerHostInfo.getId(),
+                        containerHostInfo.getHostInterfaces().findByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp(),
+                        containerHostInfo.getState() ) );
             }
 
             System.out.println( "-------" );

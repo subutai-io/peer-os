@@ -640,9 +640,12 @@ public class KeyManagerImpl implements KeyManager
             {
                 String fingerprint = getFingerprint( identityId );
 
-                securityDataService.removeKeyData( identityId );
-                securityDataService.removeSecretKeyData( identityId );
-                securityDataService.removeKeyAllTrustData( fingerprint );
+                if ( fingerprint != null )
+                {
+                    securityDataService.removeKeyData( identityId );
+                    securityDataService.removeSecretKeyData( identityId );
+                    securityDataService.removeKeyAllTrustData( fingerprint );
+                }
             }
         }
         catch ( Exception ex )
