@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.OutputRedirection;
 import io.subutai.common.command.RequestBuilder;
 import io.subutai.common.peer.ContainerHost;
 import io.subutai.core.hubmanager.api.StateLinkProcessor;
@@ -106,7 +107,8 @@ public class ContainerCommandProcessor implements StateLinkProcessor
 
                 CommandResult commandResult = containerHost.execute(
                         new RequestBuilder( commandRequestDto.getCommand() )
-                                .withTimeout( commandRequestDto.getTimeout() ) );
+                                .withTimeout( commandRequestDto.getTimeout() ).withStdOutRedirection(
+                                commandRequestDto.grabOutput() ? OutputRedirection.RETURN : OutputRedirection.NO ) );
 
                 commandResponseDto = new ContainerCommandResponseDto( commandRequestDto.getContainerId(),
                         commandRequestDto.getCommandId(), commandResult.getExitCode(), commandResult.getStdOut(),

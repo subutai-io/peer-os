@@ -26,6 +26,8 @@ public class ContainerCommandRequestDto
     // Min value is 1, Max value is io.subutai.common.settings.Common.MAX_COMMAND_TIMEOUT_SEC
     private int timeout = 30;
 
+    private boolean grabOutput = true;
+
 
     protected ContainerCommandRequestDto()
     {
@@ -46,6 +48,20 @@ public class ContainerCommandRequestDto
         this.timeout = timeout;
 
         return this;
+    }
+
+
+    public ContainerCommandRequestDto setGrabOutput( final boolean grabOutput )
+    {
+        this.grabOutput = grabOutput;
+
+        return this;
+    }
+
+
+    public boolean grabOutput()
+    {
+        return grabOutput;
     }
 
 
@@ -88,6 +104,7 @@ public class ContainerCommandRequestDto
         sb.append( ", containerId='" ).append( containerId ).append( '\'' );
         sb.append( ", command='" ).append( command ).append( '\'' );
         sb.append( ", timeout=" ).append( timeout );
+        sb.append( ", grabOutput=" ).append( grabOutput );
         sb.append( '}' );
         return sb.toString();
     }
