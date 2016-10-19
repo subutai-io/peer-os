@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentStatus;
-import io.subutai.common.environment.PeerConf;
+import io.subutai.common.environment.EnvironmentPeer;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerHost;
@@ -22,13 +22,15 @@ import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
 import io.subutai.common.peer.ResourceHost;
+import io.subutai.common.security.SshKey;
+import io.subutai.common.security.SshKeys;
 import io.subutai.common.settings.Common;
 import io.subutai.common.util.P2PUtil;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
-import io.subutai.core.hubadapter.api.HubAdapter;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.hub.share.common.HubAdapter;
 import io.subutai.hub.share.json.JsonUtil;
 
 
@@ -189,7 +191,7 @@ public class EnvironmentAdapter
     {
         ArrayNode contNode = json.putArray( "containers" );
 
-        for ( ContainerHost ch : env.getContainerHosts() )
+        for ( EnvironmentContainerHost ch : env.getContainerHosts() )
         {
             ObjectNode peerJson = JsonUtil.createNode( "id", ch.getId() );
 
@@ -210,6 +212,16 @@ public class EnvironmentAdapter
             String ip = ch.getHostInterfaces().getAll().iterator().next().getIp();
 
             peerJson.put( "ip", ip );
+
+
+            ArrayNode sshKeys = peerJson.putArray( "sshkeys" );
+
+            SshKeys chSshKeys = ch.getAuthorizedKeys();
+
+            for ( SshKey sshKey : chSshKeys.getKeys() )
+            {
+                sshKeys.add( sshKey.getPublicKey() );
+            }
 
             contNode.add( peerJson );
         }
@@ -244,18 +256,18 @@ public class EnvironmentAdapter
 
             peerJson.put( "online", peer.isOnline() );
 
-            putPeerResourceHostsJson( peerJson, env.getPeerConf( peer.getId() ) );
+            putPeerResourceHostsJson( peerJson, env.getEnvironmentPeer( peer.getId() ) );
 
             peers.add( peerJson );
         }
     }
 
 
-    private void putPeerResourceHostsJson( ObjectNode peerJson, PeerConf peerConf )
+    private void putPeerResourceHostsJson( ObjectNode peerJson, EnvironmentPeer environmentPeer )
     {
         ArrayNode rhs = peerJson.putArray( "resourceHosts" );
 
-        for ( RhP2pIp rh : peerConf.getRhP2pIps() )
+        for ( RhP2pIp rh : environmentPeer.getRhP2pIps() )
         {
             ObjectNode rhJson = JsonUtil.createNode( "id", rh.getRhId() );
 
@@ -276,6 +288,19 @@ public class EnvironmentAdapter
     {
         hubAdapter.onContainerStop( envId, contId );
     }
+
+
+    public void removeSshKey( String envId, String sshKey )
+    {
+        hubAdapter.removeSshKey( envId, sshKey );
+    }
+
+
+    public void addSshKey( String envId, String sshKey )
+    {
+        hubAdapter.addSshKey( envId, sshKey );
+    }
+
 
     public HubAdapter getHubAdapter()
     {

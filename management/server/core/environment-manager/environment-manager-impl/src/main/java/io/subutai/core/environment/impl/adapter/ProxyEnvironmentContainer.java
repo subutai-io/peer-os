@@ -22,6 +22,8 @@ import io.subutai.common.host.HostInterfaceModel;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.Host;
+import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.environment.impl.EnvironmentManagerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
@@ -37,18 +39,26 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     private final boolean local;
 
 
-    ProxyEnvironmentContainer( JsonNode json, EnvironmentManagerImpl environmentManager, Set<String> localContainerIds )
+    //temporary workaround until we get template id from Hub
+    ProxyEnvironmentContainer( JsonNode json, String templateId, EnvironmentManagerImpl environmentManager,
+                               Set<String> localContainerIds )
     {
+
         super( "hub", json.get( "peerId" ).asText(),
                 new ContainerHostInfoModel( json.get( "id" ).asText(), json.get( "hostName" ).asText(),
                         json.get( "name" ).asText(), initHostInterfaces( json ), HostArchitecture.AMD64,
-                        ContainerHostState.RUNNING ), json.get( "templateName" ).asText(), HostArchitecture.AMD64,
-                json.get( "domainName" ).asText(), parseSize( json ), json.get( "hostId" ).asText(),
-                json.get( "name" ).asText() );
+                        ContainerHostState.RUNNING ), templateId, json.get( "domainName" ).asText(), parseSize( json ),
+                json.get( "hostId" ).asText() );
 
         local = localContainerIds.contains( getId() );
 
         setEnvironmentManager( environmentManager );
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 
@@ -111,7 +121,8 @@ class ProxyEnvironmentContainer extends EnvironmentContainerImpl
     {
         this.proxyContainer = proxyContainer;
 
-        LOG.debug( "Set proxy: container={}, proxy={}", getId(), proxyContainer.getId() );
+        LOG.debug( "Set proxy: container={}, proxy={}", getId(),
+                proxyContainer == null ? "no proxy" : proxyContainer.getId() );
     }
 
 

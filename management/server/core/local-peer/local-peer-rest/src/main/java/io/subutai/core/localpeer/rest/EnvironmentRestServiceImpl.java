@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.host.ContainerHostState;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
@@ -18,12 +19,13 @@ import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.ContainerSize;
 import io.subutai.common.peer.EnvironmentId;
 import io.subutai.common.peer.LocalPeer;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.quota.ContainerQuota;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
 import io.subutai.common.security.SshKeys;
 import io.subutai.common.util.JsonUtil;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
@@ -159,6 +161,23 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkNotNull( environmentId );
 
             return localPeer.readOrCreateSshKeysForEnvironment( environmentId, sshKeyType );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public SshKeys getContainerAuthorizedKeys( final ContainerId containerId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( containerId );
+
+            return localPeer.getContainerAuthorizedKeys( containerId );
         }
         catch ( Exception e )
         {
@@ -332,7 +351,9 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
         try
         {
             Preconditions.checkNotNull( reverseProxyConfig );
+
             localPeer.addReverseProxy( reverseProxyConfig );
+
             return Response.ok().build();
         }
         catch ( Exception e )
@@ -385,6 +406,25 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
 
 
     @Override
+    public Response getTemplateDownloadProgress( final EnvironmentId environmentId )
+    {
+        try
+        {
+            Preconditions.checkNotNull( environmentId );
+
+            PeerTemplatesDownloadProgress downloadProgress = localPeer.getTemplateDownloadProgress( environmentId );
+
+            return Response.ok( downloadProgress ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
     public void updateEtcHostsWithNewContainerHostname( final EnvironmentId environmentId, final String oldHostname,
                                                         final String newHostname )
     {
@@ -415,6 +455,44 @@ public class EnvironmentRestServiceImpl implements EnvironmentRestService
             Preconditions.checkArgument( !Strings.isNullOrEmpty( newHostname ) );
 
             localPeer.updateAuthorizedKeysWithNewContainerHostname( environmentId, oldHostname, newHostname );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response addCustomProxy( final CustomProxyConfig proxyConfig )
+    {
+        try
+        {
+            Preconditions.checkNotNull( proxyConfig );
+
+            localPeer.addCustomProxy( proxyConfig );
+
+            return Response.ok().build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response removeCustomProxy( final CustomProxyConfig proxyConfig )
+    {
+        try
+        {
+            Preconditions.checkNotNull( proxyConfig );
+
+            localPeer.removeCustomProxy( proxyConfig );
+
+            return Response.ok().build();
         }
         catch ( Exception e )
         {

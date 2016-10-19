@@ -7,7 +7,7 @@ import io.subutai.common.peer.Peer;
 import io.subutai.common.protocol.P2PConfig;
 
 
-public class SetupP2PConnectionTask implements Callable<P2PConfig>
+public class SetupP2PConnectionTask implements Callable<Object>
 {
     private Peer peer;
     private P2PConfig p2PConfig;

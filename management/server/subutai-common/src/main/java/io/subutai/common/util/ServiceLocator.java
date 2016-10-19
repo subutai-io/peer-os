@@ -40,7 +40,11 @@ public class ServiceLocator
             ServiceReference serviceReference = ctx.getServiceReference( clazz.getName() );
             if ( serviceReference != null )
             {
-                return clazz.cast( ctx.getService( serviceReference ) );
+                Object service = ctx.getService( serviceReference );
+                if ( clazz.isInstance( service ) )
+                {
+                    return clazz.cast( service );
+                }
             }
         }
 

@@ -9,7 +9,7 @@ import io.subutai.hub.share.dto.SystemConfDto;
 
 public interface HubManager
 {
-    void registerPeer( String hupIp, String email, String password ) throws Exception;
+    void registerPeer( String hupIp, String email, String password, String peerName ) throws Exception;
 
     void unregisterPeer() throws Exception;
 

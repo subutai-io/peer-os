@@ -17,6 +17,7 @@ import org.apache.karaf.bundle.core.BundleStateService;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import io.subutai.common.host.HostId;
 import io.subutai.common.host.HostInterfaces;
 import io.subutai.common.metric.ResourceHostMetrics;
 import io.subutai.common.network.NetworkResourceImpl;
@@ -29,7 +30,6 @@ import io.subutai.common.peer.PeerInfo;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
-import io.subutai.common.protocol.TemplateKurjun;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.crypto.pgp.PGPKeyUtil;
 import io.subutai.common.security.relation.RelationLinkDto;
@@ -118,23 +118,6 @@ public class RestServiceImpl implements RestService
         try
         {
             return localPeer.getPeerInfo();
-        }
-        catch ( Exception e )
-        {
-            LOGGER.error( e.getMessage(), e );
-            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
-        }
-    }
-
-
-    @Override
-    public TemplateKurjun getTemplate( final String templateName )
-    {
-        try
-        {
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ) );
-
-            return localPeer.getTemplate( templateName );
         }
         catch ( Exception e )
         {
@@ -386,13 +369,30 @@ public class RestServiceImpl implements RestService
 
 
     @Override
-    public Response getHistoricalMetrics( final String hostName, final DateTimeParam startTime,
+    public Response getHistoricalMetrics( final String hostId, final DateTimeParam startTime,
                                           final DateTimeParam endTime )
     {
         try
         {
-            return Response.ok( localPeer.getHistoricalMetrics( hostName, startTime.getDate(), endTime.getDate() ) )
-                           .build();
+            return Response.ok( localPeer
+                    .getHistoricalMetrics( new HostId( hostId ), startTime.getDate(), endTime.getDate() ) ).build();
+        }
+        catch ( Exception e )
+        {
+            LOGGER.error( e.getMessage(), e );
+            throw new WebApplicationException( Response.serverError().entity( e.getMessage() ).build() );
+        }
+    }
+
+
+    @Override
+    public Response getMetricsSeries( final String hostId, final DateTimeParam startTime, final DateTimeParam endTime )
+    {
+        try
+        {
+            return Response
+                    .ok( localPeer.getMetricsSeries( new HostId( hostId ), startTime.getDate(), endTime.getDate() ) )
+                    .build();
         }
         catch ( Exception e )
         {

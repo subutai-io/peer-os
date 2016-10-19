@@ -17,11 +17,11 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.PeerGroupResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.core.strategy.api.RoundRobinStrategy;
 import io.subutai.core.strategy.api.StrategyException;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.PeerGroupResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -45,14 +45,6 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     }
 
 
-    public RoundRobinPlacementStrategy()
-    {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master", 0, 0 ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.SMALL, "hadoop", 0, 0 ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.HUGE, "cassandra", 0, 0 ) );
-    }
-
-
     @Override
     public String getId()
     {
@@ -64,22 +56,6 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
     public String getTitle()
     {
         return "Unlimited container placement strategy.";
-    }
-
-
-    @Override
-    public Topology distribute( final String environmentName, PeerGroupResources peerGroupResources,
-                                Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
-    {
-        Topology result = new Topology( environmentName );
-
-        Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
-        for ( Node node : nodes )
-        {
-            result.addNodePlacement( node.getPeerId(), node );
-        }
-
-        return result;
     }
 
 
@@ -135,9 +111,8 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             {
 
                 final RoundRobinAllocator resourceAllocator = iterator.next();
-                allocated = resourceAllocator
-                        .allocate( containerName, nodeSchema.getTemplateName(), nodeSchema.getSize(),
-                                quotas.get( nodeSchema.getSize() ) );
+                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
+                        quotas.get( nodeSchema.getSize() ) );
                 if ( allocated )
                 {
                     break;
@@ -161,8 +136,9 @@ public class RoundRobinPlacementStrategy implements RoundRobinStrategy
             {
                 for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
-                            container.getSize(), container.getPeerId(), container.getHostId() );
+                    Node node = new Node( container.getName(), container.getName(), container.getSize(),
+                            container.getPeerId(), container.getHostId(), container.getTemplateId() );
+
                     nodes.add( node );
                 }
             }

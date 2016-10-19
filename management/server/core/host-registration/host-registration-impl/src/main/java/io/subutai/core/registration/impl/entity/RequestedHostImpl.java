@@ -23,7 +23,7 @@ import com.google.gson.annotations.Expose;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 import io.subutai.core.registration.api.service.ContainerInfo;
 import io.subutai.core.registration.api.service.RequestedHost;
 
@@ -48,7 +48,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER )
     @Expose
-    private Set<HostInterface> netHostInterfaces = Sets.newHashSet();
+    private Set<HostInterface> interfaces = Sets.newHashSet();
 
     @Column( name = "arch" )
     @Enumerated( EnumType.STRING )
@@ -69,14 +69,11 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     @Expose
     private String cert;
 
-    @Column( name = "rest_hook" )
-    @Expose
-    private String restHook;
 
     @Column( name = "status" )
     @Enumerated( EnumType.STRING )
     @Expose
-    private RegistrationStatus status = RegistrationStatus.REQUESTED;
+    private ResourceHostRegistrationStatus status = ResourceHostRegistrationStatus.REQUESTED;
 
     @OneToMany( targetEntity = ContainerInfoImpl.class,
             mappedBy = "requestedHost",
@@ -99,7 +96,6 @@ public class RequestedHostImpl implements RequestedHost, Serializable
         this.arch = requestedHost.getArch();
         this.secret = requestedHost.getSecret();
         this.publicKey = requestedHost.getPublicKey();
-        this.restHook = requestedHost.getRestHook();
         this.status = requestedHost.getStatus();
         this.cert = requestedHost.getCert();
 
@@ -108,18 +104,18 @@ public class RequestedHostImpl implements RequestedHost, Serializable
             this.arch = HostArchitecture.AMD64;
         }
 
-        Set<HostInterface> netHostInterfaces = requestedHost.getNetHostInterfaces();
+        Set<HostInterface> netHostInterfaces = requestedHost.getInterfaces();
         for ( final HostInterface netHostInterface : netHostInterfaces )
         {
             HostInterfaceImpl hostInterfaceImpl = new HostInterfaceImpl( netHostInterface );
-            this.netHostInterfaces.add( hostInterfaceImpl );
+            this.interfaces.add( hostInterfaceImpl );
         }
 
         Set<ContainerInfo> hostInfoSet = requestedHost.getHostInfos();
         for ( final ContainerInfo containerInfo : hostInfoSet )
         {
             ContainerInfoImpl containerInfoImpl = new ContainerInfoImpl( containerInfo );
-            containerInfoImpl.setStatus( RegistrationStatus.REQUESTED );
+            containerInfoImpl.setStatus( ResourceHostRegistrationStatus.REQUESTED );
             containerInfoImpl.setRequestedHost( this );
             this.hostInfos.add( containerInfoImpl );
         }
@@ -127,20 +123,19 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     public RequestedHostImpl( final String id, final String hostname, final HostArchitecture arch, final String secret,
-                              final String publicKey, final String restHook, final RegistrationStatus status,
-                              Set<HostInterface> netHostInterfaces )
+                              final String publicKey, final ResourceHostRegistrationStatus status,
+                              Set<HostInterface> interfaces )
     {
         this.id = id;
         this.hostname = hostname;
         this.arch = arch;
         this.secret = secret;
         this.publicKey = publicKey;
-        this.restHook = restHook;
         this.status = status;
 
-        for ( final HostInterface anHostInterface : netHostInterfaces )
+        for ( final HostInterface anHostInterface : interfaces )
         {
-            this.netHostInterfaces.add( new HostInterfaceImpl( anHostInterface ) );
+            this.interfaces.add( new HostInterfaceImpl( anHostInterface ) );
         }
 
         if ( this.arch == null )
@@ -150,10 +145,9 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
-    @Override
-    public Set<HostInterface> getNetHostInterfaces()
+    public Set<HostInterface> getInterfaces()
     {
-        return netHostInterfaces;
+        return interfaces;
     }
 
 
@@ -161,12 +155,6 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     public Set<ContainerInfo> getHostInfos()
     {
         return hostInfos;
-    }
-
-
-    public void setHostInfos( final Set<ContainerInfo> hostInfos )
-    {
-        this.hostInfos = hostInfos;
     }
 
 
@@ -219,27 +207,13 @@ public class RequestedHostImpl implements RequestedHost, Serializable
 
 
     @Override
-    public String getRestHook()
-    {
-        return restHook;
-    }
-
-
-    @Override
-    public RegistrationStatus getStatus()
+    public ResourceHostRegistrationStatus getStatus()
     {
         return status;
     }
 
 
-    @Override
-    public void setRestHook( final String restHook )
-    {
-        this.restHook = restHook;
-    }
-
-
-    public void setStatus( final RegistrationStatus status )
+    public void setStatus( final ResourceHostRegistrationStatus status )
     {
         this.status = status;
     }
@@ -251,9 +225,9 @@ public class RequestedHostImpl implements RequestedHost, Serializable
     }
 
 
-    public void setNetHostInterfaces( final Set<HostInterface> netHostInterfaces )
+    public void setInterfaces( final Set<HostInterface> interfaces )
     {
-        this.netHostInterfaces = netHostInterfaces;
+        this.interfaces = interfaces;
     }
 
 
@@ -292,8 +266,7 @@ public class RequestedHostImpl implements RequestedHost, Serializable
                 ", arch=" + arch +
                 ", secret='" + secret + '\'' +
                 ", publicKey='" + publicKey + '\'' +
-                ", restHook='" + restHook + '\'' +
-                ", hostInterfaces=" + netHostInterfaces +
+                ", hostInterfaces=" + interfaces +
                 ", hostInfos=" + hostInfos +
                 ", cert=" + cert +
                 '}';

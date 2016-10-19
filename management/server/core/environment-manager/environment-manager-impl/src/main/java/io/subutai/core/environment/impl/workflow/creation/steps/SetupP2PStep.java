@@ -26,12 +26,14 @@ import io.subutai.core.environment.impl.workflow.creation.steps.helpers.SetupTun
 
 /**
  * P2P setup step
+ * TODO refactor - split into smaller methods
  */
 public class SetupP2PStep
 {
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public SetupP2PStep( final Topology topology, final EnvironmentImpl environment,
@@ -80,7 +82,6 @@ public class SetupP2PStep
 
 
         //p2p setup
-        PeerUtil<P2PConfig> p2pUtil = new PeerUtil<>();
 
         int addressCounter = 0;
 
@@ -96,17 +97,17 @@ public class SetupP2PStep
                 config.addRhP2pIp( new RhP2PIpEntity( rhId, p2pAddresses[addressCounter++] ) );
             }
 
-            p2pUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new SetupP2PConnectionTask( peer, config ) ) );
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new SetupP2PConnectionTask( peer, config ) ) );
         }
 
-        PeerUtil.PeerTaskResults<P2PConfig> p2pResults = p2pUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> p2pResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult<P2PConfig> p2pResult : p2pResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<Object> p2pResult : p2pResults.getPeerTaskResults() )
         {
             if ( p2pResult.hasSucceeded() )
             {
-                environment.getPeerConf( p2pResult.getPeer().getId() )
-                           .addRhP2pIps( p2pResult.getResult().getRhP2pIps() );
+                environment.getEnvironmentPeer( p2pResult.getPeer().getId() )
+                           .addRhP2pIps( ( ( P2PConfig ) p2pResult.getResult() ).getRhP2pIps() );
 
                 trackerOperation
                         .addLog( String.format( "P2P setup succeeded on peer %s", p2pResult.getPeer().getName() ) );
@@ -128,15 +129,14 @@ public class SetupP2PStep
         //tunnel setup
         P2pIps p2pIps = environment.getP2pIps();
 
-        PeerUtil<Boolean> tunnelUtil = new PeerUtil<>();
 
         for ( Peer peer : peers )
         {
-            tunnelUtil.addPeerTask(
+            peerUtil.addPeerTask(
                     new PeerUtil.PeerTask<>( peer, new SetupTunnelTask( peer, environment.getId(), p2pIps ) ) );
         }
 
-        PeerUtil.PeerTaskResults<Boolean> tunnelResults = tunnelUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> tunnelResults = peerUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults.getPeerTaskResults() )
         {

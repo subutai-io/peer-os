@@ -50,6 +50,6 @@
   </command-bundle>
 
   <reference id="nodeRegistration" availability="mandatory"
-             interface="io.subutai.core.registration.api.RegistrationManager" />
+             interface="io.subutai.core.registration.api.HostRegistrationManager" />
 
 </blueprint>

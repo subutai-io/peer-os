@@ -14,9 +14,7 @@ import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.Node;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.peer.EnvironmentContainerHost;
 import io.subutai.common.peer.ResourceHost;
-import io.subutai.common.settings.Common;
 import io.subutai.core.environment.api.EnvironmentManager;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.peer.api.PeerManager;
@@ -94,28 +92,18 @@ public class GrowLocalEnvironmentCommand extends SubutaiShellCommandSupport
         String hostId = resourceHosts.iterator().next().getId();
         Environment environment = environmentManager.loadEnvironment( environmentId );
         String containerName = String.format( "Container%d", new Random().nextInt( 999 ) );
-        Node node = new Node( containerName, containerName, templateName, ContainerSize.TINY, peerId, hostId );
-        //
+
+        Node node = new Node( containerName, containerName, ContainerSize.TINY, peerId, hostId,
+                peerManager.getLocalPeer().getTemplateByName( templateName ).getId() );
+
         Topology topology = new Topology( environment.getName() );
         topology.addNodePlacement( peerId, node );
 
-        Set<EnvironmentContainerHost> newContainers =
-                environmentManager.growEnvironment( environmentId, topology, async );
 
-        System.out.println( "New containers created:" );
+        environmentManager.modifyEnvironment( environmentId, topology, null, null, async );
 
-        for ( EnvironmentContainerHost containerHost : newContainers )
-        {
-            System.out.println( "-----------------------------------------------------------------" );
+        System.out.println( "Environment creation started" );
 
-            System.out.println( String.format( "Container id %s", containerHost.getId() ) );
-            System.out.println( String.format( "Container hostname %s", containerHost.getHostname() ) );
-            System.out.println( String.format( "Environment id %s", containerHost.getEnvironmentId() ) );
-            System.out.println( String.format( "Template name %s", containerHost.getTemplateName() ) );
-            System.out.println( String.format( "IP %s",
-                    containerHost.getInterfaceByName( Common.DEFAULT_CONTAINER_INTERFACE ).getIp() ) );
-            System.out.println( String.format( "Is connected %s", containerHost.isConnected() ) );
-        }
 
         return null;
     }

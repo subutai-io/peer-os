@@ -56,13 +56,13 @@ public class SessionManagerImpl implements SessionManager
                 try
                 {
                     removeInvalidTokens();
-                    invalidateSessions();
+                    invalidateSessions(null);
                 }
                 catch(Exception ignore)
                 {
                 }
             }
-        }, 10, 10, TimeUnit.MINUTES );
+        }, 5, 5, TimeUnit.MINUTES );
     }
 
 
@@ -86,10 +86,13 @@ public class SessionManagerImpl implements SessionManager
         {
             if ( userSession == null )
             {
+                Date currentDate = new Date( System.currentTimeMillis() );
+
                 userSession = new SessionEntity();
                 userSession.setUser( user );
                 userSession.setStatus( 1 );
-                userSession.setStartDate( new Date( System.currentTimeMillis() ) );
+                userSession.setStartDate(currentDate );
+                userSession.setEndDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
                 sessionContext.put( sessionId, userSession );
             }
             else
@@ -128,7 +131,7 @@ public class SessionManagerImpl implements SessionManager
     public void extendSessionTime( Session userSession )
     {
         Date currentDate = new Date( System.currentTimeMillis() );
-        userSession.setStartDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
+        userSession.setEndDate( DateUtils.addMinutes( currentDate, SESSION_TIMEOUT ) );
     }
 
 
@@ -140,7 +143,7 @@ public class SessionManagerImpl implements SessionManager
     {
         Session sc = sessionContext.get( sessionId );
 
-        if(sc!=null)
+        if(sc != null)
         {
             extendSessionTime( sc );
         }
@@ -163,18 +166,22 @@ public class SessionManagerImpl implements SessionManager
     }
 
 
-    /* *************************************************
+    /* ************************************************
+     *  Timeout and remove session
      */
     @PermitAll
     @Override
-    public void invalidateSessions()
+    public void invalidateSessions(Date currentDate)
     {
-        Date currentDate = DateUtils.addMinutes( new Date( System.currentTimeMillis() ), -SESSION_TIMEOUT );
+        if(currentDate == null)
+        {
+            currentDate = new Date( System.currentTimeMillis() );
+        }
 
         for ( Iterator<Session> iterator = sessionContext.values().iterator(); iterator.hasNext(); )
         {
             final Session session = iterator.next();
-            if ( session.getStartDate().before( currentDate ) )
+            if ( session.getEndDate().getTime() <= currentDate.getTime() )
             {
                 iterator.remove();
             }
@@ -204,5 +211,12 @@ public class SessionManagerImpl implements SessionManager
         SESSION_TIMEOUT = sessionTimeout;
     }
 
+
+    //*****************************************
+    @Override
+    public Map getSessionContext()
+    {
+        return sessionContext;
+    }
 
 }

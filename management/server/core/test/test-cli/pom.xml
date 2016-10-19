@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>test-parent</artifactId>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-cli</artifactId>
@@ -33,13 +33,13 @@
     </dependency>
 
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>kurjun-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.karaf.bundle</groupId>
       <artifactId>org.apache.karaf.bundle.core</artifactId>
       <version>${karaf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.subutai</groupId>
+      <artifactId>environment-manager-api</artifactId>
     </dependency>
   </dependencies>
 

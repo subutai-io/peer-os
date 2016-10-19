@@ -5,9 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -31,8 +30,7 @@ public class Blueprint
     private List<NodeSchema> nodes;
 
 
-    public Blueprint( @JsonProperty( "name" ) final String name,/*, @JsonProperty( "sshGroupId" ) final int sshGroupId,
-                      @JsonProperty( "hostGroupId" ) final int hostGroupId,*/
+    public Blueprint( @JsonProperty( "name" ) final String name,
                       @JsonProperty( "nodes" ) List<NodeSchema> nodes )
     {
 

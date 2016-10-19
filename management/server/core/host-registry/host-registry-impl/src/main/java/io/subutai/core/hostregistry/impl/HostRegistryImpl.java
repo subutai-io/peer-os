@@ -31,8 +31,8 @@ import io.subutai.common.metric.QuotaAlertValue;
 import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.peer.ResourceHost;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.common.util.CollectionUtil;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
 import io.subutai.core.hostregistry.api.HostDisconnectedException;
@@ -57,6 +57,8 @@ public class HostRegistryImpl implements HostRegistry
     protected ScheduledExecutorService hostUpdater = Executors.newSingleThreadScheduledExecutor();
     protected ExecutorService threadPool = Executors.newCachedThreadPool();
     protected Cache<String, ResourceHostInfo> hosts;
+
+    IPUtil ipUtil = new IPUtil();
 
 
     @Override
@@ -199,6 +201,15 @@ public class HostRegistryImpl implements HostRegistry
 
 
     @Override
+    public void removeResourceHost( final String id )
+    {
+        Preconditions.checkArgument( !Strings.isNullOrEmpty( id ) );
+
+        hosts.invalidate( id );
+    }
+
+
+    @Override
     public void addHostListener( final HostListener listener )
     {
         if ( listener != null )
@@ -256,7 +267,7 @@ public class HostRegistryImpl implements HostRegistry
 
             Set<ResourceHost> registeredResourceHosts = Sets.newHashSet();
 
-            LocalPeer localPeer = ServiceLocator.getServiceNoCache( LocalPeer.class );
+            LocalPeer localPeer = getLocalPeer();
 
             if ( localPeer != null )
             {
@@ -318,12 +329,13 @@ public class HostRegistryImpl implements HostRegistry
     protected void updateHost( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
+        Response response = null;
 
         try
         {
             webClient = getWebClient( resourceHostInfo, "ping" );
 
-            Response response = webClient.get();
+            response = webClient.get();
 
             if ( response.getStatus() == Response.Status.OK.getStatusCode() )
             {
@@ -350,7 +362,7 @@ public class HostRegistryImpl implements HostRegistry
         }
         finally
         {
-            RestUtil.close( webClient );
+            RestUtil.close( response, webClient );
         }
     }
 
@@ -363,36 +375,43 @@ public class HostRegistryImpl implements HostRegistry
 
     protected WebClient getWebClient( ResourceHostInfo resourceHostInfo, String action )
     {
-        return RestUtil.createWebClient( String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ),
-                Common.DEFAULT_AGENT_PORT, action ), 3000, 5000, 1 );
+        return RestUtil.createWebClient(
+                String.format( "http://%s:%d/%s", getResourceHostIp( resourceHostInfo ), Common.DEFAULT_AGENT_PORT,
+                        action ), 3000, 5000, 1 );
     }
 
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
+
+        HostInterface hostInterface;
+
         if ( resourceHostInfo instanceof ResourceHost )
         {
-            for ( HostInterface hostInterface : ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces() )
-            {
-                if ( Common.RH_INTERFACE.equals( hostInterface.getName() ) )
-                {
-                    return hostInterface.getIp();
-                }
-            }
+            Set<HostInterface> hostInterfaces = ( ( ResourceHost ) resourceHostInfo ).getSavedHostInterfaces();
 
-            throw new RuntimeException( "Network interface not found" );
+            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
         }
         else
         {
-            HostInterface hostInterface = resourceHostInfo.getHostInterfaces().findByName( Common.RH_INTERFACE );
+            Set<HostInterface> hostInterfaces = Sets.newHashSet();
+            hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
 
-            if ( hostInterface instanceof NullHostInterface )
-            {
-                throw new RuntimeException( "Network interface not found" );
-            }
-
-            return hostInterface.getIp();
+            hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
         }
+
+        if ( hostInterface instanceof NullHostInterface )
+        {
+            throw new RuntimeException( "Network interface not found" );
+        }
+
+        return hostInterface.getIp();
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 

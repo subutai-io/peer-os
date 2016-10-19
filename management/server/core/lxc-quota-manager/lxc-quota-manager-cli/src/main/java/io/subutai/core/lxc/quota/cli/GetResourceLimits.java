@@ -7,10 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.apache.karaf.shell.commands.Command;
 
 import io.subutai.common.peer.LocalPeer;
-import io.subutai.common.resource.HostResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 import io.subutai.core.lxc.quota.api.QuotaManager;
+import io.subutai.hub.share.resource.HostResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 @Command( scope = "quota", name = "limits", description = "Gets limits for local peer" )

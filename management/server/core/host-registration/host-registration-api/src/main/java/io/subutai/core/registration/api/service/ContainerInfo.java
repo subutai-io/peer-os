@@ -2,7 +2,7 @@ package io.subutai.core.registration.api.service;
 
 
 import io.subutai.common.host.ContainerHostInfo;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 
 
 public interface ContainerInfo extends ContainerHostInfo
@@ -28,7 +28,7 @@ public interface ContainerInfo extends ContainerHostInfo
     /**
      * Get container host info status
      */
-    public RegistrationStatus getStatus();
+    public ResourceHostRegistrationStatus getStatus();
 
 
     /**

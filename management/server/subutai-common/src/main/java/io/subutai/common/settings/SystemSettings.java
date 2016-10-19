@@ -1,9 +1,6 @@
 package io.subutai.common.settings;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,26 +18,17 @@ public class SystemSettings
 {
     private static final Logger LOG = LoggerFactory.getLogger( SystemSettings.class );
 
-    public static final String DEFAULT_KURJUN_REPO = "http://repo.critical-factor.com:8080/rest/kurjun";
-    public static final String DEFAULT_LOCAL_KURJUN_REPO = "http://localhost:8081/kurjun";
-    public static final int DEFAULT_P2P_PORT_START_RANGE = 0;
-    public static final int DEFAULT_P2P_PORT_END_RANGE = 65535;
+    private static final int DEFAULT_P2P_PORT_START_RANGE = 0;
+    private static final int DEFAULT_P2P_PORT_END_RANGE = 65535;
+
+    private PropertiesConfiguration PROPERTIES = null;
 
 
-    private static PropertiesConfiguration PROPERTIES = null;
-    private static String[] GLOBAL_KURJUN_URLS = null;
-
-    static
-    {
-        loadProperties();
-    }
-
-    public static void loadProperties()
+    public SystemSettings()
     {
         try
         {
             PROPERTIES = new PropertiesConfiguration( String.format( "%s/subutaisystem.cfg", Common.KARAF_ETC ) );
-            loadGlobalKurjunUrls();
         }
         catch ( ConfigurationException e )
         {
@@ -48,91 +36,14 @@ public class SystemSettings
         }
     }
 
-    // Kurjun Settings
 
-
-    public static String[] getGlobalKurjunUrls()
-    {
-        return GLOBAL_KURJUN_URLS;
-    }
-
-
-    public static String[] getLocalKurjunUrls() throws ConfigurationException
-    {
-        String[] globalKurjunUrls = PROPERTIES.getStringArray( "localKurjunUrls" );
-        if ( globalKurjunUrls.length < 1 )
-        {
-            globalKurjunUrls = new String[] {
-                    DEFAULT_LOCAL_KURJUN_REPO
-            };
-        }
-
-        return validateGlobalKurjunUrls( globalKurjunUrls );
-    }
-
-
-    public static void setLocalKurjunUrls( String[] urls ) throws ConfigurationException
-    {
-        String[] validated = validateGlobalKurjunUrls( urls );
-        saveProperty( "localKurjunUrls", validated );
-    }
-
-
-    public static void setGlobalKurjunUrls( String[] urls ) throws ConfigurationException
-    {
-        String[] validated = validateGlobalKurjunUrls( urls );
-        saveProperty( "globalKurjunUrls", validated );
-        loadGlobalKurjunUrls();
-    }
-
-
-    protected static String[] validateGlobalKurjunUrls( final String[] urls ) throws ConfigurationException
-    {
-        String[] arr = new String[urls.length];
-
-        for ( int i = 0; i < urls.length; i++ )
-        {
-            String url = urls[i];
-            try
-            {
-                new URL( url );
-                String u = url.endsWith( "/" ) ? url.replaceAll( "/+$", "" ) : url;
-                arr[i] = u;
-            }
-            catch ( MalformedURLException e )
-            {
-                throw new ConfigurationException( "Invalid URL: " + url );
-            }
-        }
-        return arr;
-    }
-
-
-    private static void loadGlobalKurjunUrls() throws ConfigurationException
-    {
-        String[] globalKurjunUrls = PROPERTIES.getStringArray( "globalKurjunUrls" );
-        if ( globalKurjunUrls.length < 1 )
-        {
-            globalKurjunUrls = new String[] { DEFAULT_KURJUN_REPO };
-        }
-
-        GLOBAL_KURJUN_URLS = validateGlobalKurjunUrls( globalKurjunUrls );
-    }
-
-
-    // Network Settings
-
-
-    // Peer Settings
-
-
-    private static LocalPeer getLocalPeer()
+    private LocalPeer getLocalPeer()
     {
         return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 
-    public static String getPublicUrl()
+    public String getPublicUrl()
     {
         LocalPeer localPeer = getLocalPeer();
         if ( localPeer != null && localPeer.isInitialized() )
@@ -146,7 +57,7 @@ public class SystemSettings
     }
 
 
-    public static int getPublicSecurePort()
+    public int getPublicSecurePort()
     {
         LocalPeer localPeer = getLocalPeer();
         if ( localPeer != null && localPeer.isInitialized() )
@@ -160,7 +71,7 @@ public class SystemSettings
     }
 
 
-    protected static void saveProperty( final String name, final Object value )
+    protected void saveProperty( final String name, final Object value )
     {
         try
         {
@@ -174,19 +85,19 @@ public class SystemSettings
     }
 
 
-    public static int getP2pPortStartRange()
+    public int getP2pPortStartRange()
     {
         return PROPERTIES.getInt( "p2pPortStartRange", DEFAULT_P2P_PORT_START_RANGE );
     }
 
 
-    public static int getP2pPortEndRange()
+    public int getP2pPortEndRange()
     {
         return PROPERTIES.getInt( "p2pPortEndRange", DEFAULT_P2P_PORT_END_RANGE );
     }
 
 
-    public static void setP2pPortRange( final int p2pPortStartRange, final int p2pPortEndRange )
+    public void setP2pPortRange( final int p2pPortStartRange, final int p2pPortEndRange )
     {
         Preconditions.checkArgument(
                 NumUtil.isIntBetween( p2pPortStartRange, DEFAULT_P2P_PORT_START_RANGE, DEFAULT_P2P_PORT_END_RANGE ) );

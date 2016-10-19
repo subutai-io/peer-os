@@ -46,6 +46,7 @@ public class ContainerCloneStep
     private final TrackerOperation operationTracker;
     private final String localPeerId;
     private PeerManager peerManager;
+    protected PeerUtil<CreateEnvironmentContainersResponse> cloneUtil = new PeerUtil<>();
 
 
     public ContainerCloneStep( final String defaultDomain, final Topology topology, final EnvironmentImpl environment,
@@ -97,7 +98,6 @@ public class ContainerCloneStep
                             requestedContainerCount, totalAvailableIpCount ) );
         }
 
-        PeerUtil<CreateEnvironmentContainersResponse> cloneUtil = new PeerUtil<>();
 
         int currentOffset = 0;
 
@@ -134,7 +134,7 @@ public class ContainerCloneStep
     }
 
 
-    private boolean processResponse( final CreateEnvironmentContainersResponse responses, final String peerId )
+    protected boolean processResponse( final CreateEnvironmentContainersResponse responses, final String peerId )
     {
         final Set<EnvironmentContainerImpl> containers = new HashSet<>();
 
@@ -159,7 +159,7 @@ public class ContainerCloneStep
     }
 
 
-    private EnvironmentContainerImpl buildContainerEntity( final String peerId, final CloneResponse cloneResponse )
+    protected EnvironmentContainerImpl buildContainerEntity( final String peerId, final CloneResponse cloneResponse )
     {
         final HostInterfaces interfaces = new HostInterfaces();
 
@@ -171,8 +171,7 @@ public class ContainerCloneStep
                         cloneResponse.getContainerName(), interfaces, cloneResponse.getTemplateArch(),
                         ContainerHostState.RUNNING );
 
-        return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateName(),
-                cloneResponse.getTemplateArch(), defaultDomain, cloneResponse.getContainerSize(),
-                cloneResponse.getResourceHostId(), cloneResponse.getContainerName() );
+        return new EnvironmentContainerImpl( localPeerId, peerId, infoModel, cloneResponse.getTemplateId(),
+                defaultDomain, cloneResponse.getContainerSize(), cloneResponse.getResourceHostId() );
     }
 }

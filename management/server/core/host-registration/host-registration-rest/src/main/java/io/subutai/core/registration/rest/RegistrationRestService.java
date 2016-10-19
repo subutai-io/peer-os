@@ -24,8 +24,8 @@ public interface RegistrationRestService
 
 
     @POST
-    @Path( "requests/{id}/unregister" )
-    public Response unRegisterRequest( @PathParam( "id" ) String requestId );
+    @Path( "requests/{id}/reject" )
+    public Response rejectRequest( @PathParam( "id" ) String requestId );
 
 
     @POST

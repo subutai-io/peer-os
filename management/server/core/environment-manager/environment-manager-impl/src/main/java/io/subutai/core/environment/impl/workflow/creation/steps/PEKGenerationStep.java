@@ -3,6 +3,7 @@ package io.subutai.core.environment.impl.workflow.creation.steps;
 
 import java.util.Set;
 
+import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRing;
 
@@ -23,6 +24,8 @@ import io.subutai.core.security.api.SecurityManager;
 
 /**
  * PEK generation step
+ *
+ * TODO refactor - split into smaller methods
  */
 public class PEKGenerationStep
 {
@@ -31,6 +34,7 @@ public class PEKGenerationStep
     private final PeerManager peerManager;
     private final SecurityManager securityManager;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> pekUtil = new PeerUtil<>();
 
 
     public PEKGenerationStep( final Topology topology, final Environment environment, final PeerManager peerManager,
@@ -57,10 +61,9 @@ public class PEKGenerationStep
         try
         {
             RelationLinkDto envLink = new RelationLinkDto( environment );
-            PublicKeyContainer publicKeyContainer =
-                    peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
+            PublicKeyContainer publicKeyContainer = peerManager.getLocalPeer().createPeerEnvironmentKeyPair( envLink );
 
-            PGPPublicKeyRing pubRing = PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
+            PGPPublicKeyRing pubRing = readPublicKeyRing( publicKeyContainer );
 
             localPeerSignedPEK =
                     securityManager.getKeyManager().setKeyTrust( envSecKeyRing, pubRing, KeyTrustLevel.Full.getId() );
@@ -80,7 +83,6 @@ public class PEKGenerationStep
             return;
         }
 
-        PeerUtil<Peer> pekUtil = new PeerUtil<>();
 
         // creating PEK on remote peers
         for ( final Peer peer : peers )
@@ -90,7 +92,7 @@ public class PEKGenerationStep
                             environment, peer, securityManager.getKeyManager() ) ) );
         }
 
-        PeerUtil.PeerTaskResults<Peer> pekResults = pekUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> pekResults = pekUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult pekResult : pekResults.getPeerTaskResults() )
         {
@@ -114,7 +116,13 @@ public class PEKGenerationStep
     }
 
 
-    private PGPSecretKeyRing getEnvironmentKeyRing()
+    protected PGPPublicKeyRing readPublicKeyRing( final PublicKeyContainer publicKeyContainer ) throws PGPException
+    {
+        return PGPKeyUtil.readPublicKeyRing( publicKeyContainer.getKey() );
+    }
+
+
+    protected PGPSecretKeyRing getEnvironmentKeyRing()
     {
         return securityManager.getKeyManager().getSecretKeyRing( environment.getEnvironmentId().getId() );
     }

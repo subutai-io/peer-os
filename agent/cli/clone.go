@@ -13,8 +13,13 @@ import (
 )
 
 func LxcClone(parent, child, envId, addr, token string) {
+	if id := strings.Split(parent, "id:"); len(id) > 1 {
+		kurjun, _ := config.CheckKurjun()
+		parent = idToName(id[1], kurjun, token)
+	}
+
 	if !container.IsTemplate(parent) {
-		LxcImport(parent, "", token)
+		LxcImport(parent, "", token, false)
 	}
 	if container.IsContainer(child) {
 		log.Error("Container " + child + " already exist")

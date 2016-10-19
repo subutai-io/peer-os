@@ -2,18 +2,17 @@ package io.subutai.core.environment.impl.workflow.modification.steps;
 
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.subutai.common.peer.Peer;
 import io.subutai.common.peer.PeerException;
-import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.tracker.TrackerOperation;
 import io.subutai.common.util.PeerUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
+import io.subutai.core.environment.impl.workflow.modification.steps.helpers.ResetP2pKeyTask;
 
 
 public class P2PSecretKeyResetStep
@@ -23,6 +22,7 @@ public class P2PSecretKeyResetStep
     private final EnvironmentImpl environment;
     private final P2PCredentials p2PCredentials;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> resetUtil = new PeerUtil<>();
 
 
     public P2PSecretKeyResetStep( final EnvironmentImpl environment, final P2PCredentials p2PCredentials,
@@ -38,29 +38,10 @@ public class P2PSecretKeyResetStep
     {
         Set<Peer> peers = environment.getPeers();
 
-        PeerUtil<Object> resetUtil = new PeerUtil<>();
-
         for ( final Peer peer : peers )
         {
-            resetUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new Callable<Object>()
-            {
-                @Override
-                public Object call() throws Exception
-                {
-                    final RegistrationStatus status = peer.getStatus();
-                    if ( status == RegistrationStatus.APPROVED )
-                    {
-                        peer.resetSwarmSecretKey( p2PCredentials );
-                    }
-                    else
-                    {
-                        LOG.warn( String.format( "Resetting p2p secret key on peer %s skipped due to peer status %s",
-                                peer.getId(), status ) );
-                    }
-
-                    return null;
-                }
-            } ) );
+            resetUtil.addPeerTask(
+                    new PeerUtil.PeerTask<>( peer, new ResetP2pKeyTask( peer, p2PCredentials, trackerOperation ) ) );
         }
 
         PeerUtil.PeerTaskResults<Object> resetResults = resetUtil.executeParallel();

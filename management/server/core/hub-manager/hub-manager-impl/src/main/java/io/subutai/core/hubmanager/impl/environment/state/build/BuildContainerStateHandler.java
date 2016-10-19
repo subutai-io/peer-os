@@ -103,9 +103,8 @@ public class BuildContainerStateHandler extends StateHandler
             log.info( "- noteDto: containerId={}, containerName={}, hostname={}, state={}", nodeDto.getContainerId(),
                     nodeDto.getContainerName(), nodeDto.getHostName(), nodeDto.getState() );
 
-            Node node =
-                    new Node( nodeDto.getHostName(), nodeDto.getContainerName(), nodeDto.getTemplateName(), contSize,
-                            peerDto.getPeerId(), nodeDto.getHostId() );
+            Node node = new Node( nodeDto.getHostName(), nodeDto.getContainerName(), contSize, peerDto.getPeerId(),
+                    nodeDto.getHostId(), nodeDto.getTemplateId() );
 
             nodes.add( node );
         }
@@ -122,7 +121,7 @@ public class BuildContainerStateHandler extends StateHandler
                 rhTemplates.put( node.getHostId(), templates );
             }
 
-            templates.add( node.getTemplateName() );
+            templates.add( node.getTemplateId() );
         }
 
         ctx.localPeer
@@ -182,7 +181,7 @@ public class BuildContainerStateHandler extends StateHandler
 
 
     private CreateEnvironmentContainersRequest createCloneRequests( EnvironmentPeerDto peerDto,
-                                                                    EnvironmentNodesDto envNodes )
+                                                                    EnvironmentNodesDto envNodes ) throws Exception
     {
         String envId = peerDto.getEnvironmentInfo().getId();
 
@@ -210,13 +209,16 @@ public class BuildContainerStateHandler extends StateHandler
     }
 
 
-    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto )
+    private CloneRequest createCloneRequest( EnvironmentNodeDto nodeDto ) throws Exception
     {
         ContainerSize contSize = ContainerSize.valueOf( nodeDto.getContainerSize() );
 
-        return new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
-                nodeDto.getContainerName(), nodeDto.getIp(), nodeDto.getTemplateName(), HostArchitecture.AMD64,
-                contSize );
+        CloneRequest cloneRequest =
+                new CloneRequest( nodeDto.getHostId(), nodeDto.getContainerName().replace( " ", "-" ),
+                        nodeDto.getContainerName(), nodeDto.getIp(), nodeDto.getTemplateId(), HostArchitecture.AMD64,
+                        contSize );
+
+        return cloneRequest;
     }
 
 

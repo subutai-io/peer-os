@@ -29,6 +29,7 @@ import io.subutai.common.environment.Containers;
 import io.subutai.common.environment.CreateEnvironmentContainersRequest;
 import io.subutai.common.environment.CreateEnvironmentContainersResponse;
 import io.subutai.common.environment.HostAddresses;
+import io.subutai.common.environment.PeerTemplatesDownloadProgress;
 import io.subutai.common.environment.PrepareTemplatesRequest;
 import io.subutai.common.environment.PrepareTemplatesResponse;
 import io.subutai.common.host.ContainerHostState;
@@ -55,13 +56,11 @@ import io.subutai.common.peer.RecipientType;
 import io.subutai.common.peer.RegistrationStatus;
 import io.subutai.common.peer.RemotePeer;
 import io.subutai.common.peer.Timeouts;
+import io.subutai.common.protocol.CustomProxyConfig;
 import io.subutai.common.protocol.P2PConfig;
 import io.subutai.common.protocol.P2PCredentials;
 import io.subutai.common.protocol.P2pIps;
 import io.subutai.common.protocol.ReverseProxyConfig;
-import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.common.security.PublicKeyContainer;
 import io.subutai.common.security.SshEncryptionType;
 import io.subutai.common.security.SshKey;
@@ -90,6 +89,9 @@ import io.subutai.core.peer.impl.command.BlockingCommandCallback;
 import io.subutai.core.peer.impl.command.CommandResponseListener;
 import io.subutai.core.peer.impl.request.MessageResponseListener;
 import io.subutai.core.security.api.SecurityManager;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.HistoricalMetrics;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -222,15 +224,6 @@ public class RemotePeerImpl implements RemotePeer
     }
 
 
-    @Override
-    public TemplateKurjun getTemplate( final String templateName ) throws PeerException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( templateName ), "Invalid template name" );
-
-        return peerWebClient.getTemplate( templateName );
-    }
-
-
     //********** ENVIRONMENT SPECIFIC REST *************************************
 
 
@@ -359,6 +352,15 @@ public class RemotePeerImpl implements RemotePeer
         Preconditions.checkNotNull( sshEncryptionType, "SSH encryption type id is null" );
 
         return environmentWebClient.getSshKeys( environmentId, sshEncryptionType );
+    }
+
+
+    @Override
+    public SshKeys getContainerAuthorizedKeys( final ContainerId containerId ) throws PeerException
+    {
+        Preconditions.checkNotNull( containerId, "Container id is null" );
+
+        return environmentWebClient.getContainerAuthorizedKeys( containerId );
     }
 
 
@@ -937,14 +939,26 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
-    public String getHistoricalMetrics( final String hostname, final Date startTime, final Date endTime )
+    public String getHistoricalMetrics( final HostId hostId, final Date startTime, final Date endTime )
             throws PeerException
     {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( hostname ), "Invalid hostname" );
+        Preconditions.checkNotNull( hostId, "Invalid host id" );
         Preconditions.checkNotNull( startTime, "Invalid start time" );
         Preconditions.checkNotNull( endTime, "Invalid end time" );
 
-        return peerWebClient.getHistoricalMetrics( hostname, startTime, endTime );
+        return peerWebClient.getHistoricalMetrics( hostId, startTime, endTime );
+    }
+
+
+    @Override
+    public HistoricalMetrics getMetricsSeries( final HostId hostId, final Date startTime, final Date endTime )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( hostId, "Invalid host id" );
+        Preconditions.checkNotNull( startTime, "Invalid start time" );
+        Preconditions.checkNotNull( endTime, "Invalid end time" );
+
+        return peerWebClient.getMetricsSeries( hostId, startTime, endTime );
     }
 
 
@@ -967,6 +981,25 @@ public class RemotePeerImpl implements RemotePeer
 
 
     @Override
+    public void addCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
+
+        environmentWebClient.addCustomProxy( proxyConfig );
+    }
+
+
+    @Override
+    public void removeCustomProxy( final CustomProxyConfig proxyConfig ) throws PeerException
+    {
+        Preconditions.checkNotNull( proxyConfig, "Invalid proxy config" );
+
+
+        environmentWebClient.removeCustomProxy( proxyConfig );
+    }
+
+
+    @Override
     public void setContainerHostname( final ContainerId containerId, final String hostname ) throws PeerException
     {
         Preconditions.checkNotNull( containerId, "Invalid container id" );
@@ -974,6 +1007,19 @@ public class RemotePeerImpl implements RemotePeer
 
         environmentWebClient.setContainerHostName( containerId, hostname );
     }
+
+
+    @Override
+    public PeerTemplatesDownloadProgress getTemplateDownloadProgress( final EnvironmentId environmentId )
+            throws PeerException
+    {
+        Preconditions.checkNotNull( environmentId, "Invalid environment id" );
+
+        return environmentWebClient.getTemplateDownloadProgress( environmentId );
+    }
+
+
+    //********************************
 
 
     @Override

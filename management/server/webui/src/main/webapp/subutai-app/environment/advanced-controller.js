@@ -16,6 +16,7 @@ var PEER_SPACE = 30;
 
 var RH_WIDTH = 100;
 var RH_SPACE = 10;
+var templatesList = [];
 
 function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, trackerSrv, SweetAlert, ngDialog) {
 
@@ -50,6 +51,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     vm.selectedPlugin = false;
     vm.editingEnv = false;
     vm.isEditing = false;
+    vm.downloadProgress = '';
 
     // functions
 
@@ -82,6 +84,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 vm.templatesList = vm.templatesList.concat(vm.templates[i]);
             }
         }
+		templatesList = vm.templatesList;
     }
 
     function getPeers() {
@@ -105,8 +108,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
     }
 
     function closePopup() {
-        vm.buildCompleted = false;
         resetPlugin();
+        vm.buildCompleted = false;
         ngDialog.closeAll();
     }
 
@@ -115,7 +118,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             .success(function (data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].description.includes(environmentId)) {
-                        getLogById(data[i].id, true);
+                        getLogById(data[i].id, true, undefined, environmentId);
                         break;
                     }
                 }
@@ -145,9 +148,72 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         }
     }
 
-    function getLogById(id, checkLast, prevLogs) {
+    function getLogById(id, checkLast, prevLogs, envId) {
         if (checkLast === undefined || checkLast === null) checkLast = false;
         if (prevLogs === undefined || prevLogs === null) prevLogs = false;
+
+
+        trackerSrv.getDownloadProgress(envId)
+            .success(function (data) {
+
+                if( data.length > 0 ) {
+
+					data.sort();
+
+					var output = '<table class="b-main-table b-main-table_progrss">';
+					var checker = false;
+					for( var i = 0; i < data.length; i++ ) {
+
+						output += [
+							'<tr>',
+								'<th colspan="2">',
+									'Peer ' + shortenIdName(data[i].peerId, 3),
+								'</th>',
+							'</tr>',
+						].join('');
+						for( var j = 0; j < data[i].templatesDownloadProgress.length; j++ ) {
+							var p = data[i].templatesDownloadProgress[j];
+
+							for (var tpl in p.templatesDownloadProgress) {
+								output += [
+									'<tr>',
+										'<td>',
+											'RH ' + shortenIdName(p.rhId, 3),
+										'</td>',
+										'<td>',
+											'<div class="b-progress-cloud b-progress-cloud_white b-progress-cloud_big">',
+												'<div class="b-progress-cloud-fill" style="width: ' + p.templatesDownloadProgress[tpl] + '%;"></div>',
+												'<span class="b-progress-cloud-text">' + tpl + '</span>',
+											'</div>',
+										'</td>',
+									'</tr>'
+								].join('');
+								if( p.templatesDownloadProgress[tpl] != 100 ) {
+									checker = true;
+								}
+							}
+						}
+					}
+					output += '</table>';
+
+
+                    if( checker == true )
+                    {
+                        $('.js-download-progress').html(output);
+                    }
+                    else
+                    {
+                        $('.js-download-progress').html('');
+                    }
+                }
+                else
+                    $('.js-download-progress').html('');
+            })
+            .error(function (data) {
+                $('.js-download-progress').html('');
+            });
+
+
         trackerSrv.getOperation('ENVIRONMENT MANAGER', id)
             .success(function (data) {
                 if (data.state == 'RUNNING') {
@@ -196,7 +262,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     vm.logMessages = vm.logMessages.concat(result);
 
                     setTimeout(function () {
-                        getLogById(id, false, logs);
+                        getLogById(id, false, logs, envId);
                     }, 2000);
 
                     return result;
@@ -227,6 +293,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
                     }
 
+                    $('.js-download-progress').html('');
                     $rootScope.notificationsUpdate = 'getLogByIdAdv';
                     $scope.$emit('reloadEnvironmentsList');
                     clearWorkspace();
@@ -264,7 +331,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                 vm.logMessages.push(currentLog);
 
                 //var logId = getLogsFromTracker(vm.environment2BuildName);
-                getLogById(data, true);
+                getLogById(data.trackerId, true, undefined, data.environmentId);
                 initScrollbar();
 
                 $rootScope.notificationsUpdate = 'startEnvironmentAdvancedBuild';
@@ -309,7 +376,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             .success(function (data) {
                 vm.newEnvID = data;
 
-                getLogById(data, true);
+                getLogById(data, true, undefined, conteiners.environmentId);
                 initScrollbar();
                 $scope.$emit('reloadEnvironmentsList');
 
@@ -336,6 +403,21 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
 
     //add resource host
     function addResource2Build(currentResource, peerId, index) {
+
+        var isManagement = false;
+
+        for (var i in vm.currentResourceHosts)
+        {
+            var rh  = vm.currentResourceHosts[i];
+
+            if(rh.id == currentResource && rh.isManagement){
+
+               isManagement = true;
+
+               break;
+            }
+        }
+
         var posX = calculatePeerPos();
 
         if (PEER_MAP[peerId] !== undefined) {
@@ -365,7 +447,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             children: 0,
             grid: [],
             gridSize: {size: 2},
-            'resourceHostName': 'RH' + (index + 1),
+            'resourceHostName': 'RH' + (index + 1) + (isManagement ? " [MH]" : ""),
             'peerName': 'Peer ' + (vm.currentPeerIndex + 1),
             'addClass': 'b-resource-host_last'
         });
@@ -813,8 +895,10 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
             scope: $scope,
             className: 'b-build-environment-info',
             preCloseCallback: function (value) {
+				if(vm.buildCompleted) {
+					resetPlugin();
+				}
                 vm.buildCompleted = false;
-                resetPlugin();
             }
         });
     }
@@ -988,6 +1072,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     var container2Build = {
                         "type": currentElement.get('quotaSize'),
                         "templateName": currentElement.get('templateName'),
+                        "templateId": currentElement.get('templateId'),
                         "name": currentElement.get('containerName'),
                         "peerId": currentElement.get('parentPeerId'),
                         "hostId": currentElement.get('parentHostId'),
@@ -1003,7 +1088,8 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
                     result.containersObj[currentElement.get('templateName')].count = 1;
                     result.containersObj[currentElement.get('templateName')].sizes = {};
                     result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] = 1;
-                    result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'));
+                    result.containersObj[currentElement.get('templateName')].name = getTemplateNameById(currentElement.get('templateName'), vm.templatesList);
+                    result.containersObj[currentElement.get('templateName')].id = currentElement.get('templateId');
                 } else {
                     result.containersObj[currentElement.get('templateName')].count++;
                     if (result.containersObj[currentElement.get('templateName')].sizes[currentElement.get('quotaSize')] === undefined) {
@@ -1034,6 +1120,7 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         vm.editingEnv = false;
         graph.resetCells();
         $('.b-resource-host').remove();
+		filterPluginsList();
     }
 
     function addSettingsToTemplate(settings) {
@@ -1068,17 +1155,6 @@ function AdvancedEnvironmentCtrl($scope, $rootScope, environmentService, tracker
         }
     }
 
-    function getTemplateNameById(id) {
-        var arr = jQuery.grep(vm.templatesList, function (e) {
-            return ( e.id == id );
-        });
-
-        if (arr.length > 0 && arr[0].name.length > 0) {
-            return arr[0].name;
-        }
-
-        return id;
-    }
 }
 
 function placeRhSimple(model) {
@@ -1212,6 +1288,7 @@ function startDrag(event) {
     }
 
     event.dataTransfer.setData("template", $(event.target).data('template'));
+    event.dataTransfer.setData("templateId", $(event.target).data('template-id'));
     event.dataTransfer.setData("img", containerImage.attr('src'));
 }
 
@@ -1232,6 +1309,7 @@ function drop(event) {
     //event.preventDefault();
 
     var template = event.dataTransfer.getData("template");
+    var templateId = event.dataTransfer.getData("templateId");
     var img = event.dataTransfer.getData("img");
 
     var posX = event.offsetX;
@@ -1241,12 +1319,12 @@ function drop(event) {
 
     for (var i = 0; i < models.length; i++) {
         if (models[i].attributes.hostId !== undefined) {
-            addContainerToHost(models[i], template, img);
+            addContainerToHost(models[i], template, img, null, null, null, templateId);
         }
     }
 }
 
-function addContainerToHost(model, template, img, size, containerId, name) {
+function addContainerToHost(model, template, img, size, containerId, name, templateId) {
 	if(size === undefined || size === null) {
 		size = 'SMALL';
 		if(template == 'appscale') {
@@ -1261,10 +1339,15 @@ function addContainerToHost(model, template, img, size, containerId, name) {
     var x = (rPos.x + gPos.x * GRID_SIZE + GRID_SPACING) + 23;
     var y = (rPos.y + gPos.y * GRID_SIZE + GRID_SPACING) + 49;
 
+	if(templateId == undefined || templateId == null) {
+		var templateId = getTemplateIdByName(template, templatesList);	
+	}
+
 	var containerName = ( name == undefined || name == null ? 'Container ' + (containerCounter++).toString() : name );
 	var devElement = new joint.shapes.tm.devElement({
 		position: { x: x, y: y },
 		templateName: template,
+		templateId: templateId,
 		parentPeerId: model.get('peerId'),
 		parentHostId: model.get('hostId'),
 		quotaSize: size,
@@ -1287,4 +1370,9 @@ function addContainerToHost(model, template, img, size, containerId, name) {
     model.set('children', model.get('children') + 1);
 
     angular.element(document.getElementById('js-environment-creation')).scope().filterPluginsList();
+}
+
+function shortenIdName( name, factor )
+{
+    return name.substring(0, factor) + '..' + name.substring(name.length - factor, name.length);
 }

@@ -11,6 +11,7 @@ import org.apache.commons.net.util.SubnetUtils;
 
 import com.google.common.collect.Sets;
 
+import io.subutai.common.environment.Environment;
 import io.subutai.common.environment.EnvironmentModificationException;
 import io.subutai.common.environment.RhP2pIp;
 import io.subutai.common.environment.Topology;
@@ -34,6 +35,7 @@ public class SetupP2PStep
     private final Topology topology;
     private final EnvironmentImpl environment;
     private final TrackerOperation trackerOperation;
+    protected PeerUtil<Object> peerUtil = new PeerUtil<>();
 
 
     public SetupP2PStep( final Topology topology, final EnvironmentImpl environment,
@@ -85,18 +87,24 @@ public class SetupP2PStep
                     String.format( "Requested IP count %d is more than available %d", totalIps, p2pAddresses.size() ) );
         }
 
-        //obtain participating peers
-        Set<Peer> peers = environment.getPeers();
 
+        //p2p setup
+        setupP2p( environment, peerRhIds, p2pAddresses );
+
+        // tunnel setup
+        setupTunnel( environment );
+    }
+
+
+    protected void setupP2p( EnvironmentImpl environment, Map<String, Set<String>> peerRhIds, Set<String> p2pAddresses )
+            throws EnvironmentModificationException, PeerException
+    {
         //generate p2p secret key
         String sharedKey = DigestUtils.md5Hex( UUID.randomUUID().toString() );
 
-        PeerUtil<P2PConfig> p2pUtil = new PeerUtil<>();
-
         Iterator<String> p2pAddressIterator = p2pAddresses.iterator();
 
-        //p2p setup
-        for ( Peer peer : peers )
+        for ( Peer peer : environment.getPeers() )
         {
             P2PConfig config = new P2PConfig( peer.getId(), environment.getId(), environment.getP2PHash(), sharedKey,
                     Common.DEFAULT_P2P_SECRET_KEY_TTL_SEC );
@@ -107,7 +115,7 @@ public class SetupP2PStep
             if ( !CollectionUtil.isCollectionEmpty( rhIds ) )
             {
                 //remove already participating peers
-                for ( RhP2pIp rhP2pIp : envP2pIps.getP2pIps() )
+                for ( RhP2pIp rhP2pIp : environment.getP2pIps().getP2pIps() )
                 {
                     rhIds.remove( rhP2pIp.getRhId() );
                 }
@@ -119,17 +127,17 @@ public class SetupP2PStep
                 }
             }
 
-            p2pUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new SetupP2PConnectionTask( peer, config ) ) );
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer, new SetupP2PConnectionTask( peer, config ) ) );
         }
 
-        PeerUtil.PeerTaskResults<P2PConfig> p2pResults = p2pUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> p2pResults = peerUtil.executeParallel();
 
-        for ( PeerUtil.PeerTaskResult<P2PConfig> p2pResult : p2pResults.getPeerTaskResults() )
+        for ( PeerUtil.PeerTaskResult<Object> p2pResult : p2pResults.getPeerTaskResults() )
         {
             if ( p2pResult.hasSucceeded() )
             {
-                environment.getPeerConf( p2pResult.getPeer().getId() )
-                           .addRhP2pIps( p2pResult.getResult().getRhP2pIps() );
+                environment.getEnvironmentPeer( p2pResult.getPeer().getId() )
+                           .addRhP2pIps( ( ( P2PConfig ) p2pResult.getResult() ).getRhP2pIps() );
 
                 trackerOperation
                         .addLog( String.format( "P2P setup succeeded on peer %s", p2pResult.getPeer().getName() ) );
@@ -146,19 +154,20 @@ public class SetupP2PStep
         {
             throw new EnvironmentModificationException( "Failed to setup P2P connection across all peers" );
         }
+    }
 
-        // tunnel setup
-        P2pIps p2pIps = environment.getP2pIps();
 
-        PeerUtil<Boolean> tunnelUtil = new PeerUtil<>();
+    protected void setupTunnel( Environment environment ) throws EnvironmentModificationException, PeerException
+    {
 
-        for ( Peer peer : peers )
+
+        for ( Peer peer : environment.getPeers() )
         {
-            tunnelUtil.addPeerTask(
-                    new PeerUtil.PeerTask<>( peer, new SetupTunnelTask( peer, environment.getId(), p2pIps ) ) );
+            peerUtil.addPeerTask( new PeerUtil.PeerTask<>( peer,
+                    new SetupTunnelTask( peer, environment.getId(), environment.getP2pIps() ) ) );
         }
 
-        PeerUtil.PeerTaskResults<Boolean> tunnelResults = tunnelUtil.executeParallel();
+        PeerUtil.PeerTaskResults<Object> tunnelResults = peerUtil.executeParallel();
 
         for ( PeerUtil.PeerTaskResult tunnelResult : tunnelResults.getPeerTaskResults() )
         {

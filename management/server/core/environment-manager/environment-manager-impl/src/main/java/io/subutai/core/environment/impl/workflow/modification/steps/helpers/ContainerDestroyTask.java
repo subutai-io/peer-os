@@ -7,7 +7,7 @@ import io.subutai.common.util.TaskUtil;
 import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 
 
-public class ContainerDestroyTask extends TaskUtil.Task<Environment>
+public class ContainerDestroyTask extends TaskUtil.Task<Object>
 {
 
     private final ContainerHost containerHost;

@@ -31,9 +31,12 @@ import io.subutai.common.command.Response;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HeartBeat;
 import io.subutai.common.host.HeartbeatListener;
+import io.subutai.common.host.HostInterface;
+import io.subutai.common.host.NullHostInterface;
 import io.subutai.common.host.ResourceHostInfo;
+import io.subutai.common.peer.LocalPeer;
 import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
+import io.subutai.common.util.IPUtil;
 import io.subutai.common.util.JsonUtil;
 import io.subutai.common.util.RestUtil;
 import io.subutai.common.util.ServiceLocator;
@@ -64,6 +67,9 @@ public class CommandProcessor implements RestProcessor
     protected Set<HeartbeatListener> listeners =
             Collections.newSetFromMap( new ConcurrentHashMap<HeartbeatListener, Boolean>() );
 
+    JsonUtil jsonUtil = new JsonUtil();
+    IPUtil ipUtil = new IPUtil();
+
 
     public void addListener( HeartbeatListener listener )
     {
@@ -86,7 +92,7 @@ public class CommandProcessor implements RestProcessor
     @Override
     public void handleHeartbeat( final HeartBeat heartBeat )
     {
-        LOG.debug( String.format( "Heartbeat:%n%s", JsonUtil.toJson( heartBeat ) ) );
+        LOG.debug( String.format( "Heartbeat:%n%s", jsonUtil.to( heartBeat ) ) );
 
         for ( final HeartbeatListener listener : listeners )
         {
@@ -154,7 +160,7 @@ public class CommandProcessor implements RestProcessor
                 new CommandProcessExpiryCallback() );
         if ( !queued )
         {
-            throw new CommandException( "This command is already queued for execution" );
+            throw new CommandException( "Command id is null " );
         }
 
         //send command
@@ -162,7 +168,7 @@ public class CommandProcessor implements RestProcessor
         {
             commandProcess.start();
 
-            String command = JsonUtil.toJson( new RequestWrapper( request ) );
+            String command = jsonUtil.to( new RequestWrapper( request ) );
 
             LOG.debug( String.format( "Sending:%n%s", command ) );
 
@@ -194,7 +200,7 @@ public class CommandProcessor implements RestProcessor
                 hostRequests = Sets.newLinkedHashSet();
                 requests.put( resourceHostInfo.getId(), hostRequests, Common.INACTIVE_COMMAND_DROP_TIMEOUT_SEC * 1000 );
             }
-            String encryptedRequest = encrypt( JsonUtil.toJsonMinified( request ), request.getId() );
+            String encryptedRequest = encrypt( jsonUtil.toMinified( request ), request.getId() );
             hostRequests.add( encryptedRequest );
         }
     }
@@ -248,11 +254,13 @@ public class CommandProcessor implements RestProcessor
     protected void notifyAgent( ResourceHostInfo resourceHostInfo )
     {
         WebClient webClient = null;
+        javax.ws.rs.core.Response response = null;
+
         try
         {
             webClient = getWebClient( resourceHostInfo );
 
-            javax.ws.rs.core.Response response = webClient.form( new Form() );
+            response = webClient.form( new Form() );
 
             if ( response.getStatus() == javax.ws.rs.core.Response.Status.OK.getStatusCode()
                     || response.getStatus() == javax.ws.rs.core.Response.Status.ACCEPTED.getStatusCode() )
@@ -262,7 +270,7 @@ public class CommandProcessor implements RestProcessor
         }
         finally
         {
-            RestUtil.close( webClient );
+            RestUtil.close( response, webClient );
         }
     }
 
@@ -276,7 +284,18 @@ public class CommandProcessor implements RestProcessor
 
     protected String getResourceHostIp( ResourceHostInfo resourceHostInfo )
     {
-        return resourceHostInfo.getHostInterfaces().findByName( Common.RH_INTERFACE ).getIp();
+
+        Set<HostInterface> hostInterfaces = Sets.newHashSet();
+        hostInterfaces.addAll( resourceHostInfo.getHostInterfaces().getAll() );
+
+        HostInterface hostInterface = ipUtil.findAddressableIface( hostInterfaces, resourceHostInfo.getId() );
+
+        if ( hostInterface instanceof NullHostInterface )
+        {
+            throw new RuntimeException( "Network interface not found" );
+        }
+
+        return hostInterface.getIp();
     }
 
 
@@ -298,6 +317,12 @@ public class CommandProcessor implements RestProcessor
     protected SecurityManager getSecurityManager()
     {
         return ServiceLocator.getServiceNoCache( SecurityManager.class );
+    }
+
+
+    protected LocalPeer getLocalPeer()
+    {
+        return ServiceLocator.getServiceNoCache( LocalPeer.class );
     }
 
 
@@ -341,7 +366,7 @@ public class CommandProcessor implements RestProcessor
             }
             else
             {
-                LOG.warn( String.format( "Callback not found for response: %s", JsonUtil.toJson( response ) ) );
+                LOG.warn( String.format( "Callback not found for response: %s", jsonUtil.to( response ) ) );
             }
 
             //update rh timestamp

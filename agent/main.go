@@ -123,10 +123,11 @@ func main() {
 
 		Name: "import", Usage: "import Subutai template",
 		Flags: []cli.Flag{
+			cli.BoolFlag{Name: "torrent", Usage: "use BitTorrent for downloading (experimental)"},
 			cli.StringFlag{Name: "v", Usage: "template version"},
 			cli.StringFlag{Name: "t", Usage: "token to access kurjun repo"}},
 		Action: func(c *cli.Context) error {
-			lib.LxcImport(c.Args().Get(0), c.String("v"), c.String("t"))
+			lib.LxcImport(c.Args().Get(0), c.String("v"), c.String("t"), c.Bool("torrent"))
 			return nil
 		}}, {
 

@@ -4,8 +4,8 @@ package io.subutai.common.peer;
 import io.subutai.common.host.ContainerHostInfo;
 import io.subutai.common.host.HostId;
 import io.subutai.common.metric.ProcessResourceUsage;
-import io.subutai.common.protocol.TemplateKurjun;
-import io.subutai.common.quota.ContainerQuota;
+import io.subutai.common.protocol.Template;
+import io.subutai.hub.share.quota.ContainerQuota;
 
 
 /**
@@ -31,10 +31,11 @@ public interface ContainerHost extends Host, ContainerHostInfo
 
     Peer getPeer();
 
-    TemplateKurjun getTemplate() throws PeerException;
+    Template getTemplate() throws PeerException;
 
     String getTemplateName();
 
+    String getTemplateId();
 
     boolean isLocal();
 

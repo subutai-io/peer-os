@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import io.subutai.common.command.CommandCallback;
 import io.subutai.common.command.CommandException;
 import io.subutai.common.command.CommandResult;
+import io.subutai.common.command.CommandResultImpl;
 import io.subutai.common.command.CommandStatus;
 import io.subutai.common.command.Request;
 import io.subutai.common.command.Response;
@@ -43,9 +44,9 @@ public class CommandProcess
     protected Semaphore semaphore;
     protected ExecutorService executor;
     private Request request;
-    private Session userSession;
+    protected Session userSession;
     private int expectedResponseNumber = 1;
-    private Set<Response> queuedResponses;
+    protected Set<Response> queuedResponses;
 
 
     public CommandProcess( final CommandProcessor commandProcessor, final CommandCallback callback,
@@ -131,7 +132,7 @@ public class CommandProcess
     }
 
 
-    private void processNextResponse( final Response response )
+    protected void processNextResponse( final Response response )
     {
         final CommandProcess THIS = this;
         if ( userSession != null )

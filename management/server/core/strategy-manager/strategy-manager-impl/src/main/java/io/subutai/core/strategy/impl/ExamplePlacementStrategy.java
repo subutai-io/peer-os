@@ -15,11 +15,11 @@ import io.subutai.common.environment.Node;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.PeerGroupResources;
-import io.subutai.common.resource.PeerResources;
 import io.subutai.core.strategy.api.ExampleStrategy;
 import io.subutai.core.strategy.api.StrategyException;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.PeerGroupResources;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -43,14 +43,6 @@ public class ExamplePlacementStrategy implements ExampleStrategy
     }
 
 
-    public ExamplePlacementStrategy()
-    {
-        scheme.add( new NodeSchema( "master", ContainerSize.TINY, "master", 0, 0 ) );
-        scheme.add( new NodeSchema( "hadoop", ContainerSize.TINY, "hadoop", 0, 0 ) );
-        scheme.add( new NodeSchema( "cassandra", ContainerSize.TINY, "cassandra", 0, 0 ) );
-    }
-
-
     @Override
     public String getId()
     {
@@ -66,27 +58,11 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
 
     @Override
-    public Topology distribute( final String environmentName, PeerGroupResources peerGroupResources,
-                                Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
-    {
-        Topology result = new Topology( environmentName );
-
-        Set<Node> nodes = distribute( getScheme(), peerGroupResources, quotas );
-        for ( Node node : nodes )
-        {
-            result.addNodePlacement( node.getPeerId(), node );
-        }
-
-        return result;
-    }
-
-
-    @Override
     public Topology distribute( final String environmentName, final List<NodeSchema> nodeSchema,
                                 final PeerGroupResources peerGroupResources,
                                 final Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException
     {
-        Topology result = new Topology( environmentName/*, sshGroupId, hostGroupId*/ );
+        Topology result = new Topology( environmentName );
 
         Set<Node> ng = distribute( nodeSchema, peerGroupResources, quotas );
         for ( Node node : ng )
@@ -131,9 +107,8 @@ public class ExamplePlacementStrategy implements ExampleStrategy
             boolean allocated = false;
             for ( ResourceAllocator resourceAllocator : preferredAllocators )
             {
-                allocated = resourceAllocator
-                        .allocate( containerName, nodeSchema.getTemplateName(), nodeSchema.getSize(),
-                                quotas.get( nodeSchema.getSize() ) );
+                allocated = resourceAllocator.allocate( containerName, nodeSchema.getTemplateId(), nodeSchema.getSize(),
+                        quotas.get( nodeSchema.getSize() ) );
                 if ( allocated )
                 {
                     break;
@@ -151,13 +126,14 @@ public class ExamplePlacementStrategy implements ExampleStrategy
 
         for ( ResourceAllocator resourceAllocator : allocators )
         {
-            List<ResourceAllocator.AllocatedContainer> containers = resourceAllocator.getContainers();
+            List<AllocatedContainer> containers = resourceAllocator.getContainers();
             if ( !containers.isEmpty() )
             {
-                for ( ResourceAllocator.AllocatedContainer container : containers )
+                for ( AllocatedContainer container : containers )
                 {
-                    Node node = new Node( container.getName(), container.getName(), container.getTemplateName(),
-                            container.getSize(), container.getPeerId(), container.getHostId() );
+                    Node node = new Node( container.getName(), container.getName(), container.getSize(),
+                            container.getPeerId(), container.getHostId(), container.getTemplateId() );
+
                     nodes.add( node );
                 }
             }

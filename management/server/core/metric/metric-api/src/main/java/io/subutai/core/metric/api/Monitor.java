@@ -14,6 +14,7 @@ import io.subutai.common.peer.AlertListener;
 import io.subutai.common.peer.ContainerId;
 import io.subutai.common.peer.Host;
 import io.subutai.core.metric.api.pojo.P2Pinfo;
+import io.subutai.hub.share.resource.HistoricalMetrics;
 
 
 /**
@@ -61,4 +62,6 @@ public interface Monitor
     void putAlert( Alert alert );
 
     List<P2Pinfo> getP2PStatus();
+
+    HistoricalMetrics getMetricsSeries( final Host host, Date startTime, Date endTime );
 }

@@ -3,8 +3,8 @@ package io.subutai.core.lxc.quota.cli;
 
 import org.apache.karaf.shell.commands.Command;
 
-import io.subutai.common.resource.ContainerResourceType;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
+import io.subutai.hub.share.resource.ContainerResourceType;
 
 
 @Command( scope = "quota", name = "list", description = "list all available resource types" )

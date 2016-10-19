@@ -3,6 +3,8 @@ package io.subutai.core.hubmanager.impl.processor;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +39,13 @@ public class HeartbeatProcessor implements Runnable
 
     private long lastSentMillis = 0;
 
-    private int fastModeLeft = 0;
+    private volatile int fastModeLeft = 0;
 
     private volatile boolean inProgress = false;
 
     private String peerId;
+
+    private Executor processorPool = Executors.newCachedThreadPool();
 
 
     public HeartbeatProcessor( HubManagerImpl hubManager, HubRestClient restClient, String peerId )
@@ -51,6 +55,35 @@ public class HeartbeatProcessor implements Runnable
         this.peerId = peerId;
 
         path = String.format( "/rest/v1.3/peers/%s/heartbeat/", peerId );
+
+        addShutDownHook();
+    }
+
+
+    private void addShutDownHook()
+    {
+        Runtime.getRuntime().addShutdownHook( new Thread()
+        {
+            public void run()
+            {
+                try
+                {
+                    log.warn( "Shutting down hub manager" );
+                    String url = path + "shutdown-hook";
+
+                    RestResult<Object> restResult = restClient.post( url, null );
+
+                    if ( restResult.isSuccess() )
+                    {
+                        log.info( "Shutdown hook successfully sent to Hub" );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    //ignore
+                }
+            }
+        } );
     }
 
 
@@ -82,9 +115,9 @@ public class HeartbeatProcessor implements Runnable
     /**
      * @param force is true if a heartbeat is sent not by scheduler, e.g. manually or triggered from Hub.
      *
-     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option
-     * is used to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor
-     * sets this option. See HubEnvironmentProcessor for example.
+     * Normally heartbeats happen with an interval defined by BIG_INTERVAL_SECONDS. But the "fast mode" option is used
+     * to make heartbeats faster, i.e. in SMALL_INTERVAL_SECONDS. Return value of StateLinkProcessor sets this option.
+     * See HubEnvironmentProcessor for example.
      */
     public void sendHeartbeat( boolean force ) throws Exception
     {
@@ -151,25 +184,32 @@ public class HeartbeatProcessor implements Runnable
     }
 
 
-    private void processStateLinks( Set<String> stateLinks )
+    private void processStateLinks( final Set<String> stateLinks )
     {
         log.info( "stateLinks: {}", stateLinks );
 
-        for ( StateLinkProcessor processor : processors )
+        for ( final StateLinkProcessor processor : processors )
         {
-            try
+            processorPool.execute( new Runnable()
             {
-                boolean fastModeAsked = processor.processStateLinks( stateLinks );
-
-                if ( fastModeAsked )
+                @Override
+                public void run()
                 {
-                    fastModeLeft = FAST_MODE_MAX;
+                    try
+                    {
+                        boolean fastModeAsked = processor.processStateLinks( stateLinks );
+
+                        if ( fastModeAsked )
+                        {
+                            fastModeLeft = FAST_MODE_MAX;
+                        }
+                    }
+                    catch ( Exception e )
+                    {
+                        log.error( "Error to process state links: ", e );
+                    }
                 }
-            }
-            catch ( Exception e )
-            {
-                log.error( "Error to process state links: ", e );
-            }
+            } );
         }
     }
 }

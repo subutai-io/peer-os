@@ -9,7 +9,7 @@ import io.subutai.core.environment.impl.entity.EnvironmentContainerImpl;
 import io.subutai.core.environment.impl.entity.EnvironmentImpl;
 
 
-public class RenameContainerTask extends TaskUtil.Task<EnvironmentContainerImpl>
+public class RenameContainerTask extends TaskUtil.Task<Object>
 {
     private final EnvironmentImpl environment;
     private final HostId containerId;
@@ -34,7 +34,7 @@ public class RenameContainerTask extends TaskUtil.Task<EnvironmentContainerImpl>
                 ( EnvironmentContainerImpl ) environment.getContainerHostById( containerId.getId() );
 
         newFullHostname = String.format( "%s-%d-%s", newHostname.replaceAll( "\\s+", "" ),
-                environment.getPeerConf( environmentContainer.getPeerId() ).getVlan(),
+                environment.getEnvironmentPeer( environmentContainer.getPeerId() ).getVlan(),
                 StringUtils.substringAfterLast( environmentContainer.getIp(), "." ) );
 
         oldHostname = environmentContainer.getHostname();

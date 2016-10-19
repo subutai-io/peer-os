@@ -6,7 +6,7 @@
   <parent>
     <groupId>io.subutai</groupId>
     <artifactId>peer-manager-parent</artifactId>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>peer-manager-impl</artifactId>
@@ -34,10 +34,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>command-executor-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>kurjun-api</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -83,11 +79,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-      <version>${jackson-jaxrs.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

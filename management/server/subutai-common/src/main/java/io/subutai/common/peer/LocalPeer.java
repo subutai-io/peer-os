@@ -7,8 +7,9 @@ import java.util.Set;
 import io.subutai.common.network.ProxyLoadBalanceStrategy;
 import io.subutai.common.network.ReservedNetworkResources;
 import io.subutai.common.network.SshTunnel;
-import io.subutai.common.protocol.TemplateKurjun;
+import io.subutai.common.protocol.Template;
 import io.subutai.common.util.HostUtil;
+import io.subutai.hub.share.resource.PeerResources;
 
 
 /**
@@ -19,21 +20,15 @@ public interface LocalPeer extends Peer
 
 
     /**
-     * Returns external IP of mgmt host
-     */
-    String getExternalIp();
-
-
-    /**
      * Binds host with given ID
      *
      * @param id ID of the host
      *
      * @return if host is registered and connected returns implementation of this host, otherwise throws exception.
      */
-    public Host bindHost( String id ) throws HostNotFoundException;
+    Host bindHost( String id ) throws HostNotFoundException;
 
-    public Host bindHost( ContainerId id ) throws HostNotFoundException;
+    Host bindHost( ContainerId id ) throws HostNotFoundException;
 
 
     /**
@@ -45,22 +40,22 @@ public interface LocalPeer extends Peer
     /**
      * Returns resource host instance by its hostname
      */
-    public ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
+    ResourceHost getResourceHostByName( String hostname ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by its id
      */
-    public ResourceHost getResourceHostById( String hostId ) throws HostNotFoundException;
+    ResourceHost getResourceHostById( String hostId ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by hostname of its container
      */
-    public ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
+    ResourceHost getResourceHostByContainerName( String containerName ) throws HostNotFoundException;
 
     /**
      * Returns resource host instance by id ot its container
      */
-    public ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
+    ResourceHost getResourceHostByContainerId( String hostId ) throws HostNotFoundException;
 
 
     /**
@@ -69,34 +64,34 @@ public interface LocalPeer extends Peer
      * @param hostname name of the container
      */
 
-    public ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
+    ContainerHost getContainerHostByName( String hostname ) throws HostNotFoundException;
 
     /**
      * Returns implementation of ContainerHost interface.
      *
      * @param hostId ID of the container
      */
-    public ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
+    ContainerHost getContainerHostById( String hostId ) throws HostNotFoundException;
 
 
     /**
      * Returns instance of management host
      */
-    public ResourceHost getManagementHost() throws HostNotFoundException;
+    ResourceHost getManagementHost() throws HostNotFoundException;
 
     /**
      * Returns all local peer's resource hosts
      */
-    public Set<ResourceHost> getResourceHosts();
+    Set<ResourceHost> getResourceHosts();
 
 
-    public void addRequestListener( RequestListener listener );
+    void addRequestListener( RequestListener listener );
 
-    public void removeRequestListener( RequestListener listener );
+    void removeRequestListener( RequestListener listener );
 
-    public Set<RequestListener> getRequestListeners();
+    Set<RequestListener> getRequestListeners();
 
-    public void removeResourceHost( String rhId ) throws HostNotFoundException;
+    void removeResourceHost( String rhId ) throws HostNotFoundException;
 
 
     /**
@@ -106,14 +101,14 @@ public interface LocalPeer extends Peer
      *
      * @return - domain or null if no domain assigned to the vni
      */
-    public String getVniDomain( Long vni ) throws PeerException;
+    String getVniDomain( Long vni ) throws PeerException;
 
     /**
      * Removes domain from vni if any
      *
      * @param vni -vni
      */
-    public void removeVniDomain( Long vni ) throws PeerException;
+    void removeVniDomain( Long vni ) throws PeerException;
 
     /**
      * Assigns domain to vni
@@ -124,8 +119,8 @@ public interface LocalPeer extends Peer
      * @param sslCertPath - path to SSL certificate to enable HTTPS access to domai only, null if not needed
      */
 
-    public void setVniDomain( Long vni, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy,
-                              String sslCertPath ) throws PeerException;
+    void setVniDomain( Long vni, String domain, ProxyLoadBalanceStrategy proxyLoadBalanceStrategy, String sslCertPath )
+            throws PeerException;
 
 
     /**
@@ -134,21 +129,21 @@ public interface LocalPeer extends Peer
      * @param hostIp - ip of host to check
      * @param vni - vni
      */
-    public boolean isIpInVniDomain( String hostIp, Long vni ) throws PeerException;
+    boolean isIpInVniDomain( String hostIp, Long vni ) throws PeerException;
 
-    public void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
+    void addIpToVniDomain( String hostIp, Long vni ) throws PeerException;
 
-    public void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
+    void removeIpFromVniDomain( String hostIp, Long vni ) throws PeerException;
 
     Set<ContainerHost> findContainersByEnvironmentId( final String environmentId );
 
     Set<ContainerHost> findContainersByOwnerId( final String ownerId );
 
-    List<TemplateKurjun> getTemplates();
+    PeerResources getResources();
 
-    TemplateKurjun getTemplateByName( String templateName );
+    Set<Template> getTemplates();
 
-    SshTunnel setupSshTunnelForContainer( String containerHostId, int sshIdleTimeout ) throws PeerException;
+    SshTunnel setupSshTunnelForContainer( String containerIp, int sshIdleTimeout ) throws PeerException;
 
     List<ContainerHost> getPeerContainers( String peerId );
 
@@ -158,11 +153,11 @@ public interface LocalPeer extends Peer
 
     void cancelAllTasks();
 
-    public void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception;
+    void exchangeKeys( ResourceHost resourceHost, String hostname ) throws Exception;
 
     void setPeerInfo( PeerInfo peerInfo );
 
-    public ReservedNetworkResources getReservedNetworkResources() throws PeerException;
+    ReservedNetworkResources getReservedNetworkResources() throws PeerException;
 
     /**
      * Returns true if peer in initialized
@@ -177,5 +172,9 @@ public interface LocalPeer extends Peer
     Set<ContainerHost> listOrphanContainers();
 
     void removeOrphanContainers();
+
+    Template getTemplateByName( String templateName ) throws PeerException;
+
+    Template getTemplateById( String templateId ) throws PeerException;
 }
 

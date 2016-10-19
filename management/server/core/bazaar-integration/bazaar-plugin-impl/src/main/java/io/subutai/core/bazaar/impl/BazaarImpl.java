@@ -1,11 +1,14 @@
 package io.subutai.core.bazaar.impl;
 
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.SynchronousBundleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +22,9 @@ import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerProductDataDto;
 
 
-public class BazaarImpl implements Bazaar, HubEventListener
+public class BazaarImpl implements Bazaar, HubEventListener, SynchronousBundleListener
 {
-	private static final Logger LOG = LoggerFactory.getLogger( BazaarImpl.class );
+    private static final Logger LOG = LoggerFactory.getLogger( BazaarImpl.class );
     private HubManager hubManager;
     private DaoManager daoManager;
     private ConfigDataService configDataService;
@@ -32,16 +35,17 @@ public class BazaarImpl implements Bazaar, HubEventListener
         this.daoManager = daoManager;
         this.configDataService = new ConfigDataServiceImpl( this.daoManager );
         this.hubManager = hubManager;
-	}
+    }
 
 
-	@Override
-	public String getChecksum ()
-	{
-		return this.hubManager.getChecksum();
-	}
+    @Override
+    public String getChecksum()
+    {
+        return this.hubManager.getChecksum();
+    }
 
-	@Override
+
+    @Override
     public String getProducts()
     {
         try
@@ -68,7 +72,7 @@ public class BazaarImpl implements Bazaar, HubEventListener
     @Override
     public void installPlugin( String name, String version, String kar, String url, String uid ) throws Exception
     {
-        this.hubManager.installPlugin(kar, name, uid );
+        this.hubManager.installPlugin( kar, name, uid );
         this.configDataService.savePlugin( name, version, kar, url, uid );
     }
 
@@ -81,14 +85,16 @@ public class BazaarImpl implements Bazaar, HubEventListener
         this.configDataService.deletePlugin( id );
     }
 
-	@Override
-	public void restorePlugin (Long id, String name, String version, String kar, String url, String uid) throws Exception
-	{
-		this.hubManager.uninstallPlugin( name, uid );
-		this.hubManager.installPlugin(kar, name, uid );
-		this.configDataService.deletePlugin (id);
-		this.configDataService.savePlugin( name, version, kar, url, uid );
-	}
+
+    @Override
+    public void restorePlugin( Long id, String name, String version, String kar, String url, String uid )
+            throws Exception
+    {
+        this.hubManager.uninstallPlugin( name, uid );
+        this.hubManager.installPlugin( kar, name, uid );
+        this.configDataService.deletePlugin( id );
+        this.configDataService.savePlugin( name, version, kar, url, uid );
+    }
 
 
     @Override
@@ -120,7 +126,7 @@ public class BazaarImpl implements Bazaar, HubEventListener
                             name = product.getString( "name" );
                             version = product.getString( "version" );
                             JSONArray metadata = product.getJSONArray( "metadata" );
-                            kar = metadata.length() > 0? metadata.getString( 0 ) : "";
+                            kar = metadata.length() > 0 ? metadata.getString( 0 ) : "";
                             url = name.toLowerCase();
                         }
                     }
@@ -138,6 +144,27 @@ public class BazaarImpl implements Bazaar, HubEventListener
         catch ( Throwable t )
         {
             LOG.error( "Failed to handle plugin event [{}]: {}", pluginUid, t.getMessage() );
+        }
+    }
+
+
+    public void init()
+    {
+        BundleContext ctx = FrameworkUtil.getBundle( getClass() ).getBundleContext();
+
+        ctx.addBundleListener( this );
+    }
+
+
+    @Override
+    public void bundleChanged( final BundleEvent event )
+    {
+        if ( event.getType() == BundleEvent.STARTED )
+        {
+            // bundle name e.g. Subutai Cassandra Plugin Web UI
+            String bundleName = event.getBundle().getHeaders().get( "Bundle-Name" );
+            // bundle version
+            String version = event.getBundle().getVersion().toString();
         }
     }
 }

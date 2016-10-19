@@ -9,7 +9,7 @@ import io.subutai.common.peer.LocalPeer;
 import io.subutai.core.identity.rbac.cli.SubutaiShellCommandSupport;
 
 
-@Command( scope = "peer", name = "stop-container" )
+@Command( scope = "localpeer", name = "stop-container" )
 public class StopContainerCommand extends SubutaiShellCommandSupport
 {
 

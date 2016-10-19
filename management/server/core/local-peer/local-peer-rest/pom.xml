@@ -6,7 +6,7 @@
   <parent>
     <artifactId>local-peer-parent</artifactId>
     <groupId>io.subutai</groupId>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>local-peer-rest</artifactId>
@@ -52,11 +52,6 @@
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-      <version>${jackson-jaxrs.version}</version>
     </dependency>
 
     <dependency>

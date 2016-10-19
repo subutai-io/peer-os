@@ -2,8 +2,6 @@ package io.subutai.core.hubmanager.impl;
 
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Date;
@@ -49,13 +47,17 @@ import io.subutai.core.hubmanager.impl.dao.ConfigDataServiceImpl;
 import io.subutai.core.hubmanager.impl.environment.HubEnvironmentProcessor;
 import io.subutai.core.hubmanager.impl.environment.state.Context;
 import io.subutai.core.hubmanager.impl.http.HubRestClient;
+import io.subutai.core.hubmanager.impl.processor.ContainerCommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ContainerEventProcessor;
 import io.subutai.core.hubmanager.impl.processor.EnvironmentUserHelper;
 import io.subutai.core.hubmanager.impl.processor.HeartbeatProcessor;
 import io.subutai.core.hubmanager.impl.processor.HubLoggerProcessor;
 import io.subutai.core.hubmanager.impl.processor.ProductProcessor;
+import io.subutai.core.hubmanager.impl.processor.RegistrationRequestProcessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostCommandProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostDataProcessor;
 import io.subutai.core.hubmanager.impl.processor.ResourceHostMonitorProcessor;
+import io.subutai.core.hubmanager.impl.processor.ResourceHostRegisterProcessor;
 import io.subutai.core.hubmanager.impl.processor.SystemConfProcessor;
 import io.subutai.core.hubmanager.impl.processor.VehsProcessor;
 import io.subutai.core.hubmanager.impl.processor.VersionInfoProcessor;
@@ -65,6 +67,7 @@ import io.subutai.core.identity.api.IdentityManager;
 import io.subutai.core.identity.api.model.User;
 import io.subutai.core.metric.api.Monitor;
 import io.subutai.core.peer.api.PeerManager;
+import io.subutai.core.registration.api.HostRegistrationManager;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.hub.share.common.HubEventListener;
 import io.subutai.hub.share.dto.PeerDto;
@@ -102,6 +105,8 @@ public class HubManagerImpl implements HubManager
 
     private final ScheduledExecutorService sumChecker = Executors.newSingleThreadScheduledExecutor();
 
+    private final ScheduledExecutorService registrationRequestExecutor = Executors.newSingleThreadScheduledExecutor();
+
     private final ExecutorService asyncHeartbeatExecutor = Executors.newFixedThreadPool( 3 );
 
     private SecurityManager securityManager;
@@ -122,6 +127,8 @@ public class HubManagerImpl implements HubManager
 
     private IdentityManager identityManager;
 
+    private HostRegistrationManager registrationManager;
+
     private HeartbeatProcessor heartbeatProcessor;
 
     private ResourceHostDataProcessor resourceHostDataProcessor;
@@ -129,6 +136,8 @@ public class HubManagerImpl implements HubManager
     private ContainerEventProcessor containerEventProcessor;
 
     private VersionInfoProcessor versionInfoProcessor;
+
+    private RegistrationRequestProcessor registrationRequestProcessor;
 
     private final Set<HubEventListener> hubEventListeners = Sets.newConcurrentHashSet();
 
@@ -204,6 +213,12 @@ public class HubManagerImpl implements HubManager
 
             versionEventExecutor.scheduleWithFixedDelay( versionInfoProcessor, 20, 120, TimeUnit.SECONDS );
 
+            registrationRequestProcessor =
+                    new RegistrationRequestProcessor( this, peerManager, registrationManager, restClient );
+
+            registrationRequestExecutor
+                    .scheduleWithFixedDelay( registrationRequestProcessor, 20, 30, TimeUnit.SECONDS );
+
             EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                     new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
@@ -252,6 +267,13 @@ public class HubManagerImpl implements HubManager
         EnvironmentTelemetryProcessor environmentTelemetryProcessor =
                 new EnvironmentTelemetryProcessor( this, peerManager, configManager );
 
+        StateLinkProcessor resourceHostRegisterProcessor =
+                new ResourceHostRegisterProcessor( registrationManager, peerManager, restClient );
+
+        StateLinkProcessor containerCommandProcessor = new ContainerCommandProcessor( ctx );
+
+        StateLinkProcessor resourceHostCommandProcessor = new ResourceHostCommandProcessor( ctx );
+
         heartbeatProcessor =
                 new HeartbeatProcessor( this, restClient, localPeer.getId() ).addProcessor( tunnelProcessor )
                                                                              .addProcessor( hubEnvironmentProcessor )
@@ -260,7 +282,12 @@ public class HubManagerImpl implements HubManager
                                                                              .addProcessor( vehsProccessor )
                                                                              .addProcessor( appScaleProcessor )
                                                                              .addProcessor(
-                                                                                     environmentTelemetryProcessor );
+                                                                                     environmentTelemetryProcessor )
+                                                                             .addProcessor(
+                                                                                     resourceHostRegisterProcessor )
+                                                                             .addProcessor( containerCommandProcessor )
+                                                                             .addProcessor(
+                                                                                     resourceHostCommandProcessor );
 
         heartbeatExecutorService
                 .scheduleWithFixedDelay( heartbeatProcessor, 10, HeartbeatProcessor.SMALL_INTERVAL_SECONDS,
@@ -279,7 +306,7 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendHeartbeat() throws Exception
     {
-        resourceHostDataProcessor.process();
+        resourceHostDataProcessor.process( false );
         heartbeatProcessor.sendHeartbeat( true );
         containerEventProcessor.process();
     }
@@ -311,23 +338,25 @@ public class HubManagerImpl implements HubManager
     @Override
     public void sendResourceHostInfo() throws Exception
     {
-        resourceHostDataProcessor.process();
+        resourceHostDataProcessor.process( true );
     }
 
 
     @RolesAllowed( { "Peer-Management|Delete", "Peer-Management|Update" } )
     @Override
-    public void registerPeer( String hupIp, String email, String password ) throws Exception
+    public void registerPeer( String hupIp, String email, String password, String peerName ) throws Exception
     {
         RegistrationManager registrationManager = new RegistrationManager( this, configManager, hupIp );
 
-        registrationManager.registerPeer( email, password );
+        registrationManager.registerPeer( email, password, peerName );
 
         generateChecksum();
 
         notifyRegistrationListeners();
 
         sendResourceHostInfo();
+
+        registrationRequestProcessor.run();
     }
 
 
@@ -423,57 +452,6 @@ public class HubManagerImpl implements HubManager
     @Override
     public void installPlugin( String url, String name, String uid ) throws Exception
     {
-        /*try
-        {
-            TrustManager[] trustAllCerts = new TrustManager[] {
-                    new X509TrustManager()
-                    {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers()
-                        {
-                            return null;
-                        }
-
-
-                        public void checkClientTrusted( java.security.cert.X509Certificate[] certs, String authType )
-                        {
-                        }
-
-
-                        public void checkServerTrusted( java.security.cert.X509Certificate[] certs, String authType )
-                        {
-                        }
-                    }
-            };
-
-            // Activate the new trust manager
-            try
-            {
-                SSLContext sc = SSLContext.getInstance( "SSL" );
-                sc.init( null, trustAllCerts, new java.security.SecureRandom() );
-                HttpsURLConnection.setDefaultSSLSocketFactory( sc.getSocketFactory() );
-            }
-            catch ( Exception e )
-            {
-            }
-
-            // And as before now you can use URL and URLConnection
-
-
-            File file =
-                    new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-            URL website = new URL( url );
-            URLConnection connection = website.openConnection();
-            InputStream in = connection.getInputStream();
-            OutputStream out = new FileOutputStream( file );
-            IOUtils.copy( in, out );
-            in.close();
-            out.close();
-            //            FileUtils.copyURLToFile( website, file );
-        }
-        catch ( IOException e )
-        {
-            throw new Exception( "Could not install plugin", e );
-        }*/
         WebClient webClient = RestUtil.createTrustedWebClient( url );
         File product = webClient.get( File.class );
         InputStream initialStream = FileUtils.openInputStream( product );
@@ -510,32 +488,7 @@ public class HubManagerImpl implements HubManager
     public void uninstallPlugin( final String name, final String uid )
     {
         File file = new File( String.format( "%s/deploy", System.getProperty( "karaf.home" ) ) + "/" + name + ".kar" );
-        log.info( file.getAbsolutePath() );
-        File repo = new File( "/opt/subutai-mng/system/io/subutai/" );
-        File[] dirs = repo.listFiles( new FileFilter()
-        {
-            @Override
-            public boolean accept( File pathname )
-            {
-                return pathname.getName().matches( ".*" + name.toLowerCase() + ".*" );
-            }
-        } );
-        if ( dirs != null )
-        {
-            for ( File f : dirs )
-            {
-                log.info( f.getAbsolutePath() );
-                try
-                {
-                    FileUtils.deleteDirectory( f );
-                    log.debug( f.getName() + " is removed." );
-                }
-                catch ( IOException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
+
         if ( file.delete() )
         {
             log.debug( file.getName() + " is removed." );
@@ -665,6 +618,12 @@ public class HubManagerImpl implements HubManager
     public void setIdentityManager( final IdentityManager identityManager )
     {
         this.identityManager = identityManager;
+    }
+
+
+    public void setRegistrationManager( final HostRegistrationManager registrationManager )
+    {
+        this.registrationManager = registrationManager;
     }
 
 

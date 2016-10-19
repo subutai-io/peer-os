@@ -1,12 +1,12 @@
 package io.subutai.common.metric;
 
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import io.subutai.common.host.InstanceType;
 import io.subutai.common.host.ResourceHostInfoModel;
 
 
@@ -15,6 +15,10 @@ import io.subutai.common.host.ResourceHostInfoModel;
  */
 public class ResourceHostMetric extends BaseMetric
 {
+    @Expose
+    @JsonProperty
+    private InstanceType instanceType;
+
     @Expose
     @SerializedName( "host" )
     @JsonProperty( "host" )
@@ -35,8 +39,13 @@ public class ResourceHostMetric extends BaseMetric
     @JsonProperty( "Disk" )
     protected Disk disk;
 
+    @Expose
     @JsonProperty
     private Integer containersCount;
+
+    @Expose
+    @JsonProperty
+    private boolean management;
 
 
     public ResourceHostMetric()
@@ -54,6 +63,7 @@ public class ResourceHostMetric extends BaseMetric
     {
         super( peerId, hostInfo );
         this.containersCount = hostInfo.getContainers().size();
+        this.instanceType = hostInfo.getInstanceType();
     }
 
 
@@ -128,6 +138,13 @@ public class ResourceHostMetric extends BaseMetric
 
 
     @JsonIgnore
+    public InstanceType getInstanceType()
+    {
+        return instanceType;
+    }
+
+
+    @JsonIgnore
     public double getCpuFrequency()
     {
         return cpu.getFrequency();
@@ -153,5 +170,17 @@ public class ResourceHostMetric extends BaseMetric
         return String
                 .format( "%s %s, CPU used:%f, Free ram: %f, Available disk space: %f", super.toString(), getCpuModel(),
                         getUsedCpu(), getFreeRam(), getAvailableSpace() );
+    }
+
+
+    public void setManagement( final boolean management )
+    {
+        this.management = management;
+    }
+
+
+    public boolean isManagement()
+    {
+        return management;
     }
 }

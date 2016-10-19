@@ -640,9 +640,12 @@ public class KeyManagerImpl implements KeyManager
             {
                 String fingerprint = getFingerprint( identityId );
 
-                securityDataService.removeKeyData( identityId );
-                securityDataService.removeSecretKeyData( identityId );
-                securityDataService.removeKeyAllTrustData( fingerprint );
+                if ( fingerprint != null )
+                {
+                    securityDataService.removeKeyData( identityId );
+                    securityDataService.removeSecretKeyData( identityId );
+                    securityDataService.removeKeyAllTrustData( fingerprint );
+                }
             }
         }
         catch ( Exception ex )
@@ -1115,7 +1118,7 @@ public class KeyManagerImpl implements KeyManager
                 if ( response.getStatus() == Response.Status.OK.getStatusCode() )
                 {
                     String publicKeyring = response.readEntity( String.class );
-                    savePublicKeyRing( peerInfo.getId(), ( short ) 3, publicKeyring );
+                    savePublicKeyRing( peerInfo.getId(), SecurityKeyType.PeerKey.getId(), publicKeyring );
                 }
 
                 RestUtil.close( response );

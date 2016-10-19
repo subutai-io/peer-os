@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.security.AccessControlException;
 
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.openpgp.PGPException;
@@ -24,9 +23,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
-import io.subutai.common.settings.ChannelSettings;
-import io.subutai.common.settings.Common;
-import io.subutai.common.settings.SystemSettings;
 import io.subutai.core.security.api.SecurityManager;
 import io.subutai.core.security.api.crypto.EncryptionTool;
 import io.subutai.core.security.api.crypto.KeyManager;
@@ -82,25 +78,6 @@ public class MessageContentUtil
     }
 
 
-    //***************************************************************************
-    public static int checkUrlAccessibility( HttpServletRequest req )
-    {
-        int inPort = req.getLocalPort();
-        String basePath = req.getRequestURI();
-
-
-        if ( inPort == Common.DEFAULT_PUBLIC_PORT )
-        {
-            if ( !ChannelSettings.checkURLAccess( basePath ) )
-            {
-                return 1;
-            }
-        }
-
-        return 0;
-    }
-
-
     /* ******************************************************
      *
      */
@@ -141,7 +118,7 @@ public class MessageContentUtil
     /* ******************************************************
      *
      */
-    private static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
+    protected static byte[] decryptData( SecurityManager securityManager, String hostIdSource, String hostIdTarget,
                                        byte[] data ) throws PGPException
     {
 
@@ -155,7 +132,6 @@ public class MessageContentUtil
             {
                 EncryptionTool encTool = securityManager.getEncryptionTool();
 
-                //encTool.
 
                 KeyManager keyMan = securityManager.getKeyManager();
                 PGPSecretKeyRing secKey = keyMan.getSecretKeyRing( hostIdSource );
@@ -180,11 +156,6 @@ public class MessageContentUtil
         }
     }
 
-
-    private static URL getURL( final Message message ) throws MalformedURLException
-    {
-        return new URL( ( String ) message.getExchange().getOutMessage().get( Message.ENDPOINT_ADDRESS ) );
-    }
 
 
     /* ******************************************************

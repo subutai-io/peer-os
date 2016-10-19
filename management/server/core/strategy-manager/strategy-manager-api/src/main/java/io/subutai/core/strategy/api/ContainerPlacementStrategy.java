@@ -7,8 +7,8 @@ import java.util.Map;
 import io.subutai.common.environment.NodeSchema;
 import io.subutai.common.environment.Topology;
 import io.subutai.common.peer.ContainerSize;
-import io.subutai.common.quota.ContainerQuota;
-import io.subutai.common.resource.PeerGroupResources;
+import io.subutai.hub.share.quota.ContainerQuota;
+import io.subutai.hub.share.resource.PeerGroupResources;
 
 
 /**
@@ -21,9 +21,6 @@ public interface ContainerPlacementStrategy
     String getTitle();
 
     List<NodeSchema> getScheme();
-
-    Topology distribute( String environmentName, PeerGroupResources peerGroupResources,
-                         Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException;
 
     Topology distribute( String environmentName, List<NodeSchema> nodegroups, PeerGroupResources peerGroupResources,
                          Map<ContainerSize, ContainerQuota> quotas ) throws StrategyException;

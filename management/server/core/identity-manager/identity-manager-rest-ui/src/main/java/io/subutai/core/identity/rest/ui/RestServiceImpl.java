@@ -59,7 +59,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllUsers() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllUsers().stream()
+                                                            .filter( user -> user.getType() != UserType.System.getId() )
+                                                            .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {
@@ -362,7 +364,9 @@ public class RestServiceImpl implements RestService
     {
         try
         {
-            return Response.ok( jsonUtil.to( identityManager.getAllRoles() ) ).build();
+            return Response.ok( jsonUtil.to( identityManager.getAllRoles().stream()
+                                                            .filter( role -> role.getType() != UserType.System.getId() )
+                                                            .collect( Collectors.toList() ) ) ).build();
         }
         catch ( Exception e )
         {

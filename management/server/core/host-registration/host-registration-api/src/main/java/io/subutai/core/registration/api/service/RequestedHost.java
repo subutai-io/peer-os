@@ -5,30 +5,26 @@ import java.util.Set;
 
 import io.subutai.common.host.HostArchitecture;
 import io.subutai.common.host.HostInterface;
-import io.subutai.core.registration.api.RegistrationStatus;
+import io.subutai.core.registration.api.ResourceHostRegistrationStatus;
 
 
 public interface RequestedHost
 {
-    public String getId();
+    String getId();
 
-    public String getHostname();
+    String getHostname();
 
-    public Set<HostInterface> getNetHostInterfaces();
+    Set<HostInterface> getInterfaces();
 
-    public Set<ContainerInfo> getHostInfos();
+    Set<ContainerInfo> getHostInfos();
 
-    public HostArchitecture getArch();
+    HostArchitecture getArch();
 
-    public RegistrationStatus getStatus();
+    ResourceHostRegistrationStatus getStatus();
 
-    public String getPublicKey();
+    String getPublicKey();
 
-    public String getRestHook();
+    String getSecret();
 
-    public void setRestHook( String restHook );
-
-    public String getSecret();
-
-    public String getCert();
+    String getCert();
 }

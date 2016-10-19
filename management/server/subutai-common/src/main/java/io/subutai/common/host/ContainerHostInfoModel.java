@@ -1,8 +1,7 @@
 package io.subutai.common.host;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.gson.annotations.SerializedName;
 
