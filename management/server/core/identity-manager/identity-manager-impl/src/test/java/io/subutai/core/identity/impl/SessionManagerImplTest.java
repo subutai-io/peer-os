@@ -2,7 +2,6 @@ package io.subutai.core.identity.impl;
 
 
 import java.util.Date;
-import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +12,6 @@ import org.apache.commons.lang.time.DateUtils;
 
 import io.subutai.core.identity.api.SessionManager;
 import io.subutai.core.identity.api.model.Session;
-import io.subutai.core.identity.api.model.User;
 import io.subutai.core.identity.impl.model.UserEntity;
 
 import static junit.framework.Assert.assertTrue;
@@ -30,10 +28,10 @@ public class SessionManagerImplTest
 {
     private String sessionId = null;
     private Session session = null;
-    private User user = null;
+    //private User user = null;
 
     //@Mock
-    private SessionManager sessionManager;
+    private SessionManager sessionManager = null;
 
 
     /* *************************************************
@@ -44,8 +42,8 @@ public class SessionManagerImplTest
         sessionManager = new SessionManagerImpl(null);
 
         sessionId = "TestSessionId";
-        user = new UserEntity();
-        session = sessionManager.startSession(sessionId , session ,user );
+        //user = new UserEntity();
+        session = sessionManager.startSession(sessionId , session ,new UserEntity() );
     }
 
 
